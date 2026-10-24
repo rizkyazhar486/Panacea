@@ -6,7 +6,7 @@ import { pathToFileURL } from 'node:url'
 const routes = ['#/', '#/chatbot', '#/settings', '#/profile', '#/fitness-hub', '#/all-features']
 
 export function verifyNegativeEvidence(mode, report) {
-  assert.ok(['bocor', 'overflow'].includes(mode), 'unknown negative-control mode')
+  assert.ok(['bocor', 'overflow', 'galat-render'].includes(mode), 'unknown negative-control mode')
   assert.equal(report?.lulus, 1, 'negative control must complete its positive warmup')
   assert.equal(report?.gagal, 1, 'negative control must have exactly one detector failure')
   assert.equal(report?.hasil?.length, 2, 'negative control must stop at the first detector step')
@@ -31,6 +31,8 @@ export function verifyNegativeEvidence(mode, report) {
     const reason = diagnostics[i].slice(prefix.length)
     if (mode === 'bocor') {
       assert.equal(reason, 'teks bocor saat lambat: [object Object],NaN', `wrong leak detector failure: ${route}`)
+    } else if (mode === 'galat-render') {
+      assert.equal(reason, 'galat render (layar ErrorBoundary tampil) saat lambat', `wrong render-error detector failure: ${route}`)
     } else {
       const match = /^overflow (\d+(?:\.\d+)?)px saat lambat$/.exec(reason)
       assert.ok(match && Number.isFinite(Number(match[1])) && Number(match[1]) > 1, `wrong overflow detector failure: ${route}`)

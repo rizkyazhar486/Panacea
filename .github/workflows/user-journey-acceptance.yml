@@ -111,7 +111,7 @@ jobs:
           }
           fresh_server resilience
           QA_OUT="$RUNNER_TEMP/user-journey-resilience-evidence.json" QA_URL=http://localhost:5190/ node scripts/qa/user-journey-resilience.mjs || rc=1
-          for mode in bocor overflow; do
+          for mode in bocor overflow galat-render; do
             fresh_server "negatif-$mode"
             if QA_SABOTASE=$mode QA_OUT="$RUNNER_TEMP/user-journey-resilience-negatif-$mode.json" QA_URL=http://localhost:5190/ node scripts/qa/user-journey-resilience.mjs; then
               echo "::error::Kontrol negatif '$mode' LOLOS: pendeteksi ketahanan tidak menangkap cacat yang disuntikkan"; rc=1
@@ -130,3 +130,4 @@ jobs:
             ${{ runner.temp }}/user-journey-resilience-evidence.json
             ${{ runner.temp }}/user-journey-resilience-negatif-bocor.json
             ${{ runner.temp }}/user-journey-resilience-negatif-overflow.json
+            ${{ runner.temp }}/user-journey-resilience-negatif-galat-render.json

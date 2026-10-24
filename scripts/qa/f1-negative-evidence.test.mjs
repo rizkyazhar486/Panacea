@@ -13,11 +13,11 @@ function evidence(mode) {
   return { lulus: 1, gagal: 1, hasil: [
     { ...common, ok: true, step: 'kontrol positif tanpa gangguan: tiap halaman terisi (pemanasan)', detail: Object.fromEntries(routes.map(route => [route, { chars: 500 }])) },
     { ...common, ok: false, step: 'API lambat (1500 ms): cangkang tetap tampil, tanpa overflow atau teks bocor',
-      detail: 'API lambat: ' + routes.map(route => `${route}: ${mode === 'bocor' ? 'teks bocor saat lambat: [object Object],NaN' : 'overflow 3610px saat lambat'}`).join(' | ') },
+      detail: 'API lambat: ' + routes.map(route => `${route}: ${{ bocor: 'teks bocor saat lambat: [object Object],NaN', overflow: 'overflow 3610px saat lambat', 'galat-render': 'galat render (layar ErrorBoundary tampil) saat lambat' }[mode]}`).join(' | ') },
   ] }
 }
 
-for (const mode of ['bocor', 'overflow']) {
+for (const mode of ['bocor', 'overflow', 'galat-render']) {
   test(`${mode}: accepts complete paired detector evidence without modifying it`, () => {
     const report = evidence(mode), before = structuredClone(report)
     assert.equal(verifyNegativeEvidence(mode, report), undefined)

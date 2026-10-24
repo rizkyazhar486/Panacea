@@ -21,9 +21,11 @@ const SLOW_MS = Number(process.env.QA_SLOW_MS || 1500)
 // Kontrol negatif bawaan: QA_SABOTASE=bocor|overflow menyuntikkan cacat ke SETIAP halaman di peramban nyata; perjalanan HARUS gagal dengan nama langkah.
 // (Membuktikan pendeteksi teks bocor dan overflow benar-benar bekerja tanpa membangun ulang aplikasi.)
 const SABOTASE = process.env.QA_SABOTASE || ''
-assert.ok(['', 'bocor', 'overflow'].includes(SABOTASE), `QA_SABOTASE tidak dikenal: ${SABOTASE}`)
+assert.ok(['', 'bocor', 'overflow', 'galat-render'].includes(SABOTASE), `QA_SABOTASE tidak dikenal: ${SABOTASE}`)
 const SKRIP_SABOTASE = { bocor: "document.addEventListener('DOMContentLoaded', () => { const d = document.createElement('div'); d.textContent = 'Saldo: NaN [object Object]'; document.body.appendChild(d) })",
-  overflow: "document.addEventListener('DOMContentLoaded', () => { const d = document.createElement('div'); d.style.cssText = 'width:4000px;height:1px'; document.body.appendChild(d) })" }
+  overflow: "document.addEventListener('DOMContentLoaded', () => { const d = document.createElement('div'); d.style.cssText = 'width:4000px;height:1px'; document.body.appendChild(d) })",
+  // Meniru layar ErrorBoundary akar (role=alert + judul tetap): halaman yang crash saat render harus terdeteksi walau teksnya cukup panjang untuk lolos 'terisi'.
+  'galat-render': "document.addEventListener('DOMContentLoaded', () => { const d = document.createElement('div'); d.setAttribute('role', 'alert'); d.innerHTML = '<h1>Something went wrong</h1><p>Sorry, an unexpected error occurred. Your data is safe. Try reloading the page.</p>'; document.body.appendChild(d) })" }
 
 const call = async (m, p, token, body) => {
   const r = await fetch(API + p, { method: m, headers: { 'content-type': 'application/json', ...(token ? { authorization: `Bearer ${token}` } : {}) }, body: body ? JSON.stringify(body) : undefined })
@@ -39,6 +41,8 @@ async function step(viewport, journey, name, fn) {
 }
 const BOCOR = ['[object Object]', 'undefined', 'NaN', 'TypeError', 'Cannot read']
 const bocor = (t) => BOCOR.filter((x) => t.includes(x))
+// Layar ErrorBoundary (src/components/layout/ErrorBoundary.tsx) adalah crash render yang DITANGKAP: tampil, tetapi halamannya tidak berfungsi.
+const galatRender = (page) => page.evaluate(() => [...document.querySelectorAll('[role="alert"]')].some((e) => /Something went wrong/.test(e.textContent || '')))
 
 const browser = await chromium.launch({ executablePath: process.env.CHROME || undefined, headless: true, args: ['--no-sandbox'] })
 let failed = null
@@ -108,6 +112,7 @@ try {
             await buka(rute)
             const o = await overflowX(page); assert.ok(o <= 1, `overflow ${o}px saat lambat`)
             const b = bocor(await teks(page)); assert.deepEqual(b, [], `teks bocor saat lambat: ${b}`)
+            assert.equal(await galatRender(page), false, 'galat render (layar ErrorBoundary tampil) saat lambat')
           })
         } finally { await page.unroute(apiUrl) }
       })
@@ -118,6 +123,7 @@ try {
           const t = await teks(page)
           assert.ok(sehat(rute, t), `nyaris kosong saat API 500 (${t.trim().length} karakter; teks=${JSON.stringify(t.trim().slice(0, 80))})`)
           const b = bocor(t); assert.deepEqual(b, [], `teks bocor saat API 500: ${b}`)
+          assert.equal(await galatRender(page), false, 'galat render (layar ErrorBoundary tampil) saat API 500')
           const o = await overflowX(page); assert.ok(o <= 1, `overflow ${o}px saat API 500`)
           return { chars: t.trim().length }
         })
@@ -126,7 +132,7 @@ try {
         await page.unroute(apiUrl)
         return await periksa('pemulihan', peran.rute, async (rute) => {
           await buka(rute); await terisi(rute, 60000)
-          const t = await teks(page); assert.ok(sehat(rute, t), `pemulihan: tidak terisi (${t.trim().length} karakter)`); assert.deepEqual(bocor(t), [], 'teks bocor setelah pemulihan')
+          const t = await teks(page); assert.ok(sehat(rute, t), `pemulihan: tidak terisi (${t.trim().length} karakter)`); assert.deepEqual(bocor(t), [], 'teks bocor setelah pemulihan'); assert.equal(await galatRender(page), false, 'galat render (layar ErrorBoundary tampil) setelah pemulihan')
           return { chars: t.trim().length }
         })
       })

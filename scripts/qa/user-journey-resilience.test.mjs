@@ -32,10 +32,10 @@ test('nurse and lab fixture roles use the official owner-granted path and the jo
   assert.match(script, /staff-assignments'[\s\S]*?userId: lab\.user\.id, patientId: P/, 'lab receives an explicit patient assignment')
 })
 
-test('workflow runs the journey on a fresh server and keeps two negative controls that must fail by named step', () => {
+test('workflow runs the journey on a fresh server and keeps three negative controls that must fail by named step', () => {
   assert.ok(workflow.includes('fresh_server resilience'), 'fresh server for the resilience run')
   assert.ok(workflow.includes('node scripts/qa/user-journey-resilience.mjs'))
-  assert.ok(/for mode in bocor overflow/.test(workflow), 'both sabotage modes')
+  assert.ok(/for mode in bocor overflow galat-render/.test(workflow), 'all sabotage modes')
   assert.ok(/QA_SABOTASE=\$mode/.test(workflow) && /LOLOS/.test(workflow), 'a sabotage run that passes fails the job')
   assert.ok(workflow.includes('berhenti tanpa langkah gagal bernama'), 'a sabotage run must stop at a named failing step')
   assert.equal((workflow.match(/user-journey-resilience\.mjs'/g) ?? []).length, 2, 'the script is in both path filters (push and pull_request)')
@@ -43,9 +43,11 @@ test('workflow runs the journey on a fresh server and keeps two negative control
 })
 
 test('negative-control modes are validated and injected into every page', () => {
-  assert.ok(script.includes("['', 'bocor', 'overflow'].includes(SABOTASE)"), 'unknown sabotage mode fails closed')
+  assert.ok(script.includes("['', 'bocor', 'overflow', 'galat-render'].includes(SABOTASE)"), 'unknown sabotage mode fails closed')
   assert.ok(script.includes('addInitScript({ content: SKRIP_SABOTASE[SABOTASE] })'), 'sabotage is injected into the browser context')
   assert.ok(script.includes('NaN [object Object]') && script.includes('width:4000px'), 'leak and overflow payloads')
+  assert.ok(script.includes("role', 'alert'") && script.includes('Something went wrong'), 'render-crash payload mimics the root ErrorBoundary screen')
+  assert.equal((script.match(/await galatRender\(page\), false/g) ?? []).length, 3, 'boundary fallback is rejected in the slow, 500 and recovery steps')
 })
 
 test('contributor identity has explicit negative authorization coverage rather than being counted as a functioning staff journey', () => {
