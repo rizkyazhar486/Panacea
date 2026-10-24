@@ -2454,6 +2454,11 @@ app.use((err: unknown, req: express.Request, res: express.Response, _next: expre
     if (!res.headersSent) res.status(413).json({ error: 'payload_too_large' })
     return
   }
+  // Pengurai menolak encoding/charset dengan 415; jangan bocorkan nilai header dalam diagnostik.
+  if (kode === 415 && (e?.type === 'encoding.unsupported' || e?.type === 'charset.unsupported')) {
+    if (!res.headersSent) res.status(415).json({ error: 'unsupported_media_type' })
+    return
+  }
   if (e?.type === 'entity.parse.failed' || (typeof kode === 'number' && kode >= 400 && kode < 500)) {
     if (e?.type === 'entity.parse.failed') catatTolakan('bad_json')
     if (!res.headersSent) res.status(400).json({ error: 'bad_request' })
