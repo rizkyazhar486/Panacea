@@ -107,8 +107,19 @@
         "citation": "Charlson et al. 1987, J Chronic Dis 40:373",
         "anchor": "Charlson et al. 1987, J Chronic Dis 40:373",
         "basis": "Header gives author, year, journal and first page. DOI/PMID not verified in this repository.",
-        "doi": null,
-        "pmid": null
+        "doi": "10.1016/0021-9681(87)90171-8",
+        "pmid": "3558716",
+        "lookup": {
+          "source": "PubMed",
+          "pmid": "3558716",
+          "doi": "10.1016/0021-9681(87)90171-8",
+          "retrievedOn": "2026-10-24",
+          "title": "A new method of classifying prognostic comorbidity in longitudinal studies: development and validation.",
+          "firstAuthor": "Charlson",
+          "journal": "J Chronic Dis",
+          "year": 1987,
+          "pages": "373-83"
+        }
       }
     },
     {
@@ -139,8 +150,19 @@
         "citation": "Cockcroft & Gault, Nephron 1976;16:31-41",
         "anchor": "Cockcroft & Gault, Nephron 1976;16:31-41",
         "basis": "Header gives journal, volume and pages; ideal weight uses the Devine formula, also uncited. DOI/PMID not verified in this repository.",
-        "doi": null,
-        "pmid": null
+        "doi": "10.1159/000180580",
+        "pmid": "1244564",
+        "lookup": {
+          "source": "PubMed",
+          "pmid": "1244564",
+          "doi": "10.1159/000180580",
+          "retrievedOn": "2026-10-24",
+          "title": "Prediction of creatinine clearance from serum creatinine.",
+          "firstAuthor": "Cockcroft",
+          "journal": "Nephron",
+          "year": 1976,
+          "pages": "31-41"
+        }
       }
     },
     {
@@ -155,8 +177,19 @@
         "citation": "Payne et al., BMJ 1973;4:643-6",
         "anchor": "Payne et al., BMJ 1973;4:643-6",
         "basis": "Header gives journal, volume and pages. DOI/PMID not verified in this repository.",
-        "doi": null,
-        "pmid": null
+        "doi": "10.1136/bmj.4.5893.643",
+        "pmid": "4758544",
+        "lookup": {
+          "source": "PubMed",
+          "pmid": "4758544",
+          "doi": "10.1136/bmj.4.5893.643",
+          "retrievedOn": "2026-10-24",
+          "title": "Interpretation of serum calcium in patients with abnormal serum proteins.",
+          "firstAuthor": "Payne",
+          "journal": "Br Med J",
+          "year": 1973,
+          "pages": "643-6"
+        }
       }
     },
     {
@@ -201,8 +234,19 @@
         "citation": "Espinel, JAMA 1976;236:579-81",
         "anchor": "Espinel, JAMA 1976;236:579-81",
         "basis": "Header gives journal, volume and pages. DOI/PMID not verified in this repository.",
-        "doi": null,
-        "pmid": null
+        "doi": "10.1001/jama.236.6.579",
+        "pmid": "947239",
+        "lookup": {
+          "source": "PubMed",
+          "pmid": "947239",
+          "doi": "10.1001/jama.236.6.579",
+          "retrievedOn": "2026-10-24",
+          "title": "The FENa test. Use in the differential diagnosis of acute renal failure.",
+          "firstAuthor": "Espinel",
+          "journal": "JAMA",
+          "year": 1976,
+          "pages": "579-81"
+        }
       }
     },
     {
@@ -217,8 +261,19 @@
         "citation": "Lindström & Tuomilehto, Diabetes Care 2003;26:725-731",
         "anchor": "Lindström & Tuomilehto, Diabetes Care 2003;26:725-731",
         "basis": "Header gives journal, volume and pages. DOI/PMID not verified in this repository.",
-        "doi": null,
-        "pmid": null
+        "doi": "10.2337/diacare.26.3.725",
+        "pmid": "12610029",
+        "lookup": {
+          "source": "PubMed",
+          "pmid": "12610029",
+          "doi": "10.2337/diacare.26.3.725",
+          "retrievedOn": "2026-10-24",
+          "title": "The diabetes risk score: a practical tool to predict type 2 diabetes risk.",
+          "firstAuthor": "Lindström",
+          "journal": "Diabetes Care",
+          "year": 2003,
+          "pages": "725-31"
+        }
       }
     },
     {
@@ -291,8 +346,19 @@
         "citation": "Blatchford et al., Lancet 2000;356:1318-23",
         "anchor": "Blatchford et al., Lancet 2000;356:1318-23",
         "basis": "Header gives journal, volume and pages. DOI/PMID not verified in this repository.",
-        "doi": null,
-        "pmid": null
+        "doi": "10.1016/S0140-6736(00)02816-6",
+        "pmid": "11073021",
+        "lookup": {
+          "source": "PubMed",
+          "pmid": "11073021",
+          "doi": "10.1016/S0140-6736(00)02816-6",
+          "retrievedOn": "2026-10-24",
+          "title": "A risk score to predict need for treatment for upper-gastrointestinal haemorrhage.",
+          "firstAuthor": "Blatchford",
+          "journal": "Lancet",
+          "year": 2000,
+          "pages": "1318-21"
+        }
       }
     },
     {
@@ -380,7 +446,18 @@
         "anchor": "Friedewald et al., Clin Chem 1972;18:499-502",
         "basis": "Header gives journal, volume and pages; bands cite NCEP ATP III without a reference. DOI/PMID not verified in this repository.",
         "doi": null,
-        "pmid": null
+        "pmid": "4337382",
+        "lookup": {
+          "source": "PubMed",
+          "pmid": "4337382",
+          "doi": null,
+          "retrievedOn": "2026-10-24",
+          "title": "Estimation of the concentration of low-density lipoprotein cholesterol in plasma, without use of the preparative ultracentrifuge.",
+          "firstAuthor": "Friedewald",
+          "journal": "Clin Chem",
+          "year": 1972,
+          "pages": "499-502"
+        }
       }
     },
     {
@@ -395,8 +472,19 @@
         "citation": "Light et al. 1972, Ann Intern Med 77:507",
         "anchor": "Light et al. 1972, Ann Intern Med 77:507",
         "basis": "Header gives journal, volume and first page. DOI/PMID not verified in this repository.",
-        "doi": null,
-        "pmid": null
+        "doi": "10.7326/0003-4819-77-4-507",
+        "pmid": "4642731",
+        "lookup": {
+          "source": "PubMed",
+          "pmid": "4642731",
+          "doi": "10.7326/0003-4819-77-4-507",
+          "retrievedOn": "2026-10-24",
+          "title": "Pleural effusions: the diagnostic separation of transudates and exudates.",
+          "firstAuthor": "Light",
+          "journal": "Ann Intern Med",
+          "year": 1972,
+          "pages": "507-13"
+        }
       }
     },
     {
@@ -637,8 +725,19 @@
         "citation": "Poungvarin et al., BMJ 1991;302:1565-7",
         "anchor": "Poungvarin et al., BMJ 1991;302:1565-7",
         "basis": "Header gives journal, volume and pages. DOI/PMID not verified in this repository.",
-        "doi": null,
-        "pmid": null
+        "doi": "10.1136/bmj.302.6792.1565",
+        "pmid": "1855041",
+        "lookup": {
+          "source": "PubMed",
+          "pmid": "1855041",
+          "doi": "10.1136/bmj.302.6792.1565",
+          "retrievedOn": "2026-10-24",
+          "title": "Siriraj stroke score and validation study to distinguish supratentorial intracerebral haemorrhage from infarction.",
+          "firstAuthor": "Poungvarin",
+          "journal": "BMJ",
+          "year": 1991,
+          "pages": "1565-7"
+        }
       }
     },
     {
@@ -683,8 +782,19 @@
         "citation": "Chung et al., 2008, Anesthesiology 108(5):812-821",
         "anchor": "Chung et al., 2008, Anesthesiology 108(5):812-821",
         "basis": "Header gives journal, volume and pages. DOI/PMID not verified in this repository.",
-        "doi": null,
-        "pmid": null
+        "doi": "10.1097/ALN.0b013e31816d83e4",
+        "pmid": "18431116",
+        "lookup": {
+          "source": "PubMed",
+          "pmid": "18431116",
+          "doi": "10.1097/ALN.0b013e31816d83e4",
+          "retrievedOn": "2026-10-24",
+          "title": "STOP questionnaire: a tool to screen patients for obstructive sleep apnea.",
+          "firstAuthor": "Chung",
+          "journal": "Anesthesiology",
+          "year": 2008,
+          "pages": "812-21"
+        }
       }
     },
     {

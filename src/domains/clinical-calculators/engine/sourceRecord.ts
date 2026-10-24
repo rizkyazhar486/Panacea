@@ -15,6 +15,22 @@ export interface SourceRecord {
   basis: string
   doi?: string | null
   pmid?: string | null
+  /** Metadata persis seperti dikembalikan PubMed saat identifier dicari; wajib bila doi/pmid terisi, agar identifier tidak bisa ditempel tanpa bukti. */
+  lookup?: SourceLookup | null
+}
+
+export interface SourceLookup {
+  source: 'PubMed'
+  /** Identifier persis seperti dikembalikan pencarian; harus sama dengan source.pmid/doi sehingga menukar satu sisi saja terdeteksi. */
+  pmid: string | null
+  doi: string | null
+  /** YYYY-MM-DD: kapan pencarian dilakukan (uji tidak memakai jaringan, jadi ini catatan, bukan pemeriksaan ulang). */
+  retrievedOn: string
+  title: string
+  firstAuthor: string
+  journal: string
+  year: number
+  pages: string
 }
 
 export interface SourceCheck {
@@ -25,6 +41,7 @@ export interface SourceCheck {
 const filled = (v: unknown): v is string => typeof v === 'string' && v.trim().length > 0
 const DOI = /^10\.\d{4,9}\/\S+$/
 const PMID = /^\d{1,9}$/
+const DATE = /^\d{4}-\d{2}-\d{2}$/
 
 /** `entries[].source` dibandingkan dengan kepala berkas mesin (`headers[id]` = komentar blok pertama). */
 export function checkSourceRecords(
@@ -48,8 +65,23 @@ export function checkSourceRecords(
     }
     if (source.doi != null && !(filled(source.doi) && DOI.test(source.doi))) errors.push(`${id}: doi-invalid`)
     if (source.pmid != null && !(filled(source.pmid) && PMID.test(source.pmid))) errors.push(`${id}: pmid-invalid`)
+    if (source.kind === 'published' && (filled(source.doi) || filled(source.pmid))) checkLookup(id, source, errors)
   }
   return { errors, counts }
+}
+
+/** Identifier hanya sah bila disertai metadata hasil pencarian yang cocok dengan kutipan di kode (penulis pertama dan tahun). */
+function checkLookup(id: string, source: SourceRecord, errors: string[]): void {
+  const l = source.lookup
+  if (!l || typeof l !== 'object') { errors.push(`${id}: identifier-without-lookup`); return }
+  if (l.source !== 'PubMed') errors.push(`${id}: lookup-source-invalid`)
+  if (!(filled(l.retrievedOn) && DATE.test(l.retrievedOn))) errors.push(`${id}: lookup-date-invalid`)
+  for (const k of ['title', 'journal', 'pages'] as const) if (!filled(l[k])) errors.push(`${id}: lookup-${k}-missing`)
+  if ((l.pmid ?? null) !== (source.pmid ?? null)) errors.push(`${id}: lookup-pmid-mismatch`)
+  if ((l.doi ?? null) !== (source.doi ?? null)) errors.push(`${id}: lookup-doi-mismatch`)
+  const citation = source.citation ?? ''
+  if (!filled(l.firstAuthor) || !citation.includes(l.firstAuthor)) errors.push(`${id}: lookup-author-not-in-citation`)
+  if (!Number.isInteger(l.year) || !citation.includes(String(l.year))) errors.push(`${id}: lookup-year-not-in-citation`)
 }
 
 /** Komentar blok pertama berkas (kepala dokumentasi mesin); string kosong bila tidak ada. */
