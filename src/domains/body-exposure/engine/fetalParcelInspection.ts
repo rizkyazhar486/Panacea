@@ -41,6 +41,16 @@ export function parseFetalParcelDataset(value: unknown): FetalParcelDataset {
       || data.runtime_admission !== 'blocked_label_identity_unresolved' || data.anatomical_identity !== 'unresolved'
       || data.asset !== 'regions.glb' || !/^[a-f0-9]{64}$/.test(data.packed_glb_sha256 ?? '')
       || !Array.isArray(data.regions) || data.regions.length !== 9) throw new Error('Incomplete anonymous dataset package')
+  // This inspector is bound to one audited source package, not an arbitrary atlas.
+  if (data.source !== 'https://gin.g-node.org/kcl_cdb/fetal_body_mri_atlas'
+      || data.source_revision !== '74f11a186c709078d712bb2fd827bfa2b36e3407'
+      || data.license !== 'CC0-1.0'
+      || data.coordinate_frame !== '+X subject left, +Y superior, +Z anterior; metres; source origin retained'
+      || data.source_sha256?.['reo-fetal-t2w-body-atlas-mask-lungs_multi-10.nii.gz'] !== '5d81b6f91bcc2a6d6e64dfcd97a3099cfdc30cd9826f29d297b3c6983aceee54'
+      || data.source_sha256?.['reo-fetal-t2w-body-atlas-mask-body_organs-10.nii.gz'] !== '4b7bade32fac95a80c622f535c05f6a6f8eab8f1e32ba093cc742b1a5dc6c8b7'
+      || data.source_glb_sha256 !== '63505eedb8867bbd0a6f7abf646edbffc19357eaf5e622871b21604a8b62bb13') {
+    throw new Error('Dataset source provenance differs')
+  }
   const labels = new Set<number>()
   for (const region of data.regions) {
     if (!Number.isInteger(region.source_label) || region.source_label < 1 || region.source_label > 9
