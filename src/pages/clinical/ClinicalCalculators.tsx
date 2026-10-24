@@ -10,6 +10,7 @@ import { api, backendEnabled } from '../../lib/api'
 import { ALAT_DI_HALAMAN, cocokAlat, URUTAN_GRUP } from '../../lib/katalogKalkulator'
 import { MANUAL_BANK } from '../../lib/payment'
 import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
+import { SumberKalkulator } from '../../components/ui/SumberKalkulator'
 import { centorMcIsaac, correctedSodiumKatz, dailyCalories, fletcherIndex, fluidBalance, hollidaySegar, idealBodyWeight, interpretAbg, ivDrip, mcdonaldGestationalAge, meanArterialPressure, midParentalHeight, naegele, paradiseCriteria, parklandVolumes, parseNumberField, pedsDose, potassiumAssessment, sirirajStrokeScore, validateBallardInputs, validateCdcInputs, validateDenverAge, validateNeonateInputs, validateWhoGrowthInputs } from '../../domains/clinical-calculators'
 import { egfrCkdEpi2021, type KdigoGfrStage } from '../../lib/longevity'
 
@@ -2614,6 +2615,7 @@ export function ClinicalCalculators() {
       )}
       <SectionTitle icon={<IconStethoscope size={20} />} title="Clinical Calculators" subtitle={`${TABS.length} published scores and tools, grouped by organ system — not a clinically validated Panacea decision`} />
       <BatasKlaimKesehatan permukaan="calculators.clinical" />
+      <SumberKalkulator ids={['bloodGas', 'centor', 'denverAge', 'electrolyteCorrection', 'fletcher', 'fluidBalance', 'hollidaySegar', 'idealBodyWeight', 'ivDrip', 'mcdonaldRule', 'meanArterialPressure', 'midParentalHeight', 'naegele', 'paradise', 'parkland', 'pedsDose', 'sirirajStrokeScore']} />
       <KartuDataPerangkat />
       <input
         className={inputClass}

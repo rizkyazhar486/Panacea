@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { Suspense, lazy, useEffect, useRef, useState } from 'react'
 import { hariIni } from '../../lib/tanggal'
 import { useStore, uid, OWNER_EMAIL } from '../../lib/store'
 import { Wordmark } from '../../components/Logo'
@@ -14,7 +14,9 @@ import { STR_ROLES, ROLES, LOGIN_PILLS } from './loginData'
 import './login.css'
 import { Prosa } from '../../components/Prosa'
 import { EmailOtpLogin } from './components/EmailOtpLogin'
-import { LegalModal } from './components/LegalModal'
+
+// Modal legal dimuat saat dibuka agar teks pengungkapan privasi tidak membebani bundel awal.
+const LegalModal = lazy(() => import('./components/LegalModal').then((m) => ({ default: m.LegalModal })))
 
 /* ── Form Field Helper ────────────────────────────────────────── */
 
@@ -647,7 +649,7 @@ export function Login({ onBack }: { onBack?: () => void }) {
         </div>
         </div>
 
-        {showLegal && <LegalModal onClose={() => setShowLegal(false)} />}
+        {showLegal && <Suspense fallback={null}><LegalModal onClose={() => setShowLegal(false)} /></Suspense>}
       </div>
     </div>
   )

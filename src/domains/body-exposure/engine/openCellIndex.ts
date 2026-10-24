@@ -49,24 +49,28 @@ function num(s: string | undefined): number | null | 'bad' {
 
 export function buildOpenCellIndex(loc: readonly LocRow[], abundance: readonly AbundanceRow[]): BuildResult {
   const ab = new Map<string, AbundanceRow>()
-  for (const r of abundance) if (!ab.has(r.ensg_id)) ab.set(r.ensg_id, r)
+  for (const r of abundance) {
+    const ensg = (r.ensg_id ?? '').trim()
+    if (!ab.has(ensg)) ab.set(ensg, r)
+  }
   const rejected: Rejected[] = []
   const proteins: OpenCellProtein[] = []
   const seen = new Set<string>()
   let withoutAbundance = 0
   for (const r of loc) {
     const gene = (r.target_name ?? '').trim()
+    const ensg = (r.ensg_id ?? '').trim()
     if (!gene) { rejected.push({ gene: '', reason: 'empty gene name' }); continue }
-    if (!ENSG.test((r.ensg_id ?? '').trim())) { rejected.push({ gene, reason: `invalid Ensembl id (${r.ensg_id})` }); continue }
-    if (seen.has(r.ensg_id)) { rejected.push({ gene, reason: 'duplicate Ensembl id' }); continue }
+    if (!ENSG.test(ensg)) { rejected.push({ gene, reason: `invalid Ensembl id (${r.ensg_id})` }); continue }
+    if (seen.has(ensg)) { rejected.push({ gene, reason: 'duplicate Ensembl id' }); continue }
     const g3 = parseAnnotations(r.annotations_grade_3 ?? ''), g2 = parseAnnotations(r.annotations_grade_2 ?? ''), g1 = parseAnnotations(r.annotations_grade_1 ?? '')
     if (!g3 || !g2 || !g1) { rejected.push({ gene, reason: 'annotation outside the OpenCell vocabulary' }); continue }
-    const a = ab.get(r.ensg_id)
+    const a = ab.get(ensg)
     const rna = num(a?.hek_rna_tpm), conc = num(a?.hek_protein_conc_nm), copies = num(a?.hek_protein_copy_number)
     if (rna === 'bad' || conc === 'bad' || copies === 'bad') { rejected.push({ gene, reason: 'abundance value is not a non-negative number' }); continue }
     if (!a) withoutAbundance++
-    seen.add(r.ensg_id)
-    proteins.push({ gene, ensg: r.ensg_id, uniprot: a?.uniprot_id?.trim() || null, name: a?.protein_name?.trim() || null, grade3: g3, grade2: g2, grade1: g1, rnaTpm: rna, proteinNm: conc, copyNumber: copies })
+    seen.add(ensg)
+    proteins.push({ gene, ensg, uniprot: a?.uniprot_id?.trim() || null, name: a?.protein_name?.trim() || null, grade3: g3, grade2: g2, grade1: g1, rnaTpm: rna, proteinNm: conc, copyNumber: copies })
   }
   proteins.sort((x, y) => x.gene.localeCompare(y.gene))
   return { proteins, rejected, withoutAbundance }

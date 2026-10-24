@@ -105,3 +105,5 @@ export { validateFraminghamInput, FRAMINGHAM_RANGE } from './engine/framinghamIn
 export type { FraminghamField, FraminghamValues, FraminghamInputResult } from './engine/framinghamInputs'
 export { autophagyTiming, AUTOPHAGY_RANGES } from './engine/autophagyTiming'
 export type { AutophagyTimingResult } from './engine/autophagyTiming'
+export { describeSource } from './engine/sourceLine'
+export type { SourceLine } from './engine/sourceLine'

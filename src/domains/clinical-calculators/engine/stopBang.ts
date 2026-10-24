@@ -49,6 +49,8 @@ export function stopBang(input: StopBangInput): StopBangResult {
     if (isEmpty(v)) missing.push(name)
     else if (!inRange(v, min, max)) invalid.push(`${name} must be ${min}–${max}${unit}`)
   }
+  // Jawaban ya/tidak yang kosong tidak boleh terbaca "tidak" (di bawah-skor): hanya boolean sungguhan yang sah.
+  for (const k of ['snoring', 'tired', 'observed', 'pressure'] as const) if (typeof input[k] !== 'boolean') invalid.push(`${k} must be yes or no`)
   if (missing.length > 0 || invalid.length > 0) return { missing, invalid, ...NONE }
   const stop = [input.snoring, input.tired, input.observed, input.pressure].filter(Boolean).length
   const bang = (input.bmi > STOP_BANG_THRESHOLDS.bmi ? 1 : 0) + (input.age > STOP_BANG_THRESHOLDS.age ? 1 : 0) +

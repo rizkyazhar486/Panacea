@@ -39,3 +39,21 @@ export function productionAssetFailure({ url, status, contentType = '', requestF
   }
   return null
 }
+
+const SHA40 = /^[0-9a-f]{40}$/
+const sha = (v) => (typeof v === 'string' && SHA40.test(v) ? v : null)
+
+// ENG-E7-02: catat SHA frontend (build.json) dan backend (/api/health build.commit) yang BENAR-BENAR diuji.
+// Hilang atau bukan 40-heksadesimal = null (tidak diketahui), tidak pernah dikarang atau dianggap sama.
+export function testedShas({ frontendBuild, health, expectSha = '' } = {}) {
+  const frontend = sha(frontendBuild?.commit)
+  const backend = sha(health?.build?.commit)
+  const expect = sha(expectSha)
+  const notes = []
+  if (!frontend) notes.push('SHA frontend TIDAK diketahui (build.json hilang atau tidak memuat commit 40-heksadesimal)')
+  if (!backend) notes.push('SHA backend TIDAK diketahui (/api/health tidak melaporkan build.commit valid)')
+  if (expectSha && !expect) notes.push('EXPECT_SHA bukan 40-heksadesimal dan diabaikan')
+  if (expect && frontend && frontend !== expect) notes.push(`frontend ${frontend.slice(0, 9)} berbeda dari yang diharapkan ${expect.slice(0, 9)}`)
+  if (expect && backend && backend !== expect) notes.push(`backend ${backend.slice(0, 9)} berbeda dari yang diharapkan ${expect.slice(0, 9)}`)
+  return { frontend, backend, frontendMatchesExpected: expect && frontend ? frontend === expect : null, backendMatchesExpected: expect && backend ? backend === expect : null, notes }
+}

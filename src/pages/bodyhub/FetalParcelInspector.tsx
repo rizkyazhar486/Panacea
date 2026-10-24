@@ -4,7 +4,7 @@ import * as THREE from 'three'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
-import { penjagaMuatan } from '../../lib/gltfSesudahLepas'
+import { buangSubtree, penjagaMuatan } from '../../lib/gltfSesudahLepas'
 import { Prosa } from '../../components/ui/Prosa'
 import { FetalMriContext } from './FetalMriContext'
 import { FETAL_PARCEL_COLORS, parseFetalParcelDataset, visibleParcelTriangles, wholeLungOverlap, type FetalParcelDataset } from '../../domains/body-exposure'
@@ -65,9 +65,12 @@ export function FetalParcelInspector() {
     const regionBounds = new Map<number, THREE.Box3>()
     const plane = new THREE.Plane()
     const render = () => { if (!disposed) renderer.render(scene, camera) }
+    let framedSide: 'anterior' | 'left' | 'superior' = 'anterior'
+    let framedLabel: number | undefined
     const fit = (side: 'anterior' | 'left' | 'superior' = 'anterior', focusLabel?: number) => {
       const frame = focusLabel === undefined ? bounds : regionBounds.get(focusLabel)
       if (!frame || frame.isEmpty()) return
+      framedSide = side; framedLabel = focusLabel
       const center = frame.getCenter(new THREE.Vector3()), size = frame.getSize(new THREE.Vector3())
       const radius = size.length() / 2
       const distance = radius / Math.sin(THREE.MathUtils.degToRad(camera.fov / 2)) / Math.min(camera.aspect, 1) * 1.15
@@ -81,7 +84,7 @@ export function FetalParcelInspector() {
       const { width, height } = host.getBoundingClientRect()
       if (width <= 0 || height <= 0) return
       camera.aspect = width / height; camera.updateProjectionMatrix(); renderer.setSize(width, height, false)
-      fit()
+      fit(framedSide, framedLabel)
     }
     const observer = new ResizeObserver(resize); observer.observe(host)
     controls.addEventListener('change', render)
@@ -103,6 +106,10 @@ export function FetalParcelInspector() {
         ob.visible = dataset.default_labels.includes(label)
         meshes.set(label, [...(meshes.get(label) ?? []), ob])
       })
+      if (failure || meshes.size !== 9) {
+        buangSubtree(gltf.scene); meshes.clear()
+        setError(failure || 'The dataset does not contain all nine regions'); return
+      }
       scene.add(gltf.scene)
       gltf.scene.updateMatrixWorld(true)
       // Referenced vertices only: packed GLBs may share a POSITION accessor.
@@ -114,23 +121,29 @@ export function FetalParcelInspector() {
         }
         regionBounds.set(label, box); bounds.union(box)
       }
-      if (failure || meshes.size !== 9) { setError(failure || 'The dataset does not contain all nine regions'); return }
       sceneRef.current = { meshes, render, fit, plane, bounds }; resize(); setLoaded(true)
     }, undefined, () => { if (!disposed) setError('Dataset geometry could not be loaded') })
     const raycaster = new THREE.Raycaster()
-    let down = { x: 0, y: 0 }
-    const pointerDown = (event: PointerEvent) => { down = { x: event.clientX, y: event.clientY } }
+    let down: { x: number; y: number; pointerId: number } | null = null
+    const pointerDown = (event: PointerEvent) => {
+      down = event.isPrimary && event.button === 0 ? { x: event.clientX, y: event.clientY, pointerId: event.pointerId } : null
+    }
+    const cancelPick = () => { down = null }
     const pick = (event: PointerEvent) => {
-      if (Math.hypot(event.clientX - down.x, event.clientY - down.y) > 5) return
+      const start = down
+      down = null
+      if (!start || !event.isPrimary || event.button !== 0 || event.pointerId !== start.pointerId || Math.hypot(event.clientX - start.x, event.clientY - start.y) > 5) return
       const rect = renderer.domElement.getBoundingClientRect()
       raycaster.setFromCamera(new THREE.Vector2((event.clientX - rect.left) / rect.width * 2 - 1, 1 - (event.clientY - rect.top) / rect.height * 2), camera)
       const hit = raycaster.intersectObjects([...meshes.values()].flat()).find(h => h.object.visible && (!sceneRef.current || sectionState.current === 'off' || plane.distanceToPoint(h.point) >= 0))
       if (hit) setSelected(Number(hit.object.userData.inspectionLabel))
     }
     renderer.domElement.addEventListener('pointerdown', pointerDown); renderer.domElement.addEventListener('pointerup', pick)
+    renderer.domElement.addEventListener('pointercancel', cancelPick)
     return () => {
       penjaga.lepas(); disposed = true; sceneRef.current = null; observer.disconnect(); controls.dispose()
       renderer.domElement.removeEventListener('pointerdown', pointerDown); renderer.domElement.removeEventListener('pointerup', pick)
+      renderer.domElement.removeEventListener('pointercancel', cancelPick)
       scene.traverse(ob => { if (ob instanceof THREE.Mesh) { ob.geometry.dispose(); (Array.isArray(ob.material) ? ob.material : [ob.material]).forEach(m => m.dispose()) } })
       renderer.dispose(); renderer.domElement.remove()
     }

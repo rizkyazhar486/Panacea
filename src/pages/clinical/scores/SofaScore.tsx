@@ -5,6 +5,7 @@ import { IconActivity } from '../../../components/icons'
 import { ScoreTrend } from '../../../components/ScoreTrend'
 import { CopyNote } from '../../../components/CopyNote'
 import { BatasKlaimSkorTerbit } from '../../../components/BatasKlaimSkorTerbit'
+import { SumberKalkulator } from '../../../components/ui/SumberKalkulator'
 import { parseNumberField, sofaScore, type CvLevel } from '../../../domains/clinical-calculators'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -62,6 +63,7 @@ export function SofaScore() {
       <Card className="!p-5">
         <SectionTitle icon={<IconActivity size={20} />} title="SOFA Score" subtitle="Sequential Organ Failure Assessment (Vincent et al. 1996)" />
         <BatasKlaimSkorTerbit />
+        <SumberKalkulator ids={['sofaScore']} />
         <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">A full ICU severity score across 6 organ systems — different from the bedside qSOFA screening tool. Used for prognosis and tracking organ dysfunction over time, not as an initial screen.</Prosa>
         <div className="mt-3 grid grid-cols-2 gap-3">
           <Field label="PaO₂/FiO₂ ratio">

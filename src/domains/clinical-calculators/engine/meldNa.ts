@@ -44,6 +44,8 @@ export function meldNa(input: MeldInput): MeldResult {
   const invalid: string[] = []
   const ok: Partial<Record<Field, number>> = {}
   const dialysis = input.dialysis === true
+  // Dialisis menentukan apakah kreatinin diminta; nilai bukan-boolean tidak boleh terbaca "tidak dialisis" secara diam-diam.
+  if (typeof input.dialysis !== 'boolean') invalid.push('dialysis must be yes or no')
   for (const k of Object.keys(MELD_RANGES) as Field[]) {
     if (k === 'creatinine' && dialysis) continue // dialisis: kreatinin dipatok 4,0, tidak diminta
     const { min, max, name, unit } = MELD_RANGES[k]

@@ -3,7 +3,7 @@
 // Keluar 2 = kegagalan jaringan (tahap disebutkan, BUKAN status aplikasi); 1 = temuan yang menggagalkan; 0 = lulus.
 // Tidak mengklaim apa pun yang tidak diamati: SHA penyebaran frontend tidak tertanam di halaman, hanya dilaporkan bila server melaporkannya.
 import dns from 'node:dns/promises'
-import { assessPublicPage, productionAssetFailure } from './production-browser-verdict.mjs'
+import { assessPublicPage, productionAssetFailure, testedShas } from './production-browser-verdict.mjs'
 import { sanitizeProductionReport } from './production-browser-report.mjs'
 import fs from 'node:fs'
 import path from 'node:path'
@@ -53,7 +53,16 @@ if (API) {
     if (EXPECT_SHA) report.server.matchesExpected = report.server.commit === EXPECT_SHA
     if (EXPECT_SHA && report.server.commit !== EXPECT_SHA) finding('warn', `server melaporkan commit ${report.server.commit} bukan ${EXPECT_SHA}`)
   } catch (e) { finding('warn', `health server tidak terbaca: ${e.message}`) }
-} else finding('info', 'SHA penyebaran frontend tidak tertanam di halaman dan PROD_API_URL tidak diberikan: SHA produksi TIDAK diverifikasi')
+} else finding('info', 'PROD_API_URL tidak diberikan: SHA backend TIDAK diverifikasi')
+// ENG-E7-02: SHA yang diuji dicatat di laporan; yang tidak teramati dilaporkan null, bukan ditebak.
+{
+  let frontendBuild = null
+  try { frontendBuild = await (await fetch(BASE + '/build.json', { signal: AbortSignal.timeout(20000) })).json() } catch { /* tidak terbaca = tidak diketahui */ }
+  const tested = testedShas({ frontendBuild, health: report.server ? { build: { commit: report.server.commit } } : null, expectSha: EXPECT_SHA })
+  report.tested = tested
+  for (const n of tested.notes) finding(n.includes('berbeda') ? 'warn' : 'info', n)
+  console.log(`tested frontend=${tested.frontend ?? 'unknown'} backend=${tested.backend ?? 'unknown'}`)
+}
 
 // Only same-origin built assets (/assets/*.css, *.js) are blocking. External fonts are
 // handled separately; a third-party timeout must not be misdiagnosed as a missing Vite chunk.

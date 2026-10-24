@@ -1,0 +1,11 @@
+{
+  "_catatan": "Inventaris halaman kritis F1 (ENG-F1-03). Sumber tunggal: scripts/qa/f1-critical-pages.test.mjs mewajibkan 'resilience' sama persis dengan rute per peran di user-journey-resilience.mjs dan setiap rute punya halaman nyata di router. Menambah halaman kritis = ubah berkas ini DAN skrip ketahanan.",
+  "resilience": {
+    "pasien": ["#/", "#/chatbot", "#/settings", "#/profile", "#/fitness-hub", "#/all-features"],
+    "dokter": ["#/doctor-review", "#/doctor-review/lab-results"],
+    "pemilik": ["#/owner"],
+    "perawat": ["#/"],
+    "lab": ["#/"]
+  },
+  "baseJourney": ["#/harian", "#/health-data", "#/clinical-hub"]
+}

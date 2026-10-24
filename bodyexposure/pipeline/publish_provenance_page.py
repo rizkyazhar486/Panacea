@@ -24,7 +24,7 @@ for p in sorted(glob.glob(f"{PUB}/vhf_denver_ct_adult_female.*.glb")):
     n = os.path.basename(p)
     kind = "rig and range-of-motion clip" if "rig_rom" in n else re.search(r"LOD\d", n).group() + " (" + n.split(".")[1] + ")"
     rows.append(f'<tr><td><a href="{n}">{html.escape(n)}</a></td><td>{html.escape(kind)}</td><td>{size(p)}</td></tr>')
-downloads = ('<table><thead><tr><th>File</th><th>Content</th><th>Size</th></tr></thead><tbody>' + "".join(rows) + "</tbody></table>"
+downloads = ('<table class="dl"><thead><tr><th>File</th><th>Content</th><th>Size</th></tr></thead><tbody>' + "".join(rows) + "</tbody></table>"
              '<p>LOD1 is the most detailed published level of the skeleton variant; the viewer itself loads LOD2 to LOD4. All files are glTF binary (GLB), '
              'meshopt-compressed; each node name is a structure ID and its extras carry the source and method.</p>')
 page = f"""<!doctype html>
@@ -38,11 +38,13 @@ body{{margin:0;background:var(--bg);color:var(--fg);font:16px/1.6 system-ui,-app
 main{{max-width:880px;margin:0 auto;padding:24px 16px 64px;overflow-wrap:anywhere}}
 h1{{font-size:1.7rem;margin:.2em 0 .4em}}h2{{margin-top:2em;border-top:1px solid var(--line);padding-top:1em;font-size:1.25rem}}h3{{font-size:1.05rem}}
 a{{color:var(--accent)}}code,pre{{background:var(--code);border-radius:6px;font-size:.88em}}code{{padding:.1em .35em;overflow-wrap:anywhere}}pre{{padding:12px;white-space:pre-wrap;overflow-wrap:anywhere}}
-table{{border-collapse:collapse;display:block;overflow-x:auto;max-width:100%}}th,td{{border:1px solid var(--line);padding:6px 10px;text-align:left;vertical-align:top}}
+table{{border-collapse:collapse;display:block;overflow-x:auto;max-width:100%}}th,td{{border:1px solid var(--line);padding:6px 10px;text-align:left;vertical-align:top}}th,.dl td:last-child{{white-space:nowrap}}
 .note{{border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:8px;padding:12px 16px;margin:16px 0;color:var(--mut)}}
 </style></head><body><main>
 <p><a href="../#/body-exposure/canonical">&larr; Back to Body Exposure</a></p>
+<p><a href="../asset-credits.html">Other PanaceaMed assets: public credits and licensing</a></p>
 <h1>Body Exposure: sources and provenance</h1>
+<p><a href="software-notices.html">Renderer and anatomy-tooling software notices</a> (separate from anatomical asset rights).</p>
 <div class="note"><strong>Educational models.</strong> Nothing here is patient-specific anatomy or a clinical tool, and no structure has been clinically reviewed
 (<code>clinically_reviewed</code> is false everywhere). Bodies built from one donor are labelled as that individual, not as an atlas.
 Structures marked <em>model segmented</em> were produced by a machine segmentation model and have no measured accuracy unless stated.</div>

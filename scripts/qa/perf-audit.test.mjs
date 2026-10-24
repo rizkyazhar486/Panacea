@@ -22,12 +22,13 @@ test('script is honest about its limits and fails only when a page cannot be mea
   assert.ok(!/process\.exit\(0\)/.test(script) && !/ANGGARAN\.\w+ \* /.test(script), 'no invented thresholds or silent success')
 })
 
-test('workflow builds production output and runs the audit as its own job with the scripts in both path filters', () => {
+test('workflow builds production output and runs audit on all main PRs', () => {
   assert.ok(/perf-audit:\n/.test(workflow), 'separate job')
   assert.ok(workflow.includes('VITE_API_URL=http://127.0.0.1:18790 npx vite build'), 'production build, not the dev server')
   assert.ok(workflow.includes('npx vite preview --host 127.0.0.1 --port 5191 --strictPort'), 'serves the production build')
   assert.ok(workflow.includes('node scripts/qa/perf-audit.mjs'))
   assert.ok(workflow.includes('name: perf-evidence'), 'evidence uploaded')
-  assert.equal((workflow.match(/scripts\/qa\/perf-audit\.mjs'/g) ?? []).length, 2, 'perf-audit.mjs in push and pull_request paths')
-  assert.equal((workflow.match(/scripts\/qa\/perf-stats\.mjs'/g) ?? []).length, 2, 'perf-stats.mjs in push and pull_request paths')
+  assert.equal((workflow.match(/scripts\/qa\/perf-audit\.mjs'/g) ?? []).length, 1, 'push watches perf audit')
+  assert.equal((workflow.match(/scripts\/qa\/perf-stats\.mjs'/g) ?? []).length, 1, 'push watches perf stats')
+  assert.match(workflow, /  pull_request:\n    branches: \[main\]\npermissions:/, 'PRs always run audit')
 })

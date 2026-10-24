@@ -11,7 +11,7 @@ export interface ThreeOwnedResourceDisposalReport {
  *
  * Use this only when the caller owns the loaded Object3D and none of its geometry,
  * materials, or textures are shared with a concurrently mounted scene. Resources
- * are deduplicated before disposal because GLTF meshes may share primitives,
+ * are deduplicated before disposal because renderable objects may share primitives,
  * materials, and textures.
  */
 export function disposeOwnedObject3DResources(root: THREE.Object3D): ThreeOwnedResourceDisposalReport {
@@ -20,8 +20,8 @@ export function disposeOwnedObject3DResources(root: THREE.Object3D): ThreeOwnedR
   const textures = new Set<THREE.Texture>()
 
   root.traverse((object) => {
-    const mesh = object as THREE.Mesh
-    if (!mesh.isMesh) return
+    const mesh = object as THREE.Mesh & { isLine?: boolean; isPoints?: boolean }
+    if (!mesh.isMesh && !mesh.isLine && !mesh.isPoints) return
 
     if (mesh.geometry) geometries.add(mesh.geometry)
     const materialList = Array.isArray(mesh.material) ? mesh.material : [mesh.material]

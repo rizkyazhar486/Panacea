@@ -17,8 +17,8 @@
   "assets": [
     {
       "source": "public/bodyexposure/adult_male.rig_rom.glb",
-      "source_sha256": "0d4a95646feac9d64a8c734877090d11d5a366d0b825a3f8ac9bf3a8df35450b",
-      "decoded_sha256": "444bc6f40ccde074910f230c97b15df448b9959f2efdd37ff0edbf4e2b5250b2",
+      "source_sha256": "03aa529c35d347d00f23c6bd2fb8dd6ac5050818e2ed818f1e11bff6bcbbd177",
+      "decoded_sha256": "6e75a235caab2f2a986b92722bdebca8a1930879548e2069e1e3d41f8c1ea28c",
       "rest_markers": {
         "L": {
           "heel": {
@@ -498,8 +498,8 @@
     },
     {
       "source": "public/bodyexposure/vhf_denver_ct_adult_female.rig_rom.glb",
-      "source_sha256": "73b112ed087bbdbf0778232f2fede7ea27e1b55ca0d2d363b0260552821a4525",
-      "decoded_sha256": "bc38eda705035a44fd8ca407d5b1f4f87be58707aa52df297f55b098f4bdc92a",
+      "source_sha256": "7ec5ae004e6dca96f93cbb85b297e32d6a1d128980cdaa4af42a1d51eb574e32",
+      "decoded_sha256": "f6285ac7fc1d76c2d61af2f9a790a6f5e22df6804d937305e23b7e049058b8ac",
       "rest_markers": {
         "L": {
           "heel": {
