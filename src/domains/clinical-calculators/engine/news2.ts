@@ -88,6 +88,8 @@ export function news2(input: News2Input): News2Result {
     if (!inRange(v, min, max)) { invalid.push(`${name} must be ${min}–${max}${unit}`); continue }
     ok[k] = v
   }
+  // Pertanyaan ya/tidak yang tak terjawab tidak boleh terbaca "tidak" (di bawah-skor): hanya boolean sungguhan yang sah.
+  for (const k of ['onOxygen', 'alert'] as const) if (typeof input[k] !== 'boolean') invalid.push(`${k === 'onOxygen' ? 'supplemental oxygen' : 'alert (AVPU)'} must be yes or no`)
   if (missing.length > 0 || invalid.length > 0) return { missing, invalid, rows: [], total: null, anyThree: null, band: null }
   const rows: News2Row[] = [
     { name: 'Respiration rate', pts: rrPoints(ok.rr as number) },

@@ -31,6 +31,9 @@ export function hydrationTarget(input: HydrationInput): HydrationResult {
   if (!inRange(input.weightKg, w.min, w.max)) return { ok: false, reason: `Body weight must be ${w.min}–${w.max} kg` }
   if (!inRange(input.exerciseMin, e.min, e.max)) return { ok: false, reason: `Exercise must be ${e.min}–${e.max} minutes` }
   if (!Object.prototype.hasOwnProperty.call(INTENSITY_ML_PER_HOUR, input.intensity)) return { ok: false, reason: 'Unknown exercise intensity' }
+  for (const [key, label] of [['hotClimate', 'Hot climate'], ['pregnant', 'Pregnancy'], ['breastfeeding', 'Breastfeeding']] as const) {
+    if (typeof input[key] !== 'boolean') return { ok: false, reason: `${label} must be yes or no` }
+  }
   const baseMl = input.weightKg * ML_PER_KG
   const exerciseMl = (input.exerciseMin / 60) * INTENSITY_ML_PER_HOUR[input.intensity]
   const climateMl = input.hotClimate ? HOT_CLIMATE_ML : 0
