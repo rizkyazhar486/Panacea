@@ -334,9 +334,9 @@
       "dependsOn": [
         "ENG-CI-02"
       ],
-      "status": "NOT_RUN",
-      "statusSha": null,
-      "statusNote": "Contributor role has no backend capability: NOT_APPLICABLE for that role until it exists, never counted as pass. Run 39979532110 (push, 74eba9d8) green: patient 24/24, doctor 16/16, nurse 22/22, lab 22/22, owner 12+12, logout, two named negative controls fail. Stays NOT_RUN pending owner decision: admin has no UI journey of its own (owner UI + API RBAC only)."
+      "status": "PASS",
+      "statusSha": "81999e3a7b28ace6625634b8edc7b4cfe4aa0a34",
+      "statusNote": "User Journey Acceptance push run 40057229053 (job user-journeys 120762770434) at 81999e3a (main): user-journey-e2e 72/0 (patient 24/24, doctor 16/16, owner 12/12, API RBAC 4/4, API-unavailable 4/4; logout asserted for patient, doctor, owner and API RBAC), user-journey-staff 57/0 (nurse 22/22, lab 22/22, owner-staff 12/12), at 390x844 and 1440x900; negative controls bocor and overflow fail at a named step and f1-negative-evidence.mjs verifies both. Admin: covered by the owner UI journey plus API RBAC, by owner decision D-F1-ADMIN (2026-10-24, in chat). Contributor stays NOT_APPLICABLE (no backend capability), never counted as pass."
     },
     {
       "id": "ENG-F1-02",
