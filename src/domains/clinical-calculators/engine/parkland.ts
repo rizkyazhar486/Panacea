@@ -2,6 +2,7 @@
  * Parkland (Baxter) burn resuscitation volumes. Murni dan deterministik; halaman hanya menampilkan hasilnya.
  * Rumus: total 24 jam = 4 mL × berat(kg) × %TBSA; separuh dalam 8 jam pertama sejak cedera, sisanya 16 jam.
  * Ini tampilan pendukung keputusan, bukan order: titrasi tetap terhadap keluaran urin oleh klinisi.
+ * Sumber bernama: Baxter & Shires, Ann N Y Acad Sci 1968;150:874-94 (PMID 4973463); konstanta belum dicocokkan dengan teks lengkap.
  */
 import { isFiniteNumber as finite } from './inputs'
 

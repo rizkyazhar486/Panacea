@@ -18,10 +18,10 @@
       "reviewed_at": null,
       "evidence": null,
       "source": {
-        "kind": "unattributed",
+        "kind": "repo-heuristic",
         "citation": null,
         "anchor": null,
-        "basis": "Standard alveolar gas equation; the engine header names no publication, so no source is claimed."
+        "basis": "Declared repo heuristic: standard alveolar gas equation and the age/4 + 4 room-air threshold moved from the page; classic rule, original source not verified."
       }
     },
     {
@@ -46,10 +46,10 @@
       "reviewed_at": null,
       "evidence": null,
       "source": {
-        "kind": "unattributed",
+        "kind": "repo-heuristic",
         "citation": null,
         "anchor": null,
-        "basis": "Generic national blood-service/WHO/PMI criteria per the engine header; no specific document is cited, so none is claimed."
+        "basis": "Declared repo heuristic: generic blood-service eligibility thresholds (age, weight, 12-week interval) moved from the page; no specific WHO/PMI document is cited or verified."
       }
     },
     {
@@ -331,10 +331,23 @@
       "reviewed_at": null,
       "evidence": null,
       "source": {
-        "kind": "named-method",
-        "citation": null,
-        "anchor": null,
-        "basis": "Header names the Fletcher index and AAO-HNS for the four-frequency mode without a citation."
+        "kind": "published",
+        "citation": "Fletcher, Acta Otolaryngol Suppl 1950;90:26-37",
+        "anchor": "Fletcher, Acta Otolaryngol Suppl 1950;90:26-37",
+        "basis": "Identifies only the Fletcher index (average of the 500/1000/2000 Hz thresholds); PubMed has no abstract, so it is not checked against the text. The four-frequency AAO-HNS mode and the 26/41/56/71/91 dB grade bands remain unattributed.",
+        "doi": "10.3109/00016485009127735",
+        "pmid": "14818775",
+        "lookup": {
+          "source": "PubMed",
+          "pmid": "14818775",
+          "doi": "10.3109/00016485009127735",
+          "retrievedOn": "2026-10-24",
+          "title": "A method of calculating hearing loss for speech from an audiogram.",
+          "firstAuthor": "Fletcher",
+          "journal": "Acta Otolaryngol Suppl",
+          "year": 1950,
+          "pages": "26-37"
+        }
       }
     },
     {
@@ -359,10 +372,10 @@
       "reviewed_at": null,
       "evidence": null,
       "source": {
-        "kind": "named-method",
+        "kind": "repo-heuristic",
         "citation": null,
         "anchor": null,
-        "basis": "Header names Holliday-Segar, PALS, Parkland, Katz and Adrogue-Madias without citations."
+        "basis": "Declared repo heuristic: a composite worksheet (Holliday-Segar, 30 mL/kg sepsis bolus, PALS 20 mL/kg, Parkland, Katz, simplified Adrogue-Madias, potassium deficit) with constants moved from the page; classic rules, original sources not verified for this composite."
       }
     },
     {
@@ -495,10 +508,10 @@
       "reviewed_at": null,
       "evidence": null,
       "source": {
-        "kind": "named-method",
+        "kind": "repo-heuristic",
         "citation": null,
         "anchor": null,
-        "basis": "Header names the Broca and Lorentz formulas without a citation."
+        "basis": "Declared repo heuristic: classic Broca and Lorentz rules and the 30/35/40 kcal/kg activity factors moved from the page; original sources (19th/early 20th century, not indexed in PubMed) not verified."
       }
     },
     {
@@ -604,10 +617,10 @@
       "reviewed_at": null,
       "evidence": null,
       "source": {
-        "kind": "named-method",
+        "kind": "repo-heuristic",
         "citation": null,
         "anchor": null,
-        "basis": "Header names the McDonald rule without a citation."
+        "basis": "Declared repo heuristic: classic McDonald rule (fundal height in cm approximates gestational weeks, 20-36 weeks); original source not found in PubMed and not verified."
       }
     },
     {
@@ -659,10 +672,10 @@
       "reviewed_at": null,
       "evidence": null,
       "source": {
-        "kind": "unattributed",
+        "kind": "repo-heuristic",
         "citation": null,
         "anchor": null,
-        "basis": "Header states the formula and a ±8.5 cm range without naming a source."
+        "basis": "Declared repo heuristic: parental average +/- 13 cm with a +/-8.5 cm range moved from the page; not attributed to Tanner 1970 because the accessible text confirms the parental average only, not the offset or range."
       }
     },
     {
@@ -673,10 +686,10 @@
       "reviewed_at": null,
       "evidence": null,
       "source": {
-        "kind": "named-method",
+        "kind": "repo-heuristic",
         "citation": null,
         "anchor": null,
-        "basis": "Header names Naegele's rule without a citation."
+        "basis": "Declared repo heuristic: classic Naegele rule (LMP + 280 days with cycle-length correction); original 19th-century source not indexed in PubMed and not verified."
       }
     },
     {
@@ -762,10 +775,23 @@
       "reviewed_at": null,
       "evidence": null,
       "source": {
-        "kind": "named-method",
-        "citation": null,
-        "anchor": null,
-        "basis": "Header names the Parkland (Baxter) formula without a citation."
+        "kind": "published",
+        "citation": "Baxter & Shires, Ann N Y Acad Sci 1968;150:874-94",
+        "anchor": "Baxter & Shires, Ann N Y Acad Sci 1968;150:874-94",
+        "basis": "The Parkland (Baxter) formula is named after this paper (PubMed record has no abstract); the 4 mL x kg x %TBSA constant and the 8 h / 16 h split have not been checked against the full text.",
+        "doi": "10.1111/j.1749-6632.1968.tb14738.x",
+        "pmid": "4973463",
+        "lookup": {
+          "source": "PubMed",
+          "pmid": "4973463",
+          "doi": "10.1111/j.1749-6632.1968.tb14738.x",
+          "retrievedOn": "2026-10-24",
+          "title": "Physiological response to crystalloid resuscitation of severe burns.",
+          "firstAuthor": "Baxter",
+          "journal": "Ann N Y Acad Sci",
+          "year": 1968,
+          "pages": "874-94"
+        }
       }
     },
     {
@@ -776,10 +802,10 @@
       "reviewed_at": null,
       "evidence": null,
       "source": {
-        "kind": "unattributed",
+        "kind": "repo-heuristic",
         "citation": null,
         "anchor": null,
-        "basis": "Header names no source for the fluid, potassium and insulin worksheet constants."
+        "basis": "Declared repo heuristic: fluid, potassium (3.5 / 5.5 mEq/L) and insulin worksheet constants moved from the page; not a validated protocol and no source is verified."
       }
     },
     {
@@ -980,10 +1006,23 @@
       "reviewed_at": null,
       "evidence": null,
       "source": {
-        "kind": "unattributed",
-        "citation": null,
-        "anchor": null,
-        "basis": "Header says the bands were moved unchanged from a page and names no source."
+        "kind": "published",
+        "citation": "Ashwell M, Gibson S. 2016. Waist-to-height ratio as an indicator of 'early health risk': simpler and more predictive than using a 'matrix' based on BMI and waist circumference. BMJ Open. 6(3):e010159.",
+        "anchor": "Ashwell M, Gibson S. 2016. BMJ Open. 6(3):e010159.",
+        "basis": "PubMed PMID 26975935 and PMC4800150 full text checked on 2026-10-24. Methods uses WHtR <0.5, >=0.5 and <0.6, and >=0.6 in UK adults (n=1453), matching the engine boundaries. App labels remain educational; input sanity ranges are repo-defined, and this is not an individualized risk probability or clinical validation.",
+        "doi": "10.1136/bmjopen-2015-010159",
+        "pmid": "26975935",
+        "lookup": {
+          "source": "PubMed",
+          "pmid": "26975935",
+          "doi": "10.1136/bmjopen-2015-010159",
+          "retrievedOn": "2026-10-24",
+          "title": "Waist-to-height ratio as an indicator of 'early health risk': simpler and more predictive than using a 'matrix' based on BMI and waist circumference.",
+          "firstAuthor": "Ashwell",
+          "journal": "BMJ open",
+          "year": 2016,
+          "pages": "e010159"
+        }
       }
     },
     {
@@ -994,10 +1033,10 @@
       "reviewed_at": null,
       "evidence": null,
       "source": {
-        "kind": "named-method",
+        "kind": "repo-heuristic",
         "citation": null,
         "anchor": null,
-        "basis": "Header names the Widmark formula without a citation; r and beta constants are uncited."
+        "basis": "Declared repo heuristic: classic Widmark formula with r = 0.68/0.55 and beta = 0.15 per mille/h moved from the page; original source not found in PubMed and the constants are not verified."
       }
     }
   ]
