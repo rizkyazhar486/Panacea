@@ -27,7 +27,7 @@ jobs:
   proof-shard:
     name: proof-shard (${{ matrix.nama }})
     runs-on: ubuntu-24.04
-    timeout-minutes: 60
+    timeout-minutes: 70
     strategy:
       fail-fast: true
       matrix:
@@ -56,8 +56,10 @@ jobs:
       - name: Production build
         run: npm run build
 
+      # Run main 39954196713 habis 15 menit di apt/browser, sebelum gerbang render.
+      # Satu instalasi, seperti #2704; retry apt yang terputus dapat mengunci dpkg.
       - name: Install browser smoke runner
-        timeout-minutes: 15
+        timeout-minutes: 22
         run: |
           set -euo pipefail
 
