@@ -22,8 +22,15 @@ const SLOW_MS = Number(process.env.QA_SLOW_MS || 1500)
 // (Membuktikan pendeteksi teks bocor dan overflow benar-benar bekerja tanpa membangun ulang aplikasi.)
 const SABOTASE = process.env.QA_SABOTASE || ''
 assert.ok(['', 'bocor', 'overflow', 'galat-render'].includes(SABOTASE), `QA_SABOTASE tidak dikenal: ${SABOTASE}`)
+// QA_CRASH=1 (butuh build VITE_QA_HOOKS=1): tiap halaman dibuat crash saat render lewat kait QA (sessionStorage); cangkang HARUS tetap
+// hidup, galat tertahan di batas rute, dan halaman pulih setelah kait dilepas. Kontrol negatif: build yang sama dengan
+// VITE_QA_NO_ROUTE_BOUNDARY=1 HARUS gagal di langkah ini untuk setiap rute (lihat f1-negative-evidence.mjs mode 'crash').
+const CRASH = process.env.QA_CRASH === '1'
+const QA_CRASH_KEY = 'panacea:qa-crash-route'
+const LANGKAH_CRASH = 'crash render satu halaman: cangkang tetap hidup, galat tertahan di halaman itu, halaman pulih setelahnya'
+assert.ok(!(CRASH && SABOTASE), 'QA_CRASH dan QA_SABOTASE tidak boleh digabung: satu kontrol per run')
 const SKRIP_SABOTASE = { bocor: "document.addEventListener('DOMContentLoaded', () => { const d = document.createElement('div'); d.textContent = 'Saldo: NaN [object Object]'; document.body.appendChild(d) })",
-  overflow: "document.addEventListener('DOMContentLoaded', () => { const d = document.createElement('div'); d.style.cssText = 'width:4000px;height:1px'; document.body.appendChild(d) })",
+  overflow: "document.addEventListener('DOMContentLoaded', () => { const d = document.createElement('div'); d.style.cssText = 'width:4000px;height:1px'; document.body.appendChild(d) })" ,
   // Meniru layar ErrorBoundary akar (role=alert + judul tetap): halaman yang crash saat render harus terdeteksi walau teksnya cukup panjang untuk lolos 'terisi'.
   'galat-render': "document.addEventListener('DOMContentLoaded', () => { const d = document.createElement('div'); d.setAttribute('role', 'alert'); d.innerHTML = '<h1>Something went wrong</h1><p>Sorry, an unexpected error occurred. Your data is safe. Try reloading the page.</p>'; document.body.appendChild(d) })" }
 
@@ -39,10 +46,11 @@ const record = (viewport, journey, step, ok, detail) => results.push({ viewport,
 async function step(viewport, journey, name, fn) {
   try { const detail = await fn(); record(viewport, journey, name, true, detail) } catch (e) { record(viewport, journey, name, false, String(e.message).split('\n')[0]); throw e }
 }
+// Crash render yang DITANGKAP tetap berarti halaman tidak berfungsi: layar ErrorBoundary akar (src/components/layout/ErrorBoundary.tsx)
+// atau fallback batas rute ([data-route-error], RouteErrorBoundary). Keduanya tidak boleh tampil di keadaan lambat, 500, atau pemulihan.
+const galatRender = (page) => page.evaluate(() => !!document.querySelector('[data-route-error]') || [...document.querySelectorAll('[role="alert"]')].some((e) => /Something went wrong/.test(e.textContent || '')))
 const BOCOR = ['[object Object]', 'undefined', 'NaN', 'TypeError', 'Cannot read']
 const bocor = (t) => BOCOR.filter((x) => t.includes(x))
-// Layar ErrorBoundary (src/components/layout/ErrorBoundary.tsx) adalah crash render yang DITANGKAP: tampil, tetapi halamannya tidak berfungsi.
-const galatRender = (page) => page.evaluate(() => [...document.querySelectorAll('[role="alert"]')].some((e) => /Something went wrong/.test(e.textContent || '')))
 
 const browser = await chromium.launch({ executablePath: process.env.CHROME || undefined, headless: true, args: ['--no-sandbox'] })
 let failed = null
@@ -105,6 +113,30 @@ try {
         await buka(rute); await terisi(rute, 120000)
         const t = await teks(page); assert.ok(sehat(rute, t), `tidak terisi TANPA gangguan (${t.trim().length} karakter)`); return { chars: t.trim().length }
       }))
+      if (CRASH) {
+        await step(vp.name, J, LANGKAH_CRASH, () => periksa('crash render', peran.rute, async (rute) => {
+          // Mulai tiap rute dari aplikasi segar (galat akar dari rute sebelumnya tidak boleh terbawa) dan selalu lepas kait di akhir.
+          await page.evaluate((k) => sessionStorage.removeItem(k), QA_CRASH_KEY)
+          try {
+            // Sasaran crash = rute AKTIF setelah redirect selesai (mis. #/all-features -> /semua-fitur), bukan teks rute di daftar.
+            await page.goto(APP + rute, { waitUntil: 'domcontentloaded', timeout: 120000 }); await page.reload({ waitUntil: 'domcontentloaded', timeout: 120000 }); await cangkang(page)
+            await page.evaluate((k) => sessionStorage.setItem(k, location.hash.slice(1).split('?')[0] || '/'), QA_CRASH_KEY)
+            await page.reload({ waitUntil: 'domcontentloaded', timeout: 120000 })
+            // Tunggu salah satu hasil: fallback batas rute atau layar galat akar (tanpa menunggu 90 dtk penuh bila cangkang hilang).
+            await page.waitForFunction(() => !!document.querySelector('[data-route-error]') || /Something went wrong/.test(document.body.innerText), null, { timeout: 60000 })
+            const akar = await page.evaluate(() => /Something went wrong/.test(document.body.innerText))
+            assert.ok(!akar, 'cangkang hilang setelah crash render (layar galat akar tampil)')
+            // Penanda cangkang yang sama untuk semua peran: penanda khusus staf ('Lab result review') adalah isi halaman, ikut hilang saat crash.
+            await page.getByRole('button', { name: 'Notifications' }).first().waitFor({ timeout: 15000 })
+            const o = await overflowX(page); assert.ok(o <= 1, `overflow ${o}px pada fallback crash`)
+          } finally { await page.evaluate((k) => sessionStorage.removeItem(k), QA_CRASH_KEY).catch(() => {}) }
+          await page.reload({ waitUntil: 'domcontentloaded', timeout: 120000 }); await cangkang(page); await terisi(rute, 60000)
+          const t = await teks(page); assert.ok(sehat(rute, t), `tidak pulih setelah crash (${t.trim().length} karakter)`)
+          return { fallback: true, chars: t.trim().length }
+        }))
+        await ctx.close()
+        continue
+      }
       await step(vp.name, J, `API lambat (${SLOW_MS} ms): cangkang tetap tampil, tanpa overflow atau teks bocor`, async () => {
         await page.route(apiUrl, async (r) => { await new Promise((x) => setTimeout(x, SLOW_MS)); await r.continue().catch(() => {}) })
         try {

@@ -61,7 +61,7 @@ Of the 10: six are equivalent or unreachable (`bloodDonationScreen`, `charlson`,
 
 - **Shows:** the arithmetic coefficients of the formulas are guarded (MELD-Na `1.32`, `0.033` and `137` were killed in run 1 already), and now also the cut-offs, clamps and input-range limits. No survivor of run 2 is a formula coefficient.
 - **Does not show:** that any limit or cut-off is clinically right. The pins freeze the values the engines declare today; `clinically_reviewed` stays `false` for every engine and nothing here is a clinical validation. The range tables are repo-defined sanity bounds, not clinical thresholds (the engine comments say so).
-- **Does not cover:** the per-engine adversarial matrix of ENG-C6-02 (blank, NaN, Infinity, negative, unit mismatch, each with a *named* rejection reason). Many engines reject those, and suites 1 to 12 exercise hostile inputs for several, but there is no generic matrix asserting it for all 47.
+- **Does not cover:** whether the adversarial matrix is exhaustive; it is a separate suite, see `CALCULATOR_ADVERSARIAL_MATRIX.md` (blank, NaN, Infinity, negative, unit text, each with a named rejection, over all 47 engines).
 - **Limits of the method:** one mutation per literal (`+1`), no mutation of operators or control flow; a survivor may be an equivalent mutant; crashed mutants fail a suite but not with an assertion, so they are reported, not credited.
 
 ## Per-engine results (run 2; the column "Run 1" is survivors before suites 12 to 14)

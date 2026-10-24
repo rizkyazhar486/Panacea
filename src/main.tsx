@@ -16,6 +16,8 @@ import { LongitudinalStateProvider } from './lib/useLongitudinalState'
 import { Shell } from './components/Shell'
 import { RangkaHalaman } from './components/Rangka'
 import { ErrorBoundary } from './components/ErrorBoundary'
+import { RouteErrorBoundary } from './components/RouteErrorBoundary'
+import { QaCrashProbe } from './components/QaCrashProbe'
 import { AppStatus } from './components/AppStatus'
 import { OfflineBanner } from './components/OfflineBanner'
 const OsceUkmppd = lazy(() => import('./pages/OsceUkmppd').then((m) => ({ default: m.OsceUkmppd })))
@@ -199,6 +201,8 @@ createRoot(document.getElementById('root')!).render(
       <OfflineBanner />
       <HashRouter>
         <Shell>
+          <RouteErrorBoundary>
+          <QaCrashProbe />
           <Suspense fallback={<PageLoader />}>
             <Routes>
               <Route path="/" element={<Home />} />
@@ -435,6 +439,7 @@ createRoot(document.getElementById('root')!).render(
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspense>
+          </RouteErrorBoundary>
         </Shell>
       </HashRouter>
     </LongitudinalStateProvider>

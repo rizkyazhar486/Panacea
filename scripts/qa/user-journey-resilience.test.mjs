@@ -60,3 +60,13 @@ test('contributor identity has explicit negative authorization coverage rather t
   assert.ok(main.includes('contributor cannot gain staff/owner/verifier powers'))
   assert.ok(main.includes('contributor token revoked on logout'))
 })
+
+test('ENG-F1-03 crash render: QA build must contain every page crash, and the no-boundary build must fail by named step', () => {
+  assert.ok(script.includes("const CRASH = process.env.QA_CRASH === '1'") && script.includes("'panacea:qa-crash-route'"), 'crash mode uses the QA hook key')
+  assert.ok(script.includes("assert.ok(!(CRASH && SABOTASE)"), 'one control per run')
+  assert.ok(script.includes("'cangkang hilang setelah crash render (layar galat akar tampil)'"), 'shell loss is a named detector failure')
+  assert.ok(workflow.includes('VITE_QA_HOOKS=1 npx vite build') && workflow.includes('VITE_QA_HOOKS=1 VITE_QA_NO_ROUTE_BOUNDARY=1 npx vite build'), 'both QA bundles are built')
+  assert.ok(/QA_CRASH=1 QA_OUT="\$RUNNER_TEMP\/user-journey-resilience-crash\.json"[^\n]*\|\| rc=1/.test(workflow), 'positive crash run fails the job when it fails')
+  assert.ok(workflow.includes("Kontrol negatif 'crash' LOLOS") && workflow.includes('f1-negative-evidence.mjs crash'), 'negative crash run must fail with verified detector evidence')
+  assert.ok(workflow.includes('user-journey-resilience-negatif-crash.json') && workflow.includes('user-journey-resilience-crash.json'), 'crash evidence is uploaded')
+})
