@@ -5,6 +5,7 @@ import { IconActivity } from '../../../components/icons'
 import { getDemoTersimpan } from '../../../lib/profile'
 import { CopyNote } from '../../../components/CopyNote'
 import { BatasKlaimKesehatan } from '../../../components/BatasKlaimKesehatan'
+import { SumberKalkulator } from '../../../components/ui/SumberKalkulator'
 import { findrisc as hitungFindrisc, parseNumberField } from '../../../domains/clinical-calculators'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -56,6 +57,7 @@ export function Findrisc() {
         <SectionTitle icon={<IconActivity size={20} />} title="Diabetes Risk (FINDRISC)" subtitle="Published 10-year type-2 diabetes screen — no blood test (Lindström & Tuomilehto 2003)" />
         <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Eight short questions estimate your 10-year type-2 diabetes risk without a blood test — a prevention screen, not a diagnosis.</Prosa>
         <BatasKlaimKesehatan permukaan="screening.findrisc" />
+        <SumberKalkulator ids={['findrisc']} />
         <div className="mt-3 grid grid-cols-2 gap-3">
           <Field label="Age (years)">
             <input className={inputClass} type="number" value={ageText} onChange={(e) => setAge(e.target.value)} />

@@ -6,11 +6,11 @@ const native = JSON.parse(fs.readFileSync('bodyexposure/qa_reports/gait_contact_
 const coordinates = JSON.parse(fs.readFileSync('bodyexposure/qa_reports/gait_coordinate_audit.json', 'utf8'))
 const expected = {
   adult_male: {
-    source: '0d4a95646feac9d64a8c734877090d11d5a366d0b825a3f8ac9bf3a8df35450b',
+    source: '03aa529c35d347d00f23c6bd2fb8dd6ac5050818e2ed818f1e11bff6bcbbd177',
     walk: { heelPlantar: { L: ['22-25+0-4'], R: ['7-10'] }, toePlantar: { L: ['22-25+0-8'], R: ['8-18'] } },
   },
   vhf_denver_ct_adult_female: {
-    source: '73b112ed087bbdbf0778232f2fede7ea27e1b55ca0d2d363b0260552821a4525',
+    source: '7ec5ae004e6dca96f93cbb85b297e32d6a1d128980cdaa4af42a1d51eb574e32',
     walk: { heelPlantar: { L: [], R: [] }, toePlantar: { L: [], R: [] } },
   },
 }

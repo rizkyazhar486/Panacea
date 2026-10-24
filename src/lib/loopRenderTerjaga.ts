@@ -27,7 +27,7 @@ export interface LoopTerjaga { berjalan: () => boolean; hentikan: () => void; ko
 export function mulaiLoopTerjaga(wadah: Element, frame: () => void, dep: DepLoop = depBrowser()): LoopTerjaga {
   let raf = 0, terlihat = false, dibuang = false, hilang = false
   const boleh = () => !dibuang && !hilang && terlihat && !dep.tersembunyi()
-  const langkah = () => { raf = 0; if (!boleh()) return; frame(); raf = dep.requestFrame(langkah) }
+  const langkah = () => { raf = 0; if (!boleh()) return; frame(); if (!raf && boleh()) raf = dep.requestFrame(langkah) }
   const mulai = () => { if (!raf && boleh()) raf = dep.requestFrame(langkah) }
   const henti = () => { if (raf) dep.cancelFrame(raf); raf = 0 }
   const lepasVis = dep.onVisibilitas(() => (dep.tersembunyi() ? henti() : mulai()))

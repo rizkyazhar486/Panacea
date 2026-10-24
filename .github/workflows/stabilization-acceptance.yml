@@ -48,7 +48,7 @@ jobs:
         run: npm run uji
 
       - name: Install mobile browser smoke runner
-        timeout-minutes: 8
+        timeout-minutes: 22
         run: |
           set -euo pipefail
           PW_PREFIX="${RUNNER_TEMP}/panacea-playwright"
@@ -90,6 +90,11 @@ jobs:
               sudo mv "$source" "$source.panacea-disabled"
             fi
           done
+          # The Azure Ubuntu mirror intermittently crawls (~40 KB/s): this step needed about
+          # 10 minutes on a bad day and failed the old 8-minute budget twice on main
+          # (c57e22fc, a0f2f0cd). A single attempt gets a larger budget. Do NOT wrap this in
+          # `timeout` + retry: killing playwright leaves its apt-get child holding the dpkg
+          # lock, so the retry fails at once with "Could not get lock" (observed on #2704).
           "$PW_PREFIX/node_modules/.bin/playwright" install --with-deps chromium
 
       - name: Start frontend preview
@@ -119,6 +124,10 @@ jobs:
 
       - name: OpenCell failed-source recovery
         run: node scripts/qa/opencell-load-recovery-smoke.mjs
+
+      - name: Fetal GLB rejection and resize regression (negative asset control)
+        timeout-minutes: 5
+        run: node qa/fetal-rejected-geometry.mjs
 
       - name: Body Exposure rendered WebGL visual artifact
         env:
@@ -357,6 +366,20 @@ jobs:
           path: artifacts/dna-duration
           if-no-files-found: ignore
 
+      - name: Human Replay duration provenance and poster (synthetic component, mobile/desktop)
+        timeout-minutes: 6
+        env:
+          PLAYWRIGHT_MODULE: ${{ runner.temp }}/panacea-playwright/node_modules/playwright/index.mjs
+        run: node scripts/qa/human-replay-duration-smoke.mjs
+
+      - name: Upload Human Replay duration evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: replay-duration
+          path: artifacts/replay-duration
+          if-no-files-found: ignore
+
       - name: Training duration provenance (synthetic client, 390x844)
         timeout-minutes: 5
         env:
@@ -502,6 +525,20 @@ jobs:
         env:
           PLAYWRIGHT_MODULE: ${{ runner.temp }}/panacea-playwright/node_modules/playwright/index.mjs
         run: node scripts/qa/lab-result-review-e2e-gate.mjs
+
+      - name: Privacy disclosure matches implemented controls (public route, mobile/desktop)
+        timeout-minutes: 6
+        env:
+          PLAYWRIGHT_MODULE: ${{ runner.temp }}/panacea-playwright/node_modules/playwright/index.mjs
+        run: node qa/clinical/privacy-disclosure.mjs
+
+      - name: Upload privacy disclosure evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: privacy-disclosure
+          path: artifacts/privacy-disclosure
+          if-no-files-found: ignore
 
       - name: A6 clinician care-plan approval (real HTTP, mobile and desktop)
         timeout-minutes: 6

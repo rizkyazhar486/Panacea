@@ -7,7 +7,7 @@ import ts from 'typescript'
 // Execute the component's actual pointer handlers with deterministic ray hits.
 // This checks event admission and dispatch, not GPU rendering or hit geometry.
 function harness(measuring = false) {
-  const source = readFileSync(new URL('../../src/pages/CanonicalBody.tsx', import.meta.url), 'utf8')
+  const source = readFileSync(new URL('../../src/pages/bodyhub/CanonicalBody.tsx', import.meta.url), 'utf8')
   const start = source.indexOf('    let down:')
   const end = source.indexOf('    // ketuk ganda:', start)
   assert.ok(start >= 0 && end > start)
@@ -66,7 +66,7 @@ test('drag over threshold is consumed and a later fresh tap still works', () => 
 })
 
 test('cancellation listener is installed and removed with the viewer', () => {
-  const source = readFileSync(new URL('../../src/pages/CanonicalBody.tsx', import.meta.url), 'utf8')
+  const source = readFileSync(new URL('../../src/pages/bodyhub/CanonicalBody.tsx', import.meta.url), 'utf8')
   assert.match(source, /addEventListener\('pointercancel', onCancel\)/)
   assert.match(source, /removeEventListener\('pointercancel', onCancel\)/)
 })

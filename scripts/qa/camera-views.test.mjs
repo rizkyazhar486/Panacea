@@ -51,6 +51,21 @@ test('menolak_input_tidak_valid', () => {
   assert.equal(viewPose('oblique', C, SZ, 30, 1), null)
 })
 
+test('framing rejects nonfinite aspect and invalid margins before camera assignment', () => {
+  for (const aspect of [NaN, Infinity, -Infinity]) {
+    assert.equal(viewPose('anterior', C, SZ, 30, aspect), null)
+  }
+  for (const margin of [NaN, Infinity, -Infinity, 0, -1]) {
+    assert.equal(viewPose('anterior', C, SZ, 30, 1, margin), null)
+  }
+})
+
+test('finite inputs that overflow framing calculations do not return invalid coordinates', () => {
+  assert.equal(viewPose('anterior', C, [Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE], 30, 1), null)
+  assert.equal(viewPose('anterior', C, SZ, Number.MIN_VALUE, 1), null)
+  assert.equal(viewPose('anterior', C, SZ, 30, Number.MIN_VALUE), null)
+})
+
 test('smootherstep_batas_dan_simetri', () => {
   assert.equal(smootherstep(0), 0); assert.equal(smootherstep(1), 1); assert.equal(smootherstep(0.5), 0.5)
   assert.equal(smootherstep(-3), 0); assert.equal(smootherstep(7), 1)

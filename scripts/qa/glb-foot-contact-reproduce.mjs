@@ -62,7 +62,31 @@ for (const side of ['L', 'R']) {
   const heelPlantar = pick(all.filter((p) => p.z <= zmin + PLANTAR_FRACTION * len), (b, a) => b.y < a.y || (b.y === a.y && b.z < a.z))
   const toePlantar = pick(all.filter((p) => p.z >= zmax - PLANTAR_FRACTION * len), (b, a) => b.y < a.y || (b.y === a.y && b.z > a.z))
   marker[side] = { heel, toe, heelPlantar, toePlantar, footLength_m: len }
+  // T-D7-02: landmark ANATOMIS dari mesh tulang sumber (bukan simpul ekstrem kaki). Rig tidak punya sendi jari, jadi bola kaki (kepala
+  // metatarsal I, atau kombinasi metatarsal+falang untuk betina) adalah pivot depan; ujung jari tidak dipakai.
+  const bone = (re) => { const m = []; feet[side].traverse((c) => { if (re.test(c.name)) footMeshes(c).forEach((x) => m.includes(x) || m.push(x)) }); return m }
+  const verts = (meshes) => { const p = []; for (const mesh of meshes) for (let i = 0; i < mesh.geometry.attributes.position.count; i++) { world(mesh, i, v); p.push({ mesh, i, y: v.y, z: v.z }) } return p }
+  const calc = verts(bone(new RegExp(`SKELETALCALCANEUS${side}$`)))
+  const mt1 = verts(bone(new RegExp(`SKELETALFIRST_METATARSAL_BONE${side}$`)))
+  const comb = verts(bone(new RegExp(`METATARSALS_AND_PHALANGES_COMBINED${side}$`)))
+  const forefoot = mt1.length ? mt1 : comb
+
+  // ENG-D7-03: rig yang diekspor membawa node landmark bernama (scripts/qa/glb-add-foot-landmarks.mjs). Metrik MEMAKAI node itu; simpul mesh
+  // hanya kontrol silang: selisih > 1 µm berarti node usang atau salah taruh, dan reproduksi berhenti.
+  for (const [kind, key, sourceMesh] of [['heelCalcaneus', 'HEEL', calc], ['ballMT1', 'BALL', forefoot]]) {
+    const node = root.getObjectByName(`FOOT_LANDMARK_${key}_${side}`)
+    if (!node && !sourceMesh.length) { marker[side][kind] = null; continue }
+    if (!node) throw new Error(`rig landmark node FOOT_LANDMARK_${key}_${side} missing while its source bone exists`)
+    if (!sourceMesh.length) throw new Error(`rig landmark node FOOT_LANDMARK_${key}_${side} has no source bone`)
+    const pn = new THREE.Vector3().setFromMatrixPosition(node.matrixWorld)
+    const closestDist = Math.min(...sourceMesh.map((pt) => pn.distanceTo(world(pt.mesh, pt.i, v))))
+    if (closestDist > 1e-6) throw new Error(`rig landmark node FOOT_LANDMARK_${key}_${side} is ${(closestDist * 1000).toFixed(3)} mm from its source vertex`)
+    marker[side][kind] = { node }
+  }
 }
+// Ketersediaan landmark anatomis per sisi dicatat; landmark yang tidak ada di sumber TIDAK diganti tebakan.
+const ANATOMICAL = { heelCalcaneus: 'rig node FOOT_LANDMARK_HEEL_<side>: calcaneus lowest vertex', ballMT1: 'rig node FOOT_LANDMARK_BALL_<side>: first metatarsal head (or forefoot combined)' }
+const landmarkAvailability = Object.fromEntries(Object.keys(ANATOMICAL).map((k) => [k, { L: !!marker.L[k], R: !!marker.R[k] }]))
 
 function sample(clip) {
   const mixer = new THREE.AnimationMixer(root)
@@ -79,7 +103,11 @@ function sample(clip) {
       let lowest = Infinity, lowestZ = 0
       for (const mesh of footMeshes(feet[side])) for (let i = 0; i < mesh.geometry.attributes.position.count; i++) { world(mesh, i, v); if (v.y < lowest) { lowest = v.y; lowestZ = v.z } }
       const mk = {}
-      for (const name of ['heel', 'toe', 'heelPlantar', 'toePlantar']) { world(marker[side][name].mesh, marker[side][name].i, v); mk[name] = { y: v.y, z: v.z } }
+      for (const name of ['heel', 'toe', 'heelPlantar', 'toePlantar', 'heelCalcaneus', 'ballMT1']) {
+        const m = marker[side][name]; if (!m) continue
+        if (m.node) v.setFromMatrixPosition(m.node.matrixWorld); else world(m.mesh, m.i, v)
+        mk[name] = { y: v.y, z: v.z }
+      }
       row[side] = { lowest, lowestZ, ...mk }
     }
     rows.push(row)
@@ -115,9 +143,10 @@ for (const clip of gltf.animations.filter((a) => a.name === 'WALK' || a.name ===
   const N = rows.length
   const floor = Math.min(...rows.flatMap((r) => ['L', 'R'].map((s) => r[s].lowest)))
   const out = { frames: N, foot_length_m: +marker.L.footLength_m.toFixed(3), loop_closed_duplicate_end_frame_dropped: closed, floor_m: +floor.toFixed(4) }
-  for (const kind of ['heel', 'toe', 'heelPlantar', 'toePlantar', 'sole']) {
+  for (const kind of ['heel', 'toe', 'heelPlantar', 'toePlantar', 'heelCalcaneus', 'ballMT1', 'sole']) {
     const groups = []; const per = {}
     for (const side of ['L', 'R']) {
+      if (kind !== 'sole' && !marker[side][kind]) { per[side] = null; continue }
       const h = rows.map((r) => (kind === 'sole' ? r[side].lowest : r[side][kind].y) - floor)
       const ph = phases(h, closed)
       per[side] = ph.map(([a, b]) => (b >= N ? `${a}-${N - 1}+0-${b - N}` : `${a}-${b}`))
@@ -125,6 +154,7 @@ for (const clip of gltf.animations.filter((a) => a.name === 'WALK' || a.name ===
       for (const [a, b] of ph) { const t = [], x = []; for (let f = a; f <= b; f++) { const r = rows[f % N]; t.push(f / FPS); x.push((kind === 'sole' ? r[side].lowestZ : r[side][kind].z) - r.pelvisZ) } groups.push({ side, t, x }) }
     }
     out[kind] = { ...fitFootContact(groups), phases_by_side: per, samples: groups }
+    if (kind in ANATOMICAL) out[kind].landmark = { definition: ANATOMICAL[kind], available_by_side: landmarkAvailability[kind] }
   }
   report.clips[clip.name] = out
 }

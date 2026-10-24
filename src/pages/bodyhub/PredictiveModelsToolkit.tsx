@@ -3,6 +3,7 @@ import { Prosa } from '../../components/Prosa'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../../components/ui'
 import { IconGauge } from '../../components/icons'
 import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
+import { SumberKalkulator } from '../../components/ui/SumberKalkulator'
 import { parsePredictiveField, type PredictiveField } from '../../domains/personal-health'
 import { autophagyTiming } from '../../domains/clinical-calculators'
 
@@ -241,6 +242,7 @@ export function PredictiveModelsToolkit() {
       <Card className="!p-5">
         <SectionTitle icon={<IconGauge size={20} />} title="Predictive Models Toolkit" subtitle="Six mathematical models — the shape of the curve, not your number" />
         <BatasKlaimKesehatan permukaan="longevity.predictive-models" />
+        <SumberKalkulator ids={['autophagyTiming']} />
         <p className="mt-2 rounded-xl bg-amber-500/10 px-3 py-2 text-[11px] leading-snug text-amber-800 dark:text-amber-300">
           The constants in these models were <b>chosen by the author</b> to make the curve shape plausible; the output is not a
           measurement and cannot be used to guide action.

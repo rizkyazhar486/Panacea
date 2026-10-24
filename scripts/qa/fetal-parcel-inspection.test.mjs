@@ -65,4 +65,12 @@ for (const [name, mutate] of [
   ['missing closure evidence', data => { delete data.regions[0].boundary_edges }],
   ['altered display defaults', data => { data.default_labels = [1,2,3,4,5,6,7,8,9] }],
   ['unsafe asset path', data => { data.asset = '../../patient.glb' }],
+  ['changed source URL', data => { data.source = 'https://example.test/other-atlas' }],
+  ['changed source revision', data => { data.source_revision = '0'.repeat(40) }],
+  ['changed license', data => { data.license = 'CC-BY-4.0' }],
+  ['changed coordinate frame', data => { data.coordinate_frame = '+X subject right; millimetres' }],
+  ['missing source hashes', data => { delete data.source_sha256 }],
+  ['changed region-mask hash', data => { data.source_sha256['reo-fetal-t2w-body-atlas-mask-lungs_multi-10.nii.gz'] = '0'.repeat(64) }],
+  ['changed organ-mask hash', data => { data.source_sha256['reo-fetal-t2w-body-atlas-mask-body_organs-10.nii.gz'] = '0'.repeat(64) }],
+  ['changed original surface hash', data => { data.source_glb_sha256 = '0'.repeat(64) }],
 ]) test(`rejects ${name}`, () => { const data = structuredClone(dataset); mutate(data); assert.throws(() => parseFetalParcelDataset(data)) })

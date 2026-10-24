@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import type { ImportedWorkout } from '../../lib/workoutImport'
+import { workoutDurationSeconds } from '../../shared/kernel/workoutDurationEvidence'
 import { getAutoSyncStatus, type AutoSyncStatus } from '../../lib/autoIsi'
 import { BatasKlaimKesehatan } from '../BatasKlaimKesehatan'
 
@@ -41,7 +42,8 @@ export function TrainingSessionCockpit({ workout, nextTitle, nextWhen, nextColor
     return () => window.removeEventListener('panacea:auto-sync', update)
   }, [])
 
-  const duration = positive(workout.durasi) ? Math.round(workout.durasi / 60) : null
+  const durationSeconds = workoutDurationSeconds(workout)
+  const duration = durationSeconds === null ? null : Math.round(durationSeconds / 60)
   const distance = positive(workout.jarakKm) ? workout.jarakKm : null
   const sessionPace = positive(workout.paceSec) ? pace(workout.paceSec) : null
   const cadence = positive(workout.kadens) ? Math.round(workout.kadens) : null
@@ -58,7 +60,9 @@ export function TrainingSessionCockpit({ workout, nextTitle, nextWhen, nextColor
     {
       label: 'Recorded',
       value: duration !== null ? `${duration} min` : avgHr !== null ? `${avgHr} bpm` : 'No signal',
-      detail: avgHr !== null ? `Avg HR ${avgHr}${maxHr !== null ? ` · max ${maxHr}` : ''}` : 'Duration / HR capture',
+      detail: duration === null
+        ? `Duration unavailable${avgHr !== null ? ` · Avg HR ${avgHr}${maxHr !== null ? ` · max ${maxHr}` : ''}` : ''}`
+        : avgHr !== null ? `Avg HR ${avgHr}${maxHr !== null ? ` · max ${maxHr}` : ''}` : 'Duration / HR capture',
       active: duration !== null || avgHr !== null || maxHr !== null,
       dot: 'bg-sky-300',
       box: 'border-sky-300/20 from-sky-400/20 to-cyan-400/[0.03]',

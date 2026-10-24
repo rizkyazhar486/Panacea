@@ -1,6 +1,7 @@
 import { getSettings, saveSettings, getHealthProfile, getRingkasan } from '../../store.js'
 import { notify } from './push.js'
 import { lingkunganKota } from '../lifestyle/lingkungan.js'
+import { waktuLokalPengguna } from '../../shared/userLocalTime.js'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Mesin aturan notifikasi.
@@ -921,8 +922,7 @@ export async function jalankanAturanNotif(userId: string, email: string): Promis
   const adaKategoriHidup = Object.values(PREF_KATEGORI).some((p) => prefs[p] === true)
   if (!adaKategoriHidup) return { terkirim: null, alasan: 'mati' }
 
-  const offset = Number(prefs.tzOffsetMin) || 0
-  const lokal = new Date(Date.now() + offset * 60_000)
+  const lokal = waktuLokalPengguna(prefs, Date.now())
   const menitLokal = lokal.getUTCHours() * 60 + lokal.getUTCMinutes()
   const tanggalLokal = lokal.toISOString().slice(0, 10)
 
