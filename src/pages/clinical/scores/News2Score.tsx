@@ -6,6 +6,7 @@ import { ScoreTrend } from '../../../components/ScoreTrend'
 import { getHealthCache, hasHealth } from '../../../lib/profile'
 import { CopyNote } from '../../../components/CopyNote'
 import { BatasKlaimSkorTerbit } from '../../../components/BatasKlaimSkorTerbit'
+import { SumberKalkulator } from '../../../components/ui/SumberKalkulator'
 import { news2, parseNumberField } from '../../../domains/clinical-calculators'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -57,6 +58,7 @@ export function News2Score() {
       <Card className="!p-5">
         <SectionTitle icon={<IconActivity size={20} />} title="NEWS2 Score" subtitle="National Early Warning Score — ward deterioration risk (RCP 2017)" />
         <BatasKlaimSkorTerbit />
+        <SumberKalkulator ids={['news2']} />
         <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Combines 7 routine vital signs into a single escalation trigger. Widely used across UK and international hospital wards to standardize the response to acute deterioration.</Prosa>
         <div className="mt-3 grid grid-cols-2 gap-3">
           <Field label="Respiration rate (/min)">

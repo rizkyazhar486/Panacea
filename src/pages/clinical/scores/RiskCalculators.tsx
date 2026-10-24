@@ -4,6 +4,7 @@ import { IconHeart, IconActivity, IconShield } from '../../../components/icons'
 import { getDemoTersimpan } from '../../../lib/profile'
 import { cvdRisk, fib4 as hitungFib4, ostIndex as hitungOst, parseNumberField } from '../../../domains/clinical-calculators'
 import { BatasKlaimKesehatan } from '../../../components/BatasKlaimKesehatan'
+import { SumberKalkulator } from '../../../components/ui/SumberKalkulator'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Clinical Risk Calculators — validated, published scores implemented with
@@ -134,6 +135,7 @@ export function RiskCalculators() {
       <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         Decision-support estimates using each score's published formula. Every tool has its own published population, units, and caveats (e.g. Framingham is a US-cohort general estimate; region-specific tools may differ). Not a diagnosis — review results with the clinician who knows your full history.
         <BatasKlaimKesehatan permukaan="calculators.risk" />
+        <SumberKalkulator ids={['riskScreens']} />
       </div>
     </div>
   )

@@ -1,7 +1,7 @@
 # T-H0-08 — required browser checks (owner action, not applied)
 
 **Task:** ENG-CI-01; **lane:** ARGON; **scope:** required checks on pull requests to `main`.
-**Prepared from:** `main` bc78d0780fc0c66f03e6c99ab232fb824cd33efe (2026-10-23).
+**Prepared from:** `main` 9db6b04e2e69794cf7cf320c59e41cf3cc275990 (2026-10-24), head CI and protection must be checked again after integration.
 **Do not enable protection until this PR is merged and exact-head CI proves the three jobs succeed.**
 
 ## Why this code change is a prerequisite
