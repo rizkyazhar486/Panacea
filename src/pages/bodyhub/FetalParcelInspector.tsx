@@ -118,19 +118,26 @@ export function FetalParcelInspector() {
       sceneRef.current = { meshes, render, fit, plane, bounds }; resize(); setLoaded(true)
     }, undefined, () => { if (!disposed) setError('Dataset geometry could not be loaded') })
     const raycaster = new THREE.Raycaster()
-    let down = { x: 0, y: 0 }
-    const pointerDown = (event: PointerEvent) => { down = { x: event.clientX, y: event.clientY } }
+    let down: { x: number; y: number; pointerId: number } | null = null
+    const pointerDown = (event: PointerEvent) => {
+      down = event.isPrimary && event.button === 0 ? { x: event.clientX, y: event.clientY, pointerId: event.pointerId } : null
+    }
+    const cancelPick = () => { down = null }
     const pick = (event: PointerEvent) => {
-      if (Math.hypot(event.clientX - down.x, event.clientY - down.y) > 5) return
+      const start = down
+      down = null
+      if (!start || !event.isPrimary || event.button !== 0 || event.pointerId !== start.pointerId || Math.hypot(event.clientX - start.x, event.clientY - start.y) > 5) return
       const rect = renderer.domElement.getBoundingClientRect()
       raycaster.setFromCamera(new THREE.Vector2((event.clientX - rect.left) / rect.width * 2 - 1, 1 - (event.clientY - rect.top) / rect.height * 2), camera)
       const hit = raycaster.intersectObjects([...meshes.values()].flat()).find(h => h.object.visible && (!sceneRef.current || sectionState.current === 'off' || plane.distanceToPoint(h.point) >= 0))
       if (hit) setSelected(Number(hit.object.userData.inspectionLabel))
     }
     renderer.domElement.addEventListener('pointerdown', pointerDown); renderer.domElement.addEventListener('pointerup', pick)
+    renderer.domElement.addEventListener('pointercancel', cancelPick)
     return () => {
       penjaga.lepas(); disposed = true; sceneRef.current = null; observer.disconnect(); controls.dispose()
       renderer.domElement.removeEventListener('pointerdown', pointerDown); renderer.domElement.removeEventListener('pointerup', pick)
+      renderer.domElement.removeEventListener('pointercancel', cancelPick)
       scene.traverse(ob => { if (ob instanceof THREE.Mesh) { ob.geometry.dispose(); (Array.isArray(ob.material) ? ob.material : [ob.material]).forEach(m => m.dispose()) } })
       renderer.dispose(); renderer.domElement.remove()
     }
