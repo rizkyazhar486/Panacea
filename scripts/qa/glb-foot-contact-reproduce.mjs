@@ -63,34 +63,29 @@ for (const side of ['L', 'R']) {
   const toePlantar = pick(all.filter((p) => p.z >= zmax - PLANTAR_FRACTION * len), (b, a) => b.y < a.y || (b.y === a.y && b.z > a.z))
   marker[side] = { heel, toe, heelPlantar, toePlantar, footLength_m: len }
   // T-D7-02: landmark ANATOMIS dari mesh tulang sumber (bukan simpul ekstrem kaki). Rig tidak punya sendi jari, jadi bola kaki (kepala
-  // metatarsal I) adalah pivot depan terjauh yang sah; ujung jari tidak dipakai. Nama simpul disanitasi three.js (titik dihapus).
+  // metatarsal I, atau kombinasi metatarsal+falang untuk betina) adalah pivot depan; ujung jari tidak dipakai.
   const bone = (re) => { const m = []; feet[side].traverse((c) => { if (re.test(c.name)) footMeshes(c).forEach((x) => m.includes(x) || m.push(x)) }); return m }
   const verts = (meshes) => { const p = []; for (const mesh of meshes) for (let i = 0; i < mesh.geometry.attributes.position.count; i++) { world(mesh, i, v); p.push({ mesh, i, y: v.y, z: v.z }) } return p }
   const calc = verts(bone(new RegExp(`SKELETALCALCANEUS${side}$`)))
   const mt1 = verts(bone(new RegExp(`SKELETALFIRST_METATARSAL_BONE${side}$`)))
-  // tumit = simpul terendah kalkaneus (tuberositas yang menapak), seri dipecah ke arah posterior
-  marker[side].heelCalcaneus = calc.length ? pick(calc, (b, a) => b.y < a.y || (b.y === a.y && b.z < a.z)) : null
-  // bola = simpul terendah di seperempat anterior metatarsal I (kepala metatarsal), seri dipecah ke arah anterior
-  if (mt1.length) {
-    const z0 = Math.min(...mt1.map((p) => p.z)), z1 = Math.max(...mt1.map((p) => p.z))
-    if (!(z1 > z0)) throw new Error(`invalid first metatarsal length: ${side}`)
-    marker[side].ballMT1 = pick(mt1.filter((p) => p.z >= z1 - PLANTAR_FRACTION * (z1 - z0)), (b, a) => b.y < a.y || (b.y === a.y && b.z > a.z))
-  } else marker[side].ballMT1 = null
+  const comb = verts(bone(new RegExp(`METATARSALS_AND_PHALANGES_COMBINED${side}$`)))
+  const forefoot = mt1.length ? mt1 : comb
+
   // ENG-D7-03: rig yang diekspor membawa node landmark bernama (scripts/qa/glb-add-foot-landmarks.mjs). Metrik MEMAKAI node itu; simpul mesh
   // hanya kontrol silang: selisih > 1 µm berarti node usang atau salah taruh, dan reproduksi berhenti.
-  for (const [kind, key] of [['heelCalcaneus', 'HEEL'], ['ballMT1', 'BALL']]) {
+  for (const [kind, key, sourceMesh] of [['heelCalcaneus', 'HEEL', calc], ['ballMT1', 'BALL', forefoot]]) {
     const node = root.getObjectByName(`FOOT_LANDMARK_${key}_${side}`)
-    const mk = marker[side][kind]
-    if (!node && !mk) continue
+    if (!node && !sourceMesh.length) { marker[side][kind] = null; continue }
     if (!node) throw new Error(`rig landmark node FOOT_LANDMARK_${key}_${side} missing while its source bone exists`)
-    if (!mk) throw new Error(`rig landmark node FOOT_LANDMARK_${key}_${side} has no source bone`)
-    const pn = new THREE.Vector3().setFromMatrixPosition(node.matrixWorld), pm = world(mk.mesh, mk.i, new THREE.Vector3())
-    if (pn.distanceTo(pm) > 1e-6) throw new Error(`rig landmark node FOOT_LANDMARK_${key}_${side} is ${(pn.distanceTo(pm) * 1000).toFixed(3)} mm from its source vertex`)
+    if (!sourceMesh.length) throw new Error(`rig landmark node FOOT_LANDMARK_${key}_${side} has no source bone`)
+    const pn = new THREE.Vector3().setFromMatrixPosition(node.matrixWorld)
+    const closestDist = Math.min(...sourceMesh.map((pt) => pn.distanceTo(world(pt.mesh, pt.i, v))))
+    if (closestDist > 1e-6) throw new Error(`rig landmark node FOOT_LANDMARK_${key}_${side} is ${(closestDist * 1000).toFixed(3)} mm from its source vertex`)
     marker[side][kind] = { node }
   }
 }
 // Ketersediaan landmark anatomis per sisi dicatat; landmark yang tidak ada di sumber TIDAK diganti tebakan.
-const ANATOMICAL = { heelCalcaneus: 'rig node FOOT_LANDMARK_HEEL_<side>: calcaneus lowest vertex', ballMT1: 'rig node FOOT_LANDMARK_BALL_<side>: first metatarsal head (lowest vertex in anterior quarter)' }
+const ANATOMICAL = { heelCalcaneus: 'rig node FOOT_LANDMARK_HEEL_<side>: calcaneus lowest vertex', ballMT1: 'rig node FOOT_LANDMARK_BALL_<side>: first metatarsal head (or forefoot combined)' }
 const landmarkAvailability = Object.fromEntries(Object.keys(ANATOMICAL).map((k) => [k, { L: !!marker.L[k], R: !!marker.R[k] }]))
 
 function sample(clip) {

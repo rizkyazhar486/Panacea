@@ -10743,8 +10743,8 @@
     },
     {
       "path": "vhf_denver_ct_adult_female.rig_rom.glb",
-      "bytes": 213228,
-      "sha256": "2a7936b5a5223ad4b728f33ee1a16bd25b816702a2ee893f6ef138158aefa4ec",
+      "bytes": 213956,
+      "sha256": "7ec5ae004e6dca96f93cbb85b297e32d6a1d128980cdaa4af42a1d51eb574e32",
       "evidencePath": "vhf_denver_ct_adult_female.rig_rom.glb",
       "sources": [
         "Andreassen et al., Scientific Data 10:34 (2023), Visible Human Female lower-extremity musculoskeletal geometry; file VHF_Left_Bone_Calcaneous_smooth.stl",
