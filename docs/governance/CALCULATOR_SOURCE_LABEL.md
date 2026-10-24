@@ -1,6 +1,6 @@
 # Calculator source record and not-reviewed label (ENG-C6-03, partial)
 
-`governance/CALCULATOR_REVIEW_REGISTRY.json` now carries a `source` record for every one of the 47 engines, checked by `scripts/uji/calculator-source-label.mts` (part of `npm run uji`). The criterion stays **NOT_RUN**: only the machine-checkable half is built.
+`governance/CALCULATOR_REVIEW_REGISTRY.json` now carries a `source` record for every one of the 47 engines, checked by `scripts/uji/calculator-source-label.mts` (part of `npm run uji`). The criterion stays **NOT_RUN**: eight source records remain incomplete and formula/unit display is not machine-checked.
 
 ## What is checked
 
@@ -15,11 +15,11 @@
 
 | kind | engines | meaning |
 |---|---|---|
-| published | 24 | the engine header cites author and year (often journal and pages) |
-| named-method | 9 | the header names a method (Holliday-Segar, Parkland, Naegele, ...) with no citation |
-| unattributed | 6 | the header names no source |
-| arithmetic | 4 | arithmetic on user-entered values, no clinical claim |
-| repo-heuristic | 4 | repo-defined model (hydration, sleep debt, caffeine, glycogen timing), not published |
+| published | 27 | the engine header cites author and year (often journal and pages) |
+| named-method | 6 | the header names a method (Holliday-Segar, Parkland, Naegele, ...) with no citation |
+| unattributed | 2 | the header names no source |
+| arithmetic | 5 | arithmetic on user-entered values, no clinical claim |
+| repo-heuristic | 7 | repo-defined model (hydration, sleep debt, caffeine, glycogen timing), not published |
 
 31 distinct pages render the 47 engines; none lacks the label.
 
@@ -33,7 +33,18 @@
 
 ## Why ENG-C6-03 is not PASS
 
-- **19 of 47 engines have no citable source** (named-method, unattributed, arithmetic, repo-heuristic). The criterion asks for a source for every engine; that needs a verified reference found for each, not an invented one.
-- **PMID is recorded for 10 of the 24 published engines** (cockcroftGault, correctedCalcium, fena, findrisc, glasgowBlatchford, ldlFriedewald, lightsCriteria, sirirajStrokeScore, stopBang, charlson), each looked up on 2026-10-24 against PubMed by journal, year, volume, first page and first author, then checked against the returned title, authors, journal, year and pages. DOI is recorded for nine of them (ldlFriedewald has none in PubMed). A `lookup` block keeps what PubMed returned; the suite requires it whenever an identifier is present, requires its PMID/DOI to equal the record's (so swapping one side fails by name), and requires its first author and year to appear in the citation the engine header carries. The suite uses no network, so it cannot re-check the lookup: the match to PubMed is a recorded manual check, not a continuous one. The other 14 published engines have no PMID because their citations lack a journal or page (for example 'Maddrey et al. 1978') or name a guideline rather than an article, and were not guessed.
-- **The source is not shown to users.** The registry holds it; the pages show the label but not the source line, and this suite does not check that pages show formula and units.
-- The label is shown while `clinically_reviewed` is false for every engine. Nothing here is a clinical review.
+- Eight engines still have neither a verified publication record nor a declared repo heuristic: aaGradient, fletcher, idealBodyWeight, mcdonaldRule, midParentalHeight, naegele, parkland and widmarkBac. The owner rule permits a verified source or an explicit heuristic declaration; unknown citations are never invented.
+- The live source suite now reports 27 published sources, of which 26 carry a PubMed lookup; NEWS2 has an explicit unindexed RCP-report record. Lookup fields are checked offline against the stored citation/header and identifier; the suite cannot continuously re-check PubMed. The source record and its boundary label are shown to users through the shared disclosure component.
+- The suite checks source disclosure and not-reviewed labels on consuming pages, but does not yet mechanically verify every displayed formula and unit.
+- All 47 engines remain `clinically_reviewed=false`. Source transparency and engineering checks do not constitute clinical validation.
+
+## Temporary Claude takeover — 2026-10-24, four-engine slice
+
+Owner authorized Codex to continue Claude's work during the usage limit. Baseline main: `9db6b04e2e69794cf7cf320c59e41cf3cc275990`. The live suite reports 12 incomplete source records before this slice and 8 after. ENG-C6-03 remains NOT_RUN; all 47 `clinically_reviewed` flags remain false. No calculator equation, threshold, units, page action or authorization changes.
+
+- `waistToHeight`: Ashwell M, Gibson S. BMJ Open. 2016;6:e010159. PMID [26975935](https://pubmed.ncbi.nlm.nih.gov/26975935/), DOI [10.1136/bmjopen-2015-010159](https://doi.org/10.1136/bmjopen-2015-010159). PubMed metadata and rights-eligible [PMC4800150](https://pmc.ncbi.nlm.nih.gov/articles/PMC4800150/) full text were retrieved on 2026-10-24. Methods explicitly uses WHtR <0.5, >=0.5 to <0.6 and >=0.6 in 1,453 UK adults. The equation is waist circumference / height with matching units; this supports the existing boundaries, not a calibrated individual risk probability or validation in children. The input sanity bounds are repo-defined.
+- `bloodDonationScreen`: declared **repo heuristic — no clinical source** for this assembled 17–65-year, 50-kg, 12-week screen and generic deferral flags. The shared source disclosure now explicitly disclaims WHO/PMI/national-service endorsement and defers actual eligibility to the blood service.
+- `fluidElectrolytes`: declared **repo heuristic — no clinical source** for the combined worksheet. Named published component methods do not validate its combined outputs. The already documented mismatch between the 140 mEq/L infusate constant and the page's 0.9% saline description is disclosed, not silently corrected or clinically approved.
+- `pediatricDka`: declared **repo heuristic — no clinical source** for the composite 48-hour fluid/potassium/insulin worksheet; a published Holliday-Segar component does not establish protocol validation. No dose or algorithm is altered.
+
+The completeness ratchet shrinks only by these four IDs; no baseline grows and no test is removed. Remaining IDs: aaGradient, fletcher, idealBodyWeight, mcdonaldRule, midParentalHeight, naegele, parkland, widmarkBac. Bibliographic identity for Baxter/Shires 1968 (PMID 4973463) and Tanner et al. 1970 (PMID 5491878) was found, but those engines are left unchanged because the retrieved metadata alone does not establish every implemented constant or applicability boundary.

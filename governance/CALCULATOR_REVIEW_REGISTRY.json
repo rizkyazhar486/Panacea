@@ -46,10 +46,10 @@
       "reviewed_at": null,
       "evidence": null,
       "source": {
-        "kind": "unattributed",
+        "kind": "repo-heuristic",
         "citation": null,
         "anchor": null,
-        "basis": "Generic national blood-service/WHO/PMI criteria per the engine header; no specific document is cited, so none is claimed."
+        "basis": "Repo heuristic — no clinical source verified for this combination of age 17–65 years, weight 50 kg, 12-week interval and generic deferral flags. No WHO, PMI or national blood-service endorsement is claimed. Actual donor suitability requires assessment by the blood service."
       }
     },
     {
@@ -359,10 +359,10 @@
       "reviewed_at": null,
       "evidence": null,
       "source": {
-        "kind": "named-method",
+        "kind": "repo-heuristic",
         "citation": null,
         "anchor": null,
-        "basis": "Header names Holliday-Segar, PALS, Parkland, Katz and Adrogue-Madias without citations."
+        "basis": "Repo heuristic — no clinical source verified for this combined resuscitation/electrolyte worksheet. Individual Holliday-Segar, Parkland, Katz and Adrogue-Madias method names do not validate the combined outputs. The existing infusate sodium constant is 140 mEq/L despite the page naming 0.9% saline; no equation or dose is changed or approved here."
       }
     },
     {
@@ -776,10 +776,10 @@
       "reviewed_at": null,
       "evidence": null,
       "source": {
-        "kind": "unattributed",
+        "kind": "repo-heuristic",
         "citation": null,
         "anchor": null,
-        "basis": "Header names no source for the fluid, potassium and insulin worksheet constants."
+        "basis": "Repo heuristic — no clinical source verified for this combined 48-hour fluid, potassium and insulin worksheet. A published Holliday-Segar component does not validate the assembled DKA protocol, potassium bands or input bounds. Educational technical output only; not a prescribing protocol."
       }
     },
     {
@@ -980,10 +980,23 @@
       "reviewed_at": null,
       "evidence": null,
       "source": {
-        "kind": "unattributed",
-        "citation": null,
-        "anchor": null,
-        "basis": "Header says the bands were moved unchanged from a page and names no source."
+        "kind": "published",
+        "citation": "Ashwell M, Gibson S. 2016. Waist-to-height ratio as an indicator of 'early health risk': simpler and more predictive than using a 'matrix' based on BMI and waist circumference. BMJ Open. 6(3):e010159.",
+        "anchor": "Ashwell M, Gibson S. 2016. BMJ Open. 6(3):e010159.",
+        "basis": "PubMed PMID 26975935 and PMC4800150 full text checked on 2026-10-24. Methods uses WHtR <0.5, >=0.5 and <0.6, and >=0.6 in UK adults (n=1453), matching the engine boundaries. App labels remain educational; input sanity ranges are repo-defined, and this is not an individualized risk probability or clinical validation.",
+        "doi": "10.1136/bmjopen-2015-010159",
+        "pmid": "26975935",
+        "lookup": {
+          "source": "PubMed",
+          "pmid": "26975935",
+          "doi": "10.1136/bmjopen-2015-010159",
+          "retrievedOn": "2026-10-24",
+          "title": "Waist-to-height ratio as an indicator of 'early health risk': simpler and more predictive than using a 'matrix' based on BMI and waist circumference.",
+          "firstAuthor": "Ashwell",
+          "journal": "BMJ open",
+          "year": 2016,
+          "pages": "e010159"
+        }
       }
     },
     {
