@@ -882,8 +882,10 @@
       "done": "Rollback script + dry-run test committed; real rollback stays an infra-owner action.",
       "checks": [
         {
-          "cmd": "node --test scripts/qa/production-browser-verdict.test.mjs",
+          "cmd": "node --test scripts/qa/rollback-plan.test.mjs",
           "files": [
+            "scripts/qa/rollback-plan.mjs",
+            "scripts/qa/rollback-plan.test.mjs",
             ".github/workflows/vercel-prebuilt-production.yml"
           ]
         }
@@ -895,7 +897,7 @@
       ],
       "status": "NOT_RUN",
       "statusSha": null,
-      "statusNote": "Rollback script does not exist yet; check entry points at the release workflow it will extend."
+      "statusNote": "Status stays NOT_RUN until CI on the PR head is recorded. Built: scripts/qa/rollback-plan.mjs (dry-run only; it starts only git, has no execute mode, asserted by a test) and scripts/qa/rollback-plan.test.mjs (14 tests, run by the build's node --test scripts/qa/*.test.mjs). It resolves a 40-hex target SHA that is an ancestor of main to the deployment URL in the smoke-verified release evidence and prints 'vercel rollback <url> --scope=panaceamed' marked NOT EXECUTED; it refuses by name for a malformed SHA, a SHA not on main or unknown to git (negative control: a verified-evidence commit on a side branch is refused), no evidence, unverified evidence, ambiguous or invalid deployment URL. Real-repo dry-runs: main~1 without evidence -> no-release-evidence; an unmerged branch SHA -> target-not-on-main; 'abc' -> invalid-target-sha. Sabotage on the real script, each reported by test name and reverted: on-main check removed, any evidence status accepted, URL validation removed, ambiguity check relaxed, an exec path added. NOT shown: no real evidence artifact was used (the artifact could not be downloaded in this environment), so the success path is proven against fixtures and a temporary git repository, not a real deployment; it does not prove the old deployment still serves or is compatible with the current backend; the rollback itself stays an infra-owner action. Details: docs/governance/ROLLBACK.md."
     },
     {
       "id": "ENG-E7-04",
