@@ -1,7 +1,7 @@
 {
  "schema": "panacea-foot-contact/v2",
  "source_sha256": "03aa529c35d347d00f23c6bd2fb8dd6ac5050818e2ed818f1e11bff6bcbbd177",
- "reproducer_sha256": "5f812e0a2c70c5e4c11b8ce9ac7917667a9c6fd141f7cc446d560fd9b9cd8342",
+ "reproducer_sha256": "4879357e6754734c9bb2174e3437ebeff91f66db45b480ab7ca8865dc50981aa",
  "math_sha256": "5114a01e1c0ac99b96d12b7a511d34f8354e462893a3fbfea5cc26c968a32d7c",
  "coordinate_contract": {
   "gltf_length_unit": "metre",
@@ -76,7 +76,7 @@
     },
     "samples": [],
     "landmark": {
-     "definition": "rig node FOOT_LANDMARK_BALL_<side>: first metatarsal head (lowest vertex in anterior quarter)",
+     "definition": "rig node FOOT_LANDMARK_BALL_<side>: first metatarsal head (or forefoot combined)",
      "available_by_side": {
       "L": true,
       "R": true
@@ -507,7 +507,7 @@
      }
     ],
     "landmark": {
-     "definition": "rig node FOOT_LANDMARK_BALL_<side>: first metatarsal head (lowest vertex in anterior quarter)",
+     "definition": "rig node FOOT_LANDMARK_BALL_<side>: first metatarsal head (or forefoot combined)",
      "available_by_side": {
       "L": true,
       "R": true

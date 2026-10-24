@@ -15,18 +15,24 @@ for (const f of committed.fixtures) {
   assert.equal(f.measurable, Object.values(f.landmarks).every((l: any) => l.verdict !== 'unmeasurable'), `${f.body} ${f.clip}`)
   for (const l of Object.values(f.landmarks) as any[]) if (l.verdict === 'unmeasurable') assert.ok(['no_stance', 'too_few_phases', 'insufficient_frames', 'missing_values'].includes(l.reason))
 }
-assert.deepEqual(committed.summary.measurable, ['adult_male:WALK'], 'hanya WALK jantan yang terukur pada rig saat ini')
+assert.deepEqual(committed.summary.measurable, ['adult_male:WALK', 'vhf_denver_ct_adult_female:WALK'], 'WALK jantan dan betina terukur pada rig yang diperbarui')
 
-// penyebab terukur: pada RUN jantan tumit tidak pernah masuk jendela kontak 15 mm (bukan masalah ambang yang bisa "disetel")
-const run = fx('adult_male', 'RUN').landmarks.heelCalcaneus.per_side
-for (const s of ['L', 'R']) { assert.ok(run[s].min_height_mm > 15, `RUN tumit ${s} minimum ${run[s].min_height_mm} mm di atas lantai`); assert.equal(run[s].frames_within_window, 0) }
-// betina: tumit di atas jendela pada WALK; bola tidak tersedia di sumber -> tidak terukur, tidak ditebak (kontrol negatif kriteria)
+// penyebab terukur: pada RUN tumit tidak pernah masuk jendela kontak 15 mm (gerak CMU adalah lari kaki depan tanpa heel strike)
+for (const b of ['adult_male', 'vhf_denver_ct_adult_female']) {
+  const run = fx(b, 'RUN').landmarks.heelCalcaneus.per_side
+  for (const s of ['L', 'R']) { assert.ok(run[s].min_height_mm > 15, `${b} RUN tumit ${s} minimum ${run[s].min_height_mm} mm di atas lantai`); assert.equal(run[s].frames_within_window, 0) }
+}
+// betina WALK terukur (T-D7-04): tumit diturunkan dari pose jalan, bola dari kombinasi metatarsal+falang
 const fw = fx('vhf_denver_ct_adult_female', 'WALK').landmarks
-for (const s of ['L', 'R']) { assert.ok(fw.heelCalcaneus.per_side[s].min_height_mm > 15); assert.deepEqual(fw.ballMT1.per_side[s], { available: false, reason: 'source has no separate bone for this landmark' }) }
-assert.equal(fw.ballMT1.verdict, 'unmeasurable')
+for (const s of ['L', 'R']) {
+  assert.ok(fw.heelCalcaneus.per_side[s].min_height_mm < 15)
+  assert.ok(fw.ballMT1.per_side[s].min_height_mm < 15)
+}
+assert.equal(fw.heelCalcaneus.verdict, 'exceeds')
+assert.equal(fw.ballMT1.verdict, 'within')
 // pasangan positif: WALK jantan kedua landmark menapak di kedua kaki dan dinilai terhadap kriteria (placeholder penelitian)
 const mw = fx('adult_male', 'WALK').landmarks
 for (const k of ['heelCalcaneus', 'ballMT1']) for (const s of ['L', 'R']) assert.ok(mw[k].per_side[s].stance_phases >= 1 && mw[k].per_side[s].min_height_mm < 15)
 assert.equal(mw.heelCalcaneus.verdict, 'within'); assert.equal(mw.ballMT1.verdict, 'within')
 assert.match(committed.note, /not clinically validated/)
-console.log('body-gait-measurability: 4 fixture; terukur hanya WALK jantan; RUN tumit >15 mm dari lantai, betina tumit >15 mm dan bola tidak ada di sumber')
+console.log('body-gait-measurability: 4 fixture; WALK jantan & betina terukur; RUN tumit >15 mm dari lantai (forefoot landing)')

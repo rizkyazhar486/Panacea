@@ -13,6 +13,13 @@ export const LANDMARK_PREFIX = 'FOOT_LANDMARK_'
 const PLANTAR_FRACTION = 0.25
 const ROUND = 1e7 // 0,1 µm: JSON stabil antar-jalan
 
+const matchName = (m, re) => {
+  for (let o = m; o; o = o.parent) {
+    if (re.test(o.name) || (o.userData?.panacea_structure_id && re.test(o.userData.panacea_structure_id))) return true
+  }
+  return false
+}
+
 export function splitGlb(buf) {
   if (buf.readUInt32LE(0) !== 0x46546c67) throw new Error('not a GLB')
   const jsonLength = buf.readUInt32LE(12)
@@ -32,19 +39,85 @@ export async function computeLandmarks(buf) {
   const gltf = await new Promise((res, rej) => loader.parse(buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength), '', res, rej))
   const root = gltf.scene; root.updateMatrixWorld(true)
   const v = new THREE.Vector3(), out = {}
+
+  const walkClip = gltf.animations?.find((a) => a.name === 'WALK')
+  const walkTrack = {}
+  if (walkClip) {
+    const FPS = 24
+    const mx = new THREE.AnimationMixer(root); mx.clipAction(walkClip).play()
+    const n = Math.round(walkClip.duration * FPS)
+    for (let f = 0; f < n; f++) {
+      mx.setTime(f / FPS); root.updateMatrixWorld(true)
+      for (const s of ['L', 'R']) {
+        const foot = root.getObjectByName(`FOOT${s}`)
+        if (!foot) continue
+        foot.traverse((m) => {
+          if (!m.isMesh) return
+          const a = m.geometry.attributes.position
+          for (let i = 0; i < a.count; i++) {
+            v.fromBufferAttribute(a, i).applyMatrix4(m.matrixWorld)
+            ;(((walkTrack[s] ??= {})[`${m.uuid}:${i}`]) ??= { m, i, ys: [] }).ys.push(v.y)
+          }
+        })
+      }
+    }
+    mx.stopAllAction(); root.updateMatrixWorld(true)
+  }
+
   for (const side of ['L', 'R']) {
     const foot = root.getObjectByName(`FOOT${side}`)
     if (!foot) throw new Error(`FOOT.${side} missing`)
     const inv = foot.matrixWorld.clone().invert()
-    const verts = (re) => { const p = []; foot.traverse((c) => { if (!re.test(c.name)) return; c.traverse((m) => { if (!m.isMesh) return; const a = m.geometry.attributes.position; for (let i = 0; i < a.count; i++) { v.fromBufferAttribute(a, i).applyMatrix4(m.matrixWorld); p.push(v.clone()) } }) }); return p }
-    const pick = (ps, better) => ps.reduce((a, b) => (better(b, a) ? b : a))
-    const calc = verts(new RegExp(`SKELETALCALCANEUS${side}$`)), mt1 = verts(new RegExp(`SKELETALFIRST_METATARSAL_BONE${side}$`))
     const local = (w) => w.clone().applyMatrix4(inv).toArray().map((x) => Math.round(x * ROUND) / ROUND)
-    if (calc.length) out[`HEEL_${side}`] = { translation: local(pick(calc, (b, a) => b.y < a.y || (b.y === a.y && b.z < a.z))), source: `SKELETAL.CALCANEUS.${side} (lowest vertex)` }
+    const verts = (re) => { const p = []; foot.traverse((c) => { if (!re.test(c.name)) return; c.traverse((m) => { if (!m.isMesh) return; const a = m.geometry.attributes.position; for (let i = 0; i < a.count; i++) { v.fromBufferAttribute(a, i).applyMatrix4(m.matrixWorld); p.push({ v: v.clone(), m, i }) } }) }); return p }
+    const pick = (ps, better) => ps.reduce((a, b) => (better(b.v, a.v) ? b : a))
+    const calc = verts(new RegExp(`SKELETALCALCANEUS${side}$`))
+    const mt1 = verts(new RegExp(`SKELETALFIRST_METATARSAL_BONE${side}$`))
+    const comb = verts(new RegExp(`METATARSALS_AND_PHALANGES_COMBINED${side}$`))
+
+    const isFemale = comb.length > 0
+
+    if (calc.length) {
+      if (isFemale && walkTrack[side]) {
+        let best = null
+        for (const item of Object.values(walkTrack[side])) {
+          if (!matchName(item.m, new RegExp(`CALCANEUS.*${side}`))) continue
+          const minY = Math.min(...item.ys)
+          if (!best || minY < best.y) best = { y: minY, item }
+        }
+        if (best) {
+          const { m, i } = best.item
+          const p = new THREE.Vector3().fromBufferAttribute(m.geometry.attributes.position, i).applyMatrix4(m.matrixWorld)
+          out[`HEEL_${side}`] = { translation: local(p), source: `SKELETAL.CALCANEUS.${side} (lowest vertex in WALK stance)` }
+        }
+      } else {
+        const pt = pick(calc, (b, a) => b.y < a.y || (b.y === a.y && b.z < a.z))
+        out[`HEEL_${side}`] = { translation: local(pt.v), source: `SKELETAL.CALCANEUS.${side} (lowest vertex)` }
+      }
+    }
+
     if (mt1.length) {
-      const z0 = Math.min(...mt1.map((p) => p.z)), z1 = Math.max(...mt1.map((p) => p.z))
+      const z0 = Math.min(...mt1.map((p) => p.v.z)), z1 = Math.max(...mt1.map((p) => p.v.z))
       if (!(z1 > z0)) throw new Error(`invalid first metatarsal length: ${side}`)
-      out[`BALL_${side}`] = { translation: local(pick(mt1.filter((p) => p.z >= z1 - PLANTAR_FRACTION * (z1 - z0)), (b, a) => b.y < a.y || (b.y === a.y && b.z > a.z))), source: `SKELETAL.FIRST_METATARSAL_BONE.${side} (lowest vertex in anterior quarter)` }
+      const pt = pick(mt1.filter((p) => p.v.z >= z1 - PLANTAR_FRACTION * (z1 - z0)), (b, a) => b.y < a.y || (b.y === a.y && b.z > a.z))
+      out[`BALL_${side}`] = { translation: local(pt.v), source: `SKELETAL.FIRST_METATARSAL_BONE.${side} (lowest vertex in anterior quarter)` }
+    } else if (comb.length) {
+      if (walkTrack[side]) {
+        let best = null
+        for (const item of Object.values(walkTrack[side])) {
+          if (!matchName(item.m, new RegExp(`METATARSALS_AND_PHALANGES_COMBINED.*${side}`))) continue
+          const minY = Math.min(...item.ys)
+          if (!best || minY < best.y) best = { y: minY, item }
+        }
+        if (best) {
+          const { m, i } = best.item
+          const p = new THREE.Vector3().fromBufferAttribute(m.geometry.attributes.position, i).applyMatrix4(m.matrixWorld)
+          out[`BALL_${side}`] = { translation: local(p), source: `SKELETAL.METATARSALS_AND_PHALANGES_COMBINED.${side} (forefoot (combined), not MT1)` }
+        }
+      } else {
+        const pt = pick(comb, (b, a) => b.y < a.y || (b.y === a.y && b.z > a.z))
+        out[`BALL_${side}`] = { translation: local(pt.v), source: `SKELETAL.METATARSALS_AND_PHALANGES_COMBINED.${side} (forefoot (combined), not MT1)` }
+      }
     }
   }
   return out

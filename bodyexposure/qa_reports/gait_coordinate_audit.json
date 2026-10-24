@@ -1251,9 +1251,9 @@
     },
     {
       "source": "public/bodyexposure/vhf_denver_ct_adult_female.rig_rom.glb",
-      "source_sha256": "2a7936b5a5223ad4b728f33ee1a16bd25b816702a2ee893f6ef138158aefa4ec",
+      "source_sha256": "7ec5ae004e6dca96f93cbb85b297e32d6a1d128980cdaa4af42a1d51eb574e32",
       "decoded_name": "vhf_denver_ct_adult_female.decoded.glb",
-      "decoded_sha256": "a6f310d26f5eb80e70b29f440fed231a5d72882f3d956e109b5d807eec3b1be9",
+      "decoded_sha256": "f6285ac7fc1d76c2d61af2f9a790a6f5e22df6804d937305e23b7e049058b8ac",
       "gltf_asset": {
         "version": "2.0",
         "generator": "gltfpack 1.3"

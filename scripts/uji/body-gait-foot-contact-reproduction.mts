@@ -59,9 +59,11 @@ assert.ok(hc.stance_frames < bm.stance_frames, 'tumit lepas sebelum bola kaki')
 assert.ok(hc.slide_max_mm <= 17 && bm.slide_max_mm <= 17, 'selip maks landmark anatomis jantan <= 17 mm')
 // kontrol silang: simpul terendah kalkaneus = penanda plantar posterior (dua definisi independen sepakat)
 assert.deepEqual(hc.phases_by_side, m.clips.WALK.heelPlantar.phases_by_side)
-// Betina: metatarsal I tidak dipisah di sumber (METATARSALS_AND_PHALANGES_COMBINED) -> landmark tidak tersedia, tidak ditebak
-assert.deepEqual(f.clips.WALK.ballMT1.landmark.available_by_side, { L: false, R: false })
-assert.deepEqual(f.clips.WALK.ballMT1.phases_by_side, { L: null, R: null })
+// Betina (T-D7-04): tumit kalkaneus diturunkan dari pose WALK (bukan istirahat telentang), bola diturunkan dari kombinasi metatarsal+falang.
+// WALK betina: kedua landmark punya fase tumpu di kedua kaki (terukur).
+assert.deepEqual(f.clips.WALK.ballMT1.landmark.available_by_side, { L: true, R: true })
+assert.equal(f.clips.WALK.ballMT1.stance_phases, 2)
+assert.equal(f.clips.WALK.heelCalcaneus.stance_phases, 3)
 
 // vonis terhadap kriteria penelitian (apa adanya)
 const v = (rep: any, clip: string, k: string) => evaluateFootSlide(rep.clips[clip][k], C)
@@ -74,8 +76,12 @@ unmeasurable(v(m, 'RUN', 'toe'), 'no_stance')
 unmeasurable(v(m, 'RUN', 'sole'), 'too_few_phases', 'RUN hanya 1 fase tumpu pada definisi titik terendah')
 unmeasurable(v(f, 'WALK', 'toe'), 'too_few_phases', 'betina: hanya kaki kanan (1 fase)')
 assert.equal(v(m, 'WALK', 'heelCalcaneus').status, 'within'); assert.equal(v(m, 'WALK', 'ballMT1').status, 'within')
+// betina WALK terukur: tumit melampaui batas selip (RMS 19,4 > 15), bola dalam batas selip (RMS 10,1 <= 15)
+assert.equal(v(f, 'WALK', 'heelCalcaneus').status, 'exceeds')
+assert.equal(v(f, 'WALK', 'ballMT1').status, 'within')
 for (const k of ['heelCalcaneus', 'ballMT1']) unmeasurable(v(m, 'RUN', k), 'no_stance', `RUN jantan ${k}: tidak ada fase tumpu pada ambang 15 mm`)
-for (const clip of ['WALK', 'RUN']) for (const k of ['heelCalcaneus', 'ballMT1']) unmeasurable(v(f, clip, k), 'no_stance', `betina ${clip} ${k}`)
+unmeasurable(v(f, 'RUN', 'heelCalcaneus'), 'no_stance', 'RUN betina tumit: tidak ada fase tumpu')
+unmeasurable(v(f, 'RUN', 'ballMT1'), 'too_few_phases', 'RUN betina bola: hanya 1 fase di kaki kanan')
 // pasangan: hanya satu angka yang berbeda dari kasus yang melampaui -> dalam kriteria
 assert.equal(evaluateFootSlide({ ...m.clips.WALK.toe, slide_max_mm: 30 }, C).status, 'within')
 // definisi sol memakai simpul terendah yang berpindah-pindah antara tumit dan jari: selipnya tidak boleh dibaca sebagai selip nyata
