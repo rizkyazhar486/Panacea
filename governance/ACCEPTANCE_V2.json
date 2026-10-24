@@ -336,7 +336,7 @@
       ],
       "status": "NOT_RUN",
       "statusSha": null,
-      "statusNote": "Contributor role has no backend capability: NOT_APPLICABLE for that role until it exists, never counted as pass."
+      "statusNote": "Contributor role has no backend capability: NOT_APPLICABLE for that role until it exists, never counted as pass. Run 39979532110 (push, 74eba9d8) green: patient 24/24, doctor 16/16, nurse 22/22, lab 22/22, owner 12+12, logout, two named negative controls fail. Stays NOT_RUN pending owner decision: admin has no UI journey of its own (owner UI + API RBAC only)."
     },
     {
       "id": "ENG-F1-02",
@@ -397,7 +397,8 @@
         "ENG-F1-01"
       ],
       "status": "NOT_RUN",
-      "statusSha": null
+      "statusSha": null,
+      "statusNote": "Run 39979532110 (push, 74eba9d8) covers all 9 inventory pages for 5 roles at 390x844 and 1440x900, 50/50 with positive control; sabotage controls bocor/overflow fail at named steps. Stays NOT_RUN: the named negative control (remove the error boundary from one listed page) does not exist yet."
     },
     {
       "id": "ENG-F2-01",
@@ -631,9 +632,9 @@
       "negativeControl": "Missing landmark name fails the loader.",
       "evidence": "GLB node listing + metrics run at exact SHA.",
       "dependsOn": [],
-      "status": "NOT_RUN",
-      "statusSha": null,
-      "statusNote": "Research task first (TASK_BOARD R-D7-RIG): unknown whether source rig can be extended without re-rigging."
+      "status": "PASS",
+      "statusSha": "b7410bef22bf896c9bc6779f10dc52b0402e1f4f",
+      "statusNote": "Validate run 40028973786 (job 120672165638) on #2734 head 768a7858, tree identical to merge commit b7410bef: step \"Body Exposure rig landmarks and licence primary sources\" success — compare-blender-gait-contact + glb-add-foot-landmarks tests pass. Rig GLBs carry FOOT_LANDMARK_HEEL/BALL_<side> nodes (bodyexposure/qa_reports/rig_landmark_nodes.json, #2723); gait metrics consume them. Negative control: renamed FOOT_LANDMARK_BALL_R and a 1 mm moved heel node both fail the loader."
     },
     {
       "id": "ENG-D8-01",
@@ -693,8 +694,9 @@
       "dependsOn": [
         "ENG-D8-01"
       ],
-      "status": "NOT_RUN",
-      "statusSha": null
+      "status": "PASS",
+      "statusSha": "b7410bef22bf896c9bc6779f10dc52b0402e1f4f",
+      "statusNote": "Validate run 40028973786 (job 120672165638), tree identical to b7410bef: `npm run uji` success incl. body-attribution-coverage ok (506 GLB, 14 licence classes, 463 sources) with per-class removal control on the real page (#2709). Rendered page: bodyexposure/qa_reports/evidence/provenance-page-58d17d8a-{390x844,1440x900}.png (headless Chrome, CDP device emulation); public/bodyexposure/provenance.html is byte-identical at 58d17d8a and b7410bef. Header wrap at 390px later fixed in #2732."
     },
     {
       "id": "ENG-D8-03",
@@ -719,9 +721,9 @@
       "negativeControl": "Licence class without a primary-source record fails the audit.",
       "evidence": "Licence check table committed with retrieval dates.",
       "dependsOn": [],
-      "status": "NOT_RUN",
-      "statusSha": null,
-      "statusNote": "PR #2685 is in flight for fetal atlas CC0 verification."
+      "status": "PASS",
+      "statusSha": "b7410bef22bf896c9bc6779f10dc52b0402e1f4f",
+      "statusNote": "Validate run 40028973786 (job 120672165638), tree identical to b7410bef: glb-provenance-audit exit 0 and licence-primary-sources tests pass; all 7 licence classes have a primary-source record in governance/LICENCE_PRIMARY_SOURCES.json (retrieved 2026-10-23T20:19:47Z, URL + SHA-256). Negative control: a class without a record fails. ICRP 145/156 are owner statements (EXT-D8-C), not verified licences. Wired into CI by #2734."
     },
     {
       "id": "ENG-E4-01",
