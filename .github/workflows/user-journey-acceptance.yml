@@ -53,7 +53,7 @@ permissions:
 jobs:
   user-journeys:
     runs-on: ubuntu-24.04
-    timeout-minutes: 20
+    timeout-minutes: 35
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -122,14 +122,24 @@ jobs:
           # ENG-F1-03 crash render: build QA (VITE_QA_HOOKS=1, kait crash hanya ada di build ini) -> batas rute HARUS menahan crash tiap
           # halaman kritis; build QA tanpa batas rute (VITE_QA_NO_ROUTE_BOUNDARY=1) -> langkah crash HARUS gagal bernama untuk tiap rute.
           qa_preview() {
-            kill "$web" 2>/dev/null || true
-            sleep 1
+            # `kill $web` hanya mematikan pembungkus npx; proses vite preview lama tetap memegang port 5190 dan (dengan --strictPort) preview baru
+            # gagal bind sementara curl lolos ke bundel LAMA -> kait crash tidak pernah ada. Matikan proses vite-nya, tunggu port bebas, lalu
+            # pastikan berkas entri yang DISAJIKAN memang milik outDir yang diminta.
+            pkill -f "vite preview" || true
+            for attempt in $(seq 1 20); do
+              if ! curl -fsS http://127.0.0.1:5190/ >/dev/null 2>&1; then break; fi
+              sleep 1
+            done
             npx vite preview --host 127.0.0.1 --port 5190 --strictPort --outDir "$1" > "$RUNNER_TEMP/f1-preview-$2.log" 2>&1 &
             web=$!
             for attempt in $(seq 1 60); do
               if curl -fsS http://127.0.0.1:5190/ >/dev/null; then break; fi
               sleep 1
             done
+            entry=$(grep -o 'assets/index-[A-Za-z0-9_-]*\.js' "$1/index.html" | head -1)
+            if [ -z "$entry" ] || ! curl -fsS http://127.0.0.1:5190/ | grep -q "$entry"; then
+              echo "::error::Preview port 5190 tidak menyajikan bundel $1 (entri '$entry')"; rc=1
+            fi
           }
           VITE_API_URL=http://127.0.0.1:18790 VITE_QA_HOOKS=1 npx vite build --emptyOutDir --outDir "$RUNNER_TEMP/dist-qa" > "$RUNNER_TEMP/f1-build-qa.log" 2>&1 || rc=1
           VITE_API_URL=http://127.0.0.1:18790 VITE_QA_HOOKS=1 VITE_QA_NO_ROUTE_BOUNDARY=1 npx vite build --emptyOutDir --outDir "$RUNNER_TEMP/dist-qa-neg" > "$RUNNER_TEMP/f1-build-qa-neg.log" 2>&1 || rc=1
