@@ -4,6 +4,7 @@ import { Card, SectionTitle, Badge, Field, inputClass } from '../../components/u
 import { IconMoon } from '../../components/icons'
 import { getDemoTersimpan } from '../../lib/profile'
 import { BatasKlaimSkorTerbit } from '../../components/BatasKlaimSkorTerbit'
+import { SumberKalkulator } from '../../components/ui/SumberKalkulator'
 import { parseNumberField, stopBang } from '../../domains/clinical-calculators'
 import type { StopBangBand } from '../../domains/clinical-calculators'
 
@@ -51,6 +52,7 @@ export function SleepApneaScreen() {
       <Card className="!p-5">
         <SectionTitle icon={<IconMoon size={20} />} title="Sleep Apnea Screening (STOP-BANG)" subtitle="Published obstructive sleep apnea risk screen (Chung et al., 2008) — not a clinically validated Panacea decision" />
         <BatasKlaimSkorTerbit />
+        <SumberKalkulator ids={['stopBang']} />
         <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">A widely used obstructive sleep apnea screen before surgery and in primary care. Answer each item honestly — it helps decide whether a sleep study may be worth discussing, not a diagnosis.</Prosa>
       </Card>
 

@@ -6,6 +6,7 @@
     "growthInputs",
     "inputs",
     "movementInputs",
+    "sourceLine",
     "sourceRecord"
   ],
   "entries": [

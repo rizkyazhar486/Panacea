@@ -3,6 +3,7 @@ import { Prosa } from '../../../components/Prosa'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../../../components/ui'
 import { IconActivity } from '../../../components/icons'
 import { BatasKlaimSkorTerbit } from '../../../components/BatasKlaimSkorTerbit'
+import { SumberKalkulator } from '../../../components/ui/SumberKalkulator'
 import { lightsCriteria, parseNumberField } from '../../../domains/clinical-calculators'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -32,6 +33,7 @@ export function LightsCriteria() {
       <Card className="!p-5">
         <SectionTitle icon={<IconActivity size={20} />} title="Light's Criteria" subtitle="Exudate vs. transudate pleural effusion (Light et al. 1972)" />
         <BatasKlaimSkorTerbit />
+        <SumberKalkulator ids={['lightsCriteria']} />
         <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Cairan digolongkan eksudat bila SALAH SATU dari ketiga kriteria terpenuhi. Kepekaannya tinggi untuk eksudat, tetapi gagal jantung yang sedang diberi diuretik kadang melewati ambang itu dan tampak sebagai eksudat palsu.</Prosa>
         <div className="mt-3 grid grid-cols-2 gap-3">
           <Field label="Pleural fluid protein (g/dL)">
