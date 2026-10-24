@@ -339,6 +339,9 @@
 .pmd-track-rail button[data-active="true"] { opacity: 1; border-color: rgba(34,211,238,.65); transform: translateY(-2px); }
 .pmd-track-rail img { width: 100%; height: 100%; object-fit: cover; }
 
+/* Opaque fill: the panel hangs from `header.kaca`, which already carries a backdrop-filter, and a backdrop-filter nested inside another
+   one does not blur on iOS/Safari. The translucent fill (92%) therefore let the page text underneath show through unblurred. The blur is
+   kept as the liquid control material (home-zero-one-liquid-contract) but nothing depends on it: the fill alone hides the page. */
 .pmd-command-spaces {
   position: absolute;
   top: calc(100% + 8px);
@@ -347,12 +350,16 @@
   padding: 8px;
   border-radius: 20px;
   border: 1px solid rgba(148,163,184,.18);
-  background: rgba(255,255,255,.92);
+  background: #f8fafc;
   box-shadow: 0 24px 70px rgba(15,23,42,.18);
   backdrop-filter: blur(24px) saturate(130%);
   -webkit-backdrop-filter: blur(24px) saturate(130%);
 }
-.dark .pmd-command-spaces { background: rgba(3,7,12,.92); border-color: rgba(255,255,255,.1); box-shadow: 0 26px 80px rgba(0,0,0,.55); }
+.dark .pmd-command-spaces { background: #070b10; border-color: rgba(255,255,255,.1); box-shadow: 0 26px 80px rgba(0,0,0,.55); }
+/* `header.kaca > *` (public/ui-iterations/panacea-liquid-infinite-v44.css) forces position:relative on every header child, and at the
+   specificity of `.pmd-command-spaces` alone that rule won: the panel became a flex item of the header, was squeezed to ~176px, took the
+   title's width (h1 collapsed to 0px) and painted over the page. This selector out-ranks it so the panel stays out of flow. */
+header.kaca > .pmd-command-spaces { position: absolute; z-index: 30; }
 .pmd-command-space-link {
   display: flex;
   min-height: 46px;
