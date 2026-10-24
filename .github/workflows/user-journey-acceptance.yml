@@ -119,6 +119,30 @@ jobs:
               echo "::error::Kontrol negatif '$mode' berhenti tanpa langkah gagal bernama dari pendeteksi yang tepat di semua rute"; rc=1
             fi
           done
+          # ENG-F1-03 crash render: build QA (VITE_QA_HOOKS=1, kait crash hanya ada di build ini) -> batas rute HARUS menahan crash tiap
+          # halaman kritis; build QA tanpa batas rute (VITE_QA_NO_ROUTE_BOUNDARY=1) -> langkah crash HARUS gagal bernama untuk tiap rute.
+          qa_preview() {
+            kill "$web" 2>/dev/null || true
+            sleep 1
+            npx vite preview --host 127.0.0.1 --port 5190 --strictPort --outDir "$1" > "$RUNNER_TEMP/f1-preview-$2.log" 2>&1 &
+            web=$!
+            for attempt in $(seq 1 60); do
+              if curl -fsS http://127.0.0.1:5190/ >/dev/null; then break; fi
+              sleep 1
+            done
+          }
+          VITE_API_URL=http://127.0.0.1:18790 VITE_QA_HOOKS=1 npx vite build --emptyOutDir --outDir "$RUNNER_TEMP/dist-qa" > "$RUNNER_TEMP/f1-build-qa.log" 2>&1 || rc=1
+          VITE_API_URL=http://127.0.0.1:18790 VITE_QA_HOOKS=1 VITE_QA_NO_ROUTE_BOUNDARY=1 npx vite build --emptyOutDir --outDir "$RUNNER_TEMP/dist-qa-neg" > "$RUNNER_TEMP/f1-build-qa-neg.log" 2>&1 || rc=1
+          qa_preview "$RUNNER_TEMP/dist-qa" crash
+          fresh_server crash
+          QA_CRASH=1 QA_OUT="$RUNNER_TEMP/user-journey-resilience-crash.json" QA_URL=http://localhost:5190/ node scripts/qa/user-journey-resilience.mjs || rc=1
+          qa_preview "$RUNNER_TEMP/dist-qa-neg" negatif-crash
+          fresh_server negatif-crash
+          if QA_CRASH=1 QA_OUT="$RUNNER_TEMP/user-journey-resilience-negatif-crash.json" QA_URL=http://localhost:5190/ node scripts/qa/user-journey-resilience.mjs; then
+            echo "::error::Kontrol negatif 'crash' LOLOS: crash render tanpa batas rute tidak terdeteksi"; rc=1
+          elif ! node scripts/qa/f1-negative-evidence.mjs crash "$RUNNER_TEMP/user-journey-resilience-negatif-crash.json"; then
+            echo "::error::Kontrol negatif 'crash' berhenti tanpa langkah gagal bernama dari pendeteksi yang tepat di semua rute"; rc=1
+          fi
           exit $rc
       - uses: actions/upload-artifact@v4
         if: always()
@@ -130,3 +154,5 @@ jobs:
             ${{ runner.temp }}/user-journey-resilience-evidence.json
             ${{ runner.temp }}/user-journey-resilience-negatif-bocor.json
             ${{ runner.temp }}/user-journey-resilience-negatif-overflow.json
+            ${{ runner.temp }}/user-journey-resilience-crash.json
+            ${{ runner.temp }}/user-journey-resilience-negatif-crash.json
