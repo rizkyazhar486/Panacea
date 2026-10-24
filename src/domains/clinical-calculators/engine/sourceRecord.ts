@@ -17,6 +17,16 @@ export interface SourceRecord {
   pmid?: string | null
   /** Metadata persis seperti dikembalikan PubMed saat identifier dicari; wajib bila doi/pmid terisi, agar identifier tidak bisa ditempel tanpa bukti. */
   lookup?: SourceLookup | null
+  /** Terbitan nyata yang TIDAK tercatat di PubMed (laporan lembaga, makalah lama): alasan wajib dan URL penerbit bila ada. Hanya untuk published tanpa PMID. */
+  unindexed?: SourceUnindexed | null
+}
+
+export interface SourceUnindexed {
+  reason: string
+  /** https URL halaman penerbit yang sudah dibuka dan diperiksa; null bila tidak ada salinan daring. */
+  url: string | null
+  /** YYYY-MM-DD: kapan URL diperiksa. */
+  checkedOn: string
 }
 
 export interface SourceLookup {
@@ -66,6 +76,7 @@ export function checkSourceRecords(
     if (source.doi != null && !(filled(source.doi) && DOI.test(source.doi))) errors.push(`${id}: doi-invalid`)
     if (source.pmid != null && !(filled(source.pmid) && PMID.test(source.pmid))) errors.push(`${id}: pmid-invalid`)
     if (source.kind === 'published' && (filled(source.doi) || filled(source.pmid))) checkLookup(id, source, errors)
+    if (source.unindexed != null) checkUnindexed(id, source, errors)
   }
   return { errors, counts }
 }
@@ -82,6 +93,49 @@ function checkLookup(id: string, source: SourceRecord, errors: string[]): void {
   const citation = source.citation ?? ''
   if (!filled(l.firstAuthor) || !citation.includes(l.firstAuthor)) errors.push(`${id}: lookup-author-not-in-citation`)
   if (!Number.isInteger(l.year) || !citation.includes(String(l.year))) errors.push(`${id}: lookup-year-not-in-citation`)
+}
+
+/** Terbitan tak terindeks: hanya sah pada published TANPA PMID, dengan alasan, tanggal periksa, dan URL https bila diberikan. */
+function checkUnindexed(id: string, source: SourceRecord, errors: string[]): void {
+  const u = source.unindexed!
+  if (source.kind !== 'published') { errors.push(`${id}: unindexed-on-unsourced`); return }
+  if (filled(source.pmid)) errors.push(`${id}: unindexed-with-pmid`)
+  if (!filled(u.reason)) errors.push(`${id}: unindexed-reason-missing`)
+  if (!(filled(u.checkedOn) && DATE.test(u.checkedOn))) errors.push(`${id}: unindexed-date-invalid`)
+  if (u.url !== null && !(filled(u.url) && /^https:\/\/\S+$/.test(u.url))) errors.push(`${id}: unindexed-url-invalid`)
+}
+
+/**
+ * Kelengkapan ENG-C6-03 (aturan owner 2026-10-24: "sumber terverifikasi atau heuristik yang dinyatakan"). Patuh bila:
+ * published dengan PMID terverifikasi atau catatan unindexed; atau dinyatakan arithmetic / repo-heuristic. named-method dan
+ * unattributed BELUM patuh: harus menjadi published (bersumber) atau dinyatakan heuristik. Mengembalikan id yang belum patuh.
+ */
+export function incompleteSources(entries: ReadonlyArray<{ id: string; source?: SourceRecord | null }>): string[] {
+  return entries.filter(({ source: s }) => {
+    if (!s) return true
+    if (s.kind === 'arithmetic' || s.kind === 'repo-heuristic') return false
+    if (s.kind === 'published') return !(filled(s.pmid) || (s.unindexed != null && filled(s.unindexed.reason)))
+    return true
+  }).map((e) => e.id).sort()
+}
+
+/**
+ * Validasi rumus dan satuan (ENG-C6-03): setiap mesin kalkulator wajib mendeklarasikan rumus (formula)
+ * dan satuan keluaran (units) yang tidak kosong. Mengembalikan daftar pesan galat per id yang melanggar.
+ */
+export function checkCalculatorFormulasAndUnits(
+  entries: ReadonlyArray<{ id: string; formula?: string | null; units?: string | null }>,
+): string[] {
+  const errors: string[] = []
+  for (const { id, formula, units } of entries) {
+    if (!formula || typeof formula !== 'string' || formula.trim().length === 0) {
+      errors.push(`${id}: formula-missing`)
+    }
+    if (!units || typeof units !== 'string' || units.trim().length === 0) {
+      errors.push(`${id}: units-missing`)
+    }
+  }
+  return errors
 }
 
 /** Komentar blok pertama berkas (kepala dokumentasi mesin); string kosong bila tidak ada. */

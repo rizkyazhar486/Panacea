@@ -200,6 +200,13 @@ jobs:
             fi
           done
 
+      - name: Verify organ camera zoom direction (320px and 390px)
+        if: matrix.nama == 'organ-wilayah-lesi'
+        timeout-minutes: 6
+        env:
+          PLAYWRIGHT_MODULE: ${{ runner.temp }}/panacea-playwright/node_modules/playwright/index.mjs
+        run: node qa/organ-zoom-direction.mjs
+
       - name: Stop production preview
         if: always()
         run: |

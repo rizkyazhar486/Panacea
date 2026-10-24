@@ -1,5 +1,6 @@
 import { trimpSesi, type Sesi, type Konteks } from './trainingPhysiology'
 import type { ImportedWorkout } from './workoutImport'
+import { workoutDurationSeconds } from '../shared/kernel/workoutDurationEvidence'
 import { kunciHari } from './tanggal'
 
 export { kunciHari }
@@ -354,10 +355,12 @@ export interface Gap {
 }
 
 export function gradeAdjustedPace(w: ImportedWorkout, naikM?: number): Gap | null {
-  if (!w.jarakKm || w.jarakKm <= 0 || !w.durasi) return null
+  const seconds = workoutDurationSeconds(w)
+  if (seconds === null || seconds <= 0 || typeof w.jarakKm !== 'number' || !Number.isFinite(w.jarakKm) || w.jarakKm <= 0) return null
   if (naikM == null || !Number.isFinite(naikM)) return null
-  const paceSec = w.durasi / w.jarakKm
+  const paceSec = seconds / w.jarakKm
   const gradien = naikM / (w.jarakKm * 1000)
+  if (!Number.isFinite(paceSec) || !Number.isFinite(gradien)) return null
   const f = faktorGradien(gradien)
   return {
     paceSec: Math.round(paceSec),
@@ -395,10 +398,12 @@ export function usahaTerbaik(workouts: ImportedWorkout[]): UsahaTerbaik[] {
   for (const jarak of JARAK_PR) {
     let terbaik: UsahaTerbaik | null = null
     for (const w of workouts) {
-      if (!w.jarakKm || !w.durasi) continue
+      const seconds = workoutDurationSeconds(w)
+      if (seconds === null || seconds <= 0 || typeof w.jarakKm !== 'number' || !Number.isFinite(w.jarakKm) || w.jarakKm <= 0) continue
       const rasio = w.jarakKm / jarak
       if (rasio < 0.9 || rasio > 1.1) continue
-      const detik = Math.round(w.durasi / rasio)
+      const detik = Math.round(seconds / rasio)
+      if (!Number.isFinite(detik)) continue
       if (terbaik && detik >= terbaik.detik) continue
       terbaik = {
         jarakKm: jarak,
@@ -574,7 +579,12 @@ export function zonaPace(workouts: ImportedWorkout[], paceAmbangSec: number): Zo
 
 /** Pace ambang diperkirakan dari sesi tercepat berdurasi ≥20 menit. */
 export function perkiraanPaceAmbang(workouts: ImportedWorkout[]): number | null {
-  const calon = workouts.filter((w) => w.paceSec && w.durasi >= 1200 && (w.jarakKm ?? 0) >= 3)
+  const calon = workouts.filter((w) => {
+    const seconds = workoutDurationSeconds(w)
+    return seconds !== null && seconds >= 1200
+      && typeof w.paceSec === 'number' && Number.isFinite(w.paceSec) && w.paceSec > 0
+      && typeof w.jarakKm === 'number' && Number.isFinite(w.jarakKm) && w.jarakKm >= 3
+  })
   if (!calon.length) return null
   return Math.min(...calon.map((w) => w.paceSec!))
 }

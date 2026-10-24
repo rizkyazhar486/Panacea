@@ -6,6 +6,7 @@ import { getDemoTersimpan } from '../../../lib/profile'
 import { ScoreTrend } from '../../../components/ScoreTrend'
 import { CopyNote } from '../../../components/CopyNote'
 import { BatasKlaimSkorTerbit } from '../../../components/BatasKlaimSkorTerbit'
+import { SumberKalkulator } from '../../../components/ui/SumberKalkulator'
 import { qtc, parseNumberField } from '../../../domains/clinical-calculators'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -55,6 +56,7 @@ export function QTcCalculator() {
       <Card className="!p-5">
         <SectionTitle icon={<IconHeart size={20} />} title="QTc Calculator" subtitle="Corrected QT interval — drug-safety screening for Torsades de Pointes risk" />
         <BatasKlaimSkorTerbit />
+        <SumberKalkulator ids={['qtc']} />
         <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Many drugs (antipsychotics, some antibiotics/antiemetics, methadone, class Ia/III antiarrhythmics) prolong the QT interval and raise the risk of Torsades de Pointes. Enter the measured QT interval and heart rate from an ECG.</Prosa>
         <div className="mt-3 grid grid-cols-3 gap-3">
           <Field label="QT interval (ms)">

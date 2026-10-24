@@ -8,14 +8,14 @@ export interface HumanReplayEpoch {
   startedAt: string
   endedAt: string
   sessions: number
-  activeMinutes: number
-  distanceKm: number
-  kcal: number
+  activeMinutes: number | null
+  distanceKm: number | null
+  kcal: number | null
   avgHr?: number
   maxHr?: number
   cumulativeSessions: number
-  cumulativeMinutes: number
-  cumulativeDistanceKm: number
+  cumulativeMinutes: number | null
+  cumulativeDistanceKm: number | null
   dominantArchetype?: string
   representativeDna?: WorkoutDnaSignature
   measuredHrSessions: number
@@ -26,8 +26,8 @@ export interface HumanReplaySummary {
   firstActivity?: string
   latestActivity?: string
   totalSessions: number
-  totalMinutes: number
-  totalDistanceKm: number
+  totalMinutes: number | null
+  totalDistanceKm: number | null
   spanMonths: number
 }
 
@@ -58,6 +58,33 @@ function dominant(values: string[]) {
   return [...counts.entries()].sort((a, b) => b[1] - a[1])[0]?.[0]
 }
 
+// A complete total requires evidence for every included session. Missing
+// measurements cannot silently contribute zero to monthly, cumulative or poster values.
+function measuredTotal(workouts: ImportedWorkout[], read: (workout: ImportedWorkout) => number | null | undefined): number | null {
+  if (!workouts.length) return null
+  let total = 0
+  for (const workout of workouts) {
+    const value = read(workout)
+    if (typeof value !== 'number' || !Number.isFinite(value) || value < 0) return null
+    total += value
+    if (!Number.isFinite(total)) return null
+  }
+  return total
+}
+
+function durationMinutes(workouts: ImportedWorkout[]): number | null {
+  return measuredTotal(workouts, workout => {
+    const seconds = workoutDurationSeconds(workout)
+    return seconds === null ? null : seconds / 60
+  })
+}
+
+function cumulativeTotal(previous: number | null, current: number | null): number | null {
+  if (previous === null || current === null) return null
+  const sum = previous + current
+  return Number.isFinite(sum) ? sum : null
+}
+
 export function buildHumanReplay(workouts: ImportedWorkout[], hrMax: number): HumanReplaySummary {
   const sorted = [...workouts].sort((a, b) => Date.parse(a.mulai) - Date.parse(b.mulai))
   const groups = new Map<string, ImportedWorkout[]>()
@@ -67,21 +94,21 @@ export function buildHumanReplay(workouts: ImportedWorkout[], hrMax: number): Hu
   })
 
   let cumulativeSessions = 0
-  let cumulativeMinutes = 0
-  let cumulativeDistanceKm = 0
+  let cumulativeMinutes: number | null = 0
+  let cumulativeDistanceKm: number | null = 0
 
   const epochs = [...groups.entries()].map(([key, group]) => {
     const dna = group.map((workout) => buildWorkoutDna(workout, hrMax))
-    const activeMinutes = group.reduce((sum, workout) => sum + workout.durasi / 60, 0)
-    const distanceKm = group.reduce((sum, workout) => sum + (workout.jarakKm ?? 0), 0)
-    const kcal = group.reduce((sum, workout) => sum + (workout.kcal ?? 0), 0)
+    const activeMinutes = durationMinutes(group)
+    const distanceKm = measuredTotal(group, workout => workout.jarakKm)
+    const kcal = measuredTotal(group, workout => workout.kcal)
     const avgHr = weightedAverage(group.map((workout) => ({ value: workout.avgHr, weight: workoutDurationSeconds(workout) ?? 0 })))
     const maxHrValues = group.map((workout) => workout.maxHr).filter((value): value is number => typeof value === 'number')
     const representativeDna = dna.slice().sort((a, b) => b.durationMin - a.durationMin)[0]
 
     cumulativeSessions += group.length
-    cumulativeMinutes += activeMinutes
-    cumulativeDistanceKm += distanceKm
+    cumulativeMinutes = cumulativeTotal(cumulativeMinutes, activeMinutes)
+    cumulativeDistanceKm = cumulativeTotal(cumulativeDistanceKm, distanceKm)
 
     return {
       key,
@@ -116,17 +143,23 @@ export function buildHumanReplay(workouts: ImportedWorkout[], hrMax: number): Hu
     firstActivity: first,
     latestActivity: latest,
     totalSessions: sorted.length,
-    totalMinutes: sorted.reduce((sum, workout) => sum + workout.durasi / 60, 0),
-    totalDistanceKm: sorted.reduce((sum, workout) => sum + (workout.jarakKm ?? 0), 0),
+    totalMinutes: durationMinutes(sorted),
+    totalDistanceKm: measuredTotal(sorted, workout => workout.jarakKm),
     spanMonths,
   }
+}
+
+function measurementDelta(current: number | null, previous: number | null, scale: number): number | null {
+  if (current === null || previous === null) return null
+  const scaled = (current - previous) * scale
+  return Number.isFinite(scaled) ? Math.round(scaled) / scale : null
 }
 
 export function compareReplayEpochs(current: HumanReplayEpoch, previous?: HumanReplayEpoch) {
   if (!previous) return []
   return [
     { label: 'sessions', delta: current.sessions - previous.sessions, unit: '' },
-    { label: 'active time', delta: Math.round(current.activeMinutes - previous.activeMinutes), unit: 'min' },
-    { label: 'distance', delta: Math.round((current.distanceKm - previous.distanceKm) * 10) / 10, unit: 'km' },
+    { label: 'active time', delta: measurementDelta(current.activeMinutes, previous.activeMinutes, 1), unit: 'min' },
+    { label: 'distance', delta: measurementDelta(current.distanceKm, previous.distanceKm, 10), unit: 'km' },
   ]
 }

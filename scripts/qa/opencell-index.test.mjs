@@ -7,6 +7,27 @@ const L = (gene, ensg, g3 = 'cytoplasmic', g2 = '', g1 = '') => ({ target_name: 
 const A = (ensg, over = {}) => ({ gene_name: 'X', ensg_id: ensg, uniprot_id: 'P1', protein_name: 'Name', hek_rna_tpm: '10', hek_protein_conc_nm: '5', hek_protein_copy_number: '1000', ...over })
 const E1 = 'ENSG00000075624', E2 = 'ENSG00000184009', E3 = 'ENSG00000111111'
 
+test('Ensembl whitespace is normalized consistently for abundance joins and published output', () => {
+  const loc = [L('ACTB', ` ${E1} `)]
+  const abundance = [A(`\t${E1}\n`, { hek_rna_tpm: '0' })]
+  const result = buildOpenCellIndex(loc, abundance)
+  assert.deepEqual(result.rejected, [])
+  assert.equal(result.withoutAbundance, 0)
+  assert.equal(result.proteins[0].ensg, E1)
+  assert.equal(result.proteins[0].rnaTpm, 0)
+  assert.equal(result.proteins[0].proteinNm, 5)
+  assert.equal(result.proteins[0].uniprot, 'P1')
+  assert.equal(parseOpenCellIndex({ schema: 1, kind: 'opencell_index', licence: 'CC BY-SA 4.0', citation: 'fixture', limitations: 'synthetic', proteins: result.proteins }).ok, true)
+  assert.equal(loc[0].ensg_id, ` ${E1} `, 'source rows remain unchanged')
+  assert.equal(abundance[0].ensg_id, `\t${E1}\n`)
+})
+
+test('Ensembl duplicates cannot bypass detection through surrounding whitespace', () => {
+  const result = buildOpenCellIndex([L('ACTB', E1), L('ACTB', ` ${E1} `)], [])
+  assert.equal(result.proteins.length, 1)
+  assert.deepEqual(result.rejected, [{ gene: 'ACTB', reason: 'duplicate Ensembl id' }])
+})
+
 test('baris_valid_digabung_dengan_kelimpahan_dan_anotasi_dipecah_per_tingkat', () => {
   const r = buildOpenCellIndex([L('ACTB', E1, 'membrane;cytoskeleton', 'cytoplasmic', '')], [A(E1)])
   assert.equal(r.rejected.length, 0); assert.equal(r.proteins.length, 1)

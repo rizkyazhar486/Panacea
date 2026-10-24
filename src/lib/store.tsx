@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactNode } from 'react'
-import { parseWithdrawAmount } from '../domains/wallet/index.ts'
+import { parseWithdrawAmount, checkTokenAmount } from '../domains/wallet/index.ts'
 import { bindPersonalHealthAccount } from '../shared/kernel/personalHealthStorageScope.ts'
 import { normalisasiDaftarPasien } from './normalisasiPasien'
 import { hariIni } from './tanggal'
@@ -1294,7 +1294,9 @@ export function StoreProvider({ children, visibilityDocument }: { children: Reac
         return { ok: true }
       },
       spendPnc: (amount, note) => {
-        if (amount <= 0) return { ok: true }
+        if (amount === 0) return { ok: true }
+        const amountCheck = checkTokenAmount(amount)
+        if (!amountCheck.ok) return { ok: false, reason: 'invalid_amount' }
         if (state.wallet.balance < amount) return { ok: false, reason: 'insufficient_balance' }
         setState((st) => ({
           ...st,

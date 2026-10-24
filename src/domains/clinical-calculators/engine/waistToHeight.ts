@@ -1,4 +1,7 @@
 /**
+ * Sumber: Ashwell M, Gibson S. 2016. BMJ Open. 6(3):e010159.
+ * PMID 26975935; DOI 10.1136/bmjopen-2015-010159. Batas 0,5/0,6 diperiksa pada teks penuh populasi dewasa UK;
+ * rentang masukan di bawah tetap batas kewajaran repo, bukan validasi individual atau populasi anak.
  * Rasio lingkar pinggang terhadap tinggi badan. Pita (<0,5 / <0,6 / ≥0,6) dipindahkan apa adanya dari
  * SelfAssessmentToolkit; ini penapisan edukasi, bukan diagnosis. Sebelumnya kolom kosong terbaca 0, sehingga tinggi
  * kosong menghasilkan "Infinity — High risk". Rentang = kewajaran input (atribut min/max kolom), bukan ambang klinis.

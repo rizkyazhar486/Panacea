@@ -48,23 +48,39 @@
    "before_sha256": "73b112ed087bbdbf0778232f2fede7ea27e1b55ca0d2d363b0260552821a4525",
    "before_json_canonical_sha256": "445b02d5dfe1524d7dda0bb6923b3c20351b22ad7eaef4e8e486fd304ae8011e",
    "bin_sha256": "d89b6b88b6dd68de4d80976942d83fb5e165b6b377a1e6a9865385adaba578bf",
-   "after_sha256": "2a7936b5a5223ad4b728f33ee1a16bd25b816702a2ee893f6ef138158aefa4ec",
+   "after_sha256": "7ec5ae004e6dca96f93cbb85b297e32d6a1d128980cdaa4af42a1d51eb574e32",
    "landmarks": {
     "HEEL_L": {
      "translation": [
-      0.0165778,
-      0.035367,
-      0.0195416
+      0.0230553,
+      -0.0151353,
+      0.0664303
      ],
-     "source": "SKELETAL.CALCANEUS.L (lowest vertex)"
+     "source": "SKELETAL.CALCANEUS.L (lowest vertex in WALK stance)"
+    },
+    "BALL_L": {
+     "translation": [
+      -0.0584348,
+      0.1706799,
+      0.0217519
+     ],
+     "source": "SKELETAL.METATARSALS_AND_PHALANGES_COMBINED.L (forefoot (combined), not MT1)"
     },
     "HEEL_R": {
      "translation": [
-      0.0174812,
-      0.0317236,
-      -0.0309754
+      0.0281207,
+      -0.0136345,
+      -0.0665666
      ],
-     "source": "SKELETAL.CALCANEUS.R (lowest vertex)"
+     "source": "SKELETAL.CALCANEUS.R (lowest vertex in WALK stance)"
+    },
+    "BALL_R": {
+     "translation": [
+      -0.0695966,
+      0.1474712,
+      -0.0252733
+     ],
+     "source": "SKELETAL.METATARSALS_AND_PHALANGES_COMBINED.R (forefoot (combined), not MT1)"
     }
    }
   }

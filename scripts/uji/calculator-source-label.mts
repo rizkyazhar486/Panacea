@@ -1,12 +1,13 @@
 // ENG-C6-03 (bagian yang bisa diperiksa mesin): setiap mesin kalkulator mencatat dasar sumbernya secara jujur, kutipan terikat ke kepala
-// berkas mesin, dan setiap halaman yang memakai mesin menampilkan batas klaim "Not clinician-reviewed" selama registri belum menandai
-// mesin itu ditinjau. BATAS: ini tidak memeriksa bahwa halaman menampilkan rumus dan satuan, dan sumber belum tampil di layar
-// pengguna; lihat docs/governance/CALCULATOR_SOURCE_LABEL.md.
+// berkas mesin, rumus (formula) dan satuan (units) terdaftar dan ditampilkan via SumberKalkulator, serta setiap halaman yang memakai mesin
+// menampilkan batas klaim "Not clinician-reviewed" selama registri belum menandai mesin itu ditinjau.
 import assert from 'node:assert/strict'
 import { readFileSync, readdirSync, statSync } from 'node:fs'
 import {
-  checkSourceRecords, engineHeader, SOURCE_KINDS, type SourceRecord,
+  checkCalculatorFormulasAndUnits,
+  checkSourceRecords, engineHeader, incompleteSources, SOURCE_KINDS, type SourceRecord,
 } from '../../src/domains/clinical-calculators/engine/sourceRecord.ts'
+import { describeSource } from '../../src/domains/clinical-calculators/engine/sourceLine.ts'
 import { reviewedCount, type ReviewRegistry } from '../../src/domains/clinical-calculators/engine/reviewRegistry.ts'
 import { clinicalClaimDisclosure, clinicalClaimLabel, klaimPermukaanKesehatan } from '../../src/lib/clinicalClaimMaturity.ts'
 
@@ -22,10 +23,30 @@ const headers = Object.fromEntries(reg.entries.map((e) => [e.id, engineHeader(re
   assert.equal(Object.values(r.counts).reduce((a, b) => a + b, 0), reg.entries.length)
   assert.ok(r.counts.published > 0, 'published sources are recorded for the engines whose header cites one')
   const withPmid = reg.entries.filter((e) => e.source?.pmid)
-  assert.equal(withPmid.length, 10, 'PMID dicatat hanya untuk sepuluh engine yang sudah dicari dan dicocokkan di PubMed')
+  // 10 (#2752) + 7 (batch 1 C6-03: childPugh, framinghamInputs, graceScore, maddreyScore, paradise, serumOsmolality, sofaScore)
+  // + 4 (batch 2: centor, electrolyteCorrection, meldNa, riskScreens; sumber kedua dicatat di basis) + 2 (batch 3: packYearScreen, qtc) + 2 (batch 4a: hollidaySegar, bloodGas) + 3 (batch 4b: parkland, fletcher, waistToHeight dari #2760)
+  assert.equal(withPmid.length, 28, 'PMID dicatat hanya untuk engine yang sudah dicari dan dicocokkan di PubMed')
   assert.ok(reg.entries.every((e) => !e.source?.pmid || e.source.kind === 'published'), 'identifier hanya pada sumber terbit')
   assert.ok(withPmid.every((e) => e.source!.lookup?.retrievedOn === '2026-10-24'))
+  // Ratchet ENG-C6-03: daftar engine yang BELUM patuh hanya boleh menyusut. Kosong = kriteria dapat dicatat PASS.
+  // Batch 4b: daftar kosong — setiap engine bersumber terverifikasi atau dinyatakan heuristik.
+  assert.deepEqual(incompleteSources(reg.entries), [], 'engine belum patuh muncul lagi: ratchet ENG-C6-03 hanya boleh tetap kosong')
   console.log(`calculator-source-label: sources ${JSON.stringify(r.counts)}, pmid ${withPmid.length}`)
+}
+
+// ── rumus & satuan (ENG-C6-03) ─────────────────────────────────────────────────────────────────────────────
+{
+  const formulaErrors = checkCalculatorFormulasAndUnits(reg.entries)
+  assert.deepEqual(formulaErrors, [], 'every registry engine declares non-empty formula and units')
+  // negatif berpasangan: engine tanpa formula atau units ditolak dengan nama
+  assert.deepEqual(
+    checkCalculatorFormulasAndUnits([{ id: 'test', formula: '', units: 'score' }]),
+    ['test: formula-missing']
+  )
+  assert.deepEqual(
+    checkCalculatorFormulasAndUnits([{ id: 'test', formula: 'A + B', units: '' }]),
+    ['test: units-missing']
+  )
 }
 
 const pubRec: SourceRecord = { kind: 'published', citation: 'Contoh et al. 1999', anchor: 'Contoh et al. 1999', basis: 'b' }
@@ -71,6 +92,25 @@ assert.deepEqual(errs(withId({ firstAuthor: 'Lain' })), ['a: lookup-author-not-i
 assert.deepEqual(errs(withId({ year: 2001 })), ['a: lookup-year-not-in-citation'])
 assert.deepEqual(errs(withId({ year: 1999.5 })), ['a: lookup-year-not-in-citation'])
 assert.deepEqual(errs(pubRec), [], 'tanpa identifier, lookup tidak diwajibkan')
+
+// terbitan tak terindeks (unindexed): hanya pada published tanpa PMID, dengan alasan, tanggal periksa, URL https atau null
+const un = { reason: 'Laporan lembaga, tidak di PubMed', url: 'https://contoh.org/laporan', checkedOn: '2026-10-24' }
+assert.deepEqual(errs({ ...pubRec, unindexed: un }), [])
+assert.deepEqual(errs({ ...pubRec, unindexed: { ...un, url: null } }), [])
+assert.deepEqual(errs({ ...none('named-method'), unindexed: un }), ['a: unindexed-on-unsourced'])
+assert.deepEqual(errs({ ...pubRec, unindexed: { ...un, reason: ' ' } }), ['a: unindexed-reason-missing'])
+assert.deepEqual(errs({ ...pubRec, unindexed: { ...un, url: 'http://contoh.org' } }), ['a: unindexed-url-invalid'])
+assert.deepEqual(errs({ ...pubRec, unindexed: { ...un, checkedOn: 'kemarin' } }), ['a: unindexed-date-invalid'])
+assert.ok(errs({ ...pubRec, pmid: '1', lookup: { source: 'PubMed', pmid: '1', doi: null, retrievedOn: '2026-10-24', title: 't', firstAuthor: 'Contoh', journal: 'j', year: 1999, pages: '1' }, unindexed: un }).includes('a: unindexed-with-pmid'))
+
+// kelengkapan (aturan owner 2026-10-24): published ber-PMID / unindexed, atau arithmetic / repo-heuristic yang dinyatakan
+const one = (s: SourceRecord) => incompleteSources([{ id: 'a', source: s }])
+assert.deepEqual(one({ ...pubRec, unindexed: un }), [])
+assert.deepEqual(one(pubRec), ['a'], 'published tanpa PMID dan tanpa unindexed belum patuh')
+assert.deepEqual(one(none('arithmetic')), [])
+assert.deepEqual(one(none('repo-heuristic')), [])
+assert.deepEqual(one(none('named-method')), ['a'])
+assert.deepEqual(one(none('unattributed')), ['a'])
 assert.equal(SOURCE_KINDS.length, 5)
 assert.equal(engineHeader('/** kepala */\nconst x = 1 /* bukan kepala */'), ' kepala ')
 assert.equal(engineHeader('const x = 1'), '')
@@ -112,6 +152,35 @@ for (const e of reg.entries) {
   for (const p of unlabeled(pages, text)) unlabeledByEngine.push(`${e.id}: ${p.split('/src/')[1]}`)
 }
 assert.deepEqual(unlabeledByEngine, [], 'every page that renders an engine result shows the claim boundary')
+
+// sumber terlihat: setiap halaman yang menampilkan sebuah mesin juga memuat <SumberKalkulator ids={[...]}> berisi id mesin itu
+const SRC_TAG = /<SumberKalkulator\b[^>]*\bids=\{\[([^\]]*)\]\}/g
+export const sourceIdsOn = (src: string) => new Set([...src.matchAll(SRC_TAG)].flatMap((m) => [...m[1]!.matchAll(/'(\w+)'/g)].map((x) => x[1]!)))
+export const sourceMissing = (engineId: string, pages: string[], files: ReadonlyMap<string, string>) => pages.filter((p) => !sourceIdsOn(files.get(p) ?? '').has(engineId))
+const sourceMissingByEngine: string[] = []
+for (const e of reg.entries) for (const p of sourceMissing(e.id, pagesUsing(exportsOf(e.id), text), text)) sourceMissingByEngine.push(`${e.id}: ${p.split('/src/')[1]}`)
+assert.deepEqual(sourceMissingByEngine, [], 'every page that renders an engine result lists that engine in its source disclosure')
+{
+  const pg = "import { SumberKalkulator } from '../components/ui/SumberKalkulator'\nexport const A = () => <SumberKalkulator ids={['fena', 'qtc']} />"
+  assert.deepEqual([...sourceIdsOn(pg)], ['fena', 'qtc'])
+  const fake = new Map([['/x/A.tsx', pg], ['/x/B.tsx', "export const B = () => <SumberKalkulator ids={['qtc']} />"], ['/x/C.tsx', 'export const C = () => null'], ['/x/D.tsx', "export const D = () => <SumberKalkulator ids={['fena']} className=\"x\" />"]])
+  assert.deepEqual(sourceMissing('fena', ['/x/A.tsx', '/x/B.tsx', '/x/C.tsx', '/x/D.tsx'], fake), ['/x/B.tsx', '/x/C.tsx'], 'a page that lists other engines, or none, is named')
+  assert.deepEqual(sourceMissing('qtc', ['/x/A.tsx', '/x/B.tsx'], fake), [], 'listing the engine is enough')
+}
+
+// teks sumber: kutipan tampil apa adanya, tautan hanya dari identifier yang tersimpan dan sah, sumber tak bernama tidak diberi kutipan
+{
+  const pub = describeSource('x', { kind: 'published', citation: 'Contoh 1999', anchor: 'Contoh 1999', basis: 'b', pmid: '12345', doi: '10.1000/abc' }, { formula: 'A + B', units: 'mg/dL' })
+  assert.deepEqual(pub, { id: 'x', kind: 'published', label: 'Published source', text: 'Contoh 1999', formula: 'A + B', units: 'mg/dL', pubmedUrl: 'https://pubmed.ncbi.nlm.nih.gov/12345/', doiUrl: 'https://doi.org/10.1000/abc' })
+  assert.equal(describeSource('x', { kind: 'published', citation: 'Contoh 1999', anchor: 'a', basis: 'b' }).pubmedUrl, null, 'tanpa PMID tersimpan tidak ada tautan')
+  assert.equal(describeSource('x', { kind: 'published', citation: 'C', anchor: 'a', basis: 'b', pmid: 'PMC1', doi: 'doi:1' }).pubmedUrl, null, 'PMID tak sah tidak jadi tautan')
+  assert.equal(describeSource('x', { kind: 'published', citation: 'C', anchor: 'a', basis: 'b', pmid: '1', doi: 'javascript:alert(1)' }).doiUrl, null, 'DOI tak sah tidak jadi tautan')
+  const un = describeSource('x', { kind: 'unattributed', citation: null, anchor: null, basis: 'Standard equation; no publication named.', pmid: '999' })
+  assert.deepEqual([un.label, un.text, un.formula, un.units, un.pubmedUrl], ['No source recorded', 'Standard equation; no publication named.', null, null, null], 'sumber tak bernama tidak membawa tautan walau ada PMID nyasar')
+  assert.equal(describeSource('x', undefined).kind, 'unknown')
+  assert.equal(describeSource('x', { kind: 'verified' as never, citation: 'C', anchor: 'a', basis: 'b' }).kind, 'unknown', 'kind tak dikenal gagal tertutup')
+  assert.equal(describeSource('x', null).text, 'No source record was found for this calculator.')
+}
 
 // negatif berpasangan: halaman tanpa label, halaman tanpa impor mesin
 {

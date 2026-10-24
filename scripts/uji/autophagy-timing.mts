@@ -51,8 +51,8 @@ for (const field of ['bodyFatPct', 'hoursSinceMeal'] as const) {
   }
 }
 const registry = JSON.parse(readFileSync(new URL('../../governance/CALCULATOR_REVIEW_REGISTRY.json', import.meta.url), 'utf8'))
-// `source` (ENG-C6-03) is checked by calculator-source-label.mts; the review fields stay compared exactly here.
-const { source: _source, ...autophagyReview } = registry.entries.find((e: { id: string }) => e.id === 'autophagyTiming')
+// `source`, `formula`, and `units` (ENG-C6-03) are checked by calculator-source-label.mts; the review fields stay compared exactly here.
+const { source: _source, formula: _formula, units: _units, ...autophagyReview } = registry.entries.find((e: { id: string }) => e.id === 'autophagyTiming')
 assert.deepEqual(autophagyReview, {
   id: 'autophagyTiming', review_status: 'PENDING_CLINICAL_REVIEW', clinically_reviewed: false,
   reviewer: null, reviewed_at: null, evidence: null,
