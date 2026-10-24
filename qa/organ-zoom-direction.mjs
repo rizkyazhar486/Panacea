@@ -29,8 +29,9 @@ const server = createServer((req, res) => {
 await new Promise(resolve => server.listen(0, '127.0.0.1', resolve))
 let browser
 try {
-  const { chromium } = await import(process.env.PLAYWRIGHT_MODULE || 'playwright')
-  browser = await chromium.launch({ executablePath: process.env.CHROME_PATH || '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+  const { chromium } = await import(process.env.PLAYWRIGHT_MODULE || '@playwright/test')
+  browser = await chromium.launch({ headless: true,
+    ...(process.env.CHROME_PATH ? { executablePath: process.env.CHROME_PATH } : {}),
     args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader'] })
   for (const width of [320, 390]) {
     const page = await browser.newPage({ viewport: { width, height: 844 }, isMobile: true, hasTouch: true })
