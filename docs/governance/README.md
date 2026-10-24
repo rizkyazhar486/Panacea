@@ -14,6 +14,9 @@ attestations now. Deferral grants no approval: AI never marks a gate decided, an
 
 | Need | File |
 |---|---|
+| **Start here, any AI model** (60-second entry) | [AGENT_ENTRYPOINT.md](AGENT_ENTRYPOINT.md) |
+| Capability router per task class (tiers, evidence, prohibitions) | [SUPER_INTELLIGENCE_CAPABILITIES.md](SUPER_INTELLIGENCE_CAPABILITIES.md) + `governance/TASK_CATALOG.json` |
+| Optional human review (voluntary, with terms) | [HUMAN_VERIFICATION_OPTIONAL.md](HUMAN_VERIFICATION_OPTIONAL.md) |
 | What exists, what is real vs mocked | [PROJECT_REALITY_MAP.md](PROJECT_REALITY_MAP.md) |
 | Where we are going (H0 → H1 → H2) | [ROADMAP_RESET.md](ROADMAP_RESET.md) |
 | What to do next, who holds it | [TASK_BOARD.md](TASK_BOARD.md) |

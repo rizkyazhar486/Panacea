@@ -5,8 +5,8 @@
   "entries": [
     {
       "path": "CREDITS.txt",
-      "bytes": 8075,
-      "sha256": "f9cdd1a3acecef8ba78eafd5a833ca197ceb5239a1c181fab7dee6afdf484c94",
+      "bytes": 8693,
+      "sha256": "2ea425ae104a19027adb0c006c37b76014e3f576e0f732f7ddccb5c33028f3b5",
       "evidencePath": "CREDITS.txt",
       "sources": [],
       "licenses": [],
@@ -1117,8 +1117,8 @@
     },
     {
       "path": "adult_male.rig_rom.glb",
-      "bytes": 1383288,
-      "sha256": "0d4a95646feac9d64a8c734877090d11d5a366d0b825a3f8ac9bf3a8df35450b",
+      "bytes": 1385024,
+      "sha256": "03aa529c35d347d00f23c6bd2fb8dd6ac5050818e2ed818f1e11bff6bcbbd177",
       "evidencePath": "adult_male.rig_rom.glb",
       "sources": [
         "Z-Anatomy (derived from BodyParts3D, DBCLS) via Panaceamed public/anatomy/skeletal.glb",
@@ -1984,8 +1984,8 @@
     },
     {
       "path": "dataset-inspection/fetal-parcels/PROVENANCE.md",
-      "bytes": 1123,
-      "sha256": "c83bb4da97c8c1c80e49b94b6ebf5250687af4cf0c6519c4c9d424860eddd38b",
+      "bytes": 1493,
+      "sha256": "c66a136d7322044a36873f714631cf5d736ec7ac9aec8a2153215721207ea7fe",
       "evidencePath": "dataset-inspection/fetal-parcels/PROVENANCE.md",
       "sources": [],
       "licenses": [],
@@ -2011,8 +2011,8 @@
     },
     {
       "path": "dataset-inspection/fetal-parcels/mri/PROVENANCE.md",
-      "bytes": 933,
-      "sha256": "1bd2d9a3ca02b07ca84295e019467278e4033dfaaa0787c861d8a157ef4a2c34",
+      "bytes": 1310,
+      "sha256": "a074c1122f21e25c1b8f4c215dfe75c4131afa6635735defa82782ed6f0d0eb5",
       "evidencePath": "dataset-inspection/fetal-parcels/mri/PROVENANCE.md",
       "sources": [],
       "licenses": [],
@@ -7953,8 +7953,8 @@
     },
     {
       "path": "provenance.html",
-      "bytes": 70180,
-      "sha256": "b126ff03818012b000fb76a0aedba0657ca712144b41a2b322f08ccaf7b9cb1b",
+      "bytes": 71444,
+      "sha256": "6accc9d2c4a4e1a5f3a7142e4f76106093ce07aa47f64fc1314f082d4142595e",
       "evidencePath": "provenance.html",
       "sources": [],
       "licenses": [],
@@ -10743,8 +10743,8 @@
     },
     {
       "path": "vhf_denver_ct_adult_female.rig_rom.glb",
-      "bytes": 212488,
-      "sha256": "73b112ed087bbdbf0778232f2fede7ea27e1b55ca0d2d363b0260552821a4525",
+      "bytes": 213956,
+      "sha256": "7ec5ae004e6dca96f93cbb85b297e32d6a1d128980cdaa4af42a1d51eb574e32",
       "evidencePath": "vhf_denver_ct_adult_female.rig_rom.glb",
       "sources": [
         "Andreassen et al., Scientific Data 10:34 (2023), Visible Human Female lower-extremity musculoskeletal geometry; file VHF_Left_Bone_Calcaneous_smooth.stl",

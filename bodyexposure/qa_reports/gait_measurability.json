@@ -1,0 +1,207 @@
+{
+ "schema": "panacea-gait-measurability/v1",
+ "criterion": "ENG-D7-02",
+ "contact_window_mm": 15,
+ "minimum_stance_phases_per_foot": 1,
+ "minimum_stance_phases_total": 2,
+ "note": "Diagnostic only. A fixture is measurable when every assessed landmark has stance on both feet within the contact window; slide is then judged against the documented research placeholder criteria (not clinically validated). Root cause figures are minimum landmark height above the single clip floor.",
+ "fixtures": [
+  {
+   "body": "adult_male",
+   "clip": "WALK",
+   "source_sha256": "03aa529c35d347d00f23c6bd2fb8dd6ac5050818e2ed818f1e11bff6bcbbd177",
+   "frames": 26,
+   "sole_min_height_mm": {
+    "L": 0,
+    "R": 0.1
+   },
+   "landmarks": {
+    "heelCalcaneus": {
+     "per_side": {
+      "L": {
+       "min_height_mm": 0.6,
+       "frames_within_window": 9,
+       "stance_phases": 1
+      },
+      "R": {
+       "min_height_mm": 0.1,
+       "frames_within_window": 5,
+       "stance_phases": 1
+      }
+     },
+     "verdict": "within",
+     "slide_rms_mm": 7.8,
+     "slide_max_mm": 16.6
+    },
+    "ballMT1": {
+     "per_side": {
+      "L": {
+       "min_height_mm": 5.7,
+       "frames_within_window": 11,
+       "stance_phases": 1
+      },
+      "R": {
+       "min_height_mm": 8.9,
+       "frames_within_window": 6,
+       "stance_phases": 1
+      }
+     },
+     "verdict": "within",
+     "slide_rms_mm": 6.9,
+     "slide_max_mm": 16.1
+    }
+   },
+   "measurable": true
+  },
+  {
+   "body": "adult_male",
+   "clip": "RUN",
+   "source_sha256": "03aa529c35d347d00f23c6bd2fb8dd6ac5050818e2ed818f1e11bff6bcbbd177",
+   "frames": 18,
+   "sole_min_height_mm": {
+    "L": 0.3,
+    "R": 0
+   },
+   "landmarks": {
+    "heelCalcaneus": {
+     "per_side": {
+      "L": {
+       "min_height_mm": 32.3,
+       "frames_within_window": 0,
+       "stance_phases": 0
+      },
+      "R": {
+       "min_height_mm": 34.8,
+       "frames_within_window": 0,
+       "stance_phases": 0
+      }
+     },
+     "verdict": "unmeasurable",
+     "reason": "no_stance"
+    },
+    "ballMT1": {
+     "per_side": {
+      "L": {
+       "min_height_mm": 17.5,
+       "frames_within_window": 0,
+       "stance_phases": 0
+      },
+      "R": {
+       "min_height_mm": 13.9,
+       "frames_within_window": 1,
+       "stance_phases": 0
+      }
+     },
+     "verdict": "unmeasurable",
+     "reason": "no_stance"
+    }
+   },
+   "measurable": false
+  },
+  {
+   "body": "vhf_denver_ct_adult_female",
+   "clip": "WALK",
+   "source_sha256": "7ec5ae004e6dca96f93cbb85b297e32d6a1d128980cdaa4af42a1d51eb574e32",
+   "frames": 26,
+   "sole_min_height_mm": {
+    "L": 0.2,
+    "R": 0
+   },
+   "landmarks": {
+    "heelCalcaneus": {
+     "per_side": {
+      "L": {
+       "min_height_mm": 0.3,
+       "frames_within_window": 10,
+       "stance_phases": 1
+      },
+      "R": {
+       "min_height_mm": 0.4,
+       "frames_within_window": 8,
+       "stance_phases": 2
+      }
+     },
+     "verdict": "exceeds",
+     "failed": [
+      "rms",
+      "peak"
+     ],
+     "slide_rms_mm": 19.4,
+     "slide_max_mm": 67.7
+    },
+    "ballMT1": {
+     "per_side": {
+      "L": {
+       "min_height_mm": 0.2,
+       "frames_within_window": 5,
+       "stance_phases": 1
+      },
+      "R": {
+       "min_height_mm": 0,
+       "frames_within_window": 13,
+       "stance_phases": 1
+      }
+     },
+     "verdict": "within",
+     "slide_rms_mm": 10.1,
+     "slide_max_mm": 24.9
+    }
+   },
+   "measurable": true
+  },
+  {
+   "body": "vhf_denver_ct_adult_female",
+   "clip": "RUN",
+   "source_sha256": "7ec5ae004e6dca96f93cbb85b297e32d6a1d128980cdaa4af42a1d51eb574e32",
+   "frames": 18,
+   "sole_min_height_mm": {
+    "L": 10.5,
+    "R": 0
+   },
+   "landmarks": {
+    "heelCalcaneus": {
+     "per_side": {
+      "L": {
+       "min_height_mm": 17.5,
+       "frames_within_window": 0,
+       "stance_phases": 0
+      },
+      "R": {
+       "min_height_mm": 23.6,
+       "frames_within_window": 0,
+       "stance_phases": 0
+      }
+     },
+     "verdict": "unmeasurable",
+     "reason": "no_stance"
+    },
+    "ballMT1": {
+     "per_side": {
+      "L": {
+       "min_height_mm": 15.2,
+       "frames_within_window": 0,
+       "stance_phases": 0
+      },
+      "R": {
+       "min_height_mm": 0.7,
+       "frames_within_window": 3,
+       "stance_phases": 1
+      }
+     },
+     "verdict": "unmeasurable",
+     "reason": "too_few_phases",
+     "slide_rms_mm": 1.8,
+     "slide_max_mm": 2.6
+    }
+   },
+   "measurable": false
+  }
+ ],
+ "summary": {
+  "fixtures": 4,
+  "measurable": [
+   "adult_male:WALK",
+   "vhf_denver_ct_adult_female:WALK"
+  ]
+ }
+}

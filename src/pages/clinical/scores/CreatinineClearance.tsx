@@ -5,6 +5,7 @@ import { IconActivity } from '../../../components/icons'
 import { getDemoTersimpan } from '../../../lib/profile'
 import { CopyNote } from '../../../components/CopyNote'
 import { BatasKlaimSkorTerbit } from '../../../components/BatasKlaimSkorTerbit'
+import { SumberKalkulator } from '../../../components/ui/SumberKalkulator'
 import { cockcroftGault, parseNumberField } from '../../../domains/clinical-calculators'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -54,6 +55,7 @@ export function CreatinineClearance() {
       <Card className="!p-5">
         <SectionTitle icon={<IconActivity size={20} />} title="Creatinine Clearance (Cockcroft-Gault)" subtitle="Published Cockcroft-Gault estimate for dosing context — not a clinically validated Panacea decision" />
         <BatasKlaimSkorTerbit />
+        <SumberKalkulator ids={['cockcroftGault']} />
         <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Banyak brosur obat dan nomogram dosis menetapkan penyesuaian dosis ginjal justru dengan rumus ini, bukan dengan eGFR — keduanya punya perannya masing-masing dan tidak dapat saling menggantikan.</Prosa>
         <div className="mt-3 grid grid-cols-2 gap-3">
           <Field label="Age (years)">

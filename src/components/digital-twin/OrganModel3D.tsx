@@ -254,15 +254,25 @@ export function OrganModel3D({ organ, selected, onSelect, tinggiClass = 'h-[300p
         if (layarBerubah(layarTerakhir, next)) { layarTerakhir = next; setLayar(next) }
       }
     }
+    // OrbitControls' dolly helpers are not a reliable public camera-command API.
+    // Move the perspective camera along its target ray, preserving OrbitControls limits.
+    const zoomCamera = (factor: number) => {
+      const offset = camera.position.clone().sub(controls.target)
+      const previous = offset.length()
+      if (!Number.isFinite(previous) || previous <= 0) return
+      const next = THREE.MathUtils.clamp(previous * factor, controls.minDistance, controls.maxDistance)
+      camera.position.copy(controls.target).addScaledVector(offset, next / previous)
+      controls.update()
+    }
     const onCameraCommand = (e: Event) => {
       const custom = e as CustomEvent<{ action?: string }>
       const action = custom.detail?.action
+      if (!action || !['zoomIn', 'zoomOut', 'reset', 'front', 'back'].includes(action)) return
+      controls.autoRotate = false
       if (action === 'zoomIn') {
-        controls.dollyIn(1.2)
-        controls.update()
+        zoomCamera(1 / 1.2)
       } else if (action === 'zoomOut') {
-        controls.dollyOut(1.2)
-        controls.update()
+        zoomCamera(1.2)
       } else if (action === 'reset') {
         camera.position.set(0, 0.4, 4.6)
         controls.target.set(0, 0, 0)

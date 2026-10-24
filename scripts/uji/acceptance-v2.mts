@@ -11,7 +11,9 @@ const legacyIds: string[] = legacy.criteria.map((c: { id: string }) => c.id)
 assert.equal(legacyIds.length, 45, 'legacy ledger keeps all 45 historical criteria')
 const real = validate(doc, { legacyIds })
 assert.deepEqual(real.errors, [], real.errors.join('\n'))
-assert.equal(real.summary.pass, 0, 'no v2 criterion may start as PASS without a recorded evidence run')
+for (const c of doc.criteria.filter((x: { status: string }) => x.status === 'PASS')) {
+  assert.ok(c.statusNote && /\d{8,}/.test(c.statusNote), `${c.id}: PASS must cite at least one CI run ID in statusNote`)
+}
 
 const clone = () => structuredClone(doc)
 const fails = (d: unknown, pattern: RegExp, why: string, opts: Record<string, unknown> = { legacyIds }) => {

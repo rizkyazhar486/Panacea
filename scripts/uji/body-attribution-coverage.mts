@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { readdirSync, readFileSync } from 'node:fs'
-import { lacunasDeAtribuicao } from '../../src/domains/body-exposure/engine/attributionCoverage.ts'
+import { LICENCAS_CONHECIDAS, lacunasDeAtribuicao } from '../../src/domains/body-exposure/engine/attributionCoverage.ts'
 
 // ── Unidade: positivo / negativo / pareado
 const pagina = 'Sources: Z-Anatomy and BodyParts3D (CC BY-SA 4.0), HuBMAP (CC BY 4.0), ICRP Publication 156 and Publication 145. CC0 1.0 atlas.'
@@ -53,6 +53,26 @@ assert.ok(comMeta > 10000, `esperava >10000 nós com licença, li ${comMeta}`)
 const paginaOficial = readFileSync(new URL('provenance.html', dir), 'utf8')
 const lacunas = lacunasDeAtribuicao([...licencas], [...fontes], paginaOficial)
 assert.deepEqual(lacunas, [], `lacunas de atribuição: ${JSON.stringify(lacunas)}`)
+
+// ENG-D8-02 controle negativo em dados reais: remover da página oficial UMA classe de licença (todas as ocorrências) deve
+// produzir exatamente a lacuna dessa classe; a página intacta não produz nenhuma (par positivo que só difere nessa condição).
+for (const c of LICENCAS_CONHECIDAS) {
+  const presente = [...licencas].some((l) => l.toLowerCase().replace(/\s+/g, ' ').includes(c.chave.toLowerCase()))
+  if (!presente) continue // classe sem uso nos GLB atuais: nada a exigir da página
+  const sem = c.aliases.reduce((p, a) => p.replace(new RegExp(a.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\s+/g, '\\s+'), 'gi'), ''), paginaOficial)
+  assert.notEqual(sem, paginaOficial, `${c.chave}: a página oficial deve nomear esta classe`)
+  assert.deepEqual(lacunasDeAtribuicao([...licencas], [...fontes], sem).filter((l) => l.tipo === 'licenca'),
+    [{ tipo: 'licenca', valor: c.chave, motivo: 'ausente-na-pagina' }], `${c.chave}: remover da página deve falhar só por ela`)
+}
+assert.ok([...licencas].some((l) => l.includes('Apache-2.0')) && [...licencas].some((l) => l.includes('CC BY-SA 2.1')),
+  'dados reais ainda trazem Apache-2.0 e CC BY-SA 2.1, agora classes exigidas')
+// Unidade pareada: omitir só a classe nova da página produz exatamente a lacuna dela
+assert.deepEqual(lacunasDeAtribuicao(['Apache-2.0; combined atlas layer CC BY-SA 4.0'], [], 'CC BY-SA 4.0'),
+  [{ tipo: 'licenca', valor: 'Apache-2.0', motivo: 'ausente-na-pagina' }])
+assert.deepEqual(lacunasDeAtribuicao(['Apache-2.0; combined atlas layer CC BY-SA 4.0'], [], 'CC BY-SA 4.0 Apache-2.0'), [])
+assert.deepEqual(lacunasDeAtribuicao(['CC BY-SA 2.1 JP (OBJ header); CC BY 4.0'], [], 'CC BY 4.0'),
+  [{ tipo: 'licenca', valor: 'CC BY-SA 2.1', motivo: 'ausente-na-pagina' }])
+assert.deepEqual(lacunasDeAtribuicao(['CC BY-SA 2.1 JP (OBJ header); CC BY 4.0'], [], 'CC BY 4.0 CC BY-SA 2.1 Japan'), [])
 
 // A página do app aponta para a página oficial
 const canonico = readFileSync(new URL('../../src/pages/bodyhub/CanonicalBody.tsx', import.meta.url), 'utf8')

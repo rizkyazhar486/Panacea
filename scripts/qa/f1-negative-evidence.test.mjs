@@ -88,5 +88,29 @@ test('CI executes the evidence verifier and watches its implementation and tests
   assert.match(workflow, /elif ! node scripts\/qa\/f1-negative-evidence\.mjs "\$mode"/)
   assert.doesNotMatch(workflow, /elif ! grep/)
   assert.match(workflow, /node --test .*scripts\/qa\/f1-negative-evidence\.test\.mjs/)
-  assert.equal(workflow.split("- 'scripts/qa/f1-negative-evidence*'").length - 1, 2)
+  assert.equal(workflow.split("- 'scripts/qa/f1-negative-evidence*'").length - 1, 1)
+  assert.match(workflow, /  pull_request:\n    branches: \[main\]\npermissions:/)
+})
+
+// Mode 'crash' (ENG-F1-03): build tanpa batas rute harus gagal di langkah crash dengan diagnosis "cangkang hilang" per rute.
+const LANGKAH_CRASH = 'crash render satu halaman: cangkang tetap hidup, galat tertahan di halaman itu, halaman pulih setelahnya'
+function crashEvidence() {
+  const report = evidence('bocor')
+  report.hasil[1] = { ...report.hasil[1], step: LANGKAH_CRASH,
+    detail: 'crash render: ' + routes.map(route => `${route}: cangkang hilang setelah crash render (layar galat akar tampil)`).join(' | ') }
+  return report
+}
+test('crash: accepts a shell-loss failure named for every route', () => {
+  assert.equal(verifyNegativeEvidence('crash', crashEvidence()), undefined)
+})
+test('crash: a timeout, a missing route, or a slow-API failure cannot stand in for the crash detector', () => {
+  const timeout = crashEvidence()
+  timeout.hasil[1].detail = 'crash render: ' + routes.map(route => `${route}: page.waitForFunction: Timeout 60000ms exceeded`).join(' | ')
+  assert.throws(() => verifyNegativeEvidence('crash', timeout), /wrong crash detector failure/)
+  const missing = crashEvidence()
+  missing.hasil[1].detail = missing.hasil[1].detail.split(' | ').slice(0, -1).join(' | ')
+  assert.throws(() => verifyNegativeEvidence('crash', missing), /every injected route/)
+  assert.throws(() => verifyNegativeEvidence('crash', evidence('bocor')), /wrong crash step/)
+  const passed = crashEvidence(); passed.hasil[1].ok = true
+  assert.throws(() => verifyNegativeEvidence('crash', passed), /not detected/)
 })

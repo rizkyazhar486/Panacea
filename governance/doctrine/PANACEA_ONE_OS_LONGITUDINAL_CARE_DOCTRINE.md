@@ -53,6 +53,14 @@ The target data fabric includes, when consented and technically available:
 
 The architecture target is continuous longitudinal context, not uncontrolled surveillance. Collection remains purpose-bound, consent-aware, role-authorized and auditable.
 
+## 3A. Temporal device fabric — past, present and future
+
+Panacea One OS must accept **safely interpretable, authorized evidence from all generations of medical devices**, without presuming they are electronically connectable. Historical analog data (paper ECG, film radiography, manual measurements), legacy digital/serial archives, present interoperable devices and emerging experimental sensors require distinct import/translation paths but converge through **one provenance-aware longitudinal identity and timeline**.
+
+Mandatory invariant: preserve original source/document, event date precision, archival import and clinical acceptance times, calibration/method context when known, units/semantic mapping, consent, subject matching, quality and reviewer. Unknowns remain unknown; an archival scan is not a current device measurement, and future experimental data are not clinically validated readings. New data must not erase signed history or autonomously control medical equipment.
+
+Use [`DOCS/UNIVERSAL_DEVICE_TRANSLATION_OS.md`](DOCS/UNIVERSAL_DEVICE_TRANSLATION_OS.md) for the future-extensible device data-engineering contracts and [`PANACEA_GENESIS_DIRECTIVE.md`](PANACEA_GENESIS_DIRECTIVE.md) for the human–AI discovery process. Reuse existing adapters and clinically reviewed publication gates.
+
 ## 4. Normalize before intelligence
 
 Raw data must not become clinical truth merely because it arrived from a device or AI.

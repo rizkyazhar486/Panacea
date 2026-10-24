@@ -1,7 +1,7 @@
 {
  "schema": "panacea-foot-contact/v2",
- "source_sha256": "73b112ed087bbdbf0778232f2fede7ea27e1b55ca0d2d363b0260552821a4525",
- "reproducer_sha256": "474590f3f203905a32a4592a4e487a1048c72a1248b61f7079fb2d087f1986ea",
+ "source_sha256": "7ec5ae004e6dca96f93cbb85b297e32d6a1d128980cdaa4af42a1d51eb574e32",
+ "reproducer_sha256": "4879357e6754734c9bb2174e3437ebeff91f66db45b480ab7ca8865dc50981aa",
  "math_sha256": "5114a01e1c0ac99b96d12b7a511d34f8354e462893a3fbfea5cc26c968a32d7c",
  "coordinate_contract": {
   "gltf_length_unit": "metre",
@@ -52,6 +52,61 @@
      "R": []
     },
     "samples": []
+   },
+   "heelCalcaneus": {
+    "stance_phases": 0,
+    "phases_by_side": {
+     "L": [],
+     "R": []
+    },
+    "samples": [],
+    "landmark": {
+     "definition": "rig node FOOT_LANDMARK_HEEL_<side>: calcaneus lowest vertex",
+     "available_by_side": {
+      "L": true,
+      "R": true
+     }
+    }
+   },
+   "ballMT1": {
+    "stance_phases": 1,
+    "stance_frames": 3,
+    "common_forward_speed_m_s": 2.858626304326977,
+    "slide_rms_mm": 1.834084302516127,
+    "slide_max_mm": 2.593786895153903,
+    "display": {
+     "common_forward_speed_m_s": 2.859,
+     "slide_rms_mm": 1.8,
+     "slide_max_mm": 2.6
+    },
+    "phases_by_side": {
+     "L": [],
+     "R": [
+      "8-10"
+     ]
+    },
+    "samples": [
+     {
+      "side": "R",
+      "t": [
+       0.3333333333333333,
+       0.375,
+       0.4166666666666667
+      ],
+      "x": [
+       0.06679374766213766,
+       -0.048425001342088915,
+       -0.1714251110317772
+      ]
+     }
+    ],
+    "landmark": {
+     "definition": "rig node FOOT_LANDMARK_BALL_<side>: first metatarsal head (or forefoot combined)",
+     "available_by_side": {
+      "L": true,
+      "R": true
+     }
+    }
    },
    "sole": {
     "stance_phases": 1,
@@ -152,6 +207,172 @@
      "R": []
     },
     "samples": []
+   },
+   "heelCalcaneus": {
+    "stance_phases": 3,
+    "stance_frames": 18,
+    "common_forward_speed_m_s": 1.1330955279910562,
+    "slide_rms_mm": 19.38375376693151,
+    "slide_max_mm": 67.71874550086349,
+    "display": {
+     "common_forward_speed_m_s": 1.133,
+     "slide_rms_mm": 19.4,
+     "slide_max_mm": 67.7
+    },
+    "phases_by_side": {
+     "L": [
+      "23-25+0-6"
+     ],
+     "R": [
+      "5-8",
+      "10-13"
+     ]
+    },
+    "samples": [
+     {
+      "side": "L",
+      "t": [
+       0.9583333333333334,
+       1,
+       1.0416666666666667,
+       1.0833333333333333,
+       1.125,
+       1.1666666666666667,
+       1.2083333333333333,
+       1.25,
+       1.2916666666666667,
+       1.3333333333333333
+      ],
+      "x": [
+       0.13613346445126073,
+       0.08579035418008724,
+       0.03580608246668807,
+       -0.012465255343309358,
+       -0.056251405235238215,
+       -0.09982480378260292,
+       -0.14679044266493171,
+       -0.198003892613652,
+       -0.25630114403362575,
+       -0.3112509539777573
+      ]
+     },
+     {
+      "side": "R",
+      "t": [
+       0.20833333333333334,
+       0.25,
+       0.2916666666666667,
+       0.3333333333333333
+      ],
+      "x": [
+       0.23643043977513983,
+       0.2730152276523925,
+       0.2380939692873365,
+       0.18578322239138068
+      ]
+     },
+     {
+      "side": "R",
+      "t": [
+       0.4166666666666667,
+       0.4583333333333333,
+       0.5,
+       0.5416666666666666
+      ],
+      "x": [
+       0.06337859184701936,
+       0.0075491212883237666,
+       -0.04218351796027635,
+       -0.09028253789577287
+      ]
+     }
+    ],
+    "landmark": {
+     "definition": "rig node FOOT_LANDMARK_HEEL_<side>: calcaneus lowest vertex",
+     "available_by_side": {
+      "L": true,
+      "R": true
+     }
+    }
+   },
+   "ballMT1": {
+    "stance_phases": 2,
+    "stance_frames": 18,
+    "common_forward_speed_m_s": 1.2214829237141966,
+    "slide_rms_mm": 10.125986534159285,
+    "slide_max_mm": 24.893964974508798,
+    "display": {
+     "common_forward_speed_m_s": 1.221,
+     "slide_rms_mm": 10.1,
+     "slide_max_mm": 24.9
+    },
+    "phases_by_side": {
+     "L": [
+      "5-9"
+     ],
+     "R": [
+      "10-22"
+     ]
+    },
+    "samples": [
+     {
+      "side": "L",
+      "t": [
+       0.20833333333333334,
+       0.25,
+       0.2916666666666667,
+       0.3333333333333333,
+       0.375
+      ],
+      "x": [
+       -0.05674589223545116,
+       -0.1111337716851907,
+       -0.16908753031743184,
+       -0.22739043302005846,
+       -0.2938868121638974
+      ]
+     },
+     {
+      "side": "R",
+      "t": [
+       0.4166666666666667,
+       0.4583333333333333,
+       0.5,
+       0.5416666666666666,
+       0.5833333333333334,
+       0.625,
+       0.6666666666666666,
+       0.7083333333333334,
+       0.75,
+       0.7916666666666666,
+       0.8333333333333334,
+       0.875,
+       0.9166666666666666
+      ],
+      "x": [
+       0.23954478334416768,
+       0.18338549011393324,
+       0.13345806124967202,
+       0.08511165583914715,
+       0.03869740969402869,
+       -0.012960891746371432,
+       -0.060575933405443795,
+       -0.1089952893540686,
+       -0.1598925378899116,
+       -0.21818205987179018,
+       -0.2772451636554493,
+       -0.29395474668564664,
+       -0.38524111082167156
+      ]
+     }
+    ],
+    "landmark": {
+     "definition": "rig node FOOT_LANDMARK_BALL_<side>: first metatarsal head (or forefoot combined)",
+     "available_by_side": {
+      "L": true,
+      "R": true
+     }
+    }
    },
    "sole": {
     "stance_phases": 3,
