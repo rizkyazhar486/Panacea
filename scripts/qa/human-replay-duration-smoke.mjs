@@ -68,12 +68,8 @@ try {
     assert.equal(await metricPanel.count(), 1, 'actual Human Replay metric panel must exist')
     await metricPanel.getByText('active min', { exact: true }).waitFor()
     const capturePanel = async (path) => {
-      const box = await metricPanel.boundingBox()
-      if (box && box.width > 0 && box.height > 0) {
-        await page.screenshot({ path, clip: box, animations: 'disabled', timeout: 90000 })
-      } else {
-        await metricPanel.screenshot({ path, animations: 'disabled', timeout: 90000 })
-      }
+      await metricPanel.scrollIntoViewIfNeeded()
+      await metricPanel.screenshot({ path, animations: 'disabled', timeout: 90000 })
     }
     await poster('Unknown');await capturePanel(`${out}/unknown-${viewport.width}.png`)
     await select('Known');assert.match(await active.innerText(),/^30\s/);assert.match(await distance.innerText(),/^3[.,]0\s/)
