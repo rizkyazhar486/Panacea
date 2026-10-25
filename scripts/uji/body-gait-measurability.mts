@@ -1,5 +1,6 @@
 // ENG-D7-02: bukti per-fixture terukur/tidak terukur, dengan penyebab terukur. Laporan = jalan ulang; vonis jujur; tidak ada fixture yang
-// "lulus" tanpa fase tumpu di kedua kaki. Status kriteria tetap FAIL selama RUN dan betina tidak terukur (sifat gerak/geometri sumber).
+// "lulus" tanpa fase tumpu di kedua kaki. Di bawah Opsi A (D-D7-RUN), RUN kaki depan dinilai pada kompleks kontak kaki depan, dan
+// ketiadaan heel strike dicatat sebagai not_applicable (bukan fabrikasi heel strike atau pelonggaran gate).
 import assert from 'node:assert/strict'
 import { execFileSync } from 'node:child_process'
 import fs from 'node:fs'
@@ -15,13 +16,25 @@ for (const f of committed.fixtures) {
   assert.equal(f.measurable, Object.values(f.landmarks).every((l: any) => l.verdict !== 'unmeasurable'), `${f.body} ${f.clip}`)
   for (const l of Object.values(f.landmarks) as any[]) if (l.verdict === 'unmeasurable') assert.ok(['no_stance', 'too_few_phases', 'insufficient_frames', 'missing_values'].includes(l.reason))
 }
-assert.deepEqual(committed.summary.measurable, ['adult_male:WALK', 'vhf_denver_ct_adult_female:WALK'], 'WALK jantan dan betina terukur pada rig yang diperbarui')
+assert.deepEqual(committed.summary.measurable, [
+  'adult_male:WALK',
+  'adult_male:RUN',
+  'vhf_denver_ct_adult_female:WALK',
+  'vhf_denver_ct_adult_female:RUN'
+], 'seluruh 4 fixture (jantan/betina x WALK/RUN) terukur pada Opsi A (D-D7-RUN)')
 
-// penyebab terukur: pada RUN tumit tidak pernah masuk jendela kontak 15 mm (gerak CMU adalah lari kaki depan tanpa heel strike)
+// Opsi A (D-D7-RUN): pada RUN tumit tidak pernah masuk fase tumpu (gerak CMU adalah lari kaki depan tanpa heel strike),
+// sehingga tumit bernilai not_applicable dengan alasan forefoot_run_no_rearfoot_strike.
 for (const b of ['adult_male', 'vhf_denver_ct_adult_female']) {
-  const run = fx(b, 'RUN').landmarks.heelCalcaneus.per_side
-  for (const s of ['L', 'R']) { assert.ok(run[s].min_height_mm > 15, `${b} RUN tumit ${s} minimum ${run[s].min_height_mm} mm di atas lantai`); assert.equal(run[s].frames_within_window, 0) }
+  const runHeel = fx(b, 'RUN').landmarks.heelCalcaneus
+  assert.equal(runHeel.verdict, 'not_applicable')
+  assert.equal(runHeel.reason, 'forefoot_run_no_rearfoot_strike')
+  assert.equal(runHeel.per_side.L.stance_phases, 0)
+  assert.equal(runHeel.per_side.R.stance_phases, 0)
+  const runForefoot = fx(b, 'RUN').landmarks.ballMT1
+  assert.equal(runForefoot.verdict, 'within')
 }
+
 // betina WALK terukur (T-D7-04): tumit diturunkan dari pose jalan, bola dari kombinasi metatarsal+falang
 const fw = fx('vhf_denver_ct_adult_female', 'WALK').landmarks
 for (const s of ['L', 'R']) {
@@ -30,9 +43,10 @@ for (const s of ['L', 'R']) {
 }
 assert.equal(fw.heelCalcaneus.verdict, 'exceeds')
 assert.equal(fw.ballMT1.verdict, 'within')
+
 // pasangan positif: WALK jantan kedua landmark menapak di kedua kaki dan dinilai terhadap kriteria (placeholder penelitian)
 const mw = fx('adult_male', 'WALK').landmarks
 for (const k of ['heelCalcaneus', 'ballMT1']) for (const s of ['L', 'R']) assert.ok(mw[k].per_side[s].stance_phases >= 1 && mw[k].per_side[s].min_height_mm < 15)
 assert.equal(mw.heelCalcaneus.verdict, 'within'); assert.equal(mw.ballMT1.verdict, 'within')
 assert.match(committed.note, /not clinically validated/)
-console.log('body-gait-measurability: 4 fixture; WALK jantan & betina terukur; RUN tumit >15 mm dari lantai (forefoot landing)')
+console.log('body-gait-measurability: 4/4 fixture terukur; WALK jantan & betina within; RUN forefoot within & heel not_applicable')

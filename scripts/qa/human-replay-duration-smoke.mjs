@@ -39,8 +39,8 @@ try {
       let file
       try {
         ;[file]=await Promise.all([
-          page.waitForEvent('download', { timeout: 120000 }),
-          page.getByRole('button',{name:'Share this chapter',exact:true}).click({ timeout: 120000, noWaitAfter: true }),
+          page.waitForEvent('download', { timeout: 75000 }),
+          page.getByRole('button',{name:'Share this chapter',exact:true}).click({ timeout: 90000, noWaitAfter: true }),
         ])
       } catch (error) {
         const diagnostic={viewport,expected,errors,consoleErrors,failedResponses,
@@ -67,26 +67,7 @@ try {
     const metricPanel = page.locator('section > div.grid > div').last()
     assert.equal(await metricPanel.count(), 1, 'actual Human Replay metric panel must exist')
     await metricPanel.getByText('active min', { exact: true }).waitFor()
-    const capturePanel = async (path) => {
-      await metricPanel.scrollIntoViewIfNeeded()
-      const rect = await metricPanel.evaluate((el) => {
-        const r = el.getBoundingClientRect()
-        const x = Math.max(0, Math.floor(r.x))
-        const y = Math.max(0, Math.floor(r.y))
-        return {
-          x,
-          y,
-          width: Math.min(window.innerWidth - x, Math.ceil(r.width)),
-          height: Math.min(window.innerHeight - y, Math.ceil(r.height)),
-        }
-      })
-      if (rect.width > 0 && rect.height > 0) {
-        await page.screenshot({ path, clip: rect, animations: 'disabled', timeout: 30000 })
-      } else {
-        await metricPanel.screenshot({ path, animations: 'disabled', timeout: 90000 })
-      }
-    }
-    await poster('Unknown');await capturePanel(`${out}/unknown-${viewport.width}.png`)
+    await poster('Unknown');await metricPanel.screenshot({path:`${out}/unknown-${viewport.width}.png`,animations:'disabled',timeout:90000})
     await select('Known');assert.match(await active.innerText(),/^30\s/);assert.match(await distance.innerText(),/^3[.,]0\s/)
     await select('Zero');assert.match(await active.innerText(),/^0\s/);assert.match(await distance.innerText(),/^0[.,]0\s/);await poster('0')
     await select('Invalid');assert.match(await active.innerText(),/Unknown/)
@@ -97,7 +78,7 @@ try {
     await page.getByText(/Cumulative: 1 sessions · 30 active minutes/).waitFor();assert.match(await active.innerText(),/^30\s/)
     await page.keyboard.press('ArrowRight');await page.getByText(/Cumulative: 2 sessions · Unknown active minutes/).waitFor();assert.match(await active.innerText(),/Unknown/)
     const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth);assert.ok(overflow<=1)
-    await capturePanel(`${out}/mixed-${viewport.width}.png`)
+    await metricPanel.screenshot({path:`${out}/mixed-${viewport.width}.png`,animations:'disabled',timeout:90000})
     await select('Empty');await page.getByRole('slider',{name:'Human Replay month'}).waitFor({state:'hidden'})
     if(errors.length||consoleErrors.length||failedResponses.length) {
       const failure={viewport,errors,consoleErrors,failedResponses};await writeFile(`${out}/failure-${viewport.width}.json`,JSON.stringify(failure,null,2));console.error(JSON.stringify(failure))
