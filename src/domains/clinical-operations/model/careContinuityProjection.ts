@@ -24,12 +24,18 @@ import {
   type ClinicalEpisodeTransportEvent,
   type EpisodeConnectivity,
 } from './clinicalEpisodeResilience.ts'
+import {
+  evaluateOneOsCareProof,
+  type OneOsEvidenceFragment,
+  type OneOsProofResult,
+} from './oneOsCareProof.ts'
 
 export interface CareContinuityProjectionInput {
   patientId: string
   evaluatedAt: string
   supportiveResults?: readonly SupportiveResult[]
   record?: EMRRecord
+  vitals?: readonly { takenAt: string; verifiedById?: string; source?: string }[]
   connectivity?: EpisodeConnectivity
   secureLocalStorageAvailable?: boolean
   payerCoverageActive?: boolean
@@ -39,6 +45,7 @@ export interface CareContinuityProjection {
   closure: ResultClosureResult | null
   careAccess: CareAccessOrchestrationResult
   episodeResilience: ClinicalEpisodeResilienceResult
+  oneOsProof: OneOsProofResult
 }
 
 function isValidIsoTimestamp(val: unknown, maxEpochMs: number): boolean {
@@ -190,9 +197,121 @@ export function deriveCareContinuityState(input: CareContinuityProjectionInput):
     events,
   })
 
+  // 4. One OS Clinical Evidence & Completeness Proof
+  const requiredDataClasses = ['vital-signs', 'anamnesis', 'physical-exam', 'diagnosis', 'plan']
+  const fragments: OneOsEvidenceFragment[] = []
+
+  // Vital signs fragments
+  if (input.vitals && input.vitals.length > 0) {
+    input.vitals.forEach((vital, idx) => {
+      if (isValidIsoTimestamp(vital.takenAt, nowMs)) {
+        const isVerified = Boolean(vital.verifiedById?.trim())
+        fragments.push({
+          id: `vital-${input.patientId}-${idx}`,
+          patientId: input.patientId,
+          sourceId: vital.source || 'vital-signs-monitor',
+          dataClass: 'vital-signs',
+          recordedAt: vital.takenAt,
+          provenancePresent: true,
+          normalized: true,
+          requiresClinicalReview: false,
+          reviewState: isVerified ? 'verified' : 'not-required',
+        })
+      }
+    })
+  }
+
+  // Clinical record fragments
+  if (record) {
+    if (record.anamnesis?.keluhanUtama || record.anamnesis?.rps) {
+      fragments.push({
+        id: `record-${record.id}-anamnesis`,
+        patientId: input.patientId,
+        sourceId: 'clinician-interview',
+        dataClass: 'anamnesis',
+        recordedAt: record.updatedAt || record.createdAt,
+        provenancePresent: true,
+        normalized: true,
+        requiresClinicalReview: true,
+        reviewState: isRecordSignedByClinician ? 'signed' : 'pending',
+      })
+    }
+
+    if (record.physicalExam) {
+      const isExamVerified = Boolean(record.physicalExam.verifiedById?.trim())
+      fragments.push({
+        id: `record-${record.id}-exam`,
+        patientId: input.patientId,
+        sourceId: 'physical-examination',
+        dataClass: 'physical-exam',
+        recordedAt: record.updatedAt || record.createdAt,
+        provenancePresent: true,
+        normalized: true,
+        requiresClinicalReview: true,
+        reviewState: isExamVerified ? 'verified' : (isRecordSignedByClinician ? 'signed' : 'pending'),
+      })
+    }
+
+    if (record.primaryDiagnosis?.title) {
+      fragments.push({
+        id: `record-${record.id}-diagnosis`,
+        patientId: input.patientId,
+        sourceId: 'clinical-assessment',
+        dataClass: 'diagnosis',
+        recordedAt: record.updatedAt || record.createdAt,
+        provenancePresent: Boolean(record.primaryDiagnosis.code?.trim()),
+        normalized: true,
+        requiresClinicalReview: true,
+        reviewState: isRecordSignedByClinician ? 'signed' : 'pending',
+      })
+    }
+
+    if (record.plan && record.plan.length > 0) {
+      record.plan.forEach((item, idx) => {
+        const isPlanRejected = item.status === 'ditolak'
+        const isPlanVerified = item.status === 'diverifikasi' || isRecordSignedByClinician
+        fragments.push({
+          id: `record-${record.id}-plan-${item.id || idx}`,
+          patientId: input.patientId,
+          sourceId: 'clinical-orders',
+          dataClass: 'plan',
+          recordedAt: record.updatedAt || record.createdAt,
+          provenancePresent: true,
+          normalized: true,
+          requiresClinicalReview: true,
+          reviewState: isPlanRejected ? 'rejected' : (isPlanVerified ? 'signed' : 'pending'),
+        })
+      })
+    }
+  }
+
+  // Supportive results fragments
+  validSupportive.forEach((item) => {
+    const isCritical = item.flag === 'critical' || item.flag === 'high'
+    fragments.push({
+      id: `supportive-${item.id}`,
+      patientId: input.patientId,
+      sourceId: `device-poli-${item.category.toLowerCase()}`,
+      dataClass: 'supportive-signal',
+      recordedAt: item.takenAt,
+      provenancePresent: Boolean(item.category),
+      normalized: true,
+      requiresClinicalReview: isCritical,
+      reviewState: isRecordSignedByClinician ? 'signed' : (isCritical ? 'pending' : 'not-required'),
+    })
+  })
+
+  const oneOsProof = evaluateOneOsCareProof({
+    targetPatientId: input.patientId,
+    evaluatedAt: input.evaluatedAt,
+    fragments,
+    requiredDataClasses,
+  })
+
   return {
     closure,
     careAccess,
     episodeResilience,
+    oneOsProof,
   }
 }

@@ -57,6 +57,7 @@ export function VisitOS() {
     evaluatedAt: nowIso,
     supportiveResults: state.supportive[activePatient.id],
     record: state.records[activePatient.id],
+    vitals: state.vitals[activePatient.id],
   })
 
   return (
@@ -70,6 +71,7 @@ export function VisitOS() {
           closure={careContinuity?.closure}
           careAccess={careContinuity?.careAccess}
           episodeResilience={careContinuity?.episodeResilience}
+          oneOsProof={careContinuity?.oneOsProof}
         />
       )}
       {activePatient.id !== 'none' && (

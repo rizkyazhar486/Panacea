@@ -30,6 +30,8 @@ test('CareContinuityPanel: enforces clean architecture boundary and domain expor
   assert.match(visitSrc, /closure=\{careContinuity\?\.closure\}/)
   assert.match(visitSrc, /careAccess=\{careContinuity\?\.careAccess\}/)
   assert.match(visitSrc, /episodeResilience=\{careContinuity\?\.episodeResilience\}/)
+  assert.match(visitSrc, /oneOsProof=\{careContinuity\?\.oneOsProof\}/)
+  assert.match(visitSrc, /vitals:\s*state\.vitals\[activePatient\.id\]/)
 })
 
 test('CareContinuityPanel: enforces PRD §8.5 result closure and clinical safety boundary surface', () => {
@@ -61,6 +63,12 @@ test('CareContinuityPanel: enforces PRD §8.5 result closure and clinical safety
   assert.match(panelSrc, /Offline Transport/)
   assert.match(panelSrc, /Offline ready/)
   assert.match(panelSrc, /tamper-evident digests/)
+
+  // One OS Evidence & Completeness Proof Section
+  assert.match(panelSrc, /data-one-os-proof="v1"/)
+  assert.match(panelSrc, /One OS Care Proof/)
+  assert.match(panelSrc, /Trust coverage:/)
+  assert.match(panelSrc, /Auditable proof: structural measures verify data provenance and completeness without fabricated claims/)
 })
 
 test('deriveCareContinuityState: positive control - clinician-signed encounter closes supportive result review', () => {
@@ -68,6 +76,13 @@ test('deriveCareContinuityState: positive control - clinician-signed encounter c
   const projection = deriveCareContinuityState({
     patientId: 'patient-signed-1',
     evaluatedAt: now,
+    vitals: [
+      {
+        takenAt: '2026-10-25T08:00:00.000Z',
+        verifiedById: 'nurse-1',
+        source: 'vital-signs-monitor',
+      },
+    ],
     supportiveResults: [
       {
         id: 'lab-hb-1',
@@ -97,7 +112,7 @@ test('deriveCareContinuityState: positive control - clinician-signed encounter c
       physicalExam: { verifiedById: 'dr-jane-doe' },
       problems: [],
       primaryDiagnosis: { code: 'Z00.0', title: 'General exam' },
-      plan: [{ id: 'plan-1', text: 'Routine follow-up in 1 year', status: 'terkonfirmasi' }],
+      plan: [{ id: 'plan-1', text: 'Routine follow-up in 1 year', status: 'diverifikasi' }],
       references: [],
     },
   })
@@ -109,6 +124,13 @@ test('deriveCareContinuityState: positive control - clinician-signed encounter c
   assert.equal(projection.careAccess.clinicalCare.financialStateMayDenyCare, false)
   assert.equal(projection.careAccess.financialWorkflow.claimSubmissionReady, true)
   assert.equal(projection.episodeResilience.safeToContinueOffline, true)
+
+  // One OS Care Proof assertions
+  assert.ok(projection.oneOsProof, 'oneOsProof is derived')
+  assert.equal(projection.oneOsProof.completenessCoverage, 1.0)
+  assert.equal(projection.oneOsProof.trustCoverage, 1.0)
+  assert.equal(projection.oneOsProof.missingRequiredDataClasses.length, 0)
+  assert.equal(projection.oneOsProof.unresolvedFragmentCount, 0)
 })
 
 test('deriveCareContinuityState: negative control - unsigned record cannot close result follow-up task', () => {
@@ -158,6 +180,13 @@ test('deriveCareContinuityState: negative control - unsigned record cannot close
   )
   // Invariant: financial/administrative state never denies emergency care
   assert.equal(projection.careAccess.clinicalCare.financialStateMayDenyCare, false)
+
+  // One OS Care Proof assertions on unsigned incomplete record
+  assert.ok(projection.oneOsProof, 'oneOsProof is derived')
+  assert.ok(projection.oneOsProof.completenessCoverage < 1.0, 'completeness is incomplete')
+  assert.ok(projection.oneOsProof.missingRequiredDataClasses.includes('physical-exam'), 'missing physical-exam')
+  assert.ok(projection.oneOsProof.missingRequiredDataClasses.includes('plan'), 'missing plan')
+  assert.ok(projection.oneOsProof.unresolvedFragmentCount > 0, 'unresolved fragments require review')
 })
 
 test('deriveCareContinuityState: empty supportive results returns graceful null closure without throwing', () => {
@@ -175,6 +204,9 @@ test('deriveCareContinuityState: empty supportive results returns graceful null 
     'missing evidence reflects absence of supportive results'
   )
   assert.equal(projection.episodeResilience.safeToContinueOffline, true)
+  assert.equal(projection.oneOsProof.completenessCoverage, 0.0)
+  assert.equal(projection.oneOsProof.trustCoverage, null)
+  assert.equal(projection.oneOsProof.missingRequiredDataClasses.length, 5)
 })
 
 test('VisitOS: wires ClinicalPatientContext and clinical anatomical twin container', () => {
