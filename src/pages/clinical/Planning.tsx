@@ -9,6 +9,7 @@ import { checkInteractions } from '../../lib/ddi'
 import { ensureEpisodeFromVerifiedPlan } from '../../lib/careEpisode'
 import type { PlanItem, Patient } from '../../lib/types'
 import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
+import { PanaceaZoneNav } from '../../components/PanaceaZoneNav'
 
 const CATEGORIES: PlanItem['category'][] = [
   'Suportif',
@@ -37,16 +38,19 @@ export function Planning() {
 
   if (!record) {
     return (
-      <Card className="mx-auto max-w-md text-center">
-        <IconPlan size={40} className="mx-auto text-brand" />
-        <h3 className="mt-3 text-lg font-bold">No plan yet</h3>
-        <p className="mt-1 text-sm text-neutral-500">
-          Draft a plan in the <b>AI Chatbot</b> first to generate AI plan suggestions.
-        </p>
-        <Link to="/chatbot" className="mt-4 inline-block">
-          <Button>Open AI Chatbot</Button>
-        </Link>
-      </Card>
+      <div className="space-y-5">
+        <PanaceaZoneNav />
+        <Card className="mx-auto max-w-md text-center">
+          <IconPlan size={40} className="mx-auto text-brand" />
+          <h3 className="mt-3 text-lg font-bold">No plan yet</h3>
+          <p className="mt-1 text-sm text-neutral-500">
+            Draft a plan in the <b>AI Chatbot</b> first to generate AI plan suggestions.
+          </p>
+          <Link to="/chatbot" className="mt-4 inline-block">
+            <Button>Open AI Chatbot</Button>
+          </Link>
+        </Card>
+      </div>
     )
   }
 
@@ -99,6 +103,33 @@ export function Planning() {
 
   return (
     <div className="space-y-6">
+      <PanaceaZoneNav />
+      {record.careEpisodes && record.careEpisodes.length > 0 && (
+        <Card data-planning-care-journey="v1" className="border border-brand/20 bg-brand/5 dark:bg-brand/10">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <div className="flex items-center gap-2">
+                <Badge tone="brand">Care Journey Active</Badge>
+                {record.careEpisodes[0].diagnosisCode && (
+                  <span className="font-mono text-xs font-bold text-neutral-600 dark:text-neutral-400">
+                    ICD-10: {record.careEpisodes[0].diagnosisCode}
+                  </span>
+                )}
+              </div>
+              <h4 className="mt-1 font-bold text-ink">{record.careEpisodes[0].title}</h4>
+              <p className="mt-0.5 text-xs text-neutral-500">
+                {record.careEpisodes.length} active care journey episode(s) linked to this patient. Verified plan items advance downstream trajectory stages.
+              </p>
+            </div>
+            <Link
+              to="/care-episode"
+              className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-xl bg-brand px-4 py-2 text-xs font-bold text-white shadow transition hover:opacity-90"
+            >
+              View Care Journey →
+            </Link>
+          </div>
+        </Card>
+      )}
       <CdssPanel
         plan={record.plan}
         patient={activePatient}

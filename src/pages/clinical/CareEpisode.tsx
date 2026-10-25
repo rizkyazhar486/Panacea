@@ -110,12 +110,20 @@ export function CareEpisodePage() {
           title="Care journey"
           subtitle="Problem to prevention — everything a plan item triggers in the real world."
         />
-        <Link
-          to="/visit"
-          className="inline-flex min-h-11 items-center gap-1.5 self-start rounded-xl border border-neutral-300 dark:border-white/10 bg-neutral-100 dark:bg-white/5 px-3 py-1.5 text-xs font-bold text-neutral-700 dark:text-white/70 transition hover:bg-neutral-200 dark:hover:bg-white/10 hover:text-neutral-900 dark:hover:text-white"
-        >
-          ← Visit OS
-        </Link>
+        <div className="flex flex-wrap items-center gap-2 self-start" data-planning-nav="v1">
+          <Link
+            to="/visit"
+            className="inline-flex min-h-11 items-center gap-1.5 rounded-xl border border-neutral-300 dark:border-white/10 bg-neutral-100 dark:bg-white/5 px-3 py-1.5 text-xs font-bold text-neutral-700 dark:text-white/70 transition hover:bg-neutral-200 dark:hover:bg-white/10 hover:text-neutral-900 dark:hover:text-white"
+          >
+            ← Visit OS
+          </Link>
+          <Link
+            to="/planning"
+            className="inline-flex min-h-11 items-center gap-1.5 rounded-xl border border-neutral-300 dark:border-white/10 bg-neutral-100 dark:bg-white/5 px-3 py-1.5 text-xs font-bold text-neutral-700 dark:text-white/70 transition hover:bg-neutral-200 dark:hover:bg-white/10 hover:text-neutral-900 dark:hover:text-white"
+          >
+            Clinical Plan →
+          </Link>
+        </div>
       </div>
       <BatasKlaimKesehatan permukaan="care.episode" />
 
