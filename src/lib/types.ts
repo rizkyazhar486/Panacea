@@ -252,6 +252,9 @@ export interface CarePlanMilestone {
   status: 'pending' | 'verified' | 'completed' | 'cancelled'
   verifiedById?: string
   verifiedAt?: string
+  completedAt?: string
+  resultId?: string
+  resultValue?: string
   updatedAt?: string
 }
 
