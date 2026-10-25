@@ -72,6 +72,7 @@ export function VisitOS() {
           careAccess={careContinuity?.careAccess}
           episodeResilience={careContinuity?.episodeResilience}
           oneOsProof={careContinuity?.oneOsProof}
+          careJourneys={careContinuity?.careJourneys}
         />
       )}
       {activePatient.id !== 'none' && (

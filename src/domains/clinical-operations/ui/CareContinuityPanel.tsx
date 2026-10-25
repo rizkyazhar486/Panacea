@@ -3,6 +3,7 @@ import type { ResultClosureResult } from '../model/resultClosure'
 import type { CareAccessOrchestrationResult } from '../model/careAccessOrchestrator'
 import type { ClinicalEpisodeResilienceResult } from '../model/clinicalEpisodeResilience'
 import type { OneOsProofResult } from '../model/oneOsCareProof'
+import type { CareJourneyContinuityResult } from '../model/careContinuityProjection'
 
 function IconHospital({ size = 18, className = '' }: { size?: number; className?: string }) {
   return (
@@ -43,6 +44,7 @@ export interface CareContinuityPanelProps {
   careAccess?: CareAccessOrchestrationResult | null
   episodeResilience?: ClinicalEpisodeResilienceResult | null
   oneOsProof?: OneOsProofResult | null
+  careJourneys?: CareJourneyContinuityResult | null
   className?: string
 }
 
@@ -57,6 +59,7 @@ export function CareContinuityPanel({
   careAccess,
   episodeResilience,
   oneOsProof,
+  careJourneys,
   className = '',
 }: CareContinuityPanelProps) {
   const hasOverdue = closure ? closure.overdueIds.length > 0 : false
@@ -106,10 +109,16 @@ export function CareContinuityPanel({
               {episodeResilience.safeToContinueOffline ? 'Offline ready' : 'Sync attention'}
             </span>
           )}
+
+          {careJourneys && careJourneys.hasBlockedStages && (
+            <span className="inline-flex items-center gap-1 rounded-full border border-red-400/40 bg-red-400/10 px-2.5 py-0.5 text-[10px] font-bold text-red-200">
+              <IconAlertTriangle size={12} /> Journey stalled ({careJourneys.stalledCount})
+            </span>
+          )}
         </div>
       </header>
 
-      <div className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+      <div className="mt-4 grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
         {/* Section 1: Result Follow-Up Closure (PRD §8.5) */}
         <div className="rounded-xl border border-white/8 bg-white/[0.025] p-3.5 sm:p-4">
           <div className="flex items-center justify-between">
@@ -351,6 +360,110 @@ export function CareContinuityPanel({
           <p className="mt-3 text-[10px] leading-tight text-white/40 border-t border-white/5 pt-2">
             Auditable proof: structural measures verify data provenance and completeness without fabricated claims.
           </p>
+        </div>
+
+        {/* Section 5: Active Care Journey Continuity (T-CLIN-07) */}
+        <div data-care-journey-continuity="v1" className="rounded-xl border border-white/8 bg-white/[0.025] p-3.5 sm:p-4">
+          <div className="flex items-center justify-between">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-white/45">
+              Care Journey
+            </span>
+            <span
+              className={`text-xs font-bold ${
+                careJourneys?.hasBlockedStages
+                  ? 'text-red-300'
+                  : (careJourneys && careJourneys.activeJourneys > 0 ? 'text-sky-300' : 'text-emerald-300')
+              }`}
+            >
+              {careJourneys
+                ? (careJourneys.hasBlockedStages ? 'BLOCKED' : `${careJourneys.activeJourneys} ACTIVE`)
+                : 'NO JOURNEY'}
+            </span>
+          </div>
+
+          {careJourneys && careJourneys.totalJourneys > 0 ? (
+            <div className="mt-2.5 space-y-2 text-xs">
+              <div className="flex justify-between text-white/70">
+                <span>Total journeys:</span>
+                <span className="font-semibold text-white">{careJourneys.totalJourneys}</span>
+              </div>
+              <div className="flex justify-between text-white/70">
+                <span>Active journeys:</span>
+                <span className="font-semibold text-sky-300">{careJourneys.activeJourneys}</span>
+              </div>
+              <div className="flex justify-between text-white/70">
+                <span>Completed:</span>
+                <span className="font-semibold text-emerald-300">{careJourneys.completedJourneys}</span>
+              </div>
+              {careJourneys.hasBlockedStages && (
+                <div className="flex justify-between text-red-300">
+                  <span>Stalled / blocked:</span>
+                  <span className="font-bold">{careJourneys.stalledCount}</span>
+                </div>
+              )}
+
+              {careJourneys.episodes.length > 0 && (
+                <div className="mt-3 border-t border-white/8 pt-2">
+                  <div className="text-[10px] font-bold text-white/45 uppercase tracking-wider mb-1.5">
+                    Trajectory stages ({careJourneys.episodes.length})
+                  </div>
+                  <ul className="space-y-1.5 max-h-36 overflow-y-auto pr-1">
+                    {careJourneys.episodes.map((ep) => (
+                      <li
+                        key={ep.id}
+                        className="rounded-lg bg-black/20 px-2 py-1.5 text-[11px]"
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="font-medium text-white/85 truncate max-w-[130px]" title={ep.title}>
+                            {ep.title}
+                          </span>
+                          <span
+                            className={`rounded px-1.5 py-0.5 text-[10px] font-semibold ${
+                              ep.stageStatus === 'blocked'
+                                ? 'bg-red-500/20 text-red-300'
+                                : ep.stageStatus === 'done'
+                                ? 'bg-emerald-500/20 text-emerald-300'
+                                : 'bg-sky-500/20 text-sky-300'
+                            }`}
+                          >
+                            {ep.activeStage} ({ep.stageStatus})
+                          </span>
+                        </div>
+                        {ep.blockedReason && (
+                          <div className="mt-1 text-[10px] text-red-300/80 italic">
+                            Stall: {ep.blockedReason}
+                          </div>
+                        )}
+                        <div className="mt-1 flex items-center justify-between text-[10px] text-white/45">
+                          <span>Progress: {ep.completedStagesCount}/{ep.totalStagesCount} stages</span>
+                          {ep.diagnosisCode && (
+                            <span className="font-mono text-[9px] text-white/60">ICD-10: {ep.diagnosisCode}</span>
+                          )}
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="mt-2.5 space-y-2 text-xs">
+              <p className="text-white/40">No care episodes seeded for this encounter.</p>
+              <p className="text-[11px] text-white/55">
+                Care journeys track diagnosis through treatment, provider selection, and recovery.
+              </p>
+            </div>
+          )}
+
+          <div className="mt-3 border-t border-white/5 pt-2 flex items-center justify-between">
+            <a
+              href="#/care-episode"
+              className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-400 hover:text-emerald-300 transition-colors"
+            >
+              Open Care Journey &rarr;
+            </a>
+            <span className="text-[10px] text-white/40">Longitudinal</span>
+          </div>
         </div>
       </div>
 

@@ -5,7 +5,7 @@
  * Architecture rule (lib-tidak-impor-ui): this file is a pure domain model and
  * MUST NEVER import UI components or styling tokens.
  */
-import type { SupportiveResult, EMRRecord } from '../../../lib/types'
+import type { SupportiveResult, EMRRecord, CareEpisode } from '../../../lib/types.ts'
 import {
   evaluateResultClosure,
   type ResultClosureRecord,
@@ -41,11 +41,33 @@ export interface CareContinuityProjectionInput {
   payerCoverageActive?: boolean
 }
 
+export interface CareJourneyEpisodeSummary {
+  id: string
+  title: string
+  diagnosisCode?: string
+  activeStage: string
+  stageStatus: 'pending' | 'active' | 'done' | 'blocked'
+  blockedReason?: string
+  completedStagesCount: number
+  totalStagesCount: number
+}
+
+export interface CareJourneyContinuityResult {
+  totalJourneys: number
+  activeJourneys: number
+  blockedJourneys: number
+  completedJourneys: number
+  stalledCount: number
+  episodes: CareJourneyEpisodeSummary[]
+  hasBlockedStages: boolean
+}
+
 export interface CareContinuityProjection {
   closure: ResultClosureResult | null
   careAccess: CareAccessOrchestrationResult
   episodeResilience: ClinicalEpisodeResilienceResult
   oneOsProof: OneOsProofResult
+  careJourneys: CareJourneyContinuityResult | null
 }
 
 function isValidIsoTimestamp(val: unknown, maxEpochMs: number): boolean {
@@ -308,10 +330,76 @@ export function deriveCareContinuityState(input: CareContinuityProjectionInput):
     requiredDataClasses,
   })
 
+  // 5. Active Care Journey Continuity Projection (T-CLIN-07)
+  let careJourneys: CareJourneyContinuityResult | null = null
+  if (record?.careEpisodes && record.careEpisodes.length > 0) {
+    careJourneys = evaluateCareJourneyContinuity(record.careEpisodes)
+  }
+
   return {
     closure,
     careAccess,
     episodeResilience,
     oneOsProof,
+    careJourneys,
+  }
+}
+
+export function evaluateCareJourneyContinuity(
+  episodes: readonly CareEpisode[]
+): CareJourneyContinuityResult {
+  let activeJourneys = 0
+  let blockedJourneys = 0
+  let completedJourneys = 0
+  let stalledCount = 0
+
+  const summaries: CareJourneyEpisodeSummary[] = episodes.map((ep) => {
+    const stages = ep.stages ?? []
+    const totalStagesCount = stages.length
+    const completedStagesCount = stages.filter((s) => s.status === 'done').length
+    const isCompleted = totalStagesCount > 0 && completedStagesCount === totalStagesCount
+
+    const blockedStage = stages.find((s) => s.status === 'blocked')
+    const activeStage = stages.find((s) => s.status === 'active')
+    const pendingStage = stages.find((s) => s.status === 'pending')
+
+    const currentStage =
+      blockedStage ||
+      activeStage ||
+      pendingStage ||
+      (stages.length > 0 ? stages[stages.length - 1] : undefined)
+    const stageId = currentStage ? currentStage.stage : 'problem'
+    const stageStatus = currentStage ? currentStage.status : 'pending'
+    const blockedReason = currentStage?.blockedReason
+
+    if (isCompleted) {
+      completedJourneys++
+    } else if (blockedStage) {
+      blockedJourneys++
+      stalledCount++
+    } else {
+      activeJourneys++
+    }
+
+    return {
+      id: ep.id,
+      title: ep.title,
+      diagnosisCode: ep.diagnosisCode,
+      activeStage: stageId,
+      stageStatus,
+      blockedReason,
+      completedStagesCount,
+      totalStagesCount,
+    }
+  })
+
+  return {
+    totalJourneys: episodes.length,
+    activeJourneys,
+    blockedJourneys,
+    completedJourneys,
+    stalledCount,
+    episodes: summaries,
+    hasBlockedStages: blockedJourneys > 0 || stalledCount > 0,
   }
 }
