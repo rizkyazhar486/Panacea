@@ -23,7 +23,25 @@ test('captures document-space panel clip without locator stability wait', async 
   const result = await captureReplayMetricPanel(page, panel, 'panel.png')
   assert.deepEqual(result.clip, { x: 12, y: 540, width: 221, height: 121 })
   assert.equal(result.pngBytes, 24)
-  assert.deepEqual(calls[0], { path: 'panel.png', clip: result.clip, scale: 'css', animations: 'disabled', timeout: 90000 })
+  assert.deepEqual(calls[0], { path: 'panel.png', clip: result.clip, fullPage: true, scale: 'css', animations: 'disabled', timeout: 90000 })
+})
+test('off-viewport panel requires full-page document-space clipping (regression)', async () => {
+  const { panel, calls } = fixture({ x: 12.25, y: 1540.5, width: 220.1, height: 120.1 })
+  const page = {
+    screenshot: async options => {
+      calls.push(options)
+      // Reproduce the CI failure: viewport-only page screenshot rejects a
+      // document-space clip beyond a 844px-high mobile viewport.
+      if (!options.fullPage && options.clip.y >= 844) {
+        throw new Error('Clipped area is either empty or outside the resulting image')
+      }
+      return png(221, 121)
+    },
+  }
+  const result = await captureReplayMetricPanel(page, panel, 'below-fold.png')
+  assert.equal(result.clip.y, 1540)
+  assert.equal(calls[0].fullPage, true)
+  assert.equal(result.pngBytes, 24)
 })
 test('negative control: nonfinite, off-page and zero-area bounds fail before screenshot', async () => {
   for (const bounds of [
