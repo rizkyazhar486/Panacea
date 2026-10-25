@@ -1,6 +1,11 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { deriveCareContinuityState } from '../../src/domains/clinical-operations/model/careContinuityProjection.ts'
+import { fileURLToPath } from 'node:url'
+import { loadTypeScriptSubject } from './load-typescript-subject.mjs'
+
+const { deriveCareContinuityState } = await loadTypeScriptSubject(
+  fileURLToPath(new URL('../../src/domains/clinical-operations/model/careContinuityProjection.ts', import.meta.url)),
+)
 
 const syntheticEncounter = {
   patientId: 'synthetic-patient-provenance',

@@ -50,8 +50,8 @@ Evidence snapshot `106fe679`, 2026-10-25 (all H0, H1, H2 engineering criteria 32
 
 ## Later (H2)
 
-| ID | Task | Criterion | Lane | Status |
-|---|---|---|---|---|
+| ID | Task | Criterion | Lane | Status | PR / evidence |
+|---|---|---|---|---|---|
 | R-D7-RIG | Research: can the source rig get heel/toe landmarks without re-rigging? | ENG-D7-03 | claude | DONE | **Yes.** Read-only Blender MCP inspection of `bodyexposure/bodies/PANACEA_RIG_ADULT_MALE_GAIT.blend` (2026-10-23): 41 bones, one rigid `FOOT.L/R` per side (no toe bone); actions WALK 0–26, RUN 0–18, ROM 1–793. Source bone meshes `SKELETAL.CALCANEUS.L/R` (726 verts) and `SKELETAL.FIRST_METATARSAL_BONE.L/R` are BONE-parented to `FOOT.*`, so landmarks can be derived from them: heel = lowest/posterior calcaneus vertex, ball = first-metatarsal head. Limit: no toe joint, so toe-off flexion is not representable; use the ball (MTP) as the forefoot pivot, not the toe tip. Female rig not yet inspected. |
 | T-D7-02 | Derive heel (calcaneus) and ball (1st metatarsal head) landmarks from source meshes in the gait metrics, male + female; report per-landmark slip | ENG-D7-02 | claude | DONE | #2713 merged 6966d01e; per-fixture measurability evidence in gait_measurability.json; ENG-D7-02 achieved PASS under Option A (32/32 Engineering Acceptance V2) |
 | T-D7-01 | UNMEASURABLE vs FAIL vs PASS distinct in metrics output | ENG-D7-01 | claude | DONE: already implemented in `evaluateFootSlide`; evidence recorded at 96cbeace (validate job 120428954204), sabotage verified; tests hardened in #2710 (assert `status`, not only `reason`: a `within` mislabel previously passed) |
