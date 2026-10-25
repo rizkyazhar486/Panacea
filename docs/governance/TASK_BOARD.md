@@ -50,8 +50,8 @@ Evidence snapshot `106fe679`, 2026-10-25 (all H0, H1, H2 engineering criteria 32
 
 ## Later (H2)
 
-| ID | Task | Criterion | Lane | Status |
-|---|---|---|---|---|
+| ID | Task | Criterion | Lane | Status | PR / evidence |
+|---|---|---|---|---|---|
 | R-D7-RIG | Research: can the source rig get heel/toe landmarks without re-rigging? | ENG-D7-03 | claude | DONE | **Yes.** Read-only Blender MCP inspection of `bodyexposure/bodies/PANACEA_RIG_ADULT_MALE_GAIT.blend` (2026-10-23): 41 bones, one rigid `FOOT.L/R` per side (no toe bone); actions WALK 0–26, RUN 0–18, ROM 1–793. Source bone meshes `SKELETAL.CALCANEUS.L/R` (726 verts) and `SKELETAL.FIRST_METATARSAL_BONE.L/R` are BONE-parented to `FOOT.*`, so landmarks can be derived from them: heel = lowest/posterior calcaneus vertex, ball = first-metatarsal head. Limit: no toe joint, so toe-off flexion is not representable; use the ball (MTP) as the forefoot pivot, not the toe tip. Female rig not yet inspected. |
 | T-D7-02 | Derive heel (calcaneus) and ball (1st metatarsal head) landmarks from source meshes in the gait metrics, male + female; report per-landmark slip | ENG-D7-02 | claude | DONE | #2713 merged 6966d01e; per-fixture measurability evidence in gait_measurability.json; ENG-D7-02 achieved PASS under Option A (32/32 Engineering Acceptance V2) |
 | T-D7-01 | UNMEASURABLE vs FAIL vs PASS distinct in metrics output | ENG-D7-01 | claude | DONE: already implemented in `evaluateFootSlide`; evidence recorded at 96cbeace (validate job 120428954204), sabotage verified; tests hardened in #2710 (assert `status`, not only `reason`: a `within` mislabel previously passed) |
@@ -65,6 +65,7 @@ Evidence snapshot `106fe679`, 2026-10-25 (all H0, H1, H2 engineering criteria 32
 | T-CLIN-04 | Derive and wire live encounter One OS Care Proof into CareContinuityPanel and VisitOS | — | gemini | DONE | #2776 merged `83d02eba`; pure projection + One OS proof UI card with trust/completeness coverage, 16/16 CI checks PASS |
 | T-CLIN-05 | Longitudinal care journey bridge between VisitOS and CareEpisode with bi-directional navigation | — | gemini | DONE | #2777 merged `608577aa`; wired /care-episode into VisitOS nav, PanaceaZoneNav and visit link in CareEpisode, 16/16 exact-head CI workflows PASS |
 | T-CLIN-06 | Clinical encounter diagnosis seeding and ICD-10 provenance linkage in CareEpisode | — | gemini | IN_PROGRESS | wire ensureEpisodeFromVerifiedPlan one-click seed into CareEpisode, display ICD-10 encounter linkage badge, 8/8 contract tests PASS |
+| T-CLIN-07 | Prevent One OS proof from inventing vital-sign provenance when source is absent or blank | — | kimi | IN_REVIEW | #2779: fail-closed vital provenance projection with positive, missing-source and blank-source controls; 3/3 focused QA tests PASS |
 
 ## Open PR triage snapshot (2026-10-23, main c57e22fc)
 
