@@ -5,7 +5,7 @@ import { evaluateResultClosure } from '../../src/domains/clinical-operations/mod
 import { evaluateCareAccessOrchestration } from '../../src/domains/clinical-operations/model/careAccessOrchestrator.ts'
 import { evaluateClinicalEpisodeResilience } from '../../src/domains/clinical-operations/model/clinicalEpisodeResilience.ts'
 import { deriveCareContinuityState, evaluateCareJourneyContinuity } from '../../src/domains/clinical-operations/model/careContinuityProjection.ts'
-import { ensureEpisodeFromVerifiedPlan } from '../../src/lib/careEpisode.ts'
+import { ensureEpisodeFromVerifiedPlan, syncEpisodeWithPlanItems, planCategoryToStage } from '../../src/lib/careEpisode.ts'
 
 const read = (p) => readFileSync(new URL('../../' + p, import.meta.url), 'utf8')
 
@@ -570,4 +570,129 @@ test('deriveCareContinuityState & evaluateCareJourneyContinuity: real-time stall
   assert.ok(projection.careJourneys)
   assert.equal(projection.careJourneys.stalledCount, 1)
   assert.equal(projection.careJourneys.atRiskCount, 1)
+})
+
+test('deriveCareContinuityState & CareEpisode: longitudinal care plan milestones and action item sync (T-CLIN-10)', async () => {
+  const evaluatedAt = '2026-10-25T14:00:00.000Z'
+
+  // 1. Plan category to stage mapping contract
+  assert.equal(planCategoryToStage('Definitif'), 'treatment')
+  assert.equal(planCategoryToStage('Suportif'), 'treatment')
+  assert.equal(planCategoryToStage('Follow-up'), 'followUp')
+  assert.equal(planCategoryToStage('Monitoring'), 'recovery')
+  assert.equal(planCategoryToStage('Edukasi'), 'plan')
+
+  // 2. Plan items from clinical encounter
+  const planItems = [
+    {
+      id: 'plan-1',
+      category: 'Definitif',
+      text: 'Laparoscopic cholecystectomy elective scheduling',
+      source: 'Dokter',
+      status: 'diverifikasi',
+      verifiedById: 'dr-anita',
+      verifiedAt: '2026-10-25T10:00:00.000Z',
+    },
+    {
+      id: 'plan-2',
+      category: 'Suportif',
+      text: 'IV Ceftriaxone 1g pre-op antibiotic prophylaxis',
+      source: 'Dokter',
+      status: 'diverifikasi',
+      verifiedById: 'dr-anita',
+      verifiedAt: '2026-10-25T10:05:00.000Z',
+    },
+    {
+      id: 'plan-3',
+      category: 'Follow-up',
+      text: 'Post-op surgical wound check in 7 days',
+      source: 'Dokter',
+      status: 'diverifikasi',
+      verifiedById: 'dr-anita',
+      verifiedAt: '2026-10-25T10:10:00.000Z',
+    },
+  ]
+
+  // Episode in active 'plan' stage
+  const baseEpisode = {
+    id: 'ce-milestone-test',
+    title: 'Kolelitiasis Simtomatik',
+    diagnosisCode: 'K80.2',
+    createdAt: '2026-10-24T08:00:00.000Z',
+    updatedAt: '2026-10-24T08:00:00.000Z',
+    stages: [
+      { stage: 'problem', status: 'done', updatedAt: '2026-10-24T08:00:00.000Z' },
+      { stage: 'diagnosis', status: 'done', updatedAt: '2026-10-24T08:00:00.000Z' },
+      { stage: 'plan', status: 'active', updatedAt: '2026-10-24T08:00:00.000Z' },
+      { stage: 'provider', status: 'pending' },
+      { stage: 'cost', status: 'pending' },
+      { stage: 'schedule', status: 'pending' },
+      { stage: 'treatment', status: 'pending' },
+      { stage: 'recovery', status: 'pending' },
+      { stage: 'followUp', status: 'pending' },
+      { stage: 'outcome', status: 'pending' },
+    ],
+  }
+
+  // Pure projection in evaluateCareJourneyContinuity
+  const projected = evaluateCareJourneyContinuity([baseEpisode], evaluatedAt, planItems)
+  assert.equal(projected.totalJourneys, 1)
+  assert.equal(projected.totalActionItemsCount, 3)
+  assert.equal(projected.totalVerifiedActionItemsCount, 3)
+  assert.equal(projected.totalPendingActionItemsCount, 0)
+
+  const epSummary = projected.episodes[0]
+  assert.equal(epSummary.actionItemsCount, 3)
+  assert.equal(epSummary.verifiedActionItemsCount, 3)
+  assert.equal(epSummary.pendingActionItemsCount, 0)
+  assert.equal(epSummary.milestones.length, 3)
+  assert.equal(epSummary.milestones[0].targetStage, 'treatment')
+  assert.equal(epSummary.milestones[0].verified, true)
+  assert.equal(epSummary.milestones[2].targetStage, 'followUp')
+
+  // Negative control: unverified proposal (status: 'usulan') must not advance stage
+  const mixedPlanItems = [
+    ...planItems.slice(0, 2),
+    {
+      id: 'plan-unverified',
+      category: 'Monitoring',
+      text: 'Daily abdominal drain output logging',
+      source: 'AI',
+      status: 'usulan',
+    },
+  ]
+
+  const syncedWithProposals = syncEpisodeWithPlanItems(baseEpisode, mixedPlanItems, {
+    nowIso: evaluatedAt,
+    autoAdvancePlanStage: true,
+  })
+  const planStageUnverified = syncedWithProposals.stages.find((s) => s.stage === 'plan')
+  assert.equal(planStageUnverified.status, 'active', 'Unverified plan item must keep plan stage active (clinical safety invariant)')
+  assert.equal(syncedWithProposals.milestones.length, 3)
+  assert.equal(syncedWithProposals.milestones[2].status, 'pending')
+
+  // Positive control: 100% verified plan items promotes plan stage to 'done' and cascades provider to 'active'
+  const syncedAllVerified = syncEpisodeWithPlanItems(baseEpisode, planItems, {
+    nowIso: evaluatedAt,
+    autoAdvancePlanStage: true,
+  })
+  const planStageDone = syncedAllVerified.stages.find((s) => s.stage === 'plan')
+  const providerStageActive = syncedAllVerified.stages.find((s) => s.stage === 'provider')
+  assert.equal(planStageDone.status, 'done', 'All verified plan items must mark plan stage done')
+  assert.equal(providerStageActive.status, 'active', 'Marking plan done cascades provider stage to active')
+
+  // Integration with deriveCareContinuityState
+  const continuity = deriveCareContinuityState({
+    patientId: 'patient-ms-test',
+    evaluatedAt,
+    record: {
+      id: 'enc-ms',
+      patientId: 'patient-ms-test',
+      plan: planItems,
+      careEpisodes: [syncedAllVerified],
+    },
+  })
+  assert.ok(continuity.careJourneys)
+  assert.equal(continuity.careJourneys.totalActionItemsCount, 3)
+  assert.equal(continuity.careJourneys.totalVerifiedActionItemsCount, 3)
 })

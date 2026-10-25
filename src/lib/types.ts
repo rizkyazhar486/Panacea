@@ -239,6 +239,20 @@ export interface CareEpisode {
   // when the default is known to be wrong for this case.
   expectedDaysOverride?: Partial<Record<CareEpisodeStageId, number>>
   stages: CareEpisodeStage[]
+  // Longitudinal care plan milestones synced from verified encounter plan items (T-CLIN-10)
+  milestones?: CarePlanMilestone[]
+}
+
+export interface CarePlanMilestone {
+  id: string
+  planItemId?: string
+  title: string
+  category: 'Suportif' | 'Definitif' | 'Edukasi' | 'Follow-up' | 'Monitoring'
+  targetStage: CareEpisodeStageId
+  status: 'pending' | 'verified' | 'completed' | 'cancelled'
+  verifiedById?: string
+  verifiedAt?: string
+  updatedAt?: string
 }
 
 // Supportive therapy numbers: resuscitation, fluid balance, calories, urine output.

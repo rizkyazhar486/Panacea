@@ -5,7 +5,14 @@
  * Architecture rule (lib-tidak-impor-ui): this file is a pure domain model and
  * MUST NEVER import UI components or styling tokens.
  */
-import type { SupportiveResult, EMRRecord, CareEpisode, CareEpisodeStageId } from '../../../lib/types.ts'
+import type {
+  SupportiveResult,
+  EMRRecord,
+  CareEpisode,
+  CareEpisodeStageId,
+  PlanItem,
+  CarePlanMilestone,
+} from '../../../lib/types.ts'
 import {
   evaluateResultClosure,
   type ResultClosureRecord,
@@ -43,6 +50,16 @@ export interface CareContinuityProjectionInput {
 
 export type EpisodeHealth = 'on_track' | 'at_risk' | 'stalled'
 
+export interface CarePlanMilestoneSummary {
+  id: string
+  title: string
+  category: 'Suportif' | 'Definitif' | 'Edukasi' | 'Follow-up' | 'Monitoring'
+  targetStage: CareEpisodeStageId
+  status: 'pending' | 'verified' | 'completed' | 'cancelled'
+  verified: boolean
+  verifiedAt?: string
+}
+
 export interface CareJourneyEpisodeSummary {
   id: string
   title: string
@@ -56,6 +73,10 @@ export interface CareJourneyEpisodeSummary {
   stalledReason?: string
   elapsedDaysInCurrentStage?: number
   expectedDaysInCurrentStage?: number
+  actionItemsCount: number
+  verifiedActionItemsCount: number
+  pendingActionItemsCount: number
+  milestones: CarePlanMilestoneSummary[]
 }
 
 export interface CareJourneyContinuityResult {
@@ -65,6 +86,9 @@ export interface CareJourneyContinuityResult {
   completedJourneys: number
   stalledCount: number
   atRiskCount: number
+  totalActionItemsCount: number
+  totalVerifiedActionItemsCount: number
+  totalPendingActionItemsCount: number
   episodes: CareJourneyEpisodeSummary[]
   hasBlockedStages: boolean
 }
@@ -337,10 +361,10 @@ export function deriveCareContinuityState(input: CareContinuityProjectionInput):
     requiredDataClasses,
   })
 
-  // 5. Active Care Journey Continuity Projection (T-CLIN-07, T-CLIN-09)
+  // 5. Active Care Journey Continuity Projection (T-CLIN-07, T-CLIN-09, T-CLIN-10)
   let careJourneys: CareJourneyContinuityResult | null = null
   if (record?.careEpisodes && record.careEpisodes.length > 0) {
-    careJourneys = evaluateCareJourneyContinuity(record.careEpisodes, input.evaluatedAt)
+    careJourneys = evaluateCareJourneyContinuity(record.careEpisodes, input.evaluatedAt, record.plan)
   }
 
   return {
@@ -349,6 +373,21 @@ export function deriveCareContinuityState(input: CareContinuityProjectionInput):
     episodeResilience,
     oneOsProof,
     careJourneys,
+  }
+}
+
+function mapPlanCategoryToStage(category: PlanItem['category']): CareEpisodeStageId {
+  switch (category) {
+    case 'Definitif':
+    case 'Suportif':
+      return 'treatment'
+    case 'Follow-up':
+      return 'followUp'
+    case 'Monitoring':
+      return 'recovery'
+    case 'Edukasi':
+    default:
+      return 'plan'
   }
 }
 
@@ -367,13 +406,17 @@ export const STAGE_EXPECTED_DAYS: Record<CareEpisodeStageId, number> = {
 
 export function evaluateCareJourneyContinuity(
   episodes: readonly CareEpisode[],
-  evaluatedAt?: string
+  evaluatedAt?: string,
+  recordPlanItems?: readonly PlanItem[],
 ): CareJourneyContinuityResult {
   let activeJourneys = 0
   let blockedJourneys = 0
   let completedJourneys = 0
   let stalledCount = 0
   let atRiskCount = 0
+  let totalActionItemsCount = 0
+  let totalVerifiedActionItemsCount = 0
+  let totalPendingActionItemsCount = 0
 
   const evaluatedAtMs = evaluatedAt && isValidIsoTimestamp(evaluatedAt, Infinity)
     ? Date.parse(evaluatedAt)
@@ -434,6 +477,43 @@ export function evaluateCareJourneyContinuity(
       }
     }
 
+    // Care plan milestones and action item projection (T-CLIN-10)
+    let milestones: CarePlanMilestoneSummary[] = []
+    if (ep.milestones && ep.milestones.length > 0) {
+      milestones = ep.milestones.map((m) => ({
+        id: m.id,
+        title: m.title,
+        category: m.category,
+        targetStage: m.targetStage,
+        status: m.status,
+        verified: m.status === 'verified' || m.status === 'completed',
+        verifiedAt: m.verifiedAt,
+      }))
+    } else if (recordPlanItems && recordPlanItems.length > 0) {
+      milestones = recordPlanItems.map((p) => {
+        const isVerified = p.status === 'diverifikasi'
+        const isCancelled = p.status === 'ditolak'
+        const status = isCancelled ? 'cancelled' : (isVerified ? 'verified' : 'pending')
+        return {
+          id: `ms_${p.id}`,
+          title: p.text,
+          category: p.category,
+          targetStage: mapPlanCategoryToStage(p.category),
+          status,
+          verified: isVerified,
+          verifiedAt: p.verifiedAt,
+        }
+      })
+    }
+
+    const actionItemsCount = milestones.length
+    const verifiedActionItemsCount = milestones.filter((m) => m.verified).length
+    const pendingActionItemsCount = milestones.filter((m) => m.status === 'pending').length
+
+    totalActionItemsCount += actionItemsCount
+    totalVerifiedActionItemsCount += verifiedActionItemsCount
+    totalPendingActionItemsCount += pendingActionItemsCount
+
     return {
       id: ep.id,
       title: ep.title,
@@ -447,6 +527,10 @@ export function evaluateCareJourneyContinuity(
       stalledReason,
       elapsedDaysInCurrentStage,
       expectedDaysInCurrentStage,
+      actionItemsCount,
+      verifiedActionItemsCount,
+      pendingActionItemsCount,
+      milestones,
     }
   })
 
@@ -457,6 +541,9 @@ export function evaluateCareJourneyContinuity(
     completedJourneys,
     stalledCount,
     atRiskCount,
+    totalActionItemsCount,
+    totalVerifiedActionItemsCount,
+    totalPendingActionItemsCount,
     episodes: summaries,
     hasBlockedStages: blockedJourneys > 0 || stalledCount > 0,
   }
