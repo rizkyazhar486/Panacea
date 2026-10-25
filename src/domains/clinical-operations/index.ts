@@ -48,6 +48,7 @@ export {
 } from './model/clinicalEpisodeResilience'
 
 export { PoliPatientFlowBoard } from './ui/PoliPatientFlowBoard'
+export { CareContinuityPanel, type CareContinuityPanelProps } from './ui/CareContinuityPanel'
 
 export {
   evaluateResultClosure,

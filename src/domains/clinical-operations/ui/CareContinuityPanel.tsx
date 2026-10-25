@@ -1,0 +1,309 @@
+import React from 'react'
+import type { ResultClosureResult } from '../model/resultClosure'
+import type { CareAccessOrchestrationResult } from '../model/careAccessOrchestrator'
+import type { ClinicalEpisodeResilienceResult } from '../model/clinicalEpisodeResilience'
+
+function IconHospital({ size = 18, className = '' }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <path d="M12 6v4" /><path d="M14 8h-4" /><path d="M18 18V5a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2Z" />
+    </svg>
+  )
+}
+
+function IconAlertTriangle({ size = 16, className = '' }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" />
+      <line x1="12" y1="9" x2="12" y2="13" /><line x1="12" y1="17" x2="12.01" y2="17" />
+    </svg>
+  )
+}
+
+function IconCheck({ size = 16, className = '' }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <polyline points="20 6 9 17 4 12" />
+    </svg>
+  )
+}
+
+function IconShield({ size = 16, className = '' }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+    </svg>
+  )
+}
+
+export interface CareContinuityPanelProps {
+  patientName: string
+  closure?: ResultClosureResult | null
+  careAccess?: CareAccessOrchestrationResult | null
+  episodeResilience?: ClinicalEpisodeResilienceResult | null
+  className?: string
+}
+
+function formatRate(rate: number | null): string {
+  if (rate === null) return 'Unmeasured'
+  return `${Math.round(rate * 100)}%`
+}
+
+export function CareContinuityPanel({
+  patientName,
+  closure,
+  careAccess,
+  episodeResilience,
+  className = '',
+}: CareContinuityPanelProps) {
+  const hasOverdue = closure ? closure.overdueIds.length > 0 : false
+  const hasDiagnosticGap = careAccess ? careAccess.diagnosticContinuity.state === 'gap' : false
+  const isTransportDegraded = episodeResilience ? episodeResilience.state !== 'ready' : false
+
+  return (
+    <section
+      data-care-continuity-panel="v1"
+      aria-label={`Care continuity and result closure for ${patientName}`}
+      className={`dark rounded-2xl border border-white/10 bg-[#06101e] p-4 text-white shadow-xl sm:p-5 ${className}`}
+    >
+      <header className="flex flex-col gap-2 border-b border-white/10 pb-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-center gap-2.5">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-400">
+            <IconHospital size={18} />
+          </div>
+          <div>
+            <h3 className="text-sm font-bold tracking-tight text-white sm:text-base">
+              Care Continuity &amp; Result Closure
+            </h3>
+            <p className="text-[11px] text-white/55">
+              Protocol follow-up and multi-facility coordination for <span className="text-white/80 font-medium">{patientName}</span>
+            </p>
+          </div>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2">
+          {hasOverdue ? (
+            <span className="inline-flex items-center gap-1 rounded-full border border-red-400/40 bg-red-400/10 px-2.5 py-0.5 text-[10px] font-bold text-red-200">
+              <IconAlertTriangle size={12} /> Overdue results
+            </span>
+          ) : (
+            <span className="inline-flex items-center gap-1 rounded-full border border-emerald-400/30 bg-emerald-400/10 px-2.5 py-0.5 text-[10px] font-bold text-emerald-200">
+              <IconCheck size={12} /> Results up to date
+            </span>
+          )}
+
+          {episodeResilience && (
+            <span
+              className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-[10px] font-semibold ${
+                isTransportDegraded
+                  ? 'border-amber-300/40 bg-amber-300/10 text-amber-200'
+                  : 'border-emerald-400/30 bg-emerald-400/10 text-emerald-200'
+              }`}
+            >
+              {episodeResilience.safeToContinueOffline ? 'Offline ready' : 'Sync attention'}
+            </span>
+          )}
+        </div>
+      </header>
+
+      <div className="mt-4 grid gap-4 lg:grid-cols-3">
+        {/* Section 1: Result Follow-Up Closure (PRD §8.5) */}
+        <div className="rounded-xl border border-white/8 bg-white/[0.025] p-3.5 sm:p-4">
+          <div className="flex items-center justify-between">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-white/45">
+              PRD §8.5 Result Closure
+            </span>
+            <span className="text-xs font-bold text-emerald-300">
+              {closure ? formatRate(closure.closureRate) : '—'}
+            </span>
+          </div>
+
+          {closure ? (
+            <div className="mt-2.5 space-y-2 text-xs">
+              <div className="flex justify-between text-white/70">
+                <span>Due in window:</span>
+                <span className="font-semibold text-white">{closure.dueCount}</span>
+              </div>
+              <div className="flex justify-between text-white/70">
+                <span>Clinician-closed:</span>
+                <span className="font-semibold text-emerald-300">{closure.closedCount}</span>
+              </div>
+              {closure.overdueIds.length > 0 && (
+                <div className="flex justify-between text-red-300">
+                  <span>Overdue:</span>
+                  <span className="font-bold">{closure.overdueIds.length}</span>
+                </div>
+              )}
+              {closure.unmeasuredReason && (
+                <p className="mt-1 text-[11px] text-amber-200/80 leading-relaxed">
+                  Notice: {closure.unmeasuredReason}
+                </p>
+              )}
+
+              {closure.items.length > 0 && (
+                <div className="mt-3 border-t border-white/8 pt-2">
+                  <div className="text-[10px] font-bold text-white/45 uppercase tracking-wider mb-1.5">
+                    Recent records ({closure.items.length})
+                  </div>
+                  <ul className="space-y-1.5 max-h-36 overflow-y-auto pr-1">
+                    {closure.items.map((item) => (
+                      <li
+                        key={item.resultId}
+                        className="flex items-center justify-between rounded-lg bg-black/20 px-2 py-1.5 text-[11px]"
+                      >
+                        <span className="font-mono text-white/80 truncate max-w-[120px]">
+                          {item.resultId}
+                        </span>
+                        <span
+                          className={`rounded px-1.5 py-0.5 text-[10px] font-semibold ${
+                            item.state === 'closed'
+                              ? 'bg-emerald-500/20 text-emerald-300'
+                              : item.state === 'overdue'
+                              ? 'bg-red-500/20 text-red-300'
+                              : 'bg-sky-500/20 text-sky-300'
+                          }`}
+                        >
+                          {item.state}
+                          {item.closedLate ? ' (late)' : ''}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          ) : (
+            <p className="mt-2 text-xs text-white/40">No result closure records in scope.</p>
+          )}
+
+          <p className="mt-3 text-[10px] leading-tight text-white/40 border-t border-white/5 pt-2">
+            Human accountability: automated system notes cannot close result follow-up tasks.
+          </p>
+        </div>
+
+        {/* Section 2: Diagnostic Routing & Chain of Custody */}
+        <div className="rounded-xl border border-white/8 bg-white/[0.025] p-3.5 sm:p-4">
+          <div className="flex items-center justify-between">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-white/45">
+              Diagnostic Continuity
+            </span>
+            <span
+              className={`text-xs font-bold ${
+                hasDiagnosticGap ? 'text-amber-300' : 'text-emerald-300'
+              }`}
+            >
+              {careAccess ? careAccess.diagnosticContinuity.state.toUpperCase() : '—'}
+            </span>
+          </div>
+
+          {careAccess ? (
+            <div className="mt-2.5 space-y-2 text-xs">
+              <div className="flex justify-between text-white/70">
+                <span>Administrative status:</span>
+                <span
+                  className={`font-semibold ${
+                    careAccess.financialWorkflow.state === 'ready'
+                      ? 'text-emerald-300'
+                      : careAccess.financialWorkflow.state === 'attention'
+                      ? 'text-amber-300'
+                      : 'text-red-300'
+                  }`}
+                >
+                  {careAccess.financialWorkflow.state}
+                </span>
+              </div>
+              <div className="flex justify-between text-white/70">
+                <span>Claim packet ready:</span>
+                <span className="font-semibold text-white">
+                  {careAccess.financialWorkflow.claimSubmissionReady ? 'Yes' : 'Pending evidence'}
+                </span>
+              </div>
+              <p className="mt-1.5 text-[11px] leading-snug text-white/65">
+                {careAccess.financialWorkflow.nextAdministrativeAction}
+              </p>
+
+              {careAccess.financialWorkflow.missingClaimEvidence.length > 0 && (
+                <div className="mt-2 rounded-lg bg-amber-400/5 p-2 text-[10px] text-amber-200/90">
+                  <span className="font-bold">Missing packet items:</span>{' '}
+                  {careAccess.financialWorkflow.missingClaimEvidence.join(', ')}
+                </div>
+              )}
+            </div>
+          ) : (
+            <p className="mt-2 text-xs text-white/40">No care access orchestration attached.</p>
+          )}
+
+          <p className="mt-3 text-[10px] leading-tight text-white/40 border-t border-white/5 pt-2">
+            Chain of custody: remote referrals preserve specimen identity and destination links.
+          </p>
+        </div>
+
+        {/* Section 3: Episode Transport & Offline Durability */}
+        <div className="rounded-xl border border-white/8 bg-white/[0.025] p-3.5 sm:p-4">
+          <div className="flex items-center justify-between">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-white/45">
+              Offline Transport
+            </span>
+            <span
+              className={`text-xs font-bold ${
+                isTransportDegraded ? 'text-amber-300' : 'text-emerald-300'
+              }`}
+            >
+              {episodeResilience ? episodeResilience.state.toUpperCase() : 'READY'}
+            </span>
+          </div>
+
+          {episodeResilience ? (
+            <div className="mt-2.5 space-y-2 text-xs">
+              <div className="flex justify-between text-white/70">
+                <span>Pending events:</span>
+                <span className="font-semibold text-white">{episodeResilience.pendingCount}</span>
+              </div>
+              <div className="flex justify-between text-white/70">
+                <span>Acknowledged events:</span>
+                <span className="font-semibold text-emerald-300">
+                  {episodeResilience.acknowledgedCount}
+                </span>
+              </div>
+              <p className="mt-1.5 text-[11px] leading-snug text-white/65">
+                {episodeResilience.nextOperationalAction}
+              </p>
+
+              {episodeResilience.warnings.length > 0 && (
+                <div className="mt-2 rounded-lg bg-amber-400/5 p-2 text-[10px] text-amber-200/90">
+                  {episodeResilience.warnings[0]}
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="mt-2.5 space-y-2 text-xs">
+              <div className="flex justify-between text-white/70">
+                <span>Local storage:</span>
+                <span className="font-semibold text-emerald-300">Encrypted / Durable</span>
+              </div>
+              <div className="flex justify-between text-white/70">
+                <span>Replay protection:</span>
+                <span className="font-semibold text-emerald-300">Digest-verified</span>
+              </div>
+              <p className="text-[11px] text-white/65">
+                Clinical records persist to local encrypted storage with tamper-evident digests.
+              </p>
+            </div>
+          )}
+
+          <p className="mt-3 text-[10px] leading-tight text-white/40 border-t border-white/5 pt-2">
+            Resilience: idempotent transport prevents duplicate encounter orders and lab dispatches.
+          </p>
+        </div>
+      </div>
+
+      {/* Safety & Clinical Care Boundary Footnote */}
+      <footer className="mt-4 flex items-start gap-2 rounded-xl border border-white/5 bg-black/20 p-2.5 text-[11px] leading-relaxed text-white/50">
+        <IconShield size={14} className="mt-0.5 shrink-0 text-[#f0d68a]" />
+        <span>
+          <strong className="text-white/75">Clinical Safety Boundary:</strong> Financial or administrative workflow state may never deny emergency or vital clinical care. Diagnostic continuity and referral tracking assist coordination but do not substitute for authorized clinician medical decision-making.
+        </span>
+      </footer>
+    </section>
+  )
+}
