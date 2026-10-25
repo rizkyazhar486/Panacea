@@ -204,7 +204,7 @@ test('T-HR-02: negative control — rejects PHI patterns in review scope or revi
     version: 'b3b3f510',
     decision: 'approve',
     scope: 'Reviewed layout rendering.',
-    reviewer: { name: 'Dr. Jane', role: 'contact: doctor@hospital.id', attributed: true },
+    reviewer: { name: 'Dr. Jane', role: 'contact: doctor@example.com', attributed: true },
     termsAccepted: true,
   })
   assert.equal(emailReviewer.valid, false)
