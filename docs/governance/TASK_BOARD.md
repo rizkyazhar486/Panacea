@@ -63,7 +63,8 @@ Evidence snapshot `106fe679`, 2026-10-25 (all H0, H1, H2 engineering criteria 32
 | T-CLIN-02 | Derive and wire live patient encounter state into CareContinuityPanel (result closure, care access, offline transport) | — | gemini | DONE | #2774 merged `dee89544`; `deriveCareContinuityState` pure projection wired into VisitOS with 16/16 CI checks PASS |
 | T-CLIN-03 | Patient anatomical context bridge in Visit OS (ClinicalPatientContext & ClinicalBodyTwin projection) | — | gemini | DONE | #2775 merged `5d48eb38`; wire ClinicalPatientContext into VisitOS within designated body-context container, 16/16 CI checks PASS |
 | T-CLIN-04 | Derive and wire live encounter One OS Care Proof into CareContinuityPanel and VisitOS | — | gemini | DONE | #2776 merged `83d02eba`; pure projection + One OS proof UI card with trust/completeness coverage, 16/16 CI checks PASS |
-| T-CLIN-05 | Longitudinal care journey bridge between VisitOS and CareEpisode with bi-directional navigation | — | gemini | IN_REVIEW | this PR: wire care-episode into VisitOS nav, add zone navigation and visit link to CareEpisode, 7/7 QA contract tests PASS |
+| T-CLIN-05 | Longitudinal care journey bridge between VisitOS and CareEpisode with bi-directional navigation | — | gemini | DONE | #2777 merged `608577aa`; care journey navigation wired in VisitOS and CareEpisode, 7/7 QA contract tests PASS |
+| T-CLIN-06 | Prevent One OS proof from inventing vital-sign provenance when source is absent or blank | — | kimi | IN_REVIEW | this PR: fail-closed vital provenance projection with positive, missing-source and blank-source controls; 3/3 focused QA tests PASS |
 
 ## Open PR triage snapshot (2026-10-23, main c57e22fc)
 
