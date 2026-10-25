@@ -124,6 +124,15 @@ export function CareContinuityPanel({
               <IconAlertTriangle size={12} /> Escalations ({careJourneys.totalEscalationsCount})
             </span>
           )}
+
+          {careJourneys && careJourneys.completedWithVerifiedOutcomeCount > 0 && (
+            <span
+              className="inline-flex items-center gap-1 rounded-full border border-emerald-400/40 bg-emerald-400/10 px-2.5 py-0.5 text-[10px] font-bold text-emerald-200"
+              data-care-outcomes-badge="v1"
+            >
+              <IconCheck size={12} /> Outcomes verified ({careJourneys.completedWithVerifiedOutcomeCount})
+            </span>
+          )}
         </div>
       </header>
 
@@ -408,7 +417,12 @@ export function CareContinuityPanel({
               </div>
               <div className="flex justify-between text-white/70">
                 <span>Completed:</span>
-                <span className="font-semibold text-emerald-300">{careJourneys.completedJourneys}</span>
+                <span className="font-semibold text-emerald-300">
+                  {careJourneys.completedJourneys}
+                  {careJourneys.completedWithVerifiedOutcomeCount > 0
+                    ? ` (${careJourneys.completedWithVerifiedOutcomeCount} verified outcome)`
+                    : ''}
+                </span>
               </div>
               {careJourneys.totalActionItemsCount > 0 && (
                 <div className="flex justify-between text-white/70">
@@ -478,6 +492,20 @@ export function CareContinuityPanel({
                           >
                             {ep.health === 'stalled' ? 'Stall: ' : 'Risk: '}
                             {ep.stalledReason}
+                          </div>
+                        )}
+                        {ep.outcomeRecord && (
+                          <div
+                            className="mt-1.5 flex items-center justify-between rounded bg-emerald-500/10 border border-emerald-500/20 px-2 py-1 text-[10px]"
+                            data-outcome-record="v1"
+                            data-outcome-status={ep.outcomeRecord.status}
+                          >
+                            <span className="text-emerald-300 font-semibold flex items-center gap-1">
+                              ✓ Outcome: {ep.outcomeRecord.status.replace('_', ' ')}
+                            </span>
+                            <span className="text-emerald-400/80 truncate max-w-[130px]" title={ep.outcomeRecord.summary}>
+                              {ep.outcomeRecord.summary}
+                            </span>
                           </div>
                         )}
                         {ep.escalation && (

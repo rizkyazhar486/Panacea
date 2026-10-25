@@ -15,6 +15,8 @@ import type {
   CareEpisodeStageId,
   CareEpisodeStageStatus,
   CarePlanMilestone,
+  ClinicalOutcomeRecord,
+  ClinicalOutcomeStatus,
   CostItem,
   EMRRecord,
   PlanItem,
@@ -275,6 +277,36 @@ export function fulfillMilestonesWithSupportiveResults(
     milestones: updatedMilestones,
     updatedAt: now,
   }
+}
+
+export function recordClinicalOutcome(
+  episode: CareEpisode,
+  outcome: ClinicalOutcomeRecord,
+  nowIso?: string,
+): CareEpisode {
+  const now = nowIso ?? new Date().toISOString()
+  const updatedOutcome: ClinicalOutcomeRecord = {
+    ...outcome,
+    updatedAt: now,
+    signedAt: outcome.signedAt ?? (outcome.verifiedById ? now : undefined),
+    verifiedAt: outcome.verifiedAt ?? (outcome.verifiedById ? now : undefined),
+  }
+
+  let updated: CareEpisode = {
+    ...episode,
+    outcomeRecord: updatedOutcome,
+    updatedAt: now,
+  }
+
+  // Advance outcome stage to done
+  const outcomeStage = updated.stages.find((s) => s.stage === 'outcome')
+  if (outcomeStage && outcomeStage.status !== 'done') {
+    updated = setStageStatus(updated, 'outcome', 'done', {
+      note: `Outcome: ${outcome.status}${outcome.summary ? ` - ${outcome.summary}` : ''}`,
+    })
+  }
+
+  return updated
 }
 
 // begun. Returns the record unchanged if there's no primary diagnosis yet,

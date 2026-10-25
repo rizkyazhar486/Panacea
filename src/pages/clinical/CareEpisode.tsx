@@ -27,6 +27,7 @@ import {
   setExpectedDays,
   syncEpisodeWithPlanItems,
   fulfillMilestonesWithSupportiveResults,
+  recordClinicalOutcome,
   COST_ITEM_PRESETS,
   addCostItem,
   updateCostItem,
@@ -39,6 +40,8 @@ import type {
   CareEpisodeStageId,
   CareEpisodeStageStatus,
   CarePlanMilestone,
+  ClinicalOutcomeRecord,
+  ClinicalOutcomeStatus,
   CostItem,
   PlanItem,
   SupportiveResult,
@@ -414,7 +417,148 @@ function EpisodeCard({
           </div>
         </div>
       )}
+
+      {/* Clinical Outcome Closure (T-CLIN-13) */}
+      <OutcomeVerificationSection episode={episode} onChange={onChange} />
     </Card>
+  )
+}
+
+function OutcomeVerificationSection({
+  episode,
+  onChange,
+}: {
+  episode: CareEpisode
+  onChange: (next: CareEpisode) => void
+}) {
+  const [editing, setEditing] = useState(false)
+  const [status, setStatus] = useState<ClinicalOutcomeStatus>(
+    episode.outcomeRecord?.status ?? 'resolved'
+  )
+  const [summary, setSummary] = useState(episode.outcomeRecord?.summary ?? '')
+  const [followUpPlan, setFollowUpPlan] = useState(episode.outcomeRecord?.followUpPlan ?? '')
+
+  if (episode.outcomeRecord && !editing) {
+    return (
+      <div
+        className="mt-4 border-t border-neutral-100 dark:border-white/10 pt-4"
+        data-care-outcome-card="v1"
+      >
+        <div className="flex items-center justify-between">
+          <div>
+            <div className="flex items-center gap-2">
+              <h4 className="text-xs font-bold text-ink">Clinical Outcome Verification</h4>
+              <Badge tone="normal">
+                {episode.outcomeRecord.status.replace('_', ' ').toUpperCase()}
+              </Badge>
+            </div>
+            <p className="mt-1 text-xs text-neutral-600 dark:text-neutral-300">
+              {episode.outcomeRecord.summary}
+            </p>
+            {episode.outcomeRecord.followUpPlan && (
+              <p className="mt-0.5 text-[11px] text-neutral-500">
+                Follow-up plan: {episode.outcomeRecord.followUpPlan}
+              </p>
+            )}
+            {episode.outcomeRecord.verifiedById && (
+              <p className="mt-1 text-[10px] text-neutral-400 font-mono">
+                Verified by {episode.outcomeRecord.verifiedById}
+                {episode.outcomeRecord.verifiedAt ? ` on ${episode.outcomeRecord.verifiedAt.slice(0, 10)}` : ''}
+              </p>
+            )}
+          </div>
+          <Button
+            variant="ghost"
+            className="!min-h-0 !px-2.5 !py-1 text-[11px]"
+            onClick={() => setEditing(true)}
+          >
+            Update Outcome
+          </Button>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div
+      className="mt-4 border-t border-neutral-100 dark:border-white/10 pt-4"
+      data-care-outcome-card="v1"
+    >
+      <div className="flex flex-col gap-2">
+        <div className="flex items-center justify-between">
+          <h4 className="text-xs font-bold text-ink">Clinical Outcome Closure</h4>
+          {editing && (
+            <button
+              type="button"
+              className="text-xs text-neutral-500 underline"
+              onClick={() => setEditing(false)}
+            >
+              Cancel
+            </button>
+          )}
+        </div>
+        <p className="text-[11px] text-neutral-500">
+          Record clinician evaluation of care journey completion and longitudinal case resolution.
+        </p>
+
+        <div className="mt-1 grid gap-2 sm:grid-cols-2">
+          <div>
+            <label className="text-[10px] font-bold text-neutral-500 uppercase">Outcome Status</label>
+            <select
+              className={`${inputClass} !mt-1 !min-h-[36px] !text-xs w-full`}
+              value={status}
+              onChange={(e) => setStatus(e.target.value as ClinicalOutcomeStatus)}
+            >
+              <option value="resolved">Resolved (Complete recovery)</option>
+              <option value="improved">Improved (Significant clinical improvement)</option>
+              <option value="stable">Stable (Condition stabilized)</option>
+              <option value="chronic_managed">Chronic Managed (Ongoing control established)</option>
+              <option value="referred">Referred (Specialist continuation)</option>
+            </select>
+          </div>
+          <div>
+            <label className="text-[10px] font-bold text-neutral-500 uppercase">Follow-up Plan</label>
+            <input
+              className={`${inputClass} !mt-1 !min-h-[36px] !text-xs w-full`}
+              placeholder="e.g. Return in 3 months with HbA1c"
+              value={followUpPlan}
+              onChange={(e) => setFollowUpPlan(e.target.value)}
+            />
+          </div>
+        </div>
+
+        <div>
+          <label className="text-[10px] font-bold text-neutral-500 uppercase">Clinical Summary</label>
+          <input
+            className={`${inputClass} !mt-1 !min-h-[36px] !text-xs w-full`}
+            placeholder="Clinical evaluation of treatment efficacy and journey completion"
+            value={summary}
+            onChange={(e) => setSummary(e.target.value)}
+          />
+        </div>
+
+        <div className="mt-1 flex items-center justify-end gap-2">
+          <Button
+            variant="brand"
+            className="!min-h-0 !px-3 !py-1.5 text-xs font-semibold"
+            disabled={!summary.trim()}
+            onClick={() => {
+              const updated = recordClinicalOutcome(episode, {
+                status,
+                summary: summary.trim(),
+                followUpPlan: followUpPlan.trim() || undefined,
+                verifiedById: 'dr-clinician',
+                verifiedAt: new Date().toISOString(),
+              })
+              onChange(updated)
+              setEditing(false)
+            }}
+          >
+            Sign & Complete Care Journey
+          </Button>
+        </div>
+      </div>
+    </div>
   )
 }
 

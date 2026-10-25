@@ -10,6 +10,8 @@ import {
   syncEpisodeWithPlanItems,
   planCategoryToStage,
   fulfillMilestonesWithSupportiveResults,
+  recordClinicalOutcome,
+  isComplete,
 } from '../../src/lib/careEpisode.ts'
 
 const read = (p) => readFileSync(new URL('../../' + p, import.meta.url), 'utf8')
@@ -970,4 +972,83 @@ test('deriveCareContinuityState & CareEpisode: stalled stage escalation and auto
   const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
   assert.ok(episodeSource.includes('data-escalation-routing="v1"'), 'CareEpisode must include escalation routing tags')
   assert.ok(episodeSource.includes('data-blocked-routing="v1"'), 'CareEpisode must include blocked routing tags')
+})
+
+test('deriveCareContinuityState & CareEpisode: clinical encounter outcome closure and episode completion bridge (T-CLIN-13)', () => {
+  const evaluatedAt = '2026-10-25T12:00:00.000Z'
+
+  const activeEpisode = {
+    id: 'ce_outcome_test',
+    title: 'Type 2 Diabetes Mellitus with Neuropathy',
+    createdAt: '2026-09-01T10:00:00.000Z',
+    updatedAt: '2026-10-20T10:00:00.000Z',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'diagnosis', status: 'done' },
+      { stage: 'plan', status: 'done' },
+      { stage: 'provider', status: 'done' },
+      { stage: 'cost', status: 'done' },
+      { stage: 'schedule', status: 'done' },
+      { stage: 'treatment', status: 'done' },
+      { stage: 'recovery', status: 'done' },
+      { stage: 'followUp', status: 'done' },
+      { stage: 'outcome', status: 'active', updatedAt: '2026-10-20T10:00:00.000Z' },
+    ],
+  }
+
+  assert.equal(isComplete(activeEpisode), false, 'Active episode before outcome is not yet complete')
+
+  // 1. Pure recordClinicalOutcome
+  const outcomeData = {
+    status: 'resolved',
+    summary: 'Glycemic control achieved with HbA1c 6.4%, neuropathic pain fully remitted.',
+    followUpPlan: 'Routine annual check-up in 12 months',
+    verifiedById: 'dr-anita',
+    verifiedAt: evaluatedAt,
+  }
+
+  const completedEp = recordClinicalOutcome(activeEpisode, outcomeData, evaluatedAt)
+  assert.ok(completedEp.outcomeRecord)
+  assert.equal(completedEp.outcomeRecord.status, 'resolved')
+  assert.equal(completedEp.outcomeRecord.verifiedById, 'dr-anita')
+  assert.equal(completedEp.outcomeRecord.summary, outcomeData.summary)
+
+  const outcomeStage = completedEp.stages.find((s) => s.stage === 'outcome')
+  assert.equal(outcomeStage.status, 'done', 'Outcome stage must be set to done')
+  assert.equal(isComplete(completedEp), true, 'Episode with all stages done is complete')
+
+  // 2. Pure projection in evaluateCareJourneyContinuity
+  const projection = evaluateCareJourneyContinuity([completedEp], evaluatedAt)
+  assert.equal(projection.totalJourneys, 1)
+  assert.equal(projection.completedJourneys, 1)
+  assert.equal(projection.completedWithVerifiedOutcomeCount, 1)
+  assert.equal(projection.totalEscalationsCount, 0, 'Completed episode has zero escalations')
+
+  const summary = projection.episodes[0]
+  assert.ok(summary.outcomeRecord)
+  assert.equal(summary.outcomeRecord.status, 'resolved')
+  assert.equal(summary.health, 'on_track')
+
+  // 3. Integration via deriveCareContinuityState
+  const continuityState = deriveCareContinuityState({
+    patientId: 'patient-outcome-test',
+    evaluatedAt,
+    record: {
+      id: 'enc-outcome-test',
+      patientId: 'patient-outcome-test',
+      careEpisodes: [completedEp],
+    },
+  })
+  assert.ok(continuityState.careJourneys)
+  assert.equal(continuityState.careJourneys.completedJourneys, 1)
+  assert.equal(continuityState.careJourneys.completedWithVerifiedOutcomeCount, 1)
+
+  // 4. UI component surface contracts
+  const panelSource = read('src/domains/clinical-operations/ui/CareContinuityPanel.tsx')
+  assert.ok(panelSource.includes('data-care-outcomes-badge="v1"'), 'CareContinuityPanel must include outcomes badge')
+  assert.ok(panelSource.includes('data-outcome-record="v1"'), 'CareContinuityPanel must include outcome record card')
+
+  const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
+  assert.ok(episodeSource.includes('data-care-outcome-card="v1"'), 'CareEpisode must include outcome card')
+  assert.ok(episodeSource.includes('Sign & Complete Care Journey'), 'CareEpisode must include sign and complete action')
 })

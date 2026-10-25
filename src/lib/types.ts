@@ -241,6 +241,25 @@ export interface CareEpisode {
   stages: CareEpisodeStage[]
   // Longitudinal care plan milestones synced from verified encounter plan items (T-CLIN-10)
   milestones?: CarePlanMilestone[]
+  // Clinical encounter outcome closure and resolution record (T-CLIN-13)
+  outcomeRecord?: ClinicalOutcomeRecord
+}
+
+export type ClinicalOutcomeStatus =
+  | 'resolved'
+  | 'improved'
+  | 'stable'
+  | 'chronic_managed'
+  | 'referred'
+
+export interface ClinicalOutcomeRecord {
+  status: ClinicalOutcomeStatus
+  summary: string
+  verifiedById?: string
+  verifiedAt?: string
+  followUpPlan?: string
+  signedAt?: string
+  updatedAt?: string
 }
 
 export interface CarePlanMilestone {
