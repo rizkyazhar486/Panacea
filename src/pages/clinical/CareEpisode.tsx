@@ -1,9 +1,10 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { useStore } from '../../lib/store'
 import { api, backendEnabled, type FacilityPriceSubmission } from '../../lib/api'
 import { Card, SectionTitle, Badge, Button, Field, inputClass } from '../../components/ui'
 import { IconPlan, IconPlus } from '../../components/icons'
+import { deriveCareJourneyTimelineEvents } from '../../domains/clinical-operations'
 import {
   CARE_EPISODE_STAGES,
   STAGE_LABEL,
@@ -25,6 +26,9 @@ import {
   episodeHealth,
   stallReason,
   setExpectedDays,
+  syncEpisodeWithPlanItems,
+  fulfillMilestonesWithSupportiveResults,
+  recordClinicalOutcome,
   COST_ITEM_PRESETS,
   addCostItem,
   updateCostItem,
@@ -32,7 +36,17 @@ import {
   type CandidateView,
   type StageStall,
 } from '../../lib/careEpisode'
-import type { CareEpisode, CareEpisodeStageId, CareEpisodeStageStatus, CostItem } from '../../lib/types'
+import type {
+  CareEpisode,
+  CareEpisodeStageId,
+  CareEpisodeStageStatus,
+  CarePlanMilestone,
+  ClinicalOutcomeRecord,
+  ClinicalOutcomeStatus,
+  CostItem,
+  PlanItem,
+  SupportiveResult,
+} from '../../lib/types'
 import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 import { PanaceaZoneNav } from '../../components/PanaceaZoneNav'
 
@@ -189,6 +203,8 @@ export function CareEpisodePage() {
         <EpisodeCard
           key={ep.id}
           episode={ep}
+          recordPlan={record.plan}
+          supportiveResults={state.supportive[activePatient.id]}
           onChange={(next) => updateEpisode(ep.id, next)}
           onRemove={() => removeEpisode(ep.id)}
         />
@@ -199,10 +215,14 @@ export function CareEpisodePage() {
 
 function EpisodeCard({
   episode,
+  recordPlan,
+  supportiveResults,
   onChange,
   onRemove,
 }: {
   episode: CareEpisode
+  recordPlan?: readonly PlanItem[]
+  supportiveResults?: readonly SupportiveResult[]
   onChange: (next: CareEpisode) => void
   onRemove: () => void
 }) {
@@ -223,6 +243,24 @@ function EpisodeCard({
     onChange(setStageStatus(episode, stage, status))
   }
 
+  const displayMilestones: readonly CarePlanMilestone[] =
+    episode.milestones && episode.milestones.length > 0
+      ? episode.milestones
+      : (recordPlan ?? []).map((p) => ({
+          id: p.id,
+          title: p.text,
+          category: p.category,
+          targetStage:
+            p.category === 'Definitif' || p.category === 'Suportif'
+              ? 'treatment'
+              : p.category === 'Follow-up'
+              ? 'followUp'
+              : p.category === 'Monitoring'
+              ? 'recovery'
+              : 'plan',
+          status: p.status === 'diverifikasi' ? 'verified' : p.status === 'ditolak' ? 'cancelled' : 'pending',
+        }))
+
   return (
     <Card data-care-episode-id={episode.id} data-diagnosis-code={episode.diagnosisCode || 'none'}>
       <div className="mb-3 flex items-start justify-between gap-3">
@@ -233,6 +271,15 @@ function EpisodeCard({
               <Badge tone="neutral">
                 <span className="font-mono text-[10px]">ICD-10: {episode.diagnosisCode}</span>
               </Badge>
+            )}
+            {episode.linkedComorbidities && episode.linkedComorbidities.length > 0 && (
+              <div className="flex items-center gap-1 flex-wrap" data-care-comorbidities="v1">
+                {episode.linkedComorbidities.map((c) => (
+                  <Badge key={c} tone="brand">
+                    <span className="text-[10px]">Linked: {c}</span>
+                  </Badge>
+                ))}
+              </div>
             )}
           </div>
           <p className="text-xs text-neutral-500">
@@ -300,12 +347,347 @@ function EpisodeCard({
       </div>
 
       {episode.facilityId && (
-        <div className="mt-4 border-t border-neutral-100 pt-4">
+        <div className="mt-4 border-t border-neutral-100 dark:border-white/10 pt-4">
           <CostEstimateField episode={episode} onChange={onChange} />
         </div>
       )}
+
+      {/* Care Plan Milestones (T-CLIN-10, T-CLIN-11) */}
+      {displayMilestones.length > 0 && (
+        <div className="mt-4 border-t border-neutral-100 dark:border-white/10 pt-4" data-episode-milestones="v1">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h4 className="text-xs font-bold text-ink">Encounter Plan Milestones</h4>
+              <p className="text-[11px] text-neutral-500">
+                Longitudinal action items mapped from clinical encounter orders to trajectory stages.
+              </p>
+            </div>
+            {recordPlan && recordPlan.length > 0 && (
+              <Button
+                variant="outline"
+                className="!min-h-0 !px-2.5 !py-1 text-[11px] self-start sm:self-auto"
+                onClick={() => {
+                  let nextEp = syncEpisodeWithPlanItems(episode, recordPlan, { autoAdvancePlanStage: true })
+                  if (supportiveResults && supportiveResults.length > 0) {
+                    nextEp = fulfillMilestonesWithSupportiveResults(nextEp, supportiveResults)
+                  }
+                  onChange(nextEp)
+                }}
+              >
+                Sync with Encounter Plan
+              </Button>
+            )}
+          </div>
+          <div className="mt-2.5 space-y-1.5">
+            {displayMilestones.map((ms) => (
+              <div
+                key={ms.id}
+                className="flex items-center justify-between rounded-lg bg-neutral-50 dark:bg-white/[0.03] px-2.5 py-1.5 text-xs"
+              >
+                <div className="flex items-center gap-2 min-w-0">
+                  <Badge
+                    tone={
+                      ms.status === 'completed'
+                        ? 'normal'
+                        : ms.status === 'verified'
+                        ? 'brand'
+                        : ms.status === 'cancelled'
+                        ? 'neutral'
+                        : 'low'
+                    }
+                  >
+                    {ms.category}
+                  </Badge>
+                  <span className="truncate text-ink font-medium">{ms.title}</span>
+                </div>
+                <div className="flex items-center gap-2 shrink-0 text-[11px] text-neutral-500">
+                  <span>→ {STAGE_LABEL[ms.targetStage as CareEpisodeStageId] ?? ms.targetStage}</span>
+                  <span
+                    className={
+                      ms.status === 'completed'
+                        ? 'text-emerald-600 dark:text-emerald-400 font-bold'
+                        : ms.status === 'verified'
+                        ? 'text-sky-600 dark:text-sky-400 font-semibold'
+                        : ms.status === 'cancelled'
+                        ? 'text-neutral-400 line-through'
+                        : 'text-amber-600 dark:text-amber-400'
+                    }
+                  >
+                    {ms.status === 'completed'
+                      ? `Fulfilled${ms.resultValue ? ` (${ms.resultValue})` : ''}`
+                      : ms.status === 'verified'
+                      ? 'Verified'
+                      : ms.status === 'cancelled'
+                      ? 'Cancelled'
+                      : 'Pending review'}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Clinical Outcome Closure (T-CLIN-13) */}
+      <OutcomeVerificationSection episode={episode} onChange={onChange} />
+
+      {/* Longitudinal Care Journey Timeline & Event Provenance Audit Trail (T-CLIN-14) */}
+      <JourneyTimelineSection episode={episode} />
     </Card>
   )
+}
+
+function OutcomeVerificationSection({
+  episode,
+  onChange,
+}: {
+  episode: CareEpisode
+  onChange: (next: CareEpisode) => void
+}) {
+  const [editing, setEditing] = useState(false)
+  const [status, setStatus] = useState<ClinicalOutcomeStatus>(
+    episode.outcomeRecord?.status ?? 'resolved'
+  )
+  const [summary, setSummary] = useState(episode.outcomeRecord?.summary ?? '')
+  const [followUpPlan, setFollowUpPlan] = useState(episode.outcomeRecord?.followUpPlan ?? '')
+
+  if (episode.outcomeRecord && !editing) {
+    return (
+      <div
+        className="mt-4 border-t border-neutral-100 dark:border-white/10 pt-4"
+        data-care-outcome-card="v1"
+      >
+        <div className="flex items-center justify-between">
+          <div>
+            <div className="flex items-center gap-2">
+              <h4 className="text-xs font-bold text-ink">Clinical Outcome Verification</h4>
+              <Badge tone="normal">
+                {episode.outcomeRecord.status.replace('_', ' ').toUpperCase()}
+              </Badge>
+            </div>
+            <p className="mt-1 text-xs text-neutral-600 dark:text-neutral-300">
+              {episode.outcomeRecord.summary}
+            </p>
+            {episode.outcomeRecord.followUpPlan && (
+              <p className="mt-0.5 text-[11px] text-neutral-500">
+                Follow-up plan: {episode.outcomeRecord.followUpPlan}
+              </p>
+            )}
+            {episode.outcomeRecord.verifiedById && (
+              <p className="mt-1 text-[10px] text-neutral-400 font-mono">
+                Verified by {episode.outcomeRecord.verifiedById}
+                {episode.outcomeRecord.verifiedAt ? ` on ${episode.outcomeRecord.verifiedAt.slice(0, 10)}` : ''}
+              </p>
+            )}
+          </div>
+          <Button
+            variant="ghost"
+            className="!min-h-0 !px-2.5 !py-1 text-[11px]"
+            onClick={() => setEditing(true)}
+          >
+            Update Outcome
+          </Button>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div
+      className="mt-4 border-t border-neutral-100 dark:border-white/10 pt-4"
+      data-care-outcome-card="v1"
+    >
+      <div className="flex flex-col gap-2">
+        <div className="flex items-center justify-between">
+          <h4 className="text-xs font-bold text-ink">Clinical Outcome Closure</h4>
+          {editing && (
+            <button
+              type="button"
+              className="text-xs text-neutral-500 underline"
+              onClick={() => setEditing(false)}
+            >
+              Cancel
+            </button>
+          )}
+        </div>
+        <p className="text-[11px] text-neutral-500">
+          Record clinician evaluation of care journey completion and longitudinal case resolution.
+        </p>
+
+        <div className="mt-1 grid gap-2 sm:grid-cols-2">
+          <div>
+            <label className="text-[10px] font-bold text-neutral-500 uppercase">Outcome Status</label>
+            <select
+              className={`${inputClass} !mt-1 !min-h-[36px] !text-xs w-full`}
+              value={status}
+              onChange={(e) => setStatus(e.target.value as ClinicalOutcomeStatus)}
+            >
+              <option value="resolved">Resolved (Complete recovery)</option>
+              <option value="improved">Improved (Significant clinical improvement)</option>
+              <option value="stable">Stable (Condition stabilized)</option>
+              <option value="chronic_managed">Chronic Managed (Ongoing control established)</option>
+              <option value="referred">Referred (Specialist continuation)</option>
+            </select>
+          </div>
+          <div>
+            <label className="text-[10px] font-bold text-neutral-500 uppercase">Follow-up Plan</label>
+            <input
+              className={`${inputClass} !mt-1 !min-h-[36px] !text-xs w-full`}
+              placeholder="e.g. Return in 3 months with HbA1c"
+              value={followUpPlan}
+              onChange={(e) => setFollowUpPlan(e.target.value)}
+            />
+          </div>
+        </div>
+
+        <div>
+          <label className="text-[10px] font-bold text-neutral-500 uppercase">Clinical Summary</label>
+          <input
+            className={`${inputClass} !mt-1 !min-h-[36px] !text-xs w-full`}
+            placeholder="Clinical evaluation of treatment efficacy and journey completion"
+            value={summary}
+            onChange={(e) => setSummary(e.target.value)}
+          />
+        </div>
+
+        <div className="mt-1 flex items-center justify-end gap-2">
+          <Button
+            variant="primary"
+            className="!min-h-0 !px-3 !py-1.5 text-xs font-semibold"
+            disabled={!summary.trim()}
+            onClick={() => {
+              const updated = recordClinicalOutcome(episode, {
+                status,
+                summary: summary.trim(),
+                followUpPlan: followUpPlan.trim() || undefined,
+                verifiedById: 'dr-clinician',
+                verifiedAt: new Date().toISOString(),
+              })
+              onChange(updated)
+              setEditing(false)
+            }}
+          >
+            Sign & Complete Care Journey
+          </Button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function JourneyTimelineSection({ episode }: { episode: CareEpisode }) {
+  const [filterKind, setFilterKind] = useState<string>('all')
+  const events = useMemo(() => {
+    return deriveCareJourneyTimelineEvents(episode)
+  }, [episode])
+
+  const filteredEvents = useMemo(() => {
+    if (filterKind === 'all') return events
+    return events.filter((e) => e.kind === filterKind)
+  }, [events, filterKind])
+
+  if (events.length === 0) return null
+
+  return (
+    <div
+      className="mt-6 rounded-xl border border-neutral-200 dark:border-white/10 bg-neutral-50 dark:bg-white/[0.02] p-4"
+      data-care-journey-timeline="v1"
+    >
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-neutral-200 dark:border-white/10 pb-3">
+        <div>
+          <h4 className="text-sm font-bold text-neutral-900 dark:text-white flex items-center gap-2">
+            <span>Care Journey Event Timeline</span>
+            <span className="rounded-full bg-neutral-200 dark:bg-white/10 px-2 py-0.5 text-[10px] font-medium text-neutral-700 dark:text-white/80">
+              {events.length} events
+            </span>
+          </h4>
+          <p className="text-xs text-neutral-500 dark:text-white/60">
+            Immutable chronological audit trail and clinical provenance
+          </p>
+        </div>
+        <div className="flex items-center gap-1.5 flex-wrap">
+          {[
+            { id: 'all', label: 'All' },
+            { id: 'stage_transition', label: 'Stages' },
+            { id: 'milestone_fulfilled', label: 'Milestones' },
+            { id: 'outcome_verified', label: 'Outcomes' },
+          ].map((f) => (
+            <button
+              key={f.id}
+              type="button"
+              onClick={() => setFilterKind(f.id)}
+              className={`rounded px-2 py-0.5 text-[10px] font-medium transition-colors ${
+                filterKind === f.id
+                  ? 'bg-primary text-white'
+                  : 'bg-neutral-200 dark:bg-white/10 text-neutral-700 dark:text-white/70 hover:bg-neutral-300 dark:hover:bg-white/20'
+              }`}
+            >
+              {f.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="mt-4 relative pl-4 border-l-2 border-neutral-200 dark:border-white/10 space-y-3">
+        {filteredEvents.map((evt) => (
+          <div key={evt.id} className="relative text-xs">
+            <div
+              className={`absolute -left-[21px] top-1 h-2.5 w-2.5 rounded-full border-2 border-white dark:border-[#06101e] ${
+                evt.severity === 'success'
+                  ? 'bg-emerald-500'
+                  : evt.severity === 'warning'
+                  ? 'bg-amber-500'
+                  : evt.severity === 'stalled'
+                  ? 'bg-red-500'
+                  : 'bg-sky-500'
+              }`}
+            />
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-0.5">
+              <span className="font-semibold text-neutral-900 dark:text-white flex items-center gap-1.5">
+                {evt.title}
+                {evt.badge && (
+                  <span
+                    className={`rounded px-1.5 py-0.2 text-[9px] font-bold ${
+                      evt.severity === 'success'
+                        ? 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-300'
+                        : evt.severity === 'warning'
+                        ? 'bg-amber-500/20 text-amber-700 dark:text-amber-300'
+                        : 'bg-sky-500/20 text-sky-700 dark:text-sky-300'
+                    }`}
+                  >
+                    {evt.badge}
+                  </span>
+                )}
+              </span>
+              <span className="text-[10px] font-mono text-neutral-400 dark:text-white/40">
+                {evt.timestamp.replace('T', ' ').slice(0, 19)}
+              </span>
+            </div>
+            {evt.description && (
+              <p className="mt-0.5 text-[11px] text-neutral-600 dark:text-white/70">
+                {evt.description}
+              </p>
+            )}
+            {evt.actorId && (
+              <span className="text-[10px] text-neutral-400 dark:text-white/40 italic">
+                Actor: {evt.actorId}
+              </span>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function getStageEscalationRouting(stage: CareEpisodeStageId): { target: string; label: string } {
+  if (stage === 'problem' || stage === 'diagnosis' || stage === 'plan' || stage === 'treatment' || stage === 'recovery') {
+    return { target: 'Clinician In-Tray', label: 'Clinician Review' }
+  }
+  if (stage === 'schedule') {
+    return { target: 'Patient Outreach', label: 'Patient Booking Reminder' }
+  }
+  return { target: 'Care Coordinator', label: 'Coordinator Outreach' }
 }
 
 function BlockedReasonEditor({
@@ -318,9 +700,15 @@ function BlockedReasonEditor({
   onChange: (reason: string | undefined) => void
 }) {
   const [text, setText] = useState(reason ?? '')
+  const routing = getStageEscalationRouting(stage)
   return (
     <div className="text-xs text-accent">
-      <b>{STAGE_LABEL[stage]} blocked</b>
+      <div className="flex items-center justify-between">
+        <b>{STAGE_LABEL[stage]} blocked</b>
+        <span className="text-[10px] text-neutral-500 dark:text-neutral-400 font-medium" data-blocked-routing="v1">
+          Auto-routed to {routing.target}
+        </span>
+      </div>
       <input
         className={`${inputClass} !mt-1 !min-h-[36px] !border-accent/30 !text-xs`}
         placeholder="What is blocking this stage?"
@@ -335,6 +723,7 @@ function BlockedReasonEditor({
 function StallLine({ stall, onAdjust }: { stall: StageStall; onAdjust: (days: number | undefined) => void }) {
   const [editing, setEditing] = useState(false)
   const [days, setDays] = useState(stall.expectedDays.toString())
+  const routing = getStageEscalationRouting(stall.stage)
 
   if (editing) {
     return (
@@ -362,12 +751,19 @@ function StallLine({ stall, onAdjust }: { stall: StageStall; onAdjust: (days: nu
   }
 
   return (
-    <p className={`text-xs ${stall.severity === 'stalled' ? 'text-accent' : 'text-amber-700'}`}>
-      {stallReason(stall)}{' '}
-      <button type="button" className="font-semibold underline" onClick={() => setEditing(true)}>
-        Adjust
-      </button>
-    </p>
+    <div className="flex flex-col gap-0.5" data-stall-line={stall.stage}>
+      <p className={`text-xs ${stall.severity === 'stalled' ? 'text-accent' : 'text-amber-700'}`}>
+        {stallReason(stall)}{' '}
+        <button type="button" className="font-semibold underline" onClick={() => setEditing(true)}>
+          Adjust
+        </button>
+      </p>
+      <div className="flex items-center gap-1.5 text-[11px] text-neutral-500" data-escalation-routing="v1">
+        <span className="font-medium text-amber-800 dark:text-amber-300">⚡ Auto-routed to {routing.target}</span>
+        <span>·</span>
+        <span>{routing.label}</span>
+      </div>
+    </div>
   )
 }
 

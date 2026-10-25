@@ -14,9 +14,16 @@ import type {
   CareEpisodeStage,
   CareEpisodeStageId,
   CareEpisodeStageStatus,
+  CareJourneyTimelineEvent,
+  CareJourneyTimelineEventKind,
+  CarePlanMilestone,
+  ClinicalOutcomeRecord,
+  ClinicalOutcomeStatus,
   CostItem,
   EMRRecord,
+  PlanItem,
   ProviderCandidate,
+  SupportiveResult,
 } from './types.ts'
 
 export const CARE_EPISODE_STAGES: CareEpisodeStageId[] = [
@@ -147,6 +154,199 @@ export function setStageStatus(
 // than done). This finds-or-creates the matching episode from the record's
 // primaryDiagnosis and fast-forwards it to that point, so the patient
 // doesn't have to start a journey by hand for something that's already
+export function planCategoryToStage(category: PlanItem['category']): CareEpisodeStageId {
+  switch (category) {
+    case 'Definitif':
+    case 'Suportif':
+      return 'treatment'
+    case 'Follow-up':
+      return 'followUp'
+    case 'Monitoring':
+      return 'recovery'
+    case 'Edukasi':
+    default:
+      return 'plan'
+  }
+}
+
+export function syncEpisodeWithPlanItems(
+  episode: CareEpisode,
+  planItems: readonly PlanItem[],
+  options?: { nowIso?: string; autoAdvancePlanStage?: boolean },
+): CareEpisode {
+  if (!planItems || planItems.length === 0) return episode
+  const now = options?.nowIso ?? new Date().toISOString()
+
+  const existingMilestones = episode.milestones ?? []
+  const updatedMilestones: CarePlanMilestone[] = planItems.map((item) => {
+    const existing = existingMilestones.find((m) => m.planItemId === item.id || m.id === item.id)
+    const targetStage = planCategoryToStage(item.category)
+    const isVerified = item.status === 'diverifikasi'
+    const isRejected = item.status === 'ditolak'
+    const status: CarePlanMilestone['status'] = isRejected
+      ? 'cancelled'
+      : isVerified
+      ? (existing?.status === 'completed' ? 'completed' : 'verified')
+      : 'pending'
+
+    return {
+      id: existing?.id ?? `milestone_${item.id}`,
+      planItemId: item.id,
+      title: item.text,
+      category: item.category,
+      targetStage,
+      status,
+      verifiedById: item.verifiedById,
+      verifiedAt: item.verifiedAt,
+      updatedAt: now,
+    }
+  })
+
+  let updated: CareEpisode = {
+    ...episode,
+    milestones: updatedMilestones,
+    updatedAt: now,
+  }
+
+  // If autoAdvancePlanStage is requested and ALL active plan items are verified (diverifikasi),
+  // advance the plan stage to 'done' (cascading provider to active).
+  const hasItems = planItems.length > 0
+  const allVerified = hasItems && planItems.every((item) => item.status === 'diverifikasi')
+  const planStage = updated.stages.find((s) => s.stage === 'plan')
+
+  if (options?.autoAdvancePlanStage && allVerified && planStage && planStage.status === 'active') {
+    updated = setStageStatus(updated, 'plan', 'done', {
+      note: 'All encounter plan items verified by clinician',
+    })
+  }
+
+  return updated
+}
+
+export function matchMilestoneWithSupportiveResult(
+  milestone: CarePlanMilestone,
+  results: readonly SupportiveResult[],
+): SupportiveResult | undefined {
+  const titleLower = milestone.title.toLowerCase()
+  return results.find((r) => {
+    const nameLower = r.name.toLowerCase()
+    // Exact or substring match
+    if (titleLower.includes(nameLower) || nameLower.includes(titleLower)) return true
+    // Significant word token match (min 3 chars, skipping stop words)
+    const nameWords = nameLower.split(/\s+/).filter((w) => w.length >= 3 && !['dan', 'and', 'the', 'for'].includes(w))
+    if (nameWords.some((w) => titleLower.includes(w))) return true
+    // Modality matching using word boundaries to avoid false positives (e.g. 'ct' matching 'function')
+    if (r.category === 'EKG' && /\b(ekg|ecg)\b/.test(titleLower)) return true
+    if (r.category === 'Radiologi' && /\b(usg|rontgen|x-ray|mri|ct|ct-scan|radiologi)\b/.test(titleLower)) return true
+    return false
+  })
+}
+
+export function fulfillMilestonesWithSupportiveResults(
+  episode: CareEpisode,
+  supportiveResults: readonly SupportiveResult[],
+  nowIso?: string,
+): CareEpisode {
+  if (!supportiveResults || supportiveResults.length === 0 || !episode.milestones || episode.milestones.length === 0) {
+    return episode
+  }
+  const now = nowIso ?? new Date().toISOString()
+
+  let hasChanges = false
+  const updatedMilestones: CarePlanMilestone[] = episode.milestones.map((ms) => {
+    if (ms.status === 'completed' || ms.status === 'cancelled') return ms
+    if (ms.category !== 'Suportif' && ms.category !== 'Monitoring') return ms
+
+    const match = matchMilestoneWithSupportiveResult(ms, supportiveResults)
+    if (match) {
+      hasChanges = true
+      return {
+        ...ms,
+        status: 'completed',
+        resultId: match.id,
+        resultValue: `${match.value}${match.unit ? ' ' + match.unit : ''}`,
+        completedAt: match.takenAt || now,
+        updatedAt: now,
+      }
+    }
+    return ms
+  })
+
+  if (!hasChanges) return episode
+
+  return {
+    ...episode,
+    milestones: updatedMilestones,
+    updatedAt: now,
+  }
+}
+
+export function recordClinicalOutcome(
+  episode: CareEpisode,
+  outcome: ClinicalOutcomeRecord,
+  nowIso?: string,
+): CareEpisode {
+  const now = nowIso ?? new Date().toISOString()
+  const updatedOutcome: ClinicalOutcomeRecord = {
+    ...outcome,
+    updatedAt: now,
+    signedAt: outcome.signedAt ?? (outcome.verifiedById ? now : undefined),
+    verifiedAt: outcome.verifiedAt ?? (outcome.verifiedById ? now : undefined),
+  }
+
+  let updated: CareEpisode = {
+    ...episode,
+    outcomeRecord: updatedOutcome,
+    updatedAt: now,
+  }
+
+  // Advance outcome stage to done
+  const outcomeStage = updated.stages.find((s) => s.stage === 'outcome')
+  if (outcomeStage && outcomeStage.status !== 'done') {
+    updated = setStageStatus(updated, 'outcome', 'done', {
+      note: `Outcome: ${outcome.status}${outcome.summary ? ` - ${outcome.summary}` : ''}`,
+    })
+  }
+
+  return updated
+}
+
+export function appendTimelineEvent(
+  episode: CareEpisode,
+  event: Omit<CareJourneyTimelineEvent, 'episodeId'>,
+  nowIso?: string,
+): CareEpisode {
+  const ts = event.timestamp ?? nowIso ?? new Date().toISOString()
+  const newEvt: CareJourneyTimelineEvent = {
+    ...event,
+    episodeId: episode.id,
+    timestamp: ts,
+  }
+  const existing = episode.timelineEvents ?? []
+  return {
+    ...episode,
+    timelineEvents: [newEvt, ...existing.filter((e) => e.id !== newEvt.id)],
+    updatedAt: ts,
+  }
+}
+
+export function linkEpisodeComorbidity(
+  episode: CareEpisode,
+  comorbidityCodeOrTitle: string,
+  nowIso?: string,
+): CareEpisode {
+  const code = comorbidityCodeOrTitle.trim()
+  if (!code) return episode
+  const existing = episode.linkedComorbidities ?? []
+  if (existing.includes(code)) return episode
+  const now = nowIso ?? new Date().toISOString()
+  return {
+    ...episode,
+    linkedComorbidities: [...existing, code],
+    updatedAt: now,
+  }
+}
+
 // begun. Returns the record unchanged if there's no primary diagnosis yet,
 // or if it's already been seeded once.
 export function ensureEpisodeFromVerifiedPlan(record: EMRRecord): EMRRecord {
@@ -159,6 +359,10 @@ export function ensureEpisodeFromVerifiedPlan(record: EMRRecord): EMRRecord {
   episode = { ...episode, diagnosisCode: dx.code, problemId: record.problems[0]?.id }
   episode = setStageStatus(episode, 'problem', 'done')
   episode = setStageStatus(episode, 'diagnosis', 'done') // cascades 'plan' to active
+
+  if (record.plan && record.plan.length > 0) {
+    episode = syncEpisodeWithPlanItems(episode, record.plan)
+  }
 
   return { ...record, careEpisodes: [...episodes, episode] }
 }

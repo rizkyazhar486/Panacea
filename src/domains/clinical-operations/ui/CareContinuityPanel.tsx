@@ -38,6 +38,15 @@ function IconShield({ size = 16, className = '' }: { size?: number; className?: 
   )
 }
 
+function IconClock({ size = 16, className = '' }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <circle cx="12" cy="12" r="10" />
+      <polyline points="12 6 12 12 16 14" />
+    </svg>
+  )
+}
+
 export interface CareContinuityPanelProps {
   patientName: string
   closure?: ResultClosureResult | null
@@ -113,6 +122,33 @@ export function CareContinuityPanel({
           {careJourneys && careJourneys.hasBlockedStages && (
             <span className="inline-flex items-center gap-1 rounded-full border border-red-400/40 bg-red-400/10 px-2.5 py-0.5 text-[10px] font-bold text-red-200">
               <IconAlertTriangle size={12} /> Journey stalled ({careJourneys.stalledCount})
+            </span>
+          )}
+
+          {careJourneys && careJourneys.totalEscalationsCount > 0 && (
+            <span
+              className="inline-flex items-center gap-1 rounded-full border border-amber-400/40 bg-amber-400/10 px-2.5 py-0.5 text-[10px] font-bold text-amber-200"
+              data-care-escalations-badge="v1"
+            >
+              <IconAlertTriangle size={12} /> Escalations ({careJourneys.totalEscalationsCount})
+            </span>
+          )}
+
+          {careJourneys && careJourneys.completedWithVerifiedOutcomeCount > 0 && (
+            <span
+              className="inline-flex items-center gap-1 rounded-full border border-emerald-400/40 bg-emerald-400/10 px-2.5 py-0.5 text-[10px] font-bold text-emerald-200"
+              data-care-outcomes-badge="v1"
+            >
+              <IconCheck size={12} /> Outcomes verified ({careJourneys.completedWithVerifiedOutcomeCount})
+            </span>
+          )}
+
+          {careJourneys && careJourneys.totalTimelineEventsCount > 0 && (
+            <span
+              className="inline-flex items-center gap-1 rounded-full border border-indigo-400/40 bg-indigo-400/10 px-2.5 py-0.5 text-[10px] font-bold text-indigo-200"
+              data-care-timeline-badge="v1"
+            >
+              <IconClock size={12} /> Audit events ({careJourneys.totalTimelineEventsCount})
             </span>
           )}
         </div>
@@ -362,7 +398,7 @@ export function CareContinuityPanel({
           </p>
         </div>
 
-        {/* Section 5: Active Care Journey Continuity (T-CLIN-07) */}
+        {/* Section 5: Active Care Journey Continuity (T-CLIN-07, T-CLIN-09) */}
         <div data-care-journey-continuity="v1" className="rounded-xl border border-white/8 bg-white/[0.025] p-3.5 sm:p-4">
           <div className="flex items-center justify-between">
             <span className="text-[10px] font-bold uppercase tracking-wider text-white/45">
@@ -372,11 +408,17 @@ export function CareContinuityPanel({
               className={`text-xs font-bold ${
                 careJourneys?.hasBlockedStages
                   ? 'text-red-300'
-                  : (careJourneys && careJourneys.activeJourneys > 0 ? 'text-sky-300' : 'text-emerald-300')
+                  : (careJourneys && careJourneys.atRiskCount > 0
+                      ? 'text-amber-300'
+                      : (careJourneys && careJourneys.activeJourneys > 0 ? 'text-sky-300' : 'text-emerald-300'))
               }`}
             >
               {careJourneys
-                ? (careJourneys.hasBlockedStages ? 'BLOCKED' : `${careJourneys.activeJourneys} ACTIVE`)
+                ? (careJourneys.hasBlockedStages
+                    ? `${careJourneys.stalledCount} STALLED`
+                    : (careJourneys.atRiskCount > 0
+                        ? `${careJourneys.atRiskCount} AT RISK`
+                        : `${careJourneys.activeJourneys} ACTIVE`))
                 : 'NO JOURNEY'}
             </span>
           </div>
@@ -393,12 +435,63 @@ export function CareContinuityPanel({
               </div>
               <div className="flex justify-between text-white/70">
                 <span>Completed:</span>
-                <span className="font-semibold text-emerald-300">{careJourneys.completedJourneys}</span>
+                <span className="font-semibold text-emerald-300">
+                  {careJourneys.completedJourneys}
+                  {careJourneys.completedWithVerifiedOutcomeCount > 0
+                    ? ` (${careJourneys.completedWithVerifiedOutcomeCount} verified outcome)`
+                    : ''}
+                </span>
               </div>
+              {careJourneys.totalActionItemsCount > 0 && (
+                <div className="flex justify-between text-white/70">
+                  <span>Plan action items:</span>
+                  <span className="font-semibold text-emerald-300">
+                    {careJourneys.totalCompletedMilestonesCount > 0
+                      ? `${careJourneys.totalCompletedMilestonesCount} fulfilled · ${careJourneys.totalVerifiedActionItemsCount}/${careJourneys.totalActionItemsCount} verified`
+                      : `${careJourneys.totalVerifiedActionItemsCount} / ${careJourneys.totalActionItemsCount} verified`}
+                  </span>
+                </div>
+              )}
+              {careJourneys.atRiskCount > 0 && (
+                <div className="flex justify-between text-amber-300">
+                  <span>At risk:</span>
+                  <span className="font-bold">{careJourneys.atRiskCount}</span>
+                </div>
+              )}
               {careJourneys.hasBlockedStages && (
                 <div className="flex justify-between text-red-300">
                   <span>Stalled / blocked:</span>
                   <span className="font-bold">{careJourneys.stalledCount}</span>
+                </div>
+              )}
+              {careJourneys.totalEscalationsCount > 0 && (
+                <div className="flex justify-between text-amber-300" data-care-escalation-metrics="v1">
+                  <span>Auto-routed escalations:</span>
+                  <span className="font-bold">
+                    {careJourneys.totalEscalationsCount} ({careJourneys.clinicianInTrayCount} clinician · {careJourneys.careCoordinatorCount} coord)
+                  </span>
+                </div>
+              )}
+              {careJourneys.totalTimelineEventsCount > 0 && (
+                <div className="flex justify-between text-indigo-300" data-care-timeline-metrics="v1">
+                  <span>Audit trail events:</span>
+                  <span className="font-bold">
+                    {careJourneys.totalTimelineEventsCount} recorded
+                  </span>
+                </div>
+              )}
+              {careJourneys.activeComorbiditiesCount > 0 && (
+                <div className="flex justify-between text-teal-300" data-patient-comorbidities="v1">
+                  <span>Linked comorbidities:</span>
+                  <span className="font-bold">{careJourneys.activeComorbiditiesCount} diagnoses</span>
+                </div>
+              )}
+              {careJourneys.totalPatientTimelineEventsCount > 0 && (
+                <div className="flex justify-between text-indigo-300" data-patient-timeline="v1">
+                  <span>Patient timeline:</span>
+                  <span className="font-bold">
+                    {careJourneys.totalPatientTimelineEventsCount} cross-episode events
+                  </span>
                 </div>
               )}
 
@@ -419,26 +512,108 @@ export function CareContinuityPanel({
                           </span>
                           <span
                             className={`rounded px-1.5 py-0.5 text-[10px] font-semibold ${
-                              ep.stageStatus === 'blocked'
+                              ep.health === 'stalled'
                                 ? 'bg-red-500/20 text-red-300'
+                                : ep.health === 'at_risk'
+                                ? 'bg-amber-500/20 text-amber-300'
                                 : ep.stageStatus === 'done'
                                 ? 'bg-emerald-500/20 text-emerald-300'
                                 : 'bg-sky-500/20 text-sky-300'
                             }`}
                           >
-                            {ep.activeStage} ({ep.stageStatus})
+                            {ep.activeStage} ({ep.health === 'stalled' ? 'stalled' : (ep.health === 'at_risk' ? 'at risk' : ep.stageStatus)})
                           </span>
                         </div>
-                        {ep.blockedReason && (
-                          <div className="mt-1 text-[10px] text-red-300/80 italic">
-                            Stall: {ep.blockedReason}
+                        {ep.stalledReason && (
+                          <div
+                            className={`mt-1 text-[10px] italic ${
+                              ep.health === 'stalled' ? 'text-red-300/80' : 'text-amber-300/80'
+                            }`}
+                          >
+                            {ep.health === 'stalled' ? 'Stall: ' : 'Risk: '}
+                            {ep.stalledReason}
+                          </div>
+                        )}
+                        {ep.outcomeRecord && (
+                          <div
+                            className="mt-1.5 flex items-center justify-between rounded bg-emerald-500/10 border border-emerald-500/20 px-2 py-1 text-[10px]"
+                            data-outcome-record="v1"
+                            data-outcome-status={ep.outcomeRecord.status}
+                          >
+                            <span className="text-emerald-300 font-semibold flex items-center gap-1">
+                              ✓ Outcome: {ep.outcomeRecord.status.replace('_', ' ')}
+                            </span>
+                            <span className="text-emerald-400/80 truncate max-w-[130px]" title={ep.outcomeRecord.summary}>
+                              {ep.outcomeRecord.summary}
+                            </span>
+                          </div>
+                        )}
+                        {ep.escalation && (
+                          <div
+                            className="mt-1.5 flex items-center justify-between rounded bg-amber-500/10 border border-amber-500/20 px-2 py-1 text-[10px]"
+                            data-escalation-routing="v1"
+                            data-escalation-target={ep.escalation.target}
+                            data-escalation-action={ep.escalation.action}
+                          >
+                            <span className="text-amber-200 font-semibold flex items-center gap-1">
+                              ⚡ {ep.escalation.target}: {ep.escalation.actionLabel}
+                            </span>
+                            <span className="text-amber-300/80 font-mono">
+                              {ep.escalation.daysOverdue > 0 ? `+${ep.escalation.daysOverdue}d overdue` : 'at risk'}
+                            </span>
+                          </div>
+                        )}
+                        {ep.milestones && ep.milestones.length > 0 && (
+                          <div className="mt-1.5 flex flex-wrap gap-1" data-care-milestones="v1">
+                            {ep.milestones.slice(0, 3).map((ms) => (
+                              <span
+                                key={ms.id}
+                                className={`inline-flex items-center rounded px-1.5 py-0.5 text-[9px] font-medium ${
+                                  ms.completed
+                                    ? 'bg-emerald-500/25 text-emerald-200 border border-emerald-400/30'
+                                    : ms.verified
+                                    ? 'bg-emerald-500/15 text-emerald-300'
+                                    : ms.status === 'cancelled'
+                                    ? 'bg-neutral-500/15 text-neutral-400 line-through'
+                                    : 'bg-amber-500/15 text-amber-300'
+                                }`}
+                                title={`${ms.title}${ms.resultValue ? ` [Result: ${ms.resultValue}]` : ''} (target stage: ${ms.targetStage})`}
+                              >
+                                {ms.completed ? '✓ ' : ms.verified ? '✓ ' : '⏳ '}
+                                {ms.category}: {ms.title.slice(0, 16)}
+                                {ms.resultValue ? ` (${ms.resultValue})` : ms.title.length > 16 ? '…' : ''}
+                              </span>
+                            ))}
+                            {ep.milestones.length > 3 && (
+                              <span className="self-center text-[9px] text-white/40">
+                                +{ep.milestones.length - 3} more
+                              </span>
+                            )}
+                          </div>
+                        )}
+                        {ep.timelineEvents && ep.timelineEvents.length > 0 && (
+                          <div
+                            className="mt-1.5 rounded bg-indigo-500/10 border border-indigo-500/20 px-2 py-1 text-[10px]"
+                            data-care-timeline-audit="v1"
+                          >
+                            <div className="flex items-center justify-between text-indigo-200 font-semibold mb-0.5">
+                              <span>Audit: {ep.timelineEvents.length} events</span>
+                              <span className="text-[9px] text-indigo-300/80 font-mono">
+                                {ep.timelineEvents[0].timestamp.replace('T', ' ').slice(0, 10)}
+                              </span>
+                            </div>
+                            <div className="text-indigo-300/90 truncate" title={ep.timelineEvents[0].title}>
+                              Latest: {ep.timelineEvents[0].title}
+                            </div>
                           </div>
                         )}
                         <div className="mt-1 flex items-center justify-between text-[10px] text-white/45">
                           <span>Progress: {ep.completedStagesCount}/{ep.totalStagesCount} stages</span>
-                          {ep.diagnosisCode && (
+                          {ep.elapsedDaysInCurrentStage != null ? (
+                            <span className="text-[9px] text-white/60">{ep.elapsedDaysInCurrentStage}d in stage</span>
+                          ) : ep.diagnosisCode ? (
                             <span className="font-mono text-[9px] text-white/60">ICD-10: {ep.diagnosisCode}</span>
-                          )}
+                          ) : null}
                         </div>
                       </li>
                     ))}

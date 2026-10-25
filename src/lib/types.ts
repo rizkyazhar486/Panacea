@@ -239,6 +239,68 @@ export interface CareEpisode {
   // when the default is known to be wrong for this case.
   expectedDaysOverride?: Partial<Record<CareEpisodeStageId, number>>
   stages: CareEpisodeStage[]
+  // Longitudinal care plan milestones synced from verified encounter plan items (T-CLIN-10)
+  milestones?: CarePlanMilestone[]
+  // Clinical encounter outcome closure and resolution record (T-CLIN-13)
+  outcomeRecord?: ClinicalOutcomeRecord
+  // Care journey longitudinal event timeline and provenance audit trail (T-CLIN-14)
+  timelineEvents?: CareJourneyTimelineEvent[]
+  // Comorbid diagnoses linked across concurrent care journeys (T-CLIN-15)
+  linkedComorbidities?: string[]
+}
+
+export type CareJourneyTimelineEventKind =
+  | 'episode_seeded'
+  | 'stage_transition'
+  | 'provider_selected'
+  | 'milestone_verified'
+  | 'milestone_fulfilled'
+  | 'outcome_verified'
+
+export interface CareJourneyTimelineEvent {
+  id: string
+  episodeId: string
+  episodeTitle?: string
+  kind: CareJourneyTimelineEventKind
+  timestamp: string
+  title: string
+  description?: string
+  stage?: CareEpisodeStageId
+  actorId?: string
+  badge?: string
+  severity?: 'info' | 'success' | 'warning' | 'stalled'
+}
+
+export type ClinicalOutcomeStatus =
+  | 'resolved'
+  | 'improved'
+  | 'stable'
+  | 'chronic_managed'
+  | 'referred'
+
+export interface ClinicalOutcomeRecord {
+  status: ClinicalOutcomeStatus
+  summary: string
+  verifiedById?: string
+  verifiedAt?: string
+  followUpPlan?: string
+  signedAt?: string
+  updatedAt?: string
+}
+
+export interface CarePlanMilestone {
+  id: string
+  planItemId?: string
+  title: string
+  category: 'Suportif' | 'Definitif' | 'Edukasi' | 'Follow-up' | 'Monitoring'
+  targetStage: CareEpisodeStageId
+  status: 'pending' | 'verified' | 'completed' | 'cancelled'
+  verifiedById?: string
+  verifiedAt?: string
+  completedAt?: string
+  resultId?: string
+  resultValue?: string
+  updatedAt?: string
 }
 
 // Supportive therapy numbers: resuscitation, fluid balance, calories, urine output.

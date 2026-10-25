@@ -50,10 +50,14 @@ export {
 export {
   deriveCareContinuityState,
   evaluateCareJourneyContinuity,
+  deriveCareJourneyTimelineEvents,
+  derivePatientLongitudinalTimeline,
+  STAGE_LABEL,
   type CareContinuityProjection,
   type CareContinuityProjectionInput,
   type CareJourneyContinuityResult,
   type CareJourneyEpisodeSummary,
+  type CarePlanMilestoneSummary,
 } from './model/careContinuityProjection'
 
 export { PoliPatientFlowBoard } from './ui/PoliPatientFlowBoard'
