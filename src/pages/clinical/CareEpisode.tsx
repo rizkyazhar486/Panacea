@@ -26,6 +26,7 @@ import {
   stallReason,
   setExpectedDays,
   syncEpisodeWithPlanItems,
+  fulfillMilestonesWithSupportiveResults,
   COST_ITEM_PRESETS,
   addCostItem,
   updateCostItem,
@@ -33,7 +34,15 @@ import {
   type CandidateView,
   type StageStall,
 } from '../../lib/careEpisode'
-import type { CareEpisode, CareEpisodeStageId, CareEpisodeStageStatus, CostItem, PlanItem } from '../../lib/types'
+import type {
+  CareEpisode,
+  CareEpisodeStageId,
+  CareEpisodeStageStatus,
+  CarePlanMilestone,
+  CostItem,
+  PlanItem,
+  SupportiveResult,
+} from '../../lib/types'
 import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 import { PanaceaZoneNav } from '../../components/PanaceaZoneNav'
 
@@ -191,6 +200,7 @@ export function CareEpisodePage() {
           key={ep.id}
           episode={ep}
           recordPlan={record.plan}
+          supportiveResults={state.supportive[activePatient.id]}
           onChange={(next) => updateEpisode(ep.id, next)}
           onRemove={() => removeEpisode(ep.id)}
         />
@@ -202,11 +212,13 @@ export function CareEpisodePage() {
 function EpisodeCard({
   episode,
   recordPlan,
+  supportiveResults,
   onChange,
   onRemove,
 }: {
   episode: CareEpisode
   recordPlan?: readonly PlanItem[]
+  supportiveResults?: readonly SupportiveResult[]
   onChange: (next: CareEpisode) => void
   onRemove: () => void
 }) {
@@ -226,6 +238,24 @@ function EpisodeCard({
     // the moment the stage was marked blocked.
     onChange(setStageStatus(episode, stage, status))
   }
+
+  const displayMilestones: readonly CarePlanMilestone[] =
+    episode.milestones && episode.milestones.length > 0
+      ? episode.milestones
+      : (recordPlan ?? []).map((p) => ({
+          id: p.id,
+          title: p.text,
+          category: p.category,
+          targetStage:
+            p.category === 'Definitif' || p.category === 'Suportif'
+              ? 'treatment'
+              : p.category === 'Follow-up'
+              ? 'followUp'
+              : p.category === 'Monitoring'
+              ? 'recovery'
+              : 'plan',
+          status: p.status === 'diverifikasi' ? 'verified' : p.status === 'ditolak' ? 'cancelled' : 'pending',
+        }))
 
   return (
     <Card data-care-episode-id={episode.id} data-diagnosis-code={episode.diagnosisCode || 'none'}>
@@ -309,8 +339,8 @@ function EpisodeCard({
         </div>
       )}
 
-      {/* Care Plan Milestones (T-CLIN-10) */}
-      {((episode.milestones && episode.milestones.length > 0) || (recordPlan && recordPlan.length > 0)) && (
+      {/* Care Plan Milestones (T-CLIN-10, T-CLIN-11) */}
+      {displayMilestones.length > 0 && (
         <div className="mt-4 border-t border-neutral-100 dark:border-white/10 pt-4" data-episode-milestones="v1">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <div>
@@ -323,30 +353,20 @@ function EpisodeCard({
               <Button
                 variant="outline"
                 className="!min-h-0 !px-2.5 !py-1 text-[11px] self-start sm:self-auto"
-                onClick={() => onChange(syncEpisodeWithPlanItems(episode, recordPlan, { autoAdvancePlanStage: true }))}
+                onClick={() => {
+                  let nextEp = syncEpisodeWithPlanItems(episode, recordPlan, { autoAdvancePlanStage: true })
+                  if (supportiveResults && supportiveResults.length > 0) {
+                    nextEp = fulfillMilestonesWithSupportiveResults(nextEp, supportiveResults)
+                  }
+                  onChange(nextEp)
+                }}
               >
                 Sync with Encounter Plan
               </Button>
             )}
           </div>
           <div className="mt-2.5 space-y-1.5">
-            {(episode.milestones && episode.milestones.length > 0
-              ? episode.milestones
-              : (recordPlan ?? []).map((p) => ({
-                  id: p.id,
-                  title: p.text,
-                  category: p.category,
-                  targetStage:
-                    p.category === 'Definitif' || p.category === 'Suportif'
-                      ? 'treatment'
-                      : p.category === 'Follow-up'
-                      ? 'followUp'
-                      : p.category === 'Monitoring'
-                      ? 'recovery'
-                      : 'plan',
-                  status: p.status === 'diverifikasi' ? 'verified' : p.status === 'ditolak' ? 'cancelled' : 'pending',
-                }))
-            ).map((ms) => (
+            {displayMilestones.map((ms) => (
               <div
                 key={ms.id}
                 className="flex items-center justify-between rounded-lg bg-neutral-50 dark:bg-white/[0.03] px-2.5 py-1.5 text-xs"
@@ -354,8 +374,10 @@ function EpisodeCard({
                 <div className="flex items-center gap-2 min-w-0">
                   <Badge
                     tone={
-                      ms.status === 'verified' || ms.status === 'completed'
+                      ms.status === 'completed'
                         ? 'normal'
+                        : ms.status === 'verified'
+                        ? 'brand'
                         : ms.status === 'cancelled'
                         ? 'neutral'
                         : 'low'
@@ -369,17 +391,19 @@ function EpisodeCard({
                   <span>→ {STAGE_LABEL[ms.targetStage as CareEpisodeStageId] ?? ms.targetStage}</span>
                   <span
                     className={
-                      ms.status === 'verified' || ms.status === 'completed'
-                        ? 'text-emerald-600 dark:text-emerald-400 font-semibold'
+                      ms.status === 'completed'
+                        ? 'text-emerald-600 dark:text-emerald-400 font-bold'
+                        : ms.status === 'verified'
+                        ? 'text-sky-600 dark:text-sky-400 font-semibold'
                         : ms.status === 'cancelled'
                         ? 'text-neutral-400 line-through'
                         : 'text-amber-600 dark:text-amber-400'
                     }
                   >
-                    {ms.status === 'verified'
+                    {ms.status === 'completed'
+                      ? `Fulfilled${ms.resultValue ? ` (${ms.resultValue})` : ''}`
+                      : ms.status === 'verified'
                       ? 'Verified'
-                      : ms.status === 'completed'
-                      ? 'Done'
                       : ms.status === 'cancelled'
                       ? 'Cancelled'
                       : 'Pending review'}

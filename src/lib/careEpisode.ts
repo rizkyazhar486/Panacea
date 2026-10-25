@@ -19,6 +19,7 @@ import type {
   EMRRecord,
   PlanItem,
   ProviderCandidate,
+  SupportiveResult,
 } from './types.ts'
 
 export const CARE_EPISODE_STAGES: CareEpisodeStageId[] = [
@@ -216,6 +217,64 @@ export function syncEpisodeWithPlanItems(
   }
 
   return updated
+}
+
+export function matchMilestoneWithSupportiveResult(
+  milestone: CarePlanMilestone,
+  results: readonly SupportiveResult[],
+): SupportiveResult | undefined {
+  const titleLower = milestone.title.toLowerCase()
+  return results.find((r) => {
+    const nameLower = r.name.toLowerCase()
+    // Exact or substring match
+    if (titleLower.includes(nameLower) || nameLower.includes(titleLower)) return true
+    // Significant word token match (min 3 chars, skipping stop words)
+    const nameWords = nameLower.split(/\s+/).filter((w) => w.length >= 3 && !['dan', 'and', 'the', 'for'].includes(w))
+    if (nameWords.some((w) => titleLower.includes(w))) return true
+    // Modality matching using word boundaries to avoid false positives (e.g. 'ct' matching 'function')
+    if (r.category === 'EKG' && /\b(ekg|ecg)\b/.test(titleLower)) return true
+    if (r.category === 'Radiologi' && /\b(usg|rontgen|x-ray|mri|ct|ct-scan|radiologi)\b/.test(titleLower)) return true
+    return false
+  })
+}
+
+export function fulfillMilestonesWithSupportiveResults(
+  episode: CareEpisode,
+  supportiveResults: readonly SupportiveResult[],
+  nowIso?: string,
+): CareEpisode {
+  if (!supportiveResults || supportiveResults.length === 0 || !episode.milestones || episode.milestones.length === 0) {
+    return episode
+  }
+  const now = nowIso ?? new Date().toISOString()
+
+  let hasChanges = false
+  const updatedMilestones: CarePlanMilestone[] = episode.milestones.map((ms) => {
+    if (ms.status === 'completed' || ms.status === 'cancelled') return ms
+    if (ms.category !== 'Suportif' && ms.category !== 'Monitoring') return ms
+
+    const match = matchMilestoneWithSupportiveResult(ms, supportiveResults)
+    if (match) {
+      hasChanges = true
+      return {
+        ...ms,
+        status: 'completed',
+        resultId: match.id,
+        resultValue: `${match.value}${match.unit ? ' ' + match.unit : ''}`,
+        completedAt: match.takenAt || now,
+        updatedAt: now,
+      }
+    }
+    return ms
+  })
+
+  if (!hasChanges) return episode
+
+  return {
+    ...episode,
+    milestones: updatedMilestones,
+    updatedAt: now,
+  }
 }
 
 // begun. Returns the record unchanged if there's no primary diagnosis yet,

@@ -57,6 +57,9 @@ export interface CarePlanMilestoneSummary {
   targetStage: CareEpisodeStageId
   status: 'pending' | 'verified' | 'completed' | 'cancelled'
   verified: boolean
+  completed: boolean
+  resultValue?: string
+  completedAt?: string
   verifiedAt?: string
 }
 
@@ -75,6 +78,7 @@ export interface CareJourneyEpisodeSummary {
   expectedDaysInCurrentStage?: number
   actionItemsCount: number
   verifiedActionItemsCount: number
+  completedMilestonesCount: number
   pendingActionItemsCount: number
   milestones: CarePlanMilestoneSummary[]
 }
@@ -88,6 +92,7 @@ export interface CareJourneyContinuityResult {
   atRiskCount: number
   totalActionItemsCount: number
   totalVerifiedActionItemsCount: number
+  totalCompletedMilestonesCount: number
   totalPendingActionItemsCount: number
   episodes: CareJourneyEpisodeSummary[]
   hasBlockedStages: boolean
@@ -361,10 +366,15 @@ export function deriveCareContinuityState(input: CareContinuityProjectionInput):
     requiredDataClasses,
   })
 
-  // 5. Active Care Journey Continuity Projection (T-CLIN-07, T-CLIN-09, T-CLIN-10)
+  // 5. Active Care Journey Continuity Projection (T-CLIN-07, T-CLIN-09, T-CLIN-10, T-CLIN-11)
   let careJourneys: CareJourneyContinuityResult | null = null
   if (record?.careEpisodes && record.careEpisodes.length > 0) {
-    careJourneys = evaluateCareJourneyContinuity(record.careEpisodes, input.evaluatedAt, record.plan)
+    careJourneys = evaluateCareJourneyContinuity(
+      record.careEpisodes,
+      input.evaluatedAt,
+      record.plan,
+      validSupportive
+    )
   }
 
   return {
@@ -408,6 +418,7 @@ export function evaluateCareJourneyContinuity(
   episodes: readonly CareEpisode[],
   evaluatedAt?: string,
   recordPlanItems?: readonly PlanItem[],
+  supportiveResults?: readonly SupportiveResult[],
 ): CareJourneyContinuityResult {
   let activeJourneys = 0
   let blockedJourneys = 0
@@ -416,6 +427,7 @@ export function evaluateCareJourneyContinuity(
   let atRiskCount = 0
   let totalActionItemsCount = 0
   let totalVerifiedActionItemsCount = 0
+  let totalCompletedMilestonesCount = 0
   let totalPendingActionItemsCount = 0
 
   const evaluatedAtMs = evaluatedAt && isValidIsoTimestamp(evaluatedAt, Infinity)
@@ -477,30 +489,91 @@ export function evaluateCareJourneyContinuity(
       }
     }
 
-    // Care plan milestones and action item projection (T-CLIN-10)
+    // Care plan milestones and action item projection with fulfillment bridge (T-CLIN-10, T-CLIN-11)
     let milestones: CarePlanMilestoneSummary[] = []
     if (ep.milestones && ep.milestones.length > 0) {
-      milestones = ep.milestones.map((m) => ({
-        id: m.id,
-        title: m.title,
-        category: m.category,
-        targetStage: m.targetStage,
-        status: m.status,
-        verified: m.status === 'verified' || m.status === 'completed',
-        verifiedAt: m.verifiedAt,
-      }))
+      milestones = ep.milestones.map((m) => {
+        let isCompleted = m.status === 'completed'
+        let resultValue = m.resultValue
+        let completedAt = m.completedAt
+
+        if (!isCompleted && supportiveResults && supportiveResults.length > 0) {
+          if (m.category === 'Suportif' || m.category === 'Monitoring') {
+            const titleLower = m.title.toLowerCase()
+            const match = supportiveResults.find((r) => {
+              const nameLower = r.name.toLowerCase()
+              if (titleLower.includes(nameLower) || nameLower.includes(titleLower)) return true
+              const nameWords = nameLower.split(/\s+/).filter((w) => w.length >= 3 && !['dan', 'and', 'the', 'for'].includes(w))
+              if (nameWords.some((w) => titleLower.includes(w))) return true
+              if (r.category === 'EKG' && /\b(ekg|ecg)\b/.test(titleLower)) return true
+              if (r.category === 'Radiologi' && /\b(usg|rontgen|x-ray|mri|ct|ct-scan|radiologi)\b/.test(titleLower)) return true
+              return false
+            })
+            if (match) {
+              isCompleted = true
+              resultValue = `${match.value}${match.unit ? ' ' + match.unit : ''}`
+              completedAt = match.takenAt
+            }
+          }
+        }
+
+        return {
+          id: m.id,
+          title: m.title,
+          category: m.category,
+          targetStage: m.targetStage,
+          status: isCompleted ? 'completed' : m.status,
+          verified: m.status === 'verified' || isCompleted,
+          completed: isCompleted,
+          resultValue,
+          completedAt,
+          verifiedAt: m.verifiedAt,
+        }
+      })
     } else if (recordPlanItems && recordPlanItems.length > 0) {
       milestones = recordPlanItems.map((p) => {
         const isVerified = p.status === 'diverifikasi'
         const isCancelled = p.status === 'ditolak'
-        const status = isCancelled ? 'cancelled' : (isVerified ? 'verified' : 'pending')
+        let isCompleted = false
+        let resultValue: string | undefined
+        let completedAt: string | undefined
+
+        if (supportiveResults && supportiveResults.length > 0 && (p.category === 'Suportif' || p.category === 'Monitoring')) {
+          const textLower = p.text.toLowerCase()
+          const match = supportiveResults.find((r) => {
+            const nameLower = r.name.toLowerCase()
+            if (textLower.includes(nameLower) || nameLower.includes(textLower)) return true
+            const nameWords = nameLower.split(/\s+/).filter((w) => w.length >= 3 && !['dan', 'and', 'the', 'for'].includes(w))
+            if (nameWords.some((w) => textLower.includes(w))) return true
+            if (r.category === 'EKG' && /\b(ekg|ecg)\b/.test(textLower)) return true
+            if (r.category === 'Radiologi' && /\b(usg|rontgen|x-ray|mri|ct|ct-scan|radiologi)\b/.test(textLower)) return true
+            return false
+          })
+          if (match) {
+            isCompleted = true
+            resultValue = `${match.value}${match.unit ? ' ' + match.unit : ''}`
+            completedAt = match.takenAt
+          }
+        }
+
+        const status = isCancelled
+          ? 'cancelled'
+          : isCompleted
+          ? 'completed'
+          : isVerified
+          ? 'verified'
+          : 'pending'
+
         return {
           id: `ms_${p.id}`,
           title: p.text,
           category: p.category,
           targetStage: mapPlanCategoryToStage(p.category),
           status,
-          verified: isVerified,
+          verified: isVerified || isCompleted,
+          completed: isCompleted,
+          resultValue,
+          completedAt,
           verifiedAt: p.verifiedAt,
         }
       })
@@ -508,10 +581,12 @@ export function evaluateCareJourneyContinuity(
 
     const actionItemsCount = milestones.length
     const verifiedActionItemsCount = milestones.filter((m) => m.verified).length
+    const completedMilestonesCount = milestones.filter((m) => m.completed).length
     const pendingActionItemsCount = milestones.filter((m) => m.status === 'pending').length
 
     totalActionItemsCount += actionItemsCount
     totalVerifiedActionItemsCount += verifiedActionItemsCount
+    totalCompletedMilestonesCount += completedMilestonesCount
     totalPendingActionItemsCount += pendingActionItemsCount
 
     return {
@@ -529,6 +604,7 @@ export function evaluateCareJourneyContinuity(
       expectedDaysInCurrentStage,
       actionItemsCount,
       verifiedActionItemsCount,
+      completedMilestonesCount,
       pendingActionItemsCount,
       milestones,
     }
@@ -543,6 +619,7 @@ export function evaluateCareJourneyContinuity(
     atRiskCount,
     totalActionItemsCount,
     totalVerifiedActionItemsCount,
+    totalCompletedMilestonesCount,
     totalPendingActionItemsCount,
     episodes: summaries,
     hasBlockedStages: blockedJourneys > 0 || stalledCount > 0,

@@ -405,7 +405,9 @@ export function CareContinuityPanel({
                 <div className="flex justify-between text-white/70">
                   <span>Plan action items:</span>
                   <span className="font-semibold text-emerald-300">
-                    {careJourneys.totalVerifiedActionItemsCount} / {careJourneys.totalActionItemsCount} verified
+                    {careJourneys.totalCompletedMilestonesCount > 0
+                      ? `${careJourneys.totalCompletedMilestonesCount} fulfilled · ${careJourneys.totalVerifiedActionItemsCount}/${careJourneys.totalActionItemsCount} verified`
+                      : `${careJourneys.totalVerifiedActionItemsCount} / ${careJourneys.totalActionItemsCount} verified`}
                   </span>
                 </div>
               )}
@@ -467,17 +469,19 @@ export function CareContinuityPanel({
                               <span
                                 key={ms.id}
                                 className={`inline-flex items-center rounded px-1.5 py-0.5 text-[9px] font-medium ${
-                                  ms.verified
+                                  ms.completed
+                                    ? 'bg-emerald-500/25 text-emerald-200 border border-emerald-400/30'
+                                    : ms.verified
                                     ? 'bg-emerald-500/15 text-emerald-300'
                                     : ms.status === 'cancelled'
                                     ? 'bg-neutral-500/15 text-neutral-400 line-through'
                                     : 'bg-amber-500/15 text-amber-300'
                                 }`}
-                                title={`${ms.title} (target stage: ${ms.targetStage})`}
+                                title={`${ms.title}${ms.resultValue ? ` [Result: ${ms.resultValue}]` : ''} (target stage: ${ms.targetStage})`}
                               >
-                                {ms.verified ? '✓ ' : '⏳ '}
-                                {ms.category}: {ms.title.slice(0, 20)}
-                                {ms.title.length > 20 ? '…' : ''}
+                                {ms.completed ? '✓ ' : ms.verified ? '✓ ' : '⏳ '}
+                                {ms.category}: {ms.title.slice(0, 16)}
+                                {ms.resultValue ? ` (${ms.resultValue})` : ms.title.length > 16 ? '…' : ''}
                               </span>
                             ))}
                             {ep.milestones.length > 3 && (

@@ -5,7 +5,12 @@ import { evaluateResultClosure } from '../../src/domains/clinical-operations/mod
 import { evaluateCareAccessOrchestration } from '../../src/domains/clinical-operations/model/careAccessOrchestrator.ts'
 import { evaluateClinicalEpisodeResilience } from '../../src/domains/clinical-operations/model/clinicalEpisodeResilience.ts'
 import { deriveCareContinuityState, evaluateCareJourneyContinuity } from '../../src/domains/clinical-operations/model/careContinuityProjection.ts'
-import { ensureEpisodeFromVerifiedPlan, syncEpisodeWithPlanItems, planCategoryToStage } from '../../src/lib/careEpisode.ts'
+import {
+  ensureEpisodeFromVerifiedPlan,
+  syncEpisodeWithPlanItems,
+  planCategoryToStage,
+  fulfillMilestonesWithSupportiveResults,
+} from '../../src/lib/careEpisode.ts'
 
 const read = (p) => readFileSync(new URL('../../' + p, import.meta.url), 'utf8')
 
@@ -695,4 +700,125 @@ test('deriveCareContinuityState & CareEpisode: longitudinal care plan milestones
   assert.ok(continuity.careJourneys)
   assert.equal(continuity.careJourneys.totalActionItemsCount, 3)
   assert.equal(continuity.careJourneys.totalVerifiedActionItemsCount, 3)
+})
+
+test('deriveCareContinuityState & CareEpisode: clinical order fulfillment and result ingestion into care milestones (T-CLIN-11)', async () => {
+  const evaluatedAt = '2026-10-25T14:30:00.000Z'
+
+  const supportiveResults = [
+    {
+      id: 'res-lab-1',
+      takenAt: '2026-10-25T11:00:00.000Z',
+      category: 'Lab',
+      name: 'Total Bilirubin',
+      value: '1.2',
+      unit: 'mg/dL',
+      flag: 'normal',
+    },
+    {
+      id: 'res-usg-1',
+      takenAt: '2026-10-25T11:30:00.000Z',
+      category: 'Radiologi',
+      name: 'USG Abdomen',
+      value: 'Cholelithiasis with acoustic shadow, wall thickness 2.5 mm',
+      flag: 'normal',
+    },
+  ]
+
+  const baseEpisode = {
+    id: 'ce-fulfill-test',
+    title: 'Kolelitiasis',
+    diagnosisCode: 'K80.2',
+    createdAt: '2026-10-24T08:00:00.000Z',
+    updatedAt: '2026-10-24T08:00:00.000Z',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'diagnosis', status: 'done' },
+      { stage: 'plan', status: 'done' },
+      { stage: 'provider', status: 'done' },
+      { stage: 'cost', status: 'done' },
+      { stage: 'schedule', status: 'done' },
+      { stage: 'treatment', status: 'active', updatedAt: '2026-10-25T08:00:00.000Z' },
+      { stage: 'recovery', status: 'pending' },
+      { stage: 'followUp', status: 'pending' },
+      { stage: 'outcome', status: 'pending' },
+    ],
+    milestones: [
+      {
+        id: 'ms-lab',
+        planItemId: 'p-lab',
+        title: 'Bilirubin and liver function test',
+        category: 'Suportif',
+        targetStage: 'treatment',
+        status: 'verified',
+        verifiedById: 'dr-anita',
+        verifiedAt: '2026-10-24T09:00:00.000Z',
+      },
+      {
+        id: 'ms-usg',
+        planItemId: 'p-usg',
+        title: 'USG Abdomen hepatobiliary evaluation',
+        category: 'Suportif',
+        targetStage: 'treatment',
+        status: 'verified',
+        verifiedById: 'dr-anita',
+        verifiedAt: '2026-10-24T09:00:00.000Z',
+      },
+      {
+        id: 'ms-followup',
+        planItemId: 'p-follow',
+        title: 'Follow-up clinical assessment',
+        category: 'Follow-up',
+        targetStage: 'followUp',
+        status: 'verified',
+        verifiedById: 'dr-anita',
+        verifiedAt: '2026-10-24T09:00:00.000Z',
+      },
+    ],
+  }
+
+  // 1. Pure fulfillment via fulfillMilestonesWithSupportiveResults
+  const fulfilledEp = fulfillMilestonesWithSupportiveResults(baseEpisode, supportiveResults, evaluatedAt)
+  assert.equal(fulfilledEp.milestones.length, 3)
+
+  const fulfilledLab = fulfilledEp.milestones.find((m) => m.id === 'ms-lab')
+  assert.equal(fulfilledLab.status, 'completed')
+  assert.equal(fulfilledLab.resultId, 'res-lab-1')
+  assert.equal(fulfilledLab.resultValue, '1.2 mg/dL')
+
+  const fulfilledUsg = fulfilledEp.milestones.find((m) => m.id === 'ms-usg')
+  assert.equal(fulfilledUsg.status, 'completed')
+  assert.equal(fulfilledUsg.resultId, 'res-usg-1')
+
+  const untouchedFollowup = fulfilledEp.milestones.find((m) => m.id === 'ms-followup')
+  assert.equal(untouchedFollowup.status, 'verified', 'Follow-up category milestone should remain untouched by lab/radiology results')
+
+  // 2. Pure projection in evaluateCareJourneyContinuity
+  const projection = evaluateCareJourneyContinuity([fulfilledEp], evaluatedAt, undefined, supportiveResults)
+  assert.equal(projection.totalActionItemsCount, 3)
+  assert.equal(projection.totalVerifiedActionItemsCount, 3)
+  assert.equal(projection.totalCompletedMilestonesCount, 2)
+
+  const epSummary = projection.episodes[0]
+  assert.equal(epSummary.completedMilestonesCount, 2)
+  assert.equal(epSummary.milestones.find((m) => m.id === 'ms-lab').completed, true)
+  assert.equal(epSummary.milestones.find((m) => m.id === 'ms-lab').resultValue, '1.2 mg/dL')
+
+  // 3. Negative control: Empty supportive results must not fulfill any milestones
+  const unfulfilledEp = fulfillMilestonesWithSupportiveResults(baseEpisode, [], evaluatedAt)
+  assert.equal(unfulfilledEp.milestones.every((m) => m.status === 'verified'), true)
+
+  // 4. End-to-end integration via deriveCareContinuityState
+  const stateResult = deriveCareContinuityState({
+    patientId: 'patient-fulfill-test',
+    evaluatedAt,
+    supportiveResults,
+    record: {
+      id: 'enc-fulfill',
+      patientId: 'patient-fulfill-test',
+      careEpisodes: [baseEpisode],
+    },
+  })
+  assert.ok(stateResult.careJourneys)
+  assert.equal(stateResult.careJourneys.totalCompletedMilestonesCount, 2)
 })
