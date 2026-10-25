@@ -61,6 +61,17 @@ function validIdentity(value: string): boolean {
 }
 
 function sameReplay(a: ClinicalEpisodeTransportEvent, b: ClinicalEpisodeTransportEvent): boolean {
+  // Delivery state and post-acknowledgement storage metadata may change between
+  // transport updates. Two pending copies must not use that flexibility to hide
+  // weaker protection or an exhausted retry attempt behind idempotent deduplication.
+  const pendingAttemptMatches =
+    a.delivery !== 'pending' || b.delivery !== 'pending' ||
+    (
+      a.durableLocalCopy === b.durableLocalCopy &&
+      a.encryptedAtRest === b.encryptedAtRest &&
+      a.retryCount === b.retryCount
+    )
+
   return a.patientId === b.patientId
     && a.episodeId === b.episodeId
     && a.kind === b.kind
@@ -68,6 +79,7 @@ function sameReplay(a: ClinicalEpisodeTransportEvent, b: ClinicalEpisodeTranspor
     && a.sourceId === b.sourceId
     && a.sequence === b.sequence
     && a.payloadDigest === b.payloadDigest
+    && pendingAttemptMatches
 }
 
 /**
