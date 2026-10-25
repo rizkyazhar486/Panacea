@@ -38,6 +38,15 @@ function IconShield({ size = 16, className = '' }: { size?: number; className?: 
   )
 }
 
+function IconClock({ size = 16, className = '' }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <circle cx="12" cy="12" r="10" />
+      <polyline points="12 6 12 12 16 14" />
+    </svg>
+  )
+}
+
 export interface CareContinuityPanelProps {
   patientName: string
   closure?: ResultClosureResult | null
@@ -131,6 +140,15 @@ export function CareContinuityPanel({
               data-care-outcomes-badge="v1"
             >
               <IconCheck size={12} /> Outcomes verified ({careJourneys.completedWithVerifiedOutcomeCount})
+            </span>
+          )}
+
+          {careJourneys && careJourneys.totalTimelineEventsCount > 0 && (
+            <span
+              className="inline-flex items-center gap-1 rounded-full border border-indigo-400/40 bg-indigo-400/10 px-2.5 py-0.5 text-[10px] font-bold text-indigo-200"
+              data-care-timeline-badge="v1"
+            >
+              <IconClock size={12} /> Audit events ({careJourneys.totalTimelineEventsCount})
             </span>
           )}
         </div>
@@ -454,6 +472,14 @@ export function CareContinuityPanel({
                   </span>
                 </div>
               )}
+              {careJourneys.totalTimelineEventsCount > 0 && (
+                <div className="flex justify-between text-indigo-300" data-care-timeline-metrics="v1">
+                  <span>Audit trail events:</span>
+                  <span className="font-bold">
+                    {careJourneys.totalTimelineEventsCount} recorded
+                  </span>
+                </div>
+              )}
 
               {careJourneys.episodes.length > 0 && (
                 <div className="mt-3 border-t border-white/8 pt-2">
@@ -549,6 +575,22 @@ export function CareContinuityPanel({
                                 +{ep.milestones.length - 3} more
                               </span>
                             )}
+                          </div>
+                        )}
+                        {ep.timelineEvents && ep.timelineEvents.length > 0 && (
+                          <div
+                            className="mt-1.5 rounded bg-indigo-500/10 border border-indigo-500/20 px-2 py-1 text-[10px]"
+                            data-care-timeline-audit="v1"
+                          >
+                            <div className="flex items-center justify-between text-indigo-200 font-semibold mb-0.5">
+                              <span>Audit: {ep.timelineEvents.length} events</span>
+                              <span className="text-[9px] text-indigo-300/80 font-mono">
+                                {ep.timelineEvents[0].timestamp.replace('T', ' ').slice(0, 10)}
+                              </span>
+                            </div>
+                            <div className="text-indigo-300/90 truncate" title={ep.timelineEvents[0].title}>
+                              Latest: {ep.timelineEvents[0].title}
+                            </div>
                           </div>
                         )}
                         <div className="mt-1 flex items-center justify-between text-[10px] text-white/45">

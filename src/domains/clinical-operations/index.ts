@@ -50,6 +50,8 @@ export {
 export {
   deriveCareContinuityState,
   evaluateCareJourneyContinuity,
+  deriveCareJourneyTimelineEvents,
+  STAGE_LABEL,
   type CareContinuityProjection,
   type CareContinuityProjectionInput,
   type CareJourneyContinuityResult,

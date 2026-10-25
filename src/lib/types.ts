@@ -243,6 +243,29 @@ export interface CareEpisode {
   milestones?: CarePlanMilestone[]
   // Clinical encounter outcome closure and resolution record (T-CLIN-13)
   outcomeRecord?: ClinicalOutcomeRecord
+  // Care journey longitudinal event timeline and provenance audit trail (T-CLIN-14)
+  timelineEvents?: CareJourneyTimelineEvent[]
+}
+
+export type CareJourneyTimelineEventKind =
+  | 'episode_seeded'
+  | 'stage_transition'
+  | 'provider_selected'
+  | 'milestone_verified'
+  | 'milestone_fulfilled'
+  | 'outcome_verified'
+
+export interface CareJourneyTimelineEvent {
+  id: string
+  episodeId: string
+  kind: CareJourneyTimelineEventKind
+  timestamp: string
+  title: string
+  description?: string
+  stage?: CareEpisodeStageId
+  actorId?: string
+  badge?: string
+  severity?: 'info' | 'success' | 'warning' | 'stalled'
 }
 
 export type ClinicalOutcomeStatus =
