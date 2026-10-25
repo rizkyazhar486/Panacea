@@ -5,6 +5,7 @@ import { evaluateResultClosure } from '../../src/domains/clinical-operations/mod
 import { evaluateCareAccessOrchestration } from '../../src/domains/clinical-operations/model/careAccessOrchestrator.ts'
 import { evaluateClinicalEpisodeResilience } from '../../src/domains/clinical-operations/model/clinicalEpisodeResilience.ts'
 import { deriveCareContinuityState } from '../../src/domains/clinical-operations/model/careContinuityProjection.ts'
+import { ensureEpisodeFromVerifiedPlan } from '../../src/lib/careEpisode.ts'
 
 const read = (p) => readFileSync(new URL('../../' + p, import.meta.url), 'utf8')
 
@@ -245,4 +246,67 @@ test('VisitOS & CareEpisode: establishes bi-directional navigation for longitudi
     /<Link[^>]*to="\/visit"/,
     'CareEpisode must link back to /visit'
   )
+})
+
+test('CareEpisode: seeds care journeys from verified encounter diagnosis and links ICD-10 provenance', () => {
+  const episodeSrc = read('src/pages/clinical/CareEpisode.tsx')
+
+  // UI contract: ensures import and wiring of ensureEpisodeFromVerifiedPlan
+  assert.match(
+    episodeSrc,
+    /ensureEpisodeFromVerifiedPlan/,
+    'CareEpisode must import ensureEpisodeFromVerifiedPlan'
+  )
+  assert.match(
+    episodeSrc,
+    /data-seed-journey="primary-diagnosis"/,
+    'CareEpisode must provide a seed journey button for encounter diagnosis'
+  )
+  assert.match(
+    episodeSrc,
+    /data-care-episode-id=\{episode\.id\}/,
+    'CareEpisode card must expose data-care-episode-id'
+  )
+  assert.match(
+    episodeSrc,
+    /data-diagnosis-code=\{episode\.diagnosisCode\s*\|\|\s*'none'\}/,
+    'CareEpisode card must expose data-diagnosis-code'
+  )
+  assert.match(
+    episodeSrc,
+    /ICD-10:\s*\{episode\.diagnosisCode\}/,
+    'CareEpisode card must render ICD-10 code badge when diagnosisCode is present'
+  )
+
+  // Pure logic contract: ensureEpisodeFromVerifiedPlan
+  const mockRecord = {
+    patientId: 'patient-42',
+    primaryDiagnosis: { code: 'K80.0', title: 'Calculus of gallbladder with acute cholecystitis' },
+    problems: [{ id: 'prob-gallstone', title: 'Right upper quadrant pain' }],
+    plan: [{ id: 'plan-1', text: 'Surgical consult', status: 'diverifikasi' }],
+    careEpisodes: [],
+  }
+
+  // Positive: seeds new episode with verified problem and diagnosis, cascades plan to active
+  const seeded = ensureEpisodeFromVerifiedPlan(mockRecord)
+  assert.equal(seeded.careEpisodes.length, 1)
+  const ep = seeded.careEpisodes[0]
+  assert.equal(ep.title, 'Calculus of gallbladder with acute cholecystitis')
+  assert.equal(ep.diagnosisCode, 'K80.0')
+  assert.equal(ep.problemId, 'prob-gallstone')
+
+  const problemStage = ep.stages.find((s) => s.stage === 'problem')
+  const dxStage = ep.stages.find((s) => s.stage === 'diagnosis')
+  const planStage = ep.stages.find((s) => s.stage === 'plan')
+  assert.equal(problemStage.status, 'done')
+  assert.equal(dxStage.status, 'done')
+  assert.equal(planStage.status, 'active')
+
+  // Idempotent: repeated calls do not create duplicate journeys for same diagnosis
+  const reseeded = ensureEpisodeFromVerifiedPlan(seeded)
+  assert.equal(reseeded.careEpisodes.length, 1)
+
+  // Negative: records without primary diagnosis remain untouched
+  const noDxRecord = { patientId: 'patient-43', careEpisodes: [] }
+  assert.equal(ensureEpisodeFromVerifiedPlan(noDxRecord), noDxRecord)
 })

@@ -9,6 +9,7 @@ import {
   STAGE_LABEL,
   STATUS_LABEL,
   newCareEpisode,
+  ensureEpisodeFromVerifiedPlan,
   nextStages,
   isComplete,
   setStageStatus,
@@ -118,6 +119,35 @@ export function CareEpisodePage() {
       </div>
       <BatasKlaimKesehatan permukaan="care.episode" />
 
+      {record.primaryDiagnosis && !episodes.some((e) => e.diagnosisCode === record.primaryDiagnosis?.code) && (
+        <Card className="border border-brand/20 bg-brand/5 dark:bg-brand/10">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <div className="flex items-center gap-2">
+                <Badge tone="brand">Encounter diagnosis</Badge>
+                <span className="font-mono text-xs font-bold text-neutral-600 dark:text-neutral-400">
+                  {record.primaryDiagnosis.code}
+                </span>
+              </div>
+              <h4 className="mt-1 font-bold text-ink">{record.primaryDiagnosis.title}</h4>
+              <p className="mt-0.5 text-xs text-neutral-500">
+                Primary diagnosis from active encounter. Track as an end-to-end care journey with problem and diagnosis stages already verified.
+              </p>
+            </div>
+            <Button
+              data-seed-journey="primary-diagnosis"
+              onClick={() => {
+                const nextRecord = ensureEpisodeFromVerifiedPlan(record)
+                saveRecord(nextRecord)
+              }}
+              className="shrink-0"
+            >
+              Track care journey
+            </Button>
+          </div>
+        </Card>
+      )}
+
       <Card>
         <Field label="New care episode">
           <div className="flex gap-2">
@@ -186,10 +216,17 @@ function EpisodeCard({
   }
 
   return (
-    <Card>
+    <Card data-care-episode-id={episode.id} data-diagnosis-code={episode.diagnosisCode || 'none'}>
       <div className="mb-3 flex items-start justify-between gap-3">
         <div>
-          <h3 className="font-bold text-ink">{episode.title}</h3>
+          <div className="flex flex-wrap items-center gap-2">
+            <h3 className="font-bold text-ink">{episode.title}</h3>
+            {episode.diagnosisCode && (
+              <Badge tone="neutral" className="font-mono text-[10px]">
+                ICD-10: {episode.diagnosisCode}
+              </Badge>
+            )}
+          </div>
           <p className="text-xs text-neutral-500">
             {done
               ? 'Complete'
