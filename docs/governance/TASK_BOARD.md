@@ -12,7 +12,7 @@ Evidence snapshot `c57e22fc`, 2026-10-23 (reconciled with H3 changes in `944a9ba
 
 | ID | Task | Criterion | Lane | Status | PR / evidence |
 |---|---|---|---|---|---|
-| T-H0-REPLAY-CAPTURE | Repair Human Replay screenshot timeout without dropping poster/duration/layout proof | ENG-CI-01 | codex | IN_PROGRESS | Main 41663ebc7cc31a0569e5eb459cbdc6ea55722e87 Stabilization run 40139421966, full-acceptance job 121007799691: human-replay-duration-smoke.mjs:73 screenshot exceeded 90000 ms after fonts loaded. #2767 held until recovery. |
+| T-H0-REPLAY-CAPTURE | Repair Human Replay screenshot timeout without dropping poster/duration/layout proof | ENG-CI-01 | codex | IN_REVIEW | Main 48cab5293c59ce71c78b6fa5f7e8c4f409660cd7 Stabilization run 40146154069 job 121027816805 failed at human-replay-duration-smoke.mjs:81: locator screenshot waited for element stability for 89993 ms after fonts loaded. Stop-line fix branch fix/h0-human-replay-clip-20261025 captures the actual metric panel via bounded page screenshot; PNG dimensions, negative controls and exact-head Stabilization required before merge. #2767 held until main green. |
 | T-H0-01 | Pin runners to Ubuntu 24.04 (Playwright + Mongo) | ENG-CI-02 | integrator | DONE | #2691 merged c57e22fc; #2686 closed as subset |
 | T-H0-02 | Bump MCP SDK + follow-redirects; audit gate OK | ENG-SEC-01 | claude | DONE | #2687 (via #2691) on c57e22fc; Dependency Audit run 39883765825 success |
 | T-H0-03 | Record run IDs of every workflow on new main SHA | ENG-CI-01 | integrator | DONE | ENG-CI-01/02, ENG-SEC-01 PASS at c57e22fc; this PR |
