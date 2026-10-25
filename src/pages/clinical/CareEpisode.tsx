@@ -34,7 +34,15 @@ import {
   type CandidateView,
   type StageStall,
 } from '../../lib/careEpisode'
-import type { CareEpisode, CareEpisodeStageId, CareEpisodeStageStatus, CostItem, PlanItem, SupportiveResult } from '../../lib/types'
+import type {
+  CareEpisode,
+  CareEpisodeStageId,
+  CareEpisodeStageStatus,
+  CarePlanMilestone,
+  CostItem,
+  PlanItem,
+  SupportiveResult,
+} from '../../lib/types'
 import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 import { PanaceaZoneNav } from '../../components/PanaceaZoneNav'
 
