@@ -5,6 +5,7 @@ import { deriveEncounterOutcomeJob } from '../../domains/clinical-operations/mod
 import { PanaceaZoneNav } from '../../components/PanaceaZoneNav'
 import { VisitCommandCenter } from '../../components/VisitCommandCenter'
 import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
+import { ClinicalPatientContext } from '../../components/ClinicalPatientContext'
 
 const STEP_LABEL: Record<string, string> = {
   missing: 'Needed',
@@ -70,6 +71,11 @@ export function VisitOS() {
           careAccess={careContinuity?.careAccess}
           episodeResilience={careContinuity?.episodeResilience}
         />
+      )}
+      {activePatient.id !== 'none' && (
+        <div data-visit-patient-body-context="v1">
+          <ClinicalPatientContext />
+        </div>
       )}
       {outcomeJob && (
         <section aria-label="Encounter outcome workflow" data-encounter-outcome-job="v1" className="rounded-2xl border border-emerald-400/20 bg-[#081410] px-4 py-4 sm:px-5">
