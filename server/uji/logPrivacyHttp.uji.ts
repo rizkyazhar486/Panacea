@@ -4,7 +4,7 @@ import assert from 'node:assert/strict'
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 import { request as httpRequest } from 'node:http'
-import { gzipSync } from 'node:zlib'
+import { deflateSync, gzipSync } from 'node:zlib'
 import { consoleCallsWithRequestData } from './support/consoleRequestGuard.ts'
 import { serverRoot, startIsolatedServer } from './support/isolatedServer.ts'
 
@@ -131,10 +131,10 @@ try {
   // GHSA-27r3-jxmh-p828: frame gzip valid diikuti sampah tidak boleh keluar sebagai exception proses.
   // Rujukan patch primer: https://github.com/expressjs/body-parser/commit/f7075eae3a84c3473ab4bf0a777da28db208e916
   const compressed = gzipSync(JSON.stringify({ email: ['logprivacy-alice', 'localhost.test'].join('@'), role: 'pasien', name: 'Alice Marker Patient' }))
-  const sendGzip = (body: Buffer): Promise<{ status: number; body: { user?: { id?: string }; error?: string } }> => new Promise((resolve, reject) => {
-    const req = httpRequest(new URL('/api/auth/dev-login', running.origin), {
+  const sendEncoded = (body: Buffer, encoding = 'gzip', options: { contentType?: string; path?: string; token?: string } = {}): Promise<{ status: number; body: { user?: { id?: string }; error?: string } }> => new Promise((resolve, reject) => {
+    const req = httpRequest(new URL(options.path ?? '/api/auth/dev-login', running.origin), {
       method: 'POST', agent: false,
-      headers: { 'content-type': 'application/json', 'content-encoding': 'gzip', 'content-length': body.length, 'user-agent': 'Mozilla/5.0 PanaceaSyntheticTest' },
+      headers: { 'content-type': options.contentType ?? 'application/json', 'content-encoding': encoding, 'content-length': body.length, 'user-agent': 'Mozilla/5.0 PanaceaSyntheticTest', ...(options.token ? { authorization: `Bearer ${options.token}` } : {}) },
     }, response => {
       const chunks: Buffer[] = []
       response.on('data', (chunk: Buffer) => chunks.push(chunk))
@@ -150,17 +150,17 @@ try {
   })
   const incidentsBefore = (logs().match(/\[incident\]/g) ?? []).length
   assert.equal(incidentsBefore, 0, 'compression probe must start without incidents so alert throttling cannot hide a parser error')
-  const validCompressed = await sendGzip(compressed)
+  const validCompressed = await sendEncoded(compressed)
   assert.equal(validCompressed.status, 200, 'valid compressed JSON remains accepted')
   assert.equal(validCompressed.body.user?.id, alice.user.id, 'valid compressed login retains the same synthetic identity')
   const usersBefore = (JSON.parse(readFileSync(running.dataFile, 'utf8')) as { users: unknown[] }).users.length
   const corrupted = Buffer.from(compressed)
   corrupted[0] ^= 0xff
-  const invalidCompressed = await sendGzip(corrupted)
+  const invalidCompressed = await sendEncoded(corrupted)
   assert.equal(invalidCompressed.status, 400, 'invalid gzip is refused before the handler')
   assert.equal(invalidCompressed.body.error, 'bad_request')
   assert.equal((JSON.parse(readFileSync(running.dataFile, 'utf8')) as { users: unknown[] }).users.length, usersBefore, 'invalid compressed JSON cannot create an account')
-  const trailingCompressed = await sendGzip(Buffer.concat([compressed, Buffer.from([0]), Buffer.alloc(100 * 1024, 0x58)]))
+  const trailingCompressed = await sendEncoded(Buffer.concat([compressed, Buffer.from([0]), Buffer.alloc(100 * 1024, 0x58)]))
   assert.equal(trailingCompressed.status, 200, 'completed gzip frame preserves valid JSON semantics despite trailing bytes')
   assert.equal(trailingCompressed.body.user?.id, alice.user.id)
   await new Promise(resolve => setTimeout(resolve, 250))
@@ -168,6 +168,41 @@ try {
   assert.equal((await call('GET', '/api/health')).status, 200, 'server remains responsive after compressed trailing bytes')
   assert.deepEqual((await call('GET', '/api/health-profile', alice.token)).body, profile.body, 'compressed parser probes do not change health data')
   console.log('bodyParserCompression: valid gzip accepted, invalid gzip refused without mutation, trailing bytes produce no uncaught incident, server responsive; passed')
+
+  // Batas tetap 12 MiB; payload sintetis yang sama diuji mentah dan setelah ekspansi.
+  // Padding tidak menjadi data akun. Pembandingan berkas membuktikan setiap penolakan tidak menulis.
+  const limit = 12 * 1024 * 1024
+  const loginPayload = JSON.stringify({ email: ['logprivacy-alice', 'localhost.test'].join('@'), role: 'pasien', name: 'Alice Marker Patient', padding: 'parser-private-marker' })
+  const boundary = Buffer.from(loginPayload.slice(0, -1) + ' '.repeat(limit - Buffer.byteLength(loginPayload)) + '}')
+  assert.equal(boundary.length, limit)
+  const refusedUnchanged = async (body: Buffer, encoding: string, status: number, error: string, options: Parameters<typeof sendEncoded>[2] = {}) => {
+    const before = readFileSync(running.dataFile, 'utf8')
+    const r = await sendEncoded(body, encoding, options)
+    assert.equal(r.status, status, `parser ${encoding} refusal must preserve HTTP ${status}`)
+    assert.ok(JSON.stringify(r.body) === JSON.stringify({ error }), `parser ${encoding} refusal must return only the expected error (response redacted)`)
+    assert.ok(readFileSync(running.dataFile, 'utf8') === before, `parser ${encoding} refusal must not mutate persisted data (contents redacted)`)
+  }
+  for (const [encoding, encode] of [['identity', (b: Buffer) => b], ['gzip', gzipSync], ['deflate', deflateSync]] as const) {
+    const accepted = await sendEncoded(encode(boundary), encoding)
+    assert.equal(accepted.status, 200, `parser ${encoding} accepts exactly 12 MiB`)
+    assert.equal(accepted.body.user?.id, alice.user.id, `parser ${encoding} preserves the existing synthetic identity`)
+    const oversized = encode(Buffer.concat([boundary, Buffer.from(' ')]))
+    if (encoding !== 'identity') assert.ok(oversized.length < limit / 100, `${encoding} fixture must exercise high-ratio expansion`)
+    await refusedUnchanged(oversized, encoding, 413, 'payload_too_large')
+    if (encoding !== 'identity') {
+      const small = encode(Buffer.from(loginPayload))
+      await refusedUnchanged(small.subarray(0, small.length - 4), encoding, 400, 'bad_request')
+      await refusedUnchanged(encode(Buffer.from('{"padding":"parser-malformed-marker"')), encoding, 400, 'bad_request')
+    }
+  }
+  await refusedUnchanged(Buffer.from(loginPayload), 'parser-unsupported-private-marker', 415, 'unsupported_media_type')
+  await refusedUnchanged(Buffer.from(loginPayload), 'identity', 415, 'unsupported_media_type', { contentType: 'application/json; charset=parser-charset-private-marker' })
+  const clinicalProbe = gzipSync(JSON.stringify({ patient: { id: 'parser-auth-marker', name: 'parser-auth-private-marker' } }))
+  await refusedUnchanged(clinicalProbe, 'gzip', 401, 'unauthorized', { path: '/api/clinical/patient' })
+  await refusedUnchanged(clinicalProbe, 'gzip', 403, 'patients can only create their own record', { path: '/api/clinical/patient', token: alice.token })
+  assert.equal((await call('GET', '/api/health')).status, 200, 'parser refusals leave the server responsive')
+  assert.equal((logs().match(/\[incident\]/g) ?? []).length, 0, 'parser refusals must not produce uncaught incidents')
+  console.log('bodyParserBounds: identity/gzip/deflate exact 12 MiB accepted; +1 and high-ratio expansion refused 413; malformed 400, unsupported 415, auth 401/403, no writes; passed')
   await new Promise(resolve => setTimeout(resolve, 1500))
 
   // 2c. Every route group of the RBAC matrix (ENG-E4-02). The 15 clinical routes of rbacKlinis plus the referral, care, reminder,
@@ -255,6 +290,7 @@ try {
     privateLabel, 'synthetic-private-health-label', 'synthetic-forged-log-line', 'weight_body_mass', 'weightKg', token,
     'malformed-name-marker', 'malformed-mrn-marker', 'malformed-trailing-marker', 'malformed-unquoted-marker', 'malformed-singlequote-marker',
     'malformed-lab-marker', 'malformed-value-marker', 'malformed-not-json-marker', 'malformed-oversize-marker',
+    'parser-private-marker', 'parser-malformed-marker', 'parser-unsupported-private-marker', 'parser-charset-private-marker', 'parser-auth-marker', 'parser-auth-private-marker',
     ...routeMarkers,
   ]) assert.ok(!written.includes(secret), `the server log must not contain "${secret}"`)
   // Operational telemetry retains counts and correlation, without health categories.

@@ -12,7 +12,8 @@ Evidence snapshot `c57e22fc`, 2026-10-23 (reconciled with H3 changes in `944a9ba
 
 | ID | Task | Criterion | Lane | Status | PR / evidence |
 |---|---|---|---|---|---|
-| T-H0-REPLAY-CAPTURE | Repair Human Replay screenshot timeout without dropping poster/duration/layout proof | ENG-CI-01 | codex | IN_PROGRESS | Main 41663ebc7cc31a0569e5eb459cbdc6ea55722e87 Stabilization run 40139421966, full-acceptance job 121007799691: human-replay-duration-smoke.mjs:73 screenshot exceeded 90000 ms after fonts loaded. #2767 held until recovery. |
+| T-H0-REPLAY-CAPTURE | Repair Human Replay screenshot timeout without dropping poster/duration/layout proof | ENG-CI-01 | codex | DONE | Merged in #2768 (48cab529); 10m step timeout stabilized dual-viewport SwiftShader execution. |
+| T-H0-PARSER | Preserve unsupported encoding/charset HTTP 415 and prove compressed parser limits, auth and private diagnostics | ENG-E4-02 | codex | IN_REVIEW | #2767; base 48cab5293c59ce71c78b6fa5f7e8c4f409660cd7. Parser 415 restored; identity/gzip/deflate boundaries and private auth/error controls pass locally. Status and gzip-limit sabotages fail by name; exact-head CI pending. Size threshold stays 12 MiB. |
 | T-H0-01 | Pin runners to Ubuntu 24.04 (Playwright + Mongo) | ENG-CI-02 | integrator | DONE | #2691 merged c57e22fc; #2686 closed as subset |
 | T-H0-02 | Bump MCP SDK + follow-redirects; audit gate OK | ENG-SEC-01 | claude | DONE | #2687 (via #2691) on c57e22fc; Dependency Audit run 39883765825 success |
 | T-H0-03 | Record run IDs of every workflow on new main SHA | ENG-CI-01 | integrator | DONE | ENG-CI-01/02, ENG-SEC-01 PASS at c57e22fc; this PR |
