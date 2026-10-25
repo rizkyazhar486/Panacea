@@ -539,7 +539,7 @@ function OutcomeVerificationSection({
 
         <div className="mt-1 flex items-center justify-end gap-2">
           <Button
-            variant="brand"
+            variant="primary"
             className="!min-h-0 !px-3 !py-1.5 text-xs font-semibold"
             disabled={!summary.trim()}
             onClick={() => {
