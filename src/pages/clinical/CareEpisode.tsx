@@ -222,8 +222,8 @@ function EpisodeCard({
           <div className="flex flex-wrap items-center gap-2">
             <h3 className="font-bold text-ink">{episode.title}</h3>
             {episode.diagnosisCode && (
-              <Badge tone="neutral" className="font-mono text-[10px]">
-                ICD-10: {episode.diagnosisCode}
+              <Badge tone="neutral">
+                <span className="font-mono text-[10px]">ICD-10: {episode.diagnosisCode}</span>
               </Badge>
             )}
           </div>
