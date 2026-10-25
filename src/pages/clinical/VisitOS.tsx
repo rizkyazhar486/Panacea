@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useStore } from '../../lib/store'
-import { derivePoliPatientFlow, PoliPatientFlowBoard } from '../../domains/clinical-operations'
+import { derivePoliPatientFlow, PoliPatientFlowBoard, CareContinuityPanel } from '../../domains/clinical-operations'
 import { deriveEncounterOutcomeJob } from '../../domains/clinical-operations/model/encounterOutcomeJob'
 import { PanaceaZoneNav } from '../../components/PanaceaZoneNav'
 import { VisitCommandCenter } from '../../components/VisitCommandCenter'
@@ -57,6 +57,9 @@ export function VisitOS() {
       <PanaceaZoneNav />
       <BatasKlaimKesehatan permukaan="care.visit-os" className="mt-2 text-[11px] leading-snug text-white/55" />
       <PoliPatientFlowBoard rows={patientRows} activePatientId={activePatient.id} onSelect={setActivePatient} />
+      {activePatient.id !== 'none' && (
+        <CareContinuityPanel patientName={activePatient.name} />
+      )}
       {outcomeJob && (
         <section aria-label="Encounter outcome workflow" data-encounter-outcome-job="v1" className="rounded-2xl border border-emerald-400/20 bg-[#081410] px-4 py-4 sm:px-5">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
