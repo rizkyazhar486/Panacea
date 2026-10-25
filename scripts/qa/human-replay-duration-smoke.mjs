@@ -1,5 +1,6 @@
 // Synthetic histories through the actual component/engine/poster. No device or route/auth proof.
 import assert from 'node:assert/strict'
+import { captureReplayMetricPanel } from './human-replay-capture.mjs'
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { build } from 'esbuild'
 const out = process.env.REPLAY_DURATION_QA_OUTPUT || 'artifacts/replay-duration'
@@ -67,7 +68,7 @@ try {
     const metricPanel = page.locator('section > div.grid > div').last()
     assert.equal(await metricPanel.count(), 1, 'actual Human Replay metric panel must exist')
     await metricPanel.getByText('active min', { exact: true }).waitFor()
-    await poster('Unknown');await metricPanel.screenshot({path:`${out}/unknown-${viewport.width}.png`,animations:'disabled',timeout:90000})
+    await poster('Unknown');await captureReplayMetricPanel(page, metricPanel, `${out}/unknown-${viewport.width}.png`)
     await select('Known');assert.match(await active.innerText(),/^30\s/);assert.match(await distance.innerText(),/^3[.,]0\s/)
     await select('Zero');assert.match(await active.innerText(),/^0\s/);assert.match(await distance.innerText(),/^0[.,]0\s/);await poster('0')
     await select('Invalid');assert.match(await active.innerText(),/Unknown/)
@@ -78,7 +79,7 @@ try {
     await page.getByText(/Cumulative: 1 sessions · 30 active minutes/).waitFor();assert.match(await active.innerText(),/^30\s/)
     await page.keyboard.press('ArrowRight');await page.getByText(/Cumulative: 2 sessions · Unknown active minutes/).waitFor();assert.match(await active.innerText(),/Unknown/)
     const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth);assert.ok(overflow<=1)
-    await metricPanel.screenshot({path:`${out}/mixed-${viewport.width}.png`,animations:'disabled',timeout:90000})
+    await captureReplayMetricPanel(page, metricPanel, `${out}/mixed-${viewport.width}.png`)
     await select('Empty');await page.getByRole('slider',{name:'Human Replay month'}).waitFor({state:'hidden'})
     if(errors.length||consoleErrors.length||failedResponses.length) {
       const failure={viewport,errors,consoleErrors,failedResponses};await writeFile(`${out}/failure-${viewport.width}.json`,JSON.stringify(failure,null,2));console.error(JSON.stringify(failure))

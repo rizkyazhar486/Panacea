@@ -12,7 +12,7 @@ Evidence snapshot `c57e22fc`, 2026-10-23 (reconciled with H3 changes in `944a9ba
 
 | ID | Task | Criterion | Lane | Status | PR / evidence |
 |---|---|---|---|---|---|
-| T-H0-REPLAY-CAPTURE | Repair Human Replay screenshot timeout without dropping poster/duration/layout proof | ENG-CI-01 | codex | DONE | Merged in #2768 (48cab529); 10m step timeout stabilized dual-viewport SwiftShader execution. |
+| T-H0-REPLAY-CAPTURE | Repair Human Replay screenshot timeout without dropping poster/duration/layout proof | ENG-CI-01 | codex | IN_REVIEW | #2768 merged but exact-head #2770 run 40147830053 failed: page clip outside viewport. #2770 adds fullPage document-space clip and below-fold negative control; exact-head Stabilization + cross-lane review pending. Main f8dfef5 Stabilization 40151178791 succeeded (flaky history remains). |
 | T-H0-PARSER | Preserve unsupported encoding/charset HTTP 415 and prove compressed parser limits, auth and private diagnostics | ENG-E4-02 | codex | IN_REVIEW | #2767; base 48cab5293c59ce71c78b6fa5f7e8c4f409660cd7. Parser 415 restored; identity/gzip/deflate boundaries and private auth/error controls pass locally. Status and gzip-limit sabotages fail by name; exact-head CI pending. Size threshold stays 12 MiB. |
 | T-H0-01 | Pin runners to Ubuntu 24.04 (Playwright + Mongo) | ENG-CI-02 | integrator | DONE | #2691 merged c57e22fc; #2686 closed as subset |
 | T-H0-02 | Bump MCP SDK + follow-redirects; audit gate OK | ENG-SEC-01 | claude | DONE | #2687 (via #2691) on c57e22fc; Dependency Audit run 39883765825 success |

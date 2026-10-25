@@ -366,6 +366,9 @@ jobs:
           path: artifacts/dna-duration
           if-no-files-found: ignore
 
+      - name: Human Replay bounded screenshot contract (negative controls)
+        run: node --test scripts/qa/human-replay-capture.test.mjs
+
       - name: Human Replay duration provenance and poster (synthetic component, mobile/desktop)
         timeout-minutes: 10
         env:
