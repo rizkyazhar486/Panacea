@@ -608,7 +608,7 @@
       ],
       "status": "PASS",
       "statusSha": "48cab5293c59ce71c78b6fa5f7e8c4f409660cd7",
-      "statusNote": "Resolved 2026-10-25 under Option A (Owner decision D-D7-RUN, docs/governance/ENG_D7_02_GAIT_DECISION_ANALYSIS.md). CMU mocap runner (09_02) is forefoot-strike running with calcaneus min height >15 mm (32.3 mm male, 16.9 mm female); heel strike is genuinely absent and recorded as NOT_APPLICABLE without artificial heel fabrication. Forefoot contact assessed against 15 mm window. All four fixtures measurable. Not clinically validated."
+      "statusNote": "Resolved 2026-10-25 under Option A (Owner decision D-D7-RUN, docs/governance/ENG_D7_02_GAIT_DECISION_ANALYSIS.md). CMU mocap runner (09_02) is forefoot-strike running with calcaneus min height >15 mm (32.3 mm male, 16.9 mm female); heel strike is genuinely absent and recorded as NOT_APPLICABLE without artificial heel fabrication. Forefoot contact assessed against 15 mm window. All four fixtures measurable. Verified on main 48cab5293c59ce71c78b6fa5f7e8c4f409660cd7, Body 3D Render run 40146154116, Validate changes run 40148244302 (job 121034117500) and PR #2769 run 40149569579. Not clinically validated."
     },
     {
       "id": "ENG-D7-03",
