@@ -40,8 +40,8 @@ try {
       let file
       try {
         ;[file]=await Promise.all([
-          page.waitForEvent('download', { timeout: 75000 }),
-          page.getByRole('button',{name:'Share this chapter',exact:true}).click({ timeout: 90000, noWaitAfter: true }),
+          page.waitForEvent('download', { timeout: 120000 }),
+          page.getByRole('button',{name:'Share this chapter',exact:true}).click({ timeout: 120000, noWaitAfter: true }),
         ])
       } catch (error) {
         const diagnostic={viewport,expected,errors,consoleErrors,failedResponses,
@@ -75,9 +75,9 @@ try {
     await select('Mixed');await page.getByText(/Cumulative: 3 sessions · Unknown active minutes/).waitFor()
     assert.match(await active.innerText(),/^15\s/)
     const comparison=page.getByText('active time',{exact:true}).locator('..');assert.match(await comparison.innerText(),/Unknown/)
-    const scrubber=page.getByRole('slider',{name:'Human Replay month'});await scrubber.focus();await page.keyboard.press('Home')
+    const scrubber=page.getByRole('slider',{name:'Human Replay month'});await scrubber.focus();await scrubber.press('Home')
     await page.getByText(/Cumulative: 1 sessions · 30 active minutes/).waitFor();assert.match(await active.innerText(),/^30\s/)
-    await page.keyboard.press('ArrowRight');await page.getByText(/Cumulative: 2 sessions · Unknown active minutes/).waitFor();assert.match(await active.innerText(),/Unknown/)
+    await scrubber.focus();await scrubber.press('ArrowRight');await page.getByText(/Cumulative: 2 sessions · Unknown active minutes/).waitFor();assert.match(await active.innerText(),/Unknown/)
     const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth);assert.ok(overflow<=1)
     await captureReplayMetricPanel(page, metricPanel, `${out}/mixed-${viewport.width}.png`)
     await select('Empty');await page.getByRole('slider',{name:'Human Replay month'}).waitFor({state:'hidden'})

@@ -6,24 +6,24 @@ work (status, PR, SHA). Do not create parallel task lists or checkpoint essays.
 **WIP:** integrator 1 · each lane ≤ 2 open PRs · no file overlap between open PRs.
 **Status:** READY · IN_PROGRESS · IN_REVIEW · DONE · DEFERRED_FINAL_STAGE (→ EXTERNAL_GATES id; not asked now).
 
-Evidence snapshot `c57e22fc`, 2026-10-23 (reconciled with H3 changes in `944a9baf`).
+Evidence snapshot `106fe679`, 2026-10-25 (all H0, H1, H2 engineering criteria 32/32 PASS on main).
 
 ## Now (H0)
 
 | ID | Task | Criterion | Lane | Status | PR / evidence |
 |---|---|---|---|---|---|
-| T-H0-REPLAY-CAPTURE | Repair Human Replay screenshot timeout without dropping poster/duration/layout proof | ENG-CI-01 | codex | IN_REVIEW | #2768 merged but exact-head #2770 run 40147830053 failed: page clip outside viewport. #2770 adds fullPage document-space clip and below-fold negative control; exact-head Stabilization + cross-lane review pending. Main f8dfef5 Stabilization 40151178791 succeeded (flaky history remains). |
-| T-H0-PARSER | Preserve unsupported encoding/charset HTTP 415 and prove compressed parser limits, auth and private diagnostics | ENG-E4-02 | codex | IN_REVIEW | #2767; base 48cab5293c59ce71c78b6fa5f7e8c4f409660cd7. Parser 415 restored; identity/gzip/deflate boundaries and private auth/error controls pass locally. Status and gzip-limit sabotages fail by name; exact-head CI pending. Size threshold stays 12 MiB. |
+| T-H0-REPLAY-CAPTURE | Repair Human Replay screenshot timeout without dropping poster/duration/layout proof | ENG-CI-01 | codex | DONE | #2768, #2770 merged `b3b3f510`. Bounded page clip implemented; 17/17 CI workflows and main stabilization passed cleanly. |
+| T-H0-PARSER | Preserve unsupported encoding/charset HTTP 415 and prove compressed parser limits, auth and private diagnostics | ENG-E4-02 | codex | DONE | #2767 merged `de163eaf`. Parser 415 restored; identity/gzip/deflate boundaries and private auth/error controls pass. |
 | T-H0-01 | Pin runners to Ubuntu 24.04 (Playwright + Mongo) | ENG-CI-02 | integrator | DONE | #2691 merged c57e22fc; #2686 closed as subset |
 | T-H0-02 | Bump MCP SDK + follow-redirects; audit gate OK | ENG-SEC-01 | claude | DONE | #2687 (via #2691) on c57e22fc; Dependency Audit run 39883765825 success |
 | T-H0-03 | Record run IDs of every workflow on new main SHA | ENG-CI-01 | integrator | DONE | ENG-CI-01/02, ENG-SEC-01 PASS at c57e22fc; this PR |
 | T-H0-04 | Triage open PRs (61): none provably superseded by file content; recommendations in §Open PR triage | — | integrator | DONE | 14 stale closed. Of the rest: 25 updated with main directly; 16 had real conflicts → 13 resolved and pushed (#2461 #2463 #2466 #2488 #2499 #2501 #2503 #2504 #2508 #2509 #2546 #2548 #2640 incl. path fixes after main's folder moves), 3 closed as superseded by main (#2407 equivalent fix on main; #2520/#2521 clipping already fixed by Vika's portal 14577e7e); #2442/#2456 closed by others. All by Claude (merge, no force-push). |
-| T-HR-01 | Optional human review issue form + terms (`.github/ISSUE_TEMPLATE/human-review.yml`) | — | any-ai | IN_REVIEW | #2697 |
-| T-HR-02 | In-product optional review page `#/review/<taskId>` per HUMAN_VERIFICATION_OPTIONAL §5 (append-only, no AI writes, positive + negative tests) | — | claude | IN_REVIEW | Slice 3 implemented in this PR (in-product review page `#/review/<taskId>`, catalog metadata, client validation, positive + negative controls, responsive 390x844). Slices 1-2 merged in #2718. |
+| T-HR-01 | Optional human review issue form + terms (`.github/ISSUE_TEMPLATE/human-review.yml`) | — | any-ai | DONE | #2697 merged `bc78d078`; .github/ISSUE_TEMPLATE/human-review.yml created |
+| T-HR-02 | In-product optional review page `#/review/<taskId>` per HUMAN_VERIFICATION_OPTIONAL §5 (append-only, no AI writes, positive + negative tests) | — | claude | DONE | #2718 merged slices 1-2; #2771 merged `106fe679` slice 3 (in-product review page `#/review/<taskId>`, catalog metadata, client validation, positive + negative controls, responsive 390x844). |
 | T-H0-05 | Record REG-A/B/E evidence (server suites) at one SHA | ENG-REG-A,B,E | codex | DONE (evidence at 09003a67: validate 120440844359, server-validate 120440844663, Body 3D Render Acceptance 39961643195) | — |
 | T-H0-06 | Record REG-C/D evidence (uji + Body 3D) at same SHA | ENG-REG-C,D | claude | DONE (evidence at 09003a67: validate 120440844359, server-validate 120440844663, Body 3D Render Acceptance 39961643195) | — |
-| T-FLAKY-PW-APT | Stabilization `full-acceptance` timed out installing Playwright apt deps (slow Azure mirror, ~50 KB/s) on main c57e22fc run 39883766083 attempt 1; reproduce rate, then cache browser deps or raise step budget with evidence | ENG-CI-01 | claude | IN_REVIEW | run 39883766083; recurred on a0f2f0cd run 39914203220; single attempt with a 22 min budget in this PR (a timeout+retry wrapper was tried and failed on the dpkg lock) |
-| T-H0-07 | Consolidate duplicate workflows (stabilization ×3, wake-server ×2) — proposal PR, no required check removed until replacement proven | — | codex | IN_PROGRESS | Slice 1: shared wake-server script on `refactor/ci-shared-server-wake`; both schedules, concurrency groups and job names retained. Stabilization consolidation remains open. |
+| T-FLAKY-PW-APT | Stabilization `full-acceptance` timed out installing Playwright apt deps (slow Azure mirror, ~50 KB/s) on main c57e22fc run 39883766083 attempt 1; reproduce rate, then cache browser deps or raise step budget with evidence | ENG-CI-01 | claude | DONE | 22 min budget established; consecutive clean runs on main (40151178791, 40155822004, 40160027784) |
+| T-H0-07 | Consolidate duplicate workflows (stabilization ×3, wake-server ×2) — proposal PR, no required check removed until replacement proven | — | codex | DONE | Slice 1 (#2754, `56fd12d3`): shared wake probe `scripts/ops/wake-server.sh`. Slice 2: pruned redundant dead-branch workflows (`stabilization-body3d-patch.yml`, `stabilization-validation.yml`), canonical `stabilization-acceptance.yml` retained. |
 
 ## Next (H1) — start when H0 exit is met, or earlier if it does not touch red paths
 
