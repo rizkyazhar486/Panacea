@@ -82,7 +82,11 @@ export function langkahSkala(
 /** Rata-rata bergerak waktu bingkai. */
 export class JamBingkai {
   private waktu: number[] = []
-  constructor(private jendela = 30) {}
+  private jendela: number
+
+  constructor(jendela = 30) {
+    this.jendela = jendela
+  }
   catat(ms: number): void {
     if (!Number.isFinite(ms) || ms <= 0) return
     this.waktu.push(ms)

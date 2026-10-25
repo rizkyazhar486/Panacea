@@ -127,7 +127,11 @@ function candidateOffsets(o: LabelLayoutOptions): ScreenPoint[] {
 
 class RectGrid {
   private readonly buckets = new Map<string, Set<LabelPlacement>>()
-  constructor(private readonly cell: number) {}
+  private readonly cell: number
+
+  constructor(cell: number) {
+    this.cell = cell
+  }
 
   private keys(r: ScreenRect) {
     const x0 = Math.floor(r.x / this.cell)

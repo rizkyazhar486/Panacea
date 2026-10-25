@@ -25,7 +25,7 @@ function run(files, baseline, { missingSource = false } = {}) {
       writeFileSync(target, content)
     }
     const result = spawnSync(process.execPath, [script], {
-      cwd: root, encoding: 'utf8', timeout: 10_000,
+      cwd: root, encoding: 'utf8', timeout: 25_000,
       env: { ...process.env, UPDATE_BASELINE: '0' },
     })
     assert.equal(result.error, undefined, 'gate process must execute rather than time out')

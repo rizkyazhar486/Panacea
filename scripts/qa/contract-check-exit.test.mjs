@@ -65,8 +65,11 @@ test('the real Assistive Touch contract rejects a missing accessible name', asyn
     await mkdir(dirname(join(root, path)), { recursive: true })
     await writeFile(join(root, path), await readFile(new URL(`../../${path}`, import.meta.url)))
   }
+  const typeFlag = parseInt(process.versions.node.split('.')[0], 10) >= 26
+    ? '--experimental-strip-types'
+    : '--experimental-transform-types'
   const execute = () => spawnSync(process.execPath, [
-    '--experimental-transform-types', join(root, files[0]),
+    typeFlag, join(root, files[0]),
   ], { encoding: 'utf8' })
   const passing = execute()
   assert.equal(passing.error, undefined)
