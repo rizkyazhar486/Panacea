@@ -4,6 +4,7 @@ import { readFileSync } from 'node:fs'
 import { evaluateResultClosure } from '../../src/domains/clinical-operations/model/resultClosure.ts'
 import { evaluateCareAccessOrchestration } from '../../src/domains/clinical-operations/model/careAccessOrchestrator.ts'
 import { evaluateClinicalEpisodeResilience } from '../../src/domains/clinical-operations/model/clinicalEpisodeResilience.ts'
+import { deriveCareContinuityState } from '../../src/domains/clinical-operations/model/careContinuityProjection.ts'
 
 const read = (p) => readFileSync(new URL('../../' + p, import.meta.url), 'utf8')
 
@@ -19,12 +20,16 @@ test('CareContinuityPanel: enforces clean architecture boundary and domain expor
     'CareContinuityPanel must not import from src/components/'
   )
 
-  // Domain index must export CareContinuityPanel
+  // Domain index must export CareContinuityPanel and deriveCareContinuityState
   assert.match(indexSrc, /export\s+\{[^}]*CareContinuityPanel[^}]*\}\s+from\s+['"]\.\/ui\/CareContinuityPanel['"]/)
+  assert.match(indexSrc, /export\s+\{[^}]*deriveCareContinuityState[^}]*\}\s+from\s+['"]\.\/model\/careContinuityProjection['"]/)
 
-  // VisitOS must wire CareContinuityPanel
+  // VisitOS must wire CareContinuityPanel with live projection props
   assert.match(visitSrc, /import\s+\{[^}]*CareContinuityPanel[^}]*\}\s+from\s+['"]\.\.\/\.\.\/domains\/clinical-operations['"]/)
   assert.match(visitSrc, /<CareContinuityPanel/)
+  assert.match(visitSrc, /closure=\{careContinuity\?\.closure\}/)
+  assert.match(visitSrc, /careAccess=\{careContinuity\?\.careAccess\}/)
+  assert.match(visitSrc, /episodeResilience=\{careContinuity\?\.episodeResilience\}/)
 })
 
 test('CareContinuityPanel: enforces PRD §8.5 result closure and clinical safety boundary surface', () => {
@@ -33,6 +38,9 @@ test('CareContinuityPanel: enforces PRD §8.5 result closure and clinical safety
   // Data attribute and accessible region
   assert.match(panelSrc, /data-care-continuity-panel="v1"/)
   assert.match(panelSrc, /aria-label=\{`Care continuity and result closure for \$\{patientName\}`\}/)
+
+  // Dark mode ratchet
+  assert.match(panelSrc, /className=\{`dark rounded-2xl border border-white\/10 bg-\[#06101e\]/)
 
   // Clinical Safety Boundary
   assert.match(panelSrc, /Clinical Safety Boundary/)
@@ -55,113 +63,106 @@ test('CareContinuityPanel: enforces PRD §8.5 result closure and clinical safety
   assert.match(panelSrc, /tamper-evident digests/)
 })
 
-test('CareContinuityPanel backing model: result closure enforces human clinician attribution (negative control)', () => {
-  const now = '2026-10-10T12:00:00.000Z'
-  const sysResult = evaluateResultClosure({
-    targetPatientId: 'p-synthetic-1',
+test('deriveCareContinuityState: positive control - clinician-signed encounter closes supportive result review', () => {
+  const now = '2026-10-25T12:00:00.000Z'
+  const projection = deriveCareContinuityState({
+    patientId: 'patient-signed-1',
     evaluatedAt: now,
-    windowStart: '2026-10-01T00:00:00.000Z',
-    windowEnd: '2026-10-10T23:59:59.000Z',
-    validNotApplicableReasons: ['patient-deceased'],
-    results: [
+    supportiveResults: [
       {
-        resultId: 'res-ai-only',
-        patientId: 'p-synthetic-1',
-        resultedAt: '2026-10-08T08:00:00.000Z',
-        dueBy: '2026-10-09T08:00:00.000Z',
-        required: { review: true, explanation: true, 'follow-up': true },
-        review: { at: '2026-10-08T09:00:00.000Z', actorId: 'ai-sys', recordedBy: 'system', authorizedClinician: false },
-        explanation: { at: '2026-10-08T10:00:00.000Z', actorId: 'ai-sys', recordedBy: 'system' },
-        followUp: { evidence: { at: '2026-10-08T11:00:00.000Z', actorId: 'ai-sys', recordedBy: 'system' } },
+        id: 'lab-hb-1',
+        takenAt: '2026-10-25T08:00:00.000Z',
+        category: 'Lab',
+        name: 'Hemoglobin',
+        value: '14.2',
+        unit: 'g/dL',
+        flag: 'normal',
       },
     ],
-  })
-
-  // System/AI cannot close required human review steps
-  assert.equal(sysResult.closedCount, 0)
-  assert.equal(sysResult.closureRate, 0)
-  assert.deepEqual(sysResult.overdueIds, ['res-ai-only'])
-
-  // Positive control: authenticated clinician review closes step
-  const humanResult = evaluateResultClosure({
-    targetPatientId: 'p-synthetic-1',
-    evaluatedAt: now,
-    windowStart: '2026-10-01T00:00:00.000Z',
-    windowEnd: '2026-10-10T23:59:59.000Z',
-    validNotApplicableReasons: ['patient-deceased'],
-    results: [
-      {
-        resultId: 'res-human-signed',
-        patientId: 'p-synthetic-1',
-        resultedAt: '2026-10-08T08:00:00.000Z',
-        dueBy: '2026-10-09T08:00:00.000Z',
-        required: { review: true, explanation: true, 'follow-up': true },
-        review: { at: '2026-10-08T09:00:00.000Z', actorId: 'dr-jane', recordedBy: 'person', authorizedClinician: true },
-        explanation: { at: '2026-10-08T10:00:00.000Z', actorId: 'nurse-bob', recordedBy: 'person' },
-        followUp: { evidence: { at: '2026-10-08T11:00:00.000Z', actorId: 'dr-jane', recordedBy: 'person' } },
-      },
-    ],
-  })
-
-  assert.equal(humanResult.closedCount, 1)
-  assert.equal(humanResult.closureRate, 1.0)
-  assert.equal(humanResult.overdueIds.length, 0)
-})
-
-test('CareContinuityPanel backing model: care access orchestrator enforces emergency non-denial invariant', () => {
-  const result = evaluateCareAccessOrchestration({
-    payer: {
-      coverage: 'active',
-      payerAdapterConfigured: false,
-      preauthorization: 'required',
-      payment: 'not-submitted',
-      evidence: {
-        patientIdentityResolved: true,
-        coverageIdentityResolved: true,
-        encounterLinked: true,
-        clinicalRecordSigned: true,
-        diagnosisCoded: true,
-        serviceItemsCoded: true,
-        supportingEvidenceLinked: true,
-        provenanceComplete: true,
-      },
+    record: {
+      id: 'emr-001',
+      patientId: 'patient-signed-1',
+      createdAt: '2026-10-25T08:30:00.000Z',
+      updatedAt: '2026-10-25T09:00:00.000Z',
+      signedById: 'dr-jane-doe',
+      signedAt: '2026-10-25T09:00:00.000Z',
+      subjective: 'Patient reports feeling well.',
+      objective: 'BP 120/80',
+      assessment: 'Normal health check',
+      primaryDiagnosis: { code: 'Z00.0', title: 'General exam' },
+      plan: [{ id: 'plan-1', text: 'Routine follow-up in 1 year', status: 'terkonfirmasi' }],
+      physicalExam: { verifiedById: 'dr-jane-doe' },
+      prescriptions: [],
+      referrals: [],
     },
-    diagnostics: [],
   })
 
-  // Clinical safety boundary must ALWAYS hold regardless of payer coverage state
-  assert.equal(result.clinicalCare.financialStateMayDenyCare, false)
-  assert.equal(result.clinicalCare.diagnosticStateMayAuthorizeTreatment, false)
-  assert.equal(result.clinicalCare.authority, 'outside-orchestrator')
+  assert.ok(projection.closure, 'closure result is present')
+  assert.equal(projection.closure.closedCount, 1)
+  assert.equal(projection.closure.closureRate, 1.0)
+  assert.equal(projection.closure.overdueIds.length, 0)
+  assert.equal(projection.careAccess.clinicalCare.financialStateMayDenyCare, false)
+  assert.equal(projection.careAccess.financialWorkflow.claimSubmissionReady, true)
+  assert.equal(projection.episodeResilience.safeToContinueOffline, true)
 })
 
-test('CareContinuityPanel backing model: episode transport resilience verifies replay integrity', () => {
-  const resilience = evaluateClinicalEpisodeResilience({
-    patientId: 'patient-synth',
-    episodeId: 'enc-synth-1',
-    connectivity: 'online',
-    secureLocalStorageAvailable: true,
-    evaluatedAt: '2026-10-25T10:00:00.000Z',
-    maxRetryCount: 3,
-    events: [
+test('deriveCareContinuityState: negative control - unsigned record cannot close result follow-up task', () => {
+  const now = '2026-10-25T12:00:00.000Z'
+  const projection = deriveCareContinuityState({
+    patientId: 'patient-unsigned-2',
+    evaluatedAt: now,
+    supportiveResults: [
       {
-        eventId: 'evt-101',
-        patientId: 'patient-synth',
-        episodeId: 'enc-synth-1',
-        kind: 'observation',
-        authoredAt: '2026-10-25T01:00:00.000Z',
-        sourceId: 'clinic-device-1',
-        sequence: 1,
-        payloadDigest: 'sha256:abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890',
-        delivery: 'acknowledged',
-        durableLocalCopy: true,
-        encryptedAtRest: true,
-        retryCount: 0,
+        id: 'lab-critical-k',
+        takenAt: '2026-10-23T08:00:00.000Z',
+        category: 'Lab',
+        name: 'Potassium',
+        value: '6.8',
+        unit: 'mEq/L',
+        flag: 'critical',
       },
     ],
+    record: {
+      id: 'emr-002',
+      patientId: 'patient-unsigned-2',
+      createdAt: '2026-10-23T08:30:00.000Z',
+      updatedAt: '2026-10-23T09:00:00.000Z',
+      subjective: 'Unsigned draft note by triage assistant',
+      objective: 'Triage vitals',
+      assessment: 'Hyperkalemia suspicion',
+      plan: [],
+      physicalExam: {}, // Not verified by clinician
+      prescriptions: [],
+      referrals: [],
+    },
   })
 
-  assert.equal(resilience.safeToContinueOffline, true)
-  assert.equal(resilience.acknowledgedCount, 1)
-  assert.equal(resilience.pendingCount, 0)
+  assert.ok(projection.closure, 'closure result is present')
+  assert.equal(projection.closure.closedCount, 0)
+  assert.equal(projection.closure.closureRate, 0.0)
+  assert.deepEqual(projection.closure.overdueIds, ['lab-critical-k'])
+  assert.ok(
+    projection.careAccess.financialWorkflow.missingClaimEvidence.includes('signed clinical record') ||
+    projection.careAccess.financialWorkflow.missingClaimEvidence.includes('clinicalRecordSigned'),
+    'missing claim evidence captures unsigned record'
+  )
+  // Invariant: financial/administrative state never denies emergency care
+  assert.equal(projection.careAccess.clinicalCare.financialStateMayDenyCare, false)
+})
+
+test('deriveCareContinuityState: empty supportive results returns graceful null closure without throwing', () => {
+  const now = '2026-10-25T12:00:00.000Z'
+  const projection = deriveCareContinuityState({
+    patientId: 'patient-empty-3',
+    evaluatedAt: now,
+    supportiveResults: [],
+  })
+
+  assert.equal(projection.closure, null)
+  assert.ok(
+    projection.careAccess.financialWorkflow.missingClaimEvidence.includes('supporting evidence') ||
+    projection.careAccess.financialWorkflow.missingClaimEvidence.includes('supportingEvidenceLinked'),
+    'missing evidence reflects absence of supportive results'
+  )
+  assert.equal(projection.episodeResilience.safeToContinueOffline, true)
 })
