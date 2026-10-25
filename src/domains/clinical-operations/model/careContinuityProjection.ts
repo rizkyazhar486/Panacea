@@ -32,7 +32,6 @@ export interface CareContinuityProjectionInput {
   record?: EMRRecord
   connectivity?: EpisodeConnectivity
   secureLocalStorageAvailable?: boolean
-  acknowledgedEventIds?: readonly string[]
   payerCoverageActive?: boolean
 }
 
@@ -98,7 +97,7 @@ export function deriveCareContinuityState(input: CareContinuityProjectionInput):
               authorizedClinician: true,
             }
           : undefined,
-        explanation: record?.assessment || record?.subjective
+        explanation: record?.anamnesis?.rps || record?.anamnesis?.keluhanUtama || record?.labEkgInterpretation
           ? {
               at: record.updatedAt,
               actorId: record.signedById || 'dr-active',
@@ -140,7 +139,7 @@ export function deriveCareContinuityState(input: CareContinuityProjectionInput):
     specimenOrStudyIdentityResolved: true,
     chainOfCustodyComplete: true,
     resultLinkedToPatientState: Boolean(record),
-    state: 'resulted',
+    state: 'result-returned',
   }))
 
   const payer: PayerOrchestrationState = {
@@ -189,7 +188,6 @@ export function deriveCareContinuityState(input: CareContinuityProjectionInput):
     evaluatedAt: input.evaluatedAt,
     maxRetryCount: 3,
     events,
-    acknowledgedEventIds: input.acknowledgedEventIds ?? events.map((e) => e.eventId),
   })
 
   return {
