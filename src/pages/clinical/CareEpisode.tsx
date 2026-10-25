@@ -231,6 +231,24 @@ function EpisodeCard({
     onChange(setStageStatus(episode, stage, status))
   }
 
+  const displayMilestones: readonly CarePlanMilestone[] =
+    episode.milestones && episode.milestones.length > 0
+      ? episode.milestones
+      : (recordPlan ?? []).map((p) => ({
+          id: p.id,
+          title: p.text,
+          category: p.category,
+          targetStage:
+            p.category === 'Definitif' || p.category === 'Suportif'
+              ? 'treatment'
+              : p.category === 'Follow-up'
+              ? 'followUp'
+              : p.category === 'Monitoring'
+              ? 'recovery'
+              : 'plan',
+          status: p.status === 'diverifikasi' ? 'verified' : p.status === 'ditolak' ? 'cancelled' : 'pending',
+        }))
+
   return (
     <Card data-care-episode-id={episode.id} data-diagnosis-code={episode.diagnosisCode || 'none'}>
       <div className="mb-3 flex items-start justify-between gap-3">
@@ -313,8 +331,8 @@ function EpisodeCard({
         </div>
       )}
 
-      {/* Care Plan Milestones (T-CLIN-10) */}
-      {((episode.milestones && episode.milestones.length > 0) || (recordPlan && recordPlan.length > 0)) && (
+      {/* Care Plan Milestones (T-CLIN-10, T-CLIN-11) */}
+      {displayMilestones.length > 0 && (
         <div className="mt-4 border-t border-neutral-100 dark:border-white/10 pt-4" data-episode-milestones="v1">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <div>
@@ -340,23 +358,7 @@ function EpisodeCard({
             )}
           </div>
           <div className="mt-2.5 space-y-1.5">
-            {(episode.milestones && episode.milestones.length > 0
-              ? episode.milestones
-              : (recordPlan ?? []).map((p) => ({
-                  id: p.id,
-                  title: p.text,
-                  category: p.category,
-                  targetStage:
-                    p.category === 'Definitif' || p.category === 'Suportif'
-                      ? 'treatment'
-                      : p.category === 'Follow-up'
-                      ? 'followUp'
-                      : p.category === 'Monitoring'
-                      ? 'recovery'
-                      : 'plan',
-                  status: p.status === 'diverifikasi' ? 'verified' : p.status === 'ditolak' ? 'cancelled' : 'pending',
-                }))
-            ).map((ms) => (
+            {displayMilestones.map((ms) => (
               <div
                 key={ms.id}
                 className="flex items-center justify-between rounded-lg bg-neutral-50 dark:bg-white/[0.03] px-2.5 py-1.5 text-xs"
