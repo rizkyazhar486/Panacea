@@ -49,3 +49,45 @@ Measurements sampled at 24 fps with a single clip-wide floor and a 15 mm contact
 ## 3. Explicit Recommendation
 
 Execute **Option A** to reflect truthful biomechanical reality (forefoot running without heel strike), resolving `ENG-D7-02` with complete evidence and without fabricating heel contact, bringing Engineering Acceptance to **32/32 PASS**, while scheduling **Option B** as a planned future asset enhancement in H2 Wave B.
+
+---
+
+## 4. Product Owner Formal Decision (2026-10-25)
+
+The Product Owner explicitly selected **Option A — Forefoot/Toe-Based RUN Assessment**:
+
+- **Date:** 2026-10-25
+- **Selected Option:** Option A (Biomechanical Forefoot RUN Assessment)
+- **Technical Rationale:** The CMU motion capture runner (09_02) represents authentic non-rearfoot running where the calcaneus is physically elevated >15 mm above the ground plane (min 32.3 mm in male, 16.9 mm in female). Expecting rearfoot heel strike during forefoot running is biomechanically unfounded. Under Option A:
+  - Rearfoot heel strike on RUN is recorded as `NOT_APPLICABLE` (`forefoot_run_no_rearfoot_strike`) whenever the measured motion genuinely lacks heel contact.
+  - WALK preserves full heel and forefoot contact assessment on both feet.
+  - The existing 15 mm contact window is strictly preserved.
+  - Source animations and anatomical provenance are strictly preserved without artificial heel contact fabrication.
+  - Contact assessment for RUN evaluates the anatomically justified forefoot/toe contact complex.
+- **Scope & Limitations:** Versioned engineering acceptance definition for Panacea 3D body motion measurability. It provides engineering verification that gait animations conform to verifiable physical contact definitions; it is **not** clinical validation of patient biomechanics.
+- **Criterion Impact:** `ENG-D7-02` capability updated and marked `PASS` (32/32 Engineering Acceptance V2). Option B (articulated MTP toe rigging) remains scheduled for future asset enhancement in H2 Wave B.
+
+---
+
+## 5. Acceptance Contract Resolution: Stance Phase Measurement Unit
+
+### Discrepancy Analysis:
+- The capability text in `ACCEPTANCE_V2.json` historically stated: `WALK and RUN for male and female rigs all measurable (>= 2 stance phases per foot)`.
+- Biomechanically, each gait clip (`WALK`: 26 frames = 1.083 s, `RUN`: 18 frames = 0.750 s) comprises exactly **one periodic gait cycle (single stride)**.
+- In bipedal gait, a single stride contains exactly **one stance phase on the left foot and one stance phase on the right foot**.
+- Therefore, within an unrepeated single-stride clip, expecting `>= 2 stance phases per foot` conflates single-stride bilateral counts with multi-stride repeated observation windows.
+- The underlying evaluation engine (`gaitFootMetrics.ts`, `foot-contact-math.mjs`, `C.minStancePhases = 2`) operates on the clip-wide sample array, enforcing that at least 2 stance phases exist across the complete bilateral gait cycle (both feet participating).
+
+### Versioned Contract Definition:
+1. **Single-Stride Observation Window (Clip-Wide):**
+   - Each foot must independently demonstrate verified ground contact within the 15 mm floor window (`>= 1 stance phase per foot`).
+   - The total number of valid bilateral stance phases across both feet in the clip must be `>= 2`.
+   - Each stance phase must contain continuous valid contact frames.
+2. **Repeated Stance Window (Multi-Stride / Loop Continuity):**
+   - When evaluating across 2 consecutive cycles (repeated loop window, testing loop seam continuity), each foot exhibits `>= 2 stance phases` (totaling `>= 4`).
+3. **Formal Specification Amendment:**
+   - In `ACCEPTANCE_V2.json`, the capability is formally clarified as:
+     `"capability": "WALK and RUN for male and female rigs all measurable (>= 1 verified stance phase per foot, >= 2 stance phases total across both feet; forefoot-strike RUN assessed on forefoot landmark with heel documented as NOT_APPLICABLE)."`
+   - This eliminates ambiguity, prevents any silent contract downgrade, and aligns the acceptance contract with the exact physical reality of 1-stride looping mocap clips.
+
+
