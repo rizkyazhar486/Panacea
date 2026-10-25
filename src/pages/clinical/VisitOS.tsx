@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useStore } from '../../lib/store'
-import { derivePoliPatientFlow, PoliPatientFlowBoard, CareContinuityPanel } from '../../domains/clinical-operations'
+import { derivePoliPatientFlow, PoliPatientFlowBoard, CareContinuityPanel, deriveCareContinuityState } from '../../domains/clinical-operations'
 import { deriveEncounterOutcomeJob } from '../../domains/clinical-operations/model/encounterOutcomeJob'
 import { PanaceaZoneNav } from '../../components/PanaceaZoneNav'
 import { VisitCommandCenter } from '../../components/VisitCommandCenter'
@@ -51,6 +51,12 @@ export function VisitOS() {
     record: state.records[activePatient.id],
     criticalFlag: patientRows.find(row => row.patientId === activePatient.id)?.priority === 'critical',
   })
+  const careContinuity = activePatient.id === 'none' ? null : deriveCareContinuityState({
+    patientId: activePatient.id,
+    evaluatedAt: nowIso,
+    supportiveResults: state.supportive[activePatient.id],
+    record: state.records[activePatient.id],
+  })
 
   return (
     <div className="mx-auto w-full max-w-[1480px] space-y-6 pb-20 text-white">
@@ -58,7 +64,12 @@ export function VisitOS() {
       <BatasKlaimKesehatan permukaan="care.visit-os" className="mt-2 text-[11px] leading-snug text-white/55" />
       <PoliPatientFlowBoard rows={patientRows} activePatientId={activePatient.id} onSelect={setActivePatient} />
       {activePatient.id !== 'none' && (
-        <CareContinuityPanel patientName={activePatient.name} />
+        <CareContinuityPanel
+          patientName={activePatient.name}
+          closure={careContinuity?.closure}
+          careAccess={careContinuity?.careAccess}
+          episodeResilience={careContinuity?.episodeResilience}
+        />
       )}
       {outcomeJob && (
         <section aria-label="Encounter outcome workflow" data-encounter-outcome-job="v1" className="rounded-2xl border border-emerald-400/20 bg-[#081410] px-4 py-4 sm:px-5">

@@ -47,6 +47,12 @@ export {
   type EpisodeTransportKind,
 } from './model/clinicalEpisodeResilience'
 
+export {
+  deriveCareContinuityState,
+  type CareContinuityProjection,
+  type CareContinuityProjectionInput,
+} from './model/careContinuityProjection'
+
 export { PoliPatientFlowBoard } from './ui/PoliPatientFlowBoard'
 export { CareContinuityPanel, type CareContinuityPanelProps } from './ui/CareContinuityPanel'
 
