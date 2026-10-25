@@ -41,7 +41,7 @@ Evidence snapshot `106fe679`, 2026-10-25 (all H0, H1, H2 engineering criteria 32
 | T-E7-03 | Rollback dry-run that resolves a target SHA and refuses a SHA not on main | ENG-E7-03 | claude | DONE (#2746); ENG-E7-03 PASS at 641c1eaf (tree identical to main 1ba97370): dry-run only, 14 tests, 5 sabotages; success path proven on fixtures, not a real evidence artifact. See docs/governance/ROLLBACK.md |
 | T-D8-01 | Land #2685 (fetal atlas CC0 primary check) after rebase | ENG-D8-03 | claude | DONE | #2685 merged 31bd8bfd |
 | T-D8-04 | Primary-source record per licence class (URL, retrieval time, SHA-256 of bytes read); ICRP as owner statement (EXT-D8-C); audit fails on a class without a record | ENG-D8-03 | claude | DONE (#2730 merged eef1ceb7); ENG-D8-03 PASS at b7410bef | governance/LICENCE_PRIMARY_SOURCES.json, 7 classes |
-| T-D8-02 | Attribution page licence-class completeness test | ENG-D8-02 | claude | DONE (#2709 merged): Apache-2.0 and CC BY-SA 2.1 required classes + per-class removal control on real data. ENG-D8-02 PASS at b7410bef: page screenshots in bodyexposure/qa_reports/evidence/; header wrap at 390px fixed in #2732 |
+| T-D8-02 | Attribution page licence-class completeness test | ENG-D8-02 | claude | DONE (#2709 merged): Apache-2.0 and CC BY-SA 2.1 required classes + per-class removal control on real data; PASS on main b7410bef: page screenshots in bodyexposure/qa_reports/evidence/; header wrap at 390px fixed in #2732 |
 | T-D8-03 | Evidence for ENG-D8-01 | ENG-D8-01 | claude | DONE: PASS at 2dd31918 (validate job 120455871022); check command corrected to the real gate `scripts/uji/public-asset-provenance.mts`. `glb-provenance-audit.mjs` (ENG-D8-03) is still not wired into any workflow and needs `three` installed |
 | T-C6-01 | Coverage assertion: every registry engine has an independent-reference test | ENG-C6-01 | claude | DONE (#2702, #2705); ENG-C6-01 PASS at 1f2771b1 with a 1054-mutant sweep, see docs/governance/CALCULATOR_MUTATION_SWEEP.md |
 | T-C6-02 | Adversarial matrix per engine | ENG-C6-02 | claude | DONE (#2733); ENG-C6-02 PASS at 8a5c1f07 (tree identical to main b073f39f), 47 engines, 2026 adversarial runs, six fail-open paths found and fixed; see docs/governance/CALCULATOR_ADVERSARIAL_MATRIX.md |
@@ -64,8 +64,9 @@ Evidence snapshot `106fe679`, 2026-10-25 (all H0, H1, H2 engineering criteria 32
 | T-CLIN-03 | Patient anatomical context bridge in Visit OS (ClinicalPatientContext & ClinicalBodyTwin projection) | — | gemini | DONE | #2775 merged `5d48eb38`; wire ClinicalPatientContext into VisitOS within designated body-context container, 16/16 CI checks PASS |
 | T-CLIN-04 | Derive and wire live encounter One OS Care Proof into CareContinuityPanel and VisitOS | — | gemini | DONE | #2776 merged `83d02eba`; pure projection + One OS proof UI card with trust/completeness coverage, 16/16 CI checks PASS |
 | T-CLIN-05 | Longitudinal care journey bridge between VisitOS and CareEpisode with bi-directional navigation | — | gemini | DONE | #2777 merged `608577aa`; wired /care-episode into VisitOS nav, PanaceaZoneNav and visit link in CareEpisode, 16/16 exact-head CI workflows PASS |
-| T-CLIN-06 | Clinical encounter diagnosis seeding and ICD-10 provenance linkage in CareEpisode | — | gemini | IN_PROGRESS | wire ensureEpisodeFromVerifiedPlan one-click seed into CareEpisode, display ICD-10 encounter linkage badge, 8/8 contract tests PASS |
-| T-CLIN-07 | Prevent One OS proof from inventing vital-sign provenance when source is absent or blank | — | kimi | IN_REVIEW | #2779: fail-closed vital provenance projection with positive, missing-source and blank-source controls; 3/3 focused QA tests PASS |
+| T-CLIN-06 | Clinical encounter diagnosis seeding and ICD-10 provenance linkage in CareEpisode | — | gemini | DONE | #2778 merged `a446546a`; wire ensureEpisodeFromVerifiedPlan one-click seed into CareEpisode, display ICD-10 encounter linkage badge, 16/16 exact-head CI workflows PASS |
+| T-CLIN-07 | Active Care Journey Continuity Projection in CareContinuityPanel.tsx and VisitOS.tsx | — | gemini | IN_PROGRESS | wire deriveCareContinuityState careJourneys projection, Section 5 in CareContinuityPanel with data-care-journey-continuity="v1" and link to #/care-episode, 9/9 contract tests PASS |
+| T-CLIN-09 | Prevent One OS proof from inventing vital-sign provenance when source is absent or blank | — | kimi | IN_REVIEW | #2779: fail-closed vital provenance projection with positive, missing-source and blank-source controls; 3/3 focused QA tests PASS |
 
 ## Open PR triage snapshot (2026-10-23, main c57e22fc)
 
@@ -75,16 +76,16 @@ Method: for each open PR, every file it changes was compared with main; no PR ha
 |---|---|---|---|---|---|
 | #395 | yes | 2026-09-08 | 2756 | Register accession-pinned cellular microscopy source | Close (stale: September, >1000 commits behind) |
 | #651 | yes | 2026-09-09 | 2514 | feat(body): holistic healthcare hub on latest main | Close (stale: September, >1000 commits behind) |
-| #760 | yes | 2026-09-09 | 2441 | feat(surgery): rebuild holistic simulator curriculum on late | Close (stale: September, >1000 commits behind) |
+| #760 | yes | 2026-09-09 | 2371 | feat(surgery): rebuild holistic simulator curriculum on late | Close (stale: September, >1000 commits behind) |
 | #925 | yes | 2026-09-09 | 2371 | Rebase surgical geometry and physiology precision onto lates | Close (stale: September, >1000 commits behind) |
-| #1001 | yes | 2026-09-09 | 2323 | feat(body): refresh anatomy-grounded surgical simulator on l | Close (stale: September, >1000 commits behind) |
+| #1001 | yes | 2026-09-09 | 2371 | Rebase surgical geometry and physiology precision onto lates | Close (stale: September, >1000 commits behind) |
 | #1681 | no | 2026-09-15 | 1770 | feat(body): add exam-first lesion localization lab | Close (stale: September, >1000 commits behind) |
 | #1713 | no | 2026-09-18 | 1755 | feat(body): add evidence provenance observatory | Close (stale: September, >1000 commits behind) |
 | #1745 | no | 2026-09-16 | 1707 | feat(state): add longitudinal patient context bridge | Close (stale: September, >1000 commits behind) |
 | #1770 | yes | 2026-09-17 | 1706 | feat(prime): execute Wisdom Fabric + adaptive stress model | Close (stale: September, >1000 commits behind) |
 | #1768 | yes | 2026-09-17 | 1706 | docs: design PANACEA PRIME human potential engine | Close (stale: September, >1000 commits behind) |
-| #1767 | yes | 2026-09-17 | 1706 | docs: design PANACEA EDGE courage and aliveness engine | Close (stale: September, >1000 commits behind) |
-| #1758 | yes | 2026-09-17 | 1706 | docs: define Panaceamed plugin control plane | Close (stale: September, >1000 commits behind) |
+| #1767 | yes | 2026-09-17 | 1706 | docs: define PANACEA PRIME human potential engine | Close (stale: September, >1000 commits behind) |
+| #1758 | yes | 2026-09-17 | 1706 | docs: define PANACEA EDGE courage and aliveness engine | Close (stale: September, >1000 commits behind) |
 | #1827 | no | 2026-09-18 | 1633 | feat(superpages): replay Body Exposure compilation with reac | Close (stale: September, >1000 commits behind) |
 | #1877 | yes | 2026-09-18 | 1484 | feat(attributes): add evidence-first explainable health attr | Close (stale: September, >1000 commits behind) |
 | #2282 | yes | 2026-10-08 | 554 | docs(strategy): make Panacea a verified outcome-delivery hea | Owner decide: rebase or close (>150 behind) |
@@ -133,9 +134,10 @@ Method: for each open PR, every file it changes was compared with main; no PR ha
 | #2693 | no | 2026-10-23 | 8 | docs(governance): AI-first super intelligence guidance for a | Keep: rebase + rerun CI |
 | #2685 | no | 2026-10-22 | 8 | fix(d8): verify fetal atlas CC0 and distinguish unresolved a | Keep: rebase + rerun CI |
 | #2679 | no | 2026-10-22 | 8 | fix(e4): prevent PHI scanner from leaking findings into CI l | Keep: rebase + rerun CI |
-| #2694 | no | 2026-10-23 | 6 | docs(governance): human gates become a deferred final stage  | Keep: rebase + rerun CI |
+| #2694 | no | 2026-10-23 | 6 | docs(governance): human gates become a deferred final stage | Keep: rebase + rerun CI |
 
 ## Waiting on humans
 
 Deferred to the final stage (H3), see [EXTERNAL_GATES.md](EXTERNAL_GATES.md). Agents do not ask or re-raise these; they are reviewed when the
 owner answers.
+
