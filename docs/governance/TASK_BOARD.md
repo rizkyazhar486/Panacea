@@ -18,7 +18,7 @@ Evidence snapshot `106fe679`, 2026-10-25 (all H0, H1, H2 engineering criteria 32
 | T-H0-02 | Bump MCP SDK + follow-redirects; audit gate OK | ENG-SEC-01 | claude | DONE | #2687 (via #2691) on c57e22fc; Dependency Audit run 39883765825 success |
 | T-H0-03 | Record run IDs of every workflow on new main SHA | ENG-CI-01 | integrator | DONE | ENG-CI-01/02, ENG-SEC-01 PASS at c57e22fc; this PR |
 | T-H0-04 | Triage open PRs (61): none provably superseded by file content; recommendations in §Open PR triage | — | integrator | DONE | 14 stale closed. Of the rest: 25 updated with main directly; 16 had real conflicts → 13 resolved and pushed (#2461 #2463 #2466 #2488 #2499 #2501 #2503 #2504 #2508 #2509 #2546 #2548 #2640 incl. path fixes after main's folder moves), 3 closed as superseded by main (#2407 equivalent fix on main; #2520/#2521 clipping already fixed by Vika's portal 14577e7e); #2442/#2456 closed by others. All by Claude (merge, no force-push). |
-| T-HR-01 | Optional human review issue form + terms (`.github/ISSUE_TEMPLATE/human-review.yml`) | — | any-ai | DONE | #2697 merged `bc78d078`; .github/ISSUE_TEMPLATE/human-review.yml created |
+| T-HR-01 | Optional human review issue form (`.github/ISSUE_TEMPLATE/human-review.yml`) | — | any-ai | DONE | #2697 merged `bc78d078`; .github/ISSUE_TEMPLATE/human-review.yml created |
 | T-HR-02 | In-product optional review page `#/review/<taskId>` per HUMAN_VERIFICATION_OPTIONAL §5 (append-only, no AI writes, positive + negative tests) | — | claude | DONE | #2718 merged slices 1-2; #2771 merged `106fe679` slice 3 (in-product review page `#/review/<taskId>`, catalog metadata, client validation, positive + negative controls, responsive 390x844). |
 | T-H0-05 | Record REG-A/B/E evidence (server suites) at one SHA | ENG-REG-A,B,E | codex | DONE (evidence at 09003a67: validate 120440844359, server-validate 120440844663, Body 3D Render Acceptance 39961643195) | — |
 | T-H0-06 | Record REG-C/D evidence (uji + Body 3D) at same SHA | ENG-REG-C,D | claude | DONE (evidence at 09003a67: validate 120440844359, server-validate 120440844663, Body 3D Render Acceptance 39961643195) | — |
@@ -35,13 +35,13 @@ Evidence snapshot `106fe679`, 2026-10-25 (all H0, H1, H2 engineering criteria 32
 | T-F1-04 | Resilience negative control: remove the error boundary from one listed page; its resilience check must fail at a named step | ENG-F1-03 | claude | DONE: slice 1 #2740 (RouteErrorBoundary + QA-build-only crash hook), slice 2 #2742 (`QA_CRASH=1` render-crash step and no-boundary negative run). ENG-F1-03 PASS at 81999e3a (User Journey Acceptance run 40057229053 on main, job 120762770434); the negative crash lines read in the log name the six patient routes only. See the ENG-F1-03 note |
 | D-F1-ADMIN | Owner decision: does admin count as covered by owner UI + API RBAC, or needs its own UI journey? | ENG-F1-01 | owner | DONE: owner answered yes (2026-10-24, in chat); ENG-F1-01 PASS at 81999e3a, push run 40057229053 |
 | T-E4-01 | Land #2679 (CI diagnostic redaction) after rebase | ENG-E4-01 | codex | DONE (#2679 merged); ENG-E4-01 PASS recorded at 8ed1065f (31/31 tests in build, four sabotages fail by name) |
-| T-E4-02b | Retention/deletion harness with policy file (test values only) | ENG-E4-03 | claude | DONE (#2749); ENG-E4-03 PASS at b7329cb4 (tree identical to main 8e9e26e7): fail-closed policy validation, injected clock/store, boundary, audit-before-delete, negative control; production policy unset (EXT-E4-A); not yet wired to store.ts |
+| T-E4-02b | Retention/deletion harness with policy file (test values only) | ENG-E4-03 | claude | DONE (#2749); ENG-E4-03 PASS at b7328cb4 (tree identical to main 8e9e26e7): fail-closed policy validation, injected clock/store, boundary, audit-before-delete, negative control; production policy unset (EXT-E4-A); not yet wired to store.ts |
 | T-E7-01 | Production browser check logs tested frontend+backend SHA | ENG-E7-02 | claude | DONE | #2701; first real exercise: scheduled run 39950731324 on main f6dd7185 logged both SHAs |
 | T-E7-02 | Staging workflow that fails closed without secrets | ENG-E7-04 | claude | DONE (#2720): fail-closed run 39979087541 recorded; smoke job unproven until EXT-E7-B provisions staging |
 | T-E7-03 | Rollback dry-run that resolves a target SHA and refuses a SHA not on main | ENG-E7-03 | claude | DONE (#2746); ENG-E7-03 PASS at 641c1eaf (tree identical to main 1ba97370): dry-run only, 14 tests, 5 sabotages; success path proven on fixtures, not a real evidence artifact. See docs/governance/ROLLBACK.md |
 | T-D8-01 | Land #2685 (fetal atlas CC0 primary check) after rebase | ENG-D8-03 | claude | DONE | #2685 merged 31bd8bfd |
 | T-D8-04 | Primary-source record per licence class (URL, retrieval time, SHA-256 of bytes read); ICRP as owner statement (EXT-D8-C); audit fails on a class without a record | ENG-D8-03 | claude | DONE (#2730 merged eef1ceb7); ENG-D8-03 PASS at b7410bef | governance/LICENCE_PRIMARY_SOURCES.json, 7 classes |
-| T-D8-02 | Attribution page licence-class completeness test | ENG-D8-02 | claude | DONE (#2709 merged): Apache-2.0 and CC BY-SA 2.1 required classes + per-class removal control on real data; PASS on main b7410bef: page screenshots in bodyexposure/qa_reports/evidence/; header wrap at 390px fixed in #2732 |
+| T-D8-02 | Attribution page licence-class completeness test | ENG-D8-02 | claude | DONE (#2709 merged): Apache-2.0 and CC BY-SA 2.1 required classes + per-class removal control on real data. ENG-D8-02 PASS at b7410bef: page screenshots in bodyexposure/qa_reports/evidence/; header wrap at 390px fixed in #2732 |
 | T-D8-03 | Evidence for ENG-D8-01 | ENG-D8-01 | claude | DONE: PASS at 2dd31918 (validate job 120455871022); check command corrected to the real gate `scripts/uji/public-asset-provenance.mts`. `glb-provenance-audit.mjs` (ENG-D8-03) is still not wired into any workflow and needs `three` installed |
 | T-C6-01 | Coverage assertion: every registry engine has an independent-reference test | ENG-C6-01 | claude | DONE (#2702, #2705); ENG-C6-01 PASS at 1f2771b1 with a 1054-mutant sweep, see docs/governance/CALCULATOR_MUTATION_SWEEP.md |
 | T-C6-02 | Adversarial matrix per engine | ENG-C6-02 | claude | DONE (#2733); ENG-C6-02 PASS at 8a5c1f07 (tree identical to main b073f39f), 47 engines, 2026 adversarial runs, six fail-open paths found and fixed; see docs/governance/CALCULATOR_ADVERSARIAL_MATRIX.md |
@@ -55,7 +55,7 @@ Evidence snapshot `106fe679`, 2026-10-25 (all H0, H1, H2 engineering criteria 32
 | R-D7-RIG | Research: can the source rig get heel/toe landmarks without re-rigging? | ENG-D7-03 | claude | DONE | **Yes.** Read-only Blender MCP inspection of `bodyexposure/bodies/PANACEA_RIG_ADULT_MALE_GAIT.blend` (2026-10-23): 41 bones, one rigid `FOOT.L/R` per side (no toe bone); actions WALK 0–26, RUN 0–18, ROM 1–793. Source bone meshes `SKELETAL.CALCANEUS.L/R` (726 verts) and `SKELETAL.FIRST_METATARSAL_BONE.L/R` are BONE-parented to `FOOT.*`, so landmarks can be derived from them: heel = lowest/posterior calcaneus vertex, ball = first-metatarsal head. Limit: no toe joint, so toe-off flexion is not representable; use the ball (MTP) as the forefoot pivot, not the toe tip. Female rig not yet inspected. |
 | T-D7-02 | Derive heel (calcaneus) and ball (1st metatarsal head) landmarks from source meshes in the gait metrics, male + female; report per-landmark slip | ENG-D7-02 | claude | DONE | #2713 merged 6966d01e; per-fixture measurability evidence in gait_measurability.json; ENG-D7-02 achieved PASS under Option A (32/32 Engineering Acceptance V2) |
 | T-D7-01 | UNMEASURABLE vs FAIL vs PASS distinct in metrics output | ENG-D7-01 | claude | DONE: already implemented in `evaluateFootSlide`; evidence recorded at 96cbeace (validate job 120428954204), sabotage verified; tests hardened in #2710 (assert `status`, not only `reason`: a `within` mislabel previously passed) |
-| T-D7-03 | Named heel/ball landmark empties in the exported rig (FOOT_LANDMARK_HEEL/BALL_<side>, from calcaneus and 1st metatarsal head); metrics consume them | ENG-D7-03 | claude | DONE | #2723 merged 654347b8; Blender reproduction re-run: only source hashes changed; ENG-D7-03 PASS at b7410bef (6/6 tests incl. missing/moved landmark controls) |
+| T-D7-03 | Named heel/ball landmark empties in the exported rig (FOOT_LANDMARK_HEEL/BALL_<side>, from source meshes); metrics consume them | ENG-D7-03 | claude | DONE | #2723 merged 654347b8; Blender reproduction re-run: only source hashes changed; ENG-D7-03 PASS at b7410bef (6/6 tests incl. missing/moved landmark controls) |
 | R-D7-CONTACT | Research: contact-corrected retarget of CMU RUN (and female lower-limb) so both feet plant within the 15 mm window, without inventing motion; compare against the uncorrected clip and label truth class honestly | ENG-D7-02 | claude | DONE (this PR): `scripts/qa/gait-contact-probe.mjs` → `bodyexposure/qa_reports/gait_contact_probe.json`. Clips do not float (sole reaches the floor). (1) Female WALK: the heel rig node is mis-derived at rest pose — the calcaneus vertex that actually lands reaches 0.3/0.4 mm (1–2 stance phases) while the node stays ≥ 35.5/22.8 mm → fixable without touching motion (T-D7-04). (2) RUN, both bodies: no calcaneus vertex ever enters the window (male 32.3/34.8, female 16.9/20.2 mm); male RUN lands on the distal toe phalanges because the rigid foot has no MTP joint → heel stance on RUN cannot be made measurable without inventing contact (D-D7-RUN). Control: male nodes equal the closest-vertex definition on every clip/side. |
 | T-D7-04 | Female rig heel node from the calcaneus vertex nearest the floor in WALK stance (pose-independent), forefoot node from the combined metatarsal+phalanx mesh labelled as such (not MT1); regenerate measurability | ENG-D7-02 | claude / gemini | DONE: female heel node derived from calcaneus vertex nearest floor in WALK stance, forefoot node derived from METATARSALS_AND_PHALANGES_COMBINED; female WALK becomes measurable (3 heel phases, 2 ball phases); contact reports regenerated |
 | D-D7-RUN | Decision: RUN clips land on the forefoot/toes with no heel strike. Option A (forefoot-only assessment with heel marked NOT_APPLICABLE) vs Option B (MTP articulated re-rig). Analysis prepared in `docs/governance/ENG_D7_02_GAIT_DECISION_ANALYSIS.md` | ENG-D7-02 | owner | DONE: Owner decided Option A (2026-10-25) — Forefoot/Toe-Based RUN Assessment. Calcaneus heel strike on RUN recorded as NOT_APPLICABLE because measured motion genuinely lacks heel contact. WALK preserves heel and forefoot assessment. 15 mm window and source animation provenance preserved without artificial heel contact. |
@@ -76,25 +76,25 @@ Method: for each open PR, every file it changes was compared with main; no PR ha
 |---|---|---|---|---|---|
 | #395 | yes | 2026-09-08 | 2756 | Register accession-pinned cellular microscopy source | Close (stale: September, >1000 commits behind) |
 | #651 | yes | 2026-09-09 | 2514 | feat(body): holistic healthcare hub on latest main | Close (stale: September, >1000 commits behind) |
-| #760 | yes | 2026-09-09 | 2371 | feat(surgery): rebuild holistic simulator curriculum on late | Close (stale: September, >1000 commits behind) |
+| #760 | yes | 2026-09-09 | 2441 | feat(surgery): rebuild holistic simulator curriculum on late | Close (stale: September, >1000 commits behind) |
 | #925 | yes | 2026-09-09 | 2371 | Rebase surgical geometry and physiology precision onto lates | Close (stale: September, >1000 commits behind) |
-| #1001 | yes | 2026-09-09 | 2371 | Rebase surgical geometry and physiology precision onto lates | Close (stale: September, >1000 commits behind) |
+| #1001 | yes | 2026-09-09 | 2323 | feat(body): refresh anatomy-grounded surgical simulator on l | Close (stale: September, >1000 commits behind) |
 | #1681 | no | 2026-09-15 | 1770 | feat(body): add exam-first lesion localization lab | Close (stale: September, >1000 commits behind) |
 | #1713 | no | 2026-09-18 | 1755 | feat(body): add evidence provenance observatory | Close (stale: September, >1000 commits behind) |
 | #1745 | no | 2026-09-16 | 1707 | feat(state): add longitudinal patient context bridge | Close (stale: September, >1000 commits behind) |
 | #1770 | yes | 2026-09-17 | 1706 | feat(prime): execute Wisdom Fabric + adaptive stress model | Close (stale: September, >1000 commits behind) |
 | #1768 | yes | 2026-09-17 | 1706 | docs: design PANACEA PRIME human potential engine | Close (stale: September, >1000 commits behind) |
-| #1767 | yes | 2026-09-17 | 1706 | docs: define PANACEA PRIME human potential engine | Close (stale: September, >1000 commits behind) |
-| #1758 | yes | 2026-09-17 | 1706 | docs: define PANACEA EDGE courage and aliveness engine | Close (stale: September, >1000 commits behind) |
+| #1767 | yes | 2026-09-17 | 1706 | docs: design PANACEA EDGE courage and aliveness engine | Close (stale: September, >1000 commits behind) |
+| #1758 | yes | 2026-09-17 | 1706 | docs: define Panaceamed plugin control plane | Close (stale: September, >1000 commits behind) |
 | #1827 | no | 2026-09-18 | 1633 | feat(superpages): replay Body Exposure compilation with reac | Close (stale: September, >1000 commits behind) |
 | #1877 | yes | 2026-09-18 | 1484 | feat(attributes): add evidence-first explainable health attr | Close (stale: September, >1000 commits behind) |
 | #2282 | yes | 2026-10-08 | 554 | docs(strategy): make Panacea a verified outcome-delivery hea | Owner decide: rebase or close (>150 behind) |
 | #2408 | yes | 2026-10-11 | 438 | fix(wallet): reject NaN/fractional PNC amounts in withdraw a | Owner decide: rebase or close (>150 behind) |
 | #2407 | yes | 2026-10-11 | 433 | fix(sport): acclimatisation logs reject blank/out-of-range i | Owner decide: rebase or close (>150 behind) |
-| #2442 | yes | 2026-10-11 | 392 | test(alpha): A3 anamnesis provenance and versioning proven o | Owner decide: rebase or close (>150 behind) |
+| #2442 | yes | 2026-10-12 | 392 | test(alpha): A3 anamnesis provenance and versioning proven o | Owner decide: rebase or close (>150 behind) |
 | #2463 | yes | 2026-10-12 | 371 | fix(data-lab): blood-panel forecaster starts blank, needs 3  | Owner decide: rebase or close (>150 behind) |
 | #2461 | yes | 2026-10-12 | 371 | fix(salat): missing lead minutes fall back to 5 instead of N | Owner decide: rebase or close (>150 behind) |
-| #2466 | yes | 2026-10-12 | 366 | fix(meets): reject out-of-range or non-numeric coordinates i | Owner decide: rebase or close (>150 behind) |
+| #2466 | yes | 2026-10-12 | 366 | fix(meets): reject non-numeric or non-finite coordinates in | Owner decide: rebase or close (>150 behind) |
 | #2456 | no | 2026-10-12 | 346 | docs(alpha): promote E2 (RBAC for clinical data) to VERIFIED | Closed superseded 2026-10-23: E2 VERIFIED on current main |
 | #2488 | yes | 2026-10-12 | 326 | fix(notifications): bound user tz offset so a huge value can | Owner decide: rebase or close (>150 behind) |
 | #2492 | no | 2026-10-12 | 324 | fix(body): preserve fetal view and region focus across viewp | Owner decide: rebase or close (>150 behind) |
@@ -105,7 +105,7 @@ Method: for each open PR, every file it changes was compared with main; no PR ha
 | #2495 | no | 2026-10-12 | 309 | fix(body): accept only completed primary taps for fetal regi | Owner decide: rebase or close (>150 behind) |
 | #2501 | no | 2026-10-12 | 307 | fix(body): detect projected-label coordinate recovery from N | Owner decide: rebase or close (>150 behind) |
 | #2500 | no | 2026-10-12 | 307 | fix(body): recognize existing CC0-1.0 attribution spelling | Owner decide: rebase or close (>150 behind) |
-| #2505 | no | 2026-10-12 | 305 | fix(body): prevent pending or duplicate frames after render  | Owner decide: rebase or close (>150 behind) |
+| #2505 | no | 2026-10-12 | 305 | fix(body): prevent pending or duplicate frames after render | Owner decide: rebase or close (>150 behind) |
 | #2504 | no | 2026-10-12 | 305 | fix(body): suspend organ autoplay on manual camera commands | Owner decide: rebase or close (>150 behind) |
 | #2503 | no | 2026-10-12 | 305 | fix(body): correct organ close-up zoom in and out directions | Owner decide: rebase or close (>150 behind) |
 | #2511 | no | 2026-10-13 | 303 | fix(body): classify explicit costal cartilage before rib/bon | Owner decide: rebase or close (>150 behind) |
@@ -115,15 +115,15 @@ Method: for each open PR, every file it changes was compared with main; no PR ha
 | #2506 | no | 2026-10-12 | 303 | fix(body): normalize OpenCell identifiers for joins and dedu | Owner decide: rebase or close (>150 behind) |
 | #2514 | no | 2026-10-13 | 301 | fix(body): reject incomplete and secondary whole-body taps | Owner decide: rebase or close (>150 behind) |
 | #2512 | no | 2026-10-13 | 301 | fix(body): release owned Three.js line and point resources | Owner decide: rebase or close (>150 behind) |
-| #2521 | no | 2026-10-14 | 289 | fix(navigation): make logout and page menus accessible | Owner decide: rebase or close (>150 behind) |
+| #2521 | yes | 2026-10-14 | 289 | fix(navigation): make logout and page menus accessible | Owner decide: rebase or close (>150 behind) |
 | #2520 | yes | 2026-10-14 | 289 | fix(nav): make page navigation and account logout accessible | Owner decide: rebase or close (>150 behind) |
-| #2548 | no | 2026-10-15 | 239 | fix(replay): preserve missing measurements in summaries and  | Owner decide: rebase or close (>150 behind) |
+| #2548 | yes | 2026-10-15 | 239 | fix(replay): preserve missing measurements in summaries and | Owner decide: rebase or close (>150 behind) |
 | #2551 | no | 2026-10-15 | 238 | fix(training): require time evidence for run records | Owner decide: rebase or close (>150 behind) |
-| #2550 | no | 2026-10-15 | 238 | fix(training): preserve session duration evidence | Owner decide: rebase or close (>150 behind) |
-| #2549 | no | 2026-10-15 | 238 | fix(dashboard): preserve unavailable performance duration | Owner decide: rebase or close (>150 behind) |
+| #2550 | yes | 2026-10-15 | 238 | fix(training): preserve session duration evidence | Owner decide: rebase or close (>150 behind) |
+| #2549 | yes | 2026-10-15 | 238 | fix(dashboard): preserve unavailable performance duration | Owner decide: rebase or close (>150 behind) |
 | #2546 | no | 2026-10-16 | 197 | fix(privacy): disclose actual controls before consent | Owner decide: rebase or close (>150 behind) |
 | #2608 | yes | 2026-10-17 | 175 | test(e4): gate server console logs against raw identifiers | Owner decide: rebase or close (>150 behind) |
-| #2638 | no | 2026-10-17 | 164 | docs(f1): audit of clinician access to patient data, with a  | Owner decide: rebase or close (>150 behind) |
+| #2638 | no | 2026-10-17 | 164 | docs(f1): audit of clinician access to patient data, with a | Owner decide: rebase or close (>150 behind) |
 | #2636 | no | 2026-10-17 | 164 | docs(f2): directed manual QA checklist with automated eviden | Owner decide: rebase or close (>150 behind) |
 | #2640 | no | 2026-10-17 | 162 | docs(f2): record measured mobile TBT finding in the F2 ledge | Owner decide: rebase or close (>150 behind) |
 | #2675 | yes | 2026-10-19 | 105 | feat(visit-os): outcome-first encounter workflow from AI too | Keep: rebase + rerun CI |
@@ -134,10 +134,9 @@ Method: for each open PR, every file it changes was compared with main; no PR ha
 | #2693 | no | 2026-10-23 | 8 | docs(governance): AI-first super intelligence guidance for a | Keep: rebase + rerun CI |
 | #2685 | no | 2026-10-22 | 8 | fix(d8): verify fetal atlas CC0 and distinguish unresolved a | Keep: rebase + rerun CI |
 | #2679 | no | 2026-10-22 | 8 | fix(e4): prevent PHI scanner from leaking findings into CI l | Keep: rebase + rerun CI |
-| #2694 | no | 2026-10-23 | 6 | docs(governance): human gates become a deferred final stage | Keep: rebase + rerun CI |
+| #2694 | no | 2026-10-23 | 6 | docs(governance): human gates become a deferred final stage  | Keep: rebase + rerun CI |
 
 ## Waiting on humans
 
 Deferred to the final stage (H3), see [EXTERNAL_GATES.md](EXTERNAL_GATES.md). Agents do not ask or re-raise these; they are reviewed when the
 owner answers.
-
