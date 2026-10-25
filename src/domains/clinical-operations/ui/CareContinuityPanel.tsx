@@ -2,6 +2,7 @@ import React from 'react'
 import type { ResultClosureResult } from '../model/resultClosure'
 import type { CareAccessOrchestrationResult } from '../model/careAccessOrchestrator'
 import type { ClinicalEpisodeResilienceResult } from '../model/clinicalEpisodeResilience'
+import type { OneOsProofResult } from '../model/oneOsCareProof'
 
 function IconHospital({ size = 18, className = '' }: { size?: number; className?: string }) {
   return (
@@ -41,6 +42,7 @@ export interface CareContinuityPanelProps {
   closure?: ResultClosureResult | null
   careAccess?: CareAccessOrchestrationResult | null
   episodeResilience?: ClinicalEpisodeResilienceResult | null
+  oneOsProof?: OneOsProofResult | null
   className?: string
 }
 
@@ -54,6 +56,7 @@ export function CareContinuityPanel({
   closure,
   careAccess,
   episodeResilience,
+  oneOsProof,
   className = '',
 }: CareContinuityPanelProps) {
   const hasOverdue = closure ? closure.overdueIds.length > 0 : false
@@ -106,7 +109,7 @@ export function CareContinuityPanel({
         </div>
       </header>
 
-      <div className="mt-4 grid gap-4 lg:grid-cols-3">
+      <div className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {/* Section 1: Result Follow-Up Closure (PRD §8.5) */}
         <div className="rounded-xl border border-white/8 bg-white/[0.025] p-3.5 sm:p-4">
           <div className="flex items-center justify-between">
@@ -293,6 +296,60 @@ export function CareContinuityPanel({
 
           <p className="mt-3 text-[10px] leading-tight text-white/40 border-t border-white/5 pt-2">
             Resilience: idempotent transport prevents duplicate encounter orders and lab dispatches.
+          </p>
+        </div>
+
+        {/* Section 4: One OS Clinical Evidence & Completeness Proof */}
+        <div data-one-os-proof="v1" className="rounded-xl border border-white/8 bg-white/[0.025] p-3.5 sm:p-4">
+          <div className="flex items-center justify-between">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-white/45">
+              One OS Care Proof
+            </span>
+            <span className="text-xs font-bold text-emerald-300">
+              {oneOsProof ? formatRate(oneOsProof.completenessCoverage) : '—'}
+            </span>
+          </div>
+
+          {oneOsProof ? (
+            <div className="mt-2.5 space-y-2 text-xs">
+              <div className="flex justify-between text-white/70">
+                <span>Trust coverage:</span>
+                <span className="font-semibold text-emerald-300">
+                  {formatRate(oneOsProof.trustCoverage)}
+                </span>
+              </div>
+              <div className="flex justify-between text-white/70">
+                <span>Trustworthy fragments:</span>
+                <span className="font-semibold text-white">
+                  {oneOsProof.trustworthyFragmentCount} / {oneOsProof.fragmentCount}
+                </span>
+              </div>
+              <div className="flex justify-between text-white/70">
+                <span>Core data classes:</span>
+                <span className="font-semibold text-white">
+                  {oneOsProof.presentRequiredDataClassCount} / {oneOsProof.requiredDataClassCount}
+                </span>
+              </div>
+
+              {oneOsProof.unresolvedFragmentCount > 0 && (
+                <div className="mt-2 rounded-lg bg-amber-400/5 p-2 text-[10px] text-amber-200/90">
+                  <span className="font-bold">Review needed:</span> {oneOsProof.unresolvedFragmentCount} unverified fragment(s)
+                </div>
+              )}
+
+              {oneOsProof.missingRequiredDataClasses.length > 0 && (
+                <div className="mt-2 rounded-lg bg-white/[0.03] p-2 text-[10px] text-white/50">
+                  <span className="font-semibold text-white/70">Missing classes:</span>{' '}
+                  {oneOsProof.missingRequiredDataClasses.join(', ')}
+                </div>
+              )}
+            </div>
+          ) : (
+            <p className="mt-2 text-xs text-white/40">No One OS evidence fragments recorded.</p>
+          )}
+
+          <p className="mt-3 text-[10px] leading-tight text-white/40 border-t border-white/5 pt-2">
+            Auditable proof: structural measures verify data provenance and completeness without fabricated claims.
           </p>
         </div>
       </div>

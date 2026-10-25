@@ -61,7 +61,8 @@ Evidence snapshot `106fe679`, 2026-10-25 (all H0, H1, H2 engineering criteria 32
 | D-D7-RUN | Decision: RUN clips land on the forefoot/toes with no heel strike. Option A (forefoot-only assessment with heel marked NOT_APPLICABLE) vs Option B (MTP articulated re-rig). Analysis prepared in `docs/governance/ENG_D7_02_GAIT_DECISION_ANALYSIS.md` | ENG-D7-02 | owner | DONE: Owner decided Option A (2026-10-25) — Forefoot/Toe-Based RUN Assessment. Calcaneus heel strike on RUN recorded as NOT_APPLICABLE because measured motion genuinely lacks heel contact. WALK preserves heel and forefoot assessment. 15 mm window and source animation provenance preserved without artificial heel contact. |
 | T-CLIN-01 | Care continuity & result closure panel (PRD §8.5, diagnostic routing, offline transport) | — | gemini | DONE | #2773 merged `b17a6889`; `CareContinuityPanel.tsx` wired into VisitOS with human accountability rules, 16/16 CI checks PASS |
 | T-CLIN-02 | Derive and wire live patient encounter state into CareContinuityPanel (result closure, care access, offline transport) | — | gemini | DONE | #2774 merged `dee89544`; `deriveCareContinuityState` pure projection wired into VisitOS with 16/16 CI checks PASS |
-| T-CLIN-03 | Patient anatomical context bridge in Visit OS (ClinicalPatientContext & ClinicalBodyTwin projection) | — | gemini | IN_REVIEW | this PR: wire `ClinicalPatientContext` into VisitOS with 6/6 QA tests PASS |
+| T-CLIN-03 | Patient anatomical context bridge in Visit OS (ClinicalPatientContext & ClinicalBodyTwin projection) | — | gemini | DONE | #2775 merged `5d48eb38`; wire ClinicalPatientContext into VisitOS within designated body-context container, 16/16 CI checks PASS |
+| T-CLIN-04 | Derive and wire live encounter One OS Care Proof into CareContinuityPanel and VisitOS | — | gemini | IN_REVIEW | this PR: pure projection + One OS proof UI card + 6/6 QA contract tests PASS |
 
 ## Open PR triage snapshot (2026-10-23, main c57e22fc)
 
