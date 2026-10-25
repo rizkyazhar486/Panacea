@@ -330,6 +330,23 @@ export function appendTimelineEvent(
   }
 }
 
+export function linkEpisodeComorbidity(
+  episode: CareEpisode,
+  comorbidityCodeOrTitle: string,
+  nowIso?: string,
+): CareEpisode {
+  const code = comorbidityCodeOrTitle.trim()
+  if (!code) return episode
+  const existing = episode.linkedComorbidities ?? []
+  if (existing.includes(code)) return episode
+  const now = nowIso ?? new Date().toISOString()
+  return {
+    ...episode,
+    linkedComorbidities: [...existing, code],
+    updatedAt: now,
+  }
+}
+
 // begun. Returns the record unchanged if there's no primary diagnosis yet,
 // or if it's already been seeded once.
 export function ensureEpisodeFromVerifiedPlan(record: EMRRecord): EMRRecord {

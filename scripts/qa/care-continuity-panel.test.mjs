@@ -8,6 +8,7 @@ import {
   deriveCareContinuityState,
   evaluateCareJourneyContinuity,
   deriveCareJourneyTimelineEvents,
+  derivePatientLongitudinalTimeline,
 } from '../../src/domains/clinical-operations/model/careContinuityProjection.ts'
 import {
   ensureEpisodeFromVerifiedPlan,
@@ -16,6 +17,7 @@ import {
   fulfillMilestonesWithSupportiveResults,
   recordClinicalOutcome,
   appendTimelineEvent,
+  linkEpisodeComorbidity,
   isComplete,
 } from '../../src/lib/careEpisode.ts'
 
@@ -1177,4 +1179,105 @@ test('deriveCareJourneyTimelineEvents & CareContinuityPanel: longitudinal timeli
 
   const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
   assert.ok(episodeSource.includes('data-care-journey-timeline="v1"'), 'CareEpisode must include care journey timeline component')
+})
+
+test('derivePatientLongitudinalTimeline & CareEpisode: multi-episode longitudinal timeline & comorbidity projection (T-CLIN-15)', () => {
+  const evaluatedAt = '2026-10-25T12:00:00.000Z'
+  const evaluatedAtMs = Date.parse(evaluatedAt)
+
+  // Episode 1: Type 2 Diabetes
+  const ep1 = {
+    id: 'ce_dm2',
+    title: 'Type 2 Diabetes Mellitus',
+    diagnosisCode: 'E11.9',
+    createdAt: '2026-08-01T08:00:00.000Z',
+    stages: [
+      { stage: 'problem', status: 'done', updatedAt: '2026-08-01T08:30:00.000Z' },
+      { stage: 'diagnosis', status: 'done', updatedAt: '2026-08-01T09:00:00.000Z' },
+      { stage: 'plan', status: 'done', updatedAt: '2026-08-05T10:00:00.000Z' },
+    ],
+    milestones: [
+      {
+        id: 'ms_hba1c',
+        title: 'HbA1c target test',
+        category: 'Monitoring',
+        targetStage: 'recovery',
+        status: 'completed',
+        completedAt: '2026-08-15T09:00:00.000Z',
+        resultValue: '6.5%',
+      },
+    ],
+  }
+
+  // Episode 2: Essential Hypertension
+  const ep2 = {
+    id: 'ce_htn',
+    title: 'Essential Hypertension',
+    diagnosisCode: 'I10',
+    createdAt: '2026-08-10T10:00:00.000Z',
+    stages: [
+      { stage: 'problem', status: 'done', updatedAt: '2026-08-10T10:15:00.000Z' },
+      { stage: 'diagnosis', status: 'done', updatedAt: '2026-08-10T10:30:00.000Z' },
+    ],
+    milestones: [
+      {
+        id: 'ms_bp',
+        title: '24-hour ambulatory BP monitoring',
+        category: 'Monitoring',
+        targetStage: 'treatment',
+        status: 'completed',
+        completedAt: '2026-08-20T11:00:00.000Z',
+        resultValue: '128/82 mmHg',
+      },
+    ],
+  }
+
+  // 1. linkEpisodeComorbidity helper
+  const ep1Linked = linkEpisodeComorbidity(ep1, 'I10', evaluatedAt)
+  assert.deepEqual(ep1Linked.linkedComorbidities, ['I10'])
+
+  // 2. Pure derivePatientLongitudinalTimeline aggregation & interleaved ordering
+  const timeline = derivePatientLongitudinalTimeline([ep1Linked, ep2], evaluatedAtMs)
+  assert.ok(timeline.length >= 6, 'Must aggregate events from both episodes')
+
+  // Chronological descending assertion across multiple episodes
+  for (let i = 0; i < timeline.length - 1; i++) {
+    const currMs = Date.parse(timeline[i].timestamp)
+    const nextMs = Date.parse(timeline[i + 1].timestamp)
+    assert.ok(currMs >= nextMs, `Interleaved timeline must be sorted descending: ${timeline[i].title} >= ${timeline[i + 1].title}`)
+  }
+
+  // Verify events contain both episode titles
+  const episodeTitles = new Set(timeline.map((e) => e.episodeTitle).filter(Boolean))
+  assert.ok(episodeTitles.has('Type 2 Diabetes Mellitus'))
+  assert.ok(episodeTitles.has('Essential Hypertension'))
+
+  // 3. evaluateCareJourneyContinuity multi-journey cohort projection
+  const projection = evaluateCareJourneyContinuity([ep1Linked, ep2], evaluatedAt)
+  assert.equal(projection.totalJourneys, 2)
+  assert.equal(projection.activeComorbiditiesCount, 2) // E11.9 and I10
+  assert.equal(projection.totalPatientTimelineEventsCount, timeline.length)
+  assert.equal(projection.patientTimelineEvents.length, timeline.length)
+
+  // 4. deriveCareContinuityState integration
+  const continuityState = deriveCareContinuityState({
+    patientId: 'patient-multi-test',
+    evaluatedAt,
+    record: {
+      id: 'enc-multi-test',
+      patientId: 'patient-multi-test',
+      careEpisodes: [ep1Linked, ep2],
+    },
+  })
+  assert.ok(continuityState.careJourneys)
+  assert.equal(continuityState.careJourneys.activeComorbiditiesCount, 2)
+  assert.equal(continuityState.careJourneys.totalPatientTimelineEventsCount, timeline.length)
+
+  // 5. UI contracts
+  const panelSource = read('src/domains/clinical-operations/ui/CareContinuityPanel.tsx')
+  assert.ok(panelSource.includes('data-patient-timeline="v1"'), 'CareContinuityPanel must include patient timeline attribute')
+  assert.ok(panelSource.includes('data-patient-comorbidities="v1"'), 'CareContinuityPanel must include patient comorbidities attribute')
+
+  const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
+  assert.ok(episodeSource.includes('data-care-comorbidities="v1"'), 'CareEpisode must include care comorbidities attribute')
 })

@@ -480,6 +480,20 @@ export function CareContinuityPanel({
                   </span>
                 </div>
               )}
+              {careJourneys.activeComorbiditiesCount > 0 && (
+                <div className="flex justify-between text-teal-300" data-patient-comorbidities="v1">
+                  <span>Linked comorbidities:</span>
+                  <span className="font-bold">{careJourneys.activeComorbiditiesCount} diagnoses</span>
+                </div>
+              )}
+              {careJourneys.totalPatientTimelineEventsCount > 0 && (
+                <div className="flex justify-between text-indigo-300" data-patient-timeline="v1">
+                  <span>Patient timeline:</span>
+                  <span className="font-bold">
+                    {careJourneys.totalPatientTimelineEventsCount} cross-episode events
+                  </span>
+                </div>
+              )}
 
               {careJourneys.episodes.length > 0 && (
                 <div className="mt-3 border-t border-white/8 pt-2">

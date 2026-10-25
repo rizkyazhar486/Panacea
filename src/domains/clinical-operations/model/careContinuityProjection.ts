@@ -133,6 +133,9 @@ export interface CareJourneyContinuityResult {
   careCoordinatorCount: number
   completedWithVerifiedOutcomeCount: number
   totalTimelineEventsCount: number
+  patientTimelineEvents: CareJourneyTimelineEvent[]
+  totalPatientTimelineEventsCount: number
+  activeComorbiditiesCount: number
   hasBlockedStages: boolean
 }
 
@@ -471,6 +474,7 @@ export function deriveCareJourneyTimelineEvents(
     events.push({
       id: `evt-${episode.id}-seed`,
       episodeId: episode.id,
+      episodeTitle: episode.title,
       kind: 'episode_seeded',
       timestamp: episode.createdAt,
       title: 'Care Journey Initiated',
@@ -490,6 +494,7 @@ export function deriveCareJourneyTimelineEvents(
         events.push({
           id: `evt-${episode.id}-stage-${s.stage}-done`,
           episodeId: episode.id,
+          episodeTitle: episode.title,
           kind: 'stage_transition',
           timestamp: s.updatedAt!,
           title: `Stage Completed: ${stageName}`,
@@ -502,6 +507,7 @@ export function deriveCareJourneyTimelineEvents(
         events.push({
           id: `evt-${episode.id}-stage-${s.stage}-active`,
           episodeId: episode.id,
+          episodeTitle: episode.title,
           kind: 'stage_transition',
           timestamp: s.updatedAt!,
           title: `Stage In Progress: ${stageName}`,
@@ -514,6 +520,7 @@ export function deriveCareJourneyTimelineEvents(
         events.push({
           id: `evt-${episode.id}-stage-${s.stage}-blocked`,
           episodeId: episode.id,
+          episodeTitle: episode.title,
           kind: 'stage_transition',
           timestamp: s.updatedAt!,
           title: `Stage Blocked: ${stageName}`,
@@ -535,6 +542,7 @@ export function deriveCareJourneyTimelineEvents(
         events.push({
           id: `evt-${episode.id}-provider-selected`,
           episodeId: episode.id,
+          episodeTitle: episode.title,
           kind: 'provider_selected',
           timestamp: providerTs,
           title: 'Provider Selected',
@@ -554,6 +562,7 @@ export function deriveCareJourneyTimelineEvents(
         events.push({
           id: `evt-${episode.id}-ms-verified-${m.id}`,
           episodeId: episode.id,
+          episodeTitle: episode.title,
           kind: 'milestone_verified',
           timestamp: m.verifiedAt!,
           title: `Milestone Verified: ${m.title}`,
@@ -568,6 +577,7 @@ export function deriveCareJourneyTimelineEvents(
         events.push({
           id: `evt-${episode.id}-ms-fulfilled-${m.id}`,
           episodeId: episode.id,
+          episodeTitle: episode.title,
           kind: 'milestone_fulfilled',
           timestamp: m.completedAt!,
           title: `Milestone Fulfilled: ${m.title}`,
@@ -590,6 +600,7 @@ export function deriveCareJourneyTimelineEvents(
       events.push({
         id: `evt-${episode.id}-outcome-signed`,
         episodeId: episode.id,
+        episodeTitle: episode.title,
         kind: 'outcome_verified',
         timestamp: outcomeTs!,
         title: `Clinical Outcome Recorded: ${episode.outcomeRecord.status.toUpperCase()}`,
@@ -606,13 +617,42 @@ export function deriveCareJourneyTimelineEvents(
   if (Array.isArray(episode.timelineEvents)) {
     for (const evt of episode.timelineEvents) {
       if (isValidIso(evt.timestamp) && !events.some((e) => e.id === evt.id)) {
-        events.push(evt)
+        events.push({
+          ...evt,
+          episodeTitle: evt.episodeTitle ?? episode.title,
+        })
       }
     }
   }
 
   // Deterministic chronological ordering (newest first, secondary sort by id)
   return events.sort((a, b) => {
+    const diff = Date.parse(b.timestamp) - Date.parse(a.timestamp)
+    if (diff !== 0) return diff
+    return a.id.localeCompare(b.id)
+  })
+}
+
+export function derivePatientLongitudinalTimeline(
+  episodes: readonly CareEpisode[],
+  maxEpochMs?: number,
+): CareJourneyTimelineEvent[] {
+  if (!Array.isArray(episodes) || episodes.length === 0) return []
+
+  const allEvents: CareJourneyTimelineEvent[] = []
+  const seenIds = new Set<string>()
+
+  for (const ep of episodes) {
+    const epEvents = deriveCareJourneyTimelineEvents(ep, maxEpochMs)
+    for (const evt of epEvents) {
+      if (!seenIds.has(evt.id)) {
+        seenIds.add(evt.id)
+        allEvents.push(evt)
+      }
+    }
+  }
+
+  return allEvents.sort((a, b) => {
     const diff = Date.parse(b.timestamp) - Date.parse(a.timestamp)
     if (diff !== 0) return diff
     return a.id.localeCompare(b.id)
@@ -904,6 +944,19 @@ export function evaluateCareJourneyContinuity(
     (acc, s) => acc + (s.timelineEvents?.length ?? 0),
     0
   )
+  const patientTimelineEvents = derivePatientLongitudinalTimeline(episodes, evaluatedAtMs)
+  const totalPatientTimelineEventsCount = patientTimelineEvents.length
+
+  const uniqueComorbidities = new Set<string>()
+  for (const ep of episodes) {
+    if (ep.diagnosisCode?.trim()) uniqueComorbidities.add(ep.diagnosisCode.trim())
+    if (Array.isArray(ep.linkedComorbidities)) {
+      ep.linkedComorbidities.forEach((c) => {
+        if (c?.trim()) uniqueComorbidities.add(c.trim())
+      })
+    }
+  }
+  const activeComorbiditiesCount = uniqueComorbidities.size
 
   return {
     totalJourneys: episodes.length,
@@ -923,6 +976,9 @@ export function evaluateCareJourneyContinuity(
     careCoordinatorCount,
     completedWithVerifiedOutcomeCount,
     totalTimelineEventsCount,
+    patientTimelineEvents,
+    totalPatientTimelineEventsCount,
+    activeComorbiditiesCount,
     hasBlockedStages: blockedJourneys > 0 || stalledCount > 0,
   }
 }

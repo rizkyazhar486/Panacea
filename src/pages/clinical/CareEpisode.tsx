@@ -272,6 +272,15 @@ function EpisodeCard({
                 <span className="font-mono text-[10px]">ICD-10: {episode.diagnosisCode}</span>
               </Badge>
             )}
+            {episode.linkedComorbidities && episode.linkedComorbidities.length > 0 && (
+              <div className="flex items-center gap-1 flex-wrap" data-care-comorbidities="v1">
+                {episode.linkedComorbidities.map((c) => (
+                  <Badge key={c} tone="brand">
+                    <span className="text-[10px]">Linked: {c}</span>
+                  </Badge>
+                ))}
+              </div>
+            )}
           </div>
           <p className="text-xs text-neutral-500">
             {done

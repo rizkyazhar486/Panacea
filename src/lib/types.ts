@@ -245,6 +245,8 @@ export interface CareEpisode {
   outcomeRecord?: ClinicalOutcomeRecord
   // Care journey longitudinal event timeline and provenance audit trail (T-CLIN-14)
   timelineEvents?: CareJourneyTimelineEvent[]
+  // Comorbid diagnoses linked across concurrent care journeys (T-CLIN-15)
+  linkedComorbidities?: string[]
 }
 
 export type CareJourneyTimelineEventKind =
@@ -258,6 +260,7 @@ export type CareJourneyTimelineEventKind =
 export interface CareJourneyTimelineEvent {
   id: string
   episodeId: string
+  episodeTitle?: string
   kind: CareJourneyTimelineEventKind
   timestamp: string
   title: string
