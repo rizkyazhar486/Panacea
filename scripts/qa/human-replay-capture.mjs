@@ -16,9 +16,12 @@ export async function captureReplayMetricPanel(page, panel, path) {
     width: Math.ceil(bounds.x + bounds.width) - Math.floor(bounds.x),
     height: Math.ceil(bounds.y + bounds.height) - Math.floor(bounds.y),
   }
-  // Page clip captures the actual rendered pixels without scrolling the element
-  // into view or waiting for an animating WebGL ancestor to become stable.
-  const png = Buffer.from(await page.screenshot({ path, clip, scale: 'css', animations: 'disabled', timeout: 90000 }))
+  // Clip coordinates are document-space, not viewport-space. The panel can sit
+  // below the fold after the poster export; without fullPage Playwright clips
+  // against the viewport and rejects the out-of-viewport rectangle.
+  // Full-page capture with a clip retains just the real panel pixels and avoids
+  // locator screenshot's animation stability wait.
+  const png = Buffer.from(await page.screenshot({ path, clip, fullPage: true, scale: 'css', animations: 'disabled', timeout: 90000 }))
   assert.ok(png.length >= 24 && png.subarray(0, 8).toString('hex') === '89504e470d0a1a0a', 'metric panel screenshot must be a PNG')
   assert.equal(png.readUInt32BE(16), clip.width, 'metric panel screenshot width must match its clip')
   assert.equal(png.readUInt32BE(20), clip.height, 'metric panel screenshot height must match its clip')
