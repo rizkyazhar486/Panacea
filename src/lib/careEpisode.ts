@@ -8,7 +8,7 @@
 // system. It reuses the existing EMRRecord rather than adding a parallel
 // store, per the "smallest architectural change" principle.
 
-import { HOSPITALS, type Hospital } from './hospitals'
+import { HOSPITALS, type Hospital } from './hospitals.ts'
 import type {
   CareEpisode,
   CareEpisodeStage,
@@ -17,7 +17,7 @@ import type {
   CostItem,
   EMRRecord,
   ProviderCandidate,
-} from './types'
+} from './types.ts'
 
 export const CARE_EPISODE_STAGES: CareEpisodeStageId[] = [
   'problem',
