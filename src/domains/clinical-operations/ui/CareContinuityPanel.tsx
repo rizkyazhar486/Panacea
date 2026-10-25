@@ -401,6 +401,14 @@ export function CareContinuityPanel({
                 <span>Completed:</span>
                 <span className="font-semibold text-emerald-300">{careJourneys.completedJourneys}</span>
               </div>
+              {careJourneys.totalActionItemsCount > 0 && (
+                <div className="flex justify-between text-white/70">
+                  <span>Plan action items:</span>
+                  <span className="font-semibold text-emerald-300">
+                    {careJourneys.totalVerifiedActionItemsCount} / {careJourneys.totalActionItemsCount} verified
+                  </span>
+                </div>
+              )}
               {careJourneys.atRiskCount > 0 && (
                 <div className="flex justify-between text-amber-300">
                   <span>At risk:</span>
@@ -451,6 +459,32 @@ export function CareContinuityPanel({
                           >
                             {ep.health === 'stalled' ? 'Stall: ' : 'Risk: '}
                             {ep.stalledReason}
+                          </div>
+                        )}
+                        {ep.milestones && ep.milestones.length > 0 && (
+                          <div className="mt-1.5 flex flex-wrap gap-1" data-care-milestones="v1">
+                            {ep.milestones.slice(0, 3).map((ms) => (
+                              <span
+                                key={ms.id}
+                                className={`inline-flex items-center rounded px-1.5 py-0.5 text-[9px] font-medium ${
+                                  ms.verified
+                                    ? 'bg-emerald-500/15 text-emerald-300'
+                                    : ms.status === 'cancelled'
+                                    ? 'bg-neutral-500/15 text-neutral-400 line-through'
+                                    : 'bg-amber-500/15 text-amber-300'
+                                }`}
+                                title={`${ms.title} (target stage: ${ms.targetStage})`}
+                              >
+                                {ms.verified ? '✓ ' : '⏳ '}
+                                {ms.category}: {ms.title.slice(0, 20)}
+                                {ms.title.length > 20 ? '…' : ''}
+                              </span>
+                            ))}
+                            {ep.milestones.length > 3 && (
+                              <span className="self-center text-[9px] text-white/40">
+                                +{ep.milestones.length - 3} more
+                              </span>
+                            )}
                           </div>
                         )}
                         <div className="mt-1 flex items-center justify-between text-[10px] text-white/45">

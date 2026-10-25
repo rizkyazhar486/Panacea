@@ -14,8 +14,10 @@ import type {
   CareEpisodeStage,
   CareEpisodeStageId,
   CareEpisodeStageStatus,
+  CarePlanMilestone,
   CostItem,
   EMRRecord,
+  PlanItem,
   ProviderCandidate,
 } from './types.ts'
 
@@ -147,6 +149,75 @@ export function setStageStatus(
 // than done). This finds-or-creates the matching episode from the record's
 // primaryDiagnosis and fast-forwards it to that point, so the patient
 // doesn't have to start a journey by hand for something that's already
+export function planCategoryToStage(category: PlanItem['category']): CareEpisodeStageId {
+  switch (category) {
+    case 'Definitif':
+    case 'Suportif':
+      return 'treatment'
+    case 'Follow-up':
+      return 'followUp'
+    case 'Monitoring':
+      return 'recovery'
+    case 'Edukasi':
+    default:
+      return 'plan'
+  }
+}
+
+export function syncEpisodeWithPlanItems(
+  episode: CareEpisode,
+  planItems: readonly PlanItem[],
+  options?: { nowIso?: string; autoAdvancePlanStage?: boolean },
+): CareEpisode {
+  if (!planItems || planItems.length === 0) return episode
+  const now = options?.nowIso ?? new Date().toISOString()
+
+  const existingMilestones = episode.milestones ?? []
+  const updatedMilestones: CarePlanMilestone[] = planItems.map((item) => {
+    const existing = existingMilestones.find((m) => m.planItemId === item.id || m.id === item.id)
+    const targetStage = planCategoryToStage(item.category)
+    const isVerified = item.status === 'diverifikasi'
+    const isRejected = item.status === 'ditolak'
+    const status: CarePlanMilestone['status'] = isRejected
+      ? 'cancelled'
+      : isVerified
+      ? (existing?.status === 'completed' ? 'completed' : 'verified')
+      : 'pending'
+
+    return {
+      id: existing?.id ?? `milestone_${item.id}`,
+      planItemId: item.id,
+      title: item.text,
+      category: item.category,
+      targetStage,
+      status,
+      verifiedById: item.verifiedById,
+      verifiedAt: item.verifiedAt,
+      updatedAt: now,
+    }
+  })
+
+  let updated: CareEpisode = {
+    ...episode,
+    milestones: updatedMilestones,
+    updatedAt: now,
+  }
+
+  // If autoAdvancePlanStage is requested and ALL active plan items are verified (diverifikasi),
+  // advance the plan stage to 'done' (cascading provider to active).
+  const hasItems = planItems.length > 0
+  const allVerified = hasItems && planItems.every((item) => item.status === 'diverifikasi')
+  const planStage = updated.stages.find((s) => s.stage === 'plan')
+
+  if (options?.autoAdvancePlanStage && allVerified && planStage && planStage.status === 'active') {
+    updated = setStageStatus(updated, 'plan', 'done', {
+      note: 'All encounter plan items verified by clinician',
+    })
+  }
+
+  return updated
+}
+
 // begun. Returns the record unchanged if there's no primary diagnosis yet,
 // or if it's already been seeded once.
 export function ensureEpisodeFromVerifiedPlan(record: EMRRecord): EMRRecord {
@@ -159,6 +230,10 @@ export function ensureEpisodeFromVerifiedPlan(record: EMRRecord): EMRRecord {
   episode = { ...episode, diagnosisCode: dx.code, problemId: record.problems[0]?.id }
   episode = setStageStatus(episode, 'problem', 'done')
   episode = setStageStatus(episode, 'diagnosis', 'done') // cascades 'plan' to active
+
+  if (record.plan && record.plan.length > 0) {
+    episode = syncEpisodeWithPlanItems(episode, record.plan)
+  }
 
   return { ...record, careEpisodes: [...episodes, episode] }
 }

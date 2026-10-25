@@ -54,6 +54,7 @@ export {
   type CareContinuityProjectionInput,
   type CareJourneyContinuityResult,
   type CareJourneyEpisodeSummary,
+  type CarePlanMilestoneSummary,
 } from './model/careContinuityProjection'
 
 export { PoliPatientFlowBoard } from './ui/PoliPatientFlowBoard'

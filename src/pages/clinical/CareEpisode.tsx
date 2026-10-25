@@ -25,6 +25,7 @@ import {
   episodeHealth,
   stallReason,
   setExpectedDays,
+  syncEpisodeWithPlanItems,
   COST_ITEM_PRESETS,
   addCostItem,
   updateCostItem,
@@ -32,7 +33,7 @@ import {
   type CandidateView,
   type StageStall,
 } from '../../lib/careEpisode'
-import type { CareEpisode, CareEpisodeStageId, CareEpisodeStageStatus, CostItem } from '../../lib/types'
+import type { CareEpisode, CareEpisodeStageId, CareEpisodeStageStatus, CostItem, PlanItem } from '../../lib/types'
 import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 import { PanaceaZoneNav } from '../../components/PanaceaZoneNav'
 
@@ -189,6 +190,7 @@ export function CareEpisodePage() {
         <EpisodeCard
           key={ep.id}
           episode={ep}
+          recordPlan={record.plan}
           onChange={(next) => updateEpisode(ep.id, next)}
           onRemove={() => removeEpisode(ep.id)}
         />
@@ -199,10 +201,12 @@ export function CareEpisodePage() {
 
 function EpisodeCard({
   episode,
+  recordPlan,
   onChange,
   onRemove,
 }: {
   episode: CareEpisode
+  recordPlan?: readonly PlanItem[]
   onChange: (next: CareEpisode) => void
   onRemove: () => void
 }) {
@@ -300,8 +304,90 @@ function EpisodeCard({
       </div>
 
       {episode.facilityId && (
-        <div className="mt-4 border-t border-neutral-100 pt-4">
+        <div className="mt-4 border-t border-neutral-100 dark:border-white/10 pt-4">
           <CostEstimateField episode={episode} onChange={onChange} />
+        </div>
+      )}
+
+      {/* Care Plan Milestones (T-CLIN-10) */}
+      {((episode.milestones && episode.milestones.length > 0) || (recordPlan && recordPlan.length > 0)) && (
+        <div className="mt-4 border-t border-neutral-100 dark:border-white/10 pt-4" data-episode-milestones="v1">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h4 className="text-xs font-bold text-ink">Encounter Plan Milestones</h4>
+              <p className="text-[11px] text-neutral-500">
+                Longitudinal action items mapped from clinical encounter orders to trajectory stages.
+              </p>
+            </div>
+            {recordPlan && recordPlan.length > 0 && (
+              <Button
+                variant="outline"
+                className="!min-h-0 !px-2.5 !py-1 text-[11px] self-start sm:self-auto"
+                onClick={() => onChange(syncEpisodeWithPlanItems(episode, recordPlan, { autoAdvancePlanStage: true }))}
+              >
+                Sync with Encounter Plan
+              </Button>
+            )}
+          </div>
+          <div className="mt-2.5 space-y-1.5">
+            {(episode.milestones && episode.milestones.length > 0
+              ? episode.milestones
+              : (recordPlan ?? []).map((p) => ({
+                  id: p.id,
+                  title: p.text,
+                  category: p.category,
+                  targetStage:
+                    p.category === 'Definitif' || p.category === 'Suportif'
+                      ? 'treatment'
+                      : p.category === 'Follow-up'
+                      ? 'followUp'
+                      : p.category === 'Monitoring'
+                      ? 'recovery'
+                      : 'plan',
+                  status: p.status === 'diverifikasi' ? 'verified' : p.status === 'ditolak' ? 'cancelled' : 'pending',
+                }))
+            ).map((ms) => (
+              <div
+                key={ms.id}
+                className="flex items-center justify-between rounded-lg bg-neutral-50 dark:bg-white/[0.03] px-2.5 py-1.5 text-xs"
+              >
+                <div className="flex items-center gap-2 min-w-0">
+                  <Badge
+                    tone={
+                      ms.status === 'verified' || ms.status === 'completed'
+                        ? 'normal'
+                        : ms.status === 'cancelled'
+                        ? 'neutral'
+                        : 'low'
+                    }
+                  >
+                    {ms.category}
+                  </Badge>
+                  <span className="truncate text-ink font-medium">{ms.title}</span>
+                </div>
+                <div className="flex items-center gap-2 shrink-0 text-[11px] text-neutral-500">
+                  <span>→ {STAGE_LABEL[ms.targetStage as CareEpisodeStageId] ?? ms.targetStage}</span>
+                  <span
+                    className={
+                      ms.status === 'verified' || ms.status === 'completed'
+                        ? 'text-emerald-600 dark:text-emerald-400 font-semibold'
+                        : ms.status === 'cancelled'
+                        ? 'text-neutral-400 line-through'
+                        : 'text-amber-600 dark:text-amber-400'
+                    }
+                  >
+                    {ms.status === 'verified'
+                      ? 'Verified'
+                      : ms.status === 'completed'
+                      ? 'Done'
+                      : ms.status === 'cancelled'
+                      ? 'Cancelled'
+                      : 'Pending review'}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       )}
     </Card>
