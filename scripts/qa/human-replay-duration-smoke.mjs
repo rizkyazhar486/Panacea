@@ -69,7 +69,22 @@ try {
     await metricPanel.getByText('active min', { exact: true }).waitFor()
     const capturePanel = async (path) => {
       await metricPanel.scrollIntoViewIfNeeded()
-      await metricPanel.screenshot({ path, animations: 'disabled', timeout: 90000 })
+      const rect = await metricPanel.evaluate((el) => {
+        const r = el.getBoundingClientRect()
+        const x = Math.max(0, Math.floor(r.x))
+        const y = Math.max(0, Math.floor(r.y))
+        return {
+          x,
+          y,
+          width: Math.min(window.innerWidth - x, Math.ceil(r.width)),
+          height: Math.min(window.innerHeight - y, Math.ceil(r.height)),
+        }
+      })
+      if (rect.width > 0 && rect.height > 0) {
+        await page.screenshot({ path, clip: rect, animations: 'disabled', timeout: 30000 })
+      } else {
+        await metricPanel.screenshot({ path, animations: 'disabled', timeout: 90000 })
+      }
     }
     await poster('Unknown');await capturePanel(`${out}/unknown-${viewport.width}.png`)
     await select('Known');assert.match(await active.innerText(),/^30\s/);assert.match(await distance.innerText(),/^3[.,]0\s/)
