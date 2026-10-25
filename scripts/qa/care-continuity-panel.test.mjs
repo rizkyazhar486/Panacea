@@ -176,3 +176,17 @@ test('deriveCareContinuityState: empty supportive results returns graceful null 
   )
   assert.equal(projection.episodeResilience.safeToContinueOffline, true)
 })
+
+test('VisitOS: wires ClinicalPatientContext and clinical anatomical twin container', () => {
+  const visitSrc = read('src/pages/clinical/VisitOS.tsx')
+  assert.match(
+    visitSrc,
+    /import\s+\{[^}]*ClinicalPatientContext[^}]*\}\s+from\s+['"]\.\.\/\.\.\/components\/ClinicalPatientContext['"]/,
+    'VisitOS must import ClinicalPatientContext'
+  )
+  assert.match(
+    visitSrc,
+    /<div data-visit-patient-body-context="v1">\s*<ClinicalPatientContext \/>\s*<\/div>/,
+    'VisitOS must render ClinicalPatientContext in designated body-context container'
+  )
+})
