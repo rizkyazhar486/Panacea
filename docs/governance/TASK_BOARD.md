@@ -65,7 +65,8 @@ Evidence snapshot `106fe679`, 2026-10-25 (all H0, H1, H2 engineering criteria 32
 | T-CLIN-04 | Derive and wire live encounter One OS Care Proof into CareContinuityPanel and VisitOS | — | gemini | DONE | #2776 merged `83d02eba`; pure projection + One OS proof UI card with trust/completeness coverage, 16/16 CI checks PASS |
 | T-CLIN-05 | Longitudinal care journey bridge between VisitOS and CareEpisode with bi-directional navigation | — | gemini | DONE | #2777 merged `608577aa`; wired /care-episode into VisitOS nav, PanaceaZoneNav and visit link in CareEpisode, 16/16 exact-head CI workflows PASS |
 | T-CLIN-06 | Clinical encounter diagnosis seeding and ICD-10 provenance linkage in CareEpisode | — | gemini | DONE | #2778 merged `a446546a`; wire ensureEpisodeFromVerifiedPlan one-click seed into CareEpisode, display ICD-10 encounter linkage badge, 16/16 exact-head CI workflows PASS |
-| T-CLIN-07 | Active Care Journey Continuity Projection in CareContinuityPanel.tsx and VisitOS.tsx | — | gemini | IN_PROGRESS | wire deriveCareContinuityState careJourneys projection, Section 5 in CareContinuityPanel with data-care-journey-continuity="v1" and link to #/care-episode, 9/9 contract tests PASS |
+| T-CLIN-07 | Active Care Journey Continuity Projection in CareContinuityPanel.tsx and VisitOS.tsx | — | gemini | DONE | #2781 merged `27f9fc53`; wire deriveCareContinuityState careJourneys projection, Section 5 in CareContinuityPanel with data-care-journey-continuity="v1" and link to #/care-episode, 16/16 exact-head CI workflows PASS |
+| T-CLIN-08 | Bi-directional Care Journey Integration in Planning OS with PanaceaZoneNav and Trajectory Card | — | gemini | IN_PROGRESS | wire PanaceaZoneNav and data-planning-care-journey card in Planning, link to Clinical Plan in CareEpisode, 10/10 contract tests PASS |
 
 ## Open PR triage snapshot (2026-10-23, main c57e22fc)
 
