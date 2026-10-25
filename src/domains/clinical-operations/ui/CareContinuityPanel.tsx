@@ -64,7 +64,7 @@ export function CareContinuityPanel({
     <section
       data-care-continuity-panel="v1"
       aria-label={`Care continuity and result closure for ${patientName}`}
-      className={`rounded-2xl border border-white/10 bg-[#06101e] p-4 text-white shadow-xl sm:p-5 ${className}`}
+      className={`dark rounded-2xl border border-white/10 bg-[#06101e] p-4 text-white shadow-xl sm:p-5 ${className}`}
     >
       <header className="flex flex-col gap-2 border-b border-white/10 pb-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-2.5">
