@@ -54,7 +54,12 @@ assert.match(UNIVERSAL_SCIENTIFIC_COVERAGE_BOUNDARY, /must not claim/i)
 assert.match(UNIVERSAL_SCIENTIFIC_COVERAGE_BOUNDARY, /every scientific database/i)
 
 assert.equal(coverageFraction({ sourceId: 'x', indexedEntities: 50, exposedEntities: 100, measuredAt: '2026-09-13', sourceVersion: 'v1' }), 0.5)
-assert.equal(coverageFraction({ sourceId: 'x', indexedEntities: 120, exposedEntities: 100, measuredAt: '2026-09-13', sourceVersion: 'v1' }), 1)
+const overcountedSnapshot = { sourceId: 'x', indexedEntities: 120, exposedEntities: 100, measuredAt: '2026-09-13', sourceVersion: 'v1' }
+assert.equal(coverageFraction(overcountedSnapshot), null)
+assert.equal(mayClaimSourceComplete(overcountedSnapshot), false)
+for (const exposedEntities of [Number.NaN, Number.POSITIVE_INFINITY]) {
+  assert.equal(coverageFraction({ sourceId: 'x', indexedEntities: 1, exposedEntities, measuredAt: '2026-09-13', sourceVersion: 'v1' }), null)
+}
 assert.equal(coverageFraction({ sourceId: 'x', indexedEntities: 1, exposedEntities: null, measuredAt: '2026-09-13', sourceVersion: null }), null)
 assert.equal(mayClaimSourceComplete({ sourceId: 'x', indexedEntities: 100, exposedEntities: 100, measuredAt: '2026-09-13', sourceVersion: null }), false)
 assert.equal(mayClaimSourceComplete({ sourceId: 'x', indexedEntities: 100, exposedEntities: 100, measuredAt: '2026-09-13', sourceVersion: 'v1' }), true)

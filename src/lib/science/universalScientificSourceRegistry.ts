@@ -212,9 +212,17 @@ export interface CoverageSnapshot {
 }
 
 export function coverageFraction(snapshot: CoverageSnapshot): number | null {
-  if (snapshot.exposedEntities == null || snapshot.exposedEntities <= 0) return null
-  if (!Number.isFinite(snapshot.indexedEntities) || snapshot.indexedEntities < 0) return null
-  return Math.min(1, snapshot.indexedEntities / snapshot.exposedEntities)
+  if (
+    snapshot.exposedEntities == null
+    || !Number.isFinite(snapshot.exposedEntities)
+    || snapshot.exposedEntities <= 0
+  ) return null
+  if (
+    !Number.isFinite(snapshot.indexedEntities)
+    || snapshot.indexedEntities < 0
+    || snapshot.indexedEntities > snapshot.exposedEntities
+  ) return null
+  return snapshot.indexedEntities / snapshot.exposedEntities
 }
 
 export function mayClaimSourceComplete(snapshot: CoverageSnapshot): boolean {
