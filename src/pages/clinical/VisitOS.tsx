@@ -112,6 +112,7 @@ export function VisitOS() {
         {[
           ['/poli', 'Poli board'],
           ['/emr', 'AI-EMR'],
+          ['/care-episode', 'Care journey'],
           ['/body-explorer', 'Body Exposure'],
           ['/health-data', 'Device data'],
           ['/consult', 'Consultations'],

@@ -33,6 +33,7 @@ import {
 } from '../../lib/careEpisode'
 import type { CareEpisode, CareEpisodeStageId, CareEpisodeStageStatus, CostItem } from '../../lib/types'
 import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
+import { PanaceaZoneNav } from '../../components/PanaceaZoneNav'
 
 // The Care Episode Graph: connects a clinical plan to what actually has to
 // happen to carry it out — provider, cost, schedule, treatment, recovery,
@@ -47,16 +48,24 @@ export function CareEpisodePage() {
 
   if (!record) {
     return (
-      <Card className="mx-auto max-w-md text-center">
-        <IconPlan size={40} className="mx-auto text-brand" />
-        <h3 className="mt-3 text-lg font-bold">No care episode yet</h3>
-        <p className="mt-1 text-sm text-neutral-500">
-          Draft a plan in the <b>AI Chatbot</b> first, then track it here as a full care journey.
-        </p>
-        <Link to="/chatbot" className="mt-4 inline-block">
-          <Button>Open AI Chatbot</Button>
-        </Link>
-      </Card>
+      <div className="space-y-5">
+        <PanaceaZoneNav />
+        <Card className="mx-auto max-w-md text-center">
+          <IconPlan size={40} className="mx-auto text-brand" />
+          <h3 className="mt-3 text-lg font-bold">No care episode yet</h3>
+          <p className="mt-1 text-sm text-neutral-500">
+            Draft a plan in the <b>AI Chatbot</b> or start in <b>Visit OS</b>, then track it here as a full care journey.
+          </p>
+          <div className="mt-4 flex justify-center gap-3">
+            <Link to="/visit">
+              <Button>Open Visit OS</Button>
+            </Link>
+            <Link to="/chatbot">
+              <Button variant="outline">Open AI Chatbot</Button>
+            </Link>
+          </div>
+        </Card>
+      </div>
     )
   }
 
@@ -93,11 +102,20 @@ export function CareEpisodePage() {
 
   return (
     <div className="space-y-5">
-      <SectionTitle
-        icon={<IconPlan size={18} />}
-        title="Care journey"
-        subtitle="Problem to prevention — everything a plan item triggers in the real world."
-      />
+      <PanaceaZoneNav />
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <SectionTitle
+          icon={<IconPlan size={18} />}
+          title="Care journey"
+          subtitle="Problem to prevention — everything a plan item triggers in the real world."
+        />
+        <Link
+          to="/visit"
+          className="inline-flex min-h-11 items-center gap-1.5 self-start rounded-xl border border-neutral-300 dark:border-white/10 bg-neutral-100 dark:bg-white/5 px-3 py-1.5 text-xs font-bold text-neutral-700 dark:text-white/70 transition hover:bg-neutral-200 dark:hover:bg-white/10 hover:text-neutral-900 dark:hover:text-white"
+        >
+          ← Visit OS
+        </Link>
+      </div>
       <BatasKlaimKesehatan permukaan="care.episode" />
 
       <Card>

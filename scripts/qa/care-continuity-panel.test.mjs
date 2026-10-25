@@ -222,3 +222,27 @@ test('VisitOS: wires ClinicalPatientContext and clinical anatomical twin contain
     'VisitOS must render ClinicalPatientContext in designated body-context container'
   )
 })
+
+test('VisitOS & CareEpisode: establishes bi-directional navigation for longitudinal care journeys', () => {
+  const visitSrc = read('src/pages/clinical/VisitOS.tsx')
+  const episodeSrc = read('src/pages/clinical/CareEpisode.tsx')
+
+  // VisitOS links to /care-episode
+  assert.match(
+    visitSrc,
+    /\['\/care-episode',\s*'Care journey'\]/,
+    'VisitOS related clinical tools must link to /care-episode'
+  )
+
+  // CareEpisode imports PanaceaZoneNav and links to /visit
+  assert.match(
+    episodeSrc,
+    /import\s+\{[^}]*PanaceaZoneNav[^}]*\}\s+from\s+['"]\.\.\/\.\.\/components\/PanaceaZoneNav['"]/,
+    'CareEpisode must import PanaceaZoneNav'
+  )
+  assert.match(
+    episodeSrc,
+    /<Link[^>]*to="\/visit"/,
+    'CareEpisode must link back to /visit'
+  )
+})
