@@ -418,6 +418,16 @@ function EpisodeCard({
   )
 }
 
+function getStageEscalationRouting(stage: CareEpisodeStageId): { target: string; label: string } {
+  if (stage === 'problem' || stage === 'diagnosis' || stage === 'plan' || stage === 'treatment' || stage === 'recovery') {
+    return { target: 'Clinician In-Tray', label: 'Clinician Review' }
+  }
+  if (stage === 'schedule') {
+    return { target: 'Patient Outreach', label: 'Patient Booking Reminder' }
+  }
+  return { target: 'Care Coordinator', label: 'Coordinator Outreach' }
+}
+
 function BlockedReasonEditor({
   stage,
   reason,
@@ -428,9 +438,15 @@ function BlockedReasonEditor({
   onChange: (reason: string | undefined) => void
 }) {
   const [text, setText] = useState(reason ?? '')
+  const routing = getStageEscalationRouting(stage)
   return (
     <div className="text-xs text-accent">
-      <b>{STAGE_LABEL[stage]} blocked</b>
+      <div className="flex items-center justify-between">
+        <b>{STAGE_LABEL[stage]} blocked</b>
+        <span className="text-[10px] text-neutral-500 dark:text-neutral-400 font-medium" data-blocked-routing="v1">
+          Auto-routed to {routing.target}
+        </span>
+      </div>
       <input
         className={`${inputClass} !mt-1 !min-h-[36px] !border-accent/30 !text-xs`}
         placeholder="What is blocking this stage?"
@@ -445,6 +461,7 @@ function BlockedReasonEditor({
 function StallLine({ stall, onAdjust }: { stall: StageStall; onAdjust: (days: number | undefined) => void }) {
   const [editing, setEditing] = useState(false)
   const [days, setDays] = useState(stall.expectedDays.toString())
+  const routing = getStageEscalationRouting(stall.stage)
 
   if (editing) {
     return (
@@ -472,12 +489,19 @@ function StallLine({ stall, onAdjust }: { stall: StageStall; onAdjust: (days: nu
   }
 
   return (
-    <p className={`text-xs ${stall.severity === 'stalled' ? 'text-accent' : 'text-amber-700'}`}>
-      {stallReason(stall)}{' '}
-      <button type="button" className="font-semibold underline" onClick={() => setEditing(true)}>
-        Adjust
-      </button>
-    </p>
+    <div className="flex flex-col gap-0.5" data-stall-line={stall.stage}>
+      <p className={`text-xs ${stall.severity === 'stalled' ? 'text-accent' : 'text-amber-700'}`}>
+        {stallReason(stall)}{' '}
+        <button type="button" className="font-semibold underline" onClick={() => setEditing(true)}>
+          Adjust
+        </button>
+      </p>
+      <div className="flex items-center gap-1.5 text-[11px] text-neutral-500" data-escalation-routing="v1">
+        <span className="font-medium text-amber-800 dark:text-amber-300">⚡ Auto-routed to {routing.target}</span>
+        <span>·</span>
+        <span>{routing.label}</span>
+      </div>
+    </div>
   )
 }
 
