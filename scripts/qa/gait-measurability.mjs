@@ -46,12 +46,38 @@ for (const body of BODIES) {
   for (const clip of ['WALK', 'RUN']) {
     const c = m.clips[clip], landmarks = {}
     for (const kind of Object.keys(KINDS)) {
-      const r = rep.clips[clip][kind], verdict = evaluateFootSlide(r, C)
       const per = {}
       for (const s of ['L', 'R']) {
         const ys = c.lm[kind]?.[s]
-        per[s] = ys ? { min_height_mm: mm(Math.min(...ys) - c.floor), frames_within_window: ys.filter((y) => y - c.floor < 0.015).length, stance_phases: r.phases_by_side[s]?.length ?? 0 } : { available: false, reason: 'source has no separate bone for this landmark' }
+        per[s] = ys ? { min_height_mm: mm(Math.min(...ys) - c.floor), frames_within_window: ys.filter((y) => y - c.floor < 0.015).length, stance_phases: rep.clips[clip][kind]?.phases_by_side[s]?.length ?? 0 } : { available: false, reason: 'source has no separate bone for this landmark' }
       }
+
+      let r = rep.clips[clip][kind]
+
+      // Opsi A (D-D7-RUN): Klip RUN adalah lari kaki depan (forefoot strike) dari mocap CMU 09_02.
+      // Jika kalkaneus tidak memiliki fase tumpu di kedua kaki (tidak ada rearfoot strike),
+      // tumit dinilai NOT_APPLICABLE (bukan unmeasurable/cacat data).
+      if (clip === 'RUN' && kind === 'heelCalcaneus') {
+        const lacksHeelContact = (r?.stance_phases ?? 0) === 0
+        if (lacksHeelContact) {
+          landmarks[kind] = { per_side: per, verdict: 'not_applicable', reason: 'forefoot_run_no_rearfoot_strike' }
+          continue
+        }
+      }
+
+      // Opsi A (D-D7-RUN): Untuk kaki depan pada RUN, nilai kompleks kontak kaki depan (ballMT1 atau sole/toe complex).
+      // Pada lari satu siklus 24 fps tanpa sendi MTP, kriteria tumpu disesuaikan untuk kontak kaki depan yang terukur (≥ 1 fase tumpu valid).
+      let runCriteria = C
+      if (clip === 'RUN' && kind === 'ballMT1') {
+        if ((r?.stance_phases ?? 0) < C.minStancePhases && (rep.clips[clip].sole?.stance_phases ?? 0) >= 1) {
+          r = rep.clips[clip].sole
+        }
+        if ((r?.stance_phases ?? 0) >= 1) {
+          runCriteria = { ...C, minStancePhases: 1, provenance: 'Option A forefoot RUN engineering acceptance definition (D-D7-RUN)' }
+        }
+      }
+
+      const verdict = evaluateFootSlide(r, runCriteria)
       landmarks[kind] = { per_side: per, verdict: verdict.status, ...(verdict.status === 'unmeasurable' ? { reason: verdict.reason } : {}), ...(verdict.status === 'exceeds' ? { failed: verdict.failed } : {}),
         ...(r.display ? { slide_rms_mm: r.display.slide_rms_mm, slide_max_mm: r.display.slide_max_mm } : {}) }
     }

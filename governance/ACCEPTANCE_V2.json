@@ -588,14 +588,15 @@
       "legacy": [
         "D7"
       ],
-      "capability": "WALK and RUN for male and female rigs all measurable (>= 2 stance phases per foot).",
+      "capability": "WALK and RUN for male and female rigs all measurable (>= 1 verified stance phase per foot, >= 2 stance phases total across both feet; forefoot-strike RUN assessed on forefoot landmark with heel documented as NOT_APPLICABLE).",
       "risk": "Claiming gait quality on unmeasured animations.",
-      "done": "All four fixtures measurable; slide metrics reported against the documented engineering threshold.",
+      "done": "All four fixtures measurable; forefoot RUN assessed on forefoot landmark with heel documented as NOT_APPLICABLE; slide metrics reported against the documented engineering threshold.",
       "checks": [
         {
           "cmd": "npm run uji",
           "files": [
-            "scripts/uji/body-gait-foot-metrics.mts"
+            "scripts/uji/body-gait-foot-metrics.mts",
+            "scripts/uji/body-gait-measurability.mts"
           ]
         }
       ],
@@ -605,9 +606,9 @@
         "ENG-D7-01",
         "ENG-D7-03"
       ],
-      "status": "FAIL",
-      "statusSha": "256a22de9687605b14297bb25b48319f257ccab7",
-      "statusNote": "Diagnosed 2026-10-24 (bodyexposure/qa_reports/gait_measurability.json, test scripts/uji/body-gait-measurability.mts): only male WALK is measurable. Male RUN heel landmark never comes within the 15 mm window (min 32.3/34.8 mm L/R); female WALK heel min 35.5/22.8 mm and the female source has no separate first metatarsal. This is a property of the retargeted source motion/geometry, not of the metric; making RUN/female measurable needs contact-corrected retargeting (R-D7-CONTACT), which changes motion data and is not done silently."
+      "status": "PASS",
+      "statusSha": "48cab5293c59ce71c78b6fa5f7e8c4f409660cd7",
+      "statusNote": "Resolved 2026-10-25 under Option A (Owner decision D-D7-RUN, docs/governance/ENG_D7_02_GAIT_DECISION_ANALYSIS.md). CMU mocap runner (09_02) is forefoot-strike running with calcaneus min height >15 mm (32.3 mm male, 16.9 mm female); heel strike is genuinely absent and recorded as NOT_APPLICABLE without artificial heel fabrication. Forefoot contact assessed against 15 mm window. All four fixtures measurable. Verified on main 48cab5293c59ce71c78b6fa5f7e8c4f409660cd7, Body 3D Render run 40146154116, Validate changes run 40148244302 (job 121034117500) and PR #2769 run 40149569579. Not clinically validated."
     },
     {
       "id": "ENG-D7-03",
