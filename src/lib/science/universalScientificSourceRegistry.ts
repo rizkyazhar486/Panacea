@@ -227,7 +227,9 @@ export function coverageFraction(snapshot: CoverageSnapshot): number | null {
 
 export function mayClaimSourceComplete(snapshot: CoverageSnapshot): boolean {
   const fraction = coverageFraction(snapshot)
-  return fraction === 1 && Boolean(snapshot.sourceVersion) && Boolean(snapshot.measuredAt)
+  const hasSourceVersion = typeof snapshot.sourceVersion === 'string' && snapshot.sourceVersion.trim() !== ''
+  const hasMeasuredAt = typeof snapshot.measuredAt === 'string' && snapshot.measuredAt.trim() !== ''
+  return fraction === 1 && hasSourceVersion && hasMeasuredAt
 }
 
 export function sourceById(id: string): ScientificSourceDefinition | null {

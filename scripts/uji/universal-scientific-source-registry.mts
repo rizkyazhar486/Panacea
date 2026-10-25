@@ -62,6 +62,9 @@ for (const exposedEntities of [Number.NaN, Number.POSITIVE_INFINITY]) {
 }
 assert.equal(coverageFraction({ sourceId: 'x', indexedEntities: 1, exposedEntities: null, measuredAt: '2026-09-13', sourceVersion: null }), null)
 assert.equal(mayClaimSourceComplete({ sourceId: 'x', indexedEntities: 100, exposedEntities: 100, measuredAt: '2026-09-13', sourceVersion: null }), false)
-assert.equal(mayClaimSourceComplete({ sourceId: 'x', indexedEntities: 100, exposedEntities: 100, measuredAt: '2026-09-13', sourceVersion: 'v1' }), true)
+const completeSnapshot = { sourceId: 'x', indexedEntities: 100, exposedEntities: 100, measuredAt: '2026-09-13', sourceVersion: 'v1' }
+assert.equal(mayClaimSourceComplete({ ...completeSnapshot, sourceVersion: '   ' }), false)
+assert.equal(mayClaimSourceComplete({ ...completeSnapshot, measuredAt: '\t' }), false)
+assert.equal(mayClaimSourceComplete(completeSnapshot), true)
 
 console.log('universal-scientific-source-registry: ok')
