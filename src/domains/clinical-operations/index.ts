@@ -51,6 +51,7 @@ export {
   deriveCareContinuityState,
   evaluateCareJourneyContinuity,
   deriveCareJourneyTimelineEvents,
+  derivePatientLongitudinalTimeline,
   STAGE_LABEL,
   type CareContinuityProjection,
   type CareContinuityProjectionInput,
