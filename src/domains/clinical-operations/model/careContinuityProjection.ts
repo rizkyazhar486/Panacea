@@ -5,7 +5,7 @@
  * Architecture rule (lib-tidak-impor-ui): this file is a pure domain model and
  * MUST NEVER import UI components or styling tokens.
  */
-import type { SupportiveResult, EMRRecord, CareEpisode } from '../../../lib/types.ts'
+import type { SupportiveResult, EMRRecord, CareEpisode, CareEpisodeStageId } from '../../../lib/types.ts'
 import {
   evaluateResultClosure,
   type ResultClosureRecord,
@@ -41,6 +41,8 @@ export interface CareContinuityProjectionInput {
   payerCoverageActive?: boolean
 }
 
+export type EpisodeHealth = 'on_track' | 'at_risk' | 'stalled'
+
 export interface CareJourneyEpisodeSummary {
   id: string
   title: string
@@ -50,6 +52,10 @@ export interface CareJourneyEpisodeSummary {
   blockedReason?: string
   completedStagesCount: number
   totalStagesCount: number
+  health: EpisodeHealth
+  stalledReason?: string
+  elapsedDaysInCurrentStage?: number
+  expectedDaysInCurrentStage?: number
 }
 
 export interface CareJourneyContinuityResult {
@@ -58,6 +64,7 @@ export interface CareJourneyContinuityResult {
   blockedJourneys: number
   completedJourneys: number
   stalledCount: number
+  atRiskCount: number
   episodes: CareJourneyEpisodeSummary[]
   hasBlockedStages: boolean
 }
@@ -330,10 +337,10 @@ export function deriveCareContinuityState(input: CareContinuityProjectionInput):
     requiredDataClasses,
   })
 
-  // 5. Active Care Journey Continuity Projection (T-CLIN-07)
+  // 5. Active Care Journey Continuity Projection (T-CLIN-07, T-CLIN-09)
   let careJourneys: CareJourneyContinuityResult | null = null
   if (record?.careEpisodes && record.careEpisodes.length > 0) {
-    careJourneys = evaluateCareJourneyContinuity(record.careEpisodes)
+    careJourneys = evaluateCareJourneyContinuity(record.careEpisodes, input.evaluatedAt)
   }
 
   return {
@@ -345,13 +352,32 @@ export function deriveCareContinuityState(input: CareContinuityProjectionInput):
   }
 }
 
+export const STAGE_EXPECTED_DAYS: Record<CareEpisodeStageId, number> = {
+  problem: 1,
+  diagnosis: 2,
+  plan: 3,
+  provider: 5,
+  cost: 5,
+  schedule: 7,
+  treatment: 21,
+  recovery: 21,
+  followUp: 21,
+  outcome: 14,
+}
+
 export function evaluateCareJourneyContinuity(
-  episodes: readonly CareEpisode[]
+  episodes: readonly CareEpisode[],
+  evaluatedAt?: string
 ): CareJourneyContinuityResult {
   let activeJourneys = 0
   let blockedJourneys = 0
   let completedJourneys = 0
   let stalledCount = 0
+  let atRiskCount = 0
+
+  const evaluatedAtMs = evaluatedAt && isValidIsoTimestamp(evaluatedAt, Infinity)
+    ? Date.parse(evaluatedAt)
+    : undefined
 
   const summaries: CareJourneyEpisodeSummary[] = episodes.map((ep) => {
     const stages = ep.stages ?? []
@@ -372,13 +398,40 @@ export function evaluateCareJourneyContinuity(
     const stageStatus = currentStage ? currentStage.status : 'pending'
     const blockedReason = currentStage?.blockedReason
 
+    let health: EpisodeHealth = 'on_track'
+    let stalledReason = blockedReason
+    let elapsedDaysInCurrentStage: number | undefined
+    let expectedDaysInCurrentStage: number | undefined
+
     if (isCompleted) {
       completedJourneys++
+      health = 'on_track'
     } else if (blockedStage) {
       blockedJourneys++
       stalledCount++
+      health = 'stalled'
     } else {
       activeJourneys++
+
+      // Real-time stall detection based on elapsed days in active stage (T-CLIN-09)
+      if (activeStage && evaluatedAtMs != null && activeStage.updatedAt) {
+        const stageUpdatedMs = Date.parse(activeStage.updatedAt)
+        if (Number.isFinite(stageUpdatedMs) && stageUpdatedMs <= evaluatedAtMs) {
+          elapsedDaysInCurrentStage = Math.max(0, Math.floor((evaluatedAtMs - stageUpdatedMs) / 86_400_000))
+          const override = ep.expectedDaysOverride ? ep.expectedDaysOverride[stageId as CareEpisodeStageId] : undefined
+          expectedDaysInCurrentStage = override ?? STAGE_EXPECTED_DAYS[stageId as CareEpisodeStageId] ?? 14
+
+          if (elapsedDaysInCurrentStage >= expectedDaysInCurrentStage) {
+            health = 'stalled'
+            stalledReason = `Stage exceeded expected timeframe (${elapsedDaysInCurrentStage}d vs ${expectedDaysInCurrentStage}d)`
+            stalledCount++
+          } else if (elapsedDaysInCurrentStage >= Math.floor(expectedDaysInCurrentStage * 0.7)) {
+            health = 'at_risk'
+            stalledReason = `Stage approaching expected timeframe (${elapsedDaysInCurrentStage}d vs ${expectedDaysInCurrentStage}d)`
+            atRiskCount++
+          }
+        }
+      }
     }
 
     return {
@@ -390,6 +443,10 @@ export function evaluateCareJourneyContinuity(
       blockedReason,
       completedStagesCount,
       totalStagesCount,
+      health,
+      stalledReason,
+      elapsedDaysInCurrentStage,
+      expectedDaysInCurrentStage,
     }
   })
 
@@ -399,6 +456,7 @@ export function evaluateCareJourneyContinuity(
     blockedJourneys,
     completedJourneys,
     stalledCount,
+    atRiskCount,
     episodes: summaries,
     hasBlockedStages: blockedJourneys > 0 || stalledCount > 0,
   }

@@ -470,3 +470,104 @@ test('Planning & CareEpisode: establishes bi-directional care journey linkage wi
     'CareEpisode must display Clinical Plan link'
   )
 })
+
+test('deriveCareContinuityState & evaluateCareJourneyContinuity: real-time stall detection and health classification (T-CLIN-09)', async () => {
+  const { evaluateCareJourneyContinuity, deriveCareContinuityState } = await import(
+    '../../src/domains/clinical-operations/model/careContinuityProjection.ts'
+  )
+
+  const evaluatedAt = '2026-10-25T12:00:00Z'
+  const evaluatedAtMs = Date.parse(evaluatedAt)
+
+  // 1. Episode exceeding expected timeframe -> 'stalled'
+  // Stage 'provider' has expected 5 days. Updated 8 days ago.
+  const eightDaysAgo = new Date(evaluatedAtMs - 8 * 86_400_000).toISOString()
+  const stalledEpisode = {
+    id: 'ep-stalled',
+    title: 'Post-op Cardiac Rehabilitation',
+    createdAt: eightDaysAgo,
+    updatedAt: eightDaysAgo,
+    stages: [
+      { id: 's1', stage: 'problem', status: 'done', updatedAt: eightDaysAgo },
+      { id: 's2', stage: 'diagnosis', status: 'done', updatedAt: eightDaysAgo },
+      { id: 's3', stage: 'provider', status: 'active', updatedAt: eightDaysAgo },
+    ],
+  }
+
+  // 2. Episode approaching expected timeframe -> 'at_risk' (>= 70% of 5 days = 3.5 days -> 4 days)
+  const fourDaysAgo = new Date(evaluatedAtMs - 4 * 86_400_000).toISOString()
+  const atRiskEpisode = {
+    id: 'ep-at-risk',
+    title: 'Endocrine Specialist Consultation',
+    createdAt: fourDaysAgo,
+    updatedAt: fourDaysAgo,
+    stages: [
+      { id: 's1', stage: 'problem', status: 'done', updatedAt: fourDaysAgo },
+      { id: 's2', stage: 'provider', status: 'active', updatedAt: fourDaysAgo },
+    ],
+  }
+
+  // 3. Episode on track -> 'on_track' (1 day in provider stage)
+  const oneDayAgo = new Date(evaluatedAtMs - 1 * 86_400_000).toISOString()
+  const onTrackEpisode = {
+    id: 'ep-on-track',
+    title: 'Routine Health Checkup Follow-up',
+    createdAt: oneDayAgo,
+    updatedAt: oneDayAgo,
+    stages: [
+      { id: 's1', stage: 'problem', status: 'done', updatedAt: oneDayAgo },
+      { id: 's2', stage: 'provider', status: 'active', updatedAt: oneDayAgo },
+    ],
+  }
+
+  // 4. Episode with clinician override: expectedDaysOverride: { provider: 10 }
+  // 8 days elapsed is < 10 days expected, but >= 7 days (70%) -> 'at_risk' instead of 'stalled'
+  const overriddenEpisode = {
+    ...stalledEpisode,
+    id: 'ep-override',
+    expectedDaysOverride: { provider: 10 },
+  }
+
+  const result = evaluateCareJourneyContinuity(
+    [stalledEpisode, atRiskEpisode, onTrackEpisode, overriddenEpisode],
+    evaluatedAt
+  )
+
+  assert.equal(result.totalJourneys, 4)
+  assert.equal(result.stalledCount, 1)
+  assert.equal(result.atRiskCount, 2)
+  assert.equal(result.hasBlockedStages, true)
+
+  const ep0 = result.episodes[0]
+  assert.equal(ep0.health, 'stalled')
+  assert.equal(ep0.elapsedDaysInCurrentStage, 8)
+  assert.match(ep0.stalledReason, /Stage exceeded expected timeframe \(8d vs 5d\)/)
+
+  const ep1 = result.episodes[1]
+  assert.equal(ep1.health, 'at_risk')
+  assert.equal(ep1.elapsedDaysInCurrentStage, 4)
+  assert.match(ep1.stalledReason, /Stage approaching expected timeframe \(4d vs 5d\)/)
+
+  const ep2 = result.episodes[2]
+  assert.equal(ep2.health, 'on_track')
+  assert.equal(ep2.elapsedDaysInCurrentStage, 1)
+
+  const ep3 = result.episodes[3]
+  assert.equal(ep3.health, 'at_risk')
+  assert.equal(ep3.elapsedDaysInCurrentStage, 8)
+  assert.match(ep3.stalledReason, /Stage approaching expected timeframe \(8d vs 10d\)/)
+
+  // Verify pure integration via deriveCareContinuityState
+  const projection = deriveCareContinuityState({
+    patientId: 'patient-stall-test',
+    evaluatedAt,
+    record: {
+      id: 'enc-1',
+      patientId: 'patient-stall-test',
+      careEpisodes: [stalledEpisode, atRiskEpisode],
+    },
+  })
+  assert.ok(projection.careJourneys)
+  assert.equal(projection.careJourneys.stalledCount, 1)
+  assert.equal(projection.careJourneys.atRiskCount, 1)
+})
