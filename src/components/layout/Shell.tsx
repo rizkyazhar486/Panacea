@@ -261,6 +261,7 @@ const KATALOG: Nav[] = [
   { to: '/ringkasan-karya', label: 'Reading Summary', icon: IconBook, roles: ALL, group: 'Content' },
   { to: '/prophet-stories', label: 'Stories of the prophets', icon: IconBook, roles: ALL, group: 'Account' },
   { to: '/notifikasi', label: 'Notification Centre', icon: IconBell, roles: ALL, group: 'Account' },
+  { to: '/review', label: 'Human Verification Review', icon: IconShield, roles: ALL, group: 'Manage' },
 ]
 
 // Diisi dari KATALOG, bukan dari `nav`: menu hanya memuat tujuan harian,
