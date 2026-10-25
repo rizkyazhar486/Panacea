@@ -81,6 +81,32 @@ export interface CareJourneyEpisodeSummary {
   completedMilestonesCount: number
   pendingActionItemsCount: number
   milestones: CarePlanMilestoneSummary[]
+  escalation?: CareJourneyEscalation
+}
+
+export type CareJourneyEscalationAction =
+  | 'clinician_review'
+  | 'coordinator_outreach'
+  | 'diagnostic_followup'
+  | 'reschedule_prompt'
+
+export type CareJourneyEscalationTarget =
+  | 'Clinician In-Tray'
+  | 'Care Coordinator'
+  | 'Patient Outreach'
+
+export interface CareJourneyEscalation {
+  id: string
+  episodeId: string
+  episodeTitle: string
+  stage: CareEpisodeStageId
+  severity: 'stalled' | 'at_risk'
+  reason: string
+  action: CareJourneyEscalationAction
+  actionLabel: string
+  target: CareJourneyEscalationTarget
+  daysOverdue: number
+  suggestedAction: string
 }
 
 export interface CareJourneyContinuityResult {
@@ -95,6 +121,10 @@ export interface CareJourneyContinuityResult {
   totalCompletedMilestonesCount: number
   totalPendingActionItemsCount: number
   episodes: CareJourneyEpisodeSummary[]
+  escalations: CareJourneyEscalation[]
+  totalEscalationsCount: number
+  clinicianInTrayCount: number
+  careCoordinatorCount: number
   hasBlockedStages: boolean
 }
 
@@ -589,6 +619,66 @@ export function evaluateCareJourneyContinuity(
     totalCompletedMilestonesCount += completedMilestonesCount
     totalPendingActionItemsCount += pendingActionItemsCount
 
+    let escalation: CareJourneyEscalation | undefined
+    if (health === 'stalled' || health === 'at_risk') {
+      let action: CareJourneyEscalationAction = 'coordinator_outreach'
+      let target: CareJourneyEscalationTarget = 'Care Coordinator'
+      let actionLabel = 'Care Coordinator Outreach'
+      let suggestedAction = 'Coordinate care journey advancement with clinical team'
+
+      if (stageId === 'problem' || stageId === 'diagnosis' || stageId === 'plan') {
+        action = 'clinician_review'
+        target = 'Clinician In-Tray'
+        actionLabel = 'Clinician Review Required'
+        suggestedAction = 'Review diagnostic workup or finalize encounter plan items'
+      } else if (stageId === 'provider' || stageId === 'cost') {
+        action = 'coordinator_outreach'
+        target = 'Care Coordinator'
+        actionLabel = 'Care Coordinator Outreach'
+        suggestedAction = 'Assist patient with facility selection and financial clearance'
+      } else if (stageId === 'schedule') {
+        action = 'reschedule_prompt'
+        target = 'Patient Outreach'
+        actionLabel = 'Patient Booking Reminder'
+        suggestedAction = 'Follow up with patient to confirm appointment booking'
+      } else if (stageId === 'treatment' || stageId === 'recovery') {
+        action = 'clinician_review'
+        target = 'Clinician In-Tray'
+        actionLabel = 'Clinical Progress Review'
+        suggestedAction = 'Evaluate recovery course and supportive therapy response'
+      } else if (stageId === 'followUp' || stageId === 'outcome') {
+        action = 'coordinator_outreach'
+        target = 'Care Coordinator'
+        actionLabel = 'Follow-up Coordinator Check-in'
+        suggestedAction = 'Confirm follow-up attendance and record clinical outcome'
+      }
+
+      let daysOverdue = 0
+      if (
+        elapsedDaysInCurrentStage != null &&
+        expectedDaysInCurrentStage != null &&
+        elapsedDaysInCurrentStage > expectedDaysInCurrentStage
+      ) {
+        daysOverdue = elapsedDaysInCurrentStage - expectedDaysInCurrentStage
+      } else if (stageStatus === 'blocked') {
+        daysOverdue = elapsedDaysInCurrentStage ?? 1
+      }
+
+      escalation = {
+        id: `esc-${ep.id}-${stageId}`,
+        episodeId: ep.id,
+        episodeTitle: ep.title,
+        stage: stageId as CareEpisodeStageId,
+        severity: health === 'stalled' ? 'stalled' : 'at_risk',
+        reason: stalledReason || (stageStatus === 'blocked' ? 'Stage is marked blocked' : 'Stage timeframe exceeded'),
+        action,
+        actionLabel,
+        target,
+        daysOverdue,
+        suggestedAction,
+      }
+    }
+
     return {
       id: ep.id,
       title: ep.title,
@@ -607,8 +697,16 @@ export function evaluateCareJourneyContinuity(
       completedMilestonesCount,
       pendingActionItemsCount,
       milestones,
+      escalation,
     }
   })
+
+  const escalations = summaries
+    .map((s) => s.escalation)
+    .filter((e): e is CareJourneyEscalation => Boolean(e))
+
+  const clinicianInTrayCount = escalations.filter((e) => e.target === 'Clinician In-Tray').length
+  const careCoordinatorCount = escalations.filter((e) => e.target === 'Care Coordinator').length
 
   return {
     totalJourneys: episodes.length,
@@ -622,6 +720,10 @@ export function evaluateCareJourneyContinuity(
     totalCompletedMilestonesCount,
     totalPendingActionItemsCount,
     episodes: summaries,
+    escalations,
+    totalEscalationsCount: escalations.length,
+    clinicianInTrayCount,
+    careCoordinatorCount,
     hasBlockedStages: blockedJourneys > 0 || stalledCount > 0,
   }
 }

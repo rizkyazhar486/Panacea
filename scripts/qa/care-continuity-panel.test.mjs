@@ -822,3 +822,152 @@ test('deriveCareContinuityState & CareEpisode: clinical order fulfillment and re
   assert.ok(stateResult.careJourneys)
   assert.equal(stateResult.careJourneys.totalCompletedMilestonesCount, 2)
 })
+
+test('deriveCareContinuityState & CareEpisode: stalled stage escalation and auto-routing to clinician in-tray / care coordinator (T-CLIN-12)', () => {
+  const evaluatedAt = '2026-10-25T12:00:00.000Z'
+
+  // Stalled plan stage (elapsed 5 days > expected 3 days)
+  const stalledPlanEpisode = {
+    id: 'ce_stalled_plan',
+    title: 'Hypertension Management',
+    createdAt: '2026-10-20T10:00:00.000Z',
+    updatedAt: '2026-10-20T10:00:00.000Z',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'diagnosis', status: 'done' },
+      { stage: 'plan', status: 'active', updatedAt: '2026-10-20T12:00:00.000Z' },
+      { stage: 'provider', status: 'pending' },
+      { stage: 'cost', status: 'pending' },
+      { stage: 'schedule', status: 'pending' },
+      { stage: 'treatment', status: 'pending' },
+      { stage: 'recovery', status: 'pending' },
+      { stage: 'followUp', status: 'pending' },
+      { stage: 'outcome', status: 'pending' },
+    ],
+  }
+
+  // Blocked provider stage
+  const blockedProviderEpisode = {
+    id: 'ce_blocked_prov',
+    title: 'Cataract Surgery Pathway',
+    createdAt: '2026-10-22T10:00:00.000Z',
+    updatedAt: '2026-10-22T10:00:00.000Z',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'diagnosis', status: 'done' },
+      { stage: 'plan', status: 'done' },
+      { stage: 'provider', status: 'blocked', blockedReason: 'Insurance pre-authorization hold', updatedAt: '2026-10-22T12:00:00.000Z' },
+      { stage: 'cost', status: 'pending' },
+      { stage: 'schedule', status: 'pending' },
+      { stage: 'treatment', status: 'pending' },
+      { stage: 'recovery', status: 'pending' },
+      { stage: 'followUp', status: 'pending' },
+      { stage: 'outcome', status: 'pending' },
+    ],
+  }
+
+  // At-risk treatment stage (elapsed 15 days >= 70% of 21 days = 14.7 days -> 14 days)
+  const atRiskTreatmentEpisode = {
+    id: 'ce_at_risk_tx',
+    title: 'Physical Therapy Rehabilitation',
+    createdAt: '2026-10-10T10:00:00.000Z',
+    updatedAt: '2026-10-10T10:00:00.000Z',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'diagnosis', status: 'done' },
+      { stage: 'plan', status: 'done' },
+      { stage: 'provider', status: 'done' },
+      { stage: 'cost', status: 'done' },
+      { stage: 'schedule', status: 'done' },
+      { stage: 'treatment', status: 'active', updatedAt: '2026-10-10T12:00:00.000Z' },
+      { stage: 'recovery', status: 'pending' },
+      { stage: 'followUp', status: 'pending' },
+      { stage: 'outcome', status: 'pending' },
+    ],
+  }
+
+  // Completed episode (negative control)
+  const completedEpisode = {
+    id: 'ce_completed',
+    title: 'Acute Bronchitis',
+    createdAt: '2026-10-01T10:00:00.000Z',
+    updatedAt: '2026-10-15T10:00:00.000Z',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'diagnosis', status: 'done' },
+      { stage: 'plan', status: 'done' },
+      { stage: 'provider', status: 'done' },
+      { stage: 'cost', status: 'done' },
+      { stage: 'schedule', status: 'done' },
+      { stage: 'treatment', status: 'done' },
+      { stage: 'recovery', status: 'done' },
+      { stage: 'followUp', status: 'done' },
+      { stage: 'outcome', status: 'done' },
+    ],
+  }
+
+  // 1. Evaluate pure care journey continuity
+  const result = evaluateCareJourneyContinuity(
+    [stalledPlanEpisode, blockedProviderEpisode, atRiskTreatmentEpisode, completedEpisode],
+    evaluatedAt
+  )
+
+  assert.equal(result.totalJourneys, 4)
+  assert.equal(result.stalledCount, 2)
+  assert.equal(result.atRiskCount, 1)
+  assert.equal(result.totalEscalationsCount, 3)
+  assert.equal(result.clinicianInTrayCount, 2, 'Stalled plan and at-risk treatment route to Clinician In-Tray')
+  assert.equal(result.careCoordinatorCount, 1, 'Blocked provider routes to Care Coordinator')
+
+  // Check stalled plan escalation
+  const planSummary = result.episodes.find((e) => e.id === 'ce_stalled_plan')
+  assert.ok(planSummary.escalation)
+  assert.equal(planSummary.escalation.target, 'Clinician In-Tray')
+  assert.equal(planSummary.escalation.action, 'clinician_review')
+  assert.equal(planSummary.escalation.actionLabel, 'Clinician Review Required')
+  assert.equal(planSummary.escalation.severity, 'stalled')
+  assert.equal(planSummary.escalation.daysOverdue, 2, '5 days elapsed minus 3 expected days = 2 days overdue')
+
+  // Check blocked provider escalation
+  const provSummary = result.episodes.find((e) => e.id === 'ce_blocked_prov')
+  assert.ok(provSummary.escalation)
+  assert.equal(provSummary.escalation.target, 'Care Coordinator')
+  assert.equal(provSummary.escalation.action, 'coordinator_outreach')
+  assert.equal(provSummary.escalation.severity, 'stalled')
+
+  // Check at-risk treatment escalation
+  const txSummary = result.episodes.find((e) => e.id === 'ce_at_risk_tx')
+  assert.ok(txSummary.escalation)
+  assert.equal(txSummary.escalation.target, 'Clinician In-Tray')
+  assert.equal(txSummary.escalation.severity, 'at_risk')
+  assert.equal(txSummary.escalation.daysOverdue, 0, 'At risk stages have 0 days overdue')
+
+  // Check completed episode (negative control: no escalation)
+  const completedSummary = result.episodes.find((e) => e.id === 'ce_completed')
+  assert.equal(completedSummary.escalation, undefined)
+
+  // 2. Integration via deriveCareContinuityState
+  const projection = deriveCareContinuityState({
+    patientId: 'patient-esc-test',
+    evaluatedAt,
+    record: {
+      id: 'enc-esc-test',
+      patientId: 'patient-esc-test',
+      careEpisodes: [stalledPlanEpisode, blockedProviderEpisode, atRiskTreatmentEpisode, completedEpisode],
+    },
+  })
+  assert.ok(projection.careJourneys)
+  assert.equal(projection.careJourneys.totalEscalationsCount, 3)
+  assert.equal(projection.careJourneys.clinicianInTrayCount, 2)
+  assert.equal(projection.careJourneys.careCoordinatorCount, 1)
+
+  // 3. UI component contract verification
+  const panelSource = read('src/domains/clinical-operations/ui/CareContinuityPanel.tsx')
+  assert.ok(panelSource.includes('data-care-escalations-badge="v1"'), 'CareContinuityPanel must include escalations badge')
+  assert.ok(panelSource.includes('data-care-escalation-metrics="v1"'), 'CareContinuityPanel must include escalation metrics')
+  assert.ok(panelSource.includes('data-escalation-routing="v1"'), 'CareContinuityPanel must include escalation routing tags')
+
+  const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
+  assert.ok(episodeSource.includes('data-escalation-routing="v1"'), 'CareEpisode must include escalation routing tags')
+  assert.ok(episodeSource.includes('data-blocked-routing="v1"'), 'CareEpisode must include blocked routing tags')
+})

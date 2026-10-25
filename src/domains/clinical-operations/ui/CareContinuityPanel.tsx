@@ -115,6 +115,15 @@ export function CareContinuityPanel({
               <IconAlertTriangle size={12} /> Journey stalled ({careJourneys.stalledCount})
             </span>
           )}
+
+          {careJourneys && careJourneys.totalEscalationsCount > 0 && (
+            <span
+              className="inline-flex items-center gap-1 rounded-full border border-amber-400/40 bg-amber-400/10 px-2.5 py-0.5 text-[10px] font-bold text-amber-200"
+              data-care-escalations-badge="v1"
+            >
+              <IconAlertTriangle size={12} /> Escalations ({careJourneys.totalEscalationsCount})
+            </span>
+          )}
         </div>
       </header>
 
@@ -423,6 +432,14 @@ export function CareContinuityPanel({
                   <span className="font-bold">{careJourneys.stalledCount}</span>
                 </div>
               )}
+              {careJourneys.totalEscalationsCount > 0 && (
+                <div className="flex justify-between text-amber-300" data-care-escalation-metrics="v1">
+                  <span>Auto-routed escalations:</span>
+                  <span className="font-bold">
+                    {careJourneys.totalEscalationsCount} ({careJourneys.clinicianInTrayCount} clinician · {careJourneys.careCoordinatorCount} coord)
+                  </span>
+                </div>
+              )}
 
               {careJourneys.episodes.length > 0 && (
                 <div className="mt-3 border-t border-white/8 pt-2">
@@ -461,6 +478,21 @@ export function CareContinuityPanel({
                           >
                             {ep.health === 'stalled' ? 'Stall: ' : 'Risk: '}
                             {ep.stalledReason}
+                          </div>
+                        )}
+                        {ep.escalation && (
+                          <div
+                            className="mt-1.5 flex items-center justify-between rounded bg-amber-500/10 border border-amber-500/20 px-2 py-1 text-[10px]"
+                            data-escalation-routing="v1"
+                            data-escalation-target={ep.escalation.target}
+                            data-escalation-action={ep.escalation.action}
+                          >
+                            <span className="text-amber-200 font-semibold flex items-center gap-1">
+                              ⚡ {ep.escalation.target}: {ep.escalation.actionLabel}
+                            </span>
+                            <span className="text-amber-300/80 font-mono">
+                              {ep.escalation.daysOverdue > 0 ? `+${ep.escalation.daysOverdue}d overdue` : 'at risk'}
+                            </span>
                           </div>
                         )}
                         {ep.milestones && ep.milestones.length > 0 && (
