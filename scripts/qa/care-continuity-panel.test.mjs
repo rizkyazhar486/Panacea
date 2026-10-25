@@ -253,6 +253,11 @@ test('VisitOS & CareEpisode: establishes bi-directional navigation for longitudi
     /<Link[^>]*to="\/visit"/,
     'CareEpisode must link back to /visit'
   )
+  assert.match(
+    episodeSrc,
+    /<Link[^>]*to="\/planning"/,
+    'CareEpisode must link to /planning'
+  )
 })
 
 test('CareEpisode: seeds care journeys from verified encounter diagnosis and links ICD-10 provenance', () => {
@@ -423,4 +428,45 @@ test('deriveCareContinuityState & evaluateCareJourneyContinuity: projects active
     record: { id: 'emr-no-ep', patientId: 'patient-no-journeys', careEpisodes: [] },
   })
   assert.equal(projectionNoJourneys.careJourneys, null)
+})
+
+test('Planning & CareEpisode: establishes bi-directional care journey linkage with PanaceaZoneNav and trajectory card', () => {
+  const planSrc = read('src/pages/clinical/Planning.tsx')
+  const episodeSrc = read('src/pages/clinical/CareEpisode.tsx')
+
+  // Planning imports and renders PanaceaZoneNav
+  assert.match(
+    planSrc,
+    /import\s+\{[^}]*PanaceaZoneNav[^}]*\}\s+from\s+['"]\.\.\/\.\.\/components\/PanaceaZoneNav['"]/,
+    'Planning must import PanaceaZoneNav'
+  )
+  assert.match(
+    planSrc,
+    /<PanaceaZoneNav \/>/,
+    'Planning must render PanaceaZoneNav'
+  )
+
+  // Planning renders Care Journey Active card and links to /care-episode
+  assert.match(
+    planSrc,
+    /data-planning-care-journey="v1"/,
+    'Planning must expose data-planning-care-journey="v1"'
+  )
+  assert.match(
+    planSrc,
+    /<Link[^>]*to="\/care-episode"/,
+    'Planning must link directly to /care-episode'
+  )
+
+  // CareEpisode exposes planning navigation container
+  assert.match(
+    episodeSrc,
+    /data-planning-nav="v1"/,
+    'CareEpisode must expose data-planning-nav="v1"'
+  )
+  assert.match(
+    episodeSrc,
+    /Clinical Plan (?:→|&rarr;)/,
+    'CareEpisode must display Clinical Plan link'
+  )
 })
