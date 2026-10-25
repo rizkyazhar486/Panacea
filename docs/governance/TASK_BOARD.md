@@ -50,8 +50,8 @@ Evidence snapshot `106fe679`, 2026-10-25 (all H0, H1, H2 engineering criteria 32
 
 ## Later (H2)
 
-| ID | Task | Criterion | Lane | Status | PR / evidence |
-|---|---|---|---|---|---|
+| ID | Task | Criterion | Lane | Status |
+|---|---|---|---|---|
 | R-D7-RIG | Research: can the source rig get heel/toe landmarks without re-rigging? | ENG-D7-03 | claude | DONE | **Yes.** Read-only Blender MCP inspection of `bodyexposure/bodies/PANACEA_RIG_ADULT_MALE_GAIT.blend` (2026-10-23): 41 bones, one rigid `FOOT.L/R` per side (no toe bone); actions WALK 0–26, RUN 0–18, ROM 1–793. Source bone meshes `SKELETAL.CALCANEUS.L/R` (726 verts) and `SKELETAL.FIRST_METATARSAL_BONE.L/R` are BONE-parented to `FOOT.*`, so landmarks can be derived from them: heel = lowest/posterior calcaneus vertex, ball = first-metatarsal head. Limit: no toe joint, so toe-off flexion is not representable; use the ball (MTP) as the forefoot pivot, not the toe tip. Female rig not yet inspected. |
 | T-D7-02 | Derive heel (calcaneus) and ball (1st metatarsal head) landmarks from source meshes in the gait metrics, male + female; report per-landmark slip | ENG-D7-02 | claude | DONE | #2713 merged 6966d01e; per-fixture measurability evidence in gait_measurability.json; ENG-D7-02 achieved PASS under Option A (32/32 Engineering Acceptance V2) |
 | T-D7-01 | UNMEASURABLE vs FAIL vs PASS distinct in metrics output | ENG-D7-01 | claude | DONE: already implemented in `evaluateFootSlide`; evidence recorded at 96cbeace (validate job 120428954204), sabotage verified; tests hardened in #2710 (assert `status`, not only `reason`: a `within` mislabel previously passed) |
@@ -66,8 +66,14 @@ Evidence snapshot `106fe679`, 2026-10-25 (all H0, H1, H2 engineering criteria 32
 | T-CLIN-05 | Longitudinal care journey bridge between VisitOS and CareEpisode with bi-directional navigation | — | gemini | DONE | #2777 merged `608577aa`; wired /care-episode into VisitOS nav, PanaceaZoneNav and visit link in CareEpisode, 16/16 exact-head CI workflows PASS |
 | T-CLIN-06 | Clinical encounter diagnosis seeding and ICD-10 provenance linkage in CareEpisode | — | gemini | DONE | #2778 merged `a446546a`; wire ensureEpisodeFromVerifiedPlan one-click seed into CareEpisode, display ICD-10 encounter linkage badge, 16/16 exact-head CI workflows PASS |
 | T-CLIN-07 | Active Care Journey Continuity Projection in CareContinuityPanel.tsx and VisitOS.tsx | — | gemini | DONE | #2781 merged `27f9fc53`; wire deriveCareContinuityState careJourneys projection, Section 5 in CareContinuityPanel with data-care-journey-continuity="v1" and link to #/care-episode, 16/16 exact-head CI workflows PASS |
-| T-CLIN-08 | Bi-directional Care Journey Integration in Planning OS with PanaceaZoneNav and Trajectory Card | — | gemini | IN_PROGRESS | wire PanaceaZoneNav and data-planning-care-journey card in Planning, link to Clinical Plan in CareEpisode, 10/10 contract tests PASS |
-| T-CLIN-10 | Prevent One OS proof from inventing vital-sign provenance when source is absent or blank | — | kimi | IN_REVIEW | #2779: fail-closed vital provenance projection with positive, missing-source and blank-source controls; 3/3 focused QA tests PASS |
+| T-CLIN-08 | Bi-directional Care Journey Integration in Planning OS with PanaceaZoneNav and Trajectory Card | — | gemini | DONE | #2782 merged `9adf399d`; wired PanaceaZoneNav, data-planning-care-journey card in Planning and Clinical Plan in CareEpisode, 16/16 exact-head CI workflows PASS |
+| T-CLIN-09 | Real-time Stall Detection & Health Classification in Care Journey Continuity | — | gemini | DONE | #2783 merged `56674128`; pure STAGE_EXPECTED_DAYS and expectedDaysOverride stall detection in evaluateCareJourneyContinuity, health badges in CareContinuityPanel, 16/16 exact-head CI workflows PASS |
+| T-CLIN-10 | Longitudinal Care Plan Milestones & Action Item Sync in CareEpisode & CareContinuityPanel | — | gemini | DONE | #2784 merged `165a41ec`; wire CarePlanMilestone types, syncEpisodeWithPlanItems in CareEpisode, plan category to stage mapping, milestone projection in evaluateCareJourneyContinuity and CareContinuityPanel, 16/16 exact-head CI workflows PASS |
+| T-CLIN-11 | Clinical Order Fulfillment & Result Ingestion Bridge into Longitudinal Care Milestones | — | gemini | DONE | #2785 merged `30a4360a`; wire matchMilestoneWithSupportiveResult & fulfillMilestonesWithSupportiveResults in careEpisode.ts, supportive result fulfillment bridge in careContinuityProjection & CareContinuityPanel, 16/16 exact-head CI workflows PASS |
+| T-CLIN-12 | Care Episode Stalled Stage Escalation & Auto-Routing to Clinician In-Tray / Care Coordinator | — | gemini | DONE | #2786 merged `8d0c55af`; wire CareJourneyEscalation in careContinuityProjection.ts, auto-routing badges in CareContinuityPanel and CareEpisode, 16/16 exact-head CI workflows PASS |
+| T-CLIN-13 | Clinical Encounter Outcome Closure & Episode Completion Bridge | — | gemini | DONE | #2787 merged `6b4ce294`; wire ClinicalOutcomeRecord in types.ts, recordClinicalOutcome in careEpisode.ts, outcome projection in careContinuityProjection & CareContinuityPanel, OutcomeVerificationSection in CareEpisode, 16/16 exact-head CI workflows PASS |
+| T-CLIN-14 | Longitudinal Care Journey Timeline & Event Provenance Audit Trail | — | gemini | DONE | #2788 merged `995b81e1`; wire CareJourneyTimelineEvent in types.ts, appendTimelineEvent in careEpisode.ts, deriveCareJourneyTimelineEvents pure projection in careContinuityProjection, timeline audit in CareContinuityPanel & CareEpisode, 16/16 exact-head CI workflows PASS |
+| T-CLIN-15 | Multi-Episode Longitudinal Patient Timeline & Cross-Journey Comorbidity Projection | — | gemini | IN_PROGRESS | wire linkedComorbidities in types.ts, linkEpisodeComorbidity in careEpisode.ts, derivePatientLongitudinalTimeline in careContinuityProjection, comorbidity & timeline metrics in CareContinuityPanel & CareEpisode, 17/17 contract tests PASS |
 
 ## Open PR triage snapshot (2026-10-23, main c57e22fc)
 
@@ -77,7 +83,7 @@ Method: for each open PR, every file it changes was compared with main; no PR ha
 |---|---|---|---|---|---|
 | #395 | yes | 2026-09-08 | 2756 | Register accession-pinned cellular microscopy source | Close (stale: September, >1000 commits behind) |
 | #651 | yes | 2026-09-09 | 2514 | feat(body): holistic healthcare hub on latest main | Close (stale: September, >1000 commits behind) |
-| #760 | yes | 2026-09-09 | 2441 | feat(surgery): rebuild holistic simulator curriculum on late | Close (stale: September, >1000 commits behind) |
+| #760 | yes | 2026-09-09 | 2371 | feat(surgery): rebuild holistic simulator curriculum on late | Close (stale: September, >1000 commits behind) |
 | #925 | yes | 2026-09-09 | 2371 | Rebase surgical geometry and physiology precision onto lates | Close (stale: September, >1000 commits behind) |
 | #1001 | yes | 2026-09-09 | 2323 | feat(body): refresh anatomy-grounded surgical simulator on l | Close (stale: September, >1000 commits behind) |
 | #1681 | no | 2026-09-15 | 1770 | feat(body): add exam-first lesion localization lab | Close (stale: September, >1000 commits behind) |
