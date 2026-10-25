@@ -362,7 +362,7 @@ export function CareContinuityPanel({
           </p>
         </div>
 
-        {/* Section 5: Active Care Journey Continuity (T-CLIN-07) */}
+        {/* Section 5: Active Care Journey Continuity (T-CLIN-07, T-CLIN-09) */}
         <div data-care-journey-continuity="v1" className="rounded-xl border border-white/8 bg-white/[0.025] p-3.5 sm:p-4">
           <div className="flex items-center justify-between">
             <span className="text-[10px] font-bold uppercase tracking-wider text-white/45">
@@ -372,11 +372,17 @@ export function CareContinuityPanel({
               className={`text-xs font-bold ${
                 careJourneys?.hasBlockedStages
                   ? 'text-red-300'
-                  : (careJourneys && careJourneys.activeJourneys > 0 ? 'text-sky-300' : 'text-emerald-300')
+                  : (careJourneys && careJourneys.atRiskCount > 0
+                      ? 'text-amber-300'
+                      : (careJourneys && careJourneys.activeJourneys > 0 ? 'text-sky-300' : 'text-emerald-300'))
               }`}
             >
               {careJourneys
-                ? (careJourneys.hasBlockedStages ? 'BLOCKED' : `${careJourneys.activeJourneys} ACTIVE`)
+                ? (careJourneys.hasBlockedStages
+                    ? `${careJourneys.stalledCount} STALLED`
+                    : (careJourneys.atRiskCount > 0
+                        ? `${careJourneys.atRiskCount} AT RISK`
+                        : `${careJourneys.activeJourneys} ACTIVE`))
                 : 'NO JOURNEY'}
             </span>
           </div>
@@ -395,6 +401,12 @@ export function CareContinuityPanel({
                 <span>Completed:</span>
                 <span className="font-semibold text-emerald-300">{careJourneys.completedJourneys}</span>
               </div>
+              {careJourneys.atRiskCount > 0 && (
+                <div className="flex justify-between text-amber-300">
+                  <span>At risk:</span>
+                  <span className="font-bold">{careJourneys.atRiskCount}</span>
+                </div>
+              )}
               {careJourneys.hasBlockedStages && (
                 <div className="flex justify-between text-red-300">
                   <span>Stalled / blocked:</span>
@@ -419,26 +431,35 @@ export function CareContinuityPanel({
                           </span>
                           <span
                             className={`rounded px-1.5 py-0.5 text-[10px] font-semibold ${
-                              ep.stageStatus === 'blocked'
+                              ep.health === 'stalled'
                                 ? 'bg-red-500/20 text-red-300'
+                                : ep.health === 'at_risk'
+                                ? 'bg-amber-500/20 text-amber-300'
                                 : ep.stageStatus === 'done'
                                 ? 'bg-emerald-500/20 text-emerald-300'
                                 : 'bg-sky-500/20 text-sky-300'
                             }`}
                           >
-                            {ep.activeStage} ({ep.stageStatus})
+                            {ep.activeStage} ({ep.health === 'stalled' ? 'stalled' : (ep.health === 'at_risk' ? 'at risk' : ep.stageStatus)})
                           </span>
                         </div>
-                        {ep.blockedReason && (
-                          <div className="mt-1 text-[10px] text-red-300/80 italic">
-                            Stall: {ep.blockedReason}
+                        {ep.stalledReason && (
+                          <div
+                            className={`mt-1 text-[10px] italic ${
+                              ep.health === 'stalled' ? 'text-red-300/80' : 'text-amber-300/80'
+                            }`}
+                          >
+                            {ep.health === 'stalled' ? 'Stall: ' : 'Risk: '}
+                            {ep.stalledReason}
                           </div>
                         )}
                         <div className="mt-1 flex items-center justify-between text-[10px] text-white/45">
                           <span>Progress: {ep.completedStagesCount}/{ep.totalStagesCount} stages</span>
-                          {ep.diagnosisCode && (
+                          {ep.elapsedDaysInCurrentStage != null ? (
+                            <span className="text-[9px] text-white/60">{ep.elapsedDaysInCurrentStage}d in stage</span>
+                          ) : ep.diagnosisCode ? (
                             <span className="font-mono text-[9px] text-white/60">ICD-10: {ep.diagnosisCode}</span>
-                          )}
+                          ) : null}
                         </div>
                       </li>
                     ))}
