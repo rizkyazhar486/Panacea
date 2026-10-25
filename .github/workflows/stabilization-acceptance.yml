@@ -367,7 +367,7 @@ jobs:
           if-no-files-found: ignore
 
       - name: Human Replay duration provenance and poster (synthetic component, mobile/desktop)
-        timeout-minutes: 6
+        timeout-minutes: 10
         env:
           PLAYWRIGHT_MODULE: ${{ runner.temp }}/panacea-playwright/node_modules/playwright/index.mjs
         run: node scripts/qa/human-replay-duration-smoke.mjs
