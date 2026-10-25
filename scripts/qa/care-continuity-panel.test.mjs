@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs'
 import { evaluateResultClosure } from '../../src/domains/clinical-operations/model/resultClosure.ts'
 import { evaluateCareAccessOrchestration } from '../../src/domains/clinical-operations/model/careAccessOrchestrator.ts'
 import { evaluateClinicalEpisodeResilience } from '../../src/domains/clinical-operations/model/clinicalEpisodeResilience.ts'
-import { deriveCareContinuityState } from '../../src/domains/clinical-operations/model/careContinuityProjection.ts'
+import { deriveCareContinuityState, evaluateCareJourneyContinuity } from '../../src/domains/clinical-operations/model/careContinuityProjection.ts'
 import { ensureEpisodeFromVerifiedPlan } from '../../src/lib/careEpisode.ts'
 
 const read = (p) => readFileSync(new URL('../../' + p, import.meta.url), 'utf8')
@@ -32,6 +32,7 @@ test('CareContinuityPanel: enforces clean architecture boundary and domain expor
   assert.match(visitSrc, /careAccess=\{careContinuity\?\.careAccess\}/)
   assert.match(visitSrc, /episodeResilience=\{careContinuity\?\.episodeResilience\}/)
   assert.match(visitSrc, /oneOsProof=\{careContinuity\?\.oneOsProof\}/)
+  assert.match(visitSrc, /careJourneys=\{careContinuity\?\.careJourneys\}/)
   assert.match(visitSrc, /vitals:\s*state\.vitals\[activePatient\.id\]/)
 })
 
@@ -70,6 +71,12 @@ test('CareContinuityPanel: enforces PRD §8.5 result closure and clinical safety
   assert.match(panelSrc, /One OS Care Proof/)
   assert.match(panelSrc, /Trust coverage:/)
   assert.match(panelSrc, /Auditable proof: structural measures verify data provenance and completeness without fabricated claims/)
+
+  // Care Journey Continuity Section (T-CLIN-07)
+  assert.match(panelSrc, /data-care-journey-continuity="v1"/)
+  assert.match(panelSrc, /Care Journey/)
+  assert.match(panelSrc, /href="#\/care-episode"/)
+  assert.match(panelSrc, /Open Care Journey &rarr;/)
 })
 
 test('deriveCareContinuityState: positive control - clinician-signed encounter closes supportive result review', () => {
@@ -309,4 +316,111 @@ test('CareEpisode: seeds care journeys from verified encounter diagnosis and lin
   // Negative: records without primary diagnosis remain untouched
   const noDxRecord = { patientId: 'patient-43', careEpisodes: [] }
   assert.equal(ensureEpisodeFromVerifiedPlan(noDxRecord), noDxRecord)
+})
+
+test('deriveCareContinuityState & evaluateCareJourneyContinuity: projects active, blocked, and completed care journeys', () => {
+  const now = '2026-10-25T12:00:00.000Z'
+  const recordWithJourneys = {
+    id: 'emr-journey-1',
+    patientId: 'patient-journey-1',
+    createdAt: '2026-10-25T08:30:00.000Z',
+    updatedAt: '2026-10-25T09:00:00.000Z',
+    primaryDiagnosis: { code: 'E11.9', title: 'Type 2 diabetes mellitus' },
+    careEpisodes: [
+      {
+        id: 'ce_active_1',
+        title: 'Type 2 diabetes mellitus',
+        diagnosisCode: 'E11.9',
+        createdAt: '2026-10-25T08:30:00.000Z',
+        updatedAt: '2026-10-25T09:00:00.000Z',
+        stages: [
+          { stage: 'problem', status: 'done' },
+          { stage: 'diagnosis', status: 'done' },
+          { stage: 'plan', status: 'active' },
+          { stage: 'provider', status: 'pending' },
+          { stage: 'cost', status: 'pending' },
+          { stage: 'schedule', status: 'pending' },
+          { stage: 'treatment', status: 'pending' },
+          { stage: 'recovery', status: 'pending' },
+          { stage: 'followUp', status: 'pending' },
+          { stage: 'outcome', status: 'pending' },
+        ],
+      },
+      {
+        id: 'ce_blocked_2',
+        title: 'Diabetic Retinopathy Screening',
+        createdAt: '2026-10-25T08:35:00.000Z',
+        updatedAt: '2026-10-25T09:00:00.000Z',
+        stages: [
+          { stage: 'problem', status: 'done' },
+          { stage: 'diagnosis', status: 'done' },
+          { stage: 'plan', status: 'done' },
+          { stage: 'provider', status: 'blocked', blockedReason: 'Specialist referral awaiting authorization' },
+          { stage: 'cost', status: 'pending' },
+          { stage: 'schedule', status: 'pending' },
+          { stage: 'treatment', status: 'pending' },
+          { stage: 'recovery', status: 'pending' },
+          { stage: 'followUp', status: 'pending' },
+          { stage: 'outcome', status: 'pending' },
+        ],
+      },
+    ],
+  }
+
+  const projection = deriveCareContinuityState({
+    patientId: 'patient-journey-1',
+    evaluatedAt: now,
+    record: recordWithJourneys,
+  })
+
+  assert.ok(projection.careJourneys, 'careJourneys is projected')
+  assert.equal(projection.careJourneys.totalJourneys, 2)
+  assert.equal(projection.careJourneys.activeJourneys, 1)
+  assert.equal(projection.careJourneys.blockedJourneys, 1)
+  assert.equal(projection.careJourneys.completedJourneys, 0)
+  assert.equal(projection.careJourneys.hasBlockedStages, true)
+  assert.equal(projection.careJourneys.stalledCount, 1)
+  assert.equal(projection.careJourneys.episodes.length, 2)
+
+  // Episode 1 details
+  const ep1 = projection.careJourneys.episodes[0]
+  assert.equal(ep1.id, 'ce_active_1')
+  assert.equal(ep1.activeStage, 'plan')
+  assert.equal(ep1.stageStatus, 'active')
+  assert.equal(ep1.completedStagesCount, 2)
+  assert.equal(ep1.totalStagesCount, 10)
+
+  // Episode 2 details (blocked)
+  const ep2 = projection.careJourneys.episodes[1]
+  assert.equal(ep2.id, 'ce_blocked_2')
+  assert.equal(ep2.activeStage, 'provider')
+  assert.equal(ep2.stageStatus, 'blocked')
+  assert.equal(ep2.blockedReason, 'Specialist referral awaiting authorization')
+  assert.equal(ep2.completedStagesCount, 3)
+
+  // Control: completed episode
+  const completedEpisode = {
+    id: 'ce_done_3',
+    title: 'Acute Bronchitis Resolution',
+    stages: [
+      'problem', 'diagnosis', 'plan', 'provider', 'cost',
+      'schedule', 'treatment', 'recovery', 'followUp', 'outcome',
+    ].map((stage) => ({ stage, status: 'done' })),
+  }
+
+  const completedResult = evaluateCareJourneyContinuity([completedEpisode])
+  assert.equal(completedResult.totalJourneys, 1)
+  assert.equal(completedResult.completedJourneys, 1)
+  assert.equal(completedResult.activeJourneys, 0)
+  assert.equal(completedResult.blockedJourneys, 0)
+  assert.equal(completedResult.hasBlockedStages, false)
+  assert.equal(completedResult.episodes[0].completedStagesCount, 10)
+
+  // Negative control: record without care episodes yields null careJourneys
+  const projectionNoJourneys = deriveCareContinuityState({
+    patientId: 'patient-no-journeys',
+    evaluatedAt: now,
+    record: { id: 'emr-no-ep', patientId: 'patient-no-journeys', careEpisodes: [] },
+  })
+  assert.equal(projectionNoJourneys.careJourneys, null)
 })

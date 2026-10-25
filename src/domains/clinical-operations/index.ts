@@ -49,8 +49,11 @@ export {
 
 export {
   deriveCareContinuityState,
+  evaluateCareJourneyContinuity,
   type CareContinuityProjection,
   type CareContinuityProjectionInput,
+  type CareJourneyContinuityResult,
+  type CareJourneyEpisodeSummary,
 } from './model/careContinuityProjection'
 
 export { PoliPatientFlowBoard } from './ui/PoliPatientFlowBoard'
