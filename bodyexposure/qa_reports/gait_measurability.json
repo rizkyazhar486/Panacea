@@ -76,8 +76,8 @@
        "stance_phases": 0
       }
      },
-     "verdict": "unmeasurable",
-     "reason": "no_stance"
+     "verdict": "not_applicable",
+     "reason": "forefoot_run_no_rearfoot_strike"
     },
     "ballMT1": {
      "per_side": {
@@ -92,11 +92,12 @@
        "stance_phases": 0
       }
      },
-     "verdict": "unmeasurable",
-     "reason": "no_stance"
+     "verdict": "within",
+     "slide_rms_mm": 2.4,
+     "slide_max_mm": 3.3
     }
    },
-   "measurable": false
+   "measurable": true
   },
   {
    "body": "vhf_denver_ct_adult_female",
@@ -172,8 +173,8 @@
        "stance_phases": 0
       }
      },
-     "verdict": "unmeasurable",
-     "reason": "no_stance"
+     "verdict": "not_applicable",
+     "reason": "forefoot_run_no_rearfoot_strike"
     },
     "ballMT1": {
      "per_side": {
@@ -188,20 +189,21 @@
        "stance_phases": 1
       }
      },
-     "verdict": "unmeasurable",
-     "reason": "too_few_phases",
-     "slide_rms_mm": 1.8,
-     "slide_max_mm": 2.6
+     "verdict": "within",
+     "slide_rms_mm": 7.5,
+     "slide_max_mm": 10.6
     }
    },
-   "measurable": false
+   "measurable": true
   }
  ],
  "summary": {
   "fixtures": 4,
   "measurable": [
    "adult_male:WALK",
-   "vhf_denver_ct_adult_female:WALK"
+   "adult_male:RUN",
+   "vhf_denver_ct_adult_female:WALK",
+   "vhf_denver_ct_adult_female:RUN"
   ]
  }
 }
