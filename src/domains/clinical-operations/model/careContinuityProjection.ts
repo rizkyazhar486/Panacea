@@ -12,6 +12,8 @@ import type {
   CareEpisodeStageId,
   PlanItem,
   CarePlanMilestone,
+  ClinicalOutcomeRecord,
+  ClinicalOutcomeStatus,
 } from '../../../lib/types.ts'
 import {
   evaluateResultClosure,
@@ -82,6 +84,7 @@ export interface CareJourneyEpisodeSummary {
   pendingActionItemsCount: number
   milestones: CarePlanMilestoneSummary[]
   escalation?: CareJourneyEscalation
+  outcomeRecord?: ClinicalOutcomeRecord
 }
 
 export type CareJourneyEscalationAction =
@@ -125,6 +128,7 @@ export interface CareJourneyContinuityResult {
   totalEscalationsCount: number
   clinicianInTrayCount: number
   careCoordinatorCount: number
+  completedWithVerifiedOutcomeCount: number
   hasBlockedStages: boolean
 }
 
@@ -698,6 +702,7 @@ export function evaluateCareJourneyContinuity(
       pendingActionItemsCount,
       milestones,
       escalation,
+      outcomeRecord: ep.outcomeRecord,
     }
   })
 
@@ -707,6 +712,9 @@ export function evaluateCareJourneyContinuity(
 
   const clinicianInTrayCount = escalations.filter((e) => e.target === 'Clinician In-Tray').length
   const careCoordinatorCount = escalations.filter((e) => e.target === 'Care Coordinator').length
+  const completedWithVerifiedOutcomeCount = summaries.filter(
+    (s) => s.completedStagesCount === s.totalStagesCount && Boolean(s.outcomeRecord?.status)
+  ).length
 
   return {
     totalJourneys: episodes.length,
@@ -724,6 +732,7 @@ export function evaluateCareJourneyContinuity(
     totalEscalationsCount: escalations.length,
     clinicianInTrayCount,
     careCoordinatorCount,
+    completedWithVerifiedOutcomeCount,
     hasBlockedStages: blockedJourneys > 0 || stalledCount > 0,
   }
 }
