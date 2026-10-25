@@ -1,9 +1,10 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { useStore } from '../../lib/store'
 import { api, backendEnabled, type FacilityPriceSubmission } from '../../lib/api'
 import { Card, SectionTitle, Badge, Button, Field, inputClass } from '../../components/ui'
 import { IconPlan, IconPlus } from '../../components/icons'
+import { deriveCareJourneyTimelineEvents } from '../../domains/clinical-operations'
 import {
   CARE_EPISODE_STAGES,
   STAGE_LABEL,
@@ -420,6 +421,9 @@ function EpisodeCard({
 
       {/* Clinical Outcome Closure (T-CLIN-13) */}
       <OutcomeVerificationSection episode={episode} onChange={onChange} />
+
+      {/* Longitudinal Care Journey Timeline & Event Provenance Audit Trail (T-CLIN-14) */}
+      <JourneyTimelineSection episode={episode} />
     </Card>
   )
 }
@@ -557,6 +561,111 @@ function OutcomeVerificationSection({
             Sign & Complete Care Journey
           </Button>
         </div>
+      </div>
+    </div>
+  )
+}
+
+function JourneyTimelineSection({ episode }: { episode: CareEpisode }) {
+  const [filterKind, setFilterKind] = useState<string>('all')
+  const events = useMemo(() => {
+    return deriveCareJourneyTimelineEvents(episode)
+  }, [episode])
+
+  const filteredEvents = useMemo(() => {
+    if (filterKind === 'all') return events
+    return events.filter((e) => e.kind === filterKind)
+  }, [events, filterKind])
+
+  if (events.length === 0) return null
+
+  return (
+    <div
+      className="mt-6 rounded-xl border border-neutral-200 dark:border-white/10 bg-neutral-50 dark:bg-white/[0.02] p-4"
+      data-care-journey-timeline="v1"
+    >
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-neutral-200 dark:border-white/10 pb-3">
+        <div>
+          <h4 className="text-sm font-bold text-neutral-900 dark:text-white flex items-center gap-2">
+            <span>Care Journey Event Timeline</span>
+            <span className="rounded-full bg-neutral-200 dark:bg-white/10 px-2 py-0.5 text-[10px] font-medium text-neutral-700 dark:text-white/80">
+              {events.length} events
+            </span>
+          </h4>
+          <p className="text-xs text-neutral-500 dark:text-white/60">
+            Immutable chronological audit trail and clinical provenance
+          </p>
+        </div>
+        <div className="flex items-center gap-1.5 flex-wrap">
+          {[
+            { id: 'all', label: 'All' },
+            { id: 'stage_transition', label: 'Stages' },
+            { id: 'milestone_fulfilled', label: 'Milestones' },
+            { id: 'outcome_verified', label: 'Outcomes' },
+          ].map((f) => (
+            <button
+              key={f.id}
+              type="button"
+              onClick={() => setFilterKind(f.id)}
+              className={`rounded px-2 py-0.5 text-[10px] font-medium transition-colors ${
+                filterKind === f.id
+                  ? 'bg-primary text-white'
+                  : 'bg-neutral-200 dark:bg-white/10 text-neutral-700 dark:text-white/70 hover:bg-neutral-300 dark:hover:bg-white/20'
+              }`}
+            >
+              {f.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="mt-4 relative pl-4 border-l-2 border-neutral-200 dark:border-white/10 space-y-3">
+        {filteredEvents.map((evt) => (
+          <div key={evt.id} className="relative text-xs">
+            <div
+              className={`absolute -left-[21px] top-1 h-2.5 w-2.5 rounded-full border-2 border-white dark:border-[#06101e] ${
+                evt.severity === 'success'
+                  ? 'bg-emerald-500'
+                  : evt.severity === 'warning'
+                  ? 'bg-amber-500'
+                  : evt.severity === 'stalled'
+                  ? 'bg-red-500'
+                  : 'bg-sky-500'
+              }`}
+            />
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-0.5">
+              <span className="font-semibold text-neutral-900 dark:text-white flex items-center gap-1.5">
+                {evt.title}
+                {evt.badge && (
+                  <span
+                    className={`rounded px-1.5 py-0.2 text-[9px] font-bold ${
+                      evt.severity === 'success'
+                        ? 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-300'
+                        : evt.severity === 'warning'
+                        ? 'bg-amber-500/20 text-amber-700 dark:text-amber-300'
+                        : 'bg-sky-500/20 text-sky-700 dark:text-sky-300'
+                    }`}
+                  >
+                    {evt.badge}
+                  </span>
+                )}
+              </span>
+              <span className="text-[10px] font-mono text-neutral-400 dark:text-white/40">
+                {evt.timestamp.replace('T', ' ').slice(0, 19)}
+              </span>
+            </div>
+            {evt.description && (
+              <p className="mt-0.5 text-[11px] text-neutral-600 dark:text-white/70">
+                {evt.description}
+              </p>
+            )}
+            {evt.actorId && (
+              <span className="text-[10px] text-neutral-400 dark:text-white/40 italic">
+                Actor: {evt.actorId}
+              </span>
+            )}
+          </div>
+        ))}
       </div>
     </div>
   )

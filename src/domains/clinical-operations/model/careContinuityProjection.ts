@@ -10,6 +10,8 @@ import type {
   EMRRecord,
   CareEpisode,
   CareEpisodeStageId,
+  CareJourneyTimelineEvent,
+  CareJourneyTimelineEventKind,
   PlanItem,
   CarePlanMilestone,
   ClinicalOutcomeRecord,
@@ -85,6 +87,7 @@ export interface CareJourneyEpisodeSummary {
   milestones: CarePlanMilestoneSummary[]
   escalation?: CareJourneyEscalation
   outcomeRecord?: ClinicalOutcomeRecord
+  timelineEvents?: CareJourneyTimelineEvent[]
 }
 
 export type CareJourneyEscalationAction =
@@ -129,6 +132,7 @@ export interface CareJourneyContinuityResult {
   clinicianInTrayCount: number
   careCoordinatorCount: number
   completedWithVerifiedOutcomeCount: number
+  totalTimelineEventsCount: number
   hasBlockedStages: boolean
 }
 
@@ -435,6 +439,186 @@ function mapPlanCategoryToStage(category: PlanItem['category']): CareEpisodeStag
   }
 }
 
+export const STAGE_LABEL: Record<CareEpisodeStageId, string> = {
+  problem: 'Problem',
+  diagnosis: 'Diagnosis',
+  plan: 'Plan',
+  provider: 'Provider',
+  cost: 'Cost',
+  schedule: 'Schedule',
+  treatment: 'Treatment',
+  recovery: 'Recovery',
+  followUp: 'Follow-up',
+  outcome: 'Outcome',
+}
+
+export function deriveCareJourneyTimelineEvents(
+  episode: CareEpisode,
+  maxEpochMs?: number,
+): CareJourneyTimelineEvent[] {
+  const events: CareJourneyTimelineEvent[] = []
+
+  const isValidIso = (ts?: string): boolean => {
+    if (!ts || typeof ts !== 'string') return false
+    const ms = Date.parse(ts)
+    if (!Number.isFinite(ms)) return false
+    if (maxEpochMs != null && ms > maxEpochMs) return false
+    return true
+  }
+
+  // 1. Episode seeded event
+  if (isValidIso(episode.createdAt)) {
+    events.push({
+      id: `evt-${episode.id}-seed`,
+      episodeId: episode.id,
+      kind: 'episode_seeded',
+      timestamp: episode.createdAt,
+      title: 'Care Journey Initiated',
+      description: episode.diagnosisCode ? `Diagnosis: ${episode.diagnosisCode}` : episode.title,
+      stage: 'problem',
+      badge: 'Seeded',
+      severity: 'info',
+    })
+  }
+
+  // 2. Stage transitions
+  if (Array.isArray(episode.stages)) {
+    for (const s of episode.stages) {
+      if (!isValidIso(s.updatedAt)) continue
+      const stageName = STAGE_LABEL[s.stage] ?? s.stage
+      if (s.status === 'done') {
+        events.push({
+          id: `evt-${episode.id}-stage-${s.stage}-done`,
+          episodeId: episode.id,
+          kind: 'stage_transition',
+          timestamp: s.updatedAt!,
+          title: `Stage Completed: ${stageName}`,
+          description: s.note,
+          stage: s.stage,
+          badge: 'Done',
+          severity: 'success',
+        })
+      } else if (s.status === 'active') {
+        events.push({
+          id: `evt-${episode.id}-stage-${s.stage}-active`,
+          episodeId: episode.id,
+          kind: 'stage_transition',
+          timestamp: s.updatedAt!,
+          title: `Stage In Progress: ${stageName}`,
+          description: s.note,
+          stage: s.stage,
+          badge: 'Active',
+          severity: 'info',
+        })
+      } else if (s.status === 'blocked') {
+        events.push({
+          id: `evt-${episode.id}-stage-${s.stage}-blocked`,
+          episodeId: episode.id,
+          kind: 'stage_transition',
+          timestamp: s.updatedAt!,
+          title: `Stage Blocked: ${stageName}`,
+          description: s.blockedReason ?? s.note,
+          stage: s.stage,
+          badge: 'Blocked',
+          severity: 'warning',
+        })
+      }
+    }
+  }
+
+  // 3. Provider selected event
+  if (episode.facilityName || episode.facilityId || episode.providerName) {
+    const providerStage = episode.stages?.find((s) => s.stage === 'provider')
+    if (providerStage && providerStage.status !== 'pending') {
+      const providerTs = providerStage.updatedAt ?? episode.updatedAt
+      if (isValidIso(providerTs)) {
+        events.push({
+          id: `evt-${episode.id}-provider-selected`,
+          episodeId: episode.id,
+          kind: 'provider_selected',
+          timestamp: providerTs,
+          title: 'Provider Selected',
+          description: episode.facilityName ?? episode.providerName ?? episode.facilityId,
+          stage: 'provider',
+          badge: 'Provider',
+          severity: 'info',
+        })
+      }
+    }
+  }
+
+  // 4. Milestone verification & completion events
+  if (Array.isArray(episode.milestones)) {
+    for (const m of episode.milestones) {
+      if (isValidIso(m.verifiedAt)) {
+        events.push({
+          id: `evt-${episode.id}-ms-verified-${m.id}`,
+          episodeId: episode.id,
+          kind: 'milestone_verified',
+          timestamp: m.verifiedAt!,
+          title: `Milestone Verified: ${m.title}`,
+          description: `Category: ${m.category}`,
+          stage: m.targetStage,
+          actorId: m.verifiedById,
+          badge: 'Verified',
+          severity: 'info',
+        })
+      }
+      if (isValidIso(m.completedAt)) {
+        events.push({
+          id: `evt-${episode.id}-ms-fulfilled-${m.id}`,
+          episodeId: episode.id,
+          kind: 'milestone_fulfilled',
+          timestamp: m.completedAt!,
+          title: `Milestone Fulfilled: ${m.title}`,
+          description: m.resultValue ? `Result: ${m.resultValue}` : `Category: ${m.category}`,
+          stage: m.targetStage,
+          badge: 'Fulfilled',
+          severity: 'success',
+        })
+      }
+    }
+  }
+
+  // 5. Clinical outcome verification event
+  if (episode.outcomeRecord) {
+    const outcomeTs =
+      episode.outcomeRecord.signedAt ??
+      episode.outcomeRecord.verifiedAt ??
+      episode.outcomeRecord.updatedAt
+    if (isValidIso(outcomeTs)) {
+      events.push({
+        id: `evt-${episode.id}-outcome-signed`,
+        episodeId: episode.id,
+        kind: 'outcome_verified',
+        timestamp: outcomeTs!,
+        title: `Clinical Outcome Recorded: ${episode.outcomeRecord.status.toUpperCase()}`,
+        description: episode.outcomeRecord.summary,
+        stage: 'outcome',
+        actorId: episode.outcomeRecord.verifiedById,
+        badge: 'Signed',
+        severity: 'success',
+      })
+    }
+  }
+
+  // 6. Explicit episode timeline events merged and deduplicated
+  if (Array.isArray(episode.timelineEvents)) {
+    for (const evt of episode.timelineEvents) {
+      if (isValidIso(evt.timestamp) && !events.some((e) => e.id === evt.id)) {
+        events.push(evt)
+      }
+    }
+  }
+
+  // Deterministic chronological ordering (newest first, secondary sort by id)
+  return events.sort((a, b) => {
+    const diff = Date.parse(b.timestamp) - Date.parse(a.timestamp)
+    if (diff !== 0) return diff
+    return a.id.localeCompare(b.id)
+  })
+}
+
 export const STAGE_EXPECTED_DAYS: Record<CareEpisodeStageId, number> = {
   problem: 1,
   diagnosis: 2,
@@ -703,6 +887,7 @@ export function evaluateCareJourneyContinuity(
       milestones,
       escalation,
       outcomeRecord: ep.outcomeRecord,
+      timelineEvents: deriveCareJourneyTimelineEvents(ep, evaluatedAtMs),
     }
   })
 
@@ -715,6 +900,10 @@ export function evaluateCareJourneyContinuity(
   const completedWithVerifiedOutcomeCount = summaries.filter(
     (s) => s.completedStagesCount === s.totalStagesCount && Boolean(s.outcomeRecord?.status)
   ).length
+  const totalTimelineEventsCount = summaries.reduce(
+    (acc, s) => acc + (s.timelineEvents?.length ?? 0),
+    0
+  )
 
   return {
     totalJourneys: episodes.length,
@@ -733,6 +922,7 @@ export function evaluateCareJourneyContinuity(
     clinicianInTrayCount,
     careCoordinatorCount,
     completedWithVerifiedOutcomeCount,
+    totalTimelineEventsCount,
     hasBlockedStages: blockedJourneys > 0 || stalledCount > 0,
   }
 }

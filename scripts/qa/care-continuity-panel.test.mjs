@@ -4,13 +4,18 @@ import { readFileSync } from 'node:fs'
 import { evaluateResultClosure } from '../../src/domains/clinical-operations/model/resultClosure.ts'
 import { evaluateCareAccessOrchestration } from '../../src/domains/clinical-operations/model/careAccessOrchestrator.ts'
 import { evaluateClinicalEpisodeResilience } from '../../src/domains/clinical-operations/model/clinicalEpisodeResilience.ts'
-import { deriveCareContinuityState, evaluateCareJourneyContinuity } from '../../src/domains/clinical-operations/model/careContinuityProjection.ts'
+import {
+  deriveCareContinuityState,
+  evaluateCareJourneyContinuity,
+  deriveCareJourneyTimelineEvents,
+} from '../../src/domains/clinical-operations/model/careContinuityProjection.ts'
 import {
   ensureEpisodeFromVerifiedPlan,
   syncEpisodeWithPlanItems,
   planCategoryToStage,
   fulfillMilestonesWithSupportiveResults,
   recordClinicalOutcome,
+  appendTimelineEvent,
   isComplete,
 } from '../../src/lib/careEpisode.ts'
 
@@ -1051,4 +1056,125 @@ test('deriveCareContinuityState & CareEpisode: clinical encounter outcome closur
   const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
   assert.ok(episodeSource.includes('data-care-outcome-card="v1"'), 'CareEpisode must include outcome card')
   assert.ok(episodeSource.includes('Sign & Complete Care Journey'), 'CareEpisode must include sign and complete action')
+})
+
+test('deriveCareJourneyTimelineEvents & CareContinuityPanel: longitudinal timeline & event provenance audit trail (T-CLIN-14)', () => {
+  const evaluatedAt = '2026-10-25T12:00:00.000Z'
+  const evaluatedAtMs = Date.parse(evaluatedAt)
+
+  const episode = {
+    id: 'ce_timeline_test',
+    title: 'Hypertensive Heart Disease',
+    diagnosisCode: 'I11.9',
+    createdAt: '2026-09-01T08:00:00.000Z',
+    updatedAt: '2026-10-20T10:00:00.000Z',
+    facilityName: 'RS Jantung Harapan Kita',
+    facilityId: 'hosp_harapan_kita',
+    stages: [
+      { stage: 'problem', status: 'done', updatedAt: '2026-09-01T08:30:00.000Z' },
+      { stage: 'diagnosis', status: 'done', updatedAt: '2026-09-01T09:00:00.000Z' },
+      { stage: 'plan', status: 'done', updatedAt: '2026-09-02T10:00:00.000Z' },
+      { stage: 'provider', status: 'done', updatedAt: '2026-09-05T11:00:00.000Z' },
+      { stage: 'cost', status: 'done', updatedAt: '2026-09-06T14:00:00.000Z' },
+      { stage: 'schedule', status: 'done', updatedAt: '2026-09-10T09:00:00.000Z' },
+      { stage: 'treatment', status: 'done', updatedAt: '2026-09-25T16:00:00.000Z' },
+      { stage: 'recovery', status: 'done', updatedAt: '2026-10-05T10:00:00.000Z' },
+      { stage: 'followUp', status: 'done', updatedAt: '2026-10-15T11:30:00.000Z' },
+      { stage: 'outcome', status: 'done', updatedAt: '2026-10-20T10:00:00.000Z' },
+    ],
+    milestones: [
+      {
+        id: 'ms_ekg',
+        title: 'EKG 12-lead baseline',
+        category: 'Suportif',
+        targetStage: 'diagnosis',
+        status: 'completed',
+        verifiedById: 'dr-spjp',
+        verifiedAt: '2026-09-01T08:45:00.000Z',
+        completedAt: '2026-09-01T08:50:00.000Z',
+        resultValue: 'Sinus rhythm, LVH by Sokolow-Lyon',
+      },
+    ],
+    outcomeRecord: {
+      status: 'stable',
+      summary: 'Blood pressure controlled at 124/78 mmHg, target organ damage stable.',
+      verifiedById: 'dr-spjp',
+      verifiedAt: '2026-10-20T10:00:00.000Z',
+      signedAt: '2026-10-20T10:00:00.000Z',
+    },
+  }
+
+  // 1. Pure deriveCareJourneyTimelineEvents extraction & chronological ordering
+  const events = deriveCareJourneyTimelineEvents(episode, evaluatedAtMs)
+  assert.ok(events.length > 0, 'Timeline events must be derived')
+
+  // Chronological descending assertion
+  for (let i = 0; i < events.length - 1; i++) {
+    const currMs = Date.parse(events[i].timestamp)
+    const nextMs = Date.parse(events[i + 1].timestamp)
+    assert.ok(currMs >= nextMs, `Events must be sorted descending: ${events[i].title} (${events[i].timestamp}) >= ${events[i + 1].title} (${events[i + 1].timestamp})`)
+  }
+
+  // Kind coverage
+  const kinds = new Set(events.map((e) => e.kind))
+  assert.ok(kinds.has('episode_seeded'), 'Must contain episode_seeded')
+  assert.ok(kinds.has('stage_transition'), 'Must contain stage_transition')
+  assert.ok(kinds.has('provider_selected'), 'Must contain provider_selected')
+  assert.ok(kinds.has('milestone_verified'), 'Must contain milestone_verified')
+  assert.ok(kinds.has('milestone_fulfilled'), 'Must contain milestone_fulfilled')
+  assert.ok(kinds.has('outcome_verified'), 'Must contain outcome_verified')
+
+  // 2. Negative controls: invalid timestamps and future timestamps dropped
+  const episodeWithBadEvents = {
+    ...episode,
+    id: 'ce_bad_ts',
+    createdAt: 'invalid-date-string',
+    stages: [
+      { stage: 'problem', status: 'done', updatedAt: '2099-01-01T00:00:00.000Z' }, // future
+      { stage: 'diagnosis', status: 'done', updatedAt: 'not-a-timestamp' }, // invalid
+      { stage: 'plan', status: 'done', updatedAt: '2026-09-01T10:00:00.000Z' }, // valid
+    ],
+    milestones: [],
+    outcomeRecord: undefined,
+  }
+  const cleanEvents = deriveCareJourneyTimelineEvents(episodeWithBadEvents, evaluatedAtMs)
+  assert.equal(cleanEvents.length, 1, 'Only the valid past event must be preserved')
+  assert.equal(cleanEvents[0].stage, 'plan')
+
+  // 3. appendTimelineEvent helper
+  const customEvt = {
+    id: 'evt_custom_memo',
+    kind: 'stage_transition',
+    timestamp: '2026-10-21T09:00:00.000Z',
+    title: 'Consultation Note Added',
+    description: 'Patient adherent to DASH diet',
+  }
+  const epWithAppended = appendTimelineEvent(episode, customEvt)
+  assert.ok(epWithAppended.timelineEvents?.some((e) => e.id === 'evt_custom_memo'))
+
+  // 4. Pure projection in evaluateCareJourneyContinuity & deriveCareContinuityState
+  const projection = evaluateCareJourneyContinuity([episode], evaluatedAt)
+  assert.ok(projection.totalTimelineEventsCount > 0)
+  assert.equal(projection.episodes[0].timelineEvents?.length, events.length)
+
+  const continuityState = deriveCareContinuityState({
+    patientId: 'pat_timeline_test',
+    evaluatedAt,
+    record: {
+      id: 'enc_timeline_test',
+      patientId: 'pat_timeline_test',
+      careEpisodes: [episode],
+    },
+  })
+  assert.ok(continuityState.careJourneys)
+  assert.ok(continuityState.careJourneys.totalTimelineEventsCount > 0)
+
+  // 5. UI contracts
+  const panelSource = read('src/domains/clinical-operations/ui/CareContinuityPanel.tsx')
+  assert.ok(panelSource.includes('data-care-timeline-badge="v1"'), 'CareContinuityPanel must include timeline badge')
+  assert.ok(panelSource.includes('data-care-timeline-metrics="v1"'), 'CareContinuityPanel must include timeline metrics')
+  assert.ok(panelSource.includes('data-care-timeline-audit="v1"'), 'CareContinuityPanel must include timeline audit element')
+
+  const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
+  assert.ok(episodeSource.includes('data-care-journey-timeline="v1"'), 'CareEpisode must include care journey timeline component')
 })

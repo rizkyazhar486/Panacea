@@ -14,6 +14,8 @@ import type {
   CareEpisodeStage,
   CareEpisodeStageId,
   CareEpisodeStageStatus,
+  CareJourneyTimelineEvent,
+  CareJourneyTimelineEventKind,
   CarePlanMilestone,
   ClinicalOutcomeRecord,
   ClinicalOutcomeStatus,
@@ -307,6 +309,25 @@ export function recordClinicalOutcome(
   }
 
   return updated
+}
+
+export function appendTimelineEvent(
+  episode: CareEpisode,
+  event: Omit<CareJourneyTimelineEvent, 'episodeId'>,
+  nowIso?: string,
+): CareEpisode {
+  const ts = event.timestamp ?? nowIso ?? new Date().toISOString()
+  const newEvt: CareJourneyTimelineEvent = {
+    ...event,
+    episodeId: episode.id,
+    timestamp: ts,
+  }
+  const existing = episode.timelineEvents ?? []
+  return {
+    ...episode,
+    timelineEvents: [newEvt, ...existing.filter((e) => e.id !== newEvt.id)],
+    updatedAt: ts,
+  }
 }
 
 // begun. Returns the record unchanged if there's no primary diagnosis yet,
