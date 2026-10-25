@@ -70,7 +70,8 @@ jobs:
           echo "exit=$code" >> "$GITHUB_STEP_SUMMARY"
           if [ -f production-check/report.json ]; then
             echo '```json' >> "$GITHUB_STEP_SUMMARY"
-            node -e "const r=require('./production-check/report.json');console.log(JSON.stringify({network:r.network,server:r.server,findings:r.findings,viewports:r.viewports.map(v=>({w:v.width,status:v.status,overflowX:v.overflowX,webgl2:v.webgl2,errors:v.errors.length,body:v.body&&{canvas:v.body.canvasPresent,finalUrl:v.body.finalUrl}}))},null,1))" >> "$GITHUB_STEP_SUMMARY"
+            # report.json already contains only sanitizeProductionReport's allowlisted fields.
+            cat production-check/report.json >> "$GITHUB_STEP_SUMMARY"
             echo '```' >> "$GITHUB_STEP_SUMMARY"
           fi
           exit $code
