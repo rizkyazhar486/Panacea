@@ -22,7 +22,7 @@ try {
     await context.route('https://fonts.googleapis.com/**',route=>route.fulfill({status:200,contentType:'text/css',body:'/* system-font fallback for isolated QA */'}))
     page.on('pageerror',e=>errors.push(e.message));page.on('console',m=>{if(m.type()==='error')consoleErrors.push({text:m.text(),location:m.location()})})
     page.on('response',r=>{if(r.status()>=400)failedResponses.push({url:r.url(),status:r.status()})})
-    await page.addInitScript(()=>{window.__replayPosterText=[];window.__replayExportTelemetry={toBlobStarted:false,toBlobFinished:false,blobBytes:null,downloadClicked:false};const original=CanvasRenderingContext2D.prototype.fillText;CanvasRenderingContext2D.prototype.fillText=function(text,...args){if(this.canvas.width===1080&&this.canvas.height===1350)window.__replayPosterText.push(text);return original.call(this,text,...args)};const encode=HTMLCanvasElement.prototype.toBlob;HTMLCanvasElement.prototype.toBlob=function(callback,...args){if(this.width===1080&&this.height===1350){window.__replayExportTelemetry.toBlobStarted=true;const started=performance.now();return encode.call(this,(blob)=>{window.__replayExportTelemetry.toBlobFinished=true;window.__replayExportTelemetry.blobBytes=blob?.size??null;window.__replayExportTelemetry.toBlobElapsedMs=Math.round(performance.now()-started);callback(blob)},...args)}return encode.call(this,callback,...args)};const click=HTMLAnchorElement.prototype.click;HTMLAnchorElement.prototype.click=function(...args){if(this.download==='panacea-human-replay.png')window.__replayExportTelemetry.downloadClicked=true;return click.apply(this,args)};Object.defineProperty(navigator,'share',{value:undefined,configurable:true})})
+    await page.addInitScript(()=>{window.__replayPosterText=[];window.__replayExportTelemetry={toBlobStarted:false,toBlobFinished:false,blobBytes:null,downloadClicked:false};const original=CanvasRenderingContext2D.prototype.fillText;CanvasRenderingContext2D.prototype.fillText=function(text,...args){if(this.canvas.width===1080&&this.canvas.height===1350)window.__replayPosterText.push(text);return original.call(this,text,...args)};const encode=HTMLCanvasElement.prototype.toBlob;HTMLCanvasElement.prototype.toBlob=function(callback,...args){if(this.width===1080&&this.height===1350){window.__replayExportTelemetry.toBlobStarted=true;const started=performance.now();return encode.call(this,(blob)=>{window.__replayExportTelemetry.toBlobFinished=true;window.__replayExportTelemetry.blobBytes=blob?.size??null;window.__replayExportTelemetry.toBlobElapsedMs=Math.round(performance.now()-started);callback(blob)},...args)}return encode.call(this,callback,...args)}return encode.call(this,callback,...args)};const click=HTMLAnchorElement.prototype.click;HTMLAnchorElement.prototype.click=function(...args){if(this.download==='panacea-human-replay.png')window.__replayExportTelemetry.downloadClicked=true;return click.apply(this,args)};Object.defineProperty(navigator,'share',{value:undefined,configurable:true})})
     await page.goto(`${origin}/replay-duration-fixture.html`,{waitUntil:'domcontentloaded',timeout:120000})
     await page.waitForLoadState('networkidle',{timeout:120000})
     const active=page.getByText('active min',{exact:true}).locator('..')
@@ -35,6 +35,19 @@ try {
     assert.ok(overlapWidth<=1||overlapHeight<=1,'reference canvas must not cover the metric cards in either responsive layout')
     assert.match(await active.innerText(),/Unknown/);assert.match(await distance.innerText(),/Unknown/)
     await page.getByRole('note').filter({hasText:'Duration unavailable in one or more sessions.'}).waitFor()
+    // WebGL pixels are covered by the separate Body3D acceptance gate. This suite
+    // has already proved the real reference canvas and its metric-panel geometry.
+    // Release that context before unrelated 2D exports/captures: a heavy submitted
+    // SwiftShader frame can otherwise block canvas readback even after drawing stops.
+    // Fail closed if WebGL was unavailable, so cleanup cannot disguise a missing renderer.
+    const referenceBodyReleased=await page.evaluate(()=>{
+      const gl=document.querySelector('section canvas')?.getContext('webgl2')
+      const loseContext=gl?.getExtension('WEBGL_lose_context')
+      if(!gl||!loseContext)return false
+      loseContext.loseContext()
+      return gl.isContextLost()
+    })
+    assert.ok(referenceBodyReleased,'real Human Replay WebGL context must exist before explicit QA cleanup')
     const poster=async expected=>{
       await page.evaluate(()=>{window.__replayPosterText=[]})
       let file
@@ -85,7 +98,7 @@ try {
       const failure={viewport,errors,consoleErrors,failedResponses};await writeFile(`${out}/failure-${viewport.width}.json`,JSON.stringify(failure,null,2));console.error(JSON.stringify(failure))
     }
     assert.deepEqual(errors,[]);assert.deepEqual(consoleErrors,[]);assert.deepEqual(failedResponses,[])
-    evidence.push({viewport,synthetic:true,actualComponentAndEngine:true,actualPoster:true,externalFontCSSStubbed:true,referenceBodyComponentUnchanged:true,webglAcceptanceVerified:false,routeAuthOrDeviceConnectivityVerified:false,unknownAndInvalidUnavailable:true,explicitZeroPreserved:true,cumulativeAndDeltaUnknown:true,keyboardMonthNavigation:true,canvasDoesNotCoverMetrics:true,overflow,pageErrors:errors,consoleErrors,failedResponses})
+    evidence.push({viewport,synthetic:true,actualComponentAndEngine:true,actualPoster:true,externalFontCSSStubbed:true,referenceBodyComponentUnchanged:true,referenceBodyWebGLReleasedAfterGeometry:true,webglAcceptanceVerified:false,routeAuthOrDeviceConnectivityVerified:false,unknownAndInvalidUnavailable:true,explicitZeroPreserved:true,cumulativeAndDeltaUnknown:true,keyboardMonthNavigation:true,canvasDoesNotCoverMetrics:true,overflow,pageErrors:errors,consoleErrors,failedResponses})
     await context.close()
   }
   await writeFile(`${out}/evidence.json`,JSON.stringify(evidence,null,2));console.log('Human Replay actual component/poster: unknown/zero/mixed/cumulative/delta, keyboard, mobile/desktop passed')
