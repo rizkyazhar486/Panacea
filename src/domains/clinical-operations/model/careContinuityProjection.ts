@@ -115,6 +115,11 @@ import type {
   EdenSirtuinRepairNodeKind,
   EdenSirtuinRepairNode,
   EdenSirtuinNadParp1Bridge,
+  EdenShelterinCappingState,
+  EdenChromosomalEndProtectionTier,
+  EdenShelterinSubunitNodeKind,
+  EdenShelterinSubunitNode,
+  EdenShelterinCapProtectionBridge,
   WellnessDay,
   MoodEntry,
   Circle,
@@ -233,6 +238,7 @@ export interface CareJourneyEpisodeSummary {
   edenCircadianAutophagyPulse?: EdenCircadianAutophagyPulseBridge
   edenRetrotransposonSilencing?: EdenRetrotransposonSilencingBridge
   edenSirtuinNadParp1?: EdenSirtuinNadParp1Bridge
+  edenShelterinCapProtection?: EdenShelterinCapProtectionBridge
 }
 
 export type ReadmissionRiskLevel = 'low' | 'moderate' | 'high'
@@ -337,6 +343,7 @@ export interface CareJourneyContinuityResult {
   edenCircadianAutophagyPulseReadyCount: number
   edenRetrotransposonSilencingReadyCount: number
   edenSirtuinNadParp1ReadyCount: number
+  edenShelterinCapProtectionReadyCount: number
   edenLifeBalance: EdenLifeBalanceSynthesis
   hasBlockedStages: boolean
 }
@@ -4188,6 +4195,115 @@ export function deriveEdenSirtuinNadParp1Bridge(
   }
 }
 
+export function deriveEdenShelterinCapProtectionBridge(
+  episode: CareEpisode,
+): EdenShelterinCapProtectionBridge {
+  const stages = episode.stages ?? []
+  const completedStages = stages.filter((s) => s.status === 'done').length
+  const hasBlocked = stages.some((s) => s.status === 'blocked')
+  const blockedCount = stages.filter((s) => s.status === 'blocked').length
+
+  const shelterinHexamerIntegrityScore = hasBlocked
+    ? Math.max(45, 65 - blockedCount * 7)
+    : Math.min(99, 79 + completedStages * 5)
+
+  const tloopStabilityIndex = hasBlocked
+    ? Math.max(44, 63 - blockedCount * 7)
+    : Math.min(98, 78 + completedStages * 5)
+
+  const ddrKinaseSuppressionCapacity = hasBlocked
+    ? Math.max(42, 62 - blockedCount * 8)
+    : Math.min(98, 77 + completedStages * 5)
+
+  let shelterinState: EdenShelterinCappingState = 'compensated_tloop_protection'
+  let shelterinStateLabel = 'Proteksi T-Loop Terkompensasi & Penstabilan Overhang 3\''
+  let protectionTier: EdenChromosomalEndProtectionTier = 'adequate_g_quadruplex_shielding'
+  let protectionTierLabel = 'Perlindungan Overhang G-Quadruplex Memadai'
+
+  if (hasBlocked) {
+    shelterinState = 'severe_telomeric_decap_crisis'
+    shelterinStateLabel = 'Krisis Dekap Telomerik Kritis & Alarm Kerusakan DNA'
+    protectionTier = 'critical_end_to_end_fusion_hazard'
+    protectionTierLabel = 'Bahaya Fusi Kromosom Ujung-ke-Ujung & Respon ATM/ATR Parah'
+  } else if (completedStages >= 3) {
+    shelterinState = 'robust_shelterin_hexamer_quiescence'
+    shelterinStateLabel = 'Integritas Heksamer Shelterin Kokoh & Proteksi T-Loop Maksimal'
+    protectionTier = 'high_fidelity_tloop_capping'
+    protectionTierLabel = 'Proteksi T-Loop Presisi Tinggi & Supresi Respon Kerusakan DNA Titik Akhir'
+  } else if (completedStages === 0) {
+    shelterinState = 'shelterin_uncapping_ddr_alarm'
+    shelterinStateLabel = 'Risiko Uncapping Shelterin & Alarm Kerusakan DNA Telomerik Dini'
+    protectionTier = 'fragile_telomeric_instability'
+    protectionTierLabel = 'Ketidakstabilan Titik Telomer Fragil Dini'
+  }
+
+  const subunitNodes: EdenShelterinSubunitNode[] = [
+    {
+      nodeKind: 'trf1_trf2_duplex_telomere_anchoring',
+      nodeLabel: 'Penambatan Dupleks DNA Telomer TTAGGG oleh TRF1/TRF2 (Supresi Jalur ATM)',
+      protectionEfficiencyScore: hasBlocked ? 0.62 : Math.min(0.99, 0.79 + completedStages * 0.05),
+      cappingIntegrityIndex: hasBlocked ? 0.60 : Math.min(0.98, 0.77 + completedStages * 0.05),
+      subunitState: hasBlocked ? 'uncapping_strain' : completedStages >= 2 ? 'optimal_capping_shield' : 'adaptive_protective_flux',
+      mechanisticNote: 'Homodimer TRF1 dan TRF2 berikatan kuat pada ulangan dupleks TTAGGG, mengunci invasi untai t-loop serta mencegah aktivasi kinasa ATM kinase yang memicu penuaan dini.',
+    },
+    {
+      nodeKind: 'pot1_tpp1_single_strand_shielding',
+      nodeLabel: 'Perlindungan Overhang Untai Tunggal 3\' oleh POT1-TPP1 (Pencegahan Respon ATR & RPA)',
+      protectionEfficiencyScore: hasBlocked ? 0.61 : Math.min(0.98, 0.78 + completedStages * 0.05),
+      cappingIntegrityIndex: hasBlocked ? 0.59 : Math.min(0.99, 0.76 + completedStages * 0.05),
+      subunitState: hasBlocked ? 'uncapping_strain' : completedStages >= 2 ? 'optimal_capping_shield' : 'adaptive_protective_flux',
+      mechanisticNote: 'Heterodimer POT1-TPP1 membungkus overhang untai tunggal 3\' telomer guna mencegah pengikatan protein RPA dan kaskade pensinyalan checkpoint replikasi ATR.',
+    },
+    {
+      nodeKind: 'tin2_central_bridge_scaffolding',
+      nodeLabel: 'Perancah Penghubung Sentral Kompleks Shelterin oleh TIN2 (Stabilisasi Heksamer Intak)',
+      protectionEfficiencyScore: hasBlocked ? 0.63 : Math.min(0.99, 0.80 + completedStages * 0.05),
+      cappingIntegrityIndex: hasBlocked ? 0.62 : Math.min(0.98, 0.78 + completedStages * 0.05),
+      subunitState: hasBlocked ? 'uncapping_strain' : completedStages >= 2 ? 'optimal_capping_shield' : 'adaptive_protective_flux',
+      mechanisticNote: 'TIN2 bertindak sebagai pusat jangkar yang menghubungkan TRF1, TRF2, dan kompleks TPP1-POT1 menjadi struktur makromolekul heksamerik yang stabil.',
+    },
+    {
+      nodeKind: 'rap1_subtelomeric_heterochromatin_silencing',
+      nodeLabel: 'Peredaman Transkripsional Heterokromatin Subtelomerik oleh RAP1 (Integritas Non-Homologous End Joining)',
+      protectionEfficiencyScore: hasBlocked ? 0.59 : Math.min(0.97, 0.76 + completedStages * 0.06),
+      cappingIntegrityIndex: hasBlocked ? 0.58 : Math.min(0.97, 0.75 + completedStages * 0.06),
+      subunitState: hasBlocked ? 'uncapping_strain' : completedStages >= 2 ? 'optimal_capping_shield' : 'adaptive_protective_flux',
+      mechanisticNote: 'RAP1 berinteraksi dengan TRF2 untuk mencegah fusi ujung-ke-ujung melalui perbaikan NHEJ (non-homologous end joining) yang aberan pada ujung kromosom.',
+    },
+  ]
+
+  const cappingNarrativeId = `Sintesis kompleks shelterin & proteksi dekap telomerik untuk episode "${episode.title}". Status shelterin: ${shelterinStateLabel}, proteksi ujung kromosom: ${protectionTierLabel}. Skor integritas heksamer shelterin ${shelterinHexamerIntegrityScore}%, indeks stabilitas t-loop ${tloopStabilityIndex}%, dan kapasitas supresi kinasa respon kerusakan DNA ${ddrKinaseSuppressionCapacity}%.`
+  const cappingNarrativeEn = `Shelterin complex & telomeric end-capping protection synthesis for episode "${episode.title}". Shelterin state: ${shelterinStateLabel}, chromosome end protection tier: ${protectionTierLabel}. Shelterin hexamer integrity score ${shelterinHexamerIntegrityScore}%, t-loop stability index ${tloopStabilityIndex}%, and DDR kinase suppression capacity ${ddrKinaseSuppressionCapacity}%.`
+
+  const telomericEndProtectionStrategy = hasBlocked
+    ? 'Cegah stres pemendekan kritis dan dekap telomerik melalui reduksi beban oksidatif mitokondria, stabilisasi t-loop via aktivator telomerase alami terpilih (seperti cycloastragenol/astragaloside) di bawah panduan klinisi, serta minimasi paparan genotoksik.'
+    : completedStages >= 3
+    ? 'Pertahankan kestabilan heksamer shelterin maksimal melalui aktivitas fisik terukur, tidur restoratif berkualitas tinggi untuk reduksi stres replikasi DNA, dan asupan antioksidan polifenol pelindung telomer.'
+    : 'Dukung kestabilan arsitektur shelterin dengan nutrisi folat, seng, magnesium, dan perlindungan terhadap stres metabolik seluler.'
+
+  return {
+    version: 'v1',
+    episodeId: episode.id,
+    episodeTitle: episode.title,
+    shelterinState,
+    shelterinStateLabel,
+    protectionTier,
+    protectionTierLabel,
+    shelterinHexamerIntegrityScore,
+    tloopStabilityIndex,
+    ddrKinaseSuppressionCapacity,
+    subunitNodes,
+    cappingNarrativeId,
+    cappingNarrativeEn,
+    telomericEndProtectionStrategy,
+    truthClass: 'shelterin_capping_protection_simulation_proxy',
+    clinically_reviewed: false,
+    patientTruthUncompromised: true,
+    neverManufacturesBiomarkers: true,
+    epistemicHumilityPreserved: true,
+  }
+}
+
 export const STAGE_EXPECTED_DAYS: Record<CareEpisodeStageId, number> = {
   problem: 1,
   diagnosis: 2,
@@ -4464,6 +4580,7 @@ export function evaluateCareJourneyContinuity(
     const edenCircadianAutophagyPulse = deriveEdenCircadianAutophagyPulseBridge(ep)
     const edenRetrotransposonSilencing = deriveEdenRetrotransposonSilencingBridge(ep)
     const edenSirtuinNadParp1 = deriveEdenSirtuinNadParp1Bridge(ep)
+    const edenShelterinCapProtection = deriveEdenShelterinCapProtectionBridge(ep)
 
     return {
       id: ep.id,
@@ -4519,6 +4636,7 @@ export function evaluateCareJourneyContinuity(
       edenCircadianAutophagyPulse,
       edenRetrotransposonSilencing,
       edenSirtuinNadParp1,
+      edenShelterinCapProtection,
     }
   })
 
@@ -4732,6 +4850,14 @@ export function evaluateCareJourneyContinuity(
           s.edenSirtuinNadParp1?.neverManufacturesBiomarkers
       )
   ).length
+  const edenShelterinCapProtectionReadyCount = summaries.filter(
+    (s) =>
+      Boolean(
+        s.edenShelterinCapProtection?.truthClass === 'shelterin_capping_protection_simulation_proxy' &&
+          s.edenShelterinCapProtection?.patientTruthUncompromised &&
+          s.edenShelterinCapProtection?.neverManufacturesBiomarkers
+      )
+  ).length
   const edenLifeBalance = deriveEdenLifeBalanceSynthesis(episodes, supportiveResults)
 
   return {
@@ -4791,6 +4917,7 @@ export function evaluateCareJourneyContinuity(
     edenCircadianAutophagyPulseReadyCount,
     edenRetrotransposonSilencingReadyCount,
     edenSirtuinNadParp1ReadyCount,
+    edenShelterinCapProtectionReadyCount,
     edenLifeBalance,
     hasBlockedStages: blockedJourneys > 0 || stalledCount > 0,
   }

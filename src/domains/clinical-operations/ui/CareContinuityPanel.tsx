@@ -834,6 +834,17 @@ export function CareContinuityPanel({
                   </span>
                 </div>
               )}
+              {careJourneys.edenShelterinCapProtectionReadyCount > 0 && (
+                <div
+                  className="flex justify-between text-emerald-300"
+                  data-eden-shelterin-cap="v1"
+                >
+                  <span>Kompleks Shelterin & proteksi dekap telomerik:</span>
+                  <span className="font-bold">
+                    {careJourneys.edenShelterinCapProtectionReadyCount} episode terhubung
+                  </span>
+                </div>
+              )}
 
               {careJourneys.episodes.length > 0 && (
                 <div className="mt-3 border-t border-white/8 pt-2">
