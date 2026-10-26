@@ -29,6 +29,8 @@ import type {
   EdenLongevityPillarRecommendation,
   EdenPreventionLongevityRhythm,
   EdenSupportCircleBridge,
+  EdenVisitPreparationQuestion,
+  EdenVisitPreparationCompanion,
   Circle,
   SupportMessage,
   GratitudeNote,
@@ -124,6 +126,7 @@ export interface CareJourneyEpisodeSummary {
   edenPhysiologyAppreciation?: EdenPhysiologyAppreciation
   edenLongevityRhythm?: EdenPreventionLongevityRhythm
   edenSupportCircle?: EdenSupportCircleBridge
+  edenVisitPreparation?: EdenVisitPreparationCompanion
 }
 
 export type ReadmissionRiskLevel = 'low' | 'moderate' | 'high'
@@ -208,6 +211,7 @@ export interface CareJourneyContinuityResult {
   edenPhysiologyLinkedCount: number
   edenLongevityReadyCount: number
   edenSupportCircleReadyCount: number
+  edenVisitPrepReadyCount: number
   edenLifeBalance: EdenLifeBalanceSynthesis
   hasBlockedStages: boolean
 }
@@ -1879,6 +1883,100 @@ export function deriveEdenSupportCircleBridge(
   }
 }
 
+export function deriveEdenVisitPreparationCompanion(
+  episode: CareEpisode,
+  supportiveResults?: readonly SupportiveResult[],
+): EdenVisitPreparationCompanion {
+  const stages = episode.stages ?? []
+  const blockedStage = stages.find((s) => s.status === 'blocked')
+  const activeStage = stages.find((s) => s.status === 'active')
+  const pendingStage = stages.find((s) => s.status === 'pending')
+  const currentStage =
+    blockedStage ??
+    activeStage ??
+    pendingStage ??
+    (stages.length > 0 ? stages[stages.length - 1] : undefined)
+
+  const focusStage: CareEpisodeStageId = currentStage?.stage ?? 'problem'
+  const focusStageLabel = STAGE_LABEL[focusStage] ?? focusStage
+
+  const safeResults: readonly SupportiveResult[] = Array.isArray(supportiveResults)
+    ? supportiveResults
+    : []
+  const flaggedResults = safeResults.filter(
+    (r) => r.flag === 'high' || r.flag === 'critical' || r.flag === 'low'
+  )
+
+  const flaggedResultSummary =
+    flaggedResults.length > 0
+      ? flaggedResults
+          .slice(0, 2)
+          .map((r) => `${r.name}: ${r.value}${r.unit ? ` ${r.unit}` : ''} (${r.flag})`)
+          .join(' · ')
+      : undefined
+
+  const understandingQuestion = flaggedResultSummary
+    ? `Could we walk through what my recent result (${flaggedResultSummary}) means in plain language for “${episode.title}”?`
+    : `How does my body’s current progress in “${episode.title}” look at the ${focusStageLabel} stage, and what signs show we are on the right track?`
+
+  const optionsNextStepQuestion = blockedStage
+    ? `Since ${focusStageLabel} is currently paused (${blockedStage.blockedReason || 'awaiting coordination'}), what is the simplest step we can take together to move forward safely?`
+    : focusStage === 'provider' || focusStage === 'cost' || focusStage === 'schedule'
+    ? `What should I prioritize when choosing or scheduling the next step for “${episode.title}”, and which timeline feels clinically safe?`
+    : `Between our options at the ${focusStageLabel} stage of “${episode.title}”, what can we expect over the coming days and weeks?`
+
+  const dailyLifeRecoveryQuestion =
+    `While we work through ${focusStageLabel} for “${episode.title}”, what gentle daily habits (sleep, movement, or nourishment) best support my recovery, and what red-flag symptoms should prompt me to contact you early?`
+
+  const questionsToBring: EdenVisitPreparationQuestion[] = [
+    {
+      id: `q-understand-${episode.id}`,
+      category: 'understanding',
+      categoryLabel: 'Clear Understanding',
+      question: understandingQuestion,
+      whyAskThis: 'Helps translate clinical findings and lab numbers into calm, everyday meaning.',
+    },
+    {
+      id: `q-options-${episode.id}`,
+      category: 'options_next_step',
+      categoryLabel: 'Next Step & Options',
+      question: optionsNextStepQuestion,
+      whyAskThis: 'Aligns your personal priorities and schedule with your clinician’s recommended care plan.',
+    },
+    {
+      id: `q-daily-${episode.id}`,
+      category: 'daily_life_recovery',
+      categoryLabel: 'Daily Life & Safety Signals',
+      question: dailyLifeRecoveryQuestion,
+      whyAskThis: 'Clarifies both supportive daily habits and specific warning signs to watch for at home.',
+    },
+  ]
+
+  const whatToShareWithClinician: string[] = [
+    'How your energy, sleep, and symptoms have felt in daily life since your last check-in.',
+    blockedStage?.blockedReason
+      ? `Any practical obstacle around ${focusStageLabel} (${blockedStage.blockedReason}) so the care team can help resolve it.`
+      : `What matters most to you as you move through the ${focusStageLabel} stage.`,
+    'Any medications, supplements, or gentle daily routines you are currently following.',
+  ]
+
+  const reassuringHeadline =
+    `Great medical care is a partnership—bringing a few calm, thoughtful questions to your next conversation about “${episode.title}” helps you and your clinician decide the best next step together.`
+
+  return {
+    episodeId: episode.id,
+    episodeTitle: episode.title,
+    currentFocusStage: focusStage,
+    currentFocusStageLabel: focusStageLabel,
+    reassuringHeadline,
+    flaggedResultSummary,
+    questionsToBring,
+    whatToShareWithClinician,
+    empoweringAgencyPreserved: true,
+    neverReplacesClinicianConsultation: true,
+  }
+}
+
 export const STAGE_EXPECTED_DAYS: Record<CareEpisodeStageId, number> = {
   problem: 1,
   diagnosis: 2,
@@ -2135,6 +2233,7 @@ export function evaluateCareJourneyContinuity(
     const edenPhysiologyAppreciation = deriveEdenPhysiologyAppreciation(ep)
     const edenLongevityRhythm = deriveEdenPreventionLongevityRhythm(ep, recordPlanItems)
     const edenSupportCircle = deriveEdenSupportCircleBridge(ep)
+    const edenVisitPreparation = deriveEdenVisitPreparationCompanion(ep, supportiveResults)
 
     return {
       id: ep.id,
@@ -2170,6 +2269,7 @@ export function evaluateCareJourneyContinuity(
       edenPhysiologyAppreciation,
       edenLongevityRhythm,
       edenSupportCircle,
+      edenVisitPreparation,
     }
   })
 
@@ -2235,6 +2335,9 @@ export function evaluateCareJourneyContinuity(
   const edenSupportCircleReadyCount = summaries.filter(
     (s) => Boolean(s.edenSupportCircle?.optInPrivacyPreserved)
   ).length
+  const edenVisitPrepReadyCount = summaries.filter(
+    (s) => Boolean(s.edenVisitPreparation?.empoweringAgencyPreserved)
+  ).length
   const edenLifeBalance = deriveEdenLifeBalanceSynthesis(episodes, supportiveResults)
 
   return {
@@ -2274,6 +2377,7 @@ export function evaluateCareJourneyContinuity(
     edenPhysiologyLinkedCount,
     edenLongevityReadyCount,
     edenSupportCircleReadyCount,
+    edenVisitPrepReadyCount,
     edenLifeBalance,
     hasBlockedStages: blockedJourneys > 0 || stalledCount > 0,
   }

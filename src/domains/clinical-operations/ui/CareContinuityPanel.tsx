@@ -614,6 +614,17 @@ export function CareContinuityPanel({
                   </span>
                 </div>
               )}
+              {careJourneys.edenVisitPrepReadyCount > 0 && (
+                <div
+                  className="flex justify-between text-violet-200"
+                  data-eden-visit-prep="v1"
+                >
+                  <span>Visit prep questions:</span>
+                  <span className="font-bold">
+                    {careJourneys.edenVisitPrepReadyCount} 3-question guide(s)
+                  </span>
+                </div>
+              )}
 
               {careJourneys.episodes.length > 0 && (
                 <div className="mt-3 border-t border-white/8 pt-2">

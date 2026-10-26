@@ -14,6 +14,7 @@ import {
   deriveEdenPhysiologyAppreciation,
   deriveEdenPreventionLongevityRhythm,
   deriveEdenSupportCircleBridge,
+  deriveEdenVisitPreparationCompanion,
 } from '../../domains/clinical-operations'
 import {
   CARE_EPISODE_STAGES,
@@ -595,6 +596,9 @@ function EpisodeCard({
         supportMessages={supportMessages}
         gratitudes={gratitudes}
       />
+
+      {/* Eden Clinician Visit Preparation & Empowering Questions Companion (T-CLIN-27 / EDEN-07) */}
+      <EdenVisitPrepSection episode={episode} supportiveResults={supportiveResults} />
     </Card>
   )
 }
@@ -1423,6 +1427,80 @@ function EdenSupportCircleSection({
           )}
         </div>
       )}
+    </div>
+  )
+}
+
+function EdenVisitPrepSection({
+  episode,
+  supportiveResults,
+}: {
+  episode: CareEpisode
+  supportiveResults?: readonly SupportiveResult[]
+}) {
+  const prep = useMemo(
+    () => deriveEdenVisitPreparationCompanion(episode, supportiveResults),
+    [episode, supportiveResults]
+  )
+
+  return (
+    <div
+      className="mt-3 rounded-xl border border-violet-200 dark:border-white/10 bg-violet-50/35 dark:bg-white/[0.02] p-3.5"
+      data-eden-visit-prep-card="v1"
+      data-visit-focus-stage={prep.currentFocusStage}
+    >
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+        <div>
+          <div className="flex items-center gap-2 flex-wrap">
+            <h4 className="text-xs font-bold text-neutral-900 dark:text-white">
+              Clinician Visit Preparation — Empowering Questions for Your Next Conversation
+            </h4>
+            <Badge tone="brand">Focus: {prep.currentFocusStageLabel}</Badge>
+            <Badge tone="neutral">Supports Clinician Partnership</Badge>
+          </div>
+          <p className="mt-1 text-xs text-neutral-700 dark:text-white/80">
+            {prep.reassuringHeadline}
+          </p>
+        </div>
+        <Link
+          to="/consult"
+          className="inline-flex items-center rounded-lg border border-violet-500/30 bg-violet-500/10 px-2.5 py-1 text-[11px] font-semibold text-violet-700 dark:text-violet-300 hover:bg-violet-500/20 shrink-0"
+        >
+          Open Clinician Consult →
+        </Link>
+      </div>
+
+      <div className="mt-2.5 grid gap-2 sm:grid-cols-3 text-xs" data-eden-visit-questions="v1">
+        {prep.questionsToBring.map((q) => (
+          <div
+            key={q.id}
+            className="rounded-lg bg-white/80 dark:bg-white/[0.03] p-2.5 border border-violet-100 dark:border-white/5 flex flex-col justify-between gap-1"
+          >
+            <div>
+              <span className="text-[10px] font-bold uppercase tracking-wider text-violet-700 dark:text-violet-300">
+                {q.categoryLabel}
+              </span>
+              <p className="mt-0.5 text-[11px] font-medium text-neutral-900 dark:text-white">
+                “{q.question}”
+              </p>
+            </div>
+            <p className="text-[10px] text-neutral-500 dark:text-white/55">
+              {q.whyAskThis}
+            </p>
+          </div>
+        ))}
+      </div>
+
+      <div className="mt-2.5 rounded-lg bg-white/80 dark:bg-white/[0.03] p-2.5 border border-violet-100 dark:border-white/5">
+        <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-500 dark:text-white/50">
+          Helpful Context to Share With Your Clinician
+        </span>
+        <ul className="mt-1 space-y-0.5 text-[11px] text-neutral-700 dark:text-white/80 list-disc list-inside">
+          {prep.whatToShareWithClinician.map((item, idx) => (
+            <li key={idx}>{item}</li>
+          ))}
+        </ul>
+      </div>
     </div>
   )
 }
