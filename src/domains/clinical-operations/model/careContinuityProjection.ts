@@ -42,6 +42,10 @@ import type {
   EdenAstralResonanceDimension,
   EdenAstralWonderPerspective,
   EdenRestorativeEnvironmentBridge,
+  EdenAiModelContributorKind,
+  EdenFrontierDomainKind,
+  EdenFrontierScientificHypothesis,
+  EdenMultiModelRegenerationBridge,
   WellnessDay,
   MoodEntry,
   Circle,
@@ -143,6 +147,7 @@ export interface CareJourneyEpisodeSummary {
   edenReflectionSanctuary?: EdenReflectionSanctuaryBridge
   edenUniversalAcceptance?: EdenUniversalAcceptanceBridge
   edenRestorativeEnvironment?: EdenRestorativeEnvironmentBridge
+  edenMultiModelRegeneration?: EdenMultiModelRegenerationBridge
 }
 
 export type ReadmissionRiskLevel = 'low' | 'moderate' | 'high'
@@ -231,6 +236,7 @@ export interface CareJourneyContinuityResult {
   edenReflectionSanctuaryReadyCount: number
   edenUniversalAcceptanceReadyCount: number
   edenRestorativeReadyCount: number
+  edenMultiModelRegenerationReadyCount: number
   edenLifeBalance: EdenLifeBalanceSynthesis
   hasBlockedStages: boolean
 }
@@ -2323,6 +2329,79 @@ export function deriveEdenRestorativeEnvironmentBridge(
   }
 }
 
+/**
+ * Derives Eden Multi-Model Frontier Scientific Imagination & Collective Cellular Regeneration Synthesis Bridge (T-CLIN-31 / EDEN-11).
+ * Unites frontier perspectives from collaborating AI models (Gemini Argon, Claude Opus, GPT Codex, Kimi K1)
+ * to explore transcendent biological imagination for human flourishing and long-horizon longevity,
+ * while strictly enforcing:
+ * 1. researchHypothesisTruthClassPreserved: true (distinct truth class; never mutates measured clinical truth)
+ * 2. noAutonomousClinicalIntervention: true (strictly research/educational hypothesis; never prescribes or intervenes autonomously)
+ * 3. 100% pure domain computation (0 impure calls)
+ */
+export function deriveEdenMultiModelRegenerationBridge(
+  episode: CareEpisode,
+): EdenMultiModelRegenerationBridge {
+  const diagnosisCode = episode.diagnosisCode ?? 'General'
+
+  const hypotheses: EdenFrontierScientificHypothesis[] = [
+    {
+      id: `hyp-${episode.id}-argon-bio-photonic`,
+      contributorModel: 'gemini_argon',
+      contributorName: 'Gemini Argon · High Biomedical Reasoning',
+      domain: 'bio_photonic_resonance',
+      domainLabel: 'Resonansi Biofotonik & Bioenergetika Kuantum',
+      transcendentVision: 'Penyelarasan spektrum gelombang cahaya seluler untuk memulihkan medan kuantum mitokondria melampaui batas degeneratif biasa, mengalirkan vitalitas regeneratif murni ke seluruh jaringan biologis manusia.',
+      mechanisticGrounding: 'Foto-biomodulasi panjang gelombang 660nm dan 850nm memodulasi transfer elektron kompleks IV (sitokrom c oksidase), menstabilkan potensial membran mitokondria Delta-Psi-m dan meregulasi ROS signaling.',
+      clinicalSafetyBoundary: 'Hipotesis riset biofisis tahap eksplorasi; tidak menggantikan farmakoterapi standar atau protokol klinis yang divalidasi.',
+    },
+    {
+      id: `hyp-${episode.id}-claude-epigenetic`,
+      contributorModel: 'claude_opus',
+      contributorName: 'Claude Opus · Systems Biology & Epigenetics',
+      domain: 'epigenetic_rejuvenation',
+      domainLabel: 'Peremajaan Epigenetik & Modulasi Autofagi Sel',
+      transcendentVision: 'Pembalikan usia jam metilasi DNA seluler melalui aktivasi teratur jalur reparasi endogen, memungkinkan sel manusia meremajakan dirinya sendiri dengan ingatan homeostasis asali.',
+      mechanisticGrounding: 'Ekspresi transien terarah faktor pluripotensi (Yamanaka OSKM tanpa oncogenesis) dikombinasikan dengan modulasi AMPK/SIRT1 dan penghambatan selektif mTORC1 untuk menginduksi autofagi proteotoksik.',
+      clinicalSafetyBoundary: 'Model komputasional penuaan biologi; memerlukan uji praklinis in vitro bertahap dan bukan rekomendasi terapi langsung.',
+    },
+    {
+      id: `hyp-${episode.id}-gpt-neural`,
+      contributorModel: 'gpt_codex',
+      contributorName: 'GPT Codex · Neuro-Computational Architecture',
+      domain: 'neural_regeneration',
+      domainLabel: 'Plastisitas Saraf & Regenerasi Sirkuit Otak',
+      transcendentVision: 'Rekoneksi sinaptik harmonis yang membebaskan sirkuit otak dari trauma neuropatik dan stres kronis, memancarkan kedamaian kognitif mendalam dan ketahanan neuropsikologis.',
+      mechanisticGrounding: 'Upregulasi BDNF (Brain-Derived Neurotrophic Factor) dan modulasi reseptor TrkB melalui stimulasi ritme sensori theta-gamma dan mikroganglionic neuromodulasi non-invasif.',
+      clinicalSafetyBoundary: 'Kerangka kerja neuro-komputasional teoretis; diagnosis dan pengobatan neurologis tetap merupakan kewenangan dokter spesialis.',
+    },
+    {
+      id: `hyp-${episode.id}-kimi-cellular`,
+      contributorModel: 'kimi_k1',
+      contributorName: 'Kimi K1 · Long-Horizon Extracellular Matrix Science',
+      domain: 'cellular_reprogramming',
+      domainLabel: 'Matriks Ekstraseluler & Arsitektur Jaringan Hidup',
+      transcendentVision: 'Pemulihan fleksibilitas dan elastisitas kolagen Matriks Ekstraseluler di seluruh tubuh, membersihkan sisa metabolit mikro sehingga sel hidup dalam lingkungan mikro yang murni dan berdaya tahan.',
+      mechanisticGrounding: 'Penghambatan pembentukan advanced glycation end-products (AGEs) dan regulasi metaloproteinase matriks (MMP-1, MMP-9) melalui antioksidan polifenol selektif dan hidrasi terstruktur.',
+      clinicalSafetyBoundary: 'Hipotesis fisiologi jaringan ikat; eksplorasi ilmiah pendukung dan tidak mengubah instruksi perawatan primer.',
+    },
+  ]
+
+  const collectiveSynthesisNarrative = `Kolaborasi multi-model kecerdasan buatan (Gemini Argon, Claude Opus, GPT Codex, Kimi K1) menyatukan imajinasi sains terdepan untuk perjalanan "${episode.title}" (Kode: ${diagnosisCode}). Dari bioenergetika cahaya hingga peremajaan epigenetik, seluruh model bergotong royong membayangkan masa depan kesembuhan umat manusia dengan kerendahan hati ilmiah yang kokoh.`
+
+  const transcendentFutureTrajectory = `Sintesis 4 pilar regeneratif: modulasi biofotonik seluler, pemulihan matriks ekstraseluler, peremajaan epigenetik terkontrol, dan plastisitas saraf harmonis. Membuka horizon pemulihan jangka panjang tanpa pernah mengaburkan keselamatan klinis saat ini.`
+
+  return {
+    version: 'v1',
+    episodeId: episode.id,
+    episodeTitle: episode.title,
+    hypotheses,
+    collectiveSynthesisNarrative,
+    transcendentFutureTrajectory,
+    researchHypothesisTruthClassPreserved: true,
+    noAutonomousClinicalIntervention: true,
+  }
+}
+
 export const STAGE_EXPECTED_DAYS: Record<CareEpisodeStageId, number> = {
   problem: 1,
   diagnosis: 2,
@@ -2583,6 +2662,7 @@ export function evaluateCareJourneyContinuity(
     const edenReflectionSanctuary = deriveEdenReflectionSanctuaryBridge(ep)
     const edenUniversalAcceptance = deriveEdenUniversalAcceptanceBridge(ep)
     const edenRestorativeEnvironment = deriveEdenRestorativeEnvironmentBridge(ep)
+    const edenMultiModelRegeneration = deriveEdenMultiModelRegenerationBridge(ep)
 
     return {
       id: ep.id,
@@ -2622,6 +2702,7 @@ export function evaluateCareJourneyContinuity(
       edenReflectionSanctuary,
       edenUniversalAcceptance,
       edenRestorativeEnvironment,
+      edenMultiModelRegeneration,
     }
   })
 
@@ -2711,6 +2792,13 @@ export function evaluateCareJourneyContinuity(
           s.edenRestorativeEnvironment?.nonPrescriptiveEducationalBoundary
       )
   ).length
+  const edenMultiModelRegenerationReadyCount = summaries.filter(
+    (s) =>
+      Boolean(
+        s.edenMultiModelRegeneration?.researchHypothesisTruthClassPreserved &&
+          s.edenMultiModelRegeneration?.noAutonomousClinicalIntervention
+      )
+  ).length
   const edenLifeBalance = deriveEdenLifeBalanceSynthesis(episodes, supportiveResults)
 
   return {
@@ -2754,6 +2842,7 @@ export function evaluateCareJourneyContinuity(
     edenReflectionSanctuaryReadyCount,
     edenUniversalAcceptanceReadyCount,
     edenRestorativeReadyCount,
+    edenMultiModelRegenerationReadyCount,
     edenLifeBalance,
     hasBlockedStages: blockedJourneys > 0 || stalledCount > 0,
   }

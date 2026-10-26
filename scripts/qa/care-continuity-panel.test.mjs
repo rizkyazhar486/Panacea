@@ -23,6 +23,7 @@ import {
   deriveEdenReflectionSanctuaryBridge,
   deriveEdenUniversalAcceptanceBridge,
   deriveEdenRestorativeEnvironmentBridge,
+  deriveEdenMultiModelRegenerationBridge,
   translateClinicalTermToEden,
   EDEN_PLAIN_LANGUAGE_GLOSSARY,
 } from '../../src/domains/clinical-operations/model/careContinuityProjection.ts'
@@ -2366,4 +2367,66 @@ test('deriveEdenRestorativeEnvironmentBridge & CareEpisode: Eden Restorative Env
   const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
   assert.ok(episodeSource.includes('data-eden-restorative-environment-card="v1"'), 'CareEpisode must include Eden restorative environment card')
   assert.ok(episodeSource.includes('data-eden-astral-perspectives="v1"'), 'CareEpisode must include Eden astral perspectives selector')
+})
+
+test('deriveEdenMultiModelRegenerationBridge & CareEpisode: Eden Multi-Model Frontier Scientific Imagination & Collective Cellular Regeneration Synthesis Bridge (T-CLIN-31 / EDEN-11)', () => {
+  const evaluatedAt = '2026-10-26T08:15:00.000Z'
+
+  const sampleEpisode = {
+    id: 'ce_multi_model_1',
+    title: 'Cellular Vitality & Cardiorespiratory Renewal',
+    diagnosisCode: 'I25.1',
+    createdAt: '2026-10-18T08:00:00.000Z',
+    updatedAt: '2026-10-26T08:00:00.000Z',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'diagnosis', status: 'done' },
+      { stage: 'treatment', status: 'active' },
+      { stage: 'recovery', status: 'pending' },
+    ],
+  }
+
+  // 1. Pure derivation across 4 frontier collaborating models
+  const bridge = deriveEdenMultiModelRegenerationBridge(sampleEpisode)
+  assert.equal(bridge.version, 'v1')
+  assert.equal(bridge.episodeId, 'ce_multi_model_1')
+  assert.equal(bridge.hypotheses.length, 4)
+  assert.equal(bridge.researchHypothesisTruthClassPreserved, true)
+  assert.equal(bridge.noAutonomousClinicalIntervention, true)
+
+  const argonHyp = bridge.hypotheses.find((h) => h.contributorModel === 'gemini_argon')
+  assert.ok(argonHyp)
+  assert.equal(argonHyp.domain, 'bio_photonic_resonance')
+  assert.ok(argonHyp.transcendentVision.includes('Penyelarasan spektrum'))
+  assert.ok(argonHyp.mechanisticGrounding.includes('Foto-biomodulasi'))
+
+  const claudeHyp = bridge.hypotheses.find((h) => h.contributorModel === 'claude_opus')
+  assert.ok(claudeHyp)
+  assert.equal(claudeHyp.domain, 'epigenetic_rejuvenation')
+  assert.ok(claudeHyp.mechanisticGrounding.includes('Yamanaka OSKM'))
+
+  const gptHyp = bridge.hypotheses.find((h) => h.contributorModel === 'gpt_codex')
+  assert.ok(gptHyp)
+  assert.equal(gptHyp.domain, 'neural_regeneration')
+  assert.ok(gptHyp.mechanisticGrounding.includes('BDNF'))
+
+  const kimiHyp = bridge.hypotheses.find((h) => h.contributorModel === 'kimi_k1')
+  assert.ok(kimiHyp)
+  assert.equal(kimiHyp.domain, 'cellular_reprogramming')
+  assert.ok(kimiHyp.transcendentVision.includes('Matriks Ekstraseluler'))
+
+  // 2. Rollup in evaluateCareJourneyContinuity
+  const projection = evaluateCareJourneyContinuity([sampleEpisode], evaluatedAt)
+  assert.equal(projection.edenMultiModelRegenerationReadyCount, 1)
+  assert.ok(projection.episodes[0].edenMultiModelRegeneration)
+  assert.equal(projection.episodes[0].edenMultiModelRegeneration.researchHypothesisTruthClassPreserved, true)
+  assert.equal(projection.episodes[0].edenMultiModelRegeneration.noAutonomousClinicalIntervention, true)
+
+  // 3. UI contracts
+  const panelSource = read('src/domains/clinical-operations/ui/CareContinuityPanel.tsx')
+  assert.ok(panelSource.includes('data-eden-multi-model-regeneration="v1"'), 'CareContinuityPanel must include multi-model regeneration attribute')
+
+  const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
+  assert.ok(episodeSource.includes('data-eden-multi-model-regeneration-card="v1"'), 'CareEpisode must include multi-model regeneration card')
+  assert.ok(episodeSource.includes('data-eden-frontier-hypotheses="v1"'), 'CareEpisode must include frontier hypotheses selector')
 })

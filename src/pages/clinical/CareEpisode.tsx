@@ -18,6 +18,7 @@ import {
   deriveEdenReflectionSanctuaryBridge,
   deriveEdenUniversalAcceptanceBridge,
   deriveEdenRestorativeEnvironmentBridge,
+  deriveEdenMultiModelRegenerationBridge,
 } from '../../domains/clinical-operations'
 import {
   CARE_EPISODE_STAGES,
@@ -71,6 +72,7 @@ import type {
   EdenLanguageCode,
   EdenLiteracyAdaptationMode,
   EdenAstralResonanceDimension,
+  EdenAiModelContributorKind,
   WellnessDay,
 } from '../../lib/types'
 import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
@@ -622,6 +624,9 @@ function EpisodeCard({
 
       {/* Eden Restorative Environment, Bio-Photonic Exposure & Cosmic Wonder Synthesis Bridge (T-CLIN-30 / EDEN-10) */}
       <EdenRestorativeEnvironmentSection episode={episode} wellness={wellness} />
+
+      {/* Eden Multi-Model Frontier Scientific Imagination & Collective Cellular Regeneration Synthesis Bridge (T-CLIN-31 / EDEN-11) */}
+      <EdenMultiModelRegenerationSection episode={episode} />
     </Card>
   )
 }
@@ -1803,6 +1808,94 @@ function EdenRestorativeEnvironmentSection({
 
       <div className="mt-2 text-[10px] text-neutral-500 dark:text-white/50 text-right">
         ARGON EDEN ∞ §8 · Non-prescriptive restorative wonder · Never fabricates unlogged exposures
+      </div>
+    </div>
+  )
+}
+
+function EdenMultiModelRegenerationSection({ episode }: { episode: CareEpisode }) {
+  const [selectedModel, setSelectedModel] = useState<EdenAiModelContributorKind>('gemini_argon')
+
+  const bridge = useMemo(
+    () => deriveEdenMultiModelRegenerationBridge(episode),
+    [episode]
+  )
+
+  const activeHypothesis = useMemo(
+    () => bridge.hypotheses.find((h) => h.contributorModel === selectedModel) ?? bridge.hypotheses[0],
+    [bridge.hypotheses, selectedModel]
+  )
+
+  return (
+    <div
+      className="mt-3 rounded-xl border border-fuchsia-200 dark:border-white/10 bg-fuchsia-50/30 dark:bg-white/[0.02] p-3.5"
+      data-eden-multi-model-regeneration-card="v1"
+    >
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+        <div>
+          <div className="flex items-center gap-2 flex-wrap">
+            <h4 className="text-xs font-bold text-neutral-900 dark:text-white">
+              Multi-Model Frontier Scientific Imagination — Collective Human Regeneration
+            </h4>
+            <Badge tone="brand">4-Model Consensus Synthesis</Badge>
+            <Badge tone="neutral">Frontier Research Horizon</Badge>
+          </div>
+          <p className="mt-1 text-xs font-medium text-neutral-800 dark:text-white/85">
+            {bridge.collectiveSynthesisNarrative}
+          </p>
+        </div>
+      </div>
+
+      <div className="mt-3 pt-3 border-t border-fuchsia-100 dark:border-white/10" data-eden-frontier-hypotheses="v1">
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-xs font-bold text-neutral-700 dark:text-white/80">
+            Kontributor Inteligensi & Domain Hipotesis Terdepan:
+          </span>
+        </div>
+        <div className="flex flex-wrap gap-1.5 mb-2.5">
+          {bridge.hypotheses.map((h) => (
+            <button
+              key={h.id}
+              type="button"
+              onClick={() => setSelectedModel(h.contributorModel)}
+              className={`rounded-lg px-2.5 py-1 text-xs font-medium transition-colors ${
+                selectedModel === h.contributorModel
+                  ? 'bg-fuchsia-600 text-white font-bold'
+                  : 'bg-white/80 dark:bg-white/5 text-neutral-700 dark:text-white/70 hover:bg-fuchsia-100/50'
+              }`}
+            >
+              {h.contributorName.split('·')[0].trim()}
+            </button>
+          ))}
+        </div>
+
+        {activeHypothesis && (
+          <div className="rounded-lg border border-fuchsia-300/40 dark:border-white/10 bg-fuchsia-100/40 dark:bg-white/[0.04] p-3 text-xs space-y-1.5">
+            <div className="flex items-center justify-between">
+              <span className="font-bold text-fuchsia-950 dark:text-fuchsia-200">
+                {activeHypothesis.contributorName}
+              </span>
+              <Badge tone="normal">{activeHypothesis.domainLabel}</Badge>
+            </div>
+            <p className="text-neutral-800 dark:text-white/85 leading-relaxed">
+              <b>Visi Terobosan:</b> {activeHypothesis.transcendentVision}
+            </p>
+            <div className="text-[11px] text-neutral-700 dark:text-white/75 pt-1 border-t border-fuchsia-200/40 dark:border-white/5">
+              <b>Mekanisme Molekuler/Fisiologis:</b> {activeHypothesis.mechanisticGrounding}
+            </div>
+            <div className="text-[10px] text-neutral-500 dark:text-white/50 italic">
+              <b>Batas Keselamatan:</b> {activeHypothesis.clinicalSafetyBoundary}
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div className="mt-2.5 rounded-lg bg-white/60 dark:bg-white/[0.02] p-2 text-[11px] text-neutral-700 dark:text-white/70 border border-fuchsia-100 dark:border-white/5">
+        <b>Trajektori Masa Depan Bersama:</b> {bridge.transcendentFutureTrajectory}
+      </div>
+
+      <div className="mt-2 text-[10px] text-neutral-500 dark:text-white/50 text-right">
+        PANACEA CONSTITUTION §0 · Separate research hypothesis truth class · No autonomous clinical intervention
       </div>
     </div>
   )

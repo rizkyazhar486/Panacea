@@ -605,6 +605,42 @@ export interface EdenRestorativeEnvironmentBridge {
   nonPrescriptiveEducationalBoundary: true
 }
 
+export type EdenAiModelContributorKind =
+  | 'gemini_argon'
+  | 'claude_opus'
+  | 'gpt_codex'
+  | 'kimi_k1'
+  | 'collective_synthesis'
+
+export type EdenFrontierDomainKind =
+  | 'cellular_reprogramming'
+  | 'bio_photonic_resonance'
+  | 'neural_regeneration'
+  | 'quantum_metabolic_flux'
+  | 'epigenetic_rejuvenation'
+
+export interface EdenFrontierScientificHypothesis {
+  id: string
+  contributorModel: EdenAiModelContributorKind
+  contributorName: string
+  domain: EdenFrontierDomainKind
+  domainLabel: string
+  transcendentVision: string
+  mechanisticGrounding: string
+  clinicalSafetyBoundary: string
+}
+
+export interface EdenMultiModelRegenerationBridge {
+  version: 'v1'
+  episodeId: string
+  episodeTitle: string
+  hypotheses: EdenFrontierScientificHypothesis[]
+  collectiveSynthesisNarrative: string
+  transcendentFutureTrajectory: string
+  researchHypothesisTruthClassPreserved: true
+  noAutonomousClinicalIntervention: true
+}
+
 export interface CareJourneyExportSummary {
   standard: 'PANACEA-CAREPLAN-FHIR-R4-V1'
   generatedAt: string
