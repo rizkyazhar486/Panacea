@@ -1721,7 +1721,7 @@ function EdenRestorativeEnvironmentSection({
             <h4 className="text-xs font-bold text-neutral-900 dark:text-white">
               Restorative Environment & Cosmic Bio-Harmony — Living Earth Resonance
             </h4>
-            <Badge tone="success">
+            <Badge tone="normal">
               {bridge.totalLoggedExposureDays > 0
                 ? `${bridge.totalLoggedExposureDays} Days Logged`
                 : 'Restorative Sanctuary Open'}
@@ -1747,9 +1747,9 @@ function EdenRestorativeEnvironmentSection({
               <Badge
                 tone={
                   exp.restorativeState === 'active'
-                    ? 'success'
+                    ? 'normal'
                     : exp.restorativeState === 'nurturing'
-                    ? 'accent'
+                    ? 'brand'
                     : 'neutral'
                 }
               >
