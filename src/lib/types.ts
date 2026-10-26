@@ -766,6 +766,45 @@ export interface EdenBioCosmicSymphonyBridge {
   epistemicHumilityPreserved: true
 }
 
+export type EdenCouncilAgentModel =
+  | 'gemini_frontier'
+  | 'claude_transcendent'
+  | 'gpt_argon'
+  | 'deepseek_astral'
+
+export type EdenCouncilConsensusState =
+  | 'harmonious_convergence'
+  | 'exploratory_equilibrium'
+  | 'stabilization_focus_needed'
+
+export interface EdenCouncilAgentPerspective {
+  agentModel: EdenCouncilAgentModel
+  agentName: string
+  councilRole: string
+  philosophicalPerspective: string
+  bioEnergeticResilienceScore: number
+  creativeWonderSynthesisId: string
+  creativeWonderSynthesisEn: string
+  suggestedExploratoryHypothesis: string
+}
+
+export interface EdenUniversalBiologicalFlourishingBridge {
+  version: 'v1'
+  episodeId: string
+  episodeTitle: string
+  consensusState: EdenCouncilConsensusState
+  consensusStateLabel: string
+  collectiveFlourishingScore: number
+  agentPerspectives: EdenCouncilAgentPerspective[]
+  collectiveHealingNarrativeId: string
+  collectiveHealingNarrativeEn: string
+  multiAgentWisdomTrajectory: string
+  healingCouncilClass: 'multi_agent_collective_synthesis'
+  patientTruthUncompromised: true
+  noAutonomousClinicalIntervention: true
+  epistemicHumilityPreserved: true
+}
+
 export interface CareJourneyExportSummary {
   standard: 'PANACEA-CAREPLAN-FHIR-R4-V1'
   generatedAt: string

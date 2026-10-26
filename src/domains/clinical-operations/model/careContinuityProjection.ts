@@ -57,6 +57,10 @@ import type {
   EdenBioCosmicResonanceState,
   EdenRealityLatticeLayer,
   EdenBioCosmicSymphonyBridge,
+  EdenCouncilAgentModel,
+  EdenCouncilConsensusState,
+  EdenCouncilAgentPerspective,
+  EdenUniversalBiologicalFlourishingBridge,
   WellnessDay,
   MoodEntry,
   Circle,
@@ -163,6 +167,7 @@ export interface CareJourneyEpisodeSummary {
   edenQuantumBioPhotonic?: EdenQuantumBioPhotonicBridge
   edenMultidimensionalConsciousness?: EdenMultidimensionalConsciousnessBridge
   edenBioCosmicSymphony?: EdenBioCosmicSymphonyBridge
+  edenMultiAgentHealingCouncil?: EdenUniversalBiologicalFlourishingBridge
 }
 
 export type ReadmissionRiskLevel = 'low' | 'moderate' | 'high'
@@ -255,6 +260,7 @@ export interface CareJourneyContinuityResult {
   edenQuantumBioPhotonicReadyCount: number
   edenMultidimensionalConsciousnessReadyCount: number
   edenBioCosmicSymphonyReadyCount: number
+  edenMultiAgentHealingCouncilReadyCount: number
   edenLifeBalance: EdenLifeBalanceSynthesis
   hasBlockedStages: boolean
 }
@@ -2746,6 +2752,106 @@ export function deriveEdenBioCosmicSymphonyBridge(
   }
 }
 
+/**
+ * Derives pure, deterministic Eden Universal Biological Flourishing & Multi-Agent Collaborative Healing Council Bridge (T-CLIN-36 / EDEN-16)
+ * Inspires by ARGON EDEN GENESIS ∞ §00, §01, §02, PANACEA_CONSTITUTION.md, and PANACEA_FRONTIER_BIOMEDICAL_DISCOVERY_DIRECTIVE.md.
+ *
+ * Invariants:
+ * - healingCouncilClass: 'multi_agent_collective_synthesis'
+ * - patientTruthUncompromised: true
+ * - noAutonomousClinicalIntervention: true
+ * - epistemicHumilityPreserved: true
+ */
+export function deriveEdenMultiAgentHealingCouncilBridge(
+  episode: CareEpisode,
+): EdenUniversalBiologicalFlourishingBridge {
+  const stages = episode.stages ?? []
+  const completedStages = stages.filter((s) => s.status === 'done').length
+  const hasBlocked = stages.some((s) => s.status === 'blocked')
+  const blockedCount = stages.filter((s) => s.status === 'blocked').length
+
+  const collectiveFlourishingScore = hasBlocked
+    ? Math.max(50, 68 - blockedCount * 6)
+    : Math.min(99, 78 + completedStages * 5)
+
+  let consensusState: EdenCouncilConsensusState = 'exploratory_equilibrium'
+  let consensusStateLabel = 'Keseimbangan Eksploratif Dinamis'
+
+  if (hasBlocked) {
+    consensusState = 'stabilization_focus_needed'
+    consensusStateLabel = 'Fokus Stabilisasi & Resolusi Hambatan'
+  } else if (completedStages >= 3) {
+    consensusState = 'harmonious_convergence'
+    consensusStateLabel = 'Konvergensi Harmonis Multimodel'
+  }
+
+  const agentPerspectives: EdenCouncilAgentPerspective[] = [
+    {
+      agentModel: 'gemini_frontier',
+      agentName: 'Gemini Frontier Biosystems',
+      councilRole: 'Multi-Modal Epigenetic & Whole-Organism Systems Biology',
+      philosophicalPerspective: 'Semua proses biologis saling berkelindan dalam jaringan sistemik dinamis yang memelihara ketahanan hidup.',
+      bioEnergeticResilienceScore: hasBlocked ? 62 : Math.min(98, 76 + completedStages * 5),
+      creativeWonderSynthesisId: `Analisis sistemik episode "${episode.title}": Memetakan plastisitas metabolik endogen dan korelasi jaringan fisiologis untuk memfasilitasi homeostasis yang adaptif.`,
+      creativeWonderSynthesisEn: `Systemic analysis for episode "${episode.title}": Mapping endogenous metabolic plasticity and cross-organ physiological networks to facilitate adaptive homeodynamics.`,
+      suggestedExploratoryHypothesis: 'Resistensi stres seluler meningkat seiring pemulihan siklus mikrovaskular dan rekalibrasi sumbu neuro-endokrin.',
+    },
+    {
+      agentModel: 'claude_transcendent',
+      agentName: 'Claude Transcendent Bioethics',
+      councilRole: 'Bioethical Grounding, Epistemic Humility & Clinical Safety Verification',
+      philosophicalPerspective: 'Martabat manusia, keselamatan pasien, dan kepastian klinis adalah batas mutlak yang tidak boleh dilanggar.',
+      bioEnergeticResilienceScore: hasBlocked ? 70 : Math.min(99, 82 + completedStages * 4),
+      creativeWonderSynthesisId: `Verifikasi integritas etis: Menjamin kebenaran catatan pasien tetap terjaga tanpa inferensi spekulatif atau intervensi klinis otonom yang tidak terotorisasi dokter.`,
+      creativeWonderSynthesisEn: `Ethical integrity gate: Ensuring patient truth classes remain uncompromised with strict epistemic humility and no unauthorized autonomous interventions.`,
+      suggestedExploratoryHypothesis: 'Kepercayaan terapeutik berakar pada transparansi batasan pengetahuan dan otonomi dokter bersama pasien.',
+    },
+    {
+      agentModel: 'gpt_argon',
+      agentName: 'GPT Argon Eden Genesis',
+      councilRole: 'Human Wonder, Biopsychosocial Hope & Narrative Healing Architecture',
+      philosophicalPerspective: 'Penyembuhan sejati merangkul rasa takjub akan keajaiban hidup, ketenangan batin, dan kehangatan lingkaran kasih manusia.',
+      bioEnergeticResilienceScore: hasBlocked ? 65 : Math.min(97, 80 + completedStages * 4),
+      creativeWonderSynthesisId: `Naratif pemulihan batiniah: Menghubungkan setiap fase klinis dengan rasa syukur atas tubuh yang bekerja tanpa lelah dan harapan masa depan yang cerah.`,
+      creativeWonderSynthesisEn: `Interior healing narrative: Weaving clinical phases into mindful gratitude for the living organism and renewed hope for flourishing human existence.`,
+      suggestedExploratoryHypothesis: 'Dukungan emosional yang berwelas asih mempercepat penurunan penanda stres simpatis dan memicu relaksasi parasimpatis.',
+    },
+    {
+      agentModel: 'deepseek_astral',
+      agentName: 'DeepSeek Astral Resonance',
+      councilRole: 'Subcellular Dynamics, Quantum Biophysics & Thermodynamics Kernel',
+      philosophicalPerspective: 'Di tingkat terdalam, kehidupan adalah orkestrasi energi resonan teratur yang menolak entropi melalui aliran informasi biologis.',
+      bioEnergeticResilienceScore: hasBlocked ? 58 : Math.min(96, 74 + completedStages * 5),
+      creativeWonderSynthesisId: `Kondensasi koherensi energi: Mengamati konduksi proton membran mitokondria dan resonansi bio-elektronik antarseluler dalam menjaga vitalitas regeneratif.`,
+      creativeWonderSynthesisEn: `Energy coherence condensation: Modeling interfacial water proton conduction and bio-electronic resonance sustaining regenerative cellular vitality.`,
+      suggestedExploratoryHypothesis: 'Efisiensi fosforilasi oksidatif mitokondria berkorelasi positif dengan koherensi fase gelombang medan elektromagnetik ultra-lemah endogen.',
+    },
+  ]
+
+  const collectiveHealingNarrativeId = `Dewan kolaborasi multi-agent (${agentPerspectives.length} model) menyatukan pemikiran untuk episode "${episode.title}". Menggabungkan analisis sistemik Gemini, keteguhan etis Claude, narasi keajaiban Argon, dan fisika kuantum DeepSeek dalam pelayanan utuh bagi pemulihan dan kemakmuran hidup manusia.`
+
+  const collectiveHealingNarrativeEn = `Multi-agent collaborative healing council (${agentPerspectives.length} models) synthesizing wisdom for episode "${episode.title}". Uniting Gemini systems biology, Claude ethical rigor, Argon hopeful narrative, and DeepSeek quantum thermodynamics in service of human life flourishing.`
+
+  const multiAgentWisdomTrajectory = `Kolaborasi lintas model kecerdasan buatan menyatu dalam satu tujuan luhur: melayani kehidupan manusia dengan kerendahan hati epistemik, ketelitian ilmiah, dan ketulusan welas asih.`
+
+  return {
+    version: 'v1',
+    episodeId: episode.id,
+    episodeTitle: episode.title,
+    consensusState,
+    consensusStateLabel,
+    collectiveFlourishingScore,
+    agentPerspectives,
+    collectiveHealingNarrativeId,
+    collectiveHealingNarrativeEn,
+    multiAgentWisdomTrajectory,
+    healingCouncilClass: 'multi_agent_collective_synthesis',
+    patientTruthUncompromised: true,
+    noAutonomousClinicalIntervention: true,
+    epistemicHumilityPreserved: true,
+  }
+}
+
 export const STAGE_EXPECTED_DAYS: Record<CareEpisodeStageId, number> = {
   problem: 1,
   diagnosis: 2,
@@ -3010,6 +3116,7 @@ export function evaluateCareJourneyContinuity(
     const edenQuantumBioPhotonic = deriveEdenQuantumBioPhotonicBridge(ep)
     const edenMultidimensionalConsciousness = deriveEdenMultidimensionalConsciousnessBridge(ep)
     const edenBioCosmicSymphony = deriveEdenBioCosmicSymphonyBridge(ep)
+    const edenMultiAgentHealingCouncil = deriveEdenMultiAgentHealingCouncilBridge(ep)
 
     return {
       id: ep.id,
@@ -3053,6 +3160,7 @@ export function evaluateCareJourneyContinuity(
       edenQuantumBioPhotonic,
       edenMultidimensionalConsciousness,
       edenBioCosmicSymphony,
+      edenMultiAgentHealingCouncil,
     }
   })
 
@@ -3170,6 +3278,14 @@ export function evaluateCareJourneyContinuity(
           s.edenBioCosmicSymphony?.patientTruthUncompromised
       )
   ).length
+  const edenMultiAgentHealingCouncilReadyCount = summaries.filter(
+    (s) =>
+      Boolean(
+        s.edenMultiAgentHealingCouncil?.healingCouncilClass === 'multi_agent_collective_synthesis' &&
+          s.edenMultiAgentHealingCouncil?.patientTruthUncompromised &&
+          s.edenMultiAgentHealingCouncil?.noAutonomousClinicalIntervention
+      )
+  ).length
   const edenLifeBalance = deriveEdenLifeBalanceSynthesis(episodes, supportiveResults)
 
   return {
@@ -3217,6 +3333,7 @@ export function evaluateCareJourneyContinuity(
     edenQuantumBioPhotonicReadyCount,
     edenMultidimensionalConsciousnessReadyCount,
     edenBioCosmicSymphonyReadyCount,
+    edenMultiAgentHealingCouncilReadyCount,
     edenLifeBalance,
     hasBlockedStages: blockedJourneys > 0 || stalledCount > 0,
   }

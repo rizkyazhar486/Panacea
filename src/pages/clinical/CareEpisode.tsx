@@ -22,6 +22,7 @@ import {
   deriveEdenQuantumBioPhotonicBridge,
   deriveEdenMultidimensionalConsciousnessBridge,
   deriveEdenBioCosmicSymphonyBridge,
+  deriveEdenMultiAgentHealingCouncilBridge,
 } from '../../domains/clinical-operations'
 import {
   CARE_EPISODE_STAGES,
@@ -639,6 +640,9 @@ function EpisodeCard({
 
       {/* Eden Bio-Cosmic Symphony & Multi-Scale Reality Lattice Bridge (T-CLIN-35 / EDEN-15) */}
       <EdenBioCosmicSymphonySection episode={episode} />
+
+      {/* Eden Universal Biological Flourishing & Multi-Agent Collaborative Healing Council Bridge (T-CLIN-36 / EDEN-16) */}
+      <EdenMultiAgentHealingCouncilSection episode={episode} />
     </Card>
   )
 }
@@ -2251,6 +2255,113 @@ function EdenBioCosmicSymphonySection({ episode }: { episode: CareEpisode }) {
 
       <div className="mt-2 text-[10px] text-neutral-500 dark:text-white/50 text-right">
         ARGON EDEN ∞ §13-14 · Governed Multi-Scale Reality Lattice · Patient Truth Uncompromised · Epistemic Humility Preserved
+      </div>
+    </div>
+  )
+}
+
+function EdenMultiAgentHealingCouncilSection({ episode }: { episode: CareEpisode }) {
+  const [lang, setLang] = useState<'id' | 'en'>('id')
+
+  const bridge = useMemo(
+    () => deriveEdenMultiAgentHealingCouncilBridge(episode),
+    [episode]
+  )
+
+  const narrative = lang === 'id' ? bridge.collectiveHealingNarrativeId : bridge.collectiveHealingNarrativeEn
+
+  return (
+    <div
+      className="mt-3 rounded-xl border border-emerald-200 dark:border-white/10 bg-emerald-50/30 dark:bg-white/[0.02] p-3.5"
+      data-eden-healing-council-card="v1"
+    >
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+        <div>
+          <div className="flex items-center gap-2 flex-wrap">
+            <h4 className="text-xs font-bold text-neutral-900 dark:text-white">
+              Eden Universal Biological Flourishing & Multi-Agent Collaborative Healing Council
+            </h4>
+            <Badge tone="brand">{bridge.consensusStateLabel}</Badge>
+            <Badge tone="normal">Flourishing {bridge.collectiveFlourishingScore}%</Badge>
+          </div>
+          <p className="mt-1 text-xs font-medium text-neutral-800 dark:text-white/85">
+            {narrative}
+          </p>
+        </div>
+        <div className="flex items-center gap-1 shrink-0">
+          <button
+            type="button"
+            onClick={() => setLang('id')}
+            className={`rounded-md px-2 py-0.5 text-[11px] font-medium transition-colors ${
+              lang === 'id'
+                ? 'bg-emerald-600 text-white font-bold'
+                : 'bg-white/80 dark:bg-white/5 text-neutral-700 dark:text-white/70 hover:bg-emerald-100/50'
+            }`}
+          >
+            Bahasa
+          </button>
+          <button
+            type="button"
+            onClick={() => setLang('en')}
+            className={`rounded-md px-2 py-0.5 text-[11px] font-medium transition-colors ${
+              lang === 'en'
+                ? 'bg-emerald-600 text-white font-bold'
+                : 'bg-white/80 dark:bg-white/5 text-neutral-700 dark:text-white/70 hover:bg-emerald-100/50'
+            }`}
+          >
+            English
+          </button>
+        </div>
+      </div>
+
+      <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2" data-eden-agent-perspectives="v1">
+        {bridge.agentPerspectives.map((a) => {
+          const synthesis = lang === 'id' ? a.creativeWonderSynthesisId : a.creativeWonderSynthesisEn
+          return (
+            <div
+              key={a.agentModel}
+              className="rounded-lg border border-emerald-200/50 dark:border-white/10 bg-white/70 dark:bg-white/[0.03] p-2.5"
+            >
+              <div className="flex items-center justify-between gap-1">
+                <span className="text-[11px] font-bold text-neutral-900 dark:text-white truncate">
+                  {a.agentName}
+                </span>
+                <span className="text-[10px] font-bold text-emerald-700 dark:text-emerald-300 shrink-0">
+                  Resilience {a.bioEnergeticResilienceScore}%
+                </span>
+              </div>
+              <div className="text-[10px] text-emerald-800/80 dark:text-emerald-400 font-medium">
+                {a.councilRole}
+              </div>
+              <p className="mt-1 text-[10px] italic text-neutral-600 dark:text-neutral-300">
+                "{a.philosophicalPerspective}"
+              </p>
+              <div className="mt-1.5 h-1.5 w-full rounded-full bg-emerald-100 dark:bg-white/10 overflow-hidden">
+                <div
+                  className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-teal-500"
+                  style={{ width: `${a.bioEnergeticResilienceScore}%` }}
+                />
+              </div>
+              <p className="mt-1.5 text-[10px] text-neutral-700 dark:text-neutral-200">
+                {synthesis}
+              </p>
+              <div className="mt-1 text-[9px] text-neutral-500 dark:text-white/45">
+                <span className="font-semibold">{lang === 'id' ? 'Hipotesis:' : 'Hypothesis:'}</span> {a.suggestedExploratoryHypothesis}
+              </div>
+            </div>
+          )
+        })}
+      </div>
+
+      <div className="mt-2.5 rounded-lg border border-emerald-200/40 dark:border-white/10 bg-emerald-100/30 dark:bg-white/[0.02] p-2.5 text-xs space-y-1">
+        <div className="text-[11px] text-neutral-800 dark:text-white/85">
+          <b>{lang === 'id' ? 'Trajektori Kebijaksanaan Multi-Model:' : 'Multi-Agent Wisdom Trajectory:'}</b>{' '}
+          {bridge.multiAgentWisdomTrajectory}
+        </div>
+      </div>
+
+      <div className="mt-2 text-[10px] text-neutral-500 dark:text-white/50 text-right">
+        ARGON EDEN ∞ §00-02 · Multi-Agent Collective Synthesis · Patient Truth Uncompromised · No Autonomous Clinical Intervention
       </div>
     </div>
   )

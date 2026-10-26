@@ -70,6 +70,7 @@ export {
   deriveEdenQuantumBioPhotonicBridge,
   deriveEdenMultidimensionalConsciousnessBridge,
   deriveEdenBioCosmicSymphonyBridge,
+  deriveEdenMultiAgentHealingCouncilBridge,
   translateClinicalTermToEden,
   EDEN_PLAIN_LANGUAGE_GLOSSARY,
   STAGE_LABEL,
