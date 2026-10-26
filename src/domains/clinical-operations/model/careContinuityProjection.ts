@@ -140,6 +140,11 @@ import type {
   EdenLamp2aNodeKind,
   EdenLamp2aNode,
   EdenLamp2aTranslocationBridge,
+  EdenNuclearPoreState,
+  EdenNuclearPoreTier,
+  EdenNuclearPoreNodeKind,
+  EdenNuclearPoreNode,
+  EdenRanGtpTransportBridge,
   WellnessDay,
   MoodEntry,
   Circle,
@@ -263,6 +268,7 @@ export interface CareJourneyEpisodeSummary {
   edenMicrovascularResilience?: EdenMicrovascularResilienceBridge
   edenRibosomalQuiescence?: EdenRibosomalQuiescenceBridge
   edenLamp2aTranslocation?: EdenLamp2aTranslocationBridge
+  edenRanGtpTransport?: EdenRanGtpTransportBridge
 }
 
 export type ReadmissionRiskLevel = 'low' | 'moderate' | 'high'
@@ -372,6 +378,7 @@ export interface CareJourneyContinuityResult {
   edenMicrovascularResilienceReadyCount: number
   edenRibosomalQuiescenceReadyCount: number
   edenLamp2aTranslocationReadyCount: number
+  edenRanGtpTransportReadyCount: number
   edenLifeBalance: EdenLifeBalanceSynthesis
   hasBlockedStages: boolean
 }
@@ -4768,6 +4775,115 @@ export function deriveEdenLamp2aTranslocationBridge(
   }
 }
 
+export function deriveEdenRanGtpTransportBridge(
+  episode: CareEpisode,
+): EdenRanGtpTransportBridge {
+  const stages = episode.stages ?? []
+  const completedStages = stages.filter((s) => s.status === 'done').length
+  const hasBlocked = stages.some((s) => s.status === 'blocked')
+  const blockedCount = stages.filter((s) => s.status === 'blocked').length
+
+  const transportFidelityScore = hasBlocked
+    ? Math.max(46, 66 - blockedCount * 7)
+    : Math.min(99, 80 + completedStages * 5)
+
+  const permeabilityBarrierIndex = hasBlocked
+    ? Math.max(45, 65 - blockedCount * 7)
+    : Math.min(98, 79 + completedStages * 5)
+
+  const ranGtpGradientCapacity = hasBlocked
+    ? Math.max(43, 64 - blockedCount * 8)
+    : Math.min(98, 78 + completedStages * 5)
+
+  let npcState: EdenNuclearPoreState = 'balanced_importin_rangtp_directional_flux'
+  let npcStateLabel = 'Fluks Nukleositoplasmik Direksional RanGTP & Karyoferin Seimbang'
+  let npcTier: EdenNuclearPoreTier = 'stable_scaffold_nucleoporin_equilibrium'
+  let npcTierLabel = 'Ekuilibrium Scaffold Nukleoporin & Porus Nukleus Stabil'
+
+  if (hasBlocked) {
+    npcState = 'critical_nucleoporin_degradation_gradient_collapse'
+    npcStateLabel = 'Degradasi Kompleks Nukleoporin & Kolaps Gradien RanGTP/RanGDP'
+    npcTier = 'critical_nuclear_envelope_leakage_instability'
+    npcTierLabel = 'Instabilitas Kebocoran Selubung Inti Kritis & Penetrasi Sitoplasma'
+  } else if (completedStages >= 3) {
+    npcState = 'impermeable_selective_central_hydrogel_harmony'
+    npcStateLabel = 'Harmoni Hidrogel Selektif FG-Nup & Integritas Saringan Inti Sempurna'
+    npcTier = 'optimal_nucleocytoplasmic_transport_fidelity'
+    npcTierLabel = 'Fidelitas Transpor Nukleositoplasmik Optimal & Presisi Genomik'
+  } else if (completedStages === 0) {
+    npcState = 'transient_fg_mesh_permeability_leakiness'
+    npcStateLabel = 'Permeabilitas Transien Saringan FG-Mesh & Kompensasi Adaptif Dini'
+    npcTier = 'moderate_permeability_barrier_strain'
+    npcTierLabel = 'Regangan Barrier Permeabilitas Porus Nukleus Dini'
+  }
+
+  const nuclearPoreNodes: EdenNuclearPoreNode[] = [
+    {
+      nodeKind: 'nup107_160_scaffold_complex_stability',
+      nodeLabel: 'Stabilitas Cincin Luar Kompleks Subunit Scaffold Nup107-160 & Nup93 Inti',
+      transportEfficiencyScore: hasBlocked ? 0.62 : Math.min(0.99, 0.81 + completedStages * 0.05),
+      permeabilitySelectivityIndex: hasBlocked ? 0.60 : Math.min(0.98, 0.78 + completedStages * 0.05),
+      npcStatus: hasBlocked ? 'permeability_leak_stress' : completedStages >= 2 ? 'optimal_barrier_mode' : 'adaptive_transport_state',
+      mechanisticNote: 'Nukleoporin scaffold berumur sangat panjang mempertahankan kurvatura membran porus selubung inti seluler, mencegah ruptur mekanis lamina dan fusi membran abnormal.',
+    },
+    {
+      nodeKind: 'fg_nucleoporin_permeability_barrier',
+      nodeLabel: 'Saringan Hidrogel Selektif Domain FG-Nup (Nup98/Nup62) Saluran Sentral',
+      transportEfficiencyScore: hasBlocked ? 0.61 : Math.min(0.98, 0.79 + completedStages * 0.05),
+      permeabilitySelectivityIndex: hasBlocked ? 0.59 : Math.min(0.99, 0.77 + completedStages * 0.05),
+      npcStatus: hasBlocked ? 'permeability_leak_stress' : completedStages >= 2 ? 'optimal_barrier_mode' : 'adaptive_transport_state',
+      mechanisticNote: 'Pengulangan fenilalanin-glisin (FG) membentuk fase kondensat cair hidrofobik yang membatasi difusi pasif molekul >40 kDa dan hanya mengizinkan translokasi terarah reseptor impor/ekspor.',
+    },
+    {
+      nodeKind: 'rangtp_rcc1_nucleocytoplasmic_gradient',
+      nodeLabel: 'Gradien RanGTP/RanGDP & Pertukaran Nukleotida Guanin Terikat Kromatin RCC1',
+      transportEfficiencyScore: hasBlocked ? 0.63 : Math.min(0.99, 0.80 + completedStages * 0.05),
+      permeabilitySelectivityIndex: hasBlocked ? 0.61 : Math.min(0.98, 0.79 + completedStages * 0.05),
+      npcStatus: hasBlocked ? 'permeability_leak_stress' : completedStages >= 2 ? 'optimal_barrier_mode' : 'adaptive_transport_state',
+      mechanisticNote: 'Konsentrasi RanGTP intra-inti yang tinggi mendorong pelepasan kargo impor ke dalam nukleoplasma dan perakitan kompleks ekspor kargo, memberikan energi vektor transpor nukleus.',
+    },
+    {
+      nodeKind: 'importin_karyopherin_cargo_translocation',
+      nodeLabel: 'Translokasi Karyoferin (Importin-α/β & Exportin-1) & Penempatan Faktor FOXO/TFEB',
+      transportEfficiencyScore: hasBlocked ? 0.59 : Math.min(0.97, 0.77 + completedStages * 0.06),
+      permeabilitySelectivityIndex: hasBlocked ? 0.58 : Math.min(0.97, 0.76 + completedStages * 0.06),
+      npcStatus: hasBlocked ? 'permeability_leak_stress' : completedStages >= 2 ? 'optimal_barrier_mode' : 'adaptive_transport_state',
+      mechanisticNote: 'Transpor berakurasi tinggi dari faktor transkripsi umur panjang (FOXO3a, TFEB, Nrf2) ke dalam inti tanpa agregasi patologis kargo di sitoplasma (seperti TDP-43 mislokasi).',
+    },
+  ]
+
+  const npcNarrativeId = `Sintesis kompleks porus nukleus & transpor nukleositoplasmik RanGTP untuk episode "${episode.title}". Status NPC: ${npcStateLabel}, tingkat resiliensi selubung inti: ${npcTierLabel}. Skor fidelitas transpor ${transportFidelityScore}%, indeks barier permeabilitas ${permeabilityBarrierIndex}%, dan kapasitas gradien RanGTP ${ranGtpGradientCapacity}%.`
+  const npcNarrativeEn = `Nuclear pore complex & RanGTP nucleocytoplasmic transport synthesis for episode "${episode.title}". NPC state: ${npcStateLabel}, nuclear envelope resilience tier: ${npcTierLabel}. Transport fidelity score ${transportFidelityScore}%, permeability barrier index ${permeabilityBarrierIndex}%, and RanGTP gradient capacity ${ranGtpGradientCapacity}%.`
+
+  const npcLongevityStrategy = hasBlocked
+    ? 'Reduksi kebocoran porus nukleus dan mislokasi kargo sitotoksik (TDP-43) melalui mitigasi stres oksidatif lipid peroksidasi selubung inti, aktivasi jalur piecemeal nucleophagy, dan pengawasan klinis ketat.'
+    : completedStages >= 3
+    ? 'Pertahankan kepadatan scaffold Nup107-160 dan hidrogel selektif FG-Nup melalui modulasi metabolik reguler, dukungan metabolit NAD+/GTP untuk stabilitas gradien Ran, asupan antioksidan pelindung porus inti, dan pola tidur sirkadian berkualitas.'
+    : 'Dukung integritas selubung inti dan kelancaran transpor makromolekuler dengan kecukupan mikronutrien, hidrasi seluler, dan pengendalian inflamasi sistemik kronis.'
+
+  return {
+    version: 'v1',
+    episodeId: episode.id,
+    episodeTitle: episode.title,
+    npcState,
+    npcStateLabel,
+    npcTier,
+    npcTierLabel,
+    transportFidelityScore,
+    permeabilityBarrierIndex,
+    ranGtpGradientCapacity,
+    nuclearPoreNodes,
+    npcNarrativeId,
+    npcNarrativeEn,
+    npcLongevityStrategy,
+    truthClass: 'nuclear_pore_rangtp_simulation_proxy',
+    clinically_reviewed: false,
+    patientTruthUncompromised: true,
+    neverManufacturesBiomarkers: true,
+    epistemicHumilityPreserved: true,
+  }
+}
+
 export const STAGE_EXPECTED_DAYS: Record<CareEpisodeStageId, number> = {
   problem: 1,
   diagnosis: 2,
@@ -5049,6 +5165,7 @@ export function evaluateCareJourneyContinuity(
     const edenMicrovascularResilience = deriveEdenMicrovascularResilienceBridge(ep)
     const edenRibosomalQuiescence = deriveEdenRibosomalQuiescenceBridge(ep)
     const edenLamp2aTranslocation = deriveEdenLamp2aTranslocationBridge(ep)
+    const edenRanGtpTransport = deriveEdenRanGtpTransportBridge(ep)
 
     return {
       id: ep.id,
@@ -5109,6 +5226,7 @@ export function evaluateCareJourneyContinuity(
       edenMicrovascularResilience,
       edenRibosomalQuiescence,
       edenLamp2aTranslocation,
+      edenRanGtpTransport,
     }
   })
 
@@ -5362,6 +5480,14 @@ export function evaluateCareJourneyContinuity(
           s.edenLamp2aTranslocation?.neverManufacturesBiomarkers
       )
   ).length
+  const edenRanGtpTransportReadyCount = summaries.filter(
+    (s) =>
+      Boolean(
+        s.edenRanGtpTransport?.truthClass === 'nuclear_pore_rangtp_simulation_proxy' &&
+          s.edenRanGtpTransport?.patientTruthUncompromised &&
+          s.edenRanGtpTransport?.neverManufacturesBiomarkers
+      )
+  ).length
   const edenLifeBalance = deriveEdenLifeBalanceSynthesis(episodes, supportiveResults)
 
   return {
@@ -5426,6 +5552,7 @@ export function evaluateCareJourneyContinuity(
     edenMicrovascularResilienceReadyCount,
     edenRibosomalQuiescenceReadyCount,
     edenLamp2aTranslocationReadyCount,
+    edenRanGtpTransportReadyCount,
     edenLifeBalance,
     hasBlockedStages: blockedJourneys > 0 || stalledCount > 0,
   }
