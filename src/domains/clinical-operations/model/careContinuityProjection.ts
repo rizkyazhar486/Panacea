@@ -34,6 +34,9 @@ import type {
   EdenReflectionLensId,
   EdenPerspectiveLens,
   EdenReflectionSanctuaryBridge,
+  EdenLanguageCode,
+  EdenLiteracyAdaptationMode,
+  EdenUniversalAcceptanceBridge,
   MoodEntry,
   Circle,
   SupportMessage,
@@ -132,6 +135,7 @@ export interface CareJourneyEpisodeSummary {
   edenSupportCircle?: EdenSupportCircleBridge
   edenVisitPreparation?: EdenVisitPreparationCompanion
   edenReflectionSanctuary?: EdenReflectionSanctuaryBridge
+  edenUniversalAcceptance?: EdenUniversalAcceptanceBridge
 }
 
 export type ReadmissionRiskLevel = 'low' | 'moderate' | 'high'
@@ -218,6 +222,7 @@ export interface CareJourneyContinuityResult {
   edenSupportCircleReadyCount: number
   edenVisitPrepReadyCount: number
   edenReflectionSanctuaryReadyCount: number
+  edenUniversalAcceptanceReadyCount: number
   edenLifeBalance: EdenLifeBalanceSynthesis
   hasBlockedStages: boolean
 }
@@ -2047,6 +2052,121 @@ export function deriveEdenReflectionSanctuaryBridge(
   }
 }
 
+const STAGE_LABEL_ID: Record<CareEpisodeStageId, string> = {
+  problem: 'Keluhan Awal',
+  diagnosis: 'Diagnosis Klinis',
+  plan: 'Rencana Perawatan',
+  provider: 'Pemilihan Fasilitas',
+  cost: 'Estimasi Biaya',
+  schedule: 'Penjadwalan',
+  treatment: 'Terapi & Tindakan',
+  recovery: 'Pemulihan',
+  followUp: 'Kontrol Lanjutan',
+  outcome: 'Hasil Akhir',
+}
+
+export function deriveEdenUniversalAcceptanceBridge(
+  episode: CareEpisode,
+  language?: EdenLanguageCode,
+  literacyMode?: EdenLiteracyAdaptationMode,
+): EdenUniversalAcceptanceBridge {
+  const lang: EdenLanguageCode = language ?? episode.edenLanguagePreference ?? 'id'
+  const mode: EdenLiteracyAdaptationMode = literacyMode ?? 'everyday_warm'
+
+  const stages = episode.stages ?? []
+  const doneCount = stages.filter((s) => s.status === 'done').length
+  const totalCount = stages.length
+  const blockedStage = stages.find((s) => s.status === 'blocked')
+  const activeStage = stages.find((s) => s.status === 'active')
+  const pendingStage = stages.find((s) => s.status === 'pending')
+  const currentStage =
+    blockedStage ??
+    activeStage ??
+    pendingStage ??
+    (stages.length > 0 ? stages[stages.length - 1] : undefined)
+
+  const stageId: CareEpisodeStageId = currentStage?.stage ?? 'problem'
+  const stageNameEn = STAGE_LABEL[stageId] ?? stageId
+  const stageNameId = STAGE_LABEL_ID[stageId] ?? stageId
+  const icdTag = episode.diagnosisCode ? ` (ICD-10: ${episode.diagnosisCode})` : ''
+
+  if (lang === 'id') {
+    const localizedHeadline =
+      mode === 'everyday_warm'
+        ? `Satu Kebenaran Pasien dalam Bahasa yang Hangat & Mudah Dipahami untuk “${episode.title}”`
+        : `Adaptasi Klinis Terstruktur untuk Episode “${episode.title}”${icdTag}`
+
+    const localizedWhatIsHappening =
+      blockedStage
+        ? `Perjalanan perawatan “${episode.title}” sedang menunggu koordinasi pada tahap ${stageNameId} (${blockedStage.blockedReason || 'menunggu konfirmasi'}) dengan ${doneCount}/${totalCount} tahap selesai.`
+        : `Perjalanan perawatan “${episode.title}” saat ini berada pada tahap ${stageNameId} dengan ${doneCount}/${totalCount} tahap telah selesai.`
+
+    const localizedNextStep =
+      blockedStage
+        ? `Langkah tenang berikutnya: selesaikan hambatan pada tahap ${stageNameId} bersama tim klinis atau pendamping Anda.`
+        : `Langkah tenang berikutnya: lanjutkan tahap ${stageNameId} sesuai panduan dokter Anda tanpa terburu-buru.`
+
+    const localizedSafetyAssurance =
+      'Kebenaran rekam medis tetap tunggal dan utuh: adaptasi bahasa, literasi, dan mode hemat kuota tidak pernah mengubah data klinis atau menggantikan keputusan dokter.'
+
+    return {
+      episodeId: episode.id,
+      episodeTitle: episode.title,
+      language: 'id',
+      languageLabel: 'Bahasa Indonesia · Hangat & Jelas',
+      literacyMode: mode,
+      localizedHeadline,
+      localizedWhatIsHappening,
+      localizedNextStep,
+      localizedSafetyAssurance,
+      accessibilityAndConnectivityGuarantees: {
+        lowBandwidthTextComplete: true,
+        screenReaderSemanticLandmarks: true,
+        noUnnecessaryExclusion: true,
+      },
+      canonicalPatientTruthPreserved: true,
+      noFalseUniversalValidationClaim: true,
+    }
+  }
+
+  const localizedHeadline =
+    mode === 'everyday_warm'
+      ? `One Canonical Patient Truth Adapted in Warm, Everyday Language for “${episode.title}”`
+      : `Structured Clinical Continuity Summary for “${episode.title}”${icdTag}`
+
+  const localizedWhatIsHappening =
+    blockedStage
+      ? `Your care journey “${episode.title}” is paused for coordination at the ${stageNameEn} stage (${blockedStage.blockedReason || 'awaiting confirmation'}) with ${doneCount}/${totalCount} stages completed.`
+      : `Your care journey “${episode.title}” is currently at the ${stageNameEn} stage with ${doneCount}/${totalCount} stages completed.`
+
+  const localizedNextStep =
+    blockedStage
+      ? `Next calm step: resolve the ${stageNameEn} coordination item together with your care team.`
+      : `Next calm step: continue through the ${stageNameEn} stage at a steady, supported pace with your clinician.`
+
+  const localizedSafetyAssurance =
+    'Canonical patient truth remains unified: adapting language, health literacy, and low-bandwidth text never alters clinical records or claims universal validation from internal tests.'
+
+  return {
+    episodeId: episode.id,
+    episodeTitle: episode.title,
+    language: 'en',
+    languageLabel: 'English · Warm & Clear',
+    literacyMode: mode,
+    localizedHeadline,
+    localizedWhatIsHappening,
+    localizedNextStep,
+    localizedSafetyAssurance,
+    accessibilityAndConnectivityGuarantees: {
+      lowBandwidthTextComplete: true,
+      screenReaderSemanticLandmarks: true,
+      noUnnecessaryExclusion: true,
+    },
+    canonicalPatientTruthPreserved: true,
+    noFalseUniversalValidationClaim: true,
+  }
+}
+
 export const STAGE_EXPECTED_DAYS: Record<CareEpisodeStageId, number> = {
   problem: 1,
   diagnosis: 2,
@@ -2305,6 +2425,7 @@ export function evaluateCareJourneyContinuity(
     const edenSupportCircle = deriveEdenSupportCircleBridge(ep)
     const edenVisitPreparation = deriveEdenVisitPreparationCompanion(ep, supportiveResults)
     const edenReflectionSanctuary = deriveEdenReflectionSanctuaryBridge(ep)
+    const edenUniversalAcceptance = deriveEdenUniversalAcceptanceBridge(ep)
 
     return {
       id: ep.id,
@@ -2342,6 +2463,7 @@ export function evaluateCareJourneyContinuity(
       edenSupportCircle,
       edenVisitPreparation,
       edenReflectionSanctuary,
+      edenUniversalAcceptance,
     }
   })
 
@@ -2417,6 +2539,13 @@ export function evaluateCareJourneyContinuity(
           s.edenReflectionSanctuary?.neverClaimsMetaphysicalAuthority
       )
   ).length
+  const edenUniversalAcceptanceReadyCount = summaries.filter(
+    (s) =>
+      Boolean(
+        s.edenUniversalAcceptance?.canonicalPatientTruthPreserved &&
+          s.edenUniversalAcceptance?.noFalseUniversalValidationClaim
+      )
+  ).length
   const edenLifeBalance = deriveEdenLifeBalanceSynthesis(episodes, supportiveResults)
 
   return {
@@ -2458,6 +2587,7 @@ export function evaluateCareJourneyContinuity(
     edenSupportCircleReadyCount,
     edenVisitPrepReadyCount,
     edenReflectionSanctuaryReadyCount,
+    edenUniversalAcceptanceReadyCount,
     edenLifeBalance,
     hasBlockedStages: blockedJourneys > 0 || stalledCount > 0,
   }

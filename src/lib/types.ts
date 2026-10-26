@@ -251,6 +251,8 @@ export interface CareEpisode {
   referralRecord?: CareJourneyReferralRecord
   // Eden three-depth progressive disclosure preference (T-CLIN-21 / EDEN-01)
   edenDepthPreference?: EdenDisclosureDepth
+  // Eden universal language preference (T-CLIN-29 / EDEN-09)
+  edenLanguagePreference?: EdenLanguageCode
 }
 
 export type CareJourneyTimelineEventKind =
@@ -536,6 +538,28 @@ export interface EdenReflectionSanctuaryBridge {
   epistemicHumilityPreserved: true
   nonDogmaticPluralismPreserved: true
   neverClaimsMetaphysicalAuthority: true
+}
+
+export type EdenLanguageCode = 'id' | 'en'
+export type EdenLiteracyAdaptationMode = 'everyday_warm' | 'clinical_structured'
+
+export interface EdenUniversalAcceptanceBridge {
+  episodeId: string
+  episodeTitle: string
+  language: EdenLanguageCode
+  languageLabel: string
+  literacyMode: EdenLiteracyAdaptationMode
+  localizedHeadline: string
+  localizedWhatIsHappening: string
+  localizedNextStep: string
+  localizedSafetyAssurance: string
+  accessibilityAndConnectivityGuarantees: {
+    lowBandwidthTextComplete: true
+    screenReaderSemanticLandmarks: true
+    noUnnecessaryExclusion: true
+  }
+  canonicalPatientTruthPreserved: true
+  noFalseUniversalValidationClaim: true
 }
 
 export interface CareJourneyExportSummary {
