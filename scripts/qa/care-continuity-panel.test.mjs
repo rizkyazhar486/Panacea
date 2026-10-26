@@ -14,6 +14,7 @@ import {
   evaluateEpisodeReadmissionRisk,
   evaluateReferralHandshakeContinuity,
   deriveEdenCareCompanion,
+  deriveEdenLifeBalanceSynthesis,
   translateClinicalTermToEden,
   EDEN_PLAIN_LANGUAGE_GLOSSARY,
 } from '../../src/domains/clinical-operations/model/careContinuityProjection.ts'
@@ -1730,4 +1731,81 @@ test('deriveEdenCareCompanion & CareEpisode: Eden 3-depth progressive disclosure
   assert.ok(episodeSource.includes('data-eden-companion-card="v1"'), 'CareEpisode must include Eden companion card')
   assert.ok(episodeSource.includes('data-eden-depth-selector="v1"'), 'CareEpisode must include Eden 3-depth selector')
   assert.ok(episodeSource.includes('data-eden-beautiful-next-step="v1"'), 'CareEpisode must include One Beautiful Next Step card')
+})
+
+test('deriveEdenLifeBalanceSynthesis & CareEpisode: Eden One Control whole-person life & care balance synthesis (T-CLIN-22 / EDEN-02)', () => {
+  const evaluatedAt = '2026-10-26T04:30:00.000Z'
+
+  // 1. Serene state: completed journey with no pending hurdles
+  const completedEp = {
+    id: 'ce_life_done',
+    title: 'Post-Viral Recovery Rhythm',
+    createdAt: '2026-10-10T08:00:00.000Z',
+    updatedAt: '2026-10-20T08:00:00.000Z',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'outcome', status: 'done' },
+    ],
+    outcomeRecord: {
+      status: 'resolved',
+      summary: 'Full physiological recovery',
+    },
+  }
+  const sereneSynth = deriveEdenLifeBalanceSynthesis([completedEp], [])
+  assert.equal(sereneSynth.calmState, 'serene')
+  assert.equal(sereneSynth.completedJourneysCount, 1)
+  assert.equal(sereneSynth.activeJourneysCount, 0)
+  assert.equal(sereneSynth.clinicalSafetyGuarantee, 'never-deny-care')
+  assert.equal(sereneSynth.dimensions.length, 4)
+
+  // 2. Balanced progress state: active journey without blocks
+  const activeEp = {
+    id: 'ce_life_active',
+    title: 'Cardiometabolic Longevity Pathway',
+    createdAt: '2026-10-20T08:00:00.000Z',
+    updatedAt: '2026-10-25T08:00:00.000Z',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'treatment', status: 'active' },
+    ],
+  }
+  const balancedSynth = deriveEdenLifeBalanceSynthesis([activeEp], [])
+  assert.equal(balancedSynth.calmState, 'balanced_progress')
+  assert.equal(balancedSynth.activeJourneysCount, 1)
+  assert.ok(balancedSynth.oneUnifiedFocus.includes('Treatment'))
+
+  // 3. Gentle attention state: blocked stage
+  const blockedEp = {
+    id: 'ce_life_blocked',
+    title: 'Diagnostic Imaging Coordination',
+    createdAt: '2026-10-21T08:00:00.000Z',
+    updatedAt: '2026-10-25T09:00:00.000Z',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'schedule', status: 'blocked', blockedReason: 'Awaiting preferred morning slot' },
+    ],
+  }
+  const gentleSynth = deriveEdenLifeBalanceSynthesis([blockedEp], [])
+  assert.equal(gentleSynth.calmState, 'gentle_attention')
+
+  // 4. Timely clinical care state: critical diagnostic flag
+  const urgentSynth = deriveEdenLifeBalanceSynthesis(
+    [activeEp],
+    [{ id: 'sr_crit', name: 'Troponin I', category: 'Lab', value: '1.8', unit: 'ng/mL', flag: 'critical', takenAt: evaluatedAt }]
+  )
+  assert.equal(urgentSynth.calmState, 'timely_clinical_care')
+
+  // 5. evaluateCareJourneyContinuity rollup
+  const projection = evaluateCareJourneyContinuity([activeEp, completedEp], evaluatedAt)
+  assert.equal(projection.edenLifeBalance.calmState, 'balanced_progress')
+  assert.equal(projection.edenLifeBalance.activeJourneysCount, 1)
+  assert.equal(projection.edenLifeBalance.completedJourneysCount, 1)
+
+  // 6. UI contracts
+  const panelSource = read('src/domains/clinical-operations/ui/CareContinuityPanel.tsx')
+  assert.ok(panelSource.includes('data-eden-life-balance="v1"'), 'CareContinuityPanel must include Eden life balance attribute')
+
+  const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
+  assert.ok(episodeSource.includes('data-eden-one-control="v1"'), 'CareEpisode must include Eden One Control header')
+  assert.ok(episodeSource.includes('data-eden-unified-focus="v1"'), 'CareEpisode must include One Unified Focus card')
 })

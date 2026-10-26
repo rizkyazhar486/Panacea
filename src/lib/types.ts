@@ -343,6 +343,31 @@ export interface EdenCareCompanionSummary {
   clinicalSafetyPreserved: true
 }
 
+export type EdenCalmState =
+  | 'serene'
+  | 'balanced_progress'
+  | 'gentle_attention'
+  | 'timely_clinical_care'
+
+export interface EdenLifeDimensionStatus {
+  dimension: 'clinical_continuity' | 'diagnostic_clarity' | 'recovery_rhythm' | 'financial_peace'
+  label: string
+  plainSummary: string
+  tone: 'serene' | 'attentive' | 'urgent'
+}
+
+export interface EdenLifeBalanceSynthesis {
+  calmState: EdenCalmState
+  calmStateLabel: string
+  harmonyHeadline: string
+  biologicalAppreciation: string
+  oneUnifiedFocus: string
+  activeJourneysCount: number
+  completedJourneysCount: number
+  dimensions: EdenLifeDimensionStatus[]
+  clinicalSafetyGuarantee: 'never-deny-care'
+}
+
 export interface CareJourneyExportSummary {
   standard: 'PANACEA-CAREPLAN-FHIR-R4-V1'
   generatedAt: string

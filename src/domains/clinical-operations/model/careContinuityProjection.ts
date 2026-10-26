@@ -18,6 +18,9 @@ import type {
   EdenDisclosureDepth,
   EdenPlainLanguageTerm,
   EdenCareCompanionSummary,
+  EdenCalmState,
+  EdenLifeDimensionStatus,
+  EdenLifeBalanceSynthesis,
   PlanItem,
   CarePlanMilestone,
   ClinicalOutcomeRecord,
@@ -183,6 +186,7 @@ export interface CareJourneyContinuityResult {
   acknowledgedReferralsCount: number
   emergencyReferralsCount: number
   edenReadyJourneysCount: number
+  edenLifeBalance: EdenLifeBalanceSynthesis
   hasBlockedStages: boolean
 }
 
@@ -1121,6 +1125,130 @@ export function deriveEdenCareCompanion(
   }
 }
 
+export function deriveEdenLifeBalanceSynthesis(
+  episodes: readonly CareEpisode[],
+  supportiveResults?: readonly SupportiveResult[],
+): EdenLifeBalanceSynthesis {
+  const safeEpisodes: readonly CareEpisode[] = Array.isArray(episodes) ? episodes : []
+  const total = safeEpisodes.length
+  let completed = 0
+  let blocked = 0
+  let hasEmergency = false
+  let firstNextStep: string | undefined
+
+  for (const ep of safeEpisodes) {
+    const stages = ep.stages ?? []
+    const isDone = stages.length > 0 && stages.every((s) => s.status === 'done')
+    const isBlocked = stages.some((s) => s.status === 'blocked')
+    if (isDone) {
+      completed++
+    } else if (isBlocked) {
+      blocked++
+    }
+    if (ep.referralRecord?.urgency === 'emergency' && ep.referralRecord.status !== 'completed' && ep.referralRecord.status !== 'cancelled') {
+      hasEmergency = true
+    }
+    if (!firstNextStep && !isDone) {
+      const companion = deriveEdenCareCompanion(ep, 'simple')
+      firstNextStep = companion.nextBeautifulStep.invitation
+    }
+  }
+
+  const active = Math.max(0, total - completed)
+  const safeResults: readonly SupportiveResult[] = Array.isArray(supportiveResults) ? supportiveResults : []
+  const abnormalResults = safeResults.filter((r) => r.flag === 'critical' || r.flag === 'high')
+  const hasCriticalDiag = abnormalResults.some((r) => r.flag === 'critical')
+  const costSummary = deriveCareJourneyCostSummary(safeEpisodes)
+
+  let calmState: EdenCalmState = 'serene'
+  let calmStateLabel = 'Serene · Balanced Rhythm'
+  if (hasEmergency || hasCriticalDiag) {
+    calmState = 'timely_clinical_care'
+    calmStateLabel = 'Timely Clinical Care · Priority Support'
+  } else if (blocked > 0 || abnormalResults.length > 0) {
+    calmState = 'gentle_attention'
+    calmStateLabel = 'Gentle Attention · Step-by-Step Support'
+  } else if (active > 0) {
+    calmState = 'balanced_progress'
+    calmStateLabel = 'Balanced Progress · Steady Recovery'
+  }
+
+  const harmonyHeadline =
+    total === 0
+      ? 'Your health space is calm and ready whenever you wish to explore or begin a care journey.'
+      : calmState === 'timely_clinical_care'
+      ? 'Your care team is prioritizing timely clinical attention while keeping your journey clear and supported.'
+      : calmState === 'gentle_attention'
+      ? `One step in your care journey needs gentle coordination (${completed} of ${total} journeys completed).`
+      : calmState === 'balanced_progress'
+      ? `Your care journeys are moving forward steadily in a calm, coordinated rhythm (${active} active, ${completed} completed).`
+      : `All ${completed} tracked care journey(s) have reached completion in steady balance.`
+
+  const biologicalAppreciation =
+    'Every breath, heartbeat, and cellular repair process works together to maintain your body’s natural balance (homeostasis).'
+
+  const oneUnifiedFocus =
+    firstNextStep ||
+    (total > 0
+      ? 'Enjoy your daily rhythm of rest, hydration, and gentle movement while maintaining scheduled check-ins.'
+      : 'Start or seed a care journey whenever you and your clinician want to track a goal together.')
+
+  const dimensions: EdenLifeDimensionStatus[] = [
+    {
+      dimension: 'clinical_continuity',
+      label: 'Care Journey Rhythm',
+      plainSummary:
+        total === 0
+          ? 'No active care episodes required right now'
+          : `${active} active · ${completed} completed${blocked > 0 ? ` · ${blocked} awaiting coordination` : ''}`,
+      tone: hasEmergency ? 'urgent' : blocked > 0 ? 'attentive' : 'serene',
+    },
+    {
+      dimension: 'diagnostic_clarity',
+      label: 'Body Signals & Lab Clarity',
+      plainSummary:
+        !supportiveResults || supportiveResults.length === 0
+          ? 'No pending lab or diagnostic alerts'
+          : abnormalResults.length > 0
+          ? `${abnormalResults.length} result(s) highlighted for clinician review`
+          : `${supportiveResults.length} supportive result(s) within expected range`,
+      tone: hasCriticalDiag ? 'urgent' : abnormalResults.length > 0 ? 'attentive' : 'serene',
+    },
+    {
+      dimension: 'recovery_rhythm',
+      label: 'Recovery & Daily Balance',
+      plainSummary:
+        completed > 0
+          ? `${completed} journey(s) reached recovery/outcome milestones`
+          : active > 0
+          ? 'Steady step-by-step physiological recovery in progress'
+          : ' Baseline daily wellness and homeostasis',
+      tone: 'serene',
+    },
+    {
+      dimension: 'financial_peace',
+      label: 'Cost Transparency & Care Guarantee',
+      plainSummary:
+        costSummary.pricedJourneysCount > 0
+          ? `${costSummary.pricedJourneysCount} journey(s) priced · Emergency/vital care is never denied`
+          : 'No billing hurdles · Vital clinical care is never denied',
+      tone: 'serene',
+    },
+  ]
+
+  return {
+    calmState,
+    calmStateLabel,
+    harmonyHeadline,
+    biologicalAppreciation,
+    oneUnifiedFocus,
+    activeJourneysCount: active,
+    completedJourneysCount: completed,
+    dimensions,
+    clinicalSafetyGuarantee: 'never-deny-care',
+  }
+}
+
 export const STAGE_EXPECTED_DAYS: Record<CareEpisodeStageId, number> = {
   problem: 1,
   diagnosis: 2,
@@ -1457,6 +1585,7 @@ export function evaluateCareJourneyContinuity(
   const edenReadyJourneysCount = summaries.filter(
     (s) => Boolean(s.edenCompanion?.clinicalSafetyPreserved)
   ).length
+  const edenLifeBalance = deriveEdenLifeBalanceSynthesis(episodes, supportiveResults)
 
   return {
     totalJourneys: episodes.length,
@@ -1491,6 +1620,7 @@ export function evaluateCareJourneyContinuity(
     acknowledgedReferralsCount,
     emergencyReferralsCount,
     edenReadyJourneysCount,
+    edenLifeBalance,
     hasBlockedStages: blockedJourneys > 0 || stalledCount > 0,
   }
 }
