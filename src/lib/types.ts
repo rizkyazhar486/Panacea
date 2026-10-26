@@ -1439,6 +1439,55 @@ export interface EdenMitophagicPrimingBridge {
   epistemicHumilityPreserved: true
 }
 
+export type EdenEndothelialGlycocalyxState =
+  | 'robust_shear_mediated_enos_glycocalyx_resonance'
+  | 'compensated_heparan_sulfate_barrier'
+  | 'glycocalyx_shedding_endothelial_dysfunction'
+  | 'microvascular_rarefaction_thrombogenic_collapse'
+
+export type EdenMicrovascularResilienceTier =
+  | 'optimal_flow_mediated_vasodilation'
+  | 'adequate_capillary_perfusion_reserve'
+  | 'attenuated_nitric_oxide_bioavailability'
+  | 'critical_microvascular_permeability_leak'
+
+export type EdenGlycocalyxNodeKind =
+  | 'enos_ser1177_phosphorylation_coupling'
+  | 'syndecan_glypican_heparan_scaffolding'
+  | 'hyaluronan_meshwork_shearing_shield'
+  | 'klf2_flow_responsive_mechanotransduction'
+
+export interface EdenGlycocalyxNode {
+  nodeKind: EdenGlycocalyxNodeKind
+  nodeLabel: string
+  perfusionEfficiencyScore: number
+  glycocalyxThicknessIndex: number
+  endothelialStatus: 'optimal_glycocalyx_shield' | 'adaptive_endothelial_state' | 'shedding_strain'
+  mechanisticNote: string
+}
+
+export interface EdenMicrovascularResilienceBridge {
+  version: 'v1'
+  episodeId: string
+  episodeTitle: string
+  glycocalyxState: EdenEndothelialGlycocalyxState
+  glycocalyxStateLabel: string
+  resilienceTier: EdenMicrovascularResilienceTier
+  resilienceTierLabel: string
+  nitricOxideBioavailabilityScore: number
+  glycocalyxIntegrityIndex: number
+  capillaryPerfusionCapacity: number
+  glycocalyxNodes: EdenGlycocalyxNode[]
+  microvascularNarrativeId: string
+  microvascularNarrativeEn: string
+  microvascularLongevityStrategy: string
+  truthClass: 'microvascular_glycocalyx_simulation_proxy'
+  clinically_reviewed: false
+  patientTruthUncompromised: true
+  neverManufacturesBiomarkers: true
+  epistemicHumilityPreserved: true
+}
+
 export interface CareJourneyExportSummary {
   standard: 'PANACEA-CAREPLAN-FHIR-R4-V1'
   generatedAt: string

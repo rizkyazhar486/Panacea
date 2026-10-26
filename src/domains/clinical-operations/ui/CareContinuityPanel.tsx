@@ -856,6 +856,17 @@ export function CareContinuityPanel({
                   </span>
                 </div>
               )}
+              {careJourneys.edenMicrovascularResilienceReadyCount > 0 && (
+                <div
+                  className="flex justify-between text-sky-300"
+                  data-eden-glycocalyx="v1"
+                >
+                  <span>Glikokaliks endotel & perfusi mikrovaskular:</span>
+                  <span className="font-bold">
+                    {careJourneys.edenMicrovascularResilienceReadyCount} episode terhubung
+                  </span>
+                </div>
+              )}
 
               {careJourneys.episodes.length > 0 && (
                 <div className="mt-3 border-t border-white/8 pt-2">

@@ -41,6 +41,7 @@ import {
   deriveEdenSirtuinNadParp1Bridge,
   deriveEdenShelterinCapProtectionBridge,
   deriveEdenMitophagicPrimingBridge,
+  deriveEdenMicrovascularResilienceBridge,
   translateClinicalTermToEden,
   EDEN_PLAIN_LANGUAGE_GLOSSARY,
 } from '../../src/domains/clinical-operations/model/careContinuityProjection.ts'
@@ -3738,4 +3739,78 @@ test('deriveEdenMitophagicPrimingBridge & CareEpisode: Eden Mitochondrial Fissio
   const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
   assert.ok(episodeSource.includes('data-eden-mitophagy-card="v1"'), 'CareEpisode must include mitophagy card')
   assert.ok(episodeSource.includes('data-eden-mitophagy-nodes="v1"'), 'CareEpisode must include mitophagy nodes grid')
+})
+
+test('deriveEdenMicrovascularResilienceBridge & CareEpisode: Eden Endothelial Nitric Oxide Synthase & Microvascular Glycocalyx Synthesizer (T-CLIN-50 / EDEN-30)', () => {
+  const evaluatedAt = '2026-10-26T20:10:00.000Z'
+  const sampleEpisode = {
+    id: 'ce_glycocalyx_1',
+    title: 'Endothelial Nitric Oxide Synthase & Microvascular Glycocalyx Pathway',
+    diagnosisCode: 'Z00.00',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'diagnosis', status: 'done' },
+      { stage: 'plan', status: 'done' },
+      { stage: 'treatment', status: 'done' },
+      { stage: 'recovery', status: 'active' },
+    ],
+  }
+
+  // 1. Pure deterministic derivation
+  const bridge = deriveEdenMicrovascularResilienceBridge(sampleEpisode)
+  assert.equal(bridge.version, 'v1')
+  assert.equal(bridge.episodeId, 'ce_glycocalyx_1')
+  assert.equal(bridge.glycocalyxState, 'robust_shear_mediated_enos_glycocalyx_resonance')
+  assert.equal(bridge.glycocalyxStateLabel, 'Resonansi eNOS & Ketebalan Glikokaliks Mikrovaskular Maksimal')
+  assert.equal(bridge.resilienceTier, 'optimal_flow_mediated_vasodilation')
+  assert.equal(bridge.resilienceTierLabel, 'Vasodilatasi Dimediasi-Aliran Optimal & Perfusi Jaringan Utuh')
+  assert.ok(bridge.nitricOxideBioavailabilityScore >= 85)
+  assert.ok(bridge.glycocalyxIntegrityIndex >= 85)
+  assert.ok(bridge.capillaryPerfusionCapacity >= 85)
+  assert.equal(bridge.glycocalyxNodes.length, 4)
+  assert.equal(bridge.glycocalyxNodes[0].nodeKind, 'enos_ser1177_phosphorylation_coupling')
+  assert.equal(bridge.glycocalyxNodes[1].nodeKind, 'syndecan_glypican_heparan_scaffolding')
+  assert.equal(bridge.glycocalyxNodes[2].nodeKind, 'hyaluronan_meshwork_shearing_shield')
+  assert.equal(bridge.glycocalyxNodes[3].nodeKind, 'klf2_flow_responsive_mechanotransduction')
+  assert.equal(bridge.truthClass, 'microvascular_glycocalyx_simulation_proxy')
+  assert.equal(bridge.clinically_reviewed, false)
+  assert.equal(bridge.patientTruthUncompromised, true)
+  assert.equal(bridge.neverManufacturesBiomarkers, true)
+  assert.equal(bridge.epistemicHumilityPreserved, true)
+
+  // 2. Blocked stage resilience
+  const blockedEpisode = {
+    id: 'ce_glycocalyx_blocked',
+    title: 'Blocked Microvascular Rarefaction Collapse Episode',
+    diagnosisCode: 'I79.8',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'diagnosis', status: 'blocked', blockedReason: 'Awaiting sublingual sidestream dark-field imaging and serum syndecan-1 shedding ELISA' },
+    ],
+  }
+  const blockedBridge = deriveEdenMicrovascularResilienceBridge(blockedEpisode)
+  assert.equal(blockedBridge.glycocalyxState, 'microvascular_rarefaction_thrombogenic_collapse')
+  assert.equal(blockedBridge.glycocalyxStateLabel, 'Rarefaksi Mikrovaskular Ekstrem & Kolaps Trombogenik')
+  assert.equal(blockedBridge.resilienceTier, 'critical_microvascular_permeability_leak')
+  assert.equal(blockedBridge.resilienceTierLabel, 'Kebocoran Permeabilitas Mikrovaskular & Kehilangan eNOS Parah')
+  assert.ok(blockedBridge.nitricOxideBioavailabilityScore <= 65)
+  assert.ok(blockedBridge.glycocalyxIntegrityIndex <= 65)
+  assert.ok(blockedBridge.capillaryPerfusionCapacity <= 65)
+  assert.equal(blockedBridge.glycocalyxNodes.every((n) => n.endothelialStatus === 'shedding_strain'), true)
+
+  // 3. Rollup in evaluateCareJourneyContinuity
+  const projection = evaluateCareJourneyContinuity([sampleEpisode, blockedEpisode], evaluatedAt)
+  assert.equal(projection.edenMicrovascularResilienceReadyCount, 2)
+  assert.ok(projection.episodes[0].edenMicrovascularResilience)
+  assert.equal(projection.episodes[0].edenMicrovascularResilience.truthClass, 'microvascular_glycocalyx_simulation_proxy')
+  assert.equal(projection.episodes[0].edenMicrovascularResilience.patientTruthUncompromised, true)
+  assert.equal(projection.episodes[0].edenMicrovascularResilience.neverManufacturesBiomarkers, true)
+
+  // 4. UI contracts
+  const panelSource = read('src/domains/clinical-operations/ui/CareContinuityPanel.tsx')
+  assert.ok(panelSource.includes('data-eden-glycocalyx="v1"'), 'CareContinuityPanel must include glycocalyx attribute')
+
+  const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
+  assert.ok(episodeSource.includes('data-eden-glycocalyx-card="v1"'), 'CareEpisode must include glycocalyx card')
+  assert.ok(episodeSource.includes('data-eden-glycocalyx-nodes="v1"'), 'CareEpisode must include glycocalyx nodes grid')
 })
