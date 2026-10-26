@@ -1292,6 +1292,55 @@ export interface EdenRetrotransposonSilencingBridge {
   epistemicHumilityPreserved: true
 }
 
+export type EdenSirtuinMetabolomicState =
+  | 'abundant_nad_sirtuin_resonance'
+  | 'compensated_salvage_equilibrium'
+  | 'depleted_nad_enzymatic_competition'
+  | 'metabolomic_exhaustion_parp_collapse'
+
+export type EdenParp1RepairTier =
+  | 'efficient_high_fidelity_parp_repair'
+  | 'adequate_single_strand_clearance'
+  | 'delayed_genomic_lesion_resolution'
+  | 'hyperactivated_nad_depletion_crisis'
+
+export type EdenSirtuinRepairNodeKind =
+  | 'nampt_salvage_nad_biosynthesis'
+  | 'sirt1_sirt6_chromatin_deacetylation'
+  | 'parp1_poly_adp_ribosylation_repair'
+  | 'cd38_sarm1_hydrolase_suppression'
+
+export interface EdenSirtuinRepairNode {
+  nodeKind: EdenSirtuinRepairNodeKind
+  nodeLabel: string
+  fluxEfficiencyScore: number
+  metabolomicIntegrityIndex: number
+  repairDynamicsStatus: 'optimal_resonance_flux' | 'compensated_adaptive_state' | 'depletion_strain'
+  mechanisticNote: string
+}
+
+export interface EdenSirtuinNadParp1Bridge {
+  version: 'v1'
+  episodeId: string
+  episodeTitle: string
+  sirtuinState: EdenSirtuinMetabolomicState
+  sirtuinStateLabel: string
+  repairTier: EdenParp1RepairTier
+  repairTierLabel: string
+  nadPoolVitalityScore: number
+  sirtuinDeacetylationIndex: number
+  parp1DnaRepairCapacity: number
+  repairNodes: EdenSirtuinRepairNode[]
+  metabolomicNarrativeId: string
+  metabolomicNarrativeEn: string
+  sirtuinNadOptimizationStrategy: string
+  truthClass: 'sirtuin_nad_repair_simulation_proxy'
+  clinically_reviewed: false
+  patientTruthUncompromised: true
+  neverManufacturesBiomarkers: true
+  epistemicHumilityPreserved: true
+}
+
 export interface CareJourneyExportSummary {
   standard: 'PANACEA-CAREPLAN-FHIR-R4-V1'
   generatedAt: string
