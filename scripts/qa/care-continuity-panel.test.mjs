@@ -1283,7 +1283,7 @@ test('derivePatientLongitudinalTimeline & CareEpisode: multi-episode longitudina
   assert.ok(episodeSource.includes('data-care-comorbidities="v1"'), 'CareEpisode must include care comorbidities attribute')
 })
 
-test('exportCareJourneySummary & CareEpisode: FHIR-aligned continuity handoff packet & digest verification (T-CLIN-16)', () => {
+test('exportCareJourneySummary & CareEpisode: FHIR-aligned continuity handoff packet & digest verification (T-CLIN-17)', () => {
   const evaluatedAt = '2026-10-25T15:00:00.000Z'
   const episode = {
     id: 'ce_export_1',

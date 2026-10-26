@@ -434,7 +434,7 @@ function EpisodeCard({
       {/* Longitudinal Care Journey Timeline & Event Provenance Audit Trail (T-CLIN-14) */}
       <JourneyTimelineSection episode={episode} />
 
-      {/* Care Journey Continuity Handoff & FHIR-Aligned Summary Export (T-CLIN-16) */}
+      {/* Care Journey Continuity Handoff & FHIR-Aligned Summary Export (T-CLIN-17) */}
       <CareJourneyExportSection episode={episode} />
     </Card>
   )
