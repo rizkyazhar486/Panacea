@@ -11,6 +11,7 @@ import {
   derivePatientLongitudinalTimeline,
   exportCareJourneySummary,
   deriveCareJourneyCostSummary,
+  evaluateEpisodeReadmissionRisk,
 } from '../../src/domains/clinical-operations/model/careContinuityProjection.ts'
 import {
   ensureEpisodeFromVerifiedPlan,
@@ -1450,4 +1451,108 @@ test('deriveCareJourneyCostSummary & CareContinuityPanel: Total Cost of Care fin
 
   const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
   assert.ok(episodeSource.includes('data-care-cost-transparency="v1"'), 'CareEpisode must include cost transparency attribute')
+})
+
+test('evaluateEpisodeReadmissionRisk & CareContinuityPanel: post-discharge follow-up & readmission risk surveillance (T-CLIN-19)', () => {
+  const evaluatedAt = '2026-10-25T16:00:00.000Z'
+  const evaluatedAtMs = Date.parse(evaluatedAt)
+
+  // 1. High-risk episode: blocked followUp stage + multi-comorbidity burden
+  const highRiskEpisode = {
+    id: 'ce_readm_high',
+    title: 'Heart Failure Post-Discharge Transition',
+    linkedComorbidities: ['I10', 'E11.9', 'N18.3'],
+    createdAt: '2026-10-10T08:00:00.000Z',
+    updatedAt: '2026-10-24T08:00:00.000Z',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'treatment', status: 'done' },
+      { stage: 'recovery', status: 'done' },
+      { stage: 'followUp', status: 'blocked', blockedReason: 'Patient missed 7-day cardiology clinic visit' },
+      { stage: 'outcome', status: 'pending' },
+    ],
+    milestones: [
+      {
+        id: 'ms_ntprobnp',
+        title: 'NT-proBNP & renal panel check',
+        category: 'Monitoring',
+        targetStage: 'followUp',
+        status: 'verified',
+      },
+    ],
+  }
+
+  const highRisk = evaluateEpisodeReadmissionRisk(highRiskEpisode, [], evaluatedAtMs)
+  assert.equal(highRisk.riskLevel, 'high')
+  assert.equal(highRisk.followUpWindowClosed, false)
+  assert.ok(highRisk.riskFactors.length >= 2)
+
+  // 2. Moderate-risk episode: active recovery with 1 unfulfilled monitoring milestone
+  const moderateRiskEpisode = {
+    id: 'ce_readm_mod',
+    title: 'Community-Acquired Pneumonia Recovery',
+    createdAt: '2026-10-20T08:00:00.000Z',
+    updatedAt: '2026-10-24T08:00:00.000Z',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'treatment', status: 'done' },
+      { stage: 'recovery', status: 'active', updatedAt: '2026-10-23T08:00:00.000Z' },
+      { stage: 'followUp', status: 'pending' },
+    ],
+    milestones: [
+      {
+        id: 'ms_cxr',
+        title: 'Follow-up chest radiograph',
+        category: 'Follow-up',
+        targetStage: 'followUp',
+        status: 'verified',
+      },
+    ],
+  }
+
+  const modRisk = evaluateEpisodeReadmissionRisk(moderateRiskEpisode, [], evaluatedAtMs)
+  assert.equal(modRisk.riskLevel, 'moderate')
+  assert.equal(modRisk.riskFactors.length, 1)
+
+  // 3. Low-risk / closed follow-up window (negative control)
+  const closedEpisode = {
+    id: 'ce_readm_low',
+    title: 'Resolved Appendectomy',
+    createdAt: '2026-10-01T08:00:00.000Z',
+    updatedAt: '2026-10-20T08:00:00.000Z',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'treatment', status: 'done' },
+      { stage: 'recovery', status: 'done' },
+      { stage: 'followUp', status: 'done' },
+      { stage: 'outcome', status: 'done' },
+    ],
+    outcomeRecord: {
+      status: 'resolved',
+      summary: 'Full surgical recovery confirmed at follow-up',
+      verifiedById: 'dr-surg',
+      verifiedAt: '2026-10-20T08:00:00.000Z',
+    },
+  }
+
+  const lowRisk = evaluateEpisodeReadmissionRisk(closedEpisode, [], evaluatedAtMs)
+  assert.equal(lowRisk.riskLevel, 'low')
+  assert.equal(lowRisk.followUpWindowClosed, true)
+  assert.equal(lowRisk.riskFactors.length, 0)
+
+  // 4. evaluateCareJourneyContinuity rollup
+  const projection = evaluateCareJourneyContinuity(
+    [highRiskEpisode, moderateRiskEpisode, closedEpisode],
+    evaluatedAt
+  )
+  assert.equal(projection.highReadmissionRiskCount, 1)
+  assert.equal(projection.moderateReadmissionRiskCount, 1)
+  assert.equal(projection.followUpWindowClosedCount, 1)
+
+  // 5. UI contracts
+  const panelSource = read('src/domains/clinical-operations/ui/CareContinuityPanel.tsx')
+  assert.ok(panelSource.includes('data-care-readmission-surveillance="v1"'), 'CareContinuityPanel must include readmission surveillance attribute')
+
+  const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
+  assert.ok(episodeSource.includes('data-care-followup-surveillance="v1"'), 'CareEpisode must include follow-up surveillance attribute')
 })

@@ -95,6 +95,18 @@ export interface CareJourneyEpisodeSummary {
   costConfidence?: 'estimated' | 'verified'
   costSource?: string
   costItemsCount: number
+  readmissionSurveillance?: CareJourneyReadmissionSurveillance
+}
+
+export type ReadmissionRiskLevel = 'low' | 'moderate' | 'high'
+
+export interface CareJourneyReadmissionSurveillance {
+  episodeId: string
+  episodeTitle: string
+  riskLevel: ReadmissionRiskLevel
+  riskFactors: string[]
+  followUpWindowClosed: boolean
+  recommendedAction: string
 }
 
 export interface CareJourneyCostSummary {
@@ -157,6 +169,9 @@ export interface CareJourneyContinuityResult {
   totalEstimatedCostHigh: number
   costVerifiedJourneysCount: number
   costEstimatedJourneysCount: number
+  highReadmissionRiskCount: number
+  moderateReadmissionRiskCount: number
+  followUpWindowClosedCount: number
   hasBlockedStages: boolean
 }
 
@@ -831,6 +846,111 @@ export function deriveCareJourneyCostSummary(
   }
 }
 
+export function evaluateEpisodeReadmissionRisk(
+  episode: CareEpisode,
+  supportiveResults?: readonly SupportiveResult[],
+  evaluatedAtMs?: number,
+): CareJourneyReadmissionSurveillance {
+  const stages = Array.isArray(episode.stages) ? episode.stages : []
+  const recoveryStage = stages.find((s) => s.stage === 'recovery')
+  const followUpStage = stages.find((s) => s.stage === 'followUp')
+  const outcomeStage = stages.find((s) => s.stage === 'outcome')
+  const allStagesDone = stages.length > 0 && stages.every((s) => s.status === 'done')
+
+  const riskFactors: string[] = []
+  let hasBlockedPostDischarge = false
+
+  if (recoveryStage?.status === 'blocked' || followUpStage?.status === 'blocked') {
+    hasBlockedPostDischarge = true
+    riskFactors.push('Recovery or follow-up stage blocked')
+  } else if (evaluatedAtMs != null) {
+    for (const st of [recoveryStage, followUpStage]) {
+      if (st?.status === 'active' && st.updatedAt) {
+        const updatedMs = Date.parse(st.updatedAt)
+        if (Number.isFinite(updatedMs) && updatedMs <= evaluatedAtMs) {
+          const elapsedDays = Math.floor((evaluatedAtMs - updatedMs) / 86_400_000)
+          const expectedDays =
+            (episode.expectedDaysOverride ? episode.expectedDaysOverride[st.stage] : undefined) ??
+            STAGE_EXPECTED_DAYS[st.stage] ??
+            21
+          if (elapsedDays >= expectedDays) {
+            riskFactors.push(`${STAGE_LABEL[st.stage]} stage exceeded expected window (${elapsedDays}d/${expectedDays}d)`)
+          }
+        }
+      }
+    }
+  }
+
+  const inPostTreatmentWindow =
+    recoveryStage?.status === 'active' ||
+    recoveryStage?.status === 'done' ||
+    followUpStage?.status === 'active' ||
+    followUpStage?.status === 'done' ||
+    outcomeStage?.status === 'active'
+
+  const milestones = Array.isArray(episode.milestones) ? episode.milestones : []
+  const pendingPostTxMilestones = milestones.filter(
+    (m) =>
+      (m.category === 'Follow-up' || m.category === 'Monitoring') &&
+      m.status !== 'completed' &&
+      m.status !== 'cancelled'
+  )
+  if (inPostTreatmentWindow && pendingPostTxMilestones.length > 0) {
+    riskFactors.push(`${pendingPostTxMilestones.length} post-treatment monitoring/follow-up milestone(s) unfulfilled`)
+  }
+
+  const comorbidityCount = Array.isArray(episode.linkedComorbidities)
+    ? episode.linkedComorbidities.filter((c) => Boolean(c?.trim())).length
+    : 0
+  if (comorbidityCount >= 2) {
+    riskFactors.push(`Multi-comorbidity burden (${comorbidityCount} linked diagnoses)`)
+  }
+
+  let hasCriticalResult = false
+  if (Array.isArray(supportiveResults)) {
+    const criticalOrHigh = supportiveResults.filter(
+      (r) => r.flag === 'critical' || r.flag === 'high'
+    )
+    if (criticalOrHigh.length > 0) {
+      hasCriticalResult = criticalOrHigh.some((r) => r.flag === 'critical')
+      riskFactors.push(`${criticalOrHigh.length} abnormal supportive diagnostic result(s) flagged`)
+    }
+  }
+
+  if (allStagesDone && !episode.outcomeRecord?.status) {
+    riskFactors.push('Episode stages completed without verified clinical outcome record')
+  }
+
+  let riskLevel: ReadmissionRiskLevel = 'low'
+  if (hasBlockedPostDischarge || hasCriticalResult || riskFactors.length >= 2) {
+    riskLevel = 'high'
+  } else if (riskFactors.length === 1) {
+    riskLevel = 'moderate'
+  }
+
+  const followUpWindowClosed = Boolean(
+    followUpStage?.status === 'done' && episode.outcomeRecord?.status
+  )
+
+  const recommendedAction =
+    riskLevel === 'high'
+      ? 'Schedule urgent clinician post-discharge review & outreach within 24h'
+      : riskLevel === 'moderate'
+      ? 'Verify follow-up milestone completion with care coordinator'
+      : followUpWindowClosed
+      ? 'Post-discharge follow-up window closed with verified outcome'
+      : 'Continue routine longitudinal monitoring'
+
+  return {
+    episodeId: episode.id,
+    episodeTitle: episode.title,
+    riskLevel,
+    riskFactors,
+    followUpWindowClosed,
+    recommendedAction,
+  }
+}
+
 export const STAGE_EXPECTED_DAYS: Record<CareEpisodeStageId, number> = {
   problem: 1,
   diagnosis: 2,
@@ -1080,6 +1200,7 @@ export function evaluateCareJourneyContinuity(
     }
 
     const costProj = deriveEpisodeCostProjection(ep)
+    const readmissionSurveillance = evaluateEpisodeReadmissionRisk(ep, supportiveResults, evaluatedAtMs)
 
     return {
       id: ep.id,
@@ -1108,6 +1229,7 @@ export function evaluateCareJourneyContinuity(
       costConfidence: costProj.costConfidence,
       costSource: costProj.costSource,
       costItemsCount: costProj.costItemsCount,
+      readmissionSurveillance,
     }
   })
 
@@ -1139,6 +1261,15 @@ export function evaluateCareJourneyContinuity(
   const activeComorbiditiesCount = uniqueComorbidities.size
   const exportableJourneysCount = summaries.filter((s) => Boolean(s.exportSummary)).length
   const costSummary = deriveCareJourneyCostSummary(episodes)
+  const highReadmissionRiskCount = summaries.filter(
+    (s) => s.readmissionSurveillance?.riskLevel === 'high'
+  ).length
+  const moderateReadmissionRiskCount = summaries.filter(
+    (s) => s.readmissionSurveillance?.riskLevel === 'moderate'
+  ).length
+  const followUpWindowClosedCount = summaries.filter(
+    (s) => Boolean(s.readmissionSurveillance?.followUpWindowClosed)
+  ).length
 
   return {
     totalJourneys: episodes.length,
@@ -1166,6 +1297,9 @@ export function evaluateCareJourneyContinuity(
     totalEstimatedCostHigh: costSummary.totalEstimatedCostHigh,
     costVerifiedJourneysCount: costSummary.costVerifiedJourneysCount,
     costEstimatedJourneysCount: costSummary.costEstimatedJourneysCount,
+    highReadmissionRiskCount,
+    moderateReadmissionRiskCount,
+    followUpWindowClosedCount,
     hasBlockedStages: blockedJourneys > 0 || stalledCount > 0,
   }
 }

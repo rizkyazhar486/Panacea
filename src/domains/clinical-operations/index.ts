@@ -54,12 +54,15 @@ export {
   derivePatientLongitudinalTimeline,
   exportCareJourneySummary,
   deriveCareJourneyCostSummary,
+  evaluateEpisodeReadmissionRisk,
   STAGE_LABEL,
   type CareContinuityProjection,
   type CareContinuityProjectionInput,
   type CareJourneyContinuityResult,
   type CareJourneyEpisodeSummary,
   type CareJourneyCostSummary,
+  type CareJourneyReadmissionSurveillance,
+  type ReadmissionRiskLevel,
   type CarePlanMilestoneSummary,
 } from './model/careContinuityProjection'
 
