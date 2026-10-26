@@ -24,6 +24,7 @@ import {
   deriveEdenUniversalAcceptanceBridge,
   deriveEdenRestorativeEnvironmentBridge,
   deriveEdenMultiModelRegenerationBridge,
+  deriveEdenQuantumBioPhotonicBridge,
   translateClinicalTermToEden,
   EDEN_PLAIN_LANGUAGE_GLOSSARY,
 } from '../../src/domains/clinical-operations/model/careContinuityProjection.ts'
@@ -2429,4 +2430,70 @@ test('deriveEdenMultiModelRegenerationBridge & CareEpisode: Eden Multi-Model Fro
   const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
   assert.ok(episodeSource.includes('data-eden-multi-model-regeneration-card="v1"'), 'CareEpisode must include multi-model regeneration card')
   assert.ok(episodeSource.includes('data-eden-frontier-hypotheses="v1"'), 'CareEpisode must include frontier hypotheses selector')
+})
+
+test('deriveCareContinuityState & CareEpisode: Eden Quantum Bio-Photonic Field & Transcendent Cellular Longevity Bridge (T-CLIN-32 / EDEN-12)', async () => {
+  const evaluatedAt = '2026-10-26T12:00:00.000Z'
+
+  const sampleEpisode = {
+    id: 'ce_quantum_biophotonic_1',
+    title: 'Longevity Cardio-Metabolic Optimization',
+    diagnosisCode: 'I10',
+    createdAt: '2026-10-20T08:00:00.000Z',
+    updatedAt: '2026-10-26T08:00:00.000Z',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'diagnosis', status: 'done' },
+      { stage: 'treatment', status: 'done' },
+      { stage: 'recovery', status: 'active' },
+    ],
+  }
+
+  // 1. Pure deterministic derivation
+  const bridge = deriveEdenQuantumBioPhotonicBridge(sampleEpisode)
+  assert.equal(bridge.version, 'v1')
+  assert.equal(bridge.episodeId, 'ce_quantum_biophotonic_1')
+  assert.equal(bridge.primaryDimension, 'mitochondrial_biophoton_flux')
+  assert.equal(bridge.photonicTrajectory, 'optimized_flux')
+  assert.ok(bridge.mitochondrialCoherenceScore >= 70 && bridge.mitochondrialCoherenceScore <= 98)
+  assert.ok(bridge.cellularResonanceIndex >= 70 && bridge.cellularResonanceIndex <= 96)
+  assert.equal(bridge.quantumBioPhotonicFieldClass, 'mechanistic_simulation')
+  assert.equal(bridge.neverFabricatesBiomarkers, true)
+  assert.equal(bridge.nonInterventionalResearchBoundary, true)
+  assert.ok(bridge.quantumBiophotonicNarrativeId.includes('Simulasi biofotonik kuantum'))
+  assert.ok(bridge.quantumBiophotonicNarrativeEn.includes('Quantum bio-photonic simulation'))
+  assert.ok(bridge.mechanisticGroundingId.includes('Fröhlich'))
+  assert.ok(bridge.transcendentLongevityTrajectory.includes('peremajaan biologis terpadu'))
+
+  // 2. Blocked stage resilience check
+  const blockedEpisode = {
+    id: 'ce_quantum_blocked',
+    title: 'Hepatobiliary Inflammation',
+    diagnosisCode: 'K80.2',
+    createdAt: '2026-10-20T08:00:00.000Z',
+    updatedAt: '2026-10-26T08:00:00.000Z',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'diagnosis', status: 'blocked', blockedReason: 'Awaiting specialized imaging' },
+    ],
+  }
+  const blockedBridge = deriveEdenQuantumBioPhotonicBridge(blockedEpisode)
+  assert.equal(blockedBridge.primaryDimension, 'coherent_water_dynamics')
+  assert.equal(blockedBridge.photonicTrajectory, 'entropy_dominated')
+  assert.ok(blockedBridge.mitochondrialCoherenceScore <= 65)
+
+  // 3. Rollup in evaluateCareJourneyContinuity
+  const projection = evaluateCareJourneyContinuity([sampleEpisode, blockedEpisode], evaluatedAt)
+  assert.equal(projection.edenQuantumBioPhotonicReadyCount, 2)
+  assert.ok(projection.episodes[0].edenQuantumBioPhotonic)
+  assert.equal(projection.episodes[0].edenQuantumBioPhotonic.quantumBioPhotonicFieldClass, 'mechanistic_simulation')
+  assert.equal(projection.episodes[0].edenQuantumBioPhotonic.neverFabricatesBiomarkers, true)
+
+  // 4. UI contracts
+  const panelSource = read('src/domains/clinical-operations/ui/CareContinuityPanel.tsx')
+  assert.ok(panelSource.includes('data-eden-quantum-biophotonic="v1"'), 'CareContinuityPanel must include quantum bio-photonic attribute')
+
+  const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
+  assert.ok(episodeSource.includes('data-eden-quantum-biophotonic-card="v1"'), 'CareEpisode must include quantum bio-photonic card')
+  assert.ok(episodeSource.includes('data-eden-quantum-metrics="v1"'), 'CareEpisode must include quantum metrics grid')
 })

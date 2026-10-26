@@ -19,6 +19,7 @@ import {
   deriveEdenUniversalAcceptanceBridge,
   deriveEdenRestorativeEnvironmentBridge,
   deriveEdenMultiModelRegenerationBridge,
+  deriveEdenQuantumBioPhotonicBridge,
 } from '../../domains/clinical-operations'
 import {
   CARE_EPISODE_STAGES,
@@ -627,6 +628,9 @@ function EpisodeCard({
 
       {/* Eden Multi-Model Frontier Scientific Imagination & Collective Cellular Regeneration Synthesis Bridge (T-CLIN-31 / EDEN-11) */}
       <EdenMultiModelRegenerationSection episode={episode} />
+
+      {/* Eden Quantum Bio-Photonic Field & Transcendent Cellular Longevity Bridge (T-CLIN-32 / EDEN-12) */}
+      <EdenQuantumBioPhotonicSection episode={episode} />
     </Card>
   )
 }
@@ -1896,6 +1900,113 @@ function EdenMultiModelRegenerationSection({ episode }: { episode: CareEpisode }
 
       <div className="mt-2 text-[10px] text-neutral-500 dark:text-white/50 text-right">
         PANACEA CONSTITUTION §0 · Separate research hypothesis truth class · No autonomous clinical intervention
+      </div>
+    </div>
+  )
+}
+
+function EdenQuantumBioPhotonicSection({ episode }: { episode: CareEpisode }) {
+  const [lang, setLang] = useState<'id' | 'en'>('id')
+
+  const bridge = useMemo(
+    () => deriveEdenQuantumBioPhotonicBridge(episode),
+    [episode]
+  )
+
+  const narrative = lang === 'id' ? bridge.quantumBiophotonicNarrativeId : bridge.quantumBiophotonicNarrativeEn
+  const mechanistic = lang === 'id' ? bridge.mechanisticGroundingId : bridge.mechanisticGroundingEn
+
+  return (
+    <div
+      className="mt-3 rounded-xl border border-cyan-200 dark:border-white/10 bg-cyan-50/30 dark:bg-white/[0.02] p-3.5"
+      data-eden-quantum-biophotonic-card="v1"
+    >
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+        <div>
+          <div className="flex items-center gap-2 flex-wrap">
+            <h4 className="text-xs font-bold text-neutral-900 dark:text-white">
+              Eden Quantum Bio-Photonic Field & Transcendent Cellular Longevity
+            </h4>
+            <Badge tone="brand">{bridge.dimensionLabel}</Badge>
+            <Badge tone="normal">{bridge.photonicTrajectoryLabel}</Badge>
+          </div>
+          <p className="mt-1 text-xs font-medium text-neutral-800 dark:text-white/85">
+            {narrative}
+          </p>
+        </div>
+        <div className="flex items-center gap-1 shrink-0">
+          <button
+            type="button"
+            onClick={() => setLang('id')}
+            className={`rounded-md px-2 py-0.5 text-[11px] font-medium transition-colors ${
+              lang === 'id'
+                ? 'bg-cyan-600 text-white font-bold'
+                : 'bg-white/80 dark:bg-white/5 text-neutral-700 dark:text-white/70 hover:bg-cyan-100/50'
+            }`}
+          >
+            Bahasa
+          </button>
+          <button
+            type="button"
+            onClick={() => setLang('en')}
+            className={`rounded-md px-2 py-0.5 text-[11px] font-medium transition-colors ${
+              lang === 'en'
+                ? 'bg-cyan-600 text-white font-bold'
+                : 'bg-white/80 dark:bg-white/5 text-neutral-700 dark:text-white/70 hover:bg-cyan-100/50'
+            }`}
+          >
+            English
+          </button>
+        </div>
+      </div>
+
+      <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2" data-eden-quantum-metrics="v1">
+        <div className="rounded-lg border border-cyan-200/50 dark:border-white/10 bg-white/70 dark:bg-white/[0.03] p-2.5">
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] font-bold text-neutral-700 dark:text-white/80">
+              Mitochondrial Coherence Index
+            </span>
+            <span className="text-xs font-extrabold text-cyan-700 dark:text-cyan-300">
+              {bridge.mitochondrialCoherenceScore}%
+            </span>
+          </div>
+          <div className="mt-1.5 h-1.5 w-full rounded-full bg-cyan-100 dark:bg-white/10 overflow-hidden">
+            <div
+              className="h-full rounded-full bg-gradient-to-r from-cyan-500 to-blue-500"
+              style={{ width: `${bridge.mitochondrialCoherenceScore}%` }}
+            />
+          </div>
+        </div>
+
+        <div className="rounded-lg border border-cyan-200/50 dark:border-white/10 bg-white/70 dark:bg-white/[0.03] p-2.5">
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] font-bold text-neutral-700 dark:text-white/80">
+              Cellular Resonance Field
+            </span>
+            <span className="text-xs font-extrabold text-blue-700 dark:text-blue-300">
+              {bridge.cellularResonanceIndex}%
+            </span>
+          </div>
+          <div className="mt-1.5 h-1.5 w-full rounded-full bg-blue-100 dark:bg-white/10 overflow-hidden">
+            <div
+              className="h-full rounded-full bg-gradient-to-r from-blue-500 to-indigo-500"
+              style={{ width: `${bridge.cellularResonanceIndex}%` }}
+            />
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-2.5 rounded-lg border border-cyan-200/40 dark:border-white/10 bg-cyan-100/30 dark:bg-white/[0.02] p-2.5 text-xs space-y-1.5">
+        <div className="text-[11px] text-neutral-800 dark:text-white/85">
+          <b>{lang === 'id' ? 'Landasan Fisiologis & Mekanistik:' : 'Physiological & Mechanistic Grounding:'}</b> {mechanistic}
+        </div>
+        <div className="text-[11px] text-neutral-700 dark:text-white/75 pt-1 border-t border-cyan-200/40 dark:border-white/5">
+          <b>{lang === 'id' ? 'Trajektori Umur Panjang Transenden:' : 'Transcendent Longevity Trajectory:'}</b> {bridge.transcendentLongevityTrajectory}
+        </div>
+      </div>
+
+      <div className="mt-2 text-[10px] text-neutral-500 dark:text-white/50 text-right">
+        ARGON EDEN ∞ §11 · Quantum bio-photonic simulation · Never fabricates biomarkers · Non-interventional boundary
       </div>
     </div>
   )
