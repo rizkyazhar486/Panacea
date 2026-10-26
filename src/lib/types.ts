@@ -846,6 +846,57 @@ export interface EdenBioHarmonicWaveformBridge {
   epistemicHumilityPreserved: true
 }
 
+// Eden Circadian-Metabolic Neuro-Synchrony & Mitochondrial Vitality Harmonizer (T-CLIN-38 / EDEN-18)
+export type EdenCircadianPhase =
+  | 'dawn_activation'
+  | 'solar_peak'
+  | 'twilight_repose'
+  | 'deep_nocturnal_repair'
+
+export type EdenMitochondrialDynamicState =
+  | 'fission_dominant'
+  | 'fusion_biogenesis'
+  | 'balanced_homeostasis'
+  | 'mitophagy_primed'
+
+export type EdenPeripheralClockKind =
+  | 'neural_suprachiasmatic'
+  | 'hepatic_metabolic'
+  | 'cardiac_chronobiological'
+  | 'musculoskeletal_energetic'
+
+export interface EdenPeripheralClockHarmonizer {
+  clockKind: EdenPeripheralClockKind
+  clockLabel: string
+  phaseAlignment: number
+  peakEfficiencyWindow: string
+  synchronyStatus: 'optimal_resonance' | 'phase_delayed' | 'phase_advanced' | 'subharmonic_drift'
+  mitochondrialCouplingIndex: number
+  mechanisticNote: string
+}
+
+export interface EdenCircadianMitochondrialHarmonizerBridge {
+  version: 'v1'
+  episodeId: string
+  episodeTitle: string
+  masterPhase: EdenCircadianPhase
+  masterPhaseLabel: string
+  mitochondrialDynamics: EdenMitochondrialDynamicState
+  mitochondrialDynamicsLabel: string
+  systemChronobiologicalResonance: number
+  peripheralClocks: EdenPeripheralClockHarmonizer[]
+  suprachiasmaticEntrainmentScore: number
+  mitochondrialVitalityIndex: number
+  circadianNarrativeId: string
+  circadianNarrativeEn: string
+  chronobiologicalLongevityStrategy: string
+  truthClass: 'chronobiological_simulation_proxy'
+  clinically_reviewed: false
+  patientTruthUncompromised: true
+  neverManufacturesBiomarkers: true
+  epistemicHumilityPreserved: true
+}
+
 export interface CareJourneyExportSummary {
   standard: 'PANACEA-CAREPLAN-FHIR-R4-V1'
   generatedAt: string

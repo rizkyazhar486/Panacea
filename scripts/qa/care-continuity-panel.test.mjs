@@ -29,6 +29,7 @@ import {
   deriveEdenBioCosmicSymphonyBridge,
   deriveEdenMultiAgentHealingCouncilBridge,
   deriveEdenBioHarmonicWaveformBridge,
+  deriveEdenCircadianMitochondrialHarmonizerBridge,
   translateClinicalTermToEden,
   EDEN_PLAIN_LANGUAGE_GLOSSARY,
 } from '../../src/domains/clinical-operations/model/careContinuityProjection.ts'
@@ -2792,4 +2793,82 @@ test('deriveEdenBioHarmonicWaveformBridge & CareEpisode: Eden Bio-Harmonic Epige
   const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
   assert.ok(episodeSource.includes('data-eden-bio-harmonic-card="v1"'), 'CareEpisode must include bio-harmonic card')
   assert.ok(episodeSource.includes('data-eden-epigenetic-layers="v1"'), 'CareEpisode must include epigenetic layers grid')
+})
+
+test('deriveEdenCircadianMitochondrialHarmonizerBridge & CareEpisode: Eden Circadian-Metabolic Neuro-Synchrony & Mitochondrial Vitality Harmonizer (T-CLIN-38 / EDEN-18)', () => {
+  const evaluatedAt = '2026-10-26T12:00:00.000Z'
+  const sampleEpisode = {
+    id: 'ce_circadian_1',
+    title: 'Circadian Metabolic Re-Entrainment & Mitochondrial Vitality',
+    diagnosisCode: 'G47.20',
+    createdAt: '2026-10-20T08:00:00.000Z',
+    updatedAt: '2026-10-26T08:00:00.000Z',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'diagnosis', status: 'done' },
+      { stage: 'treatment', status: 'done' },
+      { stage: 'recovery', status: 'active' },
+    ],
+  }
+
+  // 1. Pure deterministic derivation
+  const bridge = deriveEdenCircadianMitochondrialHarmonizerBridge(sampleEpisode)
+  assert.equal(bridge.version, 'v1')
+  assert.equal(bridge.episodeId, 'ce_circadian_1')
+  assert.equal(bridge.masterPhase, 'deep_nocturnal_repair')
+  assert.equal(bridge.masterPhaseLabel, 'Pemulihan Nokturnal Mendalam')
+  assert.equal(bridge.mitochondrialDynamics, 'fusion_biogenesis')
+  assert.equal(bridge.mitochondrialDynamicsLabel, 'Biogenesis & Fusi Mitokondria Optimal')
+  assert.ok(bridge.systemChronobiologicalResonance >= 74 && bridge.systemChronobiologicalResonance <= 99)
+  assert.ok(bridge.suprachiasmaticEntrainmentScore >= 76 && bridge.suprachiasmaticEntrainmentScore <= 98)
+  assert.ok(bridge.mitochondrialVitalityIndex >= 72 && bridge.mitochondrialVitalityIndex <= 99)
+  assert.equal(bridge.peripheralClocks.length, 4)
+  assert.equal(bridge.peripheralClocks[0].clockKind, 'neural_suprachiasmatic')
+  assert.equal(bridge.peripheralClocks[1].clockKind, 'hepatic_metabolic')
+  assert.equal(bridge.peripheralClocks[2].clockKind, 'cardiac_chronobiological')
+  assert.equal(bridge.peripheralClocks[3].clockKind, 'musculoskeletal_energetic')
+  assert.equal(bridge.truthClass, 'chronobiological_simulation_proxy')
+  assert.equal(bridge.clinically_reviewed, false)
+  assert.equal(bridge.patientTruthUncompromised, true)
+  assert.equal(bridge.neverManufacturesBiomarkers, true)
+  assert.equal(bridge.epistemicHumilityPreserved, true)
+  assert.ok(bridge.circadianNarrativeId.includes('Penyelarasan sirkadian-metabolik'))
+  assert.ok(bridge.circadianNarrativeEn.includes('Circadian-metabolic neuro-synchrony'))
+  assert.ok(bridge.chronobiologicalLongevityStrategy.includes('Pertahankan sinkronisasi'))
+
+  // 2. Blocked stage resilience check
+  const blockedEpisode = {
+    id: 'ce_circadian_blocked',
+    title: 'Severe Jetlag & Shift-Work Circadian Misalignment',
+    diagnosisCode: 'G47.26',
+    createdAt: '2026-10-20T08:00:00.000Z',
+    updatedAt: '2026-10-26T08:00:00.000Z',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'diagnosis', status: 'blocked', blockedReason: 'Awaiting polysomnography and core body temperature monitoring' },
+    ],
+  }
+  const blockedBridge = deriveEdenCircadianMitochondrialHarmonizerBridge(blockedEpisode)
+  assert.equal(blockedBridge.masterPhase, 'twilight_repose')
+  assert.equal(blockedBridge.masterPhaseLabel, 'Pemberhentian Senja (Twilight Repose)')
+  assert.equal(blockedBridge.mitochondrialDynamics, 'fission_dominant')
+  assert.equal(blockedBridge.mitochondrialDynamicsLabel, 'Fisi Dominan (Stres Metabolik Adaptif)')
+  assert.ok(blockedBridge.systemChronobiologicalResonance <= 66)
+  assert.ok(blockedBridge.chronobiologicalLongevityStrategy.includes('Fasilitasi pembersihan stres metabolik'))
+
+  // 3. Rollup in evaluateCareJourneyContinuity
+  const projection = evaluateCareJourneyContinuity([sampleEpisode, blockedEpisode], evaluatedAt)
+  assert.equal(projection.edenCircadianMitochondrialHarmonizerReadyCount, 2)
+  assert.ok(projection.episodes[0].edenCircadianMitochondrialHarmonizer)
+  assert.equal(projection.episodes[0].edenCircadianMitochondrialHarmonizer.truthClass, 'chronobiological_simulation_proxy')
+  assert.equal(projection.episodes[0].edenCircadianMitochondrialHarmonizer.patientTruthUncompromised, true)
+  assert.equal(projection.episodes[0].edenCircadianMitochondrialHarmonizer.neverManufacturesBiomarkers, true)
+
+  // 4. UI contracts
+  const panelSource = read('src/domains/clinical-operations/ui/CareContinuityPanel.tsx')
+  assert.ok(panelSource.includes('data-eden-circadian-mitochondrial="v1"'), 'CareContinuityPanel must include circadian-mitochondrial attribute')
+
+  const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
+  assert.ok(episodeSource.includes('data-eden-circadian-card="v1"'), 'CareEpisode must include circadian card')
+  assert.ok(episodeSource.includes('data-eden-peripheral-clocks="v1"'), 'CareEpisode must include peripheral clocks grid')
 })
