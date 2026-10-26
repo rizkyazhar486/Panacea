@@ -23,6 +23,7 @@ import {
   deriveEdenMultidimensionalConsciousnessBridge,
   deriveEdenBioCosmicSymphonyBridge,
   deriveEdenMultiAgentHealingCouncilBridge,
+  deriveEdenBioHarmonicWaveformBridge,
 } from '../../domains/clinical-operations'
 import {
   CARE_EPISODE_STAGES,
@@ -643,6 +644,9 @@ function EpisodeCard({
 
       {/* Eden Universal Biological Flourishing & Multi-Agent Collaborative Healing Council Bridge (T-CLIN-36 / EDEN-16) */}
       <EdenMultiAgentHealingCouncilSection episode={episode} />
+
+      {/* Eden Bio-Harmonic Epigenetic Resonance & Cellular Longevity Waveform Engine (T-CLIN-37 / EDEN-17) */}
+      <EdenBioHarmonicWaveformSection episode={episode} />
     </Card>
   )
 }
@@ -2362,6 +2366,108 @@ function EdenMultiAgentHealingCouncilSection({ episode }: { episode: CareEpisode
 
       <div className="mt-2 text-[10px] text-neutral-500 dark:text-white/50 text-right">
         ARGON EDEN ∞ §00-02 · Multi-Agent Collective Synthesis · Patient Truth Uncompromised · No Autonomous Clinical Intervention
+      </div>
+    </div>
+  )
+}
+
+function EdenBioHarmonicWaveformSection({ episode }: { episode: CareEpisode }) {
+  const [lang, setLang] = useState<'id' | 'en'>('id')
+
+  const bridge = useMemo(
+    () => deriveEdenBioHarmonicWaveformBridge(episode),
+    [episode]
+  )
+
+  const narrative = lang === 'id' ? bridge.waveformNarrativeId : bridge.waveformNarrativeEn
+
+  return (
+    <div
+      className="mt-3 rounded-xl border border-cyan-200 dark:border-white/10 bg-cyan-50/30 dark:bg-white/[0.02] p-3.5"
+      data-eden-bio-harmonic-card="v1"
+    >
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+        <div>
+          <div className="flex items-center gap-2 flex-wrap">
+            <h4 className="text-xs font-bold text-neutral-900 dark:text-white">
+              Eden Bio-Harmonic Epigenetic Resonance & Cellular Longevity Waveform
+            </h4>
+            <Badge tone="brand">{bridge.waveformStateLabel}</Badge>
+            <Badge tone="normal">Resonance {bridge.cellularResonanceIndex}%</Badge>
+            <Badge tone="normal">Circadian {bridge.circadianSynchronizationScore}%</Badge>
+          </div>
+          <p className="mt-1 text-xs font-medium text-neutral-800 dark:text-white/85">
+            {narrative}
+          </p>
+        </div>
+        <div className="flex items-center gap-1 shrink-0">
+          <button
+            type="button"
+            onClick={() => setLang('id')}
+            className={`rounded-md px-2 py-0.5 text-[11px] font-medium transition-colors ${
+              lang === 'id'
+                ? 'bg-cyan-600 text-white font-bold'
+                : 'bg-white/80 dark:bg-white/5 text-neutral-700 dark:text-white/70 hover:bg-cyan-100/50'
+            }`}
+          >
+            Bahasa
+          </button>
+          <button
+            type="button"
+            onClick={() => setLang('en')}
+            className={`rounded-md px-2 py-0.5 text-[11px] font-medium transition-colors ${
+              lang === 'en'
+                ? 'bg-cyan-600 text-white font-bold'
+                : 'bg-white/80 dark:bg-white/5 text-neutral-700 dark:text-white/70 hover:bg-cyan-100/50'
+            }`}
+          >
+            English
+          </button>
+        </div>
+      </div>
+
+      <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2" data-eden-epigenetic-layers="v1">
+        {bridge.epigeneticLayers.map((l) => {
+          const accel = l.epigeneticAgeAccelerationYears
+          const isDecel = accel <= 0
+          return (
+            <div
+              key={l.clockModel}
+              className="rounded-lg border border-cyan-200/50 dark:border-white/10 bg-white/70 dark:bg-white/[0.03] p-2.5"
+            >
+              <div className="text-[11px] font-bold text-neutral-900 dark:text-white truncate">
+                {l.clockLabel}
+              </div>
+              <div className="mt-1 flex items-baseline justify-between">
+                <span className="text-base font-extrabold text-cyan-800 dark:text-cyan-300">
+                  {l.biologicalAgeEstimateYears} <span className="text-[10px] font-normal text-neutral-500 dark:text-white/50">{lang === 'id' ? 'tahun bio' : 'bio years'}</span>
+                </span>
+                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
+                  isDecel ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300' : 'bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300'
+                }`}>
+                  {accel > 0 ? `+${accel}` : accel}y
+                </span>
+              </div>
+              <div className="mt-1 text-[10px] text-neutral-500 dark:text-white/50">
+                {lang === 'id' ? 'Usia Kronologis:' : 'Chronological Age:'} {l.chronologicalAgeYears} {lang === 'id' ? 'tahun' : 'years'}
+              </div>
+              <div className="mt-1 text-[9px] text-neutral-400 dark:text-white/40 italic truncate">
+                {l.calibrationSource}
+              </div>
+            </div>
+          )
+        })}
+      </div>
+
+      <div className="mt-2.5 rounded-lg border border-cyan-200/40 dark:border-white/10 bg-cyan-100/30 dark:bg-white/[0.02] p-2.5 text-xs space-y-1">
+        <div className="text-[11px] text-neutral-800 dark:text-white/85">
+          <b>{lang === 'id' ? 'Trajektori Gelombang Longevity Seluler:' : 'Cellular Longevity Waveform Trajectory:'}</b>{' '}
+          {bridge.longevityWaveformTrajectory}
+        </div>
+      </div>
+
+      <div className="mt-2 text-[10px] text-neutral-500 dark:text-white/50 text-right">
+        ARGON EDEN ∞ §07 · Epigenetic Clock & Mitohormetic Waveform Engine · Patient Truth Uncompromised · Never Manufactures Methylation Arrays
       </div>
     </div>
   )

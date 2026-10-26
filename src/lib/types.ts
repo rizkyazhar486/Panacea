@@ -805,6 +805,47 @@ export interface EdenUniversalBiologicalFlourishingBridge {
   epistemicHumilityPreserved: true
 }
 
+export type EdenEpigeneticClockModel =
+  | 'horvath_multi_tissue'
+  | 'hannum_blood_derived'
+  | 'phenoage_epigenetic'
+  | 'grimage_mortality_risk'
+
+export type EdenCellularWaveformState =
+  | 'coherent_oscillatory_harmony'
+  | 'adaptive_mitohormetic_surge'
+  | 'circadian_desynchronization_risk'
+  | 'blunted_restorative_amplitude'
+
+export interface EdenEpigeneticResonanceLayer {
+  clockModel: EdenEpigeneticClockModel
+  clockLabel: string
+  biologicalAgeEstimateYears: number
+  chronologicalAgeYears: number
+  epigeneticAgeAccelerationYears: number
+  confidenceLevel: 'model_estimate_proxy' | 'statistically_calibrated'
+  calibrationSource: string
+}
+
+export interface EdenBioHarmonicWaveformBridge {
+  version: 'v1'
+  episodeId: string
+  episodeTitle: string
+  waveformState: EdenCellularWaveformState
+  waveformStateLabel: string
+  cellularResonanceIndex: number
+  circadianSynchronizationScore: number
+  mitohormeticBufferYears: number
+  epigeneticLayers: EdenEpigeneticResonanceLayer[]
+  waveformNarrativeId: string
+  waveformNarrativeEn: string
+  longevityWaveformTrajectory: string
+  epigeneticWaveformClass: 'mechanistic_proxy_simulation'
+  patientTruthUncompromised: true
+  neverManufacturesMethylationArrays: true
+  epistemicHumilityPreserved: true
+}
+
 export interface CareJourneyExportSummary {
   standard: 'PANACEA-CAREPLAN-FHIR-R4-V1'
   generatedAt: string

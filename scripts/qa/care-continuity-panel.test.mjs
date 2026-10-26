@@ -28,6 +28,7 @@ import {
   deriveEdenMultidimensionalConsciousnessBridge,
   deriveEdenBioCosmicSymphonyBridge,
   deriveEdenMultiAgentHealingCouncilBridge,
+  deriveEdenBioHarmonicWaveformBridge,
   translateClinicalTermToEden,
   EDEN_PLAIN_LANGUAGE_GLOSSARY,
 } from '../../src/domains/clinical-operations/model/careContinuityProjection.ts'
@@ -2718,4 +2719,77 @@ test('deriveEdenMultiAgentHealingCouncilBridge & CareEpisode: Eden Universal Bio
   const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
   assert.ok(episodeSource.includes('data-eden-healing-council-card="v1"'), 'CareEpisode must include healing council card')
   assert.ok(episodeSource.includes('data-eden-agent-perspectives="v1"'), 'CareEpisode must include agent perspectives grid')
+})
+
+test('deriveEdenBioHarmonicWaveformBridge & CareEpisode: Eden Bio-Harmonic Epigenetic Resonance & Cellular Longevity Waveform Engine (T-CLIN-37 / EDEN-17)', () => {
+  const evaluatedAt = '2026-10-26T12:00:00.000Z'
+  const sampleEpisode = {
+    id: 'ce_waveform_1',
+    title: 'Cellular Epigenetic Harmony & Longevity Rhythm',
+    diagnosisCode: 'E11.9',
+    createdAt: '2026-10-20T08:00:00.000Z',
+    updatedAt: '2026-10-26T08:00:00.000Z',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'diagnosis', status: 'done' },
+      { stage: 'treatment', status: 'done' },
+      { stage: 'recovery', status: 'active' },
+    ],
+  }
+
+  // 1. Pure deterministic derivation
+  const bridge = deriveEdenBioHarmonicWaveformBridge(sampleEpisode)
+  assert.equal(bridge.version, 'v1')
+  assert.equal(bridge.episodeId, 'ce_waveform_1')
+  assert.equal(bridge.waveformState, 'coherent_oscillatory_harmony')
+  assert.equal(bridge.waveformStateLabel, 'Harmoni Osilatori Koheren')
+  assert.ok(bridge.cellularResonanceIndex >= 76 && bridge.cellularResonanceIndex <= 99)
+  assert.ok(bridge.circadianSynchronizationScore >= 72 && bridge.circadianSynchronizationScore <= 98)
+  assert.ok(bridge.mitohormeticBufferYears > 0)
+  assert.equal(bridge.epigeneticLayers.length, 4)
+  assert.equal(bridge.epigeneticLayers[0].clockModel, 'horvath_multi_tissue')
+  assert.equal(bridge.epigeneticLayers[1].clockModel, 'hannum_blood_derived')
+  assert.equal(bridge.epigeneticLayers[2].clockModel, 'phenoage_epigenetic')
+  assert.equal(bridge.epigeneticLayers[3].clockModel, 'grimage_mortality_risk')
+  assert.equal(bridge.epigeneticWaveformClass, 'mechanistic_proxy_simulation')
+  assert.equal(bridge.patientTruthUncompromised, true)
+  assert.equal(bridge.neverManufacturesMethylationArrays, true)
+  assert.equal(bridge.epistemicHumilityPreserved, true)
+  assert.ok(bridge.waveformNarrativeId.includes('Gelombang bio-harmonik'))
+  assert.ok(bridge.waveformNarrativeEn.includes('Cellular bio-harmonic waveform'))
+  assert.ok(bridge.longevityWaveformTrajectory.includes('Osilasi biologis'))
+
+  // 2. Blocked stage resilience check
+  const blockedEpisode = {
+    id: 'ce_waveform_blocked',
+    title: 'Severe Chronic Fatigue & Desynchronization',
+    diagnosisCode: 'R53.82',
+    createdAt: '2026-10-20T08:00:00.000Z',
+    updatedAt: '2026-10-26T08:00:00.000Z',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'diagnosis', status: 'blocked', blockedReason: 'Awaiting specialized metabolic panel' },
+    ],
+  }
+  const blockedBridge = deriveEdenBioHarmonicWaveformBridge(blockedEpisode)
+  assert.equal(blockedBridge.waveformState, 'blunted_restorative_amplitude')
+  assert.equal(blockedBridge.waveformStateLabel, 'Amplitudo Restoratif Tertekan')
+  assert.ok(blockedBridge.cellularResonanceIndex <= 68)
+  assert.ok(blockedBridge.mitohormeticBufferYears < 0)
+
+  // 3. Rollup in evaluateCareJourneyContinuity
+  const projection = evaluateCareJourneyContinuity([sampleEpisode, blockedEpisode], evaluatedAt)
+  assert.equal(projection.edenBioHarmonicWaveformReadyCount, 2)
+  assert.ok(projection.episodes[0].edenBioHarmonicWaveform)
+  assert.equal(projection.episodes[0].edenBioHarmonicWaveform.epigeneticWaveformClass, 'mechanistic_proxy_simulation')
+  assert.equal(projection.episodes[0].edenBioHarmonicWaveform.patientTruthUncompromised, true)
+  assert.equal(projection.episodes[0].edenBioHarmonicWaveform.neverManufacturesMethylationArrays, true)
+
+  // 4. UI contracts
+  const panelSource = read('src/domains/clinical-operations/ui/CareContinuityPanel.tsx')
+  assert.ok(panelSource.includes('data-eden-bio-harmonic-waveform="v1"'), 'CareContinuityPanel must include bio-harmonic waveform attribute')
+
+  const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
+  assert.ok(episodeSource.includes('data-eden-bio-harmonic-card="v1"'), 'CareEpisode must include bio-harmonic card')
+  assert.ok(episodeSource.includes('data-eden-epigenetic-layers="v1"'), 'CareEpisode must include epigenetic layers grid')
 })
