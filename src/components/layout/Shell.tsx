@@ -260,6 +260,7 @@ const KATALOG: Nav[] = [
   { to: '/longevity-curriculum', label: 'Longevity Curriculum', icon: IconBook, roles: ['pasien', 'dokter', 'owner'], group: 'Longevity' },
   { to: '/ringkasan-karya', label: 'Reading Summary', icon: IconBook, roles: ALL, group: 'Content' },
   { to: '/prophet-stories', label: 'Stories of the prophets', icon: IconBook, roles: ALL, group: 'Account' },
+  { to: '/store', label: 'Precision Formulas & Private Vault', icon: IconStore, roles: ALL, group: 'Health' },
   { to: '/notifikasi', label: 'Notification Centre', icon: IconBell, roles: ALL, group: 'Account' },
   { to: '/review', label: 'Human Verification Review', icon: IconShield, roles: ALL, group: 'Manage' },
 ]
