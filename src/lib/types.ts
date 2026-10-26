@@ -1635,6 +1635,55 @@ export interface EdenRanGtpTransportBridge {
   epistemicHumilityPreserved: true
 }
 
+export type EdenPeroxisomalRedoxState =
+  | 'optimal_catalase_quiescence_vlcfa_flux'
+  | 'balanced_pex_matrix_redox_equilibrium'
+  | 'transient_peroxisomal_h2o2_leakage'
+  | 'critical_peroxisomopathy_lipid_peroxidation'
+
+export type EdenPeroxisomalRedoxTier =
+  | 'optimal_peroxisomal_redox_fidelity'
+  | 'stable_plasmalogen_antioxidant_equilibrium'
+  | 'moderate_peroxisomal_oxidative_strain'
+  | 'critical_vlcfa_accumulation_instability'
+
+export type EdenPeroxisomalNodeKind =
+  | 'acox1_vlcfa_beta_oxidation_flux'
+  | 'catalase_h2o2_decomposition_scavenger'
+  | 'gnpat_agps_plasmalogen_ether_lipid_synthesis'
+  | 'pex5_matrix_docking_receptor_recycling'
+
+export interface EdenPeroxisomalNode {
+  nodeKind: EdenPeroxisomalNodeKind
+  nodeLabel: string
+  metabolicEfficiencyScore: number
+  redoxScavengingIndex: number
+  peroxisomeStatus: 'optimal_redox_state' | 'adaptive_metabolic_mode' | 'peroxisomal_stress'
+  mechanisticNote: string
+}
+
+export interface EdenPeroxisomalCatalaseBridge {
+  version: 'v1'
+  episodeId: string
+  episodeTitle: string
+  peroxisomeState: EdenPeroxisomalRedoxState
+  peroxisomeStateLabel: string
+  peroxisomeTier: EdenPeroxisomalRedoxTier
+  peroxisomeTierLabel: string
+  peroxisomalRedoxScore: number
+  vlcfaOxidationIndex: number
+  plasmalogenSynthesisCapacity: number
+  peroxisomalNodes: EdenPeroxisomalNode[]
+  peroxisomeNarrativeId: string
+  peroxisomeNarrativeEn: string
+  peroxisomeLongevityStrategy: string
+  truthClass: 'peroxisomal_catalase_redox_simulation_proxy'
+  clinically_reviewed: false
+  patientTruthUncompromised: true
+  neverManufacturesBiomarkers: true
+  epistemicHumilityPreserved: true
+}
+
 export interface CareJourneyExportSummary {
   standard: 'PANACEA-CAREPLAN-FHIR-R4-V1'
   generatedAt: string

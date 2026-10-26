@@ -45,6 +45,7 @@ import {
   deriveEdenRibosomalQuiescenceBridge,
   deriveEdenLamp2aTranslocationBridge,
   deriveEdenRanGtpTransportBridge,
+  deriveEdenPeroxisomalCatalaseBridge,
   translateClinicalTermToEden,
   EDEN_PLAIN_LANGUAGE_GLOSSARY,
 } from '../../src/domains/clinical-operations/model/careContinuityProjection.ts'
@@ -4038,4 +4039,78 @@ test('CareContinuityPanel: Eden Nuclear Pore Complex & RanGTP Nucleocytoplasmic 
   const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
   assert.ok(episodeSource.includes('data-eden-nuclear-pore-card="v1"'), 'CareEpisode must include nuclear pore card')
   assert.ok(episodeSource.includes('data-eden-nuclear-pore-nodes="v1"'), 'CareEpisode must include nuclear pore nodes grid')
+})
+
+test('CareContinuityPanel: Eden Peroxisomal Beta-Oxidation & Catalase Redox Homeostasis Synthesizer contract (T-CLIN-54)', () => {
+  const evaluatedAt = '2026-10-24T12:00:00.000Z'
+  const sampleEpisode = {
+    id: 'ce_peroxisomal_1',
+    title: 'Peroxisomal Beta-Oxidation & Catalase Redox Episode',
+    diagnosisCode: 'E71.51',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'diagnosis', status: 'done' },
+      { stage: 'plan', status: 'done' },
+      { stage: 'treatment', status: 'done' },
+      { stage: 'recovery', status: 'active' },
+    ],
+  }
+
+  // 1. Pure deterministic derivation
+  const bridge = deriveEdenPeroxisomalCatalaseBridge(sampleEpisode)
+  assert.equal(bridge.version, 'v1')
+  assert.equal(bridge.episodeId, 'ce_peroxisomal_1')
+  assert.equal(bridge.peroxisomeState, 'optimal_catalase_quiescence_vlcfa_flux')
+  assert.equal(bridge.peroxisomeStateLabel, 'Dekomposisi H2O2 Katalase Optimal & Fluks Pemendekan VLCFA Presisi')
+  assert.equal(bridge.peroxisomeTier, 'optimal_peroxisomal_redox_fidelity')
+  assert.equal(bridge.peroxisomeTierLabel, 'Fidelitas Redoks Peroksisom Optimal & Biosintesis Eter-Lipid Paripurna')
+  assert.ok(bridge.peroxisomalRedoxScore >= 85)
+  assert.ok(bridge.vlcfaOxidationIndex >= 85)
+  assert.ok(bridge.plasmalogenSynthesisCapacity >= 85)
+  assert.equal(bridge.peroxisomalNodes.length, 4)
+  assert.equal(bridge.peroxisomalNodes[0].nodeKind, 'acox1_vlcfa_beta_oxidation_flux')
+  assert.equal(bridge.peroxisomalNodes[1].nodeKind, 'catalase_h2o2_decomposition_scavenger')
+  assert.equal(bridge.peroxisomalNodes[2].nodeKind, 'gnpat_agps_plasmalogen_ether_lipid_synthesis')
+  assert.equal(bridge.peroxisomalNodes[3].nodeKind, 'pex5_matrix_docking_receptor_recycling')
+  assert.equal(bridge.truthClass, 'peroxisomal_catalase_redox_simulation_proxy')
+  assert.equal(bridge.clinically_reviewed, false)
+  assert.equal(bridge.patientTruthUncompromised, true)
+  assert.equal(bridge.neverManufacturesBiomarkers, true)
+  assert.equal(bridge.epistemicHumilityPreserved, true)
+
+  // 2. Blocked stage resilience
+  const blockedEpisode = {
+    id: 'ce_peroxisomal_blocked',
+    title: 'Blocked Peroxisomopathy VLCFA Accumulation Episode',
+    diagnosisCode: 'E71.50',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'diagnosis', status: 'blocked', blockedReason: 'Awaiting gas chromatography-mass spectrometry plasma VLCFA profiling and erythrocyte plasmalogen level verification' },
+    ],
+  }
+  const blockedBridge = deriveEdenPeroxisomalCatalaseBridge(blockedEpisode)
+  assert.equal(blockedBridge.peroxisomeState, 'critical_peroxisomopathy_lipid_peroxidation')
+  assert.equal(blockedBridge.peroxisomeStateLabel, 'Peroksisomopati Kritis & Peroksidasi Lipid Akumulasi Asam Lemak Rantai Sangat Panjang')
+  assert.equal(blockedBridge.peroxisomeTier, 'critical_vlcfa_accumulation_instability')
+  assert.equal(blockedBridge.peroxisomeTierLabel, 'Instabilitas Akumulasi VLCFA Kritis & Kebocoran Radikal Bebas Peroksisom')
+  assert.ok(blockedBridge.peroxisomalRedoxScore <= 66)
+  assert.ok(blockedBridge.vlcfaOxidationIndex <= 65)
+  assert.ok(blockedBridge.plasmalogenSynthesisCapacity <= 64)
+  assert.equal(blockedBridge.peroxisomalNodes.every((n) => n.peroxisomeStatus === 'peroxisomal_stress'), true)
+
+  // 3. Rollup in evaluateCareJourneyContinuity
+  const projection = evaluateCareJourneyContinuity([sampleEpisode, blockedEpisode], evaluatedAt)
+  assert.equal(projection.edenPeroxisomalCatalaseReadyCount, 2)
+  assert.ok(projection.episodes[0].edenPeroxisomalCatalase)
+  assert.equal(projection.episodes[0].edenPeroxisomalCatalase.truthClass, 'peroxisomal_catalase_redox_simulation_proxy')
+  assert.equal(projection.episodes[0].edenPeroxisomalCatalase.patientTruthUncompromised, true)
+  assert.equal(projection.episodes[0].edenPeroxisomalCatalase.neverManufacturesBiomarkers, true)
+
+  // 4. UI contracts
+  const panelSource = read('src/domains/clinical-operations/ui/CareContinuityPanel.tsx')
+  assert.ok(panelSource.includes('data-eden-peroxisomal-catalase="v1"'), 'CareContinuityPanel must include peroxisomal catalase attribute')
+
+  const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
+  assert.ok(episodeSource.includes('data-eden-peroxisomal-card="v1"'), 'CareEpisode must include peroxisomal card')
+  assert.ok(episodeSource.includes('data-eden-peroxisomal-nodes="v1"'), 'CareEpisode must include peroxisomal nodes grid')
 })

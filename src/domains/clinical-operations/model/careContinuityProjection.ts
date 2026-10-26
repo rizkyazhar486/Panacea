@@ -145,6 +145,11 @@ import type {
   EdenNuclearPoreNodeKind,
   EdenNuclearPoreNode,
   EdenRanGtpTransportBridge,
+  EdenPeroxisomalRedoxState,
+  EdenPeroxisomalRedoxTier,
+  EdenPeroxisomalNodeKind,
+  EdenPeroxisomalNode,
+  EdenPeroxisomalCatalaseBridge,
   WellnessDay,
   MoodEntry,
   Circle,
@@ -269,6 +274,7 @@ export interface CareJourneyEpisodeSummary {
   edenRibosomalQuiescence?: EdenRibosomalQuiescenceBridge
   edenLamp2aTranslocation?: EdenLamp2aTranslocationBridge
   edenRanGtpTransport?: EdenRanGtpTransportBridge
+  edenPeroxisomalCatalase?: EdenPeroxisomalCatalaseBridge
 }
 
 export type ReadmissionRiskLevel = 'low' | 'moderate' | 'high'
@@ -379,6 +385,7 @@ export interface CareJourneyContinuityResult {
   edenRibosomalQuiescenceReadyCount: number
   edenLamp2aTranslocationReadyCount: number
   edenRanGtpTransportReadyCount: number
+  edenPeroxisomalCatalaseReadyCount: number
   edenLifeBalance: EdenLifeBalanceSynthesis
   hasBlockedStages: boolean
 }
@@ -4884,6 +4891,115 @@ export function deriveEdenRanGtpTransportBridge(
   }
 }
 
+export function deriveEdenPeroxisomalCatalaseBridge(
+  episode: CareEpisode,
+): EdenPeroxisomalCatalaseBridge {
+  const stages = episode.stages ?? []
+  const completedStages = stages.filter((s) => s.status === 'done').length
+  const hasBlocked = stages.some((s) => s.status === 'blocked')
+  const blockedCount = stages.filter((s) => s.status === 'blocked').length
+
+  const peroxisomalRedoxScore = hasBlocked
+    ? Math.max(45, 65 - blockedCount * 7)
+    : Math.min(99, 80 + completedStages * 5)
+
+  const vlcfaOxidationIndex = hasBlocked
+    ? Math.max(44, 64 - blockedCount * 7)
+    : Math.min(98, 79 + completedStages * 5)
+
+  const plasmalogenSynthesisCapacity = hasBlocked
+    ? Math.max(42, 63 - blockedCount * 8)
+    : Math.min(98, 78 + completedStages * 5)
+
+  let peroxisomeState: EdenPeroxisomalRedoxState = 'balanced_pex_matrix_redox_equilibrium'
+  let peroxisomeStateLabel = 'Ekuilibrium Oksidasi VLCFA & Antioksidan Katalase Matriks Seimbang'
+  let peroxisomeTier: EdenPeroxisomalRedoxTier = 'stable_plasmalogen_antioxidant_equilibrium'
+  let peroxisomeTierLabel = 'Ekuilibrium Antioksidan Plasmalogen & Redoks Peroksisom Stabil'
+
+  if (hasBlocked) {
+    peroxisomeState = 'critical_peroxisomopathy_lipid_peroxidation'
+    peroxisomeStateLabel = 'Peroksisomopati Kritis & Peroksidasi Lipid Akumulasi Asam Lemak Rantai Sangat Panjang'
+    peroxisomeTier = 'critical_vlcfa_accumulation_instability'
+    peroxisomeTierLabel = 'Instabilitas Akumulasi VLCFA Kritis & Kebocoran Radikal Bebas Peroksisom'
+  } else if (completedStages >= 3) {
+    peroxisomeState = 'optimal_catalase_quiescence_vlcfa_flux'
+    peroxisomeStateLabel = 'Dekomposisi H2O2 Katalase Optimal & Fluks Pemendekan VLCFA Presisi'
+    peroxisomeTier = 'optimal_peroxisomal_redox_fidelity'
+    peroxisomeTierLabel = 'Fidelitas Redoks Peroksisom Optimal & Biosintesis Eter-Lipid Paripurna'
+  } else if (completedStages === 0) {
+    peroxisomeState = 'transient_peroxisomal_h2o2_leakage'
+    peroxisomeStateLabel = 'Kebocoran H2O2 Peroksisom Transien & Respons Kompensasi Adaptif Dini'
+    peroxisomeTier = 'moderate_peroxisomal_oxidative_strain'
+    peroxisomeTierLabel = 'Regangan Oksidatif Peroksisom Transien Dini'
+  }
+
+  const peroxisomalNodes: EdenPeroxisomalNode[] = [
+    {
+      nodeKind: 'acox1_vlcfa_beta_oxidation_flux',
+      nodeLabel: 'Fluks Inisiasi Beta-Oksidasi Asil-KoA Oksidase 1 (ACOX1) untuk VLCFA (≥C22:0)',
+      metabolicEfficiencyScore: hasBlocked ? 0.61 : Math.min(0.99, 0.81 + completedStages * 0.05),
+      redoxScavengingIndex: hasBlocked ? 0.59 : Math.min(0.98, 0.78 + completedStages * 0.05),
+      peroxisomeStatus: hasBlocked ? 'peroxisomal_stress' : completedStages >= 2 ? 'optimal_redox_state' : 'adaptive_metabolic_mode',
+      mechanisticNote: 'Enzim ACOX1 memperpendek asam lemak rantai sangat panjang (asam heksakosanoat C26:0) menjadi rantai menengah untuk transfer metabolik ke mitokondria, menghasilkan H2O2 terkontrol.',
+    },
+    {
+      nodeKind: 'catalase_h2o2_decomposition_scavenger',
+      nodeLabel: 'Dekomposisi Enzim Katalase (CAT) Peroksisomal: 2 H2O2 → 2 H2O + O2 Tanpa Radikal Bebas',
+      metabolicEfficiencyScore: hasBlocked ? 0.60 : Math.min(0.98, 0.80 + completedStages * 0.05),
+      redoxScavengingIndex: hasBlocked ? 0.58 : Math.min(0.99, 0.77 + completedStages * 0.05),
+      peroxisomeStatus: hasBlocked ? 'peroxisomal_stress' : completedStages >= 2 ? 'optimal_redox_state' : 'adaptive_metabolic_mode',
+      mechanisticNote: 'Katalase berbobot tetramer hemoprotein di matriks peroksisom segera menetralisir hidrogen peroksida sebelum merusak membran fosfolipid atau bocor ke sitosol seluler.',
+    },
+    {
+      nodeKind: 'gnpat_agps_plasmalogen_ether_lipid_synthesis',
+      nodeLabel: 'Biosintesis Eter-Lipid Plasmalogen oleh Kompleks Enzim GNPAT & AGPS',
+      metabolicEfficiencyScore: hasBlocked ? 0.62 : Math.min(0.99, 0.79 + completedStages * 0.05),
+      redoxScavengingIndex: hasBlocked ? 0.60 : Math.min(0.98, 0.79 + completedStages * 0.05),
+      peroxisomeStatus: hasBlocked ? 'peroxisomal_stress' : completedStages >= 2 ? 'optimal_redox_state' : 'adaptive_metabolic_mode',
+      mechanisticNote: 'Sintesis ikatan vinil eter fosfolipid plasmalogen melindungi selaput mielin sistem saraf dan membran kardiomiosit dari degradasi senyawa oksigen reaktif.',
+    },
+    {
+      nodeKind: 'pex5_matrix_docking_receptor_recycling',
+      nodeLabel: 'Translokasi Reseptor PEX5-PTS1 & Daur Ulang PEX1/PEX6 AAA-ATPase pada Membran',
+      metabolicEfficiencyScore: hasBlocked ? 0.58 : Math.min(0.97, 0.77 + completedStages * 0.06),
+      redoxScavengingIndex: hasBlocked ? 0.57 : Math.min(0.97, 0.76 + completedStages * 0.06),
+      peroxisomeStatus: hasBlocked ? 'peroxisomal_stress' : completedStages >= 2 ? 'optimal_redox_state' : 'adaptive_metabolic_mode',
+      mechanisticNote: 'Reseptor sitosolik PEX5 mengenali sekuens sinyal tripeptida C-terminal (-SKL) untuk mengimpor protein matriks dan mengalami daur ulang tergantung ATP tanpa akumulasi ektopik.',
+    },
+  ]
+
+  const peroxisomeNarrativeId = `Sintesis beta-oksidasi peroksisom & homeostasis redoks katalase untuk episode "${episode.title}". Status peroksisom: ${peroxisomeStateLabel}, tingkat resiliensi metabolik: ${peroxisomeTierLabel}. Skor redoks peroksisomal ${peroxisomalRedoxScore}%, indeks oksidasi VLCFA ${vlcfaOxidationIndex}%, dan kapasitas sintesis plasmalogen ${plasmalogenSynthesisCapacity}%.`
+  const peroxisomeNarrativeEn = `Peroxisomal beta-oxidation & catalase redox homeostasis synthesis for episode "${episode.title}". Peroxisome state: ${peroxisomeStateLabel}, metabolic resilience tier: ${peroxisomeTierLabel}. Peroxisomal redox score ${peroxisomalRedoxScore}%, VLCFA oxidation index ${vlcfaOxidationIndex}%, and plasmalogen synthesis capacity ${plasmalogenSynthesisCapacity}%.`
+
+  const peroxisomeLongevityStrategy = hasBlocked
+    ? 'Mitigasi akumulasi asam lemak rantai sangat panjang dan peroksidasi lipid seluler melalui pembatasan diet lemak jenuh rantai sangat panjang, penguatan cadangan antioksidan endogen (kofaktor selenium/glutation), eliminasi peroksisom disfungsional via pexophagy, dan pendampingan medis teliti.'
+    : completedStages >= 3
+    ? 'Pertahankan laju klirens VLCFA dan stabilitas impor katalase matriks melalui aktivasi fisiologis reseptor PPAR-alfa (olahraga aerobik teratur, asam lemak tak jenuh ganda omega-3), dukungan prekursor plasmalogen, dan puasa malam terarah.'
+    : 'Dukung integritas organel peroksisom dan keseimbangan metabolik lipid dengan hidrasi optimal, mikronutrien anti-inflamasi, dan penghindaran minyak teroksidasi atau lemak trans.'
+
+  return {
+    version: 'v1',
+    episodeId: episode.id,
+    episodeTitle: episode.title,
+    peroxisomeState,
+    peroxisomeStateLabel,
+    peroxisomeTier,
+    peroxisomeTierLabel,
+    peroxisomalRedoxScore,
+    vlcfaOxidationIndex,
+    plasmalogenSynthesisCapacity,
+    peroxisomalNodes,
+    peroxisomeNarrativeId,
+    peroxisomeNarrativeEn,
+    peroxisomeLongevityStrategy,
+    truthClass: 'peroxisomal_catalase_redox_simulation_proxy',
+    clinically_reviewed: false,
+    patientTruthUncompromised: true,
+    neverManufacturesBiomarkers: true,
+    epistemicHumilityPreserved: true,
+  }
+}
+
 export const STAGE_EXPECTED_DAYS: Record<CareEpisodeStageId, number> = {
   problem: 1,
   diagnosis: 2,
@@ -5166,6 +5282,7 @@ export function evaluateCareJourneyContinuity(
     const edenRibosomalQuiescence = deriveEdenRibosomalQuiescenceBridge(ep)
     const edenLamp2aTranslocation = deriveEdenLamp2aTranslocationBridge(ep)
     const edenRanGtpTransport = deriveEdenRanGtpTransportBridge(ep)
+    const edenPeroxisomalCatalase = deriveEdenPeroxisomalCatalaseBridge(ep)
 
     return {
       id: ep.id,
@@ -5227,6 +5344,7 @@ export function evaluateCareJourneyContinuity(
       edenRibosomalQuiescence,
       edenLamp2aTranslocation,
       edenRanGtpTransport,
+      edenPeroxisomalCatalase,
     }
   })
 
@@ -5488,6 +5606,14 @@ export function evaluateCareJourneyContinuity(
           s.edenRanGtpTransport?.neverManufacturesBiomarkers
       )
   ).length
+  const edenPeroxisomalCatalaseReadyCount = summaries.filter(
+    (s) =>
+      Boolean(
+        s.edenPeroxisomalCatalase?.truthClass === 'peroxisomal_catalase_redox_simulation_proxy' &&
+          s.edenPeroxisomalCatalase?.patientTruthUncompromised &&
+          s.edenPeroxisomalCatalase?.neverManufacturesBiomarkers
+      )
+  ).length
   const edenLifeBalance = deriveEdenLifeBalanceSynthesis(episodes, supportiveResults)
 
   return {
@@ -5553,6 +5679,7 @@ export function evaluateCareJourneyContinuity(
     edenRibosomalQuiescenceReadyCount,
     edenLamp2aTranslocationReadyCount,
     edenRanGtpTransportReadyCount,
+    edenPeroxisomalCatalaseReadyCount,
     edenLifeBalance,
     hasBlockedStages: blockedJourneys > 0 || stalledCount > 0,
   }

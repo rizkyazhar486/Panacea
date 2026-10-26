@@ -900,6 +900,17 @@ export function CareContinuityPanel({
                   </span>
                 </div>
               )}
+              {careJourneys.edenPeroxisomalCatalaseReadyCount > 0 && (
+                <div
+                  className="flex justify-between text-indigo-300"
+                  data-eden-peroxisomal-catalase="v1"
+                >
+                  <span>Homeostasis redoks peroksisom & katalase:</span>
+                  <span className="font-bold">
+                    {careJourneys.edenPeroxisomalCatalaseReadyCount} episode terhubung
+                  </span>
+                </div>
+              )}
 
               {careJourneys.episodes.length > 0 && (
                 <div className="mt-3 border-t border-white/8 pt-2">
