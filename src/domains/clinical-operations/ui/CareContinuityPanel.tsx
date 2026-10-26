@@ -658,6 +658,17 @@ export function CareContinuityPanel({
                   </span>
                 </div>
               )}
+              {careJourneys.edenMultiModelRegenerationReadyCount > 0 && (
+                <div
+                  className="flex justify-between text-fuchsia-300"
+                  data-eden-multi-model-regeneration="v1"
+                >
+                  <span>Multi-model frontier R&D:</span>
+                  <span className="font-bold">
+                    {careJourneys.edenMultiModelRegenerationReadyCount} 4-model collective
+                  </span>
+                </div>
+              )}
 
               {careJourneys.episodes.length > 0 && (
                 <div className="mt-3 border-t border-white/8 pt-2">
