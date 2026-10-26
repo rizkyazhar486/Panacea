@@ -1390,6 +1390,55 @@ export interface EdenShelterinCapProtectionBridge {
   epistemicHumilityPreserved: true
 }
 
+export type EdenMitochondrialFissionState =
+  | 'balanced_drp1_parkin_mitophagy_equilibrium'
+  | 'compensated_fission_clearance'
+  | 'excessive_drp1_fragmentation_strain'
+  | 'mitophagic_arrest_depolarization_collapse'
+
+export type EdenMitophagicQualityControlTier =
+  | 'high_fidelity_pink1_parkin_ubiquitination'
+  | 'adequate_lc3_receptor_autophagosome_docking'
+  | 'delayed_depolarized_cristae_clearance'
+  | 'severe_ros_leakage_mitophagy_blockade'
+
+export type EdenMitophagyNodeKind =
+  | 'drp1_mff_outer_membrane_fission_constriction'
+  | 'pink1_accumulation_depolarized_omm'
+  | 'parkin_e3_ligase_polyubiquitination'
+  | 'optineurin_ndp52_autophagosome_engulfment'
+
+export interface EdenMitophagyNode {
+  nodeKind: EdenMitophagyNodeKind
+  nodeLabel: string
+  clearanceEfficiencyScore: number
+  membranePolarityIndex: number
+  fissionDynamicsStatus: 'optimal_mitophagic_flux' | 'adaptive_clearance_state' | 'fragmentation_strain'
+  mechanisticNote: string
+}
+
+export interface EdenMitophagicPrimingBridge {
+  version: 'v1'
+  episodeId: string
+  episodeTitle: string
+  fissionState: EdenMitochondrialFissionState
+  fissionStateLabel: string
+  qualityControlTier: EdenMitophagicQualityControlTier
+  qualityControlTierLabel: string
+  mitophagicFluxVitalityScore: number
+  membranePotentialRetentionScore: number
+  parkinUbiquitinationCapacity: number
+  mitophagyNodes: EdenMitophagyNode[]
+  fissionNarrativeId: string
+  fissionNarrativeEn: string
+  mitochondrialQualityControlStrategy: string
+  truthClass: 'mitochondrial_fission_mitophagy_simulation_proxy'
+  clinically_reviewed: false
+  patientTruthUncompromised: true
+  neverManufacturesBiomarkers: true
+  epistemicHumilityPreserved: true
+}
+
 export interface CareJourneyExportSummary {
   standard: 'PANACEA-CAREPLAN-FHIR-R4-V1'
   generatedAt: string

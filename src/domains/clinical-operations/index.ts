@@ -83,6 +83,7 @@ export {
   deriveEdenRetrotransposonSilencingBridge,
   deriveEdenSirtuinNadParp1Bridge,
   deriveEdenShelterinCapProtectionBridge,
+  deriveEdenMitophagicPrimingBridge,
   translateClinicalTermToEden,
   EDEN_PLAIN_LANGUAGE_GLOSSARY,
   STAGE_LABEL,
