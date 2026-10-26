@@ -1194,6 +1194,55 @@ export interface EdenMitochondrialHeteroplasmyBridge {
   epistemicHumilityPreserved: true
 }
 
+export type EdenCircadianAutophagyState =
+  | 'synchronized_pulsatile_autophagy'
+  | 'intermittent_metabolic_switching_balance'
+  | 'attenuated_circadian_amplitude_lag'
+  | 'chronodisrupted_autophagic_stagnation'
+
+export type EdenXenohormeticPulseTier =
+  | 'robust_biphasic_hormetic_adaptation'
+  | 'compensated_xenoprotective_equilibrium'
+  | 'blunted_hormetic_plasticity'
+  | 'maladaptive_oxidative_exhaustion'
+
+export type EdenXenohormeticPulseNodeKind =
+  | 'ampk_ulk1_fasting_autophagy_trigger'
+  | 'sirt1_pgc1a_xenohormetic_deacetylation_flux'
+  | 'nrf2_electrophilic_phase2_defense'
+  | 'mtorc1_tfeb_lysosomal_biogenesis'
+
+export interface EdenXenohormeticPulseNode {
+  nodeKind: EdenXenohormeticPulseNodeKind
+  nodeLabel: string
+  activationIndex: number
+  circadianSynchronyScore: number
+  pulseDynamicsStatus: 'optimal_pulsatile_flux' | 'compensated_adaptive_signal' | 'blunted_stagnation'
+  mechanisticNote: string
+}
+
+export interface EdenCircadianAutophagyPulseBridge {
+  version: 'v1'
+  episodeId: string
+  episodeTitle: string
+  autophagyState: EdenCircadianAutophagyState
+  autophagyStateLabel: string
+  pulseTier: EdenXenohormeticPulseTier
+  pulseTierLabel: string
+  circadianSynchronyIndex: number
+  autophagicFluxCapacity: number
+  xenohormeticResilienceScore: number
+  pulseNodes: EdenXenohormeticPulseNode[]
+  autophagyNarrativeId: string
+  autophagyNarrativeEn: string
+  xenohormeticLongevityStrategy: string
+  truthClass: 'circadian_autophagy_pulse_simulation_proxy'
+  clinically_reviewed: false
+  patientTruthUncompromised: true
+  neverManufacturesBiomarkers: true
+  epistemicHumilityPreserved: true
+}
+
 export interface CareJourneyExportSummary {
   standard: 'PANACEA-CAREPLAN-FHIR-R4-V1'
   generatedAt: string
