@@ -214,11 +214,11 @@ export interface CoverageSnapshot {
 export function coverageFraction(snapshot: CoverageSnapshot): number | null {
   if (
     snapshot.exposedEntities == null
-    || !Number.isFinite(snapshot.exposedEntities)
+    || !Number.isInteger(snapshot.exposedEntities)
     || snapshot.exposedEntities <= 0
   ) return null
   if (
-    !Number.isFinite(snapshot.indexedEntities)
+    !Number.isInteger(snapshot.indexedEntities)
     || snapshot.indexedEntities < 0
     || snapshot.indexedEntities > snapshot.exposedEntities
   ) return null
@@ -229,7 +229,9 @@ export function mayClaimSourceComplete(snapshot: CoverageSnapshot): boolean {
   const fraction = coverageFraction(snapshot)
   const hasSourceId = typeof snapshot.sourceId === 'string' && snapshot.sourceId.trim() !== ''
   const hasSourceVersion = typeof snapshot.sourceVersion === 'string' && snapshot.sourceVersion.trim() !== ''
-  const hasMeasuredAt = typeof snapshot.measuredAt === 'string' && snapshot.measuredAt.trim() !== ''
+  const hasMeasuredAt = typeof snapshot.measuredAt === 'string'
+    && snapshot.measuredAt.trim() !== ''
+    && Number.isFinite(Date.parse(snapshot.measuredAt))
   return fraction === 1 && hasSourceId && hasSourceVersion && hasMeasuredAt
 }
 
