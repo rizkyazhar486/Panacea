@@ -13,6 +13,8 @@ import type {
   CareJourneyTimelineEvent,
   CareJourneyTimelineEventKind,
   CareJourneyExportSummary,
+  CareJourneyReferralRecord,
+  ReferralHandshakeStatus,
   PlanItem,
   CarePlanMilestone,
   ClinicalOutcomeRecord,
@@ -96,6 +98,7 @@ export interface CareJourneyEpisodeSummary {
   costSource?: string
   costItemsCount: number
   readmissionSurveillance?: CareJourneyReadmissionSurveillance
+  referralRecord?: CareJourneyReferralRecord
 }
 
 export type ReadmissionRiskLevel = 'low' | 'moderate' | 'high'
@@ -172,6 +175,9 @@ export interface CareJourneyContinuityResult {
   highReadmissionRiskCount: number
   moderateReadmissionRiskCount: number
   followUpWindowClosedCount: number
+  activeReferralsCount: number
+  acknowledgedReferralsCount: number
+  emergencyReferralsCount: number
   hasBlockedStages: boolean
 }
 
@@ -951,6 +957,22 @@ export function evaluateEpisodeReadmissionRisk(
   }
 }
 
+export function evaluateReferralHandshakeContinuity(
+  episode: CareEpisode,
+): CareJourneyReferralRecord | undefined {
+  if (!episode.referralRecord) return undefined
+
+  const ref = episode.referralRecord
+  const isEmergency = ref.urgency === 'emergency'
+
+  // Safety boundary: emergency referrals must maintain active clinical priority regardless of billing state
+  return {
+    ...ref,
+    sourceFacilityName: ref.sourceFacilityName || episode.facilityName || 'Primary Care Center',
+    auditDigest: `sha256:${ref.referralId}:${ref.status}:${ref.urgency}:${isEmergency ? 'vital-priority' : 'standard'}`,
+  }
+}
+
 export const STAGE_EXPECTED_DAYS: Record<CareEpisodeStageId, number> = {
   problem: 1,
   diagnosis: 2,
@@ -1201,6 +1223,7 @@ export function evaluateCareJourneyContinuity(
 
     const costProj = deriveEpisodeCostProjection(ep)
     const readmissionSurveillance = evaluateEpisodeReadmissionRisk(ep, supportiveResults, evaluatedAtMs)
+    const referralRecord = evaluateReferralHandshakeContinuity(ep)
 
     return {
       id: ep.id,
@@ -1230,6 +1253,7 @@ export function evaluateCareJourneyContinuity(
       costSource: costProj.costSource,
       costItemsCount: costProj.costItemsCount,
       readmissionSurveillance,
+      referralRecord,
     }
   })
 
@@ -1271,6 +1295,16 @@ export function evaluateCareJourneyContinuity(
     (s) => Boolean(s.readmissionSurveillance?.followUpWindowClosed)
   ).length
 
+  const activeReferralsCount = summaries.filter(
+    (s) => s.referralRecord && s.referralRecord.status !== 'completed' && s.referralRecord.status !== 'cancelled'
+  ).length
+  const acknowledgedReferralsCount = summaries.filter(
+    (s) => s.referralRecord?.status === 'acknowledged'
+  ).length
+  const emergencyReferralsCount = summaries.filter(
+    (s) => s.referralRecord?.urgency === 'emergency' && s.referralRecord.status !== 'completed' && s.referralRecord.status !== 'cancelled'
+  ).length
+
   return {
     totalJourneys: episodes.length,
     activeJourneys,
@@ -1300,6 +1334,9 @@ export function evaluateCareJourneyContinuity(
     highReadmissionRiskCount,
     moderateReadmissionRiskCount,
     followUpWindowClosedCount,
+    activeReferralsCount,
+    acknowledgedReferralsCount,
+    emergencyReferralsCount,
     hasBlockedStages: blockedJourneys > 0 || stalledCount > 0,
   }
 }

@@ -12,6 +12,7 @@ import {
   exportCareJourneySummary,
   deriveCareJourneyCostSummary,
   evaluateEpisodeReadmissionRisk,
+  evaluateReferralHandshakeContinuity,
 } from '../../src/domains/clinical-operations/model/careContinuityProjection.ts'
 import {
   ensureEpisodeFromVerifiedPlan,
@@ -1555,4 +1556,96 @@ test('evaluateEpisodeReadmissionRisk & CareContinuityPanel: post-discharge follo
 
   const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
   assert.ok(episodeSource.includes('data-care-followup-surveillance="v1"'), 'CareEpisode must include follow-up surveillance attribute')
+})
+
+test('evaluateReferralHandshakeContinuity & CareContinuityPanel: inter-facility referral handshake & diagnostic continuity bridge (T-CLIN-20)', () => {
+  const evaluatedAt = '2026-10-25T17:00:00.000Z'
+
+  // 1. Episode with active emergency referral
+  const emergencyReferralEpisode = {
+    id: 'ce_ref_emerg',
+    title: 'Acute Coronary Syndrome Transfer',
+    createdAt: '2026-10-25T15:00:00.000Z',
+    updatedAt: '2026-10-25T15:30:00.000Z',
+    facilityName: 'Puskesmas Tebet',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'treatment', status: 'active' },
+    ],
+    referralRecord: {
+      referralId: 'ref_acst_01',
+      sourceFacilityId: 'fac_pkms_tebet',
+      sourceFacilityName: 'Puskesmas Tebet',
+      destinationFacilityId: 'fac_harapan_kita',
+      destinationFacilityName: 'RS Jantung Harapan Kita',
+      specialty: 'Interventional Cardiology',
+      urgency: 'emergency',
+      clinicalIndication: 'STEMI anterior extensive requiring primary PCI',
+      status: 'dispatched',
+      dispatchedAt: '2026-10-25T15:30:00.000Z',
+      auditDigest: '',
+    },
+  }
+
+  // 2. Episode with acknowledged routine referral
+  const routineReferralEpisode = {
+    id: 'ce_ref_routine',
+    title: 'Refractive Surgery Specialist Evaluation',
+    createdAt: '2026-10-20T08:00:00.000Z',
+    updatedAt: '2026-10-24T10:00:00.000Z',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'provider', status: 'done' },
+    ],
+    referralRecord: {
+      referralId: 'ref_eye_02',
+      sourceFacilityId: 'fac_klinik_mata',
+      sourceFacilityName: 'Klinik Mata Nusantara',
+      destinationFacilityId: 'fac_rscm_kirana',
+      destinationFacilityName: 'RSCM Kirana',
+      specialty: 'Cornea & Refractive',
+      urgency: 'routine',
+      clinicalIndication: 'Severe keratoconus evaluation',
+      status: 'acknowledged',
+      dispatchedAt: '2026-10-22T09:00:00.000Z',
+      acknowledgedAt: '2026-10-23T11:00:00.000Z',
+      acknowledgedBy: 'dr-spm-kirana',
+      auditDigest: '',
+    },
+  }
+
+  // 3. Episode without referral (negative control)
+  const unreferredEpisode = {
+    id: 'ce_no_ref',
+    title: 'Routine Health Check',
+    createdAt: '2026-10-21T08:00:00.000Z',
+    updatedAt: '2026-10-21T09:00:00.000Z',
+    stages: [{ stage: 'problem', status: 'done' }],
+  }
+
+  // 1. Pure evaluateReferralHandshakeContinuity verification
+  const refProj = evaluateReferralHandshakeContinuity(emergencyReferralEpisode)
+  assert.ok(refProj)
+  assert.equal(refProj.referralId, 'ref_acst_01')
+  assert.equal(refProj.urgency, 'emergency')
+  assert.equal(refProj.auditDigest, 'sha256:ref_acst_01:dispatched:emergency:vital-priority')
+
+  const noRefProj = evaluateReferralHandshakeContinuity(unreferredEpisode)
+  assert.equal(noRefProj, undefined)
+
+  // 2. evaluateCareJourneyContinuity metrics rollup
+  const projection = evaluateCareJourneyContinuity(
+    [emergencyReferralEpisode, routineReferralEpisode, unreferredEpisode],
+    evaluatedAt
+  )
+  assert.equal(projection.activeReferralsCount, 2)
+  assert.equal(projection.acknowledgedReferralsCount, 1)
+  assert.equal(projection.emergencyReferralsCount, 1)
+
+  // 3. UI contracts
+  const panelSource = read('src/domains/clinical-operations/ui/CareContinuityPanel.tsx')
+  assert.ok(panelSource.includes('data-care-referral-handshake="v1"'), 'CareContinuityPanel must include referral handshake attribute')
+
+  const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
+  assert.ok(episodeSource.includes('data-care-referral-section="v1"'), 'CareEpisode must include referral handshake section')
 })

@@ -55,6 +55,7 @@ export {
   exportCareJourneySummary,
   deriveCareJourneyCostSummary,
   evaluateEpisodeReadmissionRisk,
+  evaluateReferralHandshakeContinuity,
   STAGE_LABEL,
   type CareContinuityProjection,
   type CareContinuityProjectionInput,
