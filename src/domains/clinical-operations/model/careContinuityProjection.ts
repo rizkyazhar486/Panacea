@@ -130,6 +130,11 @@ import type {
   EdenGlycocalyxNodeKind,
   EdenGlycocalyxNode,
   EdenMicrovascularResilienceBridge,
+  EdenNucleolarQuiescenceState,
+  EdenNucleolarQuiescenceTier,
+  EdenRibosomalNodeKind,
+  EdenRibosomalNode,
+  EdenRibosomalQuiescenceBridge,
   WellnessDay,
   MoodEntry,
   Circle,
@@ -251,6 +256,7 @@ export interface CareJourneyEpisodeSummary {
   edenShelterinCapProtection?: EdenShelterinCapProtectionBridge
   edenMitophagicPriming?: EdenMitophagicPrimingBridge
   edenMicrovascularResilience?: EdenMicrovascularResilienceBridge
+  edenRibosomalQuiescence?: EdenRibosomalQuiescenceBridge
 }
 
 export type ReadmissionRiskLevel = 'low' | 'moderate' | 'high'
@@ -358,6 +364,7 @@ export interface CareJourneyContinuityResult {
   edenShelterinCapProtectionReadyCount: number
   edenMitophagicPrimingReadyCount: number
   edenMicrovascularResilienceReadyCount: number
+  edenRibosomalQuiescenceReadyCount: number
   edenLifeBalance: EdenLifeBalanceSynthesis
   hasBlockedStages: boolean
 }
@@ -4536,6 +4543,115 @@ export function deriveEdenMicrovascularResilienceBridge(
   }
 }
 
+export function deriveEdenRibosomalQuiescenceBridge(
+  episode: CareEpisode,
+): EdenRibosomalQuiescenceBridge {
+  const stages = episode.stages ?? []
+  const completedStages = stages.filter((s) => s.status === 'done').length
+  const hasBlocked = stages.some((s) => s.status === 'blocked')
+  const blockedCount = stages.filter((s) => s.status === 'blocked').length
+
+  const nucleolarQuiescenceScore = hasBlocked
+    ? Math.max(46, 66 - blockedCount * 7)
+    : Math.min(99, 80 + completedStages * 5)
+
+  const translationFidelityIndex = hasBlocked
+    ? Math.max(45, 65 - blockedCount * 7)
+    : Math.min(98, 79 + completedStages * 5)
+
+  const ribosomalProteostasisCapacity = hasBlocked
+    ? Math.max(43, 64 - blockedCount * 8)
+    : Math.min(98, 78 + completedStages * 5)
+
+  let quiescenceState: EdenNucleolarQuiescenceState = 'balanced_fidelity_ribosomal_translation'
+  let quiescenceStateLabel = 'Translasi Ribosom Berpresisi Tinggi & Ekuilibrium Nukleolus'
+  let quiescenceTier: EdenNucleolarQuiescenceTier = 'stable_nucleolar_proteostatic_equilibrium'
+  let quiescenceTierLabel = 'Ekuilibrium Proteostatik Nukleolus Stabil'
+
+  if (hasBlocked) {
+    quiescenceState = 'hypertrophic_ribosomopathy_proteotoxic_strain'
+    quiescenceStateLabel = 'Hipertrofi Nukleolus Patologis & Stres Ribosomopati Proteotoksik'
+    quiescenceTier = 'critical_nucleolar_hypertrophy_instability'
+    quiescenceTierLabel = 'Instabilitas Nukleolus Kritis & Beban Translasi Berlebihan'
+  } else if (completedStages >= 3) {
+    quiescenceState = 'quiescent_compact_nucleolar_harmony'
+    quiescenceStateLabel = 'Harmoni Nukleolus Kompak, Quiescent & Presisi Umur Panjang'
+    quiescenceTier = 'optimal_quiescent_ribosomal_fidelity'
+    quiescenceTierLabel = 'Fidelitas Translasi Ribosom Optimal & Quiescence Protektif'
+  } else if (completedStages === 0) {
+    quiescenceState = 'nucleolar_stress_rpl11_mdm2_activation'
+    quiescenceStateLabel = 'Stres Nukleolus Transien & Aktivasi Pengawasan RPL11-MDM2'
+    quiescenceTier = 'transient_ribosomal_biogenesis_stress'
+    quiescenceTierLabel = 'Stres Biogenesis Ribosom Transien Dini'
+  }
+
+  const ribosomalNodes: EdenRibosomalNode[] = [
+    {
+      nodeKind: 'pol1_pre_rrna_transcription_fidelity',
+      nodeLabel: 'Transkripsi Pre-rRNA RNA Polimerase I & Kontrol Laju Sintesis Ribosom',
+      biogenesisEfficiencyScore: hasBlocked ? 0.62 : Math.min(0.99, 0.81 + completedStages * 0.05),
+      quiescenceIndex: hasBlocked ? 0.60 : Math.min(0.98, 0.78 + completedStages * 0.05),
+      nucleolarStatus: hasBlocked ? 'hypertrophic_stress' : completedStages >= 2 ? 'optimal_quiescent_state' : 'adaptive_ribosomal_mode',
+      mechanisticNote: 'Regulasi aktivitas RNA Pol I melalui faktor inisiasi RRN3/TIF-IA mencegah hiper-transkripsi rRNA 47S yang memicu pembesaran nukleolus dan penuaan seluler.',
+    },
+    {
+      nodeKind: 'fibrillarin_dense_fibrillar_compartmentalization',
+      nodeLabel: 'Kompartementalisasi Fibrillarin & Pemrosesan 2\'-O-Metilasi rRNA di Dense Fibrillar Component',
+      biogenesisEfficiencyScore: hasBlocked ? 0.61 : Math.min(0.98, 0.79 + completedStages * 0.05),
+      quiescenceIndex: hasBlocked ? 0.59 : Math.min(0.99, 0.77 + completedStages * 0.05),
+      nucleolarStatus: hasBlocked ? 'hypertrophic_stress' : completedStages >= 2 ? 'optimal_quiescent_state' : 'adaptive_ribosomal_mode',
+      mechanisticNote: 'Metilasi spesifik nukleotida rRNA yang dipandu snoRNA oleh enzim metiltransferase fibrillarin mempertahankan struktur ribosome decoding center dan akurasi translasi.',
+    },
+    {
+      nodeKind: 'rpl5_rpl11_mdm2_p53_stress_sensor',
+      nodeLabel: 'Kompleks Ribosomal RPL5/RPL11-5S rRNA & Pengikatan MDM2 (Sensor Stres Nukleolus)',
+      biogenesisEfficiencyScore: hasBlocked ? 0.63 : Math.min(0.99, 0.80 + completedStages * 0.05),
+      quiescenceIndex: hasBlocked ? 0.61 : Math.min(0.98, 0.79 + completedStages * 0.05),
+      nucleolarStatus: hasBlocked ? 'hypertrophic_stress' : completedStages >= 2 ? 'optimal_quiescent_state' : 'adaptive_ribosomal_mode',
+      mechanisticNote: 'Saat terjadi gangguan biogenesis ribosom, protein RPL5 dan RPL11 berikatan dengan MDM2, memblokir degradasi p53 untuk memicu henti siklus sel protektif tanpa apoptosis.',
+    },
+    {
+      nodeKind: 'ribosomal_translation_elongation_accuracy',
+      nodeLabel: 'Presisi Elongasi Translasi Ribosom & Mitigasi Kesalahan Sintesis Polipeptida (eEF2/eIF2α)',
+      biogenesisEfficiencyScore: hasBlocked ? 0.59 : Math.min(0.97, 0.77 + completedStages * 0.06),
+      quiescenceIndex: hasBlocked ? 0.58 : Math.min(0.97, 0.76 + completedStages * 0.06),
+      nucleolarStatus: hasBlocked ? 'hypertrophic_stress' : completedStages >= 2 ? 'optimal_quiescent_state' : 'adaptive_ribosomal_mode',
+      mechanisticNote: 'Kecepatan translasi yang terkalibrasi menghindari ribosomal stalling, misfolding polipeptida baru lahir, dan agregasi proteotoksik intraseluler.',
+    },
+  ]
+
+  const nucleolarNarrativeId = `Sintesis ketenangan nukleolus & stres biogenesis ribosom untuk episode "${episode.title}". Status nukleolus: ${quiescenceStateLabel}, tingkat resiliensi ribosom: ${quiescenceTierLabel}. Skor ketenangan nukleolus ${nucleolarQuiescenceScore}%, indeks fidelitas translasi ${translationFidelityIndex}%, dan kapasitas proteostasis ribosom ${ribosomalProteostasisCapacity}%.`
+  const nucleolarNarrativeEn = `Nucleolar quiescence & ribosomal biogenesis stress synthesis for episode "${episode.title}". Nucleolar state: ${quiescenceStateLabel}, ribosomal resilience tier: ${quiescenceTierLabel}. Nucleolar quiescence score ${nucleolarQuiescenceScore}%, translation fidelity index ${translationFidelityIndex}%, and ribosomal proteostasis capacity ${ribosomalProteostasisCapacity}%.`
+
+  const nucleolarLongevityStrategy = hasBlocked
+    ? 'Reduksi stres biogenesis ribosom patologis dan proteotoksisitas melalui modulasi laju translasi (intervensi nutrisi pembatasan metionin terkontrol), aktivasi jalur autofagi pelindung ribophagy, dan asistensi medis menyeluruh.'
+    : completedStages >= 3
+    ? 'Pertahankan morfologi nukleolus kompak dan akurasi elongasi translasi optimal melalui modulasi fisiologis mTORC1 (puasa intermiten terarah), asupan fitokimia spermidin pemelihara proteostasis, dan istirahat regeneratif.'
+    : 'Dukung stabilitas nukleolus dan fidelitas biosintesis protein dengan keseimbangan makronutrien, hidrasi seluler adekuat, dan minimisasi toksin oksidatif perusak rRNA.'
+
+  return {
+    version: 'v1',
+    episodeId: episode.id,
+    episodeTitle: episode.title,
+    quiescenceState,
+    quiescenceStateLabel,
+    quiescenceTier,
+    quiescenceTierLabel,
+    nucleolarQuiescenceScore,
+    translationFidelityIndex,
+    ribosomalProteostasisCapacity,
+    ribosomalNodes,
+    nucleolarNarrativeId,
+    nucleolarNarrativeEn,
+    nucleolarLongevityStrategy,
+    truthClass: 'nucleolar_ribosomal_simulation_proxy',
+    clinically_reviewed: false,
+    patientTruthUncompromised: true,
+    neverManufacturesBiomarkers: true,
+    epistemicHumilityPreserved: true,
+  }
+}
+
 export const STAGE_EXPECTED_DAYS: Record<CareEpisodeStageId, number> = {
   problem: 1,
   diagnosis: 2,
@@ -4815,6 +4931,7 @@ export function evaluateCareJourneyContinuity(
     const edenShelterinCapProtection = deriveEdenShelterinCapProtectionBridge(ep)
     const edenMitophagicPriming = deriveEdenMitophagicPrimingBridge(ep)
     const edenMicrovascularResilience = deriveEdenMicrovascularResilienceBridge(ep)
+    const edenRibosomalQuiescence = deriveEdenRibosomalQuiescenceBridge(ep)
 
     return {
       id: ep.id,
@@ -4873,6 +4990,7 @@ export function evaluateCareJourneyContinuity(
       edenShelterinCapProtection,
       edenMitophagicPriming,
       edenMicrovascularResilience,
+      edenRibosomalQuiescence,
     }
   })
 
@@ -5110,6 +5228,14 @@ export function evaluateCareJourneyContinuity(
           s.edenMicrovascularResilience?.neverManufacturesBiomarkers
       )
   ).length
+  const edenRibosomalQuiescenceReadyCount = summaries.filter(
+    (s) =>
+      Boolean(
+        s.edenRibosomalQuiescence?.truthClass === 'nucleolar_ribosomal_simulation_proxy' &&
+          s.edenRibosomalQuiescence?.patientTruthUncompromised &&
+          s.edenRibosomalQuiescence?.neverManufacturesBiomarkers
+      )
+  ).length
   const edenLifeBalance = deriveEdenLifeBalanceSynthesis(episodes, supportiveResults)
 
   return {
@@ -5172,6 +5298,7 @@ export function evaluateCareJourneyContinuity(
     edenShelterinCapProtectionReadyCount,
     edenMitophagicPrimingReadyCount,
     edenMicrovascularResilienceReadyCount,
+    edenRibosomalQuiescenceReadyCount,
     edenLifeBalance,
     hasBlockedStages: blockedJourneys > 0 || stalledCount > 0,
   }

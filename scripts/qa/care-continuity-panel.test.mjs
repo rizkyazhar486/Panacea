@@ -42,6 +42,7 @@ import {
   deriveEdenShelterinCapProtectionBridge,
   deriveEdenMitophagicPrimingBridge,
   deriveEdenMicrovascularResilienceBridge,
+  deriveEdenRibosomalQuiescenceBridge,
   translateClinicalTermToEden,
   EDEN_PLAIN_LANGUAGE_GLOSSARY,
 } from '../../src/domains/clinical-operations/model/careContinuityProjection.ts'
@@ -3813,4 +3814,78 @@ test('deriveEdenMicrovascularResilienceBridge & CareEpisode: Eden Endothelial Ni
   const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
   assert.ok(episodeSource.includes('data-eden-glycocalyx-card="v1"'), 'CareEpisode must include glycocalyx card')
   assert.ok(episodeSource.includes('data-eden-glycocalyx-nodes="v1"'), 'CareEpisode must include glycocalyx nodes grid')
+})
+
+test('CareContinuityPanel: Eden Ribosomal Biogenesis Stress & Nucleolar Quiescence Synthesizer contract (T-CLIN-51)', () => {
+  const evaluatedAt = '2026-10-24T12:00:00.000Z'
+  const sampleEpisode = {
+    id: 'ce_ribosomal_1',
+    title: 'Ribosomal Biogenesis & Nucleolar Quiescence Episode',
+    diagnosisCode: 'Q87.8',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'diagnosis', status: 'done' },
+      { stage: 'plan', status: 'done' },
+      { stage: 'treatment', status: 'done' },
+      { stage: 'recovery', status: 'active' },
+    ],
+  }
+
+  // 1. Pure deterministic derivation
+  const bridge = deriveEdenRibosomalQuiescenceBridge(sampleEpisode)
+  assert.equal(bridge.version, 'v1')
+  assert.equal(bridge.episodeId, 'ce_ribosomal_1')
+  assert.equal(bridge.quiescenceState, 'quiescent_compact_nucleolar_harmony')
+  assert.equal(bridge.quiescenceStateLabel, 'Harmoni Nukleolus Kompak, Quiescent & Presisi Umur Panjang')
+  assert.equal(bridge.quiescenceTier, 'optimal_quiescent_ribosomal_fidelity')
+  assert.equal(bridge.quiescenceTierLabel, 'Fidelitas Translasi Ribosom Optimal & Quiescence Protektif')
+  assert.ok(bridge.nucleolarQuiescenceScore >= 85)
+  assert.ok(bridge.translationFidelityIndex >= 85)
+  assert.ok(bridge.ribosomalProteostasisCapacity >= 85)
+  assert.equal(bridge.ribosomalNodes.length, 4)
+  assert.equal(bridge.ribosomalNodes[0].nodeKind, 'pol1_pre_rrna_transcription_fidelity')
+  assert.equal(bridge.ribosomalNodes[1].nodeKind, 'fibrillarin_dense_fibrillar_compartmentalization')
+  assert.equal(bridge.ribosomalNodes[2].nodeKind, 'rpl5_rpl11_mdm2_p53_stress_sensor')
+  assert.equal(bridge.ribosomalNodes[3].nodeKind, 'ribosomal_translation_elongation_accuracy')
+  assert.equal(bridge.truthClass, 'nucleolar_ribosomal_simulation_proxy')
+  assert.equal(bridge.clinically_reviewed, false)
+  assert.equal(bridge.patientTruthUncompromised, true)
+  assert.equal(bridge.neverManufacturesBiomarkers, true)
+  assert.equal(bridge.epistemicHumilityPreserved, true)
+
+  // 2. Blocked stage resilience
+  const blockedEpisode = {
+    id: 'ce_ribosomal_blocked',
+    title: 'Blocked Hypertrophic Ribosomopathy Episode',
+    diagnosisCode: 'D61.0',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'diagnosis', status: 'blocked', blockedReason: 'Awaiting high-resolution nucleolar morphometry and ribosomal protein RPL11 ribosome profiling' },
+    ],
+  }
+  const blockedBridge = deriveEdenRibosomalQuiescenceBridge(blockedEpisode)
+  assert.equal(blockedBridge.quiescenceState, 'hypertrophic_ribosomopathy_proteotoxic_strain')
+  assert.equal(blockedBridge.quiescenceStateLabel, 'Hipertrofi Nukleolus Patologis & Stres Ribosomopati Proteotoksik')
+  assert.equal(blockedBridge.quiescenceTier, 'critical_nucleolar_hypertrophy_instability')
+  assert.equal(blockedBridge.quiescenceTierLabel, 'Instabilitas Nukleolus Kritis & Beban Translasi Berlebihan')
+  assert.ok(blockedBridge.nucleolarQuiescenceScore <= 66)
+  assert.ok(blockedBridge.translationFidelityIndex <= 65)
+  assert.ok(blockedBridge.ribosomalProteostasisCapacity <= 64)
+  assert.equal(blockedBridge.ribosomalNodes.every((n) => n.nucleolarStatus === 'hypertrophic_stress'), true)
+
+  // 3. Rollup in evaluateCareJourneyContinuity
+  const projection = evaluateCareJourneyContinuity([sampleEpisode, blockedEpisode], evaluatedAt)
+  assert.equal(projection.edenRibosomalQuiescenceReadyCount, 2)
+  assert.ok(projection.episodes[0].edenRibosomalQuiescence)
+  assert.equal(projection.episodes[0].edenRibosomalQuiescence.truthClass, 'nucleolar_ribosomal_simulation_proxy')
+  assert.equal(projection.episodes[0].edenRibosomalQuiescence.patientTruthUncompromised, true)
+  assert.equal(projection.episodes[0].edenRibosomalQuiescence.neverManufacturesBiomarkers, true)
+
+  // 4. UI contracts
+  const panelSource = read('src/domains/clinical-operations/ui/CareContinuityPanel.tsx')
+  assert.ok(panelSource.includes('data-eden-ribosomal-quiescence="v1"'), 'CareContinuityPanel must include ribosomal quiescence attribute')
+
+  const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
+  assert.ok(episodeSource.includes('data-eden-ribosomal-quiescence-card="v1"'), 'CareEpisode must include ribosomal quiescence card')
+  assert.ok(episodeSource.includes('data-eden-ribosomal-quiescence-nodes="v1"'), 'CareEpisode must include ribosomal quiescence nodes grid')
 })
