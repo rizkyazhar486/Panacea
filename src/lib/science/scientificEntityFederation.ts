@@ -17,19 +17,35 @@ export interface FederatedScientificEntity {
   contradictions: string[]
 }
 
-const tidy = (value: string) => value.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-')
+// Identity normalization must be injective (modulo trim/case): a lossy slug
+// silently collapses distinct scientific names (e.g. α-synuclein vs β-synuclein)
+// into one federation key. Percent-encoding preserves every code point and
+// neutralizes delimiter injection, while leaving plain ASCII ids unchanged.
+// Unpaired surrogates are malformed input and are replaced with U+FFFD so
+// encoding never throws.
+const identityComponent = (value: string): string => encodeURIComponent(
+  value.trim().toLowerCase()
+    .replace(/[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?<![\uD800-\uDBFF])[\uDC00-\uDFFF]/g, '\uFFFD'),
+)
 
 export function buildFederationId(domain: string, label: string, ids: SourceNativeId[]): string {
-  const anchored = ids.filter((id) => id.sourceId.trim() && id.nativeId.trim())
-    .map((id) => `${tidy(id.sourceId)}:${id.nativeId.trim()}`)
+  const anchored = ids.filter((id) => typeof id.sourceId === 'string' && typeof id.nativeId === 'string' && id.sourceId.trim() && id.nativeId.trim())
+    .map((id) => `${identityComponent(id.sourceId)}:${id.nativeId.trim()}`)
+    // 'label' is the reserved fallback-namespace marker: an anchor whose source
+    // is literally named 'label' would forge a fallback-looking key, so it is
+    // refused as an anchor and the entity falls back to label-derived identity.
+    .filter((candidate) => !candidate.startsWith('label:'))
     .sort()[0]
-  return anchored ? `${tidy(domain)}:${anchored}` : `${tidy(domain)}:label:${tidy(label)}`
+  return anchored ? `${identityComponent(domain)}:${anchored}` : `${identityComponent(domain)}:label:${identityComponent(label)}`
 }
 
 export function mergeFederatedScientificEntities(input: FederatedScientificEntity[]): FederatedScientificEntity[] {
   const merged = new Map<string, FederatedScientificEntity>()
   for (const item of input) {
-    const key = item.federationId || buildFederationId(item.domain, item.label, item.sourceIds)
+    // A blank or non-string supplied id is not an identity: derive one instead
+    // of letting whitespace become a shared Map key that merges distinct entities.
+    const suppliedId = typeof item.federationId === 'string' ? item.federationId.trim() : ''
+    const key = suppliedId || buildFederationId(item.domain, item.label, item.sourceIds)
     const previous = merged.get(key)
     if (!previous) {
       merged.set(key, { ...item, federationId: key, sourceIds: [...item.sourceIds], aliases: [...new Set(item.aliases)], evidence: [...new Set(item.evidence)], contradictions: [...new Set(item.contradictions)] })
