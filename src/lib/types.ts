@@ -1047,6 +1047,55 @@ export interface EdenSenescentInflammagingBridge {
   epistemicHumilityPreserved: true
 }
 
+export type EdenStemCellNicheState =
+  | 'quiescent_reserve_primed'
+  | 'balanced_asymmetric_self_renewal'
+  | 'niche_exhaustion_depletion_risk'
+  | 'stress_induced_hyperactivation'
+
+export type EdenTissuePlasticityIndexLevel =
+  | 'high_fidelity_pluripotent_plasticity'
+  | 'physiological_lineage_commitment'
+  | 'attenuated_lineage_fidelity'
+  | 'fibrotic_metaplastic_divergence'
+
+export type EdenStemCellNicheKind =
+  | 'hematopoietic_bone_marrow_niche'
+  | 'intestinal_crypt_lgr5_niche'
+  | 'neural_subventricular_niche'
+  | 'skeletal_muscle_satellite_niche'
+
+export interface EdenStemCellNicheNode {
+  nicheKind: EdenStemCellNicheKind
+  nicheLabel: string
+  renewalCapacityScore: number
+  lineageFidelityIndex: number
+  nicheHomeostasisStatus: 'optimal_asymmetric_balance' | 'quiescent_pool_preserved' | 'stress_accelerated_differentiation'
+  mechanisticNote: string
+}
+
+export interface EdenRegenerativePlasticityBridge {
+  version: 'v1'
+  episodeId: string
+  episodeTitle: string
+  stemCellNicheState: EdenStemCellNicheState
+  stemCellNicheStateLabel: string
+  plasticityLevel: EdenTissuePlasticityIndexLevel
+  plasticityLevelLabel: string
+  regenerativePlasticityScore: number
+  stemNicheVitalityIndex: number
+  lineageCommitmentCapacity: number
+  nicheNodes: EdenStemCellNicheNode[]
+  regenerativeNarrativeId: string
+  regenerativeNarrativeEn: string
+  stemCellRegenerativeStrategy: string
+  truthClass: 'stem_cell_niche_simulation_proxy'
+  clinically_reviewed: false
+  patientTruthUncompromised: true
+  neverManufacturesBiomarkers: true
+  epistemicHumilityPreserved: true
+}
+
 export interface CareJourneyExportSummary {
   standard: 'PANACEA-CAREPLAN-FHIR-R4-V1'
   generatedAt: string

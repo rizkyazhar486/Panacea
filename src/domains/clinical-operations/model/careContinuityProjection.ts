@@ -85,6 +85,11 @@ import type {
   EdenSenescentSurveillanceNodeKind,
   EdenSenescentSurveillanceNode,
   EdenSenescentInflammagingBridge,
+  EdenStemCellNicheState,
+  EdenTissuePlasticityIndexLevel,
+  EdenStemCellNicheKind,
+  EdenStemCellNicheNode,
+  EdenRegenerativePlasticityBridge,
   WellnessDay,
   MoodEntry,
   Circle,
@@ -197,6 +202,7 @@ export interface CareJourneyEpisodeSummary {
   edenProteostasisAutophagicFlux?: EdenProteostasisAutophagicFluxBridge
   edenTelomericGenomicIntegrity?: EdenTelomericGenomicIntegrityBridge
   edenSenescentInflammaging?: EdenSenescentInflammagingBridge
+  edenRegenerativePlasticity?: EdenRegenerativePlasticityBridge
 }
 
 export type ReadmissionRiskLevel = 'low' | 'moderate' | 'high'
@@ -295,6 +301,7 @@ export interface CareJourneyContinuityResult {
   edenProteostasisAutophagicFluxReadyCount: number
   edenTelomericGenomicIntegrityReadyCount: number
   edenSenescentInflammagingReadyCount: number
+  edenRegenerativePlasticityReadyCount: number
   edenLifeBalance: EdenLifeBalanceSynthesis
   hasBlockedStages: boolean
 }
@@ -3492,6 +3499,115 @@ export function deriveEdenSenescentInflammagingBridge(
   }
 }
 
+export function deriveEdenRegenerativePlasticityBridge(
+  episode: CareEpisode,
+): EdenRegenerativePlasticityBridge {
+  const stages = episode.stages ?? []
+  const completedStages = stages.filter((s) => s.status === 'done').length
+  const hasBlocked = stages.some((s) => s.status === 'blocked')
+  const blockedCount = stages.filter((s) => s.status === 'blocked').length
+
+  const regenerativePlasticityScore = hasBlocked
+    ? Math.max(46, 68 - blockedCount * 7)
+    : Math.min(99, 78 + completedStages * 5)
+
+  const stemNicheVitalityIndex = hasBlocked
+    ? Math.max(44, 65 - blockedCount * 7)
+    : Math.min(98, 76 + completedStages * 5)
+
+  const lineageCommitmentCapacity = hasBlocked
+    ? Math.max(42, 63 - blockedCount * 8)
+    : Math.min(98, 75 + completedStages * 6)
+
+  let stemCellNicheState: EdenStemCellNicheState = 'quiescent_reserve_primed'
+  let stemCellNicheStateLabel = 'Reservoir Sel Punca Terpriming Tenang'
+  let plasticityLevel: EdenTissuePlasticityIndexLevel = 'physiological_lineage_commitment'
+  let plasticityLevelLabel = 'Komitmen Galur Fisiologis Seimbang'
+
+  if (hasBlocked) {
+    stemCellNicheState = 'niche_exhaustion_depletion_risk'
+    stemCellNicheStateLabel = 'Risiko Penipisan Niche Akibat Tekanan Sistemik'
+    plasticityLevel = 'fibrotic_metaplastic_divergence'
+    plasticityLevelLabel = 'Divergensi Fibrotik / Metaplastik Reaktif'
+  } else if (completedStages >= 3) {
+    stemCellNicheState = 'balanced_asymmetric_self_renewal'
+    stemCellNicheStateLabel = 'Pembaruan Asimetris Seimbang & Homeostasis Optimal'
+    plasticityLevel = 'high_fidelity_pluripotent_plasticity'
+    plasticityLevelLabel = 'Plastisitas Regeneratif & Diferensiasi Presisi Tinggi'
+  } else if (completedStages === 0) {
+    stemCellNicheState = 'stress_induced_hyperactivation'
+    stemCellNicheStateLabel = 'Hiperaktivasi Sel Punca Terinduksi Stres Dini'
+    plasticityLevel = 'attenuated_lineage_fidelity'
+    plasticityLevelLabel = 'Fidelitas Galur Seluler Teredam'
+  }
+
+  const nicheNodes: EdenStemCellNicheNode[] = [
+    {
+      nicheKind: 'hematopoietic_bone_marrow_niche',
+      nicheLabel: 'Niche Sumsum Tulang Hematopoietik (HSC / Endosteal)',
+      renewalCapacityScore: hasBlocked ? 0.62 : Math.min(0.99, 0.78 + completedStages * 0.05),
+      lineageFidelityIndex: hasBlocked ? 0.60 : Math.min(0.98, 0.76 + completedStages * 0.05),
+      nicheHomeostasisStatus: hasBlocked ? 'stress_accelerated_differentiation' : completedStages >= 2 ? 'optimal_asymmetric_balance' : 'quiescent_pool_preserved',
+      mechanisticNote: 'Pemeliharaan koloni stem sel darah melalui sinyal CXCL12-CXCR4 dan sel endotelial sinus trabekular.',
+    },
+    {
+      nicheKind: 'intestinal_crypt_lgr5_niche',
+      nicheLabel: 'Niche Kriptus Mukosa Usus Lgr5+ (Epitelial CBC)',
+      renewalCapacityScore: hasBlocked ? 0.65 : Math.min(0.98, 0.79 + completedStages * 0.05),
+      lineageFidelityIndex: hasBlocked ? 0.63 : Math.min(0.99, 0.77 + completedStages * 0.05),
+      nicheHomeostasisStatus: hasBlocked ? 'stress_accelerated_differentiation' : completedStages >= 2 ? 'optimal_asymmetric_balance' : 'quiescent_pool_preserved',
+      mechanisticNote: 'Regenerasi mukosa cepat via pensinyalan Wnt/R-spondin dan interaksi sel Paneth untuk integritas sawar usus.',
+    },
+    {
+      nicheKind: 'neural_subventricular_niche',
+      nicheLabel: 'Niche Zona Subventrikular / Hipokampus Subgranular (NSC)',
+      renewalCapacityScore: hasBlocked ? 0.58 : Math.min(0.97, 0.74 + completedStages * 0.06),
+      lineageFidelityIndex: hasBlocked ? 0.59 : Math.min(0.98, 0.75 + completedStages * 0.06),
+      nicheHomeostasisStatus: hasBlocked ? 'stress_accelerated_differentiation' : completedStages >= 2 ? 'optimal_asymmetric_balance' : 'quiescent_pool_preserved',
+      mechanisticNote: 'Neurogenesis dewasa dan plastisitas sinaptik melalui pensinyalan Notch teratur dan faktor neurotropik BDNF.',
+    },
+    {
+      nicheKind: 'skeletal_muscle_satellite_niche',
+      nicheLabel: 'Niche Sel Satelit Otot Rangka (Pax7+ Sub-Lamina Basal)',
+      renewalCapacityScore: hasBlocked ? 0.64 : Math.min(0.99, 0.77 + completedStages * 0.05),
+      lineageFidelityIndex: hasBlocked ? 0.61 : Math.min(0.98, 0.75 + completedStages * 0.06),
+      nicheHomeostasisStatus: hasBlocked ? 'stress_accelerated_differentiation' : completedStages >= 2 ? 'optimal_asymmetric_balance' : 'quiescent_pool_preserved',
+      mechanisticNote: 'Perbaikan serat kontraktil mioblas melalui aktivasi mekanosensitif dan integrasi miofibril terarah.',
+    },
+  ]
+
+  const regenerativeNarrativeId = `Sintesis sel punca & plastisitas regeneratif jaringan untuk episode "${episode.title}". Status niche sel punca: ${stemCellNicheStateLabel}, tingkat plastisitas: ${plasticityLevelLabel}. Skor plastisitas regeneratif ${regenerativePlasticityScore}%, indeks vitalitas niche ${stemNicheVitalityIndex}%, dan kapasitas komitmen galur ${lineageCommitmentCapacity}%.`
+  const regenerativeNarrativeEn = `Stem cell niches & regenerative tissue plasticity synthesis for episode "${episode.title}". Stem cell niche status: ${stemCellNicheStateLabel}, plasticity level: ${plasticityLevelLabel}. Regenerative plasticity score ${regenerativePlasticityScore}%, niche vitality index ${stemNicheVitalityIndex}%, and lineage commitment capacity ${lineageCommitmentCapacity}%.`
+
+  const stemCellRegenerativeStrategy = hasBlocked
+    ? 'Lindungi reservoir sel punca dari diferensiasi prematur dengan meredakan stres oksidatif/inflamasi sistemik, hidrasi optimal, dan nutrisi kaya asam amino rantai cabang (BCAA) di bawah pantauan medis.'
+    : completedStages >= 3
+    ? 'Pertahankan pembaruan asimetris optimal melalui latihan resistensi teratur untuk pelepasan irisin/miokin dan siklus sirkadian konsisten yang mendukung rejuvenasi koloni stem.'
+    : 'Dukung aktivasi regeneratif fisiologis dengan asupan mikronutrien esensial (zinc, folat, vitamin B12) serta istirahat pemulihan mendalam untuk memperkuat diferensiasi seluler berfidelitas tinggi.'
+
+  return {
+    version: 'v1',
+    episodeId: episode.id,
+    episodeTitle: episode.title,
+    stemCellNicheState,
+    stemCellNicheStateLabel,
+    plasticityLevel,
+    plasticityLevelLabel,
+    regenerativePlasticityScore,
+    stemNicheVitalityIndex,
+    lineageCommitmentCapacity,
+    nicheNodes,
+    regenerativeNarrativeId,
+    regenerativeNarrativeEn,
+    stemCellRegenerativeStrategy,
+    truthClass: 'stem_cell_niche_simulation_proxy',
+    clinically_reviewed: false,
+    patientTruthUncompromised: true,
+    neverManufacturesBiomarkers: true,
+    epistemicHumilityPreserved: true,
+  }
+}
+
 export const STAGE_EXPECTED_DAYS: Record<CareEpisodeStageId, number> = {
   problem: 1,
   diagnosis: 2,
@@ -3762,6 +3878,7 @@ export function evaluateCareJourneyContinuity(
     const edenProteostasisAutophagicFlux = deriveEdenProteostasisAutophagicFluxBridge(ep)
     const edenTelomericGenomicIntegrity = deriveEdenTelomericGenomicIntegrityBridge(ep)
     const edenSenescentInflammaging = deriveEdenSenescentInflammagingBridge(ep)
+    const edenRegenerativePlasticity = deriveEdenRegenerativePlasticityBridge(ep)
 
     return {
       id: ep.id,
@@ -3811,6 +3928,7 @@ export function evaluateCareJourneyContinuity(
       edenProteostasisAutophagicFlux,
       edenTelomericGenomicIntegrity,
       edenSenescentInflammaging,
+      edenRegenerativePlasticity,
     }
   })
 
@@ -3976,6 +4094,14 @@ export function evaluateCareJourneyContinuity(
           s.edenSenescentInflammaging?.neverManufacturesBiomarkers
       )
   ).length
+  const edenRegenerativePlasticityReadyCount = summaries.filter(
+    (s) =>
+      Boolean(
+        s.edenRegenerativePlasticity?.truthClass === 'stem_cell_niche_simulation_proxy' &&
+          s.edenRegenerativePlasticity?.patientTruthUncompromised &&
+          s.edenRegenerativePlasticity?.neverManufacturesBiomarkers
+      )
+  ).length
   const edenLifeBalance = deriveEdenLifeBalanceSynthesis(episodes, supportiveResults)
 
   return {
@@ -4029,6 +4155,7 @@ export function evaluateCareJourneyContinuity(
     edenProteostasisAutophagicFluxReadyCount,
     edenTelomericGenomicIntegrityReadyCount,
     edenSenescentInflammagingReadyCount,
+    edenRegenerativePlasticityReadyCount,
     edenLifeBalance,
     hasBlockedStages: blockedJourneys > 0 || stalledCount > 0,
   }

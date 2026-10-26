@@ -76,6 +76,7 @@ export {
   deriveEdenProteostasisAutophagicFluxBridge,
   deriveEdenTelomericGenomicIntegrityBridge,
   deriveEdenSenescentInflammagingBridge,
+  deriveEdenRegenerativePlasticityBridge,
   translateClinicalTermToEden,
   EDEN_PLAIN_LANGUAGE_GLOSSARY,
   STAGE_LABEL,
