@@ -20,6 +20,7 @@ import {
   deriveEdenRestorativeEnvironmentBridge,
   deriveEdenMultiModelRegenerationBridge,
   deriveEdenQuantumBioPhotonicBridge,
+  deriveEdenMultidimensionalConsciousnessBridge,
 } from '../../domains/clinical-operations'
 import {
   CARE_EPISODE_STAGES,
@@ -631,6 +632,9 @@ function EpisodeCard({
 
       {/* Eden Quantum Bio-Photonic Field & Transcendent Cellular Longevity Bridge (T-CLIN-32 / EDEN-12) */}
       <EdenQuantumBioPhotonicSection episode={episode} />
+
+      {/* Eden Astral Holographic Projection & Multidimensional Biological Consciousness Bridge (T-CLIN-33 / EDEN-13) */}
+      <EdenMultidimensionalConsciousnessSection episode={episode} />
     </Card>
   )
 }
@@ -2007,6 +2011,107 @@ function EdenQuantumBioPhotonicSection({ episode }: { episode: CareEpisode }) {
 
       <div className="mt-2 text-[10px] text-neutral-500 dark:text-white/50 text-right">
         ARGON EDEN ∞ §11 · Quantum bio-photonic simulation · Never fabricates biomarkers · Non-interventional boundary
+      </div>
+    </div>
+  )
+}
+
+function EdenMultidimensionalConsciousnessSection({ episode }: { episode: CareEpisode }) {
+  const [lang, setLang] = useState<'id' | 'en'>('id')
+
+  const bridge = useMemo(
+    () => deriveEdenMultidimensionalConsciousnessBridge(episode),
+    [episode]
+  )
+
+  const narrative = lang === 'id' ? bridge.astralHolographicNarrativeId : bridge.astralHolographicNarrativeEn
+
+  return (
+    <div
+      className="mt-3 rounded-xl border border-indigo-200 dark:border-white/10 bg-indigo-50/30 dark:bg-white/[0.02] p-3.5"
+      data-eden-multidimensional-consciousness-card="v1"
+    >
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+        <div>
+          <div className="flex items-center gap-2 flex-wrap">
+            <h4 className="text-xs font-bold text-neutral-900 dark:text-white">
+              Eden Astral Holographic Projection & Multidimensional Biological Consciousness
+            </h4>
+            <Badge tone="brand">{bridge.equilibriumStateLabel}</Badge>
+            <Badge tone="normal">Harmony {bridge.overallConsciousnessHarmonyScore}%</Badge>
+          </div>
+          <p className="mt-1 text-xs font-medium text-neutral-800 dark:text-white/85">
+            {narrative}
+          </p>
+        </div>
+        <div className="flex items-center gap-1 shrink-0">
+          <button
+            type="button"
+            onClick={() => setLang('id')}
+            className={`rounded-md px-2 py-0.5 text-[11px] font-medium transition-colors ${
+              lang === 'id'
+                ? 'bg-indigo-600 text-white font-bold'
+                : 'bg-white/80 dark:bg-white/5 text-neutral-700 dark:text-white/70 hover:bg-indigo-100/50'
+            }`}
+          >
+            Bahasa
+          </button>
+          <button
+            type="button"
+            onClick={() => setLang('en')}
+            className={`rounded-md px-2 py-0.5 text-[11px] font-medium transition-colors ${
+              lang === 'en'
+                ? 'bg-indigo-600 text-white font-bold'
+                : 'bg-white/80 dark:bg-white/5 text-neutral-700 dark:text-white/70 hover:bg-indigo-100/50'
+            }`}
+          >
+            English
+          </button>
+        </div>
+      </div>
+
+      <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2" data-eden-consciousness-scales="v1">
+        {bridge.scales.map((s) => {
+          const insight = lang === 'id' ? s.holographicInsightId : s.holographicInsightEn
+          return (
+            <div
+              key={s.scale}
+              className="rounded-lg border border-indigo-200/50 dark:border-white/10 bg-white/70 dark:bg-white/[0.03] p-2.5"
+            >
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-bold text-neutral-700 dark:text-white/80">
+                  {s.scaleLabel}
+                </span>
+                <span className="text-xs font-extrabold text-indigo-700 dark:text-indigo-300">
+                  {s.biopsychosocialIndex}%
+                </span>
+              </div>
+              <div className="mt-1.5 h-1.5 w-full rounded-full bg-indigo-100 dark:bg-white/10 overflow-hidden">
+                <div
+                  className="h-full rounded-full bg-gradient-to-r from-indigo-500 to-purple-500"
+                  style={{ width: `${s.biopsychosocialIndex}%` }}
+                />
+              </div>
+              <p className="mt-1.5 text-[10px] text-neutral-600 dark:text-neutral-300">
+                {insight}
+              </p>
+              <div className="mt-1 text-[9px] text-neutral-400 dark:text-white/40 italic">
+                {s.mechanisticGrounding}
+              </div>
+            </div>
+          )
+        })}
+      </div>
+
+      <div className="mt-2.5 rounded-lg border border-indigo-200/40 dark:border-white/10 bg-indigo-100/30 dark:bg-white/[0.02] p-2.5 text-xs space-y-1">
+        <div className="text-[11px] text-neutral-800 dark:text-white/85">
+          <b>{lang === 'id' ? 'Trajektori Pengalaman Transenden:' : 'Transcendent Human Experience Trajectory:'}</b>{' '}
+          {bridge.transcendentHumanExperienceTrajectory}
+        </div>
+      </div>
+
+      <div className="mt-2 text-[10px] text-neutral-500 dark:text-white/50 text-right">
+        ARGON EDEN ∞ §12 · Multidimensional consciousness projection · No autonomous neurological diagnosis · Phenomenological experience preserved
       </div>
     </div>
   )
