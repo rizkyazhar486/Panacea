@@ -25,6 +25,7 @@ import {
   deriveEdenRestorativeEnvironmentBridge,
   deriveEdenMultiModelRegenerationBridge,
   deriveEdenQuantumBioPhotonicBridge,
+  deriveEdenMultidimensionalConsciousnessBridge,
   translateClinicalTermToEden,
   EDEN_PLAIN_LANGUAGE_GLOSSARY,
 } from '../../src/domains/clinical-operations/model/careContinuityProjection.ts'
@@ -2496,4 +2497,71 @@ test('deriveCareContinuityState & CareEpisode: Eden Quantum Bio-Photonic Field &
   const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
   assert.ok(episodeSource.includes('data-eden-quantum-biophotonic-card="v1"'), 'CareEpisode must include quantum bio-photonic card')
   assert.ok(episodeSource.includes('data-eden-quantum-metrics="v1"'), 'CareEpisode must include quantum metrics grid')
+})
+
+test('34. Eden Astral Holographic Projection & Multidimensional Biological Consciousness Bridge (T-CLIN-33 / EDEN-13)', () => {
+  const evaluatedAt = '2026-10-26T12:00:00.000Z'
+  const sampleEpisode = {
+    id: 'ce_consciousness_1',
+    title: 'Holistic Neuro-Integrative Vitality',
+    diagnosisCode: 'G90.9',
+    createdAt: '2026-10-20T08:00:00.000Z',
+    updatedAt: '2026-10-26T08:00:00.000Z',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'diagnosis', status: 'done' },
+      { stage: 'treatment', status: 'done' },
+      { stage: 'recovery', status: 'active' },
+    ],
+  }
+
+  // 1. Pure deterministic derivation
+  const bridge = deriveEdenMultidimensionalConsciousnessBridge(sampleEpisode)
+  assert.equal(bridge.version, 'v1')
+  assert.equal(bridge.episodeId, 'ce_consciousness_1')
+  assert.equal(bridge.equilibriumState, 'deep_tranquility')
+  assert.equal(bridge.equilibriumStateLabel, 'Tranquilitas Mendalam Terintegrasi')
+  assert.ok(bridge.overallConsciousnessHarmonyScore >= 74 && bridge.overallConsciousnessHarmonyScore <= 99)
+  assert.equal(bridge.scales.length, 4)
+  assert.equal(bridge.scales[0].scale, 'subcellular_quantum_coherence')
+  assert.equal(bridge.scales[1].scale, 'synaptic_neuro_integration')
+  assert.equal(bridge.scales[2].scale, 'visceral_autonomic_balance')
+  assert.equal(bridge.scales[3].scale, 'noetic_experiential_harmony')
+  assert.equal(bridge.noAutonomousNeurologicalDiagnosis, true)
+  assert.equal(bridge.phenomenologicalExperiencePreserved, true)
+  assert.ok(bridge.astralHolographicNarrativeId.includes('Proyeksi holografik kesadaran'))
+  assert.ok(bridge.astralHolographicNarrativeEn.includes('Multidimensional consciousness holographic projection'))
+  assert.ok(bridge.transcendentHumanExperienceTrajectory.includes('Integrasi kesadaran holistik'))
+
+  // 2. Blocked stage resilience check
+  const blockedEpisode = {
+    id: 'ce_consciousness_blocked',
+    title: 'Acute Sensory Dysregulation',
+    diagnosisCode: 'R44.8',
+    createdAt: '2026-10-20T08:00:00.000Z',
+    updatedAt: '2026-10-26T08:00:00.000Z',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'diagnosis', status: 'blocked', blockedReason: 'Awaiting clinical evaluation' },
+    ],
+  }
+  const blockedBridge = deriveEdenMultidimensionalConsciousnessBridge(blockedEpisode)
+  assert.equal(blockedBridge.equilibriumState, 'acute_sensory_stabilization')
+  assert.equal(blockedBridge.equilibriumStateLabel, 'Stabilisasi Sensorik Akut')
+  assert.ok(blockedBridge.overallConsciousnessHarmonyScore <= 68)
+
+  // 3. Rollup in evaluateCareJourneyContinuity
+  const projection = evaluateCareJourneyContinuity([sampleEpisode, blockedEpisode], evaluatedAt)
+  assert.equal(projection.edenMultidimensionalConsciousnessReadyCount, 2)
+  assert.ok(projection.episodes[0].edenMultidimensionalConsciousness)
+  assert.equal(projection.episodes[0].edenMultidimensionalConsciousness.noAutonomousNeurologicalDiagnosis, true)
+  assert.equal(projection.episodes[0].edenMultidimensionalConsciousness.phenomenologicalExperiencePreserved, true)
+
+  // 4. UI contracts
+  const panelSource = read('src/domains/clinical-operations/ui/CareContinuityPanel.tsx')
+  assert.ok(panelSource.includes('data-eden-multidimensional-consciousness="v1"'), 'CareContinuityPanel must include multidimensional consciousness attribute')
+
+  const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
+  assert.ok(episodeSource.includes('data-eden-multidimensional-consciousness-card="v1"'), 'CareEpisode must include multidimensional consciousness card')
+  assert.ok(episodeSource.includes('data-eden-consciousness-scales="v1"'), 'CareEpisode must include consciousness scales grid')
 })

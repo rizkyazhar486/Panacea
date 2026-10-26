@@ -49,6 +49,10 @@ import type {
   EdenQuantumBioPhotonicDimension,
   EdenQuantumPhotonicTrajectory,
   EdenQuantumBioPhotonicBridge,
+  EdenConsciousnessScaleKind,
+  EdenBiopsychosocialEquilibriumState,
+  EdenAstralScalePerspective,
+  EdenMultidimensionalConsciousnessBridge,
   WellnessDay,
   MoodEntry,
   Circle,
@@ -152,6 +156,7 @@ export interface CareJourneyEpisodeSummary {
   edenRestorativeEnvironment?: EdenRestorativeEnvironmentBridge
   edenMultiModelRegeneration?: EdenMultiModelRegenerationBridge
   edenQuantumBioPhotonic?: EdenQuantumBioPhotonicBridge
+  edenMultidimensionalConsciousness?: EdenMultidimensionalConsciousnessBridge
 }
 
 export type ReadmissionRiskLevel = 'low' | 'moderate' | 'high'
@@ -242,6 +247,7 @@ export interface CareJourneyContinuityResult {
   edenRestorativeReadyCount: number
   edenMultiModelRegenerationReadyCount: number
   edenQuantumBioPhotonicReadyCount: number
+  edenMultidimensionalConsciousnessReadyCount: number
   edenLifeBalance: EdenLifeBalanceSynthesis
   hasBlockedStages: boolean
 }
@@ -2499,6 +2505,113 @@ export function deriveEdenQuantumBioPhotonicBridge(
   }
 }
 
+/**
+ * Derives pure, deterministic Eden Multidimensional Consciousness Bridge (T-CLIN-33 / EDEN-13)
+ * Inspired by ARGON EDEN GENESIS ∞ §12, PANACEA_CONSTITUTION.md, and PANACEA_INVICTUS_PRINCIPLE.md
+ *
+ * Invariants:
+ * - noAutonomousNeurologicalDiagnosis: true
+ * - phenomenologicalExperiencePreserved: true
+ */
+export function deriveEdenMultidimensionalConsciousnessBridge(
+  episode: CareEpisode,
+): EdenMultidimensionalConsciousnessBridge {
+  const stages = episode.stages ?? []
+  const completedStages = stages.filter((s) => s.status === 'done').length
+  const hasBlocked = stages.some((s) => s.status === 'blocked')
+  const blockedCount = stages.filter((s) => s.status === 'blocked').length
+
+  const overallConsciousnessHarmonyScore = hasBlocked
+    ? Math.max(50, 68 - blockedCount * 6)
+    : Math.min(99, 74 + completedStages * 5)
+
+  let equilibriumState: EdenBiopsychosocialEquilibriumState = 'coherent_adaptation'
+  let equilibriumStateLabel = 'Adaptasi Koheren Aktif'
+
+  if (hasBlocked) {
+    equilibriumState = 'acute_sensory_stabilization'
+    equilibriumStateLabel = 'Stabilisasi Sensorik Akut'
+  } else if (completedStages >= 3) {
+    equilibriumState = 'deep_tranquility'
+    equilibriumStateLabel = 'Tranquilitas Mendalam Terintegrasi'
+  } else if (completedStages === 0) {
+    equilibriumState = 'restorative_rebalancing'
+    equilibriumStateLabel = 'Penyeimbangan Restoratif Awal'
+  }
+
+  const subCellularIndex = hasBlocked
+    ? Math.max(52, 66 - blockedCount * 5)
+    : Math.min(98, 72 + completedStages * 5)
+
+  const synapticIndex = hasBlocked
+    ? Math.max(50, 64 - blockedCount * 5)
+    : Math.min(96, 75 + completedStages * 4)
+
+  const visceralIndex = hasBlocked
+    ? Math.max(54, 68 - blockedCount * 4)
+    : Math.min(97, 76 + completedStages * 4)
+
+  const noeticIndex = hasBlocked
+    ? Math.max(55, 70 - blockedCount * 4)
+    : Math.min(99, 78 + completedStages * 4)
+
+  const scales: EdenAstralScalePerspective[] = [
+    {
+      scale: 'subcellular_quantum_coherence',
+      scaleLabel: 'Koherensi Kuantum Subseluler',
+      biopsychosocialIndex: subCellularIndex,
+      holographicInsightId: 'Interaksi kisi mikrotubulus sitoskeletal dan emisi biofoton mempertahankan keteraturan energi subseluler dasar.',
+      holographicInsightEn: 'Cytoskeletal microtubule lattices and ultra-weak photon emission sustain foundational subcellular energy coherence.',
+      mechanisticGrounding: 'Subcellular Orch-OR quantum substrate & biomolecular dipolar resonance',
+    },
+    {
+      scale: 'synaptic_neuro_integration',
+      scaleLabel: 'Integrasi Sinaptik Neurobiologis',
+      biopsychosocialIndex: synapticIndex,
+      holographicInsightId: 'Sinkronisasi gelombang gama kortiko-talamik dan plastisitas sinaptik memelihara kejernihan persepsi serta kognisi.',
+      holographicInsightEn: 'Cortico-thalamic gamma synchrony and synaptic neuroplasticity preserve perceptual clarity and conscious cognitive flow.',
+      mechanisticGrounding: 'Cortico-thalamic rhythmic oscillation & synaptic neurotransmitter balance',
+    },
+    {
+      scale: 'visceral_autonomic_balance',
+      scaleLabel: 'Keseimbangan Viseral Otonom',
+      biopsychosocialIndex: visceralIndex,
+      holographicInsightId: 'Kopling aksis vagal usus-jantung-otak menyelaraskan ritme detak dan respon relaksasi parasimpatis.',
+      holographicInsightEn: 'Vagal gut-heart-brain axis coupling harmonizes cardiac intervals and parasympathetic restorative equilibrium.',
+      mechanisticGrounding: 'Polyvagal autonomic neuroception & heart rate variability (HRV) dynamics',
+    },
+    {
+      scale: 'noetic_experiential_harmony',
+      scaleLabel: 'Harmoni Pengalaman Noetik & Eksistensial',
+      biopsychosocialIndex: noeticIndex,
+      holographicInsightId: 'Rasa takjub, kedamaian batin, dan pemaknaan hidup memperkokoh integritas psikososial serta martabat diri.',
+      holographicInsightEn: 'Existential awe, inner peace, and meaning-making reinforce psychosocial resilience and inviolable human dignity.',
+      mechanisticGrounding: 'Biopsychosocial-spiritual phenomenological integration & existential narrative medicine',
+    },
+  ]
+
+  const astralHolographicNarrativeId = `Proyeksi holografik kesadaran multidimensi untuk "${episode.title}". Status kesadaran biopsikososial: ${equilibriumStateLabel} dengan indeks harmoni menyeluruh ${overallConsciousnessHarmonyScore}%. Menghubungkan getaran biofoton subseluler hingga ketenangan batin tanpa reduksi mekanistik.`
+
+  const astralHolographicNarrativeEn = `Multidimensional consciousness holographic projection for "${episode.title}". Biopsychosocial equilibrium: ${equilibriumStateLabel} with overall harmony score of ${overallConsciousnessHarmonyScore}%. Bridging subcellular biophotonic flux to reflective inner peace without biological reductionism.`
+
+  const transcendentHumanExperienceTrajectory = `Integrasi kesadaran holistik dari dimensi kuantum seluler hingga pengalaman eksistensial manusiawi, memperdalam ketenangan hidup, kejernihan mental, dan pemulihan utuh berkelanjutan.`
+
+  return {
+    version: 'v1',
+    episodeId: episode.id,
+    episodeTitle: episode.title,
+    equilibriumState,
+    equilibriumStateLabel,
+    overallConsciousnessHarmonyScore,
+    scales,
+    astralHolographicNarrativeId,
+    astralHolographicNarrativeEn,
+    transcendentHumanExperienceTrajectory,
+    noAutonomousNeurologicalDiagnosis: true,
+    phenomenologicalExperiencePreserved: true,
+  }
+}
+
 export const STAGE_EXPECTED_DAYS: Record<CareEpisodeStageId, number> = {
   problem: 1,
   diagnosis: 2,
@@ -2761,6 +2874,7 @@ export function evaluateCareJourneyContinuity(
     const edenRestorativeEnvironment = deriveEdenRestorativeEnvironmentBridge(ep)
     const edenMultiModelRegeneration = deriveEdenMultiModelRegenerationBridge(ep)
     const edenQuantumBioPhotonic = deriveEdenQuantumBioPhotonicBridge(ep)
+    const edenMultidimensionalConsciousness = deriveEdenMultidimensionalConsciousnessBridge(ep)
 
     return {
       id: ep.id,
@@ -2802,6 +2916,7 @@ export function evaluateCareJourneyContinuity(
       edenRestorativeEnvironment,
       edenMultiModelRegeneration,
       edenQuantumBioPhotonic,
+      edenMultidimensionalConsciousness,
     }
   })
 
@@ -2905,6 +3020,13 @@ export function evaluateCareJourneyContinuity(
           s.edenQuantumBioPhotonic?.neverFabricatesBiomarkers
       )
   ).length
+  const edenMultidimensionalConsciousnessReadyCount = summaries.filter(
+    (s) =>
+      Boolean(
+        s.edenMultidimensionalConsciousness?.noAutonomousNeurologicalDiagnosis &&
+          s.edenMultidimensionalConsciousness?.phenomenologicalExperiencePreserved
+      )
+  ).length
   const edenLifeBalance = deriveEdenLifeBalanceSynthesis(episodes, supportiveResults)
 
   return {
@@ -2950,6 +3072,7 @@ export function evaluateCareJourneyContinuity(
     edenRestorativeReadyCount,
     edenMultiModelRegenerationReadyCount,
     edenQuantumBioPhotonicReadyCount,
+    edenMultidimensionalConsciousnessReadyCount,
     edenLifeBalance,
     hasBlockedStages: blockedJourneys > 0 || stalledCount > 0,
   }

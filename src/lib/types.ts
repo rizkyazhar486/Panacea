@@ -673,6 +673,42 @@ export interface EdenQuantumBioPhotonicBridge {
   nonInterventionalResearchBoundary: true
 }
 
+export type EdenConsciousnessScaleKind =
+  | 'subcellular_quantum_coherence'
+  | 'synaptic_neuro_integration'
+  | 'visceral_autonomic_balance'
+  | 'noetic_experiential_harmony'
+
+export type EdenBiopsychosocialEquilibriumState =
+  | 'deep_tranquility'
+  | 'coherent_adaptation'
+  | 'restorative_rebalancing'
+  | 'acute_sensory_stabilization'
+
+export interface EdenAstralScalePerspective {
+  scale: EdenConsciousnessScaleKind
+  scaleLabel: string
+  biopsychosocialIndex: number
+  holographicInsightId: string
+  holographicInsightEn: string
+  mechanisticGrounding: string
+}
+
+export interface EdenMultidimensionalConsciousnessBridge {
+  version: 'v1'
+  episodeId: string
+  episodeTitle: string
+  equilibriumState: EdenBiopsychosocialEquilibriumState
+  equilibriumStateLabel: string
+  overallConsciousnessHarmonyScore: number
+  scales: EdenAstralScalePerspective[]
+  astralHolographicNarrativeId: string
+  astralHolographicNarrativeEn: string
+  transcendentHumanExperienceTrajectory: string
+  noAutonomousNeurologicalDiagnosis: true
+  phenomenologicalExperiencePreserved: true
+}
+
 export interface CareJourneyExportSummary {
   standard: 'PANACEA-CAREPLAN-FHIR-R4-V1'
   generatedAt: string

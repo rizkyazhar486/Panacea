@@ -68,6 +68,7 @@ export {
   deriveEdenRestorativeEnvironmentBridge,
   deriveEdenMultiModelRegenerationBridge,
   deriveEdenQuantumBioPhotonicBridge,
+  deriveEdenMultidimensionalConsciousnessBridge,
   translateClinicalTermToEden,
   EDEN_PLAIN_LANGUAGE_GLOSSARY,
   STAGE_LABEL,
