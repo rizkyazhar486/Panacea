@@ -80,6 +80,7 @@ export {
   deriveEdenEpigeneticAgeReversalBridge,
   deriveEdenMitochondrialHeteroplasmyBridge,
   deriveEdenCircadianAutophagyPulseBridge,
+  deriveEdenRetrotransposonSilencingBridge,
   translateClinicalTermToEden,
   EDEN_PLAIN_LANGUAGE_GLOSSARY,
   STAGE_LABEL,

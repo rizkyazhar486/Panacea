@@ -37,6 +37,7 @@ import {
   deriveEdenEpigeneticAgeReversalBridge,
   deriveEdenMitochondrialHeteroplasmyBridge,
   deriveEdenCircadianAutophagyPulseBridge,
+  deriveEdenRetrotransposonSilencingBridge,
   translateClinicalTermToEden,
   EDEN_PLAIN_LANGUAGE_GLOSSARY,
 } from '../../src/domains/clinical-operations/model/careContinuityProjection.ts'
@@ -3432,4 +3433,84 @@ test('deriveEdenCircadianAutophagyPulseBridge & CareEpisode: Eden Circadian Auto
   const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
   assert.ok(episodeSource.includes('data-eden-circadian-autophagy-card="v1"'), 'CareEpisode must include circadian autophagy card')
   assert.ok(episodeSource.includes('data-eden-xenohormetic-pulse-nodes="v1"'), 'CareEpisode must include xenohormetic pulse nodes grid')
+})
+
+test('deriveEdenRetrotransposonSilencingBridge & CareEpisode: Eden Epigenetic Retrotransposon Silencing & LINE-1 Vigilance Synthesizer (T-CLIN-46 / EDEN-26)', () => {
+  const evaluatedAt = '2026-10-26T19:30:00.000Z'
+  const sampleEpisode = {
+    id: 'ce_retro_1',
+    title: 'Epigenetic Retrotransposon Silencing & LINE-1 Vigilance Pathway',
+    diagnosisCode: 'Z00.00',
+    createdAt: '2026-10-20T08:00:00.000Z',
+    updatedAt: '2026-10-26T08:00:00.000Z',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'diagnosis', status: 'done' },
+      { stage: 'treatment', status: 'done' },
+      { stage: 'recovery', status: 'active' },
+    ],
+  }
+
+  // 1. Pure deterministic derivation
+  const bridge = deriveEdenRetrotransposonSilencingBridge(sampleEpisode)
+  assert.equal(bridge.version, 'v1')
+  assert.equal(bridge.episodeId, 'ce_retro_1')
+  assert.equal(bridge.silencingState, 'deep_heterochromatic_silencing')
+  assert.equal(bridge.silencingStateLabel, 'Peredaman Heterokromatin Mendalam & Kestabilan Genomik Maksimal')
+  assert.equal(bridge.vigilanceTier, 'dormant_transposon_quiescence')
+  assert.equal(bridge.vigilanceTierLabel, 'Dormansi Transposon Penuh & Perlindungan Elemen Parasit DNA')
+  assert.ok(bridge.retrotransposonSilencingScore >= 80 && bridge.retrotransposonSilencingScore <= 99)
+  assert.ok(bridge.heterochromatinStabilityIndex >= 80 && bridge.heterochromatinStabilityIndex <= 98)
+  assert.ok(bridge.line1SuppressionCapacity >= 80 && bridge.line1SuppressionCapacity <= 98)
+  assert.equal(bridge.vigilanceNodes.length, 4)
+  assert.equal(bridge.vigilanceNodes[0].nodeKind, 'kap1_trim28_corepressor_scaffold')
+  assert.equal(bridge.vigilanceNodes[1].nodeKind, 'h3k9me3_hp1_heterochromatin_compaction')
+  assert.equal(bridge.vigilanceNodes[2].nodeKind, 'dna_methylation_l1_utr_maintenance')
+  assert.equal(bridge.vigilanceNodes[3].nodeKind, 'sirt6_nuclear_retention_surveillance')
+  assert.equal(bridge.truthClass, 'retrotransposon_silencing_simulation_proxy')
+  assert.equal(bridge.clinically_reviewed, false)
+  assert.equal(bridge.patientTruthUncompromised, true)
+  assert.equal(bridge.neverManufacturesBiomarkers, true)
+  assert.equal(bridge.epistemicHumilityPreserved, true)
+  assert.ok(bridge.silencingNarrativeId.includes('Sintesis peredaman retrotransposon epigenetik'))
+  assert.ok(bridge.silencingNarrativeEn.includes('Epigenetic retrotransposon silencing'))
+  assert.ok(bridge.retrotransposonRepressionStrategy.includes('Pertahankan kondensasi heterokromatin'))
+
+  // 2. Blocked stage resilience check
+  const blockedEpisode = {
+    id: 'ce_retro_blocked',
+    title: 'Severe Epigenetic Exhaustion & Retrotransposon Derepression Crisis',
+    diagnosisCode: 'M35.9',
+    createdAt: '2026-10-20T08:00:00.000Z',
+    updatedAt: '2026-10-26T08:00:00.000Z',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'diagnosis', status: 'blocked', blockedReason: 'Awaiting LINE-1 ORF1p protein expression and cytosolic cDNA surveillance panel' },
+    ],
+  }
+  const blockedBridge = deriveEdenRetrotransposonSilencingBridge(blockedEpisode)
+  assert.equal(blockedBridge.silencingState, 'retrotransposon_derepression_strain')
+  assert.equal(blockedBridge.silencingStateLabel, 'Tekanan Derepresi Retrotransposon / LINE-1 Bangkit')
+  assert.equal(blockedBridge.vigilanceTier, 'active_retrotransposition_crisis')
+  assert.equal(blockedBridge.vigilanceTierLabel, 'Beban Retrotransposisi Aktif & Sinyal cGAS-STING Sitotoksik')
+  assert.ok(blockedBridge.retrotransposonSilencingScore <= 65)
+  assert.ok(blockedBridge.heterochromatinStabilityIndex <= 62)
+  assert.ok(blockedBridge.line1SuppressionCapacity <= 60)
+  assert.ok(blockedBridge.retrotransposonRepressionStrategy.includes('Dukung stabilitas heterokromatin'))
+
+  // 3. Rollup in evaluateCareJourneyContinuity
+  const projection = evaluateCareJourneyContinuity([sampleEpisode, blockedEpisode], evaluatedAt)
+  assert.equal(projection.edenRetrotransposonSilencingReadyCount, 2)
+  assert.ok(projection.episodes[0].edenRetrotransposonSilencing)
+  assert.equal(projection.episodes[0].edenRetrotransposonSilencing.truthClass, 'retrotransposon_silencing_simulation_proxy')
+  assert.equal(projection.episodes[0].edenRetrotransposonSilencing.patientTruthUncompromised, true)
+  assert.equal(projection.episodes[0].edenRetrotransposonSilencing.neverManufacturesBiomarkers, true)
+
+  // 4. UI contracts
+  const panelSource = read('src/domains/clinical-operations/ui/CareContinuityPanel.tsx')
+  assert.ok(panelSource.includes('data-eden-retrotransposon-silencing="v1"'), 'CareContinuityPanel must include retrotransposon-silencing attribute')
+
+  const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
+  assert.ok(episodeSource.includes('data-eden-retrotransposon-card="v1"'), 'CareEpisode must include retrotransposon card')
+  assert.ok(episodeSource.includes('data-eden-transposon-nodes="v1"'), 'CareEpisode must include transposon nodes grid')
 })

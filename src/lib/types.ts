@@ -1243,6 +1243,55 @@ export interface EdenCircadianAutophagyPulseBridge {
   epistemicHumilityPreserved: true
 }
 
+export type EdenRetrotransposonSilencingState =
+  | 'deep_heterochromatic_silencing'
+  | 'compensated_repressive_equilibrium'
+  | 'focal_heterochromatin_erosion_risk'
+  | 'retrotransposon_derepression_strain'
+
+export type EdenLine1VigilanceTier =
+  | 'dormant_transposon_quiescence'
+  | 'surveilled_basal_transcription'
+  | 'elevated_cytosolic_cdna_surveillance'
+  | 'active_retrotransposition_crisis'
+
+export type EdenTransposonVigilanceNodeKind =
+  | 'kap1_trim28_corepressor_scaffold'
+  | 'h3k9me3_hp1_heterochromatin_compaction'
+  | 'dna_methylation_l1_utr_maintenance'
+  | 'sirt6_nuclear_retention_surveillance'
+
+export interface EdenTransposonVigilanceNode {
+  nodeKind: EdenTransposonVigilanceNodeKind
+  nodeLabel: string
+  silencingEfficiencyScore: number
+  chromatinDensityIndex: number
+  vigilanceStatus: 'optimal_deep_silencing' | 'compensated_surveillance' | 'derepression_vulnerability'
+  mechanisticNote: string
+}
+
+export interface EdenRetrotransposonSilencingBridge {
+  version: 'v1'
+  episodeId: string
+  episodeTitle: string
+  silencingState: EdenRetrotransposonSilencingState
+  silencingStateLabel: string
+  vigilanceTier: EdenLine1VigilanceTier
+  vigilanceTierLabel: string
+  retrotransposonSilencingScore: number
+  heterochromatinStabilityIndex: number
+  line1SuppressionCapacity: number
+  vigilanceNodes: EdenTransposonVigilanceNode[]
+  silencingNarrativeId: string
+  silencingNarrativeEn: string
+  retrotransposonRepressionStrategy: string
+  truthClass: 'retrotransposon_silencing_simulation_proxy'
+  clinically_reviewed: false
+  patientTruthUncompromised: true
+  neverManufacturesBiomarkers: true
+  epistemicHumilityPreserved: true
+}
+
 export interface CareJourneyExportSummary {
   standard: 'PANACEA-CAREPLAN-FHIR-R4-V1'
   generatedAt: string

@@ -105,6 +105,11 @@ import type {
   EdenXenohormeticPulseNodeKind,
   EdenXenohormeticPulseNode,
   EdenCircadianAutophagyPulseBridge,
+  EdenRetrotransposonSilencingState,
+  EdenLine1VigilanceTier,
+  EdenTransposonVigilanceNodeKind,
+  EdenTransposonVigilanceNode,
+  EdenRetrotransposonSilencingBridge,
   WellnessDay,
   MoodEntry,
   Circle,
@@ -221,6 +226,7 @@ export interface CareJourneyEpisodeSummary {
   edenEpigeneticAgeReversal?: EdenEpigeneticAgeReversalBridge
   edenMitochondrialHeteroplasmy?: EdenMitochondrialHeteroplasmyBridge
   edenCircadianAutophagyPulse?: EdenCircadianAutophagyPulseBridge
+  edenRetrotransposonSilencing?: EdenRetrotransposonSilencingBridge
 }
 
 export type ReadmissionRiskLevel = 'low' | 'moderate' | 'high'
@@ -323,6 +329,7 @@ export interface CareJourneyContinuityResult {
   edenEpigeneticAgeReversalReadyCount: number
   edenMitochondrialHeteroplasmyReadyCount: number
   edenCircadianAutophagyPulseReadyCount: number
+  edenRetrotransposonSilencingReadyCount: number
   edenLifeBalance: EdenLifeBalanceSynthesis
   hasBlockedStages: boolean
 }
@@ -3956,6 +3963,115 @@ export function deriveEdenCircadianAutophagyPulseBridge(
   }
 }
 
+export function deriveEdenRetrotransposonSilencingBridge(
+  episode: CareEpisode,
+): EdenRetrotransposonSilencingBridge {
+  const stages = episode.stages ?? []
+  const completedStages = stages.filter((s) => s.status === 'done').length
+  const hasBlocked = stages.some((s) => s.status === 'blocked')
+  const blockedCount = stages.filter((s) => s.status === 'blocked').length
+
+  const retrotransposonSilencingScore = hasBlocked
+    ? Math.max(46, 67 - blockedCount * 7)
+    : Math.min(99, 78 + completedStages * 5)
+
+  const heterochromatinStabilityIndex = hasBlocked
+    ? Math.max(44, 65 - blockedCount * 7)
+    : Math.min(98, 77 + completedStages * 5)
+
+  const line1SuppressionCapacity = hasBlocked
+    ? Math.max(42, 63 - blockedCount * 8)
+    : Math.min(98, 76 + completedStages * 5)
+
+  let silencingState: EdenRetrotransposonSilencingState = 'compensated_repressive_equilibrium'
+  let silencingStateLabel = 'Keseimbangan Represi Heterokromatin Terkompensasi'
+  let vigilanceTier: EdenLine1VigilanceTier = 'surveilled_basal_transcription'
+  let vigilanceTierLabel = 'Transkripsi Basal Terawasi & Pengawasan Nuklear Aktif'
+
+  if (hasBlocked) {
+    silencingState = 'retrotransposon_derepression_strain'
+    silencingStateLabel = 'Tekanan Derepresi Retrotransposon / LINE-1 Bangkit'
+    vigilanceTier = 'active_retrotransposition_crisis'
+    vigilanceTierLabel = 'Beban Retrotransposisi Aktif & Sinyal cGAS-STING Sitotoksik'
+  } else if (completedStages >= 3) {
+    silencingState = 'deep_heterochromatic_silencing'
+    silencingStateLabel = 'Peredaman Heterokromatin Mendalam & Kestabilan Genomik Maksimal'
+    vigilanceTier = 'dormant_transposon_quiescence'
+    vigilanceTierLabel = 'Dormansi Transposon Penuh & Perlindungan Elemen Parasit DNA'
+  } else if (completedStages === 0) {
+    silencingState = 'focal_heterochromatin_erosion_risk'
+    silencingStateLabel = 'Risiko Erosi Heterokromatin Fokal Dini'
+    vigilanceTier = 'elevated_cytosolic_cdna_surveillance'
+    vigilanceTierLabel = 'Surveilans Peningkatan cDNA Sitosolik Dini'
+  }
+
+  const vigilanceNodes: EdenTransposonVigilanceNode[] = [
+    {
+      nodeKind: 'kap1_trim28_corepressor_scaffold',
+      nodeLabel: 'Perancah Korepresor KAP1 / TRIM28 (Rekrutmen Histon Metiltransferase)',
+      silencingEfficiencyScore: hasBlocked ? 0.62 : Math.min(0.99, 0.78 + completedStages * 0.05),
+      chromatinDensityIndex: hasBlocked ? 0.60 : Math.min(0.98, 0.76 + completedStages * 0.05),
+      vigilanceStatus: hasBlocked ? 'derepression_vulnerability' : completedStages >= 2 ? 'optimal_deep_silencing' : 'compensated_surveillance',
+      mechanisticNote: 'Kompleks KRAB-ZFP/KAP1 merekrut SETDB1 dan deasetilase NuRD untuk peredaman transkripsional elemen retrotransposon muda.',
+    },
+    {
+      nodeKind: 'h3k9me3_hp1_heterochromatin_compaction',
+      nodeLabel: 'Kompaksi Heterokromatin H3K9me3-HP1α (Kondensasi Kromatin Konstitutif)',
+      silencingEfficiencyScore: hasBlocked ? 0.63 : Math.min(0.98, 0.79 + completedStages * 0.05),
+      chromatinDensityIndex: hasBlocked ? 0.61 : Math.min(0.99, 0.77 + completedStages * 0.05),
+      vigilanceStatus: hasBlocked ? 'derepression_vulnerability' : completedStages >= 2 ? 'optimal_deep_silencing' : 'compensated_surveillance',
+      mechanisticNote: 'Pengikatan protein HP1 pada tanda trimetilasi H3K9 membentuk pemisahan fase cairan-cair yang mengisolasi lokus berulang dari RNA polimerase.',
+    },
+    {
+      nodeKind: 'dna_methylation_l1_utr_maintenance',
+      nodeLabel: 'Pemeliharaan Metilasi DNA 5\'-UTR LINE-1 (Integritas CpG Promotor)',
+      silencingEfficiencyScore: hasBlocked ? 0.59 : Math.min(0.97, 0.75 + completedStages * 0.06),
+      chromatinDensityIndex: hasBlocked ? 0.58 : Math.min(0.98, 0.76 + completedStages * 0.06),
+      vigilanceStatus: hasBlocked ? 'derepression_vulnerability' : completedStages >= 2 ? 'optimal_deep_silencing' : 'compensated_surveillance',
+      mechanisticNote: 'Hipermetilasi pulau CpG pada promotor 5\'-UTR retrotransposon LINE-1 mencegah pengikatan faktor transkripsi esensial seluler.',
+    },
+    {
+      nodeKind: 'sirt6_nuclear_retention_surveillance',
+      nodeLabel: 'Surveilans Retensi Nuklear & Mono-ADP-Ribosilasi SIRT6',
+      silencingEfficiencyScore: hasBlocked ? 0.64 : Math.min(0.99, 0.77 + completedStages * 0.05),
+      chromatinDensityIndex: hasBlocked ? 0.62 : Math.min(0.97, 0.74 + completedStages * 0.06),
+      vigilanceStatus: hasBlocked ? 'derepression_vulnerability' : completedStages >= 2 ? 'optimal_deep_silencing' : 'compensated_surveillance',
+      mechanisticNote: 'SIRT6 memblokir transkripsi LINE-1 melalui deasetilasi H3K56ac dan ribosilasi KAP1, mencegah pembentukan cDNA sitosolik perusak.',
+    },
+  ]
+
+  const silencingNarrativeId = `Sintesis peredaman retrotransposon epigenetik & surveilans LINE-1 untuk episode "${episode.title}". Status peredaman: ${silencingStateLabel}, tingkat vigilansi: ${vigilanceTierLabel}. Skor peredaman retrotransposon ${retrotransposonSilencingScore}%, indeks stabilitas heterokromatin ${heterochromatinStabilityIndex}%, dan kapasitas supresi LINE-1 ${line1SuppressionCapacity}%.`
+  const silencingNarrativeEn = `Epigenetic retrotransposon silencing & LINE-1 vigilance synthesis for episode "${episode.title}". Silencing state: ${silencingStateLabel}, vigilance tier: ${vigilanceTierLabel}. Retrotransposon silencing score ${retrotransposonSilencingScore}%, heterochromatin stability index ${heterochromatinStabilityIndex}%, and LINE-1 suppression capacity ${line1SuppressionCapacity}%.`
+
+  const retrotransposonRepressionStrategy = hasBlocked
+    ? 'Dukung stabilitas heterokromatin dan atenuasi inflamasi bawaan (jalur cGAS-STING) melalui optimasi donor metil (kolin, betain, folat bioaktif) dan kofaktor SIRT6 (NAD+/sirtuin activators) bersama dokter pengawas.'
+    : completedStages >= 3
+    ? 'Pertahankan kondensasi heterokromatin konstitutif mendalam via gaya hidup anti-inflamasi, asupan polifenol penstabil kromatin (resveratrol, apigenin), serta kebugaran kardiorespirasi yang menunjang rasio NAD+/NADH.'
+    : 'Dukung integritas metilasi DNA pulau CpG dan aktivitas SIRT6 dengan menjaga kecukupan vitamin B kompleks termetilasi, paparan sinar matahari pagi, dan perlindungan dari racun lingkungan.'
+
+  return {
+    version: 'v1',
+    episodeId: episode.id,
+    episodeTitle: episode.title,
+    silencingState,
+    silencingStateLabel,
+    vigilanceTier,
+    vigilanceTierLabel,
+    retrotransposonSilencingScore,
+    heterochromatinStabilityIndex,
+    line1SuppressionCapacity,
+    vigilanceNodes,
+    silencingNarrativeId,
+    silencingNarrativeEn,
+    retrotransposonRepressionStrategy,
+    truthClass: 'retrotransposon_silencing_simulation_proxy',
+    clinically_reviewed: false,
+    patientTruthUncompromised: true,
+    neverManufacturesBiomarkers: true,
+    epistemicHumilityPreserved: true,
+  }
+}
+
 export const STAGE_EXPECTED_DAYS: Record<CareEpisodeStageId, number> = {
   problem: 1,
   diagnosis: 2,
@@ -4230,6 +4346,7 @@ export function evaluateCareJourneyContinuity(
     const edenEpigeneticAgeReversal = deriveEdenEpigeneticAgeReversalBridge(ep)
     const edenMitochondrialHeteroplasmy = deriveEdenMitochondrialHeteroplasmyBridge(ep)
     const edenCircadianAutophagyPulse = deriveEdenCircadianAutophagyPulseBridge(ep)
+    const edenRetrotransposonSilencing = deriveEdenRetrotransposonSilencingBridge(ep)
 
     return {
       id: ep.id,
@@ -4283,6 +4400,7 @@ export function evaluateCareJourneyContinuity(
       edenEpigeneticAgeReversal,
       edenMitochondrialHeteroplasmy,
       edenCircadianAutophagyPulse,
+      edenRetrotransposonSilencing,
     }
   })
 
@@ -4480,6 +4598,14 @@ export function evaluateCareJourneyContinuity(
           s.edenCircadianAutophagyPulse?.neverManufacturesBiomarkers
       )
   ).length
+  const edenRetrotransposonSilencingReadyCount = summaries.filter(
+    (s) =>
+      Boolean(
+        s.edenRetrotransposonSilencing?.truthClass === 'retrotransposon_silencing_simulation_proxy' &&
+          s.edenRetrotransposonSilencing?.patientTruthUncompromised &&
+          s.edenRetrotransposonSilencing?.neverManufacturesBiomarkers
+      )
+  ).length
   const edenLifeBalance = deriveEdenLifeBalanceSynthesis(episodes, supportiveResults)
 
   return {
@@ -4537,6 +4663,7 @@ export function evaluateCareJourneyContinuity(
     edenEpigeneticAgeReversalReadyCount,
     edenMitochondrialHeteroplasmyReadyCount,
     edenCircadianAutophagyPulseReadyCount,
+    edenRetrotransposonSilencingReadyCount,
     edenLifeBalance,
     hasBlockedStages: blockedJourneys > 0 || stalledCount > 0,
   }
