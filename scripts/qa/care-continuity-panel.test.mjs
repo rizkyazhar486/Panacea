@@ -32,6 +32,7 @@ import {
   deriveEdenCircadianMitochondrialHarmonizerBridge,
   deriveEdenProteostasisAutophagicFluxBridge,
   deriveEdenTelomericGenomicIntegrityBridge,
+  deriveEdenSenescentInflammagingBridge,
   translateClinicalTermToEden,
   EDEN_PLAIN_LANGUAGE_GLOSSARY,
 } from '../../src/domains/clinical-operations/model/careContinuityProjection.ts'
@@ -3029,4 +3030,83 @@ test('deriveEdenTelomericGenomicIntegrityBridge & CareEpisode: Eden Telomeric Ma
   const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
   assert.ok(episodeSource.includes('data-eden-telomeric-card="v1"'), 'CareEpisode must include telomeric card')
   assert.ok(episodeSource.includes('data-eden-genomic-clusters="v1"'), 'CareEpisode must include genomic clusters grid')
+})
+
+test('deriveEdenSenescentInflammagingBridge & CareEpisode: Eden Senescent Secretome & Inflammaging Attenuation Synthesizer (T-CLIN-41 / EDEN-21)', () => {
+  const evaluatedAt = '2026-10-26T14:00:00.000Z'
+  const sampleEpisode = {
+    id: 'ce_senescent_1',
+    title: 'Senescent Secretome Clearance & Systemic Inflammaging Attenuation',
+    diagnosisCode: 'Z00.00',
+    createdAt: '2026-10-20T08:00:00.000Z',
+    updatedAt: '2026-10-26T08:00:00.000Z',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'diagnosis', status: 'done' },
+      { stage: 'treatment', status: 'done' },
+      { stage: 'recovery', status: 'active' },
+    ],
+  }
+
+  // 1. Pure deterministic derivation
+  const bridge = deriveEdenSenescentInflammagingBridge(sampleEpisode)
+  assert.equal(bridge.version, 'v1')
+  assert.equal(bridge.episodeId, 'ce_senescent_1')
+  assert.equal(bridge.senescenceBurden, 'minimal_sasp_surveillance')
+  assert.equal(bridge.senescenceBurdenLabel, 'Beban Senesen Minimal & Terkendali')
+  assert.equal(bridge.inflammagingLevel, 'quiescent_eugenerative')
+  assert.equal(bridge.inflammagingLevelLabel, 'Eugenesis Tenang & Homeostasis Sitokin Optimal')
+  assert.ok(bridge.systemicInflammagingScore >= 12 && bridge.systemicInflammagingScore <= 25)
+  assert.ok(bridge.senolyticResilienceIndex >= 80 && bridge.senolyticResilienceIndex <= 99)
+  assert.ok(bridge.secretomeSuppressionCapacity >= 80 && bridge.secretomeSuppressionCapacity <= 98)
+  assert.equal(bridge.surveillanceNodes.length, 4)
+  assert.equal(bridge.surveillanceNodes[0].nodeKind, 'senolytic_immune_clearance')
+  assert.equal(bridge.surveillanceNodes[1].nodeKind, 'sasp_cytokine_neutralization')
+  assert.equal(bridge.surveillanceNodes[2].nodeKind, 'extracellular_matrix_remodeling')
+  assert.equal(bridge.surveillanceNodes[3].nodeKind, 'anti_inflammatory_resolution_pathway')
+  assert.equal(bridge.truthClass, 'cellular_senescence_simulation_proxy')
+  assert.equal(bridge.clinically_reviewed, false)
+  assert.equal(bridge.patientTruthUncompromised, true)
+  assert.equal(bridge.neverManufacturesBiomarkers, true)
+  assert.equal(bridge.epistemicHumilityPreserved, true)
+  assert.ok(bridge.senescentNarrativeId.includes('Sintesis atenuasi senesen & inflammaging'))
+  assert.ok(bridge.senescentNarrativeEn.includes('Senescent secretome & inflammaging attenuation'))
+  assert.ok(bridge.senolyticInflammagingStrategy.includes('Pertahankan lingkungan jaringan eugenik'))
+
+  // 2. Blocked stage resilience check
+  const blockedEpisode = {
+    id: 'ce_senescent_blocked',
+    title: 'Smoldering Inflammaging & Elevated Paracrine Secretome Propagation',
+    diagnosisCode: 'M06.9',
+    createdAt: '2026-10-20T08:00:00.000Z',
+    updatedAt: '2026-10-26T08:00:00.000Z',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'diagnosis', status: 'blocked', blockedReason: 'Awaiting high-sensitivity CRP and cytokine secretome panel' },
+    ],
+  }
+  const blockedBridge = deriveEdenSenescentInflammagingBridge(blockedEpisode)
+  assert.equal(blockedBridge.senescenceBurden, 'smoldering_inflammaging_strain')
+  assert.equal(blockedBridge.senescenceBurdenLabel, 'Beban Inflamasi Kronis Smoldering')
+  assert.equal(blockedBridge.inflammagingLevel, 'elevated_secretory_phenotype')
+  assert.equal(blockedBridge.inflammagingLevelLabel, 'Fenotipe Sekretori Pro-Inflamasi Meningkat')
+  assert.ok(blockedBridge.systemicInflammagingScore >= 52)
+  assert.ok(blockedBridge.senolyticResilienceIndex <= 60)
+  assert.ok(blockedBridge.senolyticInflammagingStrategy.includes('Kendalikan penyebaran SASP'))
+
+  // 3. Rollup in evaluateCareJourneyContinuity
+  const projection = evaluateCareJourneyContinuity([sampleEpisode, blockedEpisode], evaluatedAt)
+  assert.equal(projection.edenSenescentInflammagingReadyCount, 2)
+  assert.ok(projection.episodes[0].edenSenescentInflammaging)
+  assert.equal(projection.episodes[0].edenSenescentInflammaging.truthClass, 'cellular_senescence_simulation_proxy')
+  assert.equal(projection.episodes[0].edenSenescentInflammaging.patientTruthUncompromised, true)
+  assert.equal(projection.episodes[0].edenSenescentInflammaging.neverManufacturesBiomarkers, true)
+
+  // 4. UI contracts
+  const panelSource = read('src/domains/clinical-operations/ui/CareContinuityPanel.tsx')
+  assert.ok(panelSource.includes('data-eden-senescent-inflammaging="v1"'), 'CareContinuityPanel must include senescent-inflammaging attribute')
+
+  const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
+  assert.ok(episodeSource.includes('data-eden-senescent-card="v1"'), 'CareEpisode must include senescent card')
+  assert.ok(episodeSource.includes('data-eden-surveillance-nodes="v1"'), 'CareEpisode must include surveillance nodes grid')
 })

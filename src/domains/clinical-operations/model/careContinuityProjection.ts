@@ -80,6 +80,11 @@ import type {
   EdenGenomicMaintenanceClusterKind,
   EdenGenomicMaintenanceCluster,
   EdenTelomericGenomicIntegrityBridge,
+  EdenSenescenceBurdenState,
+  EdenInflammagingIndexLevel,
+  EdenSenescentSurveillanceNodeKind,
+  EdenSenescentSurveillanceNode,
+  EdenSenescentInflammagingBridge,
   WellnessDay,
   MoodEntry,
   Circle,
@@ -191,6 +196,7 @@ export interface CareJourneyEpisodeSummary {
   edenCircadianMitochondrialHarmonizer?: EdenCircadianMitochondrialHarmonizerBridge
   edenProteostasisAutophagicFlux?: EdenProteostasisAutophagicFluxBridge
   edenTelomericGenomicIntegrity?: EdenTelomericGenomicIntegrityBridge
+  edenSenescentInflammaging?: EdenSenescentInflammagingBridge
 }
 
 export type ReadmissionRiskLevel = 'low' | 'moderate' | 'high'
@@ -288,6 +294,7 @@ export interface CareJourneyContinuityResult {
   edenCircadianMitochondrialHarmonizerReadyCount: number
   edenProteostasisAutophagicFluxReadyCount: number
   edenTelomericGenomicIntegrityReadyCount: number
+  edenSenescentInflammagingReadyCount: number
   edenLifeBalance: EdenLifeBalanceSynthesis
   hasBlockedStages: boolean
 }
@@ -3363,6 +3370,128 @@ export function deriveEdenTelomericGenomicIntegrityBridge(
   }
 }
 
+/**
+ * Eden Senescent Secretome & Inflammaging Attenuation Synthesizer (T-CLIN-41 / EDEN-21)
+ * Synthesizes senolytic immune clearance (NK/macrophages), SASP cytokine neutralization
+ * (IL-6, IL-1β, TNF-α), extracellular matrix remodeling protection, and specialized pro-resolving
+ * mediator (SPM) pathways to model biological inflammaging burden in longitudinal care episodes.
+ *
+ * Invariants:
+ * - truthClass: 'cellular_senescence_simulation_proxy'
+ * - clinically_reviewed: false
+ * - patientTruthUncompromised: true
+ * - neverManufacturesBiomarkers: true
+ * - epistemicHumilityPreserved: true
+ */
+export function deriveEdenSenescentInflammagingBridge(
+  episode: CareEpisode,
+): EdenSenescentInflammagingBridge {
+  const stages = episode.stages ?? []
+  const completedStages = stages.filter((s) => s.status === 'done').length
+  const hasBlocked = stages.some((s) => s.status === 'blocked')
+  const blockedCount = stages.filter((s) => s.status === 'blocked').length
+
+  const systemicInflammagingScore = hasBlocked
+    ? Math.min(85, 52 + blockedCount * 8)
+    : Math.max(12, 38 - completedStages * 6)
+
+  const senolyticResilienceIndex = hasBlocked
+    ? Math.max(42, 64 - blockedCount * 7)
+    : Math.min(99, 75 + completedStages * 6)
+
+  const secretomeSuppressionCapacity = hasBlocked
+    ? Math.max(40, 63 - blockedCount * 8)
+    : Math.min(98, 77 + completedStages * 5)
+
+  let senescenceBurden: EdenSenescenceBurdenState = 'adaptive_senolytic_priming'
+  let senescenceBurdenLabel = 'Priming Senolitik Adaptif Aktif'
+  let inflammagingLevel: EdenInflammagingIndexLevel = 'compensated_low_grade_surveillance'
+  let inflammagingLevelLabel = 'Surveilans Derajat Rendah Terkompensasi'
+
+  if (hasBlocked) {
+    senescenceBurden = 'smoldering_inflammaging_strain'
+    senescenceBurdenLabel = 'Beban Inflamasi Kronis Smoldering'
+    inflammagingLevel = 'elevated_secretory_phenotype'
+    inflammagingLevelLabel = 'Fenotipe Sekretori Pro-Inflamasi Meningkat'
+  } else if (completedStages >= 3) {
+    senescenceBurden = 'minimal_sasp_surveillance'
+    senescenceBurdenLabel = 'Beban Senesen Minimal & Terkendali'
+    inflammagingLevel = 'quiescent_eugenerative'
+    inflammagingLevelLabel = 'Eugenesis Tenang & Homeostasis Sitokin Optimal'
+  } else if (completedStages === 0) {
+    senescenceBurden = 'elevated_paracrine_secretome_risk'
+    senescenceBurdenLabel = 'Risiko Penyebaran Parakrin SASP Awal'
+    inflammagingLevel = 'systemic_proteolytic_cascade'
+    inflammagingLevelLabel = 'Kaskade Proteolitik & Kerusakan Matriks Dini'
+  }
+
+  const surveillanceNodes: EdenSenescentSurveillanceNode[] = [
+    {
+      nodeKind: 'senolytic_immune_clearance',
+      nodeLabel: 'Pembersihan Imun Senolitik (NK / Makrofag M1-M2)',
+      clearanceCapacityScore: hasBlocked ? 0.61 : Math.min(0.99, 0.76 + completedStages * 0.06),
+      secretomeSuppressionIndex: hasBlocked ? 0.59 : Math.min(0.98, 0.74 + completedStages * 0.06),
+      surveillanceStatus: hasBlocked ? 'compensated_clearance' : completedStages >= 2 ? 'optimal_resolution' : 'compensated_clearance',
+      mechanisticNote: 'Pengenalan antigen permukaan sel senesen oleh sel NK dan fagositosi terarah oleh makrofag teraktivasi.',
+    },
+    {
+      nodeKind: 'sasp_cytokine_neutralization',
+      nodeLabel: 'Netralisasi Sitokin SASP (IL-6 / IL-1β / TNF-α)',
+      clearanceCapacityScore: hasBlocked ? 0.64 : Math.min(0.98, 0.78 + completedStages * 0.05),
+      secretomeSuppressionIndex: hasBlocked ? 0.60 : Math.min(0.99, 0.77 + completedStages * 0.05),
+      surveillanceStatus: hasBlocked ? 'sasp_propagation' : completedStages >= 2 ? 'optimal_resolution' : 'compensated_clearance',
+      mechanisticNote: 'Peredaman jalur NF-κB dan C/EBP-β untuk membatasi pelepasan sitokin pro-inflamasi ke mikrolingkungan jaringan.',
+    },
+    {
+      nodeKind: 'extracellular_matrix_remodeling',
+      nodeLabel: 'Remodeling Matriks & Proteksi Metaloproteinase (TIMP/MMP)',
+      clearanceCapacityScore: hasBlocked ? 0.58 : Math.min(0.97, 0.73 + completedStages * 0.06),
+      secretomeSuppressionIndex: hasBlocked ? 0.57 : Math.min(0.97, 0.72 + completedStages * 0.06),
+      surveillanceStatus: hasBlocked ? 'sasp_propagation' : completedStages >= 2 ? 'optimal_resolution' : 'compensated_clearance',
+      mechanisticNote: 'Keseimbangan inhibitor jaringan metaloproteinase (TIMP-1/2) mencegah degradasi kolagen & elastin ekstraseluler.',
+    },
+    {
+      nodeKind: 'anti_inflammatory_resolution_pathway',
+      nodeLabel: 'Jalur Resolusi Pro-Resolving Mediators (Resolvin / Protectin)',
+      clearanceCapacityScore: hasBlocked ? 0.63 : Math.min(0.99, 0.77 + completedStages * 0.05),
+      secretomeSuppressionIndex: hasBlocked ? 0.62 : Math.min(0.98, 0.75 + completedStages * 0.06),
+      surveillanceStatus: hasBlocked ? 'compensated_clearance' : completedStages >= 2 ? 'optimal_resolution' : 'compensated_clearance',
+      mechanisticNote: 'Aktivasi mediator resolusi lipid terspesialisasi (SPM) untuk terminasi inflamasi tanpa imunosupresi destruktif.',
+    },
+  ]
+
+  const senescentNarrativeId = `Sintesis atenuasi senesen & inflammaging untuk episode "${episode.title}". Beban senesen: ${senescenceBurdenLabel}, tingkat inflammaging: ${inflammagingLevelLabel}. Skor inflammaging sistemik ${systemicInflammagingScore} (lebih rendah lebih tenang) dengan indeks resiliensi senolitik ${senolyticResilienceIndex}% dan kapasitas supresi secretome ${secretomeSuppressionCapacity}%.`
+  const senescentNarrativeEn = `Senescent secretome & inflammaging attenuation synthesis for episode "${episode.title}". Senescence burden: ${senescenceBurdenLabel}, inflammaging level: ${inflammagingLevelLabel}. Systemic inflammaging score ${systemicInflammagingScore} (lower is calmer) with senolytic resilience index ${senolyticResilienceIndex}% and secretome suppression capacity ${secretomeSuppressionCapacity}%.`
+
+  const senolyticInflammagingStrategy = hasBlocked
+    ? 'Kendalikan penyebaran SASP melalui protokol anti-inflamasi nutrisi terukur (asam lemak omega-3 EPA/DHA rasio tinggi, kurkumin bioavailable, dan kuersetin fitonutrien) bersama dokter pengawas untuk meredam sitokin destruktif.'
+    : completedStages >= 3
+    ? 'Pertahankan lingkungan jaringan eugenik melalui stimulasi senolisis alami via puasa berkala ringan, latihan resistensi teratur untuk pembersihan miokin, dan eliminasi paparan polutan lingkungan.'
+    : 'Dukung transisi resolusi inflamasi dengan konsumsi polifenol protektif, istirahat regeneratif memadai, dan mitigasi stres psikososial guna menjaga ketenangan imunologik.'
+
+  return {
+    version: 'v1',
+    episodeId: episode.id,
+    episodeTitle: episode.title,
+    senescenceBurden,
+    senescenceBurdenLabel,
+    inflammagingLevel,
+    inflammagingLevelLabel,
+    systemicInflammagingScore,
+    senolyticResilienceIndex,
+    secretomeSuppressionCapacity,
+    surveillanceNodes,
+    senescentNarrativeId,
+    senescentNarrativeEn,
+    senolyticInflammagingStrategy,
+    truthClass: 'cellular_senescence_simulation_proxy',
+    clinically_reviewed: false,
+    patientTruthUncompromised: true,
+    neverManufacturesBiomarkers: true,
+    epistemicHumilityPreserved: true,
+  }
+}
+
 export const STAGE_EXPECTED_DAYS: Record<CareEpisodeStageId, number> = {
   problem: 1,
   diagnosis: 2,
@@ -3632,6 +3761,7 @@ export function evaluateCareJourneyContinuity(
     const edenCircadianMitochondrialHarmonizer = deriveEdenCircadianMitochondrialHarmonizerBridge(ep)
     const edenProteostasisAutophagicFlux = deriveEdenProteostasisAutophagicFluxBridge(ep)
     const edenTelomericGenomicIntegrity = deriveEdenTelomericGenomicIntegrityBridge(ep)
+    const edenSenescentInflammaging = deriveEdenSenescentInflammagingBridge(ep)
 
     return {
       id: ep.id,
@@ -3680,6 +3810,7 @@ export function evaluateCareJourneyContinuity(
       edenCircadianMitochondrialHarmonizer,
       edenProteostasisAutophagicFlux,
       edenTelomericGenomicIntegrity,
+      edenSenescentInflammaging,
     }
   })
 
@@ -3837,6 +3968,14 @@ export function evaluateCareJourneyContinuity(
           s.edenTelomericGenomicIntegrity?.neverManufacturesBiomarkers
       )
   ).length
+  const edenSenescentInflammagingReadyCount = summaries.filter(
+    (s) =>
+      Boolean(
+        s.edenSenescentInflammaging?.truthClass === 'cellular_senescence_simulation_proxy' &&
+          s.edenSenescentInflammaging?.patientTruthUncompromised &&
+          s.edenSenescentInflammaging?.neverManufacturesBiomarkers
+      )
+  ).length
   const edenLifeBalance = deriveEdenLifeBalanceSynthesis(episodes, supportiveResults)
 
   return {
@@ -3889,6 +4028,7 @@ export function evaluateCareJourneyContinuity(
     edenCircadianMitochondrialHarmonizerReadyCount,
     edenProteostasisAutophagicFluxReadyCount,
     edenTelomericGenomicIntegrityReadyCount,
+    edenSenescentInflammagingReadyCount,
     edenLifeBalance,
     hasBlockedStages: blockedJourneys > 0 || stalledCount > 0,
   }

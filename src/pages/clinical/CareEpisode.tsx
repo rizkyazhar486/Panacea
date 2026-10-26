@@ -27,6 +27,7 @@ import {
   deriveEdenCircadianMitochondrialHarmonizerBridge,
   deriveEdenProteostasisAutophagicFluxBridge,
   deriveEdenTelomericGenomicIntegrityBridge,
+  deriveEdenSenescentInflammagingBridge,
 } from '../../domains/clinical-operations'
 import {
   CARE_EPISODE_STAGES,
@@ -659,6 +660,9 @@ function EpisodeCard({
 
       {/* Eden Telomeric Maintenance & Genomic Integrity Synthesizer (T-CLIN-40 / EDEN-20) */}
       <EdenTelomericGenomicIntegritySection episode={episode} />
+
+      {/* Eden Senescent Secretome & Inflammaging Attenuation Synthesizer (T-CLIN-41 / EDEN-21) */}
+      <EdenSenescentInflammagingSection episode={episode} />
     </Card>
   )
 }
@@ -2797,6 +2801,114 @@ function EdenTelomericGenomicIntegritySection({ episode }: { episode: CareEpisod
 
       <div className="mt-2 text-[10px] text-neutral-500 dark:text-white/50 text-right">
         ARGON EDEN ∞ §07 · Telomeric Maintenance & Genomic Integrity Synthesizer · Patient Truth Uncompromised · Never Manufactures Biomarkers
+      </div>
+    </div>
+  )
+}
+
+function EdenSenescentInflammagingSection({ episode }: { episode: CareEpisode }) {
+  const [lang, setLang] = useState<'id' | 'en'>('id')
+
+  const bridge = useMemo(
+    () => deriveEdenSenescentInflammagingBridge(episode),
+    [episode]
+  )
+
+  const narrative = lang === 'id' ? bridge.senescentNarrativeId : bridge.senescentNarrativeEn
+
+  return (
+    <div
+      className="mt-3 rounded-xl border border-rose-200 dark:border-white/10 bg-rose-50/30 dark:bg-white/[0.02] p-3.5"
+      data-eden-senescent-card="v1"
+    >
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+        <div>
+          <div className="flex items-center gap-2 flex-wrap">
+            <h4 className="text-xs font-bold text-neutral-900 dark:text-white">
+              Eden Senescent Secretome & Inflammaging Attenuation Synthesizer
+            </h4>
+            <Badge tone="brand">{bridge.senescenceBurdenLabel}</Badge>
+            <Badge tone="normal">{bridge.inflammagingLevelLabel}</Badge>
+            <Badge tone="normal">Inflammaging: {bridge.systemicInflammagingScore}</Badge>
+            <Badge tone="normal">Senolytic: {bridge.senolyticResilienceIndex}%</Badge>
+            <Badge tone="normal">Suppression: {bridge.secretomeSuppressionCapacity}%</Badge>
+          </div>
+          <p className="mt-1 text-xs font-medium text-neutral-800 dark:text-white/85">
+            {narrative}
+          </p>
+        </div>
+        <div className="flex items-center gap-1 shrink-0">
+          <button
+            type="button"
+            onClick={() => setLang('id')}
+            className={`rounded-md px-2 py-0.5 text-[11px] font-medium transition-colors ${
+              lang === 'id'
+                ? 'bg-rose-600 text-white font-bold'
+                : 'bg-white/80 dark:bg-white/5 text-neutral-700 dark:text-white/70 hover:bg-rose-100/50'
+            }`}
+          >
+            Bahasa
+          </button>
+          <button
+            type="button"
+            onClick={() => setLang('en')}
+            className={`rounded-md px-2 py-0.5 text-[11px] font-medium transition-colors ${
+              lang === 'en'
+                ? 'bg-rose-600 text-white font-bold'
+                : 'bg-white/80 dark:bg-white/5 text-neutral-700 dark:text-white/70 hover:bg-rose-100/50'
+            }`}
+          >
+            English
+          </button>
+        </div>
+      </div>
+
+      <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2" data-eden-surveillance-nodes="v1">
+        {bridge.surveillanceNodes.map((n) => {
+          const clearancePct = Math.round(n.clearanceCapacityScore * 100)
+          const suppressionPct = Math.round(n.secretomeSuppressionIndex * 100)
+          return (
+            <div
+              key={n.nodeKind}
+              className="rounded-lg border border-rose-200/50 dark:border-white/10 bg-white/70 dark:bg-white/[0.03] p-2.5"
+            >
+              <div className="text-[11px] font-bold text-neutral-900 dark:text-white truncate">
+                {n.nodeLabel}
+              </div>
+              <div className="mt-1 flex items-baseline justify-between">
+                <span className="text-base font-extrabold text-rose-800 dark:text-rose-300">
+                  {clearancePct}% <span className="text-[10px] font-normal text-neutral-500 dark:text-white/50">{lang === 'id' ? 'pembersihan' : 'clearance'}</span>
+                </span>
+                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
+                  n.surveillanceStatus === 'optimal_resolution'
+                    ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300'
+                    : n.surveillanceStatus === 'sasp_propagation'
+                    ? 'bg-rose-100 text-rose-800 dark:bg-rose-950/60 dark:text-rose-300'
+                    : 'bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300'
+                }`}>
+                  Suppression {suppressionPct}%
+                </span>
+              </div>
+              <div className="mt-1 text-[10px] text-neutral-600 dark:text-white/60">
+                {lang === 'id' ? 'Status Pengawasan:' : 'Surveillance Status:'} {n.surveillanceStatus}
+              </div>
+              <div className="mt-1 text-[9px] text-neutral-500 dark:text-white/50 italic line-clamp-2">
+                {n.mechanisticNote}
+              </div>
+            </div>
+          )
+        })}
+      </div>
+
+      <div className="mt-2.5 rounded-lg border border-rose-200/40 dark:border-white/10 bg-rose-100/30 dark:bg-white/[0.02] p-2.5 text-xs space-y-1">
+        <div className="text-[11px] text-neutral-800 dark:text-white/85">
+          <b>{lang === 'id' ? 'Strategi Atenuasi Senesen & Inflammaging:' : 'Senescent & Inflammaging Attenuation Strategy:'}</b>{' '}
+          {bridge.senolyticInflammagingStrategy}
+        </div>
+      </div>
+
+      <div className="mt-2 text-[10px] text-neutral-500 dark:text-white/50 text-right">
+        ARGON EDEN ∞ §07 · Senescent Secretome & Inflammaging Attenuation Synthesizer · Patient Truth Uncompromised · Never Manufactures Biomarkers
       </div>
     </div>
   )
