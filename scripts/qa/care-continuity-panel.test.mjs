@@ -9,6 +9,9 @@ import {
   evaluateCareJourneyContinuity,
   deriveCareJourneyTimelineEvents,
   derivePatientLongitudinalTimeline,
+  exportCareJourneySummary,
+  deriveCareJourneyCostSummary,
+  evaluateEpisodeReadmissionRisk,
 } from '../../src/domains/clinical-operations/model/careContinuityProjection.ts'
 import {
   ensureEpisodeFromVerifiedPlan,
@@ -1280,4 +1283,276 @@ test('derivePatientLongitudinalTimeline & CareEpisode: multi-episode longitudina
 
   const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
   assert.ok(episodeSource.includes('data-care-comorbidities="v1"'), 'CareEpisode must include care comorbidities attribute')
+})
+
+test('exportCareJourneySummary & CareEpisode: FHIR-aligned continuity handoff packet & digest verification (T-CLIN-17)', () => {
+  const evaluatedAt = '2026-10-25T15:00:00.000Z'
+  const episode = {
+    id: 'ce_export_1',
+    title: 'Acute Cholecystitis Surgical Pathway',
+    diagnosisCode: 'K81.0',
+    linkedComorbidities: ['I10', 'E11.9'],
+    createdAt: '2026-10-20T08:00:00.000Z',
+    updatedAt: '2026-10-24T12:00:00.000Z',
+    facilityId: 'fac_rscm',
+    facilityName: 'RSCM Kencana',
+    estimatedCostLow: 18_000_000,
+    estimatedCostHigh: 25_000_000,
+    stages: [
+      { stage: 'problem', status: 'done', updatedAt: '2026-10-20T08:30:00.000Z' },
+      { stage: 'diagnosis', status: 'done', updatedAt: '2026-10-20T09:00:00.000Z' },
+      { stage: 'plan', status: 'done', updatedAt: '2026-10-20T10:00:00.000Z' },
+      { stage: 'provider', status: 'done', updatedAt: '2026-10-21T10:00:00.000Z' },
+      { stage: 'cost', status: 'done', updatedAt: '2026-10-21T11:00:00.000Z' },
+      { stage: 'schedule', status: 'done', updatedAt: '2026-10-22T09:00:00.000Z' },
+      { stage: 'treatment', status: 'done', updatedAt: '2026-10-23T14:00:00.000Z' },
+      { stage: 'recovery', status: 'done', updatedAt: '2026-10-24T09:00:00.000Z' },
+      { stage: 'followUp', status: 'done', updatedAt: '2026-10-24T11:00:00.000Z' },
+      { stage: 'outcome', status: 'done', updatedAt: '2026-10-24T12:00:00.000Z' },
+    ],
+    milestones: [
+      {
+        id: 'ms_lap',
+        title: 'Laparoscopic cholecystectomy',
+        category: 'Definitif',
+        targetStage: 'treatment',
+        status: 'completed',
+        completedAt: '2026-10-23T14:00:00.000Z',
+      },
+    ],
+    outcomeRecord: {
+      status: 'resolved',
+      summary: 'Complete post-operative recovery without complications',
+      verifiedById: 'dr-surgeon-1',
+      verifiedAt: '2026-10-24T12:00:00.000Z',
+    },
+  }
+
+  // 1. Pure exportCareJourneySummary verification
+  const packet = exportCareJourneySummary(episode, evaluatedAt)
+  assert.equal(packet.standard, 'PANACEA-CAREPLAN-FHIR-R4-V1')
+  assert.equal(packet.episodeId, 'ce_export_1')
+  assert.equal(packet.diagnosisCode, 'K81.0')
+  assert.deepEqual(packet.linkedComorbidities, ['I10', 'E11.9'])
+  assert.equal(packet.status, 'completed')
+  assert.equal(packet.generatedAt, evaluatedAt)
+  assert.equal(packet.stages.length, 10)
+  assert.equal(packet.milestones.length, 1)
+  assert.equal(packet.provider?.facilityName, 'RSCM Kencana')
+  assert.deepEqual(packet.provider?.costRangeIdr, { min: 18_000_000, max: 25_000_000 })
+  assert.equal(packet.outcome?.status, 'resolved')
+  assert.ok(packet.timelineEventCount >= 10)
+  assert.equal(
+    packet.auditDigest,
+    'sha256:ce_export_1:2026-10-24T12:00:00.000Z:10:1:completed'
+  )
+
+  // 2. Blocked episode maps to on_hold status
+  const blockedEp = {
+    ...episode,
+    id: 'ce_blocked_export',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'provider', status: 'blocked', blockedReason: 'Awaiting referral letter' },
+    ],
+  }
+  const blockedPacket = exportCareJourneySummary(blockedEp, evaluatedAt)
+  assert.equal(blockedPacket.status, 'on_hold')
+
+  // 3. evaluateCareJourneyContinuity exportableJourneysCount
+  const projection = evaluateCareJourneyContinuity([episode, blockedEp], evaluatedAt)
+  assert.equal(projection.exportableJourneysCount, 2)
+  assert.equal(projection.episodes[0].exportSummary?.standard, 'PANACEA-CAREPLAN-FHIR-R4-V1')
+
+  // 4. UI contracts
+  const panelSource = read('src/domains/clinical-operations/ui/CareContinuityPanel.tsx')
+  assert.ok(panelSource.includes('data-care-export-ready="v1"'), 'CareContinuityPanel must include export readiness attribute')
+
+  const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
+  assert.ok(episodeSource.includes('data-care-export-summary="v1"'), 'CareEpisode must include export summary card attribute')
+})
+
+test('deriveCareJourneyCostSummary & CareContinuityPanel: Total Cost of Care financial transparency rollup & never-deny-care boundary (T-CLIN-18)', () => {
+  const evaluatedAt = '2026-10-25T16:00:00.000Z'
+
+  // Episode 1: Itemized verified cost items
+  const epItemized = {
+    id: 'ce_cost_itemized',
+    title: 'Laparoscopic Cholecystectomy',
+    createdAt: '2026-10-20T08:00:00.000Z',
+    updatedAt: '2026-10-24T10:00:00.000Z',
+    facilityId: 'fac_rscm',
+    facilityName: 'RSCM Kencana',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'cost', status: 'done' },
+    ],
+    costItems: [
+      { id: 'ci_1', label: 'Surgical fee', low: 12_000_000, high: 15_000_000, confidence: 'verified', source: 'RSCM quote' },
+      { id: 'ci_2', label: 'Hospital stay', low: 6_000_000, high: 8_000_000, confidence: 'verified', source: 'RSCM quote' },
+    ],
+  }
+
+  // Episode 2: Top-level estimated cost range
+  const epEstimated = {
+    id: 'ce_cost_est',
+    title: 'Post-op Physical Therapy',
+    createdAt: '2026-10-22T08:00:00.000Z',
+    updatedAt: '2026-10-24T11:00:00.000Z',
+    estimatedCostLow: 2_000_000,
+    estimatedCostHigh: 3_500_000,
+    costConfidence: 'estimated',
+    costSource: 'Outpatient tariff reference',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'recovery', status: 'active' },
+    ],
+  }
+
+  // Episode 3: No cost data (negative control — must never fabricate prices)
+  const epUnpriced = {
+    id: 'ce_cost_none',
+    title: 'Hypertension Follow-up',
+    createdAt: '2026-10-23T08:00:00.000Z',
+    updatedAt: '2026-10-24T12:00:00.000Z',
+    stages: [
+      { stage: 'problem', status: 'done' },
+    ],
+  }
+
+  // 1. Pure deriveCareJourneyCostSummary rollup
+  const summary = deriveCareJourneyCostSummary([epItemized, epEstimated, epUnpriced])
+  assert.equal(summary.totalEstimatedCostLow, 20_000_000)
+  assert.equal(summary.totalEstimatedCostHigh, 26_500_000)
+  assert.equal(summary.costVerifiedJourneysCount, 1)
+  assert.equal(summary.costEstimatedJourneysCount, 1)
+  assert.equal(summary.pricedJourneysCount, 2)
+  assert.equal(summary.clinicalCareBoundary, 'never-deny-care')
+
+  // 2. Negative control: unpriced episodes must produce 0 cost and 0 priced journeys
+  const emptyCost = deriveCareJourneyCostSummary([epUnpriced])
+  assert.equal(emptyCost.totalEstimatedCostLow, 0)
+  assert.equal(emptyCost.totalEstimatedCostHigh, 0)
+  assert.equal(emptyCost.pricedJourneysCount, 0)
+
+  // 3. evaluateCareJourneyContinuity projection
+  const projection = evaluateCareJourneyContinuity([epItemized, epEstimated, epUnpriced], evaluatedAt)
+  assert.equal(projection.totalEstimatedCostLow, 20_000_000)
+  assert.equal(projection.totalEstimatedCostHigh, 26_500_000)
+  assert.equal(projection.costVerifiedJourneysCount, 1)
+  assert.equal(projection.costEstimatedJourneysCount, 1)
+  assert.equal(projection.episodes[0].costConfidence, 'verified')
+  assert.equal(projection.episodes[0].costItemsCount, 2)
+  assert.equal(projection.episodes[2].estimatedCostLow, undefined)
+
+  // 4. UI contracts
+  const panelSource = read('src/domains/clinical-operations/ui/CareContinuityPanel.tsx')
+  assert.ok(panelSource.includes('data-care-cost-rollup="v1"'), 'CareContinuityPanel must include cost rollup attribute')
+
+  const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
+  assert.ok(episodeSource.includes('data-care-cost-transparency="v1"'), 'CareEpisode must include cost transparency attribute')
+})
+
+test('evaluateEpisodeReadmissionRisk & CareContinuityPanel: post-discharge follow-up & readmission risk surveillance (T-CLIN-19)', () => {
+  const evaluatedAt = '2026-10-25T16:00:00.000Z'
+  const evaluatedAtMs = Date.parse(evaluatedAt)
+
+  // 1. High-risk episode: blocked followUp stage + multi-comorbidity burden
+  const highRiskEpisode = {
+    id: 'ce_readm_high',
+    title: 'Heart Failure Post-Discharge Transition',
+    linkedComorbidities: ['I10', 'E11.9', 'N18.3'],
+    createdAt: '2026-10-10T08:00:00.000Z',
+    updatedAt: '2026-10-24T08:00:00.000Z',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'treatment', status: 'done' },
+      { stage: 'recovery', status: 'done' },
+      { stage: 'followUp', status: 'blocked', blockedReason: 'Patient missed 7-day cardiology clinic visit' },
+      { stage: 'outcome', status: 'pending' },
+    ],
+    milestones: [
+      {
+        id: 'ms_ntprobnp',
+        title: 'NT-proBNP & renal panel check',
+        category: 'Monitoring',
+        targetStage: 'followUp',
+        status: 'verified',
+      },
+    ],
+  }
+
+  const highRisk = evaluateEpisodeReadmissionRisk(highRiskEpisode, [], evaluatedAtMs)
+  assert.equal(highRisk.riskLevel, 'high')
+  assert.equal(highRisk.followUpWindowClosed, false)
+  assert.ok(highRisk.riskFactors.length >= 2)
+
+  // 2. Moderate-risk episode: active recovery with 1 unfulfilled monitoring milestone
+  const moderateRiskEpisode = {
+    id: 'ce_readm_mod',
+    title: 'Community-Acquired Pneumonia Recovery',
+    createdAt: '2026-10-20T08:00:00.000Z',
+    updatedAt: '2026-10-24T08:00:00.000Z',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'treatment', status: 'done' },
+      { stage: 'recovery', status: 'active', updatedAt: '2026-10-23T08:00:00.000Z' },
+      { stage: 'followUp', status: 'pending' },
+    ],
+    milestones: [
+      {
+        id: 'ms_cxr',
+        title: 'Follow-up chest radiograph',
+        category: 'Follow-up',
+        targetStage: 'followUp',
+        status: 'verified',
+      },
+    ],
+  }
+
+  const modRisk = evaluateEpisodeReadmissionRisk(moderateRiskEpisode, [], evaluatedAtMs)
+  assert.equal(modRisk.riskLevel, 'moderate')
+  assert.equal(modRisk.riskFactors.length, 1)
+
+  // 3. Low-risk / closed follow-up window (negative control)
+  const closedEpisode = {
+    id: 'ce_readm_low',
+    title: 'Resolved Appendectomy',
+    createdAt: '2026-10-01T08:00:00.000Z',
+    updatedAt: '2026-10-20T08:00:00.000Z',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'treatment', status: 'done' },
+      { stage: 'recovery', status: 'done' },
+      { stage: 'followUp', status: 'done' },
+      { stage: 'outcome', status: 'done' },
+    ],
+    outcomeRecord: {
+      status: 'resolved',
+      summary: 'Full surgical recovery confirmed at follow-up',
+      verifiedById: 'dr-surg',
+      verifiedAt: '2026-10-20T08:00:00.000Z',
+    },
+  }
+
+  const lowRisk = evaluateEpisodeReadmissionRisk(closedEpisode, [], evaluatedAtMs)
+  assert.equal(lowRisk.riskLevel, 'low')
+  assert.equal(lowRisk.followUpWindowClosed, true)
+  assert.equal(lowRisk.riskFactors.length, 0)
+
+  // 4. evaluateCareJourneyContinuity rollup
+  const projection = evaluateCareJourneyContinuity(
+    [highRiskEpisode, moderateRiskEpisode, closedEpisode],
+    evaluatedAt
+  )
+  assert.equal(projection.highReadmissionRiskCount, 1)
+  assert.equal(projection.moderateReadmissionRiskCount, 1)
+  assert.equal(projection.followUpWindowClosedCount, 1)
+
+  // 5. UI contracts
+  const panelSource = read('src/domains/clinical-operations/ui/CareContinuityPanel.tsx')
+  assert.ok(panelSource.includes('data-care-readmission-surveillance="v1"'), 'CareContinuityPanel must include readmission surveillance attribute')
+
+  const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
+  assert.ok(episodeSource.includes('data-care-followup-surveillance="v1"'), 'CareEpisode must include follow-up surveillance attribute')
 })

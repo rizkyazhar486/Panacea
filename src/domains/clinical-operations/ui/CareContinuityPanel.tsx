@@ -494,6 +494,47 @@ export function CareContinuityPanel({
                   </span>
                 </div>
               )}
+              {careJourneys.exportableJourneysCount > 0 && (
+                <div className="flex justify-between text-cyan-300" data-care-export-ready="v1">
+                  <span>Continuity handoff:</span>
+                  <span className="font-bold">
+                    {careJourneys.exportableJourneysCount} FHIR packet(s) ready
+                  </span>
+                </div>
+              )}
+              {(careJourneys.costVerifiedJourneysCount > 0 || careJourneys.costEstimatedJourneysCount > 0) && (
+                <div className="flex justify-between text-emerald-300" data-care-cost-rollup="v1">
+                  <span>Cost transparency:</span>
+                  <span className="font-bold">
+                    {careJourneys.costVerifiedJourneysCount > 0
+                      ? `${careJourneys.costVerifiedJourneysCount} verified`
+                      : `${careJourneys.costEstimatedJourneysCount} est.`}
+                    {' · IDR '}
+                    {(careJourneys.totalEstimatedCostLow / 1_000_000).toFixed(1)}M–{(careJourneys.totalEstimatedCostHigh / 1_000_000).toFixed(1)}M
+                  </span>
+                </div>
+              )}
+              {(careJourneys.highReadmissionRiskCount > 0 || careJourneys.moderateReadmissionRiskCount > 0 || careJourneys.followUpWindowClosedCount > 0) && (
+                <div
+                  className={`flex justify-between ${
+                    careJourneys.highReadmissionRiskCount > 0
+                      ? 'text-rose-300'
+                      : careJourneys.moderateReadmissionRiskCount > 0
+                      ? 'text-amber-300'
+                      : 'text-emerald-300'
+                  }`}
+                  data-care-readmission-surveillance="v1"
+                >
+                  <span>Post-discharge surveillance:</span>
+                  <span className="font-bold">
+                    {careJourneys.highReadmissionRiskCount > 0
+                      ? `${careJourneys.highReadmissionRiskCount} HIGH RISK`
+                      : careJourneys.moderateReadmissionRiskCount > 0
+                      ? `${careJourneys.moderateReadmissionRiskCount} MODERATE RISK`
+                      : `${careJourneys.followUpWindowClosedCount} closed`}
+                  </span>
+                </div>
+              )}
 
               {careJourneys.episodes.length > 0 && (
                 <div className="mt-3 border-t border-white/8 pt-2">
