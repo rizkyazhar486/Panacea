@@ -725,6 +725,47 @@ export interface EdenMultidimensionalConsciousnessBridge {
   phenomenologicalExperiencePreserved: true
 }
 
+export type EdenRealityLatticeLayerKind =
+  | 'observed_clinical_evidence'
+  | 'derived_physiological_resilience'
+  | 'model_estimated_trajectory'
+  | 'mechanistic_simulation'
+  | 'phenomenological_human_experience'
+  | 'cosmic_planetary_rhythm'
+
+export type EdenBioCosmicResonanceState =
+  | 'pristine_harmony'
+  | 'dynamic_homeokinesis'
+  | 'restorative_recalibration'
+  | 'acute_stabilization_needed'
+
+export interface EdenRealityLatticeLayer {
+  layer: EdenRealityLatticeLayerKind
+  layerLabel: string
+  truthClass: 'observed' | 'derived' | 'model_estimated' | 'mechanistic_simulation' | 'phenomenological' | 'cosmic_rhythm'
+  coherenceIndex: number
+  groundingSummaryId: string
+  groundingSummaryEn: string
+  scientificOrExperientialSource: string
+}
+
+export interface EdenBioCosmicSymphonyBridge {
+  version: 'v1'
+  episodeId: string
+  episodeTitle: string
+  resonanceState: EdenBioCosmicResonanceState
+  resonanceStateLabel: string
+  symphonyHarmonyScore: number
+  layers: EdenRealityLatticeLayer[]
+  bioCosmicNarrativeId: string
+  bioCosmicNarrativeEn: string
+  universalFlourishingTrajectory: string
+  realityLatticeClass: 'governed_multi_scale_projection'
+  patientTruthUncompromised: true
+  noSpeculativeClinicalActuation: true
+  epistemicHumilityPreserved: true
+}
+
 export interface CareJourneyExportSummary {
   standard: 'PANACEA-CAREPLAN-FHIR-R4-V1'
   generatedAt: string

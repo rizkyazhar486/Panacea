@@ -26,6 +26,7 @@ import {
   deriveEdenMultiModelRegenerationBridge,
   deriveEdenQuantumBioPhotonicBridge,
   deriveEdenMultidimensionalConsciousnessBridge,
+  deriveEdenBioCosmicSymphonyBridge,
   translateClinicalTermToEden,
   EDEN_PLAIN_LANGUAGE_GLOSSARY,
 } from '../../src/domains/clinical-operations/model/careContinuityProjection.ts'
@@ -2569,4 +2570,81 @@ test('34. Eden Astral Holographic Projection & Multidimensional Biological Consc
   const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
   assert.ok(episodeSource.includes('data-eden-multidimensional-consciousness-card="v1"'), 'CareEpisode must include multidimensional consciousness card')
   assert.ok(episodeSource.includes('data-eden-consciousness-scales="v1"'), 'CareEpisode must include consciousness scales grid')
+})
+
+test('deriveEdenBioCosmicSymphonyBridge & CareEpisode: Eden Bio-Cosmic Symphony & Multi-Scale Reality Lattice Bridge (T-CLIN-35 / EDEN-15)', () => {
+  const evaluatedAt = '2026-10-26T12:00:00.000Z'
+  const sampleEpisode = {
+    id: 'ce_biocosmic_1',
+    title: 'Cellular Renewal & Metabolic Harmony',
+    diagnosisCode: 'E11.9',
+    createdAt: '2026-10-20T08:00:00.000Z',
+    updatedAt: '2026-10-26T08:00:00.000Z',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'diagnosis', status: 'done' },
+      { stage: 'treatment', status: 'done' },
+      { stage: 'recovery', status: 'active' },
+    ],
+  }
+
+  // 1. Pure deterministic derivation
+  const bridge = deriveEdenBioCosmicSymphonyBridge(sampleEpisode)
+  assert.equal(bridge.version, 'v1')
+  assert.equal(bridge.episodeId, 'ce_biocosmic_1')
+  assert.equal(bridge.resonanceState, 'pristine_harmony')
+  assert.equal(bridge.resonanceStateLabel, 'Simfoni Kosmis Seimbang')
+  assert.ok(bridge.symphonyHarmonyScore >= 75 && bridge.symphonyHarmonyScore <= 99)
+  assert.equal(bridge.layers.length, 6)
+  assert.equal(bridge.layers[0].layer, 'observed_clinical_evidence')
+  assert.equal(bridge.layers[0].truthClass, 'observed')
+  assert.equal(bridge.layers[1].layer, 'derived_physiological_resilience')
+  assert.equal(bridge.layers[1].truthClass, 'derived')
+  assert.equal(bridge.layers[2].layer, 'model_estimated_trajectory')
+  assert.equal(bridge.layers[2].truthClass, 'model_estimated')
+  assert.equal(bridge.layers[3].layer, 'mechanistic_simulation')
+  assert.equal(bridge.layers[3].truthClass, 'mechanistic_simulation')
+  assert.equal(bridge.layers[4].layer, 'phenomenological_human_experience')
+  assert.equal(bridge.layers[4].truthClass, 'phenomenological')
+  assert.equal(bridge.layers[5].layer, 'cosmic_planetary_rhythm')
+  assert.equal(bridge.layers[5].truthClass, 'cosmic_rhythm')
+  assert.equal(bridge.realityLatticeClass, 'governed_multi_scale_projection')
+  assert.equal(bridge.patientTruthUncompromised, true)
+  assert.equal(bridge.noSpeculativeClinicalActuation, true)
+  assert.equal(bridge.epistemicHumilityPreserved, true)
+  assert.ok(bridge.bioCosmicNarrativeId.includes('Simfoni bio-kosmis untuk episode'))
+  assert.ok(bridge.bioCosmicNarrativeEn.includes('Bio-cosmic symphony for episode'))
+  assert.ok(bridge.universalFlourishingTrajectory.includes('Penyelarasan komputasional dan manusiawi'))
+
+  // 2. Blocked stage resilience check
+  const blockedEpisode = {
+    id: 'ce_biocosmic_blocked',
+    title: 'Acute Multiorgan Strain',
+    diagnosisCode: 'R68.8',
+    createdAt: '2026-10-20T08:00:00.000Z',
+    updatedAt: '2026-10-26T08:00:00.000Z',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'diagnosis', status: 'blocked', blockedReason: 'Awaiting laboratory confirmation' },
+    ],
+  }
+  const blockedBridge = deriveEdenBioCosmicSymphonyBridge(blockedEpisode)
+  assert.equal(blockedBridge.resonanceState, 'acute_stabilization_needed')
+  assert.equal(blockedBridge.resonanceStateLabel, 'Stabilisasi Klinis Diperlukan')
+  assert.ok(blockedBridge.symphonyHarmonyScore <= 70)
+
+  // 3. Rollup in evaluateCareJourneyContinuity
+  const projection = evaluateCareJourneyContinuity([sampleEpisode, blockedEpisode], evaluatedAt)
+  assert.equal(projection.edenBioCosmicSymphonyReadyCount, 2)
+  assert.ok(projection.episodes[0].edenBioCosmicSymphony)
+  assert.equal(projection.episodes[0].edenBioCosmicSymphony.realityLatticeClass, 'governed_multi_scale_projection')
+  assert.equal(projection.episodes[0].edenBioCosmicSymphony.patientTruthUncompromised, true)
+
+  // 4. UI contracts
+  const panelSource = read('src/domains/clinical-operations/ui/CareContinuityPanel.tsx')
+  assert.ok(panelSource.includes('data-eden-bio-cosmic-symphony="v1"'), 'CareContinuityPanel must include bio-cosmic symphony attribute')
+
+  const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
+  assert.ok(episodeSource.includes('data-eden-bio-cosmic-card="v1"'), 'CareEpisode must include bio-cosmic card')
+  assert.ok(episodeSource.includes('data-eden-reality-lattice="v1"'), 'CareEpisode must include reality lattice grid')
 })

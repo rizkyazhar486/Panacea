@@ -21,6 +21,7 @@ import {
   deriveEdenMultiModelRegenerationBridge,
   deriveEdenQuantumBioPhotonicBridge,
   deriveEdenMultidimensionalConsciousnessBridge,
+  deriveEdenBioCosmicSymphonyBridge,
 } from '../../domains/clinical-operations'
 import {
   CARE_EPISODE_STAGES,
@@ -635,6 +636,9 @@ function EpisodeCard({
 
       {/* Eden Astral Holographic Projection & Multidimensional Biological Consciousness Bridge (T-CLIN-33 / EDEN-13) */}
       <EdenMultidimensionalConsciousnessSection episode={episode} />
+
+      {/* Eden Bio-Cosmic Symphony & Multi-Scale Reality Lattice Bridge (T-CLIN-35 / EDEN-15) */}
+      <EdenBioCosmicSymphonySection episode={episode} />
     </Card>
   )
 }
@@ -2142,6 +2146,111 @@ function EdenMultidimensionalConsciousnessSection({ episode }: { episode: CareEp
 
       <div className="mt-2 text-[10px] text-neutral-500 dark:text-white/50 text-right">
         ARGON EDEN ∞ §12 · Multidimensional consciousness projection · No autonomous neurological diagnosis · Phenomenological experience preserved
+      </div>
+    </div>
+  )
+}
+
+function EdenBioCosmicSymphonySection({ episode }: { episode: CareEpisode }) {
+  const [lang, setLang] = useState<'id' | 'en'>('id')
+
+  const bridge = useMemo(
+    () => deriveEdenBioCosmicSymphonyBridge(episode),
+    [episode]
+  )
+
+  const narrative = lang === 'id' ? bridge.bioCosmicNarrativeId : bridge.bioCosmicNarrativeEn
+
+  return (
+    <div
+      className="mt-3 rounded-xl border border-violet-200 dark:border-white/10 bg-violet-50/30 dark:bg-white/[0.02] p-3.5"
+      data-eden-bio-cosmic-card="v1"
+    >
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+        <div>
+          <div className="flex items-center gap-2 flex-wrap">
+            <h4 className="text-xs font-bold text-neutral-900 dark:text-white">
+              Eden Bio-Cosmic Symphony & Multi-Scale Reality Lattice Bridge
+            </h4>
+            <Badge tone="brand">{bridge.resonanceStateLabel}</Badge>
+            <Badge tone="normal">Harmony {bridge.symphonyHarmonyScore}%</Badge>
+          </div>
+          <p className="mt-1 text-xs font-medium text-neutral-800 dark:text-white/85">
+            {narrative}
+          </p>
+        </div>
+        <div className="flex items-center gap-1 shrink-0">
+          <button
+            type="button"
+            onClick={() => setLang('id')}
+            className={`rounded-md px-2 py-0.5 text-[11px] font-medium transition-colors ${
+              lang === 'id'
+                ? 'bg-violet-600 text-white font-bold'
+                : 'bg-white/80 dark:bg-white/5 text-neutral-700 dark:text-white/70 hover:bg-violet-100/50'
+            }`}
+          >
+            Bahasa
+          </button>
+          <button
+            type="button"
+            onClick={() => setLang('en')}
+            className={`rounded-md px-2 py-0.5 text-[11px] font-medium transition-colors ${
+              lang === 'en'
+                ? 'bg-violet-600 text-white font-bold'
+                : 'bg-white/80 dark:bg-white/5 text-neutral-700 dark:text-white/70 hover:bg-violet-100/50'
+            }`}
+          >
+            English
+          </button>
+        </div>
+      </div>
+
+      <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2" data-eden-reality-lattice="v1">
+        {bridge.layers.map((l) => {
+          const summary = lang === 'id' ? l.groundingSummaryId : l.groundingSummaryEn
+          return (
+            <div
+              key={l.layer}
+              className="rounded-lg border border-violet-200/50 dark:border-white/10 bg-white/70 dark:bg-white/[0.03] p-2.5"
+            >
+              <div className="flex items-center justify-between gap-1">
+                <span className="text-[11px] font-bold text-neutral-700 dark:text-white/80 truncate">
+                  {l.layerLabel}
+                </span>
+                <span className="text-[10px] uppercase font-semibold text-violet-700 dark:text-violet-300 shrink-0">
+                  {l.truthClass}
+                </span>
+              </div>
+              <div className="mt-1.5 flex items-center justify-between text-[10px]">
+                <span className="text-neutral-500 dark:text-white/50">Koherensi</span>
+                <span className="font-extrabold text-violet-700 dark:text-violet-300">{l.coherenceIndex}%</span>
+              </div>
+              <div className="mt-1 h-1.5 w-full rounded-full bg-violet-100 dark:bg-white/10 overflow-hidden">
+                <div
+                  className="h-full rounded-full bg-gradient-to-r from-violet-500 to-indigo-500"
+                  style={{ width: `${l.coherenceIndex}%` }}
+                />
+              </div>
+              <p className="mt-1.5 text-[10px] text-neutral-600 dark:text-neutral-300">
+                {summary}
+              </p>
+              <div className="mt-1 text-[9px] text-neutral-400 dark:text-white/40 italic truncate">
+                {l.scientificOrExperientialSource}
+              </div>
+            </div>
+          )
+        })}
+      </div>
+
+      <div className="mt-2.5 rounded-lg border border-violet-200/40 dark:border-white/10 bg-violet-100/30 dark:bg-white/[0.02] p-2.5 text-xs space-y-1">
+        <div className="text-[11px] text-neutral-800 dark:text-white/85">
+          <b>{lang === 'id' ? 'Trajektori Kemakmuran Universal:' : 'Universal Flourishing Trajectory:'}</b>{' '}
+          {bridge.universalFlourishingTrajectory}
+        </div>
+      </div>
+
+      <div className="mt-2 text-[10px] text-neutral-500 dark:text-white/50 text-right">
+        ARGON EDEN ∞ §13-14 · Governed Multi-Scale Reality Lattice · Patient Truth Uncompromised · Epistemic Humility Preserved
       </div>
     </div>
   )
