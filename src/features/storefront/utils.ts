@@ -12,3 +12,9 @@ export function cn(...inputs: (string | boolean | undefined | null | Record<stri
     })
     .join(' ')
 }
+
+export function scrollToSection(id: string) {
+  if (typeof document !== 'undefined') {
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
+  }
+}

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { ArrowLeft, ArrowRight, Check, Copy, Minus, Plus, ShoppingBag, Trash2, XIcon } from '../icons'
 import type { CartItem } from '../types/shop'
 import { formatPrice, productById } from '../data/products'
+import { scrollToSection } from '../utils'
 
 export function CartDrawer({
   open,
@@ -105,12 +106,12 @@ export function CartDrawer({
             <ShoppingBag size={32} strokeWidth={1.3} aria-hidden="true" />
             <h3 className="mt-4 text-xl font-medium">Your ritual starts here.</h3>
             <p className="mt-2 text-sm text-stone-600 max-w-xs">Explore targeted formulas or build a personalized collection with 20% savings.</p>
-            <a href="#catalog" className="button button--green mt-6" onClick={handleClose}>
+            <button type="button" className="button button--green mt-6" onClick={() => { handleClose(); scrollToSection('catalog') }}>
               Explore formulas <ArrowRight size={17} />
-            </a>
-            <a href="#vault-builder" className="text-link mt-4" onClick={handleClose}>
+            </button>
+            <button type="button" className="text-link mt-4" onClick={() => { handleClose(); scrollToSection('vault-builder') }}>
               Build a Private Vault
-            </a>
+            </button>
           </div>
         ) : view === 'preview' ? (
           <div className="checkout-preview flex-1 overflow-y-auto p-6 flex flex-col gap-4">

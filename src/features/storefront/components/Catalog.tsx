@@ -5,6 +5,7 @@ import type { Product } from '../data/products'
 import { categories, products } from '../data/products'
 import { ProductCard } from './ProductCard'
 import { Reveal } from './Reveal'
+import { scrollToSection } from '../utils'
 
 export function Catalog({ onView, onAdd }: { onView: (product: Product) => void; onAdd: (product: Product) => void }) {
   const [filter, setFilter] = useState<(typeof categories)[number]>('All formulas')
@@ -40,7 +41,7 @@ export function Catalog({ onView, onAdd }: { onView: (product: Product) => void;
             {visible.map((product) => <ProductCard key={product.id} product={product} onView={onView} onAdd={onAdd} />)}
           </motion.div>
         </AnimatePresence>
-        <div className="catalog__foot"><p>Prefer a collection that starts with you?</p><a href="#vault-builder" className="text-link">Build your Private Vault <ArrowUpRight size={16} /></a></div>
+        <div className="catalog__foot"><p>Prefer a collection that starts with you?</p><button type="button" onClick={() => scrollToSection('vault-builder')} className="text-link">Build your Private Vault <ArrowUpRight size={16} /></button></div>
       </div>
     </section>
   )

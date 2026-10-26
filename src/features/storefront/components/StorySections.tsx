@@ -3,6 +3,7 @@ import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { ArrowLeft, ArrowRight, ArrowUpRight, Plus } from '../icons'
 import { Reveal } from './Reveal'
 import { testimonials } from '../data/products'
+import { scrollToSection } from '../utils'
 
 const scienceSteps = [
   {
@@ -134,9 +135,9 @@ export function Services() {
       <div className="page-shell services__grid">
         <Reveal className="services__intro"><p className="eyebrow">The PanaceaMed service</p><h2>Considered care,<br /><em>beyond the jar.</em></h2><p>Less friction between wanting to feel your best and building a routine that makes sense to you.</p></Reveal>
         <div className="services__list">
-          <details><summary><span>Personalized formulas</span><Plus size={20} aria-hidden="true" /></summary><div><p>Build a collection around your preferred areas of focus and routine. Recommendations are editable at every step, because personalization should never mean giving up control.</p><a href="#vault-builder" className="text-link">Create your collection <ArrowRight size={15} /></a></div></details>
-          <details><summary><span>Bundle savings</span><Plus size={20} aria-hidden="true" /></summary><div><p>Every Private Vault saves 20% on the formulas inside it. The discount is shown clearly before you add the collection to your cart, with no subscription required.</p><a href="#vault-builder" className="text-link">See your saving <ArrowRight size={15} /></a></div></details>
-          <details><summary><span>Scientifically tested</span><Plus size={20} aria-hidden="true" /></summary><div><p>Our quality approach centers on ingredient review, controlled manufacturing, and product testing. Testing supports quality and consistency; it does not turn a supplement into a treatment or guarantee an outcome.</p><a href="#our-standard" className="text-link">Explore our standard <ArrowRight size={15} /></a></div></details>
+          <details><summary><span>Personalized formulas</span><Plus size={20} aria-hidden="true" /></summary><div><p>Build a collection around your preferred areas of focus and routine. Recommendations are editable at every step, because personalization should never mean giving up control.</p><button type="button" onClick={() => scrollToSection('vault-builder')} className="text-link">Create your collection <ArrowRight size={15} /></button></div></details>
+          <details><summary><span>Bundle savings</span><Plus size={20} aria-hidden="true" /></summary><div><p>Every Private Vault saves 20% on the formulas inside it. The discount is shown clearly before you add the collection to your cart, with no subscription required.</p><button type="button" onClick={() => scrollToSection('vault-builder')} className="text-link">See your saving <ArrowRight size={15} /></button></div></details>
+          <details><summary><span>Scientifically tested</span><Plus size={20} aria-hidden="true" /></summary><div><p>Our quality approach centers on ingredient review, controlled manufacturing, and product testing. Testing supports quality and consistency; it does not turn a supplement into a treatment or guarantee an outcome.</p><button type="button" onClick={() => scrollToSection('our-standard')} className="text-link">Explore our standard <ArrowRight size={15} /></button></div></details>
         </div>
       </div>
     </section>
@@ -173,7 +174,7 @@ export function Faq() {
   return (
     <section className="faq section-space" id="faq">
       <div className="page-shell faq__grid">
-        <Reveal className="faq__intro"><p className="eyebrow">Good to know</p><h2>A few clear<br /><em>answers.</em></h2><p>Still deciding? Begin with the essentials, then make the routine your own.</p><a href="#vault-builder" className="text-link">Build your Private Vault <ArrowUpRight size={16} /></a></Reveal>
+        <Reveal className="faq__intro"><p className="eyebrow">Good to know</p><h2>A few clear<br /><em>answers.</em></h2><p>Still deciding? Begin with the essentials, then make the routine your own.</p><button type="button" onClick={() => scrollToSection('vault-builder')} className="text-link">Build your Private Vault <ArrowUpRight size={16} /></button></Reveal>
         <div className="faq__list">
           {faqs.map((faq) => <details key={faq.question}><summary>{faq.question}<Plus size={19} aria-hidden="true" /></summary><p>{faq.answer}</p></details>)}
         </div>
@@ -187,7 +188,7 @@ export function ClosingCta() {
     <section className="closing-cta">
       <div className="page-shell closing-cta__inner">
         <Reveal><p className="eyebrow">Your next ritual</p><h2>Wellness, well considered.<br /><em>Made yours.</em></h2></Reveal>
-        <Reveal className="closing-cta__action" delay={0.08}><p>Start with one formula, or save 20% on a collection built around you.</p><a href="#vault-builder" className="button button--orange">Build your private vault <ArrowRight size={18} /></a></Reveal>
+        <Reveal className="closing-cta__action" delay={0.08}><p>Start with one formula, or save 20% on a collection built around you.</p><button type="button" onClick={() => scrollToSection('vault-builder')} className="button button--orange">Build your private vault <ArrowRight size={18} /></button></Reveal>
       </div>
     </section>
   )

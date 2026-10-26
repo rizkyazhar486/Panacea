@@ -12,6 +12,7 @@ import { ClosingCta, Faq, ScienceQuality, Services, Testimonials, WhyPanacea } f
 import type { Product } from './data/products'
 import { productById } from './data/products'
 import type { CartItem, SavedVault } from './types/shop'
+import { scrollToSection } from './utils'
 import '../../styles/storefront.css'
 
 interface Notification {
@@ -118,9 +119,13 @@ export function StorefrontPage() {
 
   return (
     <div className="storefront-app antialiased selection:bg-amber-200 selection:text-stone-900">
-      <a href="#main" className="skip-link sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:p-3 focus:bg-white focus:text-black">
+      <button
+        type="button"
+        onClick={() => scrollToSection('main')}
+        className="skip-link sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:p-3 focus:bg-white focus:text-black"
+      >
         Skip to content
-      </a>
+      </button>
       <Header cartCount={cartCount} onCartOpen={() => setCartOpen(true)} />
       <main id="main">
         <Hero />
@@ -147,28 +152,49 @@ export function StorefrontPage() {
         <div className="page-shell">
           <div className="footer__top">
             <div className="footer__brand">
-              <a href="#top" aria-label="PanaceaMed home">
+              <button
+                type="button"
+                onClick={() => scrollToSection('top')}
+                className="bg-transparent border-0 p-0 cursor-pointer text-left"
+                aria-label="PanaceaMed home"
+              >
                 <Brand light />
-              </a>
+              </button>
               <p>Precision formulas.<br />Personal rituals.</p>
             </div>
             <div className="footer__nav">
               <div>
                 <span>EXPLORE</span>
-                <a href="#catalog">Catalog</a>
-                <a href="#private-vault">Private Vault</a>
-                <a href="#why-panacea">Why Panacea</a>
+                <button type="button" onClick={() => scrollToSection('catalog')} className="bg-transparent border-0 cursor-pointer p-0 text-left block text-stone-300 hover:text-white">
+                  Catalog
+                </button>
+                <button type="button" onClick={() => scrollToSection('private-vault')} className="bg-transparent border-0 cursor-pointer p-0 text-left block text-stone-300 hover:text-white">
+                  Private Vault
+                </button>
+                <button type="button" onClick={() => scrollToSection('why-panacea')} className="bg-transparent border-0 cursor-pointer p-0 text-left block text-stone-300 hover:text-white">
+                  Why Panacea
+                </button>
               </div>
               <div>
                 <span>DISCOVER</span>
-                <a href="#our-standard">Our Standard</a>
-                <a href="#services">Services</a>
-                <a href="#faq">FAQ</a>
+                <button type="button" onClick={() => scrollToSection('our-standard')} className="bg-transparent border-0 cursor-pointer p-0 text-left block text-stone-300 hover:text-white">
+                  Our Standard
+                </button>
+                <button type="button" onClick={() => scrollToSection('services')} className="bg-transparent border-0 cursor-pointer p-0 text-left block text-stone-300 hover:text-white">
+                  Services
+                </button>
+                <button type="button" onClick={() => scrollToSection('faq')} className="bg-transparent border-0 cursor-pointer p-0 text-left block text-stone-300 hover:text-white">
+                  FAQ
+                </button>
               </div>
             </div>
-            <a href="#vault-builder" className="footer__cta">
+            <button
+              type="button"
+              onClick={() => scrollToSection('vault-builder')}
+              className="footer__cta bg-transparent border-0 cursor-pointer text-left"
+            >
               Build your collection <ArrowUpRight size={21} />
-            </a>
+            </button>
           </div>
           <div className="footer__disclaimer">
             <strong>Medical disclaimer</strong>
@@ -181,9 +207,13 @@ export function StorefrontPage() {
           <div className="footer__bottom">
             <span>© 2026 PANACEAMED. ALL RIGHTS RESERVED.</span>
             <span>STOREFRONT PREVIEW · BROWSER-LOCAL CART & VAULT</span>
-            <a href="#top">
+            <button
+              type="button"
+              onClick={() => scrollToSection('top')}
+              className="bg-transparent border-0 p-0 text-inherit cursor-pointer inline-flex items-center gap-1.5"
+            >
               Back to top <ArrowUp size={14} />
-            </a>
+            </button>
           </div>
         </div>
       </footer>

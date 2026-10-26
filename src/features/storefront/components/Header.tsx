@@ -1,12 +1,13 @@
 import { useState } from 'react'
 import { ArrowUpRight, Menu, ShoppingBag, XIcon } from '../icons'
 import { Brand } from './Brand'
+import { scrollToSection } from '../utils'
 
 const navigation = [
-  { label: 'Catalog', href: '#catalog' },
-  { label: 'Private Vault', href: '#private-vault' },
-  { label: 'Why Panacea', href: '#why-panacea' },
-  { label: 'Our Standard', href: '#our-standard' },
+  { label: 'Catalog', targetId: 'catalog' },
+  { label: 'Private Vault', targetId: 'private-vault' },
+  { label: 'Why Panacea', targetId: 'why-panacea' },
+  { label: 'Our Standard', targetId: 'our-standard' },
 ]
 
 export function Header({ cartCount, onCartOpen }: { cartCount: number; onCartOpen: () => void }) {
@@ -14,21 +15,35 @@ export function Header({ cartCount, onCartOpen }: { cartCount: number; onCartOpe
 
   return (
     <>
-      <a className="announcement" href="#private-vault">
+      <button
+        type="button"
+        className="announcement w-full block text-center"
+        onClick={() => scrollToSection('private-vault')}
+      >
         <span>Private Vault</span>
         <span className="announcement__message">Your personal collection. Always 20% less.</span>
         <ArrowUpRight size={15} aria-hidden="true" />
-      </a>
+      </button>
       <header className="site-header">
         <div className="site-header__inner page-shell">
-          <a href="#top" className="site-header__brand" aria-label="PanaceaMed home">
+          <button
+            type="button"
+            onClick={() => scrollToSection('top')}
+            className="site-header__brand bg-transparent border-0 p-0 cursor-pointer text-left"
+            aria-label="PanaceaMed home"
+          >
             <Brand />
-          </a>
+          </button>
           <nav className="site-header__nav" aria-label="Primary navigation">
             {navigation.map((item) => (
-              <a key={item.href} href={item.href}>
+              <button
+                key={item.targetId}
+                type="button"
+                onClick={() => scrollToSection(item.targetId)}
+                className="bg-transparent border-0 cursor-pointer p-0 font-inherit"
+              >
                 {item.label}
-              </a>
+              </button>
             ))}
           </nav>
           <div className="site-header__actions">
@@ -69,16 +84,19 @@ export function Header({ cartCount, onCartOpen }: { cartCount: number; onCartOpe
               </div>
               <nav className="mobile-menu__nav flex flex-col gap-4" aria-label="Mobile navigation">
                 {navigation.map((item, index) => (
-                  <a
-                    key={item.href}
-                    href={item.href}
-                    onClick={() => setMenuOpen(false)}
-                    className="flex items-center justify-between py-3 border-b border-stone-800 text-lg hover:text-amber-300 transition-colors"
+                  <button
+                    key={item.targetId}
+                    type="button"
+                    onClick={() => {
+                      setMenuOpen(false)
+                      scrollToSection(item.targetId)
+                    }}
+                    className="flex items-center justify-between py-3 border-b border-stone-800 text-lg hover:text-amber-300 transition-colors w-full text-left bg-transparent"
                   >
                     <span className="text-xs text-stone-500 font-mono">0{index + 1}</span>
                     <span className="font-serif">{item.label}</span>
                     <ArrowUpRight size={18} aria-hidden="true" />
-                  </a>
+                  </button>
                 ))}
               </nav>
             </div>

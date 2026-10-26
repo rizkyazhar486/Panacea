@@ -1,6 +1,7 @@
 import { useRef } from 'react'
 import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion'
 import { ArrowDown, ArrowUpRight } from '../icons'
+import { scrollToSection } from '../utils'
 
 export function Hero() {
   const sectionRef = useRef<HTMLElement>(null)
@@ -39,8 +40,8 @@ export function Hero() {
             animate={{ y: 0 }}
             transition={{ duration: 0.55, delay: 0.27 }}
           >
-            <a href="#vault-builder" className="button button--orange">Build your private vault <ArrowUpRight size={18} aria-hidden="true" /></a>
-            <a href="#catalog" className="text-link">Explore the formulas <ArrowDown size={16} aria-hidden="true" /></a>
+            <button type="button" onClick={() => scrollToSection('vault-builder')} className="button button--orange">Build your private vault <ArrowUpRight size={18} aria-hidden="true" /></button>
+            <button type="button" onClick={() => scrollToSection('catalog')} className="text-link">Explore the formulas <ArrowDown size={16} aria-hidden="true" /></button>
           </motion.div>
           <div className="hero__proof" aria-label="PanaceaMed principles">
             <div><strong>04</strong><span>Targeted formulas</span></div>
