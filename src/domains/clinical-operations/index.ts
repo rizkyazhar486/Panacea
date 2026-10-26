@@ -53,11 +53,13 @@ export {
   deriveCareJourneyTimelineEvents,
   derivePatientLongitudinalTimeline,
   exportCareJourneySummary,
+  deriveCareJourneyCostSummary,
   STAGE_LABEL,
   type CareContinuityProjection,
   type CareContinuityProjectionInput,
   type CareJourneyContinuityResult,
   type CareJourneyEpisodeSummary,
+  type CareJourneyCostSummary,
   type CarePlanMilestoneSummary,
 } from './model/careContinuityProjection'
 

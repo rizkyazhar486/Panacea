@@ -90,6 +90,20 @@ export interface CareJourneyEpisodeSummary {
   outcomeRecord?: ClinicalOutcomeRecord
   timelineEvents?: CareJourneyTimelineEvent[]
   exportSummary?: CareJourneyExportSummary
+  estimatedCostLow?: number
+  estimatedCostHigh?: number
+  costConfidence?: 'estimated' | 'verified'
+  costSource?: string
+  costItemsCount: number
+}
+
+export interface CareJourneyCostSummary {
+  totalEstimatedCostLow: number
+  totalEstimatedCostHigh: number
+  costVerifiedJourneysCount: number
+  costEstimatedJourneysCount: number
+  pricedJourneysCount: number
+  clinicalCareBoundary: 'never-deny-care'
 }
 
 export type CareJourneyEscalationAction =
@@ -139,6 +153,10 @@ export interface CareJourneyContinuityResult {
   totalPatientTimelineEventsCount: number
   activeComorbiditiesCount: number
   exportableJourneysCount: number
+  totalEstimatedCostLow: number
+  totalEstimatedCostHigh: number
+  costVerifiedJourneysCount: number
+  costEstimatedJourneysCount: number
   hasBlockedStages: boolean
 }
 
@@ -724,6 +742,95 @@ export function exportCareJourneySummary(
   }
 }
 
+export function deriveEpisodeCostProjection(episode: CareEpisode): {
+  estimatedCostLow?: number
+  estimatedCostHigh?: number
+  costConfidence?: 'estimated' | 'verified'
+  costSource?: string
+  costItemsCount: number
+} {
+  const items = Array.isArray(episode.costItems) ? episode.costItems : []
+  const pricedItems = items.filter(
+    (i) =>
+      (typeof i.low === 'number' && Number.isFinite(i.low) && i.low >= 0) ||
+      (typeof i.high === 'number' && Number.isFinite(i.high) && i.high >= 0)
+  )
+
+  if (pricedItems.length > 0) {
+    let lowSum = 0
+    let highSum = 0
+    let allVerified = true
+    for (const item of pricedItems) {
+      const l = typeof item.low === 'number' && Number.isFinite(item.low) && item.low >= 0 ? item.low : undefined
+      const h = typeof item.high === 'number' && Number.isFinite(item.high) && item.high >= 0 ? item.high : undefined
+      lowSum += l ?? h ?? 0
+      highSum += h ?? l ?? 0
+      if (item.confidence !== 'verified') {
+        allVerified = false
+      }
+    }
+    return {
+      estimatedCostLow: lowSum,
+      estimatedCostHigh: Math.max(lowSum, highSum),
+      costConfidence: allVerified ? 'verified' : 'estimated',
+      costSource: episode.costSource || pricedItems.find((i) => i.source?.trim())?.source?.trim(),
+      costItemsCount: items.length,
+    }
+  }
+
+  const hasLow = typeof episode.estimatedCostLow === 'number' && Number.isFinite(episode.estimatedCostLow) && episode.estimatedCostLow >= 0
+  const hasHigh = typeof episode.estimatedCostHigh === 'number' && Number.isFinite(episode.estimatedCostHigh) && episode.estimatedCostHigh >= 0
+
+  if (hasLow || hasHigh) {
+    const low = hasLow ? episode.estimatedCostLow! : episode.estimatedCostHigh!
+    const high = hasHigh ? Math.max(low, episode.estimatedCostHigh!) : low
+    return {
+      estimatedCostLow: low,
+      estimatedCostHigh: high,
+      costConfidence: episode.costConfidence === 'verified' ? 'verified' : 'estimated',
+      costSource: episode.costSource,
+      costItemsCount: items.length,
+    }
+  }
+
+  return {
+    costItemsCount: items.length,
+  }
+}
+
+export function deriveCareJourneyCostSummary(
+  episodes: readonly CareEpisode[],
+): CareJourneyCostSummary {
+  let totalEstimatedCostLow = 0
+  let totalEstimatedCostHigh = 0
+  let costVerifiedJourneysCount = 0
+  let costEstimatedJourneysCount = 0
+
+  if (Array.isArray(episodes)) {
+    for (const ep of episodes) {
+      const proj = deriveEpisodeCostProjection(ep)
+      if (proj.estimatedCostLow != null && proj.estimatedCostHigh != null) {
+        totalEstimatedCostLow += proj.estimatedCostLow
+        totalEstimatedCostHigh += proj.estimatedCostHigh
+        if (proj.costConfidence === 'verified') {
+          costVerifiedJourneysCount++
+        } else {
+          costEstimatedJourneysCount++
+        }
+      }
+    }
+  }
+
+  return {
+    totalEstimatedCostLow,
+    totalEstimatedCostHigh,
+    costVerifiedJourneysCount,
+    costEstimatedJourneysCount,
+    pricedJourneysCount: costVerifiedJourneysCount + costEstimatedJourneysCount,
+    clinicalCareBoundary: 'never-deny-care',
+  }
+}
+
 export const STAGE_EXPECTED_DAYS: Record<CareEpisodeStageId, number> = {
   problem: 1,
   diagnosis: 2,
@@ -972,6 +1079,8 @@ export function evaluateCareJourneyContinuity(
       }
     }
 
+    const costProj = deriveEpisodeCostProjection(ep)
+
     return {
       id: ep.id,
       title: ep.title,
@@ -994,6 +1103,11 @@ export function evaluateCareJourneyContinuity(
       outcomeRecord: ep.outcomeRecord,
       timelineEvents: deriveCareJourneyTimelineEvents(ep, evaluatedAtMs),
       exportSummary: exportCareJourneySummary(ep, evaluatedAt),
+      estimatedCostLow: costProj.estimatedCostLow,
+      estimatedCostHigh: costProj.estimatedCostHigh,
+      costConfidence: costProj.costConfidence,
+      costSource: costProj.costSource,
+      costItemsCount: costProj.costItemsCount,
     }
   })
 
@@ -1024,6 +1138,7 @@ export function evaluateCareJourneyContinuity(
   }
   const activeComorbiditiesCount = uniqueComorbidities.size
   const exportableJourneysCount = summaries.filter((s) => Boolean(s.exportSummary)).length
+  const costSummary = deriveCareJourneyCostSummary(episodes)
 
   return {
     totalJourneys: episodes.length,
@@ -1047,6 +1162,10 @@ export function evaluateCareJourneyContinuity(
     totalPatientTimelineEventsCount,
     activeComorbiditiesCount,
     exportableJourneysCount,
+    totalEstimatedCostLow: costSummary.totalEstimatedCostLow,
+    totalEstimatedCostHigh: costSummary.totalEstimatedCostHigh,
+    costVerifiedJourneysCount: costSummary.costVerifiedJourneysCount,
+    costEstimatedJourneysCount: costSummary.costEstimatedJourneysCount,
     hasBlockedStages: blockedJourneys > 0 || stalledCount > 0,
   }
 }

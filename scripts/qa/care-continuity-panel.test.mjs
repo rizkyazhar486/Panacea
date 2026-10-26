@@ -10,6 +10,7 @@ import {
   deriveCareJourneyTimelineEvents,
   derivePatientLongitudinalTimeline,
   exportCareJourneySummary,
+  deriveCareJourneyCostSummary,
 } from '../../src/domains/clinical-operations/model/careContinuityProjection.ts'
 import {
   ensureEpisodeFromVerifiedPlan,
@@ -1368,4 +1369,85 @@ test('exportCareJourneySummary & CareEpisode: FHIR-aligned continuity handoff pa
 
   const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
   assert.ok(episodeSource.includes('data-care-export-summary="v1"'), 'CareEpisode must include export summary card attribute')
+})
+
+test('deriveCareJourneyCostSummary & CareContinuityPanel: Total Cost of Care financial transparency rollup & never-deny-care boundary (T-CLIN-18)', () => {
+  const evaluatedAt = '2026-10-25T16:00:00.000Z'
+
+  // Episode 1: Itemized verified cost items
+  const epItemized = {
+    id: 'ce_cost_itemized',
+    title: 'Laparoscopic Cholecystectomy',
+    createdAt: '2026-10-20T08:00:00.000Z',
+    updatedAt: '2026-10-24T10:00:00.000Z',
+    facilityId: 'fac_rscm',
+    facilityName: 'RSCM Kencana',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'cost', status: 'done' },
+    ],
+    costItems: [
+      { id: 'ci_1', label: 'Surgical fee', low: 12_000_000, high: 15_000_000, confidence: 'verified', source: 'RSCM quote' },
+      { id: 'ci_2', label: 'Hospital stay', low: 6_000_000, high: 8_000_000, confidence: 'verified', source: 'RSCM quote' },
+    ],
+  }
+
+  // Episode 2: Top-level estimated cost range
+  const epEstimated = {
+    id: 'ce_cost_est',
+    title: 'Post-op Physical Therapy',
+    createdAt: '2026-10-22T08:00:00.000Z',
+    updatedAt: '2026-10-24T11:00:00.000Z',
+    estimatedCostLow: 2_000_000,
+    estimatedCostHigh: 3_500_000,
+    costConfidence: 'estimated',
+    costSource: 'Outpatient tariff reference',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'recovery', status: 'active' },
+    ],
+  }
+
+  // Episode 3: No cost data (negative control — must never fabricate prices)
+  const epUnpriced = {
+    id: 'ce_cost_none',
+    title: 'Hypertension Follow-up',
+    createdAt: '2026-10-23T08:00:00.000Z',
+    updatedAt: '2026-10-24T12:00:00.000Z',
+    stages: [
+      { stage: 'problem', status: 'done' },
+    ],
+  }
+
+  // 1. Pure deriveCareJourneyCostSummary rollup
+  const summary = deriveCareJourneyCostSummary([epItemized, epEstimated, epUnpriced])
+  assert.equal(summary.totalEstimatedCostLow, 20_000_000)
+  assert.equal(summary.totalEstimatedCostHigh, 26_500_000)
+  assert.equal(summary.costVerifiedJourneysCount, 1)
+  assert.equal(summary.costEstimatedJourneysCount, 1)
+  assert.equal(summary.pricedJourneysCount, 2)
+  assert.equal(summary.clinicalCareBoundary, 'never-deny-care')
+
+  // 2. Negative control: unpriced episodes must produce 0 cost and 0 priced journeys
+  const emptyCost = deriveCareJourneyCostSummary([epUnpriced])
+  assert.equal(emptyCost.totalEstimatedCostLow, 0)
+  assert.equal(emptyCost.totalEstimatedCostHigh, 0)
+  assert.equal(emptyCost.pricedJourneysCount, 0)
+
+  // 3. evaluateCareJourneyContinuity projection
+  const projection = evaluateCareJourneyContinuity([epItemized, epEstimated, epUnpriced], evaluatedAt)
+  assert.equal(projection.totalEstimatedCostLow, 20_000_000)
+  assert.equal(projection.totalEstimatedCostHigh, 26_500_000)
+  assert.equal(projection.costVerifiedJourneysCount, 1)
+  assert.equal(projection.costEstimatedJourneysCount, 1)
+  assert.equal(projection.episodes[0].costConfidence, 'verified')
+  assert.equal(projection.episodes[0].costItemsCount, 2)
+  assert.equal(projection.episodes[2].estimatedCostLow, undefined)
+
+  // 4. UI contracts
+  const panelSource = read('src/domains/clinical-operations/ui/CareContinuityPanel.tsx')
+  assert.ok(panelSource.includes('data-care-cost-rollup="v1"'), 'CareContinuityPanel must include cost rollup attribute')
+
+  const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
+  assert.ok(episodeSource.includes('data-care-cost-transparency="v1"'), 'CareEpisode must include cost transparency attribute')
 })
