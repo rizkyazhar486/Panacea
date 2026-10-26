@@ -947,6 +947,56 @@ export interface EdenProteostasisAutophagicFluxBridge {
   epistemicHumilityPreserved: true
 }
 
+// Eden Telomeric Maintenance & Genomic Integrity Synthesizer (T-CLIN-40 / EDEN-20)
+export type EdenTelomericState =
+  | 'shelterin_capped_protected'
+  | 'compensated_telomere_maintenance'
+  | 'subtelomeric_attrition_risk'
+  | 'critical_shortening_checkpoint_primed'
+
+export type EdenDnaRepairFidelity =
+  | 'high_fidelity_homologous_recombination'
+  | 'active_base_excision_repair'
+  | 'attenuated_mismatch_clearance'
+  | 'error_prone_end_joining_predominant'
+
+export type EdenGenomicMaintenanceClusterKind =
+  | 'shelterin_telomere_capping'
+  | 'base_nucleotide_excision_repair'
+  | 'double_strand_break_surveillance'
+  | 'epigenetic_heterochromatin_stabilization'
+
+export interface EdenGenomicMaintenanceCluster {
+  clusterKind: EdenGenomicMaintenanceClusterKind
+  clusterLabel: string
+  integrityScore: number
+  repairCapacityIndex: number
+  maintenanceStatus: 'resilient_capping' | 'active_repair_strain' | 'checkpoint_surveillance'
+  mechanisticNote: string
+}
+
+export interface EdenTelomericGenomicIntegrityBridge {
+  version: 'v1'
+  episodeId: string
+  episodeTitle: string
+  telomericState: EdenTelomericState
+  telomericStateLabel: string
+  dnaRepairFidelity: EdenDnaRepairFidelity
+  dnaRepairFidelityLabel: string
+  genomicResilienceIndex: number
+  shelterinCappingScore: number
+  dnaRepairCapacityScore: number
+  genomicClusters: EdenGenomicMaintenanceCluster[]
+  genomicNarrativeId: string
+  genomicNarrativeEn: string
+  telomericLongevityStrategy: string
+  truthClass: 'genomic_stability_simulation_proxy'
+  clinically_reviewed: false
+  patientTruthUncompromised: true
+  neverManufacturesBiomarkers: true
+  epistemicHumilityPreserved: true
+}
+
 export interface CareJourneyExportSummary {
   standard: 'PANACEA-CAREPLAN-FHIR-R4-V1'
   generatedAt: string
