@@ -9,6 +9,7 @@ import {
   exportCareJourneySummary,
   evaluateEpisodeReadmissionRisk,
   deriveEdenCareCompanion,
+  deriveEdenLifeBalanceSynthesis,
 } from '../../domains/clinical-operations'
 import {
   CARE_EPISODE_STAGES,
@@ -148,6 +149,13 @@ export function CareEpisodePage() {
       </div>
       <BatasKlaimKesehatan permukaan="care.episode" />
 
+      {episodes.length > 0 && (
+        <EdenOneControlHeader
+          episodes={episodes}
+          supportiveResults={state.supportive[activePatient.id]}
+        />
+      )}
+
       {record.primaryDiagnosis && !episodes.some((e) => e.diagnosisCode === record.primaryDiagnosis?.code) && (
         <Card className="border border-brand/20 bg-brand/5 dark:bg-brand/10">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -217,6 +225,83 @@ export function CareEpisodePage() {
         />
       ))}
     </div>
+  )
+}
+
+function EdenOneControlHeader({
+  episodes,
+  supportiveResults,
+}: {
+  episodes: readonly CareEpisode[]
+  supportiveResults?: readonly SupportiveResult[]
+}) {
+  const synthesis = useMemo(
+    () => deriveEdenLifeBalanceSynthesis(episodes, supportiveResults),
+    [episodes, supportiveResults]
+  )
+
+  return (
+    <Card
+      className="border border-emerald-200 dark:border-white/10 bg-emerald-50/30 dark:bg-white/[0.02]"
+      data-eden-one-control="v1"
+      data-eden-calm-state={synthesis.calmState}
+    >
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+        <div>
+          <div className="flex items-center gap-2 flex-wrap">
+            <h3 className="text-sm font-bold text-neutral-900 dark:text-white">
+              Eden One Control — Whole-Person Life & Care Balance
+            </h3>
+            <Badge
+              tone={
+                synthesis.calmState === 'timely_clinical_care'
+                  ? 'high'
+                  : synthesis.calmState === 'gentle_attention'
+                  ? 'low'
+                  : 'normal'
+              }
+            >
+              {synthesis.calmStateLabel}
+            </Badge>
+          </div>
+          <p className="mt-1 text-xs text-neutral-700 dark:text-white/80">
+            {synthesis.harmonyHeadline}
+          </p>
+          <p className="mt-0.5 text-[11px] italic text-emerald-800 dark:text-emerald-300">
+            {synthesis.biologicalAppreciation}
+          </p>
+        </div>
+      </div>
+
+      <div
+        className="mt-3 rounded-xl bg-white/80 dark:bg-white/[0.03] border border-emerald-200/70 dark:border-white/10 p-3"
+        data-eden-unified-focus="v1"
+      >
+        <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-300">
+          One Unified Focus Today
+        </span>
+        <p className="mt-0.5 text-xs font-semibold text-neutral-900 dark:text-white">
+          {synthesis.oneUnifiedFocus}
+        </p>
+      </div>
+
+      <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-4 text-xs">
+        {synthesis.dimensions.map((dim) => (
+          <div
+            key={dim.dimension}
+            className="rounded-lg bg-white/70 dark:bg-white/[0.02] border border-neutral-200/70 dark:border-white/5 p-2.5"
+            data-eden-dimension={dim.dimension}
+          >
+            <div className="text-[10px] font-bold uppercase tracking-wider text-neutral-500 dark:text-white/55">
+              {dim.label}
+            </div>
+            <div className="mt-0.5 text-[11px] text-neutral-800 dark:text-white/85">
+              {dim.plainSummary}
+            </div>
+          </div>
+        ))}
+      </div>
+    </Card>
   )
 }
 

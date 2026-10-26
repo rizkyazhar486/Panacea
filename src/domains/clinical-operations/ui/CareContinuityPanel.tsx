@@ -560,6 +560,16 @@ export function CareContinuityPanel({
                   </span>
                 </div>
               )}
+              {careJourneys.edenLifeBalance && (
+                <div
+                  className="flex justify-between text-teal-200"
+                  data-eden-life-balance="v1"
+                  data-eden-calm-state={careJourneys.edenLifeBalance.calmState}
+                >
+                  <span>Eden life balance:</span>
+                  <span className="font-bold">{careJourneys.edenLifeBalance.calmStateLabel}</span>
+                </div>
+              )}
 
               {careJourneys.episodes.length > 0 && (
                 <div className="mt-3 border-t border-white/8 pt-2">
