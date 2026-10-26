@@ -247,6 +247,8 @@ export interface CareEpisode {
   timelineEvents?: CareJourneyTimelineEvent[]
   // Comorbid diagnoses linked across concurrent care journeys (T-CLIN-15)
   linkedComorbidities?: string[]
+  // Inter-facility referral handshake & diagnostic continuity record (T-CLIN-20)
+  referralRecord?: CareJourneyReferralRecord
 }
 
 export type CareJourneyTimelineEventKind =
@@ -286,6 +288,30 @@ export interface ClinicalOutcomeRecord {
   followUpPlan?: string
   signedAt?: string
   updatedAt?: string
+}
+
+export type ReferralHandshakeStatus =
+  | 'draft'
+  | 'dispatched'
+  | 'acknowledged'
+  | 'completed'
+  | 'cancelled'
+
+export interface CareJourneyReferralRecord {
+  referralId: string
+  sourceFacilityId: string
+  sourceFacilityName: string
+  destinationFacilityId?: string
+  destinationFacilityName?: string
+  specialty: string
+  urgency: 'routine' | 'urgent' | 'emergency'
+  clinicalIndication: string
+  status: ReferralHandshakeStatus
+  dispatchedAt?: string
+  acknowledgedAt?: string
+  acknowledgedBy?: string
+  completedAt?: string
+  auditDigest: string
 }
 
 export interface CareJourneyExportSummary {

@@ -50,6 +50,7 @@ import type {
   CostItem,
   PlanItem,
   SupportiveResult,
+  CareJourneyReferralRecord,
 } from '../../lib/types'
 import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 import { PanaceaZoneNav } from '../../components/PanaceaZoneNav'
@@ -446,6 +447,11 @@ function EpisodeCard({
 
       {/* Post-Discharge Follow-Up & Readmission Risk Surveillance (T-CLIN-19) */}
       <ReadmissionSurveillanceSection episode={episode} supportiveResults={supportiveResults} />
+
+      {/* Inter-Facility Referral Handshake & Diagnostic Continuity (T-CLIN-20) */}
+      {episode.referralRecord && (
+        <ReferralHandshakeSection referral={episode.referralRecord} />
+      )}
     </Card>
   )
 }
@@ -802,6 +808,56 @@ function ReadmissionSurveillanceSection({
           ))}
         </ul>
       )}
+    </div>
+  )
+}
+
+function ReferralHandshakeSection({ referral }: { referral: CareJourneyReferralRecord }) {
+  return (
+    <div
+      className="mt-4 rounded-xl border border-neutral-200 dark:border-white/10 bg-neutral-50 dark:bg-white/[0.02] p-3.5"
+      data-care-referral-section="v1"
+      data-referral-urgency={referral.urgency}
+      data-referral-status={referral.status}
+    >
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+        <div>
+          <div className="flex items-center gap-2 flex-wrap">
+            <h4 className="text-xs font-bold text-neutral-900 dark:text-white">
+              Inter-Facility Referral Handshake
+            </h4>
+            <Badge
+              tone={
+                referral.urgency === 'emergency'
+                  ? 'high'
+                  : referral.urgency === 'urgent'
+                  ? 'low'
+                  : 'neutral'
+              }
+            >
+              {referral.urgency.toUpperCase()}
+            </Badge>
+            <Badge
+              tone={
+                referral.status === 'acknowledged' || referral.status === 'completed'
+                  ? 'normal'
+                  : 'brand'
+              }
+            >
+              {referral.status.toUpperCase()}
+            </Badge>
+          </div>
+          <p className="mt-1 text-xs text-neutral-700 dark:text-white/80">
+            <strong>{referral.specialty}</strong> referral: {referral.clinicalIndication}
+          </p>
+          <p className="mt-0.5 text-[11px] text-neutral-500 dark:text-white/60">
+            Route: {referral.sourceFacilityName} → {referral.destinationFacilityName || 'Pending destination match'}
+          </p>
+        </div>
+      </div>
+      <div className="mt-2 text-[10px] font-mono text-neutral-400 dark:text-white/40 truncate">
+        Digest: {referral.auditDigest}
+      </div>
     </div>
   )
 }
