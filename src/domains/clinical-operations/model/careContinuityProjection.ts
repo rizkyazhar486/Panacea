@@ -89,6 +89,7 @@ import {
   type OneOsEvidenceFragment,
   type OneOsProofResult,
 } from './oneOsCareProof.ts'
+import { projectLongevityTrajectory } from './transcendentLongevityTrajectory.ts'
 
 export interface CareContinuityProjectionInput {
   patientId: string
@@ -1834,6 +1835,15 @@ export function deriveEdenPreventionLongevityRhythm(
       ? `While your body rebuilds through “${episode.title}”, gentle sleep, nourishment, and calm breathing partner with your clinical plan.`
       : `As you begin “${episode.title}”, peaceful rest and steady daily habits prepare your body’s natural resilience.`
 
+  const projectedTrajectory = projectLongevityTrajectory({
+    baselineChronologicalAge: 40,
+    baselineBiologicalAge: isCompleted ? 38 : inRebuilding ? 40 : 42,
+    cardiorespiratoryFitnessScore: isCompleted ? 45 : 38,
+    metabolicFlexibilityIndex: isCompleted ? 0.85 : 0.70,
+    glycemicStabilityScore: isCompleted ? 0.90 : 0.75,
+    inflammationIndex: isCompleted ? 0.4 : inRebuilding ? 0.8 : 1.2,
+  })
+
   return {
     episodeId: episode.id,
     episodeTitle: episode.title,
@@ -1845,6 +1855,7 @@ export function deriveEdenPreventionLongevityRhythm(
     pillars,
     clinicianVerifiedPlanCount: verifiedPlans.length,
     nonPrescriptiveEducationalBoundary: true,
+    projectedTrajectory,
   }
 }
 

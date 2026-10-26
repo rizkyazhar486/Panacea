@@ -456,6 +456,21 @@ export interface EdenLongevityPillarRecommendation {
   workspaceRoute: string
 }
 
+export interface TrajectoryPoint {
+  yearsAhead: number
+  projectedChronologicalAge: number
+  projectedBiologicalAge: number
+  accumulatedResilienceBuffer: number
+  survivalProbability10Year: number
+}
+
+export interface TranscendentTrajectoryResult {
+  status: 'valid' | 'fail-closed'
+  trajectory: TrajectoryPoint[]
+  dominantVelocityFactor: string
+  recommendationProvenance: string
+}
+
 export interface EdenPreventionLongevityRhythm {
   episodeId: string
   episodeTitle: string
@@ -467,6 +482,7 @@ export interface EdenPreventionLongevityRhythm {
   pillars: EdenLongevityPillarRecommendation[]
   clinicianVerifiedPlanCount: number
   nonPrescriptiveEducationalBoundary: true
+  projectedTrajectory?: TranscendentTrajectoryResult
 }
 
 export interface EdenSupportCircleBridge {

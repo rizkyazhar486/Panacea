@@ -1365,6 +1365,36 @@ function EdenLongevityRhythmSection({
           </div>
         ))}
       </div>
+
+      {rhythm.projectedTrajectory?.status === 'valid' && (
+        <div
+          className="mt-2.5 rounded-lg bg-white/80 dark:bg-white/[0.03] p-2.5 border border-amber-100 dark:border-white/5"
+          data-eden-trajectory-preview="v1"
+        >
+          <div className="flex items-center justify-between text-[11px] font-bold text-neutral-800 dark:text-white/85">
+            <span>Proyeksi Ketahanan Fisiologis & Usia Biologis</span>
+            <span className="text-[10px] text-amber-700 dark:text-amber-300 font-semibold">
+              Faktor dominan: {rhythm.projectedTrajectory.dominantVelocityFactor}
+            </span>
+          </div>
+          <div className="mt-1.5 grid grid-cols-2 sm:grid-cols-4 gap-2 text-center">
+            {rhythm.projectedTrajectory.trajectory.slice(0, 4).map((pt) => (
+              <div key={pt.yearsAhead} className="rounded-md bg-amber-50/50 dark:bg-white/[0.02] p-1.5 border border-amber-200/30">
+                <div className="text-[10px] font-bold text-neutral-600 dark:text-white/60">+{pt.yearsAhead} Tahun</div>
+                <div className="text-xs font-extrabold text-amber-800 dark:text-amber-300">
+                  {pt.projectedBiologicalAge} thn
+                </div>
+                <div className="text-[9px] text-neutral-500 dark:text-white/40">
+                  Buffer: {pt.accumulatedResilienceBuffer}%
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="mt-1 text-[9px] text-neutral-400 dark:text-white/40 text-right italic">
+            {rhythm.projectedTrajectory.recommendationProvenance}
+          </div>
+        </div>
+      )}
     </div>
   )
 }

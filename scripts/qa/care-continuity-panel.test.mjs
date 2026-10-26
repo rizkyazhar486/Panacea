@@ -2010,6 +2010,10 @@ test('deriveEdenPreventionLongevityRhythm & CareEpisode: Eden Daily Prevention, 
   assert.equal(rhythm.nonPrescriptiveEducationalBoundary, true)
   assert.ok(rhythm.oneGentleDailyHabit.includes('15-minute post-dinner walk'))
   assert.equal(rhythm.pillars.length, 4)
+  assert.ok(rhythm.projectedTrajectory)
+  assert.equal(rhythm.projectedTrajectory.status, 'valid')
+  assert.equal(rhythm.projectedTrajectory.trajectory.length, 7)
+  assert.ok(rhythm.projectedTrajectory.trajectory[0].projectedBiologicalAge > 0)
 
   // 2. Completed episode -> longevity_maintenance phase
   const completedEpisode = {
@@ -2040,6 +2044,7 @@ test('deriveEdenPreventionLongevityRhythm & CareEpisode: Eden Daily Prevention, 
   const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
   assert.ok(episodeSource.includes('data-eden-longevity-card="v1"'), 'CareEpisode must include Eden longevity card')
   assert.ok(episodeSource.includes('data-eden-longevity-pillars="v1"'), 'CareEpisode must include Eden 4-pillar longevity grid')
+  assert.ok(episodeSource.includes('data-eden-trajectory-preview="v1"'), 'CareEpisode must include Eden trajectory preview card')
 })
 
 test('deriveEdenSupportCircleBridge & CareEpisode: Eden Trusted Support Circle & Family/Caregiver Encouragement Bridge (T-CLIN-26 / EDEN-06)', () => {

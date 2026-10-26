@@ -97,3 +97,10 @@ export {
   type ResultClosureState,
   type ResultInvalidReason,
 } from './model/resultClosure'
+
+export {
+  projectLongevityTrajectory,
+  type TrajectoryInput,
+  type TrajectoryPoint,
+  type TranscendentTrajectoryResult,
+} from './model/transcendentLongevityTrajectory'
