@@ -20,6 +20,7 @@ import {
   deriveEdenPreventionLongevityRhythm,
   deriveEdenSupportCircleBridge,
   deriveEdenVisitPreparationCompanion,
+  deriveEdenReflectionSanctuaryBridge,
   translateClinicalTermToEden,
   EDEN_PLAIN_LANGUAGE_GLOSSARY,
 } from '../../src/domains/clinical-operations/model/careContinuityProjection.ts'
@@ -2172,4 +2173,63 @@ test('deriveEdenVisitPreparationCompanion & CareEpisode: Eden Clinician Visit Pr
   const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
   assert.ok(episodeSource.includes('data-eden-visit-prep-card="v1"'), 'CareEpisode must include Eden visit prep card')
   assert.ok(episodeSource.includes('data-eden-visit-questions="v1"'), 'CareEpisode must include Eden visit questions grid')
+})
+
+test('deriveEdenReflectionSanctuaryBridge & CareEpisode: Eden Multi-Perspective Reflection, Epistemic Humility & Peace Sanctuary Bridge (T-CLIN-28 / EDEN-08)', () => {
+  const evaluatedAt = '2026-10-26T07:05:00.000Z'
+
+  const sampleEpisode = {
+    id: 'ce_sanctuary_1',
+    title: 'Cardiac Arrhythmia Recovery Rhythm',
+    diagnosisCode: 'I48',
+    createdAt: '2026-10-20T08:00:00.000Z',
+    updatedAt: '2026-10-25T08:00:00.000Z',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'treatment', status: 'active' },
+    ],
+  }
+
+  const sampleMoods = [
+    {
+      id: 'm_1',
+      email: 'patient@example.com',
+      name: 'Pasien',
+      mood: 'senang',
+      note: 'Bersyukur tidur nyenyak tadi malam',
+      at: '2026-10-25T07:00:00.000Z',
+    },
+  ]
+
+  // 1. With self-logged mood: honors mood without inferring hidden state
+  const sanctuary = deriveEdenReflectionSanctuaryBridge(sampleEpisode, sampleMoods)
+  assert.equal(sanctuary.lenses.length, 4)
+  assert.equal(sanctuary.lenses[0].id, 'biological_adaptation')
+  assert.equal(sanctuary.lenses[1].id, 'emotional_resilience')
+  assert.ok(sanctuary.lenses[1].reflection.includes('senang'))
+  assert.equal(sanctuary.lenses[2].id, 'relational_meaning')
+  assert.equal(sanctuary.lenses[3].id, 'personal_peace')
+  assert.equal(sanctuary.recentMoodSummary?.mood, 'senang')
+  assert.equal(sanctuary.epistemicHumilityPreserved, true)
+  assert.equal(sanctuary.nonDogmaticPluralismPreserved, true)
+  assert.equal(sanctuary.neverClaimsMetaphysicalAuthority, true)
+
+  // 2. Without mood: never fabricates or infers mood
+  const emptyMoodSanctuary = deriveEdenReflectionSanctuaryBridge(sampleEpisode, [])
+  assert.equal(emptyMoodSanctuary.recentMoodSummary, undefined)
+  assert.ok(emptyMoodSanctuary.lenses[1].reflection.includes('never judged by an algorithm'))
+
+  // 3. Rollup in evaluateCareJourneyContinuity
+  const projection = evaluateCareJourneyContinuity([sampleEpisode], evaluatedAt)
+  assert.equal(projection.edenReflectionSanctuaryReadyCount, 1)
+  assert.ok(projection.episodes[0].edenReflectionSanctuary)
+  assert.equal(projection.episodes[0].edenReflectionSanctuary.neverClaimsMetaphysicalAuthority, true)
+
+  // 4. UI contracts
+  const panelSource = read('src/domains/clinical-operations/ui/CareContinuityPanel.tsx')
+  assert.ok(panelSource.includes('data-eden-reflection-sanctuary="v1"'), 'CareContinuityPanel must include Eden reflection sanctuary attribute')
+
+  const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
+  assert.ok(episodeSource.includes('data-eden-reflection-sanctuary-card="v1"'), 'CareEpisode must include Eden reflection sanctuary card')
+  assert.ok(episodeSource.includes('data-eden-perspective-lenses="v1"'), 'CareEpisode must include Eden 4-lens perspective grid')
 })

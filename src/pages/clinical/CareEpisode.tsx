@@ -15,6 +15,7 @@ import {
   deriveEdenPreventionLongevityRhythm,
   deriveEdenSupportCircleBridge,
   deriveEdenVisitPreparationCompanion,
+  deriveEdenReflectionSanctuaryBridge,
 } from '../../domains/clinical-operations'
 import {
   CARE_EPISODE_STAGES,
@@ -64,6 +65,7 @@ import type {
   Circle,
   SupportMessage,
   GratitudeNote,
+  MoodEntry,
 } from '../../lib/types'
 import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 import { PanaceaZoneNav } from '../../components/PanaceaZoneNav'
@@ -237,6 +239,7 @@ export function CareEpisodePage() {
           circles={state.circles}
           supportMessages={state.supportMessages}
           gratitudes={state.gratitudes}
+          moods={state.moods}
           onChange={(next) => updateEpisode(ep.id, next)}
           onRemove={() => removeEpisode(ep.id)}
         />
@@ -333,6 +336,7 @@ function EpisodeCard({
   circles,
   supportMessages,
   gratitudes,
+  moods,
   onChange,
   onRemove,
 }: {
@@ -346,6 +350,7 @@ function EpisodeCard({
   circles?: readonly Circle[]
   supportMessages?: readonly SupportMessage[]
   gratitudes?: readonly GratitudeNote[]
+  moods?: readonly MoodEntry[]
   onChange: (next: CareEpisode) => void
   onRemove: () => void
 }) {
@@ -599,6 +604,9 @@ function EpisodeCard({
 
       {/* Eden Clinician Visit Preparation & Empowering Questions Companion (T-CLIN-27 / EDEN-07) */}
       <EdenVisitPrepSection episode={episode} supportiveResults={supportiveResults} />
+
+      {/* Eden Multi-Perspective Reflection, Epistemic Humility & Peace Sanctuary Bridge (T-CLIN-28 / EDEN-08) */}
+      <EdenReflectionSanctuarySection episode={episode} moods={moods} />
     </Card>
   )
 }
@@ -1501,6 +1509,72 @@ function EdenVisitPrepSection({
           ))}
         </ul>
       </div>
+    </div>
+  )
+}
+
+function EdenReflectionSanctuarySection({
+  episode,
+  moods,
+}: {
+  episode: CareEpisode
+  moods?: readonly MoodEntry[]
+}) {
+  const sanctuary = useMemo(
+    () => deriveEdenReflectionSanctuaryBridge(episode, moods),
+    [episode, moods]
+  )
+
+  return (
+    <div
+      className="mt-3 rounded-xl border border-sky-200 dark:border-white/10 bg-sky-50/35 dark:bg-white/[0.02] p-3.5"
+      data-eden-reflection-sanctuary-card="v1"
+    >
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+        <div>
+          <div className="flex items-center gap-2 flex-wrap">
+            <h4 className="text-xs font-bold text-neutral-900 dark:text-white">
+              Peace & Multi-Perspective Reflection Sanctuary — Epistemic Humility
+            </h4>
+            <Badge tone="brand">4 Pluralistic Lenses</Badge>
+            <Badge tone="neutral">Non-Dogmatic · Respects Every Belief</Badge>
+          </div>
+          <p className="mt-1 text-xs text-neutral-700 dark:text-white/80">
+            {sanctuary.peaceHeadline}
+          </p>
+        </div>
+        <Link
+          to="/mental"
+          className="inline-flex items-center rounded-lg border border-sky-500/30 bg-sky-500/10 px-2.5 py-1 text-[11px] font-semibold text-sky-700 dark:text-sky-300 hover:bg-sky-500/20 shrink-0"
+        >
+          Open Peace Sanctuary →
+        </Link>
+      </div>
+
+      <div className="mt-2.5 grid gap-2 sm:grid-cols-2 lg:grid-cols-4 text-xs" data-eden-perspective-lenses="v1">
+        {sanctuary.lenses.map((lens) => (
+          <div
+            key={lens.id}
+            className="rounded-lg bg-white/80 dark:bg-white/[0.03] p-2.5 border border-sky-100 dark:border-white/5 flex flex-col justify-between gap-1.5"
+          >
+            <div>
+              <span className="text-[10px] font-bold uppercase tracking-wider text-sky-700 dark:text-sky-300">
+                {lens.label}
+              </span>
+              <p className="mt-0.5 text-[11px] font-medium text-neutral-800 dark:text-white/85">
+                {lens.reflection}
+              </p>
+            </div>
+            <p className="text-[10px] text-neutral-500 dark:text-white/55 italic">
+              {lens.humilityBoundary}
+            </p>
+          </div>
+        ))}
+      </div>
+
+      <p className="mt-2 text-[11px] italic text-sky-800 dark:text-sky-300">
+        {sanctuary.openReflectionInvitation}
+      </p>
     </div>
   )
 }

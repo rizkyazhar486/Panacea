@@ -509,6 +509,35 @@ export interface EdenVisitPreparationCompanion {
   neverReplacesClinicianConsultation: true
 }
 
+export type EdenReflectionLensId =
+  | 'biological_adaptation'
+  | 'emotional_resilience'
+  | 'relational_meaning'
+  | 'personal_peace'
+
+export interface EdenPerspectiveLens {
+  id: EdenReflectionLensId
+  label: string
+  reflection: string
+  humilityBoundary: string
+}
+
+export interface EdenReflectionSanctuaryBridge {
+  episodeId: string
+  episodeTitle: string
+  peaceHeadline: string
+  lenses: EdenPerspectiveLens[]
+  openReflectionInvitation: string
+  recentMoodSummary?: {
+    mood: MoodEntry['mood']
+    at: string
+    note?: string
+  }
+  epistemicHumilityPreserved: true
+  nonDogmaticPluralismPreserved: true
+  neverClaimsMetaphysicalAuthority: true
+}
+
 export interface CareJourneyExportSummary {
   standard: 'PANACEA-CAREPLAN-FHIR-R4-V1'
   generatedAt: string

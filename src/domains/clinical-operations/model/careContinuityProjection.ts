@@ -31,6 +31,10 @@ import type {
   EdenSupportCircleBridge,
   EdenVisitPreparationQuestion,
   EdenVisitPreparationCompanion,
+  EdenReflectionLensId,
+  EdenPerspectiveLens,
+  EdenReflectionSanctuaryBridge,
+  MoodEntry,
   Circle,
   SupportMessage,
   GratitudeNote,
@@ -127,6 +131,7 @@ export interface CareJourneyEpisodeSummary {
   edenLongevityRhythm?: EdenPreventionLongevityRhythm
   edenSupportCircle?: EdenSupportCircleBridge
   edenVisitPreparation?: EdenVisitPreparationCompanion
+  edenReflectionSanctuary?: EdenReflectionSanctuaryBridge
 }
 
 export type ReadmissionRiskLevel = 'low' | 'moderate' | 'high'
@@ -212,6 +217,7 @@ export interface CareJourneyContinuityResult {
   edenLongevityReadyCount: number
   edenSupportCircleReadyCount: number
   edenVisitPrepReadyCount: number
+  edenReflectionSanctuaryReadyCount: number
   edenLifeBalance: EdenLifeBalanceSynthesis
   hasBlockedStages: boolean
 }
@@ -1977,6 +1983,70 @@ export function deriveEdenVisitPreparationCompanion(
   }
 }
 
+export function deriveEdenReflectionSanctuaryBridge(
+  episode: CareEpisode,
+  moods?: readonly MoodEntry[],
+): EdenReflectionSanctuaryBridge {
+  const appreciation = deriveEdenPhysiologyAppreciation(episode)
+  const safeMoods: readonly MoodEntry[] = Array.isArray(moods) ? moods : []
+  const latestMood = safeMoods.length > 0 ? safeMoods[0] : undefined
+
+  const recentMoodSummary = latestMood
+    ? {
+        mood: latestMood.mood,
+        at: latestMood.at,
+        note: latestMood.note,
+      }
+    : undefined
+
+  const lenses: EdenPerspectiveLens[] = [
+    {
+      id: 'biological_adaptation',
+      label: 'Biological Adaptation Lens',
+      reflection: `Through “${episode.title}”, your ${appreciation.primarySystem.label} is actively adapting and working toward physiological balance.`,
+      humilityBoundary: 'Describes physiological mechanisms without claiming certainty over individual recovery timelines.',
+    },
+    {
+      id: 'emotional_resilience',
+      label: 'Emotional & Psychological Lens',
+      reflection: latestMood
+        ? `Your recent self-logged mood (“${latestMood.mood}”) is honored as part of your lived experience—health journeys naturally bring both quiet strength and moments of fatigue.`
+        : `Navigating “${episode.title}” invites patience with yourself—every feeling you experience along the way is valid and never judged by an algorithm.`,
+      humilityBoundary: 'Honors self-reported emotional state without diagnosing or inferring hidden psychological meaning.',
+    },
+    {
+      id: 'relational_meaning',
+      label: 'Relational & Human Connection Lens',
+      reflection: `Care is a shared human story—allowing clinicians, family, or trusted companions to walk alongside you lightens the weight of “${episode.title}”.`,
+      humilityBoundary: 'Respects personal boundaries and opt-in connection; never prescribes how you should relate to others.',
+    },
+    {
+      id: 'personal_peace',
+      label: 'Open Personal & Contemplative Lens',
+      reflection: `Whether you find peace in quiet gratitude, nature, philosophy, or personal faith, this space respects your own sources of meaning as you move through “${episode.title}”.`,
+      humilityBoundary: 'Non-dogmatic and pluralistic; PanaceaMed never claims metaphysical authority or tells anyone what to believe.',
+    },
+  ]
+
+  const peaceHeadline =
+    `Beyond numbers and schedules, “${episode.title}” is approached here with curiosity, epistemic humility, and respect for your own perspective.`
+
+  const openReflectionInvitation =
+    `What gives you the greatest sense of calm and steadiness today as you take the next step in “${episode.title}”?`
+
+  return {
+    episodeId: episode.id,
+    episodeTitle: episode.title,
+    peaceHeadline,
+    lenses,
+    openReflectionInvitation,
+    recentMoodSummary,
+    epistemicHumilityPreserved: true,
+    nonDogmaticPluralismPreserved: true,
+    neverClaimsMetaphysicalAuthority: true,
+  }
+}
+
 export const STAGE_EXPECTED_DAYS: Record<CareEpisodeStageId, number> = {
   problem: 1,
   diagnosis: 2,
@@ -2234,6 +2304,7 @@ export function evaluateCareJourneyContinuity(
     const edenLongevityRhythm = deriveEdenPreventionLongevityRhythm(ep, recordPlanItems)
     const edenSupportCircle = deriveEdenSupportCircleBridge(ep)
     const edenVisitPreparation = deriveEdenVisitPreparationCompanion(ep, supportiveResults)
+    const edenReflectionSanctuary = deriveEdenReflectionSanctuaryBridge(ep)
 
     return {
       id: ep.id,
@@ -2270,6 +2341,7 @@ export function evaluateCareJourneyContinuity(
       edenLongevityRhythm,
       edenSupportCircle,
       edenVisitPreparation,
+      edenReflectionSanctuary,
     }
   })
 
@@ -2338,6 +2410,13 @@ export function evaluateCareJourneyContinuity(
   const edenVisitPrepReadyCount = summaries.filter(
     (s) => Boolean(s.edenVisitPreparation?.empoweringAgencyPreserved)
   ).length
+  const edenReflectionSanctuaryReadyCount = summaries.filter(
+    (s) =>
+      Boolean(
+        s.edenReflectionSanctuary?.epistemicHumilityPreserved &&
+          s.edenReflectionSanctuary?.neverClaimsMetaphysicalAuthority
+      )
+  ).length
   const edenLifeBalance = deriveEdenLifeBalanceSynthesis(episodes, supportiveResults)
 
   return {
@@ -2378,6 +2457,7 @@ export function evaluateCareJourneyContinuity(
     edenLongevityReadyCount,
     edenSupportCircleReadyCount,
     edenVisitPrepReadyCount,
+    edenReflectionSanctuaryReadyCount,
     edenLifeBalance,
     hasBlockedStages: blockedJourneys > 0 || stalledCount > 0,
   }
