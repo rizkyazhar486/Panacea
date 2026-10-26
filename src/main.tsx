@@ -156,6 +156,7 @@ const PredictiveModelsToolkit = lazy(() => import('./pages/bodyhub/PredictiveMod
 const DataLabAdvanced = lazy(() => import('./pages/bodyhub/DataLabAdvanced').then((m) => ({ default: m.DataLabAdvanced })))
 const BioSimulators = lazy(() => import('./pages/longevity/BioSimulators').then((m) => ({ default: m.BioSimulators })))
 const DesignDemo = lazy(() => import('./pages/DesignDemo').then((m) => ({ default: m.DesignDemo })))
+const Storefront = lazy(() => import('./features/storefront/StorefrontPage').then((m) => ({ default: m.StorefrontPage })))
 
 // Apply the saved appearance (theme, text size, motion) and language before first paint.
 applyAppearance()
@@ -439,6 +440,11 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/legal" element={<Legal />} />
               {/* Halaman demo terisolasi, sengaja tidak ditautkan dari navigasi mana pun. */}
               <Route path="/design-demo" element={<DesignDemo />} />
+              {/* PanaceaMed Precision Formulas & Private Vault Storefront */}
+              <Route path="/store" element={<Storefront />} />
+              <Route path="/vault" element={<Storefront />} />
+              <Route path="/apothecary" element={<Storefront />} />
+              <Route path="/private-vault" element={<Storefront />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspense>
