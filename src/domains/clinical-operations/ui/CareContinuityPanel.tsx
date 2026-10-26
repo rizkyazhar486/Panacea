@@ -724,6 +724,17 @@ export function CareContinuityPanel({
                   </span>
                 </div>
               )}
+              {careJourneys.edenCircadianMitochondrialHarmonizerReadyCount > 0 && (
+                <div
+                  className="flex justify-between text-amber-300"
+                  data-eden-circadian-mitochondrial="v1"
+                >
+                  <span>Kronobiologi sirkadian & vitalitas mitokondria:</span>
+                  <span className="font-bold">
+                    {careJourneys.edenCircadianMitochondrialHarmonizerReadyCount} episode terhubung
+                  </span>
+                </div>
+              )}
 
               {careJourneys.episodes.length > 0 && (
                 <div className="mt-3 border-t border-white/8 pt-2">

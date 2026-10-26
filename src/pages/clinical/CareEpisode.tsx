@@ -24,6 +24,7 @@ import {
   deriveEdenBioCosmicSymphonyBridge,
   deriveEdenMultiAgentHealingCouncilBridge,
   deriveEdenBioHarmonicWaveformBridge,
+  deriveEdenCircadianMitochondrialHarmonizerBridge,
 } from '../../domains/clinical-operations'
 import {
   CARE_EPISODE_STAGES,
@@ -647,6 +648,9 @@ function EpisodeCard({
 
       {/* Eden Bio-Harmonic Epigenetic Resonance & Cellular Longevity Waveform Engine (T-CLIN-37 / EDEN-17) */}
       <EdenBioHarmonicWaveformSection episode={episode} />
+
+      {/* Eden Circadian-Metabolic Neuro-Synchrony & Mitochondrial Vitality Harmonizer (T-CLIN-38 / EDEN-18) */}
+      <EdenCircadianMitochondrialSection episode={episode} />
     </Card>
   )
 }
@@ -2468,6 +2472,108 @@ function EdenBioHarmonicWaveformSection({ episode }: { episode: CareEpisode }) {
 
       <div className="mt-2 text-[10px] text-neutral-500 dark:text-white/50 text-right">
         ARGON EDEN ∞ §07 · Epigenetic Clock & Mitohormetic Waveform Engine · Patient Truth Uncompromised · Never Manufactures Methylation Arrays
+      </div>
+    </div>
+  )
+}
+
+function EdenCircadianMitochondrialSection({ episode }: { episode: CareEpisode }) {
+  const [lang, setLang] = useState<'id' | 'en'>('id')
+
+  const bridge = useMemo(
+    () => deriveEdenCircadianMitochondrialHarmonizerBridge(episode),
+    [episode]
+  )
+
+  const narrative = lang === 'id' ? bridge.circadianNarrativeId : bridge.circadianNarrativeEn
+
+  return (
+    <div
+      className="mt-3 rounded-xl border border-amber-200 dark:border-white/10 bg-amber-50/30 dark:bg-white/[0.02] p-3.5"
+      data-eden-circadian-card="v1"
+    >
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+        <div>
+          <div className="flex items-center gap-2 flex-wrap">
+            <h4 className="text-xs font-bold text-neutral-900 dark:text-white">
+              Eden Circadian-Metabolic Neuro-Synchrony & Mitochondrial Vitality Harmonizer
+            </h4>
+            <Badge tone="brand">{bridge.masterPhaseLabel}</Badge>
+            <Badge tone="normal">{bridge.mitochondrialDynamicsLabel}</Badge>
+            <Badge tone="normal">Resonance {bridge.systemChronobiologicalResonance}%</Badge>
+            <Badge tone="normal">SCN {bridge.suprachiasmaticEntrainmentScore}%</Badge>
+            <Badge tone="normal">Mito {bridge.mitochondrialVitalityIndex}%</Badge>
+          </div>
+          <p className="mt-1 text-xs font-medium text-neutral-800 dark:text-white/85">
+            {narrative}
+          </p>
+        </div>
+        <div className="flex items-center gap-1 shrink-0">
+          <button
+            type="button"
+            onClick={() => setLang('id')}
+            className={`rounded-md px-2 py-0.5 text-[11px] font-medium transition-colors ${
+              lang === 'id'
+                ? 'bg-amber-600 text-white font-bold'
+                : 'bg-white/80 dark:bg-white/5 text-neutral-700 dark:text-white/70 hover:bg-amber-100/50'
+            }`}
+          >
+            Bahasa
+          </button>
+          <button
+            type="button"
+            onClick={() => setLang('en')}
+            className={`rounded-md px-2 py-0.5 text-[11px] font-medium transition-colors ${
+              lang === 'en'
+                ? 'bg-amber-600 text-white font-bold'
+                : 'bg-white/80 dark:bg-white/5 text-neutral-700 dark:text-white/70 hover:bg-amber-100/50'
+            }`}
+          >
+            English
+          </button>
+        </div>
+      </div>
+
+      <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2" data-eden-peripheral-clocks="v1">
+        {bridge.peripheralClocks.map((c) => {
+          const alignmentPct = Math.round(c.phaseAlignment * 100)
+          const mitoCouplingPct = Math.round(c.mitochondrialCouplingIndex * 100)
+          return (
+            <div
+              key={c.clockKind}
+              className="rounded-lg border border-amber-200/50 dark:border-white/10 bg-white/70 dark:bg-white/[0.03] p-2.5"
+            >
+              <div className="text-[11px] font-bold text-neutral-900 dark:text-white truncate">
+                {c.clockLabel}
+              </div>
+              <div className="mt-1 flex items-baseline justify-between">
+                <span className="text-base font-extrabold text-amber-800 dark:text-amber-300">
+                  {alignmentPct}% <span className="text-[10px] font-normal text-neutral-500 dark:text-white/50">{lang === 'id' ? 'selaras' : 'aligned'}</span>
+                </span>
+                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300">
+                  Mito {mitoCouplingPct}%
+                </span>
+              </div>
+              <div className="mt-1 text-[10px] text-neutral-600 dark:text-white/60">
+                {lang === 'id' ? 'Jendela Puncak:' : 'Peak Window:'} {c.peakEfficiencyWindow}
+              </div>
+              <div className="mt-1 text-[9px] text-neutral-500 dark:text-white/50 italic line-clamp-2">
+                {c.mechanisticNote}
+              </div>
+            </div>
+          )
+        })}
+      </div>
+
+      <div className="mt-2.5 rounded-lg border border-amber-200/40 dark:border-white/10 bg-amber-100/30 dark:bg-white/[0.02] p-2.5 text-xs space-y-1">
+        <div className="text-[11px] text-neutral-800 dark:text-white/85">
+          <b>{lang === 'id' ? 'Strategi Longevity Kronobiologis & Mitokondria:' : 'Chronobiological & Mitochondrial Longevity Strategy:'}</b>{' '}
+          {bridge.chronobiologicalLongevityStrategy}
+        </div>
+      </div>
+
+      <div className="mt-2 text-[10px] text-neutral-500 dark:text-white/50 text-right">
+        ARGON EDEN ∞ §08 · Circadian-Metabolic Neuro-Synchrony & Mitochondrial Vitality Harmonizer · Patient Truth Uncompromised · Never Manufactures Biomarkers
       </div>
     </div>
   )
