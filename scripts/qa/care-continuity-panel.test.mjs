@@ -38,6 +38,7 @@ import {
   deriveEdenMitochondrialHeteroplasmyBridge,
   deriveEdenCircadianAutophagyPulseBridge,
   deriveEdenRetrotransposonSilencingBridge,
+  deriveEdenSirtuinNadParp1Bridge,
   translateClinicalTermToEden,
   EDEN_PLAIN_LANGUAGE_GLOSSARY,
 } from '../../src/domains/clinical-operations/model/careContinuityProjection.ts'
@@ -3513,4 +3514,78 @@ test('deriveEdenRetrotransposonSilencingBridge & CareEpisode: Eden Epigenetic Re
   const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
   assert.ok(episodeSource.includes('data-eden-retrotransposon-card="v1"'), 'CareEpisode must include retrotransposon card')
   assert.ok(episodeSource.includes('data-eden-transposon-nodes="v1"'), 'CareEpisode must include transposon nodes grid')
+})
+
+test('deriveEdenSirtuinNadParp1Bridge & CareEpisode: Eden Sirtuin-NAD+ Metabolomic Resonance & PARP1 Genomic Repair Synthesizer (T-CLIN-47 / EDEN-27)', () => {
+  const evaluatedAt = '2026-10-26T19:40:00.000Z'
+  const sampleEpisode = {
+    id: 'ce_sirtuin_1',
+    title: 'Sirtuin-NAD+ Metabolomic Resonance & PARP1 Genomic Repair Pathway',
+    diagnosisCode: 'Z00.00',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'diagnosis', status: 'done' },
+      { stage: 'plan', status: 'done' },
+      { stage: 'treatment', status: 'done' },
+      { stage: 'recovery', status: 'active' },
+    ],
+  }
+
+  // 1. Pure deterministic derivation
+  const bridge = deriveEdenSirtuinNadParp1Bridge(sampleEpisode)
+  assert.equal(bridge.version, 'v1')
+  assert.equal(bridge.episodeId, 'ce_sirtuin_1')
+  assert.equal(bridge.sirtuinState, 'abundant_nad_sirtuin_resonance')
+  assert.equal(bridge.sirtuinStateLabel, 'Resonansi Sirtuin NAD+ Berlimpah & Umur Panjang Seluler')
+  assert.equal(bridge.repairTier, 'efficient_high_fidelity_parp_repair')
+  assert.equal(bridge.repairTierLabel, 'Reparasi Genomik Presisi Tinggi & Resolusi Lesi Cepat')
+  assert.ok(bridge.nadPoolVitalityScore >= 85)
+  assert.ok(bridge.sirtuinDeacetylationIndex >= 85)
+  assert.ok(bridge.parp1DnaRepairCapacity >= 85)
+  assert.equal(bridge.repairNodes.length, 4)
+  assert.equal(bridge.repairNodes[0].nodeKind, 'nampt_salvage_nad_biosynthesis')
+  assert.equal(bridge.repairNodes[1].nodeKind, 'sirt1_sirt6_chromatin_deacetylation')
+  assert.equal(bridge.repairNodes[2].nodeKind, 'parp1_poly_adp_ribosylation_repair')
+  assert.equal(bridge.repairNodes[3].nodeKind, 'cd38_sarm1_hydrolase_suppression')
+  assert.equal(bridge.truthClass, 'sirtuin_nad_repair_simulation_proxy')
+  assert.equal(bridge.clinically_reviewed, false)
+  assert.equal(bridge.patientTruthUncompromised, true)
+  assert.equal(bridge.neverManufacturesBiomarkers, true)
+  assert.equal(bridge.epistemicHumilityPreserved, true)
+
+  // 2. Blocked stage resilience
+  const blockedEpisode = {
+    id: 'ce_sirtuin_blocked',
+    title: 'Blocked Sirtuin-NAD+ Exhaustion Episode',
+    diagnosisCode: 'E88.89',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'diagnosis', status: 'blocked', blockedReason: 'Awaiting quantitative intracellular NAD+/NADH fluorometric ratio and PARP1 cleavage status' },
+    ],
+  }
+  const blockedBridge = deriveEdenSirtuinNadParp1Bridge(blockedEpisode)
+  assert.equal(blockedBridge.sirtuinState, 'metabolomic_exhaustion_parp_collapse')
+  assert.equal(blockedBridge.sirtuinStateLabel, 'Kelelahan Metabolomik NAD+ & Deplesi Ekstrem PARP1')
+  assert.equal(blockedBridge.repairTier, 'hyperactivated_nad_depletion_crisis')
+  assert.equal(blockedBridge.repairTierLabel, 'Krisis Hiperaktivasi PARP1 & Kurasan NAD+ Seluler Parah')
+  assert.ok(blockedBridge.nadPoolVitalityScore <= 65)
+  assert.ok(blockedBridge.sirtuinDeacetylationIndex <= 65)
+  assert.ok(blockedBridge.parp1DnaRepairCapacity <= 65)
+  assert.equal(blockedBridge.repairNodes.every((n) => n.repairDynamicsStatus === 'depletion_strain'), true)
+
+  // 3. Rollup in evaluateCareJourneyContinuity
+  const projection = evaluateCareJourneyContinuity([sampleEpisode, blockedEpisode], evaluatedAt)
+  assert.equal(projection.edenSirtuinNadParp1ReadyCount, 2)
+  assert.ok(projection.episodes[0].edenSirtuinNadParp1)
+  assert.equal(projection.episodes[0].edenSirtuinNadParp1.truthClass, 'sirtuin_nad_repair_simulation_proxy')
+  assert.equal(projection.episodes[0].edenSirtuinNadParp1.patientTruthUncompromised, true)
+  assert.equal(projection.episodes[0].edenSirtuinNadParp1.neverManufacturesBiomarkers, true)
+
+  // 4. UI contracts
+  const panelSource = read('src/domains/clinical-operations/ui/CareContinuityPanel.tsx')
+  assert.ok(panelSource.includes('data-eden-sirtuin-nad="v1"'), 'CareContinuityPanel must include sirtuin-nad attribute')
+
+  const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
+  assert.ok(episodeSource.includes('data-eden-sirtuin-card="v1"'), 'CareEpisode must include sirtuin card')
+  assert.ok(episodeSource.includes('data-eden-sirtuin-nodes="v1"'), 'CareEpisode must include sirtuin nodes grid')
 })

@@ -110,6 +110,11 @@ import type {
   EdenTransposonVigilanceNodeKind,
   EdenTransposonVigilanceNode,
   EdenRetrotransposonSilencingBridge,
+  EdenSirtuinMetabolomicState,
+  EdenParp1RepairTier,
+  EdenSirtuinRepairNodeKind,
+  EdenSirtuinRepairNode,
+  EdenSirtuinNadParp1Bridge,
   WellnessDay,
   MoodEntry,
   Circle,
@@ -227,6 +232,7 @@ export interface CareJourneyEpisodeSummary {
   edenMitochondrialHeteroplasmy?: EdenMitochondrialHeteroplasmyBridge
   edenCircadianAutophagyPulse?: EdenCircadianAutophagyPulseBridge
   edenRetrotransposonSilencing?: EdenRetrotransposonSilencingBridge
+  edenSirtuinNadParp1?: EdenSirtuinNadParp1Bridge
 }
 
 export type ReadmissionRiskLevel = 'low' | 'moderate' | 'high'
@@ -330,6 +336,7 @@ export interface CareJourneyContinuityResult {
   edenMitochondrialHeteroplasmyReadyCount: number
   edenCircadianAutophagyPulseReadyCount: number
   edenRetrotransposonSilencingReadyCount: number
+  edenSirtuinNadParp1ReadyCount: number
   edenLifeBalance: EdenLifeBalanceSynthesis
   hasBlockedStages: boolean
 }
@@ -4072,6 +4079,115 @@ export function deriveEdenRetrotransposonSilencingBridge(
   }
 }
 
+export function deriveEdenSirtuinNadParp1Bridge(
+  episode: CareEpisode,
+): EdenSirtuinNadParp1Bridge {
+  const stages = episode.stages ?? []
+  const completedStages = stages.filter((s) => s.status === 'done').length
+  const hasBlocked = stages.some((s) => s.status === 'blocked')
+  const blockedCount = stages.filter((s) => s.status === 'blocked').length
+
+  const nadPoolVitalityScore = hasBlocked
+    ? Math.max(45, 66 - blockedCount * 7)
+    : Math.min(99, 78 + completedStages * 5)
+
+  const sirtuinDeacetylationIndex = hasBlocked
+    ? Math.max(43, 64 - blockedCount * 7)
+    : Math.min(98, 77 + completedStages * 5)
+
+  const parp1DnaRepairCapacity = hasBlocked
+    ? Math.max(42, 63 - blockedCount * 8)
+    : Math.min(98, 76 + completedStages * 5)
+
+  let sirtuinState: EdenSirtuinMetabolomicState = 'compensated_salvage_equilibrium'
+  let sirtuinStateLabel = 'Keseimbangan Jalur Penyelamatan NAD+ Terkompensasi'
+  let repairTier: EdenParp1RepairTier = 'adequate_single_strand_clearance'
+  let repairTierLabel = 'Klirens Kerusakan Untai Tunggal PARP1 Memadai'
+
+  if (hasBlocked) {
+    sirtuinState = 'metabolomic_exhaustion_parp_collapse'
+    sirtuinStateLabel = 'Kelelahan Metabolomik NAD+ & Deplesi Ekstrem PARP1'
+    repairTier = 'hyperactivated_nad_depletion_crisis'
+    repairTierLabel = 'Krisis Hiperaktivasi PARP1 & Kurasan NAD+ Seluler Parah'
+  } else if (completedStages >= 3) {
+    sirtuinState = 'abundant_nad_sirtuin_resonance'
+    sirtuinStateLabel = 'Resonansi Sirtuin NAD+ Berlimpah & Umur Panjang Seluler'
+    repairTier = 'efficient_high_fidelity_parp_repair'
+    repairTierLabel = 'Reparasi Genomik Presisi Tinggi & Resolusi Lesi Cepat'
+  } else if (completedStages === 0) {
+    sirtuinState = 'depleted_nad_enzymatic_competition'
+    sirtuinStateLabel = 'Risiko Kompetisi Enzimatik Akibat Penurunan NAD+ Dini'
+    repairTier = 'delayed_genomic_lesion_resolution'
+    repairTierLabel = 'Resolusi Lesi Genomik Tertunda Sementara'
+  }
+
+  const repairNodes: EdenSirtuinRepairNode[] = [
+    {
+      nodeKind: 'nampt_salvage_nad_biosynthesis',
+      nodeLabel: 'Biosintesis Penyelamatan NAD+ Jalur NAMPT (Nikotinamida Fosforibosiltransferase)',
+      fluxEfficiencyScore: hasBlocked ? 0.61 : Math.min(0.99, 0.78 + completedStages * 0.05),
+      metabolomicIntegrityIndex: hasBlocked ? 0.59 : Math.min(0.98, 0.76 + completedStages * 0.05),
+      repairDynamicsStatus: hasBlocked ? 'depletion_strain' : completedStages >= 2 ? 'optimal_resonance_flux' : 'compensated_adaptive_state',
+      mechanisticNote: 'Enzim pembatas laju sintesis NAD+ dari nikotinamida untuk mempertahankan rasio NAD+/NADH dan pasokan koenzim seluler.',
+    },
+    {
+      nodeKind: 'sirt1_sirt6_chromatin_deacetylation',
+      nodeLabel: 'Deasetilasi Kromatin & Reparasi DSB SIRT1/SIRT6 (Stabilitas Epigenetik Nuklear)',
+      fluxEfficiencyScore: hasBlocked ? 0.63 : Math.min(0.98, 0.79 + completedStages * 0.05),
+      metabolomicIntegrityIndex: hasBlocked ? 0.60 : Math.min(0.99, 0.77 + completedStages * 0.05),
+      repairDynamicsStatus: hasBlocked ? 'depletion_strain' : completedStages >= 2 ? 'optimal_resonance_flux' : 'compensated_adaptive_state',
+      mechanisticNote: 'Sirtuin nuklear mengonsumsi NAD+ untuk deasetilasi H3K9ac/H3K56ac serta mobilisasi DNA-PKcs pada titik patah untai ganda.',
+    },
+    {
+      nodeKind: 'parp1_poly_adp_ribosylation_repair',
+      nodeLabel: 'Poli-ADP-Ribosilasi PARP1 & Reparasi Eksisi Basa (Deteksi Cepat Kerusakan DNA)',
+      fluxEfficiencyScore: hasBlocked ? 0.58 : Math.min(0.97, 0.75 + completedStages * 0.06),
+      metabolomicIntegrityIndex: hasBlocked ? 0.58 : Math.min(0.98, 0.75 + completedStages * 0.06),
+      repairDynamicsStatus: hasBlocked ? 'depletion_strain' : completedStages >= 2 ? 'optimal_resonance_flux' : 'compensated_adaptive_state',
+      mechanisticNote: 'Sintesis rantai PAR bermuatan negatif merekrut XRCC1 dan ligase III ke lokasi putus untai tunggal sebelum degradasi oleh PARG.',
+    },
+    {
+      nodeKind: 'cd38_sarm1_hydrolase_suppression',
+      nodeLabel: 'Supresi Ektoenzim CD38 / SARM1 NADase (Pencegahan Pemborosan NAD+ Sistemik)',
+      fluxEfficiencyScore: hasBlocked ? 0.62 : Math.min(0.99, 0.77 + completedStages * 0.05),
+      metabolomicIntegrityIndex: hasBlocked ? 0.61 : Math.min(0.97, 0.74 + completedStages * 0.06),
+      repairDynamicsStatus: hasBlocked ? 'depletion_strain' : completedStages >= 2 ? 'optimal_resonance_flux' : 'compensated_adaptive_state',
+      mechanisticNote: 'Peredaman hidrolase NAD+ membran ekstraseluler dan aksonal guna mencegah pemborosan stok metabolit berharga saat penuaan.',
+    },
+  ]
+
+  const metabolomicNarrativeId = `Sintesis metabolomik sirtuin-NAD+ & reparasi genomik PARP1 untuk episode "${episode.title}". Status sirtuin: ${sirtuinStateLabel}, kapasitas reparasi PARP1: ${repairTierLabel}. Skor vitalitas cadangan NAD+ ${nadPoolVitalityScore}%, indeks deasetilasi sirtuin ${sirtuinDeacetylationIndex}%, dan kapasitas perbaikan DNA PARP1 ${parp1DnaRepairCapacity}%.`
+  const metabolomicNarrativeEn = `Sirtuin-NAD+ metabolomics & PARP1 genomic repair synthesis for episode "${episode.title}". Sirtuin state: ${sirtuinStateLabel}, PARP1 repair tier: ${repairTierLabel}. NAD+ pool vitality score ${nadPoolVitalityScore}%, sirtuin deacetylation index ${sirtuinDeacetylationIndex}%, and PARP1 DNA repair capacity ${parp1DnaRepairCapacity}%.`
+
+  const sirtuinNadOptimizationStrategy = hasBlocked
+    ? 'Dukung regenerasi cadangan NAD+ intraseluler dan redam aktivitas CD38 melalui inhibisi flavonoid (apigenin, kuersetin) serta suplementasi prekursor metabolit (NMN/NR) di bawah pengawasan klinisi.'
+    : completedStages >= 3
+    ? 'Pertahankan kelimpahan NAD+ dan resonansi sirtuin maksimal melalui stimulasi enzim NAMPT via latihan aerobik teratur, puasa intermiten berkala, dan optimasi ritme sirkadian metabolisme energi.'
+    : 'Dukung pasokan biosintesis NAD+ dengan asupan nutrisi kaya vitamin B3 (niasinamida/niasin), asam amino triptofan, dan hidrasi elektrolit seimbang.'
+
+  return {
+    version: 'v1',
+    episodeId: episode.id,
+    episodeTitle: episode.title,
+    sirtuinState,
+    sirtuinStateLabel,
+    repairTier,
+    repairTierLabel,
+    nadPoolVitalityScore,
+    sirtuinDeacetylationIndex,
+    parp1DnaRepairCapacity,
+    repairNodes,
+    metabolomicNarrativeId,
+    metabolomicNarrativeEn,
+    sirtuinNadOptimizationStrategy,
+    truthClass: 'sirtuin_nad_repair_simulation_proxy',
+    clinically_reviewed: false,
+    patientTruthUncompromised: true,
+    neverManufacturesBiomarkers: true,
+    epistemicHumilityPreserved: true,
+  }
+}
+
 export const STAGE_EXPECTED_DAYS: Record<CareEpisodeStageId, number> = {
   problem: 1,
   diagnosis: 2,
@@ -4347,6 +4463,7 @@ export function evaluateCareJourneyContinuity(
     const edenMitochondrialHeteroplasmy = deriveEdenMitochondrialHeteroplasmyBridge(ep)
     const edenCircadianAutophagyPulse = deriveEdenCircadianAutophagyPulseBridge(ep)
     const edenRetrotransposonSilencing = deriveEdenRetrotransposonSilencingBridge(ep)
+    const edenSirtuinNadParp1 = deriveEdenSirtuinNadParp1Bridge(ep)
 
     return {
       id: ep.id,
@@ -4401,6 +4518,7 @@ export function evaluateCareJourneyContinuity(
       edenMitochondrialHeteroplasmy,
       edenCircadianAutophagyPulse,
       edenRetrotransposonSilencing,
+      edenSirtuinNadParp1,
     }
   })
 
@@ -4606,6 +4724,14 @@ export function evaluateCareJourneyContinuity(
           s.edenRetrotransposonSilencing?.neverManufacturesBiomarkers
       )
   ).length
+  const edenSirtuinNadParp1ReadyCount = summaries.filter(
+    (s) =>
+      Boolean(
+        s.edenSirtuinNadParp1?.truthClass === 'sirtuin_nad_repair_simulation_proxy' &&
+          s.edenSirtuinNadParp1?.patientTruthUncompromised &&
+          s.edenSirtuinNadParp1?.neverManufacturesBiomarkers
+      )
+  ).length
   const edenLifeBalance = deriveEdenLifeBalanceSynthesis(episodes, supportiveResults)
 
   return {
@@ -4664,6 +4790,7 @@ export function evaluateCareJourneyContinuity(
     edenMitochondrialHeteroplasmyReadyCount,
     edenCircadianAutophagyPulseReadyCount,
     edenRetrotransposonSilencingReadyCount,
+    edenSirtuinNadParp1ReadyCount,
     edenLifeBalance,
     hasBlockedStages: blockedJourneys > 0 || stalledCount > 0,
   }
