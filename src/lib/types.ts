@@ -997,6 +997,56 @@ export interface EdenTelomericGenomicIntegrityBridge {
   epistemicHumilityPreserved: true
 }
 
+// Eden Senescent Secretome & Inflammaging Attenuation Synthesizer (T-CLIN-41 / EDEN-21)
+export type EdenSenescenceBurdenState =
+  | 'minimal_sasp_surveillance'
+  | 'adaptive_senolytic_priming'
+  | 'smoldering_inflammaging_strain'
+  | 'elevated_paracrine_secretome_risk'
+
+export type EdenInflammagingIndexLevel =
+  | 'quiescent_eugenerative'
+  | 'compensated_low_grade_surveillance'
+  | 'elevated_secretory_phenotype'
+  | 'systemic_proteolytic_cascade'
+
+export type EdenSenescentSurveillanceNodeKind =
+  | 'senolytic_immune_clearance'
+  | 'sasp_cytokine_neutralization'
+  | 'extracellular_matrix_remodeling'
+  | 'anti_inflammatory_resolution_pathway'
+
+export interface EdenSenescentSurveillanceNode {
+  nodeKind: EdenSenescentSurveillanceNodeKind
+  nodeLabel: string
+  clearanceCapacityScore: number
+  secretomeSuppressionIndex: number
+  surveillanceStatus: 'optimal_resolution' | 'compensated_clearance' | 'sasp_propagation'
+  mechanisticNote: string
+}
+
+export interface EdenSenescentInflammagingBridge {
+  version: 'v1'
+  episodeId: string
+  episodeTitle: string
+  senescenceBurden: EdenSenescenceBurdenState
+  senescenceBurdenLabel: string
+  inflammagingLevel: EdenInflammagingIndexLevel
+  inflammagingLevelLabel: string
+  systemicInflammagingScore: number
+  senolyticResilienceIndex: number
+  secretomeSuppressionCapacity: number
+  surveillanceNodes: EdenSenescentSurveillanceNode[]
+  senescentNarrativeId: string
+  senescentNarrativeEn: string
+  senolyticInflammagingStrategy: string
+  truthClass: 'cellular_senescence_simulation_proxy'
+  clinically_reviewed: false
+  patientTruthUncompromised: true
+  neverManufacturesBiomarkers: true
+  epistemicHumilityPreserved: true
+}
+
 export interface CareJourneyExportSummary {
   standard: 'PANACEA-CAREPLAN-FHIR-R4-V1'
   generatedAt: string
