@@ -11,6 +11,7 @@ import {
   deriveEdenCareCompanion,
   deriveEdenLifeBalanceSynthesis,
   deriveEdenLifeStoryBridge,
+  deriveEdenPhysiologyAppreciation,
 } from '../../domains/clinical-operations'
 import {
   CARE_EPISODE_STAGES,
@@ -562,6 +563,9 @@ function EpisodeCard({
         quests={quests}
         patientDob={patientDob}
       />
+
+      {/* Eden Living Physiology Appreciation & Organ System Connection Bridge (T-CLIN-24 / EDEN-04) */}
+      <EdenPhysiologyAppreciationSection episode={episode} />
     </Card>
   )
 }
@@ -1168,6 +1172,58 @@ function EdenLifeStorySection({
       <p className="mt-2 text-[11px] italic text-cyan-800 dark:text-cyan-300">
         {bridge.gentleReflectionPrompt}
       </p>
+    </div>
+  )
+}
+
+function EdenPhysiologyAppreciationSection({ episode }: { episode: CareEpisode }) {
+  const appreciation = useMemo(() => deriveEdenPhysiologyAppreciation(episode), [episode])
+
+  return (
+    <div
+      className="mt-3 rounded-xl border border-indigo-200 dark:border-white/10 bg-indigo-50/35 dark:bg-white/[0.02] p-3.5"
+      data-eden-physiology-card="v1"
+      data-organ-system={appreciation.primarySystem.id}
+    >
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+        <div>
+          <div className="flex items-center gap-2 flex-wrap">
+            <h4 className="text-xs font-bold text-neutral-900 dark:text-white">
+              Living Physiology Appreciation — How Your Body Sustains Balance
+            </h4>
+            <Badge tone="brand">{appreciation.primarySystem.label}</Badge>
+            <Badge tone="neutral">Educational Reference · Never Fabricates Vitals</Badge>
+          </div>
+          <p className="mt-1 text-xs font-medium text-indigo-900 dark:text-indigo-200">
+            {appreciation.livingWonderHeadline}
+          </p>
+          <p className="mt-0.5 text-[11px] text-neutral-600 dark:text-white/70">
+            {appreciation.homeostaticMechanismSummary}
+          </p>
+        </div>
+        <Link
+          to={appreciation.primarySystem.bodyTwinRoute}
+          className="inline-flex items-center rounded-lg border border-indigo-500/30 bg-indigo-500/10 px-2.5 py-1 text-[11px] font-semibold text-indigo-700 dark:text-indigo-300 hover:bg-indigo-500/20 shrink-0"
+        >
+          Explore 3D Body Twin →
+        </Link>
+      </div>
+
+      <div className="mt-2.5 grid gap-2 sm:grid-cols-2 text-xs" data-eden-coupled-systems="v1">
+        {appreciation.coupledSystems.map((cs) => (
+          <div
+            key={cs.id}
+            className="rounded-lg bg-white/80 dark:bg-white/[0.03] p-2.5 border border-indigo-100 dark:border-white/5"
+          >
+            <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-700 dark:text-indigo-300">
+              Coupled System: {cs.label}
+            </span>
+            <p className="mt-0.5 text-[11px] text-neutral-700 dark:text-white/80">
+              {cs.couplingExplanation}
+            </p>
+          </div>
+        ))}
+      </div>
     </div>
   )
 }

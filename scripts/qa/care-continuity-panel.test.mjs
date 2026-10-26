@@ -16,6 +16,7 @@ import {
   deriveEdenCareCompanion,
   deriveEdenLifeBalanceSynthesis,
   deriveEdenLifeStoryBridge,
+  deriveEdenPhysiologyAppreciation,
   translateClinicalTermToEden,
   EDEN_PLAIN_LANGUAGE_GLOSSARY,
 } from '../../src/domains/clinical-operations/model/careContinuityProjection.ts'
@@ -1916,4 +1917,52 @@ test('deriveEdenLifeStoryBridge & CareEpisode: Eden Personal Life Story & Turnin
 
   const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
   assert.ok(episodeSource.includes('data-eden-life-story-card="v1"'), 'CareEpisode must include Eden life story card')
+})
+
+test('deriveEdenPhysiologyAppreciation & CareEpisode: Eden Living Physiology Appreciation & Organ System Connection Bridge (T-CLIN-24 / EDEN-04)', () => {
+  const evaluatedAt = '2026-10-26T05:30:00.000Z'
+
+  // 1. ICD-10 I-prefix -> cardiovascular with respiratory & renal coupling
+  const cardioEpisode = {
+    id: 'ce_phys_cardio',
+    title: 'Essential Hypertension Control',
+    diagnosisCode: 'I10',
+    createdAt: '2026-10-20T08:00:00.000Z',
+    updatedAt: '2026-10-25T08:00:00.000Z',
+    stages: [{ stage: 'problem', status: 'done' }, { stage: 'treatment', status: 'active' }],
+  }
+  const cardioApp = deriveEdenPhysiologyAppreciation(cardioEpisode)
+  assert.equal(cardioApp.primarySystem.id, 'cardiovascular')
+  assert.equal(cardioApp.primarySystem.bodyTwinRoute, '/body')
+  assert.equal(cardioApp.coupledSystems.length, 2)
+  assert.equal(cardioApp.coupledSystems[0].id, 'respiratory')
+  assert.equal(cardioApp.coupledSystems[1].id, 'renal_urinary')
+  assert.equal(cardioApp.truthClass, 'educational_physiology_reference')
+  assert.equal(cardioApp.neverFabricatesMeasuredVitals, true)
+
+  // 2. Title keyword -> digestive_hepatobiliary
+  const hepatoEpisode = {
+    id: 'ce_phys_hepato',
+    title: 'Gallstone Cholecystectomy Recovery',
+    createdAt: '2026-10-20T08:00:00.000Z',
+    updatedAt: '2026-10-25T08:00:00.000Z',
+    stages: [{ stage: 'problem', status: 'done' }],
+  }
+  const hepatoApp = deriveEdenPhysiologyAppreciation(hepatoEpisode)
+  assert.equal(hepatoApp.primarySystem.id, 'digestive_hepatobiliary')
+  assert.equal(hepatoApp.coupledSystems[0].id, 'metabolic_endocrine')
+
+  // 3. Rollup in evaluateCareJourneyContinuity
+  const projection = evaluateCareJourneyContinuity([cardioEpisode, hepatoEpisode], evaluatedAt)
+  assert.equal(projection.edenPhysiologyLinkedCount, 2)
+  assert.ok(projection.episodes[0].edenPhysiologyAppreciation)
+  assert.equal(projection.episodes[0].edenPhysiologyAppreciation.primarySystem.id, 'cardiovascular')
+
+  // 4. UI contracts
+  const panelSource = read('src/domains/clinical-operations/ui/CareContinuityPanel.tsx')
+  assert.ok(panelSource.includes('data-eden-physiology-bridge="v1"'), 'CareContinuityPanel must include Eden physiology bridge attribute')
+
+  const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
+  assert.ok(episodeSource.includes('data-eden-physiology-card="v1"'), 'CareEpisode must include Eden physiology card')
+  assert.ok(episodeSource.includes('data-eden-coupled-systems="v1"'), 'CareEpisode must include coupled systems grid')
 })

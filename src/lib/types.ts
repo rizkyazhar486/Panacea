@@ -408,6 +408,36 @@ export interface EdenLifeStoryBridge {
   selfAuthoredNeverInferred: true
 }
 
+export type EdenOrganSystemId =
+  | 'cardiovascular'
+  | 'respiratory'
+  | 'metabolic_endocrine'
+  | 'musculoskeletal'
+  | 'neurological'
+  | 'digestive_hepatobiliary'
+  | 'renal_urinary'
+  | 'immune_lymphatic'
+  | 'whole_body_homeostasis'
+
+export interface EdenPhysiologyAppreciation {
+  episodeId: string
+  episodeTitle: string
+  primarySystem: {
+    id: EdenOrganSystemId
+    label: string
+    bodyTwinRoute: string
+  }
+  coupledSystems: {
+    id: EdenOrganSystemId
+    label: string
+    couplingExplanation: string
+  }[]
+  livingWonderHeadline: string
+  homeostaticMechanismSummary: string
+  truthClass: 'educational_physiology_reference'
+  neverFabricatesMeasuredVitals: true
+}
+
 export interface CareJourneyExportSummary {
   standard: 'PANACEA-CAREPLAN-FHIR-R4-V1'
   generatedAt: string
