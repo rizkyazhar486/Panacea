@@ -8,6 +8,7 @@ import {
   deriveCareJourneyTimelineEvents,
   exportCareJourneySummary,
   evaluateEpisodeReadmissionRisk,
+  deriveEdenCareCompanion,
 } from '../../domains/clinical-operations'
 import {
   CARE_EPISODE_STAGES,
@@ -51,6 +52,7 @@ import type {
   PlanItem,
   SupportiveResult,
   CareJourneyReferralRecord,
+  EdenDisclosureDepth,
 } from '../../lib/types'
 import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 import { PanaceaZoneNav } from '../../components/PanaceaZoneNav'
@@ -452,6 +454,9 @@ function EpisodeCard({
       {episode.referralRecord && (
         <ReferralHandshakeSection referral={episode.referralRecord} />
       )}
+
+      {/* Eden Three-Depth Progressive Disclosure & Plain-Language Clinical Companion (T-CLIN-21 / EDEN-01) */}
+      <EdenCareCompanionSection episode={episode} onChange={onChange} />
     </Card>
   )
 }
@@ -858,6 +863,104 @@ function ReferralHandshakeSection({ referral }: { referral: CareJourneyReferralR
       <div className="mt-2 text-[10px] font-mono text-neutral-400 dark:text-white/40 truncate">
         Digest: {referral.auditDigest}
       </div>
+    </div>
+  )
+}
+
+function EdenCareCompanionSection({
+  episode,
+  onChange,
+}: {
+  episode: CareEpisode
+  onChange: (next: CareEpisode) => void
+}) {
+  const [depth, setDepth] = useState<EdenDisclosureDepth>(episode.edenDepthPreference ?? 'simple')
+  const companion = useMemo(() => deriveEdenCareCompanion(episode, depth), [episode, depth])
+
+  function selectDepth(nextDepth: EdenDisclosureDepth) {
+    setDepth(nextDepth)
+    onChange({ ...episode, edenDepthPreference: nextDepth })
+  }
+
+  return (
+    <div
+      className="mt-4 rounded-xl border border-emerald-200 dark:border-white/10 bg-emerald-50/40 dark:bg-white/[0.02] p-3.5"
+      data-eden-companion-card="v1"
+      data-eden-depth={depth}
+    >
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+        <div>
+          <div className="flex items-center gap-2 flex-wrap">
+            <h4 className="text-xs font-bold text-neutral-900 dark:text-white">
+              Eden Care Companion — Wonder & Plain-Language Clarity
+            </h4>
+            <Badge tone="normal">{companion.depthLabel}</Badge>
+          </div>
+          <p className="mt-0.5 text-[11px] italic text-emerald-800 dark:text-emerald-300">
+            {companion.wonderReflection}
+          </p>
+        </div>
+        <div className="flex items-center gap-1.5 flex-wrap" data-eden-depth-selector="v1">
+          {(['simple', 'explore', 'deep'] as const).map((d) => (
+            <button
+              key={d}
+              type="button"
+              onClick={() => selectDepth(d)}
+              className={`rounded-lg px-2.5 py-1 text-[10px] font-semibold transition-colors ${
+                depth === d
+                  ? 'bg-emerald-600 text-white'
+                  : 'bg-neutral-200 dark:bg-white/10 text-neutral-700 dark:text-white/75 hover:bg-neutral-300 dark:hover:bg-white/20'
+              }`}
+            >
+              {d === 'simple' ? 'Simple' : d === 'explore' ? 'Explore' : 'Deep'}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="mt-3 grid gap-2 sm:grid-cols-2 text-xs">
+        <div className="rounded-lg bg-white/80 dark:bg-white/[0.03] p-2.5 border border-emerald-100 dark:border-white/5">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-500 dark:text-white/50">
+            What is happening
+          </span>
+          <p className="mt-0.5 text-neutral-800 dark:text-white/85">{companion.whatIsHappening}</p>
+        </div>
+        <div className="rounded-lg bg-white/80 dark:bg-white/[0.03] p-2.5 border border-emerald-100 dark:border-white/5">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-500 dark:text-white/50">
+            Why it matters
+          </span>
+          <p className="mt-0.5 text-neutral-800 dark:text-white/85">{companion.whyItMatters}</p>
+        </div>
+        <div
+          className="rounded-lg bg-white/80 dark:bg-white/[0.03] p-2.5 border border-emerald-100 dark:border-white/5"
+          data-eden-beautiful-next-step="v1"
+        >
+          <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-300">
+            One Beautiful Next Step ({companion.nextBeautifulStep.stageLabel})
+          </span>
+          <p className="mt-0.5 font-medium text-neutral-900 dark:text-white">{companion.whatYouCanDo}</p>
+        </div>
+        <div className="rounded-lg bg-white/80 dark:bg-white/[0.03] p-2.5 border border-emerald-100 dark:border-white/5">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-500 dark:text-white/50">
+            What remains uncertain
+          </span>
+          <p className="mt-0.5 text-neutral-700 dark:text-white/75">{companion.whatRemainsUncertain}</p>
+        </div>
+      </div>
+
+      {depth !== 'simple' && (
+        <div className="mt-2.5 flex flex-wrap gap-1.5 pt-2 border-t border-emerald-200/60 dark:border-white/10" data-eden-glossary="v1">
+          {companion.plainLanguageGlossary.map((term) => (
+            <span
+              key={term.technicalTerm}
+              className="inline-flex items-center gap-1 rounded-md bg-white/70 dark:bg-white/5 px-2 py-0.5 text-[10px] text-neutral-600 dark:text-white/70"
+            >
+              <strong className="text-neutral-900 dark:text-white">{term.technicalTerm}:</strong>{' '}
+              {term.humanTranslation}
+            </span>
+          ))}
+        </div>
+      )}
     </div>
   )
 }

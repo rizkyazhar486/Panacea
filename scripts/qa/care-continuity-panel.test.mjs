@@ -13,6 +13,9 @@ import {
   deriveCareJourneyCostSummary,
   evaluateEpisodeReadmissionRisk,
   evaluateReferralHandshakeContinuity,
+  deriveEdenCareCompanion,
+  translateClinicalTermToEden,
+  EDEN_PLAIN_LANGUAGE_GLOSSARY,
 } from '../../src/domains/clinical-operations/model/careContinuityProjection.ts'
 import {
   ensureEpisodeFromVerifiedPlan,
@@ -1648,4 +1651,83 @@ test('evaluateReferralHandshakeContinuity & CareContinuityPanel: inter-facility 
 
   const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
   assert.ok(episodeSource.includes('data-care-referral-section="v1"'), 'CareEpisode must include referral handshake section')
+})
+
+test('deriveEdenCareCompanion & CareEpisode: Eden 3-depth progressive disclosure & plain-language clinical companion (T-CLIN-21 / EDEN-01)', () => {
+  const evaluatedAt = '2026-10-26T04:00:00.000Z'
+
+  // 1. Five-Second Understanding Rule: Plain-language glossary translations
+  assert.equal(EDEN_PLAIN_LANGUAGE_GLOSSARY.length, 6)
+  assert.equal(translateClinicalTermToEden('Provenance'), 'Where this information came from')
+  assert.equal(translateClinicalTermToEden('Interoperability'), 'Connecting your health information safely')
+  assert.equal(translateClinicalTermToEden('Homeostasis'), 'How your body maintains its balance')
+  assert.equal(translateClinicalTermToEden('Evidence confidence'), 'How well this information is supported')
+  assert.equal(translateClinicalTermToEden('Physiological system'), 'How this part of your body works')
+  assert.equal(translateClinicalTermToEden('Trajectory'), 'How things are changing over time')
+
+  const episode = {
+    id: 'ce_eden_1',
+    title: 'Essential Hypertension Balance Plan',
+    diagnosisCode: 'I10',
+    createdAt: '2026-10-20T08:00:00.000Z',
+    updatedAt: '2026-10-25T10:00:00.000Z',
+    estimatedCostLow: 1_500_000,
+    estimatedCostHigh: 2_500_000,
+    costConfidence: 'estimated',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'diagnosis', status: 'done' },
+      { stage: 'plan', status: 'done' },
+      { stage: 'treatment', status: 'active' },
+      { stage: 'recovery', status: 'pending' },
+    ],
+    milestones: [
+      {
+        id: 'ms_bp_home',
+        title: 'Morning blood pressure check',
+        category: 'Monitoring',
+        targetStage: 'treatment',
+        status: 'completed',
+      },
+    ],
+  }
+
+  // 2. Depth 1: Simple · Just Live
+  const simpleCompanion = deriveEdenCareCompanion(episode, 'simple')
+  assert.equal(simpleCompanion.depth, 'simple')
+  assert.equal(simpleCompanion.depthLabel, 'Simple · Just Live')
+  assert.equal(simpleCompanion.clinicalSafetyPreserved, true)
+  assert.equal(simpleCompanion.nextBeautifulStep.stage, 'treatment')
+  assert.equal(simpleCompanion.nextBeautifulStep.urgencyTone, 'calm')
+  assert.ok(simpleCompanion.wonderReflection.includes('natural balance'))
+  assert.ok(simpleCompanion.whatIsHappening.includes('Essential Hypertension Balance Plan'))
+
+  // 3. Depth 2: Explore · Understand More
+  const exploreCompanion = deriveEdenCareCompanion(episode, 'explore')
+  assert.equal(exploreCompanion.depth, 'explore')
+  assert.equal(exploreCompanion.depthLabel, 'Explore · Understand More')
+  assert.ok(exploreCompanion.wonderReflection.includes('homeostasis'))
+  assert.ok(exploreCompanion.whatYouCanDo.includes('1/1 care plan items fulfilled'))
+
+  // 4. Depth 3: Deep · Scientific & Clinical
+  const deepCompanion = deriveEdenCareCompanion(episode, 'deep')
+  assert.equal(deepCompanion.depth, 'deep')
+  assert.equal(deepCompanion.depthLabel, 'Deep · Scientific & Clinical')
+  assert.ok(deepCompanion.whatIsHappening.includes('ICD-10: I10'))
+  assert.ok(deepCompanion.whyItMatters.includes('never-deny-care'))
+
+  // 5. evaluateCareJourneyContinuity rollup
+  const projection = evaluateCareJourneyContinuity([episode], evaluatedAt)
+  assert.equal(projection.edenReadyJourneysCount, 1)
+  assert.equal(projection.episodes[0].edenCompanion?.depthLabel, 'Simple · Just Live')
+
+  // 6. UI contracts
+  const panelSource = read('src/domains/clinical-operations/ui/CareContinuityPanel.tsx')
+  assert.ok(panelSource.includes('data-eden-calm-companion="v1"'), 'CareContinuityPanel must include Eden calm companion attribute')
+  assert.ok(panelSource.includes('data-eden-next-step="v1"'), 'CareContinuityPanel must include Eden next step attribute')
+
+  const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
+  assert.ok(episodeSource.includes('data-eden-companion-card="v1"'), 'CareEpisode must include Eden companion card')
+  assert.ok(episodeSource.includes('data-eden-depth-selector="v1"'), 'CareEpisode must include Eden 3-depth selector')
+  assert.ok(episodeSource.includes('data-eden-beautiful-next-step="v1"'), 'CareEpisode must include One Beautiful Next Step card')
 })

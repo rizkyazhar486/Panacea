@@ -552,6 +552,14 @@ export function CareContinuityPanel({
                   </span>
                 </div>
               )}
+              {careJourneys.edenReadyJourneysCount > 0 && (
+                <div className="flex justify-between text-emerald-200" data-eden-calm-companion="v1">
+                  <span>Eden 3-depth companion:</span>
+                  <span className="font-bold">
+                    {careJourneys.edenReadyJourneysCount} active (Simple · Explore · Deep)
+                  </span>
+                </div>
+              )}
 
               {careJourneys.episodes.length > 0 && (
                 <div className="mt-3 border-t border-white/8 pt-2">
@@ -673,6 +681,15 @@ export function CareContinuityPanel({
                             <span className="font-mono text-[9px] text-white/60">ICD-10: {ep.diagnosisCode}</span>
                           ) : null}
                         </div>
+                        {ep.edenCompanion && (
+                          <div
+                            className="mt-1 text-[10px] text-emerald-200/85 truncate"
+                            data-eden-next-step="v1"
+                            title={ep.edenCompanion.nextBeautifulStep.invitation}
+                          >
+                            Next step: {ep.edenCompanion.nextBeautifulStep.invitation}
+                          </div>
+                        )}
                       </li>
                     ))}
                   </ul>
