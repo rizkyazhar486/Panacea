@@ -691,6 +691,17 @@ export function CareContinuityPanel({
                   </span>
                 </div>
               )}
+              {careJourneys.edenBioCosmicSymphonyReadyCount > 0 && (
+                <div
+                  className="flex justify-between text-violet-300"
+                  data-eden-bio-cosmic-symphony="v1"
+                >
+                  <span>Simfoni bio-kosmis & lattice realitas:</span>
+                  <span className="font-bold">
+                    {careJourneys.edenBioCosmicSymphonyReadyCount} episode terhubung
+                  </span>
+                </div>
+              )}
 
               {careJourneys.episodes.length > 0 && (
                 <div className="mt-3 border-t border-white/8 pt-2">
