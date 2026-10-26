@@ -100,6 +100,11 @@ import type {
   EdenMitochondrialFusionNodeKind,
   EdenMitochondrialFusionNode,
   EdenMitochondrialHeteroplasmyBridge,
+  EdenCircadianAutophagyState,
+  EdenXenohormeticPulseTier,
+  EdenXenohormeticPulseNodeKind,
+  EdenXenohormeticPulseNode,
+  EdenCircadianAutophagyPulseBridge,
   WellnessDay,
   MoodEntry,
   Circle,
@@ -215,6 +220,7 @@ export interface CareJourneyEpisodeSummary {
   edenRegenerativePlasticity?: EdenRegenerativePlasticityBridge
   edenEpigeneticAgeReversal?: EdenEpigeneticAgeReversalBridge
   edenMitochondrialHeteroplasmy?: EdenMitochondrialHeteroplasmyBridge
+  edenCircadianAutophagyPulse?: EdenCircadianAutophagyPulseBridge
 }
 
 export type ReadmissionRiskLevel = 'low' | 'moderate' | 'high'
@@ -316,6 +322,7 @@ export interface CareJourneyContinuityResult {
   edenRegenerativePlasticityReadyCount: number
   edenEpigeneticAgeReversalReadyCount: number
   edenMitochondrialHeteroplasmyReadyCount: number
+  edenCircadianAutophagyPulseReadyCount: number
   edenLifeBalance: EdenLifeBalanceSynthesis
   hasBlockedStages: boolean
 }
@@ -3840,6 +3847,115 @@ export function deriveEdenMitochondrialHeteroplasmyBridge(
   }
 }
 
+export function deriveEdenCircadianAutophagyPulseBridge(
+  episode: CareEpisode,
+): EdenCircadianAutophagyPulseBridge {
+  const stages = episode.stages ?? []
+  const completedStages = stages.filter((s) => s.status === 'done').length
+  const hasBlocked = stages.some((s) => s.status === 'blocked')
+  const blockedCount = stages.filter((s) => s.status === 'blocked').length
+
+  const circadianSynchronyIndex = hasBlocked
+    ? Math.max(45, 66 - blockedCount * 7)
+    : Math.min(99, 78 + completedStages * 5)
+
+  const autophagicFluxCapacity = hasBlocked
+    ? Math.max(43, 64 - blockedCount * 7)
+    : Math.min(98, 77 + completedStages * 5)
+
+  const xenohormeticResilienceScore = hasBlocked
+    ? Math.max(42, 62 - blockedCount * 8)
+    : Math.min(98, 76 + completedStages * 5)
+
+  let autophagyState: EdenCircadianAutophagyState = 'intermittent_metabolic_switching_balance'
+  let autophagyStateLabel = 'Keseimbangan Peralihan Metabolik Intermiten Adaptif'
+  let pulseTier: EdenXenohormeticPulseTier = 'compensated_xenoprotective_equilibrium'
+  let pulseTierLabel = 'Keseimbangan Xenoprotektif Terkompensasi Stabil'
+
+  if (hasBlocked) {
+    autophagyState = 'chronodisrupted_autophagic_stagnation'
+    autophagyStateLabel = 'Stagnasi Autofagi Akibat Kronodisrupsi Sirkadian'
+    pulseTier = 'maladaptive_oxidative_exhaustion'
+    pulseTierLabel = 'Kelelahan Oksidatif Maladaptif & Hilangnya Plastisitas Hormesis'
+  } else if (completedStages >= 3) {
+    autophagyState = 'synchronized_pulsatile_autophagy'
+    autophagyStateLabel = 'Autofagi Pulsatil Tersinkronisasi Sirkadian Presisi'
+    pulseTier = 'robust_biphasic_hormetic_adaptation'
+    pulseTierLabel = 'Adaptasi Hormesis Bifasik Kuat & Perlindungan Proteom Maksimal'
+  } else if (completedStages === 0) {
+    autophagyState = 'attenuated_circadian_amplitude_lag'
+    autophagyStateLabel = 'Lag Amplitudo Ritme Sirkadian Teredam Dini'
+    pulseTier = 'blunted_hormetic_plasticity'
+    pulseTierLabel = 'Plastisitas Hormesis Tumpul Sementara'
+  }
+
+  const pulseNodes: EdenXenohormeticPulseNode[] = [
+    {
+      nodeKind: 'ampk_ulk1_fasting_autophagy_trigger',
+      nodeLabel: 'Pemicu Autofagi Puasa AMPK-ULK1 (Deteksi Deplesi Energi Seluler)',
+      activationIndex: hasBlocked ? 0.61 : Math.min(0.99, 0.78 + completedStages * 0.05),
+      circadianSynchronyScore: hasBlocked ? 0.59 : Math.min(0.98, 0.76 + completedStages * 0.05),
+      pulseDynamicsStatus: hasBlocked ? 'blunted_stagnation' : completedStages >= 2 ? 'optimal_pulsatile_flux' : 'compensated_adaptive_signal',
+      mechanisticNote: 'Fosforilasi ULK1 serin 317/777 oleh AMPK saat rasio AMP/ATP meningkat di fase istirahat nokturnal guna menginisiasi autofagosom.',
+    },
+    {
+      nodeKind: 'sirt1_pgc1a_xenohormetic_deacetylation_flux',
+      nodeLabel: 'Fluks Deasetilasi Xenohormesis SIRT1-PGC-1α (NAD+ Tergantung)',
+      activationIndex: hasBlocked ? 0.63 : Math.min(0.98, 0.79 + completedStages * 0.05),
+      circadianSynchronyScore: hasBlocked ? 0.60 : Math.min(0.99, 0.77 + completedStages * 0.05),
+      pulseDynamicsStatus: hasBlocked ? 'blunted_stagnation' : completedStages >= 2 ? 'optimal_pulsatile_flux' : 'compensated_adaptive_signal',
+      mechanisticNote: 'Deasetilasi koaktivator transkripsional PGC-1α dan FOXO3a yang dipicu ketersediaan NAD+ metabolik dan fitokimia xenohormetik.',
+    },
+    {
+      nodeKind: 'nrf2_electrophilic_phase2_defense',
+      nodeLabel: 'Pertahanan Antioksidan Fase-II Nrf2-Keap1 (Respons Stres Elektrofilik)',
+      activationIndex: hasBlocked ? 0.58 : Math.min(0.97, 0.75 + completedStages * 0.06),
+      circadianSynchronyScore: hasBlocked ? 0.58 : Math.min(0.98, 0.75 + completedStages * 0.06),
+      pulseDynamicsStatus: hasBlocked ? 'blunted_stagnation' : completedStages >= 2 ? 'optimal_pulsatile_flux' : 'compensated_adaptive_signal',
+      mechanisticNote: 'Disosiasi Nrf2 dari represor Keap1 memicu translokasi nuklear dan ekspresi elemen respons antioksidan (ARE) endogenous.',
+    },
+    {
+      nodeKind: 'mtorc1_tfeb_lysosomal_biogenesis',
+      nodeLabel: 'Biogenesis Lisosomal & Klirens TFEB-mTORC1 (Osilasi Bifasik Makan-Puasa)',
+      activationIndex: hasBlocked ? 0.62 : Math.min(0.99, 0.77 + completedStages * 0.05),
+      circadianSynchronyScore: hasBlocked ? 0.61 : Math.min(0.97, 0.74 + completedStages * 0.06),
+      pulseDynamicsStatus: hasBlocked ? 'blunted_stagnation' : completedStages >= 2 ? 'optimal_pulsatile_flux' : 'compensated_adaptive_signal',
+      mechanisticNote: 'Defosforilasi faktor transkripsi EB (TFEB) saat penekanan sementara mTORC1 memicu translokasi ke nukleus untuk biogenesis lisosom.',
+    },
+  ]
+
+  const autophagyNarrativeId = `Sintesis autofagi pulsatil sirkadian & respons xenohormesis untuk episode "${episode.title}". Status autofagi: ${autophagyStateLabel}, respons pulsa xenohormetik: ${pulseTierLabel}. Indeks sinkroni sirkadian ${circadianSynchronyIndex}%, kapasitas fluks autofagi ${autophagicFluxCapacity}%, dan skor resiliensi xenohormesis ${xenohormeticResilienceScore}%.`
+  const autophagyNarrativeEn = `Circadian pulsatile autophagy & xenohormetic response synthesis for episode "${episode.title}". Autophagy state: ${autophagyStateLabel}, xenohormetic pulse tier: ${pulseTierLabel}. Circadian synchrony index ${circadianSynchronyIndex}%, autophagic flux capacity ${autophagicFluxCapacity}%, and xenohormetic resilience score ${xenohormeticResilienceScore}%.`
+
+  const xenohormeticLongevityStrategy = hasBlocked
+    ? 'Sinkronkan kembali ritme makan-puasa (time-restricted feeding 12:12) dan kurangi paparan cahaya biru malam hari guna memulihkan osilasi ritme sirkadian sebelum mengaplikasikan tantangan xenohormetik lebih intens.'
+    : completedStages >= 3
+    ? 'Pertahankan adaptasi hormesis bifasik melalui stimulasi AMPK/SIRT1 berkala: jendela puasa intermiten (14-16 jam), variasi suhu teratur (sauna inframerah/mandi dingin terkendali), dan asupan polifenol xenohormetik (resveratrol, sulforafan).'
+    : 'Dukung biogenesis lisosom dan detoksifikasi fase-II dengan istirahat tidur gelap gulita, hidrasi optimal di pagi hari, dan konsumsi sayuran silangan (brassica) yang kaya prekursor sulforafan.'
+
+  return {
+    version: 'v1',
+    episodeId: episode.id,
+    episodeTitle: episode.title,
+    autophagyState,
+    autophagyStateLabel,
+    pulseTier,
+    pulseTierLabel,
+    circadianSynchronyIndex,
+    autophagicFluxCapacity,
+    xenohormeticResilienceScore,
+    pulseNodes,
+    autophagyNarrativeId,
+    autophagyNarrativeEn,
+    xenohormeticLongevityStrategy,
+    truthClass: 'circadian_autophagy_pulse_simulation_proxy',
+    clinically_reviewed: false,
+    patientTruthUncompromised: true,
+    neverManufacturesBiomarkers: true,
+    epistemicHumilityPreserved: true,
+  }
+}
+
 export const STAGE_EXPECTED_DAYS: Record<CareEpisodeStageId, number> = {
   problem: 1,
   diagnosis: 2,
@@ -4113,6 +4229,7 @@ export function evaluateCareJourneyContinuity(
     const edenRegenerativePlasticity = deriveEdenRegenerativePlasticityBridge(ep)
     const edenEpigeneticAgeReversal = deriveEdenEpigeneticAgeReversalBridge(ep)
     const edenMitochondrialHeteroplasmy = deriveEdenMitochondrialHeteroplasmyBridge(ep)
+    const edenCircadianAutophagyPulse = deriveEdenCircadianAutophagyPulseBridge(ep)
 
     return {
       id: ep.id,
@@ -4165,6 +4282,7 @@ export function evaluateCareJourneyContinuity(
       edenRegenerativePlasticity,
       edenEpigeneticAgeReversal,
       edenMitochondrialHeteroplasmy,
+      edenCircadianAutophagyPulse,
     }
   })
 
@@ -4354,6 +4472,14 @@ export function evaluateCareJourneyContinuity(
           s.edenMitochondrialHeteroplasmy?.neverManufacturesBiomarkers
       )
   ).length
+  const edenCircadianAutophagyPulseReadyCount = summaries.filter(
+    (s) =>
+      Boolean(
+        s.edenCircadianAutophagyPulse?.truthClass === 'circadian_autophagy_pulse_simulation_proxy' &&
+          s.edenCircadianAutophagyPulse?.patientTruthUncompromised &&
+          s.edenCircadianAutophagyPulse?.neverManufacturesBiomarkers
+      )
+  ).length
   const edenLifeBalance = deriveEdenLifeBalanceSynthesis(episodes, supportiveResults)
 
   return {
@@ -4410,6 +4536,7 @@ export function evaluateCareJourneyContinuity(
     edenRegenerativePlasticityReadyCount,
     edenEpigeneticAgeReversalReadyCount,
     edenMitochondrialHeteroplasmyReadyCount,
+    edenCircadianAutophagyPulseReadyCount,
     edenLifeBalance,
     hasBlockedStages: blockedJourneys > 0 || stalledCount > 0,
   }

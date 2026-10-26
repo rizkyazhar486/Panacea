@@ -36,6 +36,7 @@ import {
   deriveEdenRegenerativePlasticityBridge,
   deriveEdenEpigeneticAgeReversalBridge,
   deriveEdenMitochondrialHeteroplasmyBridge,
+  deriveEdenCircadianAutophagyPulseBridge,
   translateClinicalTermToEden,
   EDEN_PLAIN_LANGUAGE_GLOSSARY,
 } from '../../src/domains/clinical-operations/model/careContinuityProjection.ts'
@@ -3351,4 +3352,84 @@ test('deriveEdenMitochondrialHeteroplasmyBridge & CareEpisode: Eden Mitochondria
   const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
   assert.ok(episodeSource.includes('data-eden-mitochondrial-heteroplasmy-card="v1"'), 'CareEpisode must include mitochondrial heteroplasmy card')
   assert.ok(episodeSource.includes('data-eden-mitochondrial-fusion-nodes="v1"'), 'CareEpisode must include mitochondrial fusion nodes grid')
+})
+
+test('deriveEdenCircadianAutophagyPulseBridge & CareEpisode: Eden Circadian Autophagy & Xenohormetic Longevity Pulse Synthesizer (T-CLIN-45 / EDEN-25)', () => {
+  const evaluatedAt = '2026-10-26T19:00:00.000Z'
+  const sampleEpisode = {
+    id: 'ce_autophagy_1',
+    title: 'Circadian Pulsatile Autophagy & Xenohormetic Adaptation Pathway',
+    diagnosisCode: 'Z71.3',
+    createdAt: '2026-10-20T08:00:00.000Z',
+    updatedAt: '2026-10-26T08:00:00.000Z',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'diagnosis', status: 'done' },
+      { stage: 'treatment', status: 'done' },
+      { stage: 'recovery', status: 'active' },
+    ],
+  }
+
+  // 1. Pure deterministic derivation
+  const bridge = deriveEdenCircadianAutophagyPulseBridge(sampleEpisode)
+  assert.equal(bridge.version, 'v1')
+  assert.equal(bridge.episodeId, 'ce_autophagy_1')
+  assert.equal(bridge.autophagyState, 'synchronized_pulsatile_autophagy')
+  assert.equal(bridge.autophagyStateLabel, 'Autofagi Pulsatil Tersinkronisasi Sirkadian Presisi')
+  assert.equal(bridge.pulseTier, 'robust_biphasic_hormetic_adaptation')
+  assert.equal(bridge.pulseTierLabel, 'Adaptasi Hormesis Bifasik Kuat & Perlindungan Proteom Maksimal')
+  assert.ok(bridge.circadianSynchronyIndex >= 80 && bridge.circadianSynchronyIndex <= 99)
+  assert.ok(bridge.autophagicFluxCapacity >= 80 && bridge.autophagicFluxCapacity <= 98)
+  assert.ok(bridge.xenohormeticResilienceScore >= 80 && bridge.xenohormeticResilienceScore <= 98)
+  assert.equal(bridge.pulseNodes.length, 4)
+  assert.equal(bridge.pulseNodes[0].nodeKind, 'ampk_ulk1_fasting_autophagy_trigger')
+  assert.equal(bridge.pulseNodes[1].nodeKind, 'sirt1_pgc1a_xenohormetic_deacetylation_flux')
+  assert.equal(bridge.pulseNodes[2].nodeKind, 'nrf2_electrophilic_phase2_defense')
+  assert.equal(bridge.pulseNodes[3].nodeKind, 'mtorc1_tfeb_lysosomal_biogenesis')
+  assert.equal(bridge.truthClass, 'circadian_autophagy_pulse_simulation_proxy')
+  assert.equal(bridge.clinically_reviewed, false)
+  assert.equal(bridge.patientTruthUncompromised, true)
+  assert.equal(bridge.neverManufacturesBiomarkers, true)
+  assert.equal(bridge.epistemicHumilityPreserved, true)
+  assert.ok(bridge.autophagyNarrativeId.includes('Sintesis autofagi pulsatil sirkadian'))
+  assert.ok(bridge.autophagyNarrativeEn.includes('Circadian pulsatile autophagy'))
+  assert.ok(bridge.xenohormeticLongevityStrategy.includes('Pertahankan adaptasi hormesis bifasik'))
+
+  // 2. Blocked stage resilience check
+  const blockedEpisode = {
+    id: 'ce_autophagy_blocked',
+    title: 'Severe Chronodisruption & Autophagic Stagnation Exhaustion',
+    diagnosisCode: 'G47.20',
+    createdAt: '2026-10-20T08:00:00.000Z',
+    updatedAt: '2026-10-26T08:00:00.000Z',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'diagnosis', status: 'blocked', blockedReason: 'Awaiting circadian metabolomics and lysosomal enzyme clearance panel' },
+    ],
+  }
+  const blockedBridge = deriveEdenCircadianAutophagyPulseBridge(blockedEpisode)
+  assert.equal(blockedBridge.autophagyState, 'chronodisrupted_autophagic_stagnation')
+  assert.equal(blockedBridge.autophagyStateLabel, 'Stagnasi Autofagi Akibat Kronodisrupsi Sirkadian')
+  assert.equal(blockedBridge.pulseTier, 'maladaptive_oxidative_exhaustion')
+  assert.equal(blockedBridge.pulseTierLabel, 'Kelelahan Oksidatif Maladaptif & Hilangnya Plastisitas Hormesis')
+  assert.ok(blockedBridge.circadianSynchronyIndex <= 65)
+  assert.ok(blockedBridge.autophagicFluxCapacity <= 62)
+  assert.ok(blockedBridge.xenohormeticResilienceScore <= 60)
+  assert.ok(blockedBridge.xenohormeticLongevityStrategy.includes('Sinkronkan kembali ritme makan-puasa'))
+
+  // 3. Rollup in evaluateCareJourneyContinuity
+  const projection = evaluateCareJourneyContinuity([sampleEpisode, blockedEpisode], evaluatedAt)
+  assert.equal(projection.edenCircadianAutophagyPulseReadyCount, 2)
+  assert.ok(projection.episodes[0].edenCircadianAutophagyPulse)
+  assert.equal(projection.episodes[0].edenCircadianAutophagyPulse.truthClass, 'circadian_autophagy_pulse_simulation_proxy')
+  assert.equal(projection.episodes[0].edenCircadianAutophagyPulse.patientTruthUncompromised, true)
+  assert.equal(projection.episodes[0].edenCircadianAutophagyPulse.neverManufacturesBiomarkers, true)
+
+  // 4. UI contracts
+  const panelSource = read('src/domains/clinical-operations/ui/CareContinuityPanel.tsx')
+  assert.ok(panelSource.includes('data-eden-circadian-autophagy="v1"'), 'CareContinuityPanel must include circadian-autophagy attribute')
+
+  const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
+  assert.ok(episodeSource.includes('data-eden-circadian-autophagy-card="v1"'), 'CareEpisode must include circadian autophagy card')
+  assert.ok(episodeSource.includes('data-eden-xenohormetic-pulse-nodes="v1"'), 'CareEpisode must include xenohormetic pulse nodes grid')
 })
