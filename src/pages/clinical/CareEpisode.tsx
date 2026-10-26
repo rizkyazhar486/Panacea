@@ -36,6 +36,7 @@ import {
   deriveEdenSirtuinNadParp1Bridge,
   deriveEdenShelterinCapProtectionBridge,
   deriveEdenMitophagicPrimingBridge,
+  deriveEdenMicrovascularResilienceBridge,
 } from '../../domains/clinical-operations'
 import {
   CARE_EPISODE_STAGES,
@@ -695,6 +696,9 @@ function EpisodeCard({
 
       {/* Eden Mitochondrial Fission Quality Control & Mitophagic Priming Synthesizer (T-CLIN-49 / EDEN-29) */}
       <EdenMitophagicPrimingSection episode={episode} />
+
+      {/* Eden Endothelial Nitric Oxide Synthase & Microvascular Glycocalyx Synthesizer (T-CLIN-50 / EDEN-30) */}
+      <EdenMicrovascularResilienceSection episode={episode} />
     </Card>
   )
 }
@@ -3876,6 +3880,128 @@ function EdenMitophagicPrimingSection({ episode }: { episode: CareEpisode }) {
 
       <div className="mt-2 text-[10px] text-neutral-500 dark:text-white/50 text-right">
         ARGON EDEN ∞ §07 · Mitochondrial Fission Quality Control & Mitophagic Priming Synthesizer · Patient Truth Uncompromised · Never Manufactures Biomarkers
+      </div>
+    </div>
+  )
+}
+
+function EdenMicrovascularResilienceSection({ episode }: { episode: CareEpisode }) {
+  const [lang, setLang] = useState<'id' | 'en'>('id')
+
+  const bridge = useMemo(
+    () => deriveEdenMicrovascularResilienceBridge(episode),
+    [episode]
+  )
+
+  const narrative = lang === 'id' ? bridge.microvascularNarrativeId : bridge.microvascularNarrativeEn
+
+  return (
+    <div
+      className="mt-3 rounded-xl border border-sky-200 dark:border-white/10 bg-sky-50/30 dark:bg-white/[0.02] p-3.5"
+      data-eden-glycocalyx-card="v1"
+    >
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+        <div>
+          <div className="flex items-center gap-2 flex-wrap">
+            <h4 className="text-xs font-bold text-neutral-900 dark:text-white">
+              {lang === 'id'
+                ? 'Glikokaliks Endotel Mikrovaskular & Bioavailabilitas eNOS'
+                : 'Microvascular Endothelial Glycocalyx & eNOS Bioavailability'}
+            </h4>
+            <span className="rounded-full bg-sky-100 dark:bg-white/10 px-2 py-0.5 text-[10px] font-bold text-sky-800 dark:text-sky-300">
+              {bridge.glycocalyxStateLabel}
+            </span>
+          </div>
+          <p className="mt-0.5 text-[11px] text-neutral-600 dark:text-white/70">
+            {bridge.resilienceTierLabel}
+          </p>
+        </div>
+        <div className="flex items-center gap-2 self-start sm:self-auto">
+          <div className="flex rounded-md border border-sky-200 dark:border-white/10 p-0.5 text-[10px]">
+            <button
+              type="button"
+              onClick={() => setLang('id')}
+              className={`px-1.5 py-0.5 rounded ${lang === 'id' ? 'bg-sky-600 text-white font-bold' : 'text-neutral-600 dark:text-white/60'}`}
+            >
+              ID
+            </button>
+            <button
+              type="button"
+              onClick={() => setLang('en')}
+              className={`px-1.5 py-0.5 rounded ${lang === 'en' ? 'bg-sky-600 text-white font-bold' : 'text-neutral-600 dark:text-white/60'}`}
+            >
+              EN
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-2.5 grid grid-cols-1 sm:grid-cols-3 gap-2">
+        <div className="rounded-lg bg-sky-100/40 dark:bg-white/[0.03] p-2 text-center">
+          <span className="text-[10px] text-neutral-500 dark:text-white/60 block">
+            {lang === 'id' ? 'Bioavailabilitas Oksida Nitrat' : 'Nitric Oxide Bioavailability'}
+          </span>
+          <span className="text-sm font-extrabold text-sky-700 dark:text-sky-400">
+            {bridge.nitricOxideBioavailabilityScore}%
+          </span>
+        </div>
+        <div className="rounded-lg bg-sky-100/40 dark:bg-white/[0.03] p-2 text-center">
+          <span className="text-[10px] text-neutral-500 dark:text-white/60 block">
+            {lang === 'id' ? 'Integritas Glikokaliks' : 'Glycocalyx Integrity'}
+          </span>
+          <span className="text-sm font-extrabold text-sky-700 dark:text-sky-400">
+            {bridge.glycocalyxIntegrityIndex}%
+          </span>
+        </div>
+        <div className="rounded-lg bg-sky-100/40 dark:bg-white/[0.03] p-2 text-center">
+          <span className="text-[10px] text-neutral-500 dark:text-white/60 block">
+            {lang === 'id' ? 'Kapasitas Perfusi Kapiler' : 'Capillary Perfusion Capacity'}
+          </span>
+          <span className="text-sm font-extrabold text-sky-700 dark:text-sky-400">
+            {bridge.capillaryPerfusionCapacity}%
+          </span>
+        </div>
+      </div>
+
+      <p className="mt-2 text-xs text-neutral-700 dark:text-white/80 leading-relaxed">
+        {narrative}
+      </p>
+
+      <div className="mt-2.5 space-y-1.5" data-eden-glycocalyx-nodes="v1">
+        <div className="text-[10px] font-bold text-neutral-500 dark:text-white/60 uppercase tracking-wider">
+          {lang === 'id' ? 'Nodus Integritas & Mekanotransduksi Endotel (4 Nodus)' : 'Endothelial Integrity & Mechanotransduction Nodes (4 Nodes)'}
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-1.5">
+          {bridge.glycocalyxNodes.map((node) => (
+            <div
+              key={node.nodeKind}
+              className="rounded-lg border border-sky-200/50 dark:border-white/10 bg-white/60 dark:bg-white/[0.02] p-2 text-xs"
+            >
+              <div className="flex items-center justify-between gap-1">
+                <span className="font-bold text-neutral-800 dark:text-white truncate">
+                  {node.nodeLabel}
+                </span>
+                <span className="text-[10px] font-bold text-sky-700 dark:text-sky-300">
+                  {Math.round(node.perfusionEfficiencyScore * 100)}%
+                </span>
+              </div>
+              <div className="mt-0.5 text-[10px] text-neutral-500 dark:text-white/60">
+                {node.mechanisticNote}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="mt-2.5 rounded-lg border border-sky-200/40 dark:border-white/10 bg-sky-100/30 dark:bg-white/[0.02] p-2.5 text-xs space-y-1">
+        <div className="text-[11px] text-neutral-800 dark:text-white/85">
+          <b>{lang === 'id' ? 'Strategi Perlindungan Barier Glikokaliks & Longevitas Mikrovaskular:' : 'Glycocalyx Barrier Protection & Microvascular Longevity Strategy:'}</b>{' '}
+          {bridge.microvascularLongevityStrategy}
+        </div>
+      </div>
+
+      <div className="mt-2 text-[10px] text-neutral-500 dark:text-white/50 text-right">
+        ARGON EDEN ∞ §07 · Endothelial Nitric Oxide Synthase & Microvascular Glycocalyx Synthesizer · Patient Truth Uncompromised · Never Manufactures Biomarkers
       </div>
     </div>
   )

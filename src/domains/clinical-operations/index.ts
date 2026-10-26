@@ -84,6 +84,7 @@ export {
   deriveEdenSirtuinNadParp1Bridge,
   deriveEdenShelterinCapProtectionBridge,
   deriveEdenMitophagicPrimingBridge,
+  deriveEdenMicrovascularResilienceBridge,
   translateClinicalTermToEden,
   EDEN_PLAIN_LANGUAGE_GLOSSARY,
   STAGE_LABEL,
