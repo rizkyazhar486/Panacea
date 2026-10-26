@@ -148,6 +148,32 @@ test('fully acknowledged online episode reaches ready transport state', () => {
   assert.equal(result.acknowledgedCount, 1)
 })
 
+test('malformed transport states fail closed instead of becoming offline-ready', () => {
+  for (const patch of [
+    { delivery: 'unknown' },
+    { kind: 'unknown' },
+    { durableLocalCopy: 'false' },
+    { encryptedAtRest: 'false' },
+  ]) {
+    const result = evaluateClinicalEpisodeResilience(input([{ ...base, eventId: 'evt-1', ...patch }]))
+    const label = JSON.stringify(patch)
+    assert.equal(result.state, 'blocked', label)
+    assert.equal(result.safeToContinueOffline, false, label)
+    assert.deepEqual(result.integrityConflictIds, ['evt-1'], label)
+  }
+})
+
+test('invalid connectivity and secure-storage capability are rejected explicitly', () => {
+  assert.throws(
+    () => evaluateClinicalEpisodeResilience(input([], { connectivity: 'offline-ish' })),
+    /connectivity must be online, degraded, or offline/,
+  )
+  assert.throws(
+    () => evaluateClinicalEpisodeResilience(input([], { secureLocalStorageAvailable: 'false' })),
+    /secureLocalStorageAvailable must be a boolean/,
+  )
+})
+
 test('transport resilience never claims clinical readiness', () => {
   const source = String(evaluateClinicalEpisodeResilience)
   assert.doesNotMatch(source, /diagnos|treat|prescrib/i)

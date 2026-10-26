@@ -60,6 +60,19 @@ function validIdentity(value: string): boolean {
   return value.trim().length > 0
 }
 
+function validTransportKind(value: unknown): value is EpisodeTransportKind {
+  return value === 'observation'
+    || value === 'lab-order'
+    || value === 'specimen-handoff'
+    || value === 'diagnostic-result'
+    || value === 'care-plan'
+    || value === 'claim-evidence'
+}
+
+function validDeliveryState(value: unknown): value is EpisodeDeliveryState {
+  return value === 'pending' || value === 'acknowledged' || value === 'rejected'
+}
+
 function sameReplay(a: ClinicalEpisodeTransportEvent, b: ClinicalEpisodeTransportEvent): boolean {
   // Delivery state and post-acknowledgement storage metadata may change between
   // transport updates. Two pending copies must not use that flexibility to hide
@@ -103,6 +116,12 @@ export function evaluateClinicalEpisodeResilience(
   if (!Number.isFinite(evaluatedAtMs)) throw new Error('evaluatedAt must be a valid timestamp')
   if (!validIdentity(input.patientId)) throw new Error('patientId is required')
   if (!validIdentity(input.episodeId)) throw new Error('episodeId is required')
+  if (input.connectivity !== 'online' && input.connectivity !== 'degraded' && input.connectivity !== 'offline') {
+    throw new Error('connectivity must be online, degraded, or offline')
+  }
+  if (typeof input.secureLocalStorageAvailable !== 'boolean') {
+    throw new Error('secureLocalStorageAvailable must be a boolean')
+  }
   const maxRetryCount = input.maxRetryCount ?? 8
   if (!Number.isInteger(maxRetryCount) || maxRetryCount < 0) {
     throw new Error('maxRetryCount must be a non-negative integer')
@@ -124,6 +143,17 @@ export function evaluateClinicalEpisodeResilience(
     const eventId = event.eventId.trim()
     if (!eventId || !validIdentity(event.sourceId) || !validIdentity(event.payloadDigest)) {
       integrityConflictIds.add(event.eventId || '(missing-event-id)')
+      continue
+    }
+    if (
+      !validTransportKind(event.kind)
+      || !validDeliveryState(event.delivery)
+      || typeof event.durableLocalCopy !== 'boolean'
+      || typeof event.encryptedAtRest !== 'boolean'
+    ) {
+      // Type declarations do not validate data received at runtime. Unknown
+      // transport states and non-boolean protection claims must fail closed.
+      integrityConflictIds.add(eventId)
       continue
     }
     if (event.patientId !== input.patientId || event.episodeId !== input.episodeId) {
