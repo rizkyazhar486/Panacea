@@ -12,6 +12,7 @@ import {
   deriveEdenLifeBalanceSynthesis,
   deriveEdenLifeStoryBridge,
   deriveEdenPhysiologyAppreciation,
+  deriveEdenPreventionLongevityRhythm,
 } from '../../domains/clinical-operations'
 import {
   CARE_EPISODE_STAGES,
@@ -566,6 +567,9 @@ function EpisodeCard({
 
       {/* Eden Living Physiology Appreciation & Organ System Connection Bridge (T-CLIN-24 / EDEN-04) */}
       <EdenPhysiologyAppreciationSection episode={episode} />
+
+      {/* Eden Daily Prevention, Longevity Rhythm & Restorative Habit Continuity Bridge (T-CLIN-25 / EDEN-05) */}
+      <EdenLongevityRhythmSection episode={episode} recordPlan={recordPlan} />
     </Card>
   )
 }
@@ -1221,6 +1225,78 @@ function EdenPhysiologyAppreciationSection({ episode }: { episode: CareEpisode }
             <p className="mt-0.5 text-[11px] text-neutral-700 dark:text-white/80">
               {cs.couplingExplanation}
             </p>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function EdenLongevityRhythmSection({
+  episode,
+  recordPlan,
+}: {
+  episode: CareEpisode
+  recordPlan?: readonly PlanItem[]
+}) {
+  const rhythm = useMemo(
+    () => deriveEdenPreventionLongevityRhythm(episode, recordPlan),
+    [episode, recordPlan]
+  )
+
+  return (
+    <div
+      className="mt-3 rounded-xl border border-amber-200 dark:border-white/10 bg-amber-50/35 dark:bg-white/[0.02] p-3.5"
+      data-eden-longevity-card="v1"
+      data-longevity-phase={rhythm.rhythmPhase}
+    >
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+        <div>
+          <div className="flex items-center gap-2 flex-wrap">
+            <h4 className="text-xs font-bold text-neutral-900 dark:text-white">
+              Daily Prevention & Longevity Rhythm — Sustainable Flourishing
+            </h4>
+            <Badge tone="normal">{rhythm.rhythmPhaseLabel}</Badge>
+            <Badge tone="neutral">Non-Prescriptive · Educational Rhythm</Badge>
+          </div>
+          <p className="mt-1 text-xs text-neutral-700 dark:text-white/80">
+            {rhythm.compassionateHeadline}
+          </p>
+        </div>
+      </div>
+
+      <div className="mt-2.5 rounded-lg bg-white/80 dark:bg-white/[0.03] p-2.5 border border-amber-100 dark:border-white/5">
+        <span className="text-[10px] font-bold uppercase tracking-wider text-amber-800 dark:text-amber-300">
+          One Gentle Daily Habit
+        </span>
+        <p className="mt-0.5 text-xs font-medium text-neutral-900 dark:text-white">
+          {rhythm.oneGentleDailyHabit}
+        </p>
+      </div>
+
+      <div className="mt-2.5 grid gap-2 sm:grid-cols-2 lg:grid-cols-4 text-xs" data-eden-longevity-pillars="v1">
+        {rhythm.pillars.map((p) => (
+          <div
+            key={p.pillar}
+            className="rounded-lg bg-white/80 dark:bg-white/[0.03] p-2.5 border border-amber-100 dark:border-white/5 flex flex-col justify-between gap-1.5"
+          >
+            <div>
+              <span className="text-[10px] font-bold uppercase tracking-wider text-amber-800 dark:text-amber-300">
+                {p.label}
+              </span>
+              <p className="mt-0.5 text-[11px] font-medium text-neutral-800 dark:text-white/85">
+                {p.gentlePractice}
+              </p>
+              <p className="mt-0.5 text-[10px] text-neutral-500 dark:text-white/55">
+                {p.physiologicalRationale}
+              </p>
+            </div>
+            <Link
+              to={p.workspaceRoute}
+              className="text-[10px] font-semibold text-amber-700 dark:text-amber-300 hover:underline self-start"
+            >
+              Open {p.label.split(' ')[0]} →
+            </Link>
           </div>
         ))}
       </div>

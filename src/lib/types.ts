@@ -438,6 +438,33 @@ export interface EdenPhysiologyAppreciation {
   neverFabricatesMeasuredVitals: true
 }
 
+export type EdenLongevityPillarId =
+  | 'sleep_circadian'
+  | 'movement_vitality'
+  | 'nourishment_hydration'
+  | 'autonomic_calm'
+
+export interface EdenLongevityPillarRecommendation {
+  pillar: EdenLongevityPillarId
+  label: string
+  gentlePractice: string
+  physiologicalRationale: string
+  workspaceRoute: string
+}
+
+export interface EdenPreventionLongevityRhythm {
+  episodeId: string
+  episodeTitle: string
+  primaryOrganSystem: EdenOrganSystemId
+  rhythmPhase: 'acute_restoration' | 'active_rebuilding' | 'longevity_maintenance'
+  rhythmPhaseLabel: string
+  compassionateHeadline: string
+  oneGentleDailyHabit: string
+  pillars: EdenLongevityPillarRecommendation[]
+  clinicianVerifiedPlanCount: number
+  nonPrescriptiveEducationalBoundary: true
+}
+
 export interface CareJourneyExportSummary {
   standard: 'PANACEA-CAREPLAN-FHIR-R4-V1'
   generatedAt: string
