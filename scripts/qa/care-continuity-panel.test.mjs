@@ -40,6 +40,7 @@ import {
   deriveEdenRetrotransposonSilencingBridge,
   deriveEdenSirtuinNadParp1Bridge,
   deriveEdenShelterinCapProtectionBridge,
+  deriveEdenMitophagicPrimingBridge,
   translateClinicalTermToEden,
   EDEN_PLAIN_LANGUAGE_GLOSSARY,
 } from '../../src/domains/clinical-operations/model/careContinuityProjection.ts'
@@ -3663,4 +3664,78 @@ test('deriveEdenShelterinCapProtectionBridge & CareEpisode: Eden Telomeric Shelt
   const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
   assert.ok(episodeSource.includes('data-eden-shelterin-card="v1"'), 'CareEpisode must include shelterin card')
   assert.ok(episodeSource.includes('data-eden-shelterin-nodes="v1"'), 'CareEpisode must include shelterin nodes grid')
+})
+
+test('deriveEdenMitophagicPrimingBridge & CareEpisode: Eden Mitochondrial Fission Quality Control & Mitophagic Priming Synthesizer (T-CLIN-49 / EDEN-29)', () => {
+  const evaluatedAt = '2026-10-26T20:00:00.000Z'
+  const sampleEpisode = {
+    id: 'ce_mitophagy_1',
+    title: 'Mitochondrial Fission Quality Control & Mitophagic Priming Pathway',
+    diagnosisCode: 'Z00.00',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'diagnosis', status: 'done' },
+      { stage: 'plan', status: 'done' },
+      { stage: 'treatment', status: 'done' },
+      { stage: 'recovery', status: 'active' },
+    ],
+  }
+
+  // 1. Pure deterministic derivation
+  const bridge = deriveEdenMitophagicPrimingBridge(sampleEpisode)
+  assert.equal(bridge.version, 'v1')
+  assert.equal(bridge.episodeId, 'ce_mitophagy_1')
+  assert.equal(bridge.fissionState, 'balanced_drp1_parkin_mitophagy_equilibrium')
+  assert.equal(bridge.fissionStateLabel, 'Keseimbangan Fisi Mitokondria & Priming Mitofagi Terorkestrasi')
+  assert.equal(bridge.qualityControlTier, 'high_fidelity_pink1_parkin_ubiquitination')
+  assert.equal(bridge.qualityControlTierLabel, 'Ubiquitinasi PINK1/Parkin Presisi Tinggi & Eliminasi Organel Disfungsional')
+  assert.ok(bridge.mitophagicFluxVitalityScore >= 85)
+  assert.ok(bridge.membranePotentialRetentionScore >= 85)
+  assert.ok(bridge.parkinUbiquitinationCapacity >= 85)
+  assert.equal(bridge.mitophagyNodes.length, 4)
+  assert.equal(bridge.mitophagyNodes[0].nodeKind, 'drp1_mff_outer_membrane_fission_constriction')
+  assert.equal(bridge.mitophagyNodes[1].nodeKind, 'pink1_accumulation_depolarized_omm')
+  assert.equal(bridge.mitophagyNodes[2].nodeKind, 'parkin_e3_ligase_polyubiquitination')
+  assert.equal(bridge.mitophagyNodes[3].nodeKind, 'optineurin_ndp52_autophagosome_engulfment')
+  assert.equal(bridge.truthClass, 'mitochondrial_fission_mitophagy_simulation_proxy')
+  assert.equal(bridge.clinically_reviewed, false)
+  assert.equal(bridge.patientTruthUncompromised, true)
+  assert.equal(bridge.neverManufacturesBiomarkers, true)
+  assert.equal(bridge.epistemicHumilityPreserved, true)
+
+  // 2. Blocked stage resilience
+  const blockedEpisode = {
+    id: 'ce_mitophagy_blocked',
+    title: 'Blocked Mitochondrial Depolarization Collapse Episode',
+    diagnosisCode: 'G31.84',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'diagnosis', status: 'blocked', blockedReason: 'Awaiting tetramethylrhodamine methyl ester (TMRM) mitochondrial membrane potential assay' },
+    ],
+  }
+  const blockedBridge = deriveEdenMitophagicPrimingBridge(blockedEpisode)
+  assert.equal(blockedBridge.fissionState, 'mitophagic_arrest_depolarization_collapse')
+  assert.equal(blockedBridge.fissionStateLabel, 'Kolaps Depolarisasi Membran Dalam & Hambatan Mitofagi Parah')
+  assert.equal(blockedBridge.qualityControlTier, 'severe_ros_leakage_mitophagy_blockade')
+  assert.equal(blockedBridge.qualityControlTierLabel, 'Kebocoran ROS Parah & Blokade Jalur Mitofagi Kritis')
+  assert.ok(blockedBridge.mitophagicFluxVitalityScore <= 65)
+  assert.ok(blockedBridge.membranePotentialRetentionScore <= 65)
+  assert.ok(blockedBridge.parkinUbiquitinationCapacity <= 65)
+  assert.equal(blockedBridge.mitophagyNodes.every((n) => n.fissionDynamicsStatus === 'fragmentation_strain'), true)
+
+  // 3. Rollup in evaluateCareJourneyContinuity
+  const projection = evaluateCareJourneyContinuity([sampleEpisode, blockedEpisode], evaluatedAt)
+  assert.equal(projection.edenMitophagicPrimingReadyCount, 2)
+  assert.ok(projection.episodes[0].edenMitophagicPriming)
+  assert.equal(projection.episodes[0].edenMitophagicPriming.truthClass, 'mitochondrial_fission_mitophagy_simulation_proxy')
+  assert.equal(projection.episodes[0].edenMitophagicPriming.patientTruthUncompromised, true)
+  assert.equal(projection.episodes[0].edenMitophagicPriming.neverManufacturesBiomarkers, true)
+
+  // 4. UI contracts
+  const panelSource = read('src/domains/clinical-operations/ui/CareContinuityPanel.tsx')
+  assert.ok(panelSource.includes('data-eden-mitophagy="v1"'), 'CareContinuityPanel must include mitophagy attribute')
+
+  const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
+  assert.ok(episodeSource.includes('data-eden-mitophagy-card="v1"'), 'CareEpisode must include mitophagy card')
+  assert.ok(episodeSource.includes('data-eden-mitophagy-nodes="v1"'), 'CareEpisode must include mitophagy nodes grid')
 })

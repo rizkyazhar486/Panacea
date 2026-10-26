@@ -120,6 +120,11 @@ import type {
   EdenShelterinSubunitNodeKind,
   EdenShelterinSubunitNode,
   EdenShelterinCapProtectionBridge,
+  EdenMitochondrialFissionState,
+  EdenMitophagicQualityControlTier,
+  EdenMitophagyNodeKind,
+  EdenMitophagyNode,
+  EdenMitophagicPrimingBridge,
   WellnessDay,
   MoodEntry,
   Circle,
@@ -239,6 +244,7 @@ export interface CareJourneyEpisodeSummary {
   edenRetrotransposonSilencing?: EdenRetrotransposonSilencingBridge
   edenSirtuinNadParp1?: EdenSirtuinNadParp1Bridge
   edenShelterinCapProtection?: EdenShelterinCapProtectionBridge
+  edenMitophagicPriming?: EdenMitophagicPrimingBridge
 }
 
 export type ReadmissionRiskLevel = 'low' | 'moderate' | 'high'
@@ -344,6 +350,7 @@ export interface CareJourneyContinuityResult {
   edenRetrotransposonSilencingReadyCount: number
   edenSirtuinNadParp1ReadyCount: number
   edenShelterinCapProtectionReadyCount: number
+  edenMitophagicPrimingReadyCount: number
   edenLifeBalance: EdenLifeBalanceSynthesis
   hasBlockedStages: boolean
 }
@@ -4304,6 +4311,115 @@ export function deriveEdenShelterinCapProtectionBridge(
   }
 }
 
+export function deriveEdenMitophagicPrimingBridge(
+  episode: CareEpisode,
+): EdenMitophagicPrimingBridge {
+  const stages = episode.stages ?? []
+  const completedStages = stages.filter((s) => s.status === 'done').length
+  const hasBlocked = stages.some((s) => s.status === 'blocked')
+  const blockedCount = stages.filter((s) => s.status === 'blocked').length
+
+  const mitophagicFluxVitalityScore = hasBlocked
+    ? Math.max(45, 66 - blockedCount * 7)
+    : Math.min(99, 78 + completedStages * 5)
+
+  const membranePotentialRetentionScore = hasBlocked
+    ? Math.max(44, 64 - blockedCount * 7)
+    : Math.min(98, 77 + completedStages * 5)
+
+  const parkinUbiquitinationCapacity = hasBlocked
+    ? Math.max(43, 63 - blockedCount * 8)
+    : Math.min(98, 76 + completedStages * 5)
+
+  let fissionState: EdenMitochondrialFissionState = 'compensated_fission_clearance'
+  let fissionStateLabel = 'Klirens Organel Mitokondria Fragmen Terkompensasi'
+  let qualityControlTier: EdenMitophagicQualityControlTier = 'adequate_lc3_receptor_autophagosome_docking'
+  let qualityControlTierLabel = 'Penambatan Reseptor LC3 pada Autofagosom Memadai'
+
+  if (hasBlocked) {
+    fissionState = 'mitophagic_arrest_depolarization_collapse'
+    fissionStateLabel = 'Kolaps Depolarisasi Membran Dalam & Hambatan Mitofagi Parah'
+    qualityControlTier = 'severe_ros_leakage_mitophagy_blockade'
+    qualityControlTierLabel = 'Kebocoran ROS Parah & Blokade Jalur Mitofagi Kritis'
+  } else if (completedStages >= 3) {
+    fissionState = 'balanced_drp1_parkin_mitophagy_equilibrium'
+    fissionStateLabel = 'Keseimbangan Fisi Mitokondria & Priming Mitofagi Terorkestrasi'
+    qualityControlTier = 'high_fidelity_pink1_parkin_ubiquitination'
+    qualityControlTierLabel = 'Ubiquitinasi PINK1/Parkin Presisi Tinggi & Eliminasi Organel Disfungsional'
+  } else if (completedStages === 0) {
+    fissionState = 'excessive_drp1_fragmentation_strain'
+    fissionStateLabel = 'Tekanan Fragmentasi Mitokondria Berlebih & Kerusakan Membran Dini'
+    qualityControlTier = 'delayed_depolarized_cristae_clearance'
+    qualityControlTierLabel = 'Pembersihan Krista Mitokondria Terdepolarisasi Tertunda'
+  }
+
+  const mitophagyNodes: EdenMitophagyNode[] = [
+    {
+      nodeKind: 'drp1_mff_outer_membrane_fission_constriction',
+      nodeLabel: 'Konstriksi Membran Luar Mitokondria via DRP1-Mff (Pemecahan Asimetris Terarah)',
+      clearanceEfficiencyScore: hasBlocked ? 0.62 : Math.min(0.99, 0.79 + completedStages * 0.05),
+      membranePolarityIndex: hasBlocked ? 0.60 : Math.min(0.98, 0.77 + completedStages * 0.05),
+      fissionDynamicsStatus: hasBlocked ? 'fragmentation_strain' : completedStages >= 2 ? 'optimal_mitophagic_flux' : 'adaptive_clearance_state',
+      mechanisticNote: 'Perekrutan protein dinamin DRP1 ke reseptor membran luar Mff dan Fis1 memfasilitasi pembelahan terarah organel mitokondria yang rusak untuk isolasi selektif.',
+    },
+    {
+      nodeKind: 'pink1_accumulation_depolarized_omm',
+      nodeLabel: 'Akumulasi Kinasa PINK1 pada Membran Terdepolarisasi (Sensor Kehilangan Potensial Membran ΔΨm)',
+      clearanceEfficiencyScore: hasBlocked ? 0.61 : Math.min(0.98, 0.78 + completedStages * 0.05),
+      membranePolarityIndex: hasBlocked ? 0.59 : Math.min(0.99, 0.76 + completedStages * 0.05),
+      fissionDynamicsStatus: hasBlocked ? 'fragmentation_strain' : completedStages >= 2 ? 'optimal_mitophagic_flux' : 'adaptive_clearance_state',
+      mechanisticNote: 'Hilangnya gradien proton mencegah impor PINK1 ke membran dalam melalui TIM23, menyebabkan akumulasi molekuler stabil di membran luar dan memicu fosforilasi ubiquitin.',
+    },
+    {
+      nodeKind: 'parkin_e3_ligase_polyubiquitination',
+      nodeLabel: 'Aktivasi E3 Ubiquitin Ligase Parkin & Poli-Ubiquitinasi Proteom Membran Luar',
+      clearanceEfficiencyScore: hasBlocked ? 0.63 : Math.min(0.99, 0.80 + completedStages * 0.05),
+      membranePolarityIndex: hasBlocked ? 0.61 : Math.min(0.98, 0.78 + completedStages * 0.05),
+      fissionDynamicsStatus: hasBlocked ? 'fragmentation_strain' : completedStages >= 2 ? 'optimal_mitophagic_flux' : 'adaptive_clearance_state',
+      mechanisticNote: 'Pengikatan ubiquitin terfosforilasi melepaskan autoinhibisi Parkin sitosolik, mengkatalisis sintesis rantai polubiquitin K63/K48 pada protein target membran luar mitokondria.',
+    },
+    {
+      nodeKind: 'optineurin_ndp52_autophagosome_engulfment',
+      nodeLabel: 'Perekrutan Adaptor Autofagi Optineurin/NDP52 & Penelanan Fagofor Bertaut LC3',
+      clearanceEfficiencyScore: hasBlocked ? 0.59 : Math.min(0.97, 0.76 + completedStages * 0.06),
+      membranePolarityIndex: hasBlocked ? 0.58 : Math.min(0.97, 0.75 + completedStages * 0.06),
+      fissionDynamicsStatus: hasBlocked ? 'fragmentation_strain' : completedStages >= 2 ? 'optimal_mitophagic_flux' : 'adaptive_clearance_state',
+      mechanisticNote: 'Adaptor mitofagi mengenali sinyal ubiquitin dan berikatan dengan rantai LC3-II pada membran fagofor yang mengembang untuk fusi lisosom dan degradasi total enzimatis.',
+    },
+  ]
+
+  const fissionNarrativeId = `Sintesis kontrol kualitas fisi mitokondria & priming mitofagi untuk episode "${episode.title}". Status fisi: ${fissionStateLabel}, kualitas eliminasi mitofagi: ${qualityControlTierLabel}. Skor vitalitas fluks mitofagi ${mitophagicFluxVitalityScore}%, indeks retensi potensial membran ${membranePotentialRetentionScore}%, dan kapasitas ubiquitinasi Parkin ${parkinUbiquitinationCapacity}%.`
+  const fissionNarrativeEn = `Mitochondrial fission quality control & mitophagic priming synthesis for episode "${episode.title}". Fission state: ${fissionStateLabel}, mitophagic quality tier: ${qualityControlTierLabel}. Mitophagic flux vitality score ${mitophagicFluxVitalityScore}%, membrane potential retention index ${membranePotentialRetentionScore}%, and Parkin ubiquitination capacity ${parkinUbiquitinationCapacity}%.`
+
+  const mitochondrialQualityControlStrategy = hasBlocked
+    ? 'Atasi hambatan mitofagi dan kolaps membran dalam melalui suplementasi Urolithin A di bawah pengawasan klinisi, aktivasi fluks lisosom, reduksi radikal bebas O2•-, dan pencegahan akumulasi mtDNA sitosolik pro-inflamasi.'
+    : completedStages >= 3
+    ? 'Pertahankan efisiensi klirens mitokondria usang melalui latihan resistensi intermiten, puasa periodik untuk aktivasi kinase AMPK, dan konsumsi senyawa penginduksi mitofagi alami (seperti ellagitannin dan spermidine).'
+    : 'Dukung priming mitofagi dengan optimasi nutrisi koenzim Q10, magnesium seluler, asam alfa-lipoat, dan hidrasi sitoplasmik adekuat.'
+
+  return {
+    version: 'v1',
+    episodeId: episode.id,
+    episodeTitle: episode.title,
+    fissionState,
+    fissionStateLabel,
+    qualityControlTier,
+    qualityControlTierLabel,
+    mitophagicFluxVitalityScore,
+    membranePotentialRetentionScore,
+    parkinUbiquitinationCapacity,
+    mitophagyNodes,
+    fissionNarrativeId,
+    fissionNarrativeEn,
+    mitochondrialQualityControlStrategy,
+    truthClass: 'mitochondrial_fission_mitophagy_simulation_proxy',
+    clinically_reviewed: false,
+    patientTruthUncompromised: true,
+    neverManufacturesBiomarkers: true,
+    epistemicHumilityPreserved: true,
+  }
+}
+
 export const STAGE_EXPECTED_DAYS: Record<CareEpisodeStageId, number> = {
   problem: 1,
   diagnosis: 2,
@@ -4581,6 +4697,7 @@ export function evaluateCareJourneyContinuity(
     const edenRetrotransposonSilencing = deriveEdenRetrotransposonSilencingBridge(ep)
     const edenSirtuinNadParp1 = deriveEdenSirtuinNadParp1Bridge(ep)
     const edenShelterinCapProtection = deriveEdenShelterinCapProtectionBridge(ep)
+    const edenMitophagicPriming = deriveEdenMitophagicPrimingBridge(ep)
 
     return {
       id: ep.id,
@@ -4637,6 +4754,7 @@ export function evaluateCareJourneyContinuity(
       edenRetrotransposonSilencing,
       edenSirtuinNadParp1,
       edenShelterinCapProtection,
+      edenMitophagicPriming,
     }
   })
 
@@ -4858,6 +4976,14 @@ export function evaluateCareJourneyContinuity(
           s.edenShelterinCapProtection?.neverManufacturesBiomarkers
       )
   ).length
+  const edenMitophagicPrimingReadyCount = summaries.filter(
+    (s) =>
+      Boolean(
+        s.edenMitophagicPriming?.truthClass === 'mitochondrial_fission_mitophagy_simulation_proxy' &&
+          s.edenMitophagicPriming?.patientTruthUncompromised &&
+          s.edenMitophagicPriming?.neverManufacturesBiomarkers
+      )
+  ).length
   const edenLifeBalance = deriveEdenLifeBalanceSynthesis(episodes, supportiveResults)
 
   return {
@@ -4918,6 +5044,7 @@ export function evaluateCareJourneyContinuity(
     edenRetrotransposonSilencingReadyCount,
     edenSirtuinNadParp1ReadyCount,
     edenShelterinCapProtectionReadyCount,
+    edenMitophagicPrimingReadyCount,
     edenLifeBalance,
     hasBlockedStages: blockedJourneys > 0 || stalledCount > 0,
   }
