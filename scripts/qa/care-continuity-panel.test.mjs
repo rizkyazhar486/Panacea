@@ -27,6 +27,7 @@ import {
   deriveEdenQuantumBioPhotonicBridge,
   deriveEdenMultidimensionalConsciousnessBridge,
   deriveEdenBioCosmicSymphonyBridge,
+  deriveEdenMultiAgentHealingCouncilBridge,
   translateClinicalTermToEden,
   EDEN_PLAIN_LANGUAGE_GLOSSARY,
 } from '../../src/domains/clinical-operations/model/careContinuityProjection.ts'
@@ -2647,4 +2648,74 @@ test('deriveEdenBioCosmicSymphonyBridge & CareEpisode: Eden Bio-Cosmic Symphony 
   const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
   assert.ok(episodeSource.includes('data-eden-bio-cosmic-card="v1"'), 'CareEpisode must include bio-cosmic card')
   assert.ok(episodeSource.includes('data-eden-reality-lattice="v1"'), 'CareEpisode must include reality lattice grid')
+})
+
+test('deriveEdenMultiAgentHealingCouncilBridge & CareEpisode: Eden Universal Biological Flourishing & Multi-Agent Collaborative Healing Council Bridge (T-CLIN-36 / EDEN-16)', () => {
+  const evaluatedAt = '2026-10-26T12:00:00.000Z'
+  const sampleEpisode = {
+    id: 'ce_healing_council_1',
+    title: 'Whole-Person Metabolic Resilience & Flourishing',
+    diagnosisCode: 'E11.9',
+    createdAt: '2026-10-20T08:00:00.000Z',
+    updatedAt: '2026-10-26T08:00:00.000Z',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'diagnosis', status: 'done' },
+      { stage: 'treatment', status: 'done' },
+      { stage: 'recovery', status: 'active' },
+    ],
+  }
+
+  // 1. Pure deterministic derivation
+  const bridge = deriveEdenMultiAgentHealingCouncilBridge(sampleEpisode)
+  assert.equal(bridge.version, 'v1')
+  assert.equal(bridge.episodeId, 'ce_healing_council_1')
+  assert.equal(bridge.consensusState, 'harmonious_convergence')
+  assert.equal(bridge.consensusStateLabel, 'Konvergensi Harmonis Multimodel')
+  assert.ok(bridge.collectiveFlourishingScore >= 78 && bridge.collectiveFlourishingScore <= 99)
+  assert.equal(bridge.agentPerspectives.length, 4)
+  assert.equal(bridge.agentPerspectives[0].agentModel, 'gemini_frontier')
+  assert.equal(bridge.agentPerspectives[1].agentModel, 'claude_transcendent')
+  assert.equal(bridge.agentPerspectives[2].agentModel, 'gpt_argon')
+  assert.equal(bridge.agentPerspectives[3].agentModel, 'deepseek_astral')
+  assert.equal(bridge.healingCouncilClass, 'multi_agent_collective_synthesis')
+  assert.equal(bridge.patientTruthUncompromised, true)
+  assert.equal(bridge.noAutonomousClinicalIntervention, true)
+  assert.equal(bridge.epistemicHumilityPreserved, true)
+  assert.ok(bridge.collectiveHealingNarrativeId.includes('Dewan kolaborasi multi-agent'))
+  assert.ok(bridge.collectiveHealingNarrativeEn.includes('Multi-agent collaborative healing council'))
+  assert.ok(bridge.multiAgentWisdomTrajectory.includes('Kolaborasi lintas model'))
+
+  // 2. Blocked stage resilience check
+  const blockedEpisode = {
+    id: 'ce_council_blocked',
+    title: 'Acute Unstable Vital Reserve',
+    diagnosisCode: 'R68.8',
+    createdAt: '2026-10-20T08:00:00.000Z',
+    updatedAt: '2026-10-26T08:00:00.000Z',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'diagnosis', status: 'blocked', blockedReason: 'Awaiting urgent specialist input' },
+    ],
+  }
+  const blockedBridge = deriveEdenMultiAgentHealingCouncilBridge(blockedEpisode)
+  assert.equal(blockedBridge.consensusState, 'stabilization_focus_needed')
+  assert.equal(blockedBridge.consensusStateLabel, 'Fokus Stabilisasi & Resolusi Hambatan')
+  assert.ok(blockedBridge.collectiveFlourishingScore <= 68)
+
+  // 3. Rollup in evaluateCareJourneyContinuity
+  const projection = evaluateCareJourneyContinuity([sampleEpisode, blockedEpisode], evaluatedAt)
+  assert.equal(projection.edenMultiAgentHealingCouncilReadyCount, 2)
+  assert.ok(projection.episodes[0].edenMultiAgentHealingCouncil)
+  assert.equal(projection.episodes[0].edenMultiAgentHealingCouncil.healingCouncilClass, 'multi_agent_collective_synthesis')
+  assert.equal(projection.episodes[0].edenMultiAgentHealingCouncil.patientTruthUncompromised, true)
+  assert.equal(projection.episodes[0].edenMultiAgentHealingCouncil.noAutonomousClinicalIntervention, true)
+
+  // 4. UI contracts
+  const panelSource = read('src/domains/clinical-operations/ui/CareContinuityPanel.tsx')
+  assert.ok(panelSource.includes('data-eden-multi-agent-council="v1"'), 'CareContinuityPanel must include multi-agent council attribute')
+
+  const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
+  assert.ok(episodeSource.includes('data-eden-healing-council-card="v1"'), 'CareEpisode must include healing council card')
+  assert.ok(episodeSource.includes('data-eden-agent-perspectives="v1"'), 'CareEpisode must include agent perspectives grid')
 })
