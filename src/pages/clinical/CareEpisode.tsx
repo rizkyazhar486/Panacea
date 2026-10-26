@@ -38,6 +38,7 @@ import {
   deriveEdenMitophagicPrimingBridge,
   deriveEdenMicrovascularResilienceBridge,
   deriveEdenRibosomalQuiescenceBridge,
+  deriveEdenLamp2aTranslocationBridge,
 } from '../../domains/clinical-operations'
 import {
   CARE_EPISODE_STAGES,
@@ -703,6 +704,9 @@ function EpisodeCard({
 
       {/* Eden Ribosomal Biogenesis Stress & Nucleolar Quiescence Synthesizer (T-CLIN-51 / EDEN-31) */}
       <EdenRibosomalQuiescenceSection episode={episode} />
+
+      {/* Eden Chaperone-Mediated Autophagy & LAMP2A Lysosomal Translocation Synthesizer (T-CLIN-52 / EDEN-32) */}
+      <EdenLamp2aTranslocationSection episode={episode} />
     </Card>
   )
 }
@@ -4128,6 +4132,128 @@ function EdenRibosomalQuiescenceSection({ episode }: { episode: CareEpisode }) {
 
       <div className="mt-2 text-[10px] text-neutral-500 dark:text-white/50 text-right">
         ARGON EDEN ∞ §07 · Ribosomal Biogenesis Stress & Nucleolar Quiescence Synthesizer · Patient Truth Uncompromised · Never Manufactures Biomarkers
+      </div>
+    </div>
+  )
+}
+
+function EdenLamp2aTranslocationSection({ episode }: { episode: CareEpisode }) {
+  const [lang, setLang] = useState<'id' | 'en'>('id')
+
+  const bridge = useMemo(
+    () => deriveEdenLamp2aTranslocationBridge(episode),
+    [episode]
+  )
+
+  const narrative = lang === 'id' ? bridge.cmaNarrativeId : bridge.cmaNarrativeEn
+
+  return (
+    <div
+      className="mt-3 rounded-xl border border-indigo-200 dark:border-white/10 bg-indigo-50/30 dark:bg-white/[0.02] p-3.5"
+      data-eden-lamp2a-card="v1"
+    >
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+        <div>
+          <div className="flex items-center gap-2 flex-wrap">
+            <h4 className="text-xs font-bold text-neutral-900 dark:text-white">
+              {lang === 'id'
+                ? 'Autofagi Termediasi Pendamping & Translokasi LAMP2A'
+                : 'Chaperone-Mediated Autophagy & LAMP2A Translocation'}
+            </h4>
+            <span className="rounded-full bg-indigo-100 dark:bg-white/10 px-2 py-0.5 text-[10px] font-bold text-indigo-800 dark:text-indigo-300">
+              {bridge.cmaStateLabel}
+            </span>
+          </div>
+          <p className="mt-0.5 text-[11px] text-neutral-600 dark:text-white/70">
+            {bridge.cmaTierLabel}
+          </p>
+        </div>
+        <div className="flex items-center gap-2 self-start sm:self-auto">
+          <div className="flex rounded-md border border-indigo-200 dark:border-white/10 p-0.5 text-[10px]">
+            <button
+              type="button"
+              onClick={() => setLang('id')}
+              className={`px-1.5 py-0.5 rounded ${lang === 'id' ? 'bg-indigo-600 text-white font-bold' : 'text-neutral-600 dark:text-white/60'}`}
+            >
+              ID
+            </button>
+            <button
+              type="button"
+              onClick={() => setLang('en')}
+              className={`px-1.5 py-0.5 rounded ${lang === 'en' ? 'bg-indigo-600 text-white font-bold' : 'text-neutral-600 dark:text-white/60'}`}
+            >
+              EN
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-2.5 grid grid-cols-1 sm:grid-cols-3 gap-2">
+        <div className="rounded-lg bg-indigo-100/40 dark:bg-white/[0.03] p-2 text-center">
+          <span className="text-[10px] text-neutral-500 dark:text-white/60 block">
+            {lang === 'id' ? 'Skor Translokasi CMA' : 'CMA Translocation Score'}
+          </span>
+          <span className="text-sm font-extrabold text-indigo-700 dark:text-indigo-400">
+            {bridge.cmaTranslocationScore}%
+          </span>
+        </div>
+        <div className="rounded-lg bg-indigo-100/40 dark:bg-white/[0.03] p-2 text-center">
+          <span className="text-[10px] text-neutral-500 dark:text-white/60 block">
+            {lang === 'id' ? 'Indeks Multimerisasi LAMP2A' : 'LAMP2A Multimerization Index'}
+          </span>
+          <span className="text-sm font-extrabold text-indigo-700 dark:text-indigo-400">
+            {bridge.lamp2aMultimerizationIndex}%
+          </span>
+        </div>
+        <div className="rounded-lg bg-indigo-100/40 dark:bg-white/[0.03] p-2 text-center">
+          <span className="text-[10px] text-neutral-500 dark:text-white/60 block">
+            {lang === 'id' ? 'Kapasitas Proteostasis KFERQ' : 'KFERQ Proteostasis Capacity'}
+          </span>
+          <span className="text-sm font-extrabold text-indigo-700 dark:text-indigo-400">
+            {bridge.kferqProteostasisCapacity}%
+          </span>
+        </div>
+      </div>
+
+      <p className="mt-2 text-xs text-neutral-700 dark:text-white/80 leading-relaxed">
+        {narrative}
+      </p>
+
+      <div className="mt-2.5 space-y-1.5" data-eden-lamp2a-nodes="v1">
+        <div className="text-[10px] font-bold text-neutral-500 dark:text-white/60 uppercase tracking-wider">
+          {lang === 'id' ? 'Nodus Jalur Translokasi Lisosomal CMA & LAMP2A (4 Nodus)' : 'CMA Lysosomal Translocation & LAMP2A Nodes (4 Nodes)'}
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-1.5">
+          {bridge.lamp2aNodes.map((node) => (
+            <div
+              key={node.nodeKind}
+              className="rounded-lg border border-indigo-200/50 dark:border-white/10 bg-white/60 dark:bg-white/[0.02] p-2 text-xs"
+            >
+              <div className="flex items-center justify-between gap-1">
+                <span className="font-bold text-neutral-800 dark:text-white truncate">
+                  {node.nodeLabel}
+                </span>
+                <span className="text-[10px] font-bold text-indigo-700 dark:text-indigo-300">
+                  {Math.round(node.translocationEfficiencyScore * 100)}%
+                </span>
+              </div>
+              <div className="mt-0.5 text-[10px] text-neutral-500 dark:text-white/60">
+                {node.mechanisticNote}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="mt-2.5 rounded-lg border border-indigo-200/40 dark:border-white/10 bg-indigo-100/30 dark:bg-white/[0.02] p-2.5 text-xs space-y-1">
+        <div className="text-[11px] text-neutral-800 dark:text-white/85">
+          <b>{lang === 'id' ? 'Strategi Modulasi CMA & Longevitas Proteomik:' : 'CMA Modulation & Proteomic Longevity Strategy:'}</b>{' '}
+          {bridge.cmaLongevityStrategy}
+        </div>
+      </div>
+
+      <div className="mt-2 text-[10px] text-neutral-500 dark:text-white/50 text-right">
+        ARGON EDEN ∞ §07 · Chaperone-Mediated Autophagy & LAMP2A Synthesizer · Patient Truth Uncompromised · Never Manufactures Biomarkers
       </div>
     </div>
   )

@@ -1537,6 +1537,55 @@ export interface EdenRibosomalQuiescenceBridge {
   epistemicHumilityPreserved: true
 }
 
+export type EdenChaperoneAutophagyState =
+  | 'optimal_lamp2a_multimerization_flux'
+  | 'balanced_hsc70_kferq_translocation'
+  | 'attenuated_lysosomal_lamp2a_clearance'
+  | 'chaperone_mediated_autophagic_blockade'
+
+export type EdenChaperoneAutophagyTier =
+  | 'optimal_cma_lysosomal_clearance'
+  | 'stable_chaperone_translocation_flux'
+  | 'moderate_cma_lysosomal_attenuation'
+  | 'critical_cma_blockade_proteotoxic_strain'
+
+export type EdenLamp2aNodeKind =
+  | 'hsc70_kferq_motif_recognition'
+  | 'lamp2a_lysosomal_multimerization'
+  | 'lysosomal_hsc70_luminal_translocation'
+  | 'cathepsin_acid_hydrolase_proteolysis'
+
+export interface EdenLamp2aNode {
+  nodeKind: EdenLamp2aNodeKind
+  nodeLabel: string
+  translocationEfficiencyScore: number
+  lysosomalClearanceIndex: number
+  cmaStatus: 'optimal_translocation_mode' | 'adaptive_clearance_state' | 'cma_attenuation_stress'
+  mechanisticNote: string
+}
+
+export interface EdenLamp2aTranslocationBridge {
+  version: 'v1'
+  episodeId: string
+  episodeTitle: string
+  cmaState: EdenChaperoneAutophagyState
+  cmaStateLabel: string
+  cmaTier: EdenChaperoneAutophagyTier
+  cmaTierLabel: string
+  cmaTranslocationScore: number
+  lamp2aMultimerizationIndex: number
+  kferqProteostasisCapacity: number
+  lamp2aNodes: EdenLamp2aNode[]
+  cmaNarrativeId: string
+  cmaNarrativeEn: string
+  cmaLongevityStrategy: string
+  truthClass: 'chaperone_autophagy_lamp2a_simulation_proxy'
+  clinically_reviewed: false
+  patientTruthUncompromised: true
+  neverManufacturesBiomarkers: true
+  epistemicHumilityPreserved: true
+}
+
 export interface CareJourneyExportSummary {
   standard: 'PANACEA-CAREPLAN-FHIR-R4-V1'
   generatedAt: string
