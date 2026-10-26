@@ -625,6 +625,17 @@ export function CareContinuityPanel({
                   </span>
                 </div>
               )}
+              {careJourneys.edenReflectionSanctuaryReadyCount > 0 && (
+                <div
+                  className="flex justify-between text-sky-200"
+                  data-eden-reflection-sanctuary="v1"
+                >
+                  <span>Reflection sanctuary:</span>
+                  <span className="font-bold">
+                    {careJourneys.edenReflectionSanctuaryReadyCount} 4-lens pluralistic
+                  </span>
+                </div>
+              )}
 
               {careJourneys.episodes.length > 0 && (
                 <div className="mt-3 border-t border-white/8 pt-2">
