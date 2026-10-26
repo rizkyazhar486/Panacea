@@ -488,6 +488,27 @@ export interface EdenSupportCircleBridge {
   noFabricatedSocialAccounts: true
 }
 
+export interface EdenVisitPreparationQuestion {
+  id: string
+  category: 'understanding' | 'options_next_step' | 'daily_life_recovery'
+  categoryLabel: string
+  question: string
+  whyAskThis: string
+}
+
+export interface EdenVisitPreparationCompanion {
+  episodeId: string
+  episodeTitle: string
+  currentFocusStage: CareEpisodeStageId
+  currentFocusStageLabel: string
+  reassuringHeadline: string
+  flaggedResultSummary?: string
+  questionsToBring: EdenVisitPreparationQuestion[]
+  whatToShareWithClinician: string[]
+  empoweringAgencyPreserved: true
+  neverReplacesClinicianConsultation: true
+}
+
 export interface CareJourneyExportSummary {
   standard: 'PANACEA-CAREPLAN-FHIR-R4-V1'
   generatedAt: string

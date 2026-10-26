@@ -19,6 +19,7 @@ import {
   deriveEdenPhysiologyAppreciation,
   deriveEdenPreventionLongevityRhythm,
   deriveEdenSupportCircleBridge,
+  deriveEdenVisitPreparationCompanion,
   translateClinicalTermToEden,
   EDEN_PLAIN_LANGUAGE_GLOSSARY,
 } from '../../src/domains/clinical-operations/model/careContinuityProjection.ts'
@@ -2098,4 +2099,77 @@ test('deriveEdenSupportCircleBridge & CareEpisode: Eden Trusted Support Circle &
   const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
   assert.ok(episodeSource.includes('data-eden-support-circle-card="v1"'), 'CareEpisode must include Eden support circle card')
   assert.ok(episodeSource.includes('data-eden-shareable-update="v1"'), 'CareEpisode must include shareable plain update box')
+})
+
+test('deriveEdenVisitPreparationCompanion & CareEpisode: Eden Clinician Visit Preparation & Empowering Questions Companion (T-CLIN-27 / EDEN-07)', () => {
+  const evaluatedAt = '2026-10-26T06:40:00.000Z'
+
+  // 1. Episode with active stage and flagged supportive lab result
+  const activeEpisode = {
+    id: 'ce_prep_1',
+    title: 'Type 2 Diabetes Cardiometabolic Control',
+    diagnosisCode: 'E11',
+    createdAt: '2026-10-20T08:00:00.000Z',
+    updatedAt: '2026-10-25T08:00:00.000Z',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'diagnosis', status: 'done' },
+      { stage: 'treatment', status: 'active' },
+      { stage: 'followUp', status: 'pending' },
+    ],
+  }
+  const flaggedLabs = [
+    {
+      id: 'sr_hba1c',
+      name: 'HbA1c',
+      category: 'Lab',
+      value: '7.9',
+      unit: '%',
+      flag: 'high',
+      takenAt: '2026-10-24T09:00:00.000Z',
+    },
+  ]
+
+  const prep = deriveEdenVisitPreparationCompanion(activeEpisode, flaggedLabs)
+  assert.equal(prep.currentFocusStage, 'treatment')
+  assert.equal(prep.currentFocusStageLabel, 'Treatment')
+  assert.equal(prep.flaggedResultSummary, 'HbA1c: 7.9 % (high)')
+  assert.equal(prep.questionsToBring.length, 3)
+  assert.equal(prep.questionsToBring[0].category, 'understanding')
+  assert.ok(prep.questionsToBring[0].question.includes('HbA1c: 7.9 % (high)'))
+  assert.equal(prep.questionsToBring[1].category, 'options_next_step')
+  assert.equal(prep.questionsToBring[2].category, 'daily_life_recovery')
+  assert.equal(prep.whatToShareWithClinician.length, 3)
+  assert.equal(prep.empoweringAgencyPreserved, true)
+  assert.equal(prep.neverReplacesClinicianConsultation, true)
+
+  // 2. Blocked episode tailors options question and context to the blocker
+  const blockedEpisode = {
+    id: 'ce_prep_blocked',
+    title: 'Knee Arthroscopy Scheduling',
+    createdAt: '2026-10-21T08:00:00.000Z',
+    updatedAt: '2026-10-25T08:00:00.000Z',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'schedule', status: 'blocked', blockedReason: 'Awaiting insurance referral letter' },
+    ],
+  }
+  const blockedPrep = deriveEdenVisitPreparationCompanion(blockedEpisode, [])
+  assert.equal(blockedPrep.currentFocusStage, 'schedule')
+  assert.ok(blockedPrep.questionsToBring[1].question.includes('Awaiting insurance referral letter'))
+  assert.ok(blockedPrep.whatToShareWithClinician[1].includes('Awaiting insurance referral letter'))
+
+  // 3. Rollup in evaluateCareJourneyContinuity
+  const projection = evaluateCareJourneyContinuity([activeEpisode, blockedEpisode], evaluatedAt, [], flaggedLabs)
+  assert.equal(projection.edenVisitPrepReadyCount, 2)
+  assert.ok(projection.episodes[0].edenVisitPreparation)
+  assert.equal(projection.episodes[0].edenVisitPreparation.empoweringAgencyPreserved, true)
+
+  // 4. UI contracts
+  const panelSource = read('src/domains/clinical-operations/ui/CareContinuityPanel.tsx')
+  assert.ok(panelSource.includes('data-eden-visit-prep="v1"'), 'CareContinuityPanel must include Eden visit prep attribute')
+
+  const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
+  assert.ok(episodeSource.includes('data-eden-visit-prep-card="v1"'), 'CareEpisode must include Eden visit prep card')
+  assert.ok(episodeSource.includes('data-eden-visit-questions="v1"'), 'CareEpisode must include Eden visit questions grid')
 })
