@@ -19,6 +19,7 @@ export interface Fitur {
 }
 
 export const FITUR_DARI_HUB: Fitur[] = [
+  { to: '/store', nama: 'Precision Store & Vault', apa: 'Precision longevity formulas, medical-grade diagnostics, and private vault allocation', kw: 'store storefront shop precision formula vault longevity supplements diagnostic biomarker', grup: 'Longevity' },
   { to: '/health-simulator', nama: 'What-If Health Simulator', apa: 'See how today’s choices reshape your 10-year risk', kw: 'simulator digital twin future risk what-if prevent timeline', grup: 'Longevity' },
   { to: '/findrisc', nama: 'Diabetes Risk (FINDRISC)', apa: 'Your 10-year diabetes risk — and how to lower it', kw: 'diabetes findrisc prediabetes prevention metabolic glucose', grup: 'Longevity' },
   { to: '/biological-age', nama: 'Biological Age', apa: 'PhenoAge-style estimate from your logged labs — technical, not a true age', kw: 'phenoage biomarker aging longevity', grup: 'Longevity' },

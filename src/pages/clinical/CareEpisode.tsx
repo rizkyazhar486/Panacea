@@ -1,6 +1,7 @@
 import { useEffect, useState, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { useStore } from '../../lib/store'
+import { useLongitudinalState } from '../../lib/useLongitudinalState'
 import { api, backendEnabled, type FacilityPriceSubmission } from '../../lib/api'
 import { Card, SectionTitle, Badge, Button, Field, inputClass } from '../../components/ui'
 import { IconPlan, IconPlus } from '../../components/icons'
@@ -41,6 +42,7 @@ import {
   deriveEdenLamp2aTranslocationBridge,
   deriveEdenRanGtpTransportBridge,
   deriveEdenPeroxisomalCatalaseBridge,
+  EdenLongitudinalInsightSection,
 } from '../../domains/clinical-operations'
 import {
   CARE_EPISODE_STAGES,
@@ -108,6 +110,8 @@ import { PanaceaZoneNav } from '../../components/PanaceaZoneNav'
 
 export function CareEpisodePage() {
   const { state, activePatient, saveRecord } = useStore()
+  const longitudinal = useLongitudinalState()
+  const [duplicateWarning, setDuplicateWarning] = useState(false)
   const record = state.records[activePatient.id]
   const [newTitle, setNewTitle] = useState('')
 
@@ -139,8 +143,6 @@ export function CareEpisodePage() {
   function update(episodes: CareEpisode[]) {
     saveRecord({ ...record!, careEpisodes: episodes, updatedAt: new Date().toISOString() })
   }
-
-  const [duplicateWarning, setDuplicateWarning] = useState(false)
 
   function addEpisode() {
     const title = newTitle.trim()
@@ -1132,6 +1134,8 @@ function EdenCareCompanionSection({
   episode: CareEpisode
   onChange: (next: CareEpisode) => void
 }) {
+  const { state, activePatient } = useStore()
+  const longitudinal = useLongitudinalState()
   const [depth, setDepth] = useState<EdenDisclosureDepth>(episode.edenDepthPreference ?? 'simple')
   const companion = useMemo(() => deriveEdenCareCompanion(episode, depth), [episode, depth])
 
@@ -1170,31 +1174,29 @@ function EdenCareCompanionSection({
                   : 'bg-neutral-200 dark:bg-white/10 text-neutral-700 dark:text-white/75 hover:bg-neutral-300 dark:hover:bg-white/20'
               }`}
             >
-              {d === 'simple' ? 'Simple' : d === 'explore' ? 'Explore' : 'Deep'}
+              {d === 'simple' ? 'Simple' : d === 'explore' ? 'Explore' : 'Evidence'}
             </button>
           ))}
         </div>
       </div>
 
       <div className="mt-3 grid gap-2 sm:grid-cols-2 text-xs">
-        <div className="rounded-lg bg-white/80 dark:bg-white/[0.03] p-2.5 border border-emerald-100 dark:border-white/5">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-500 dark:text-white/50">
-            What is happening
-          </span>
-          <p className="mt-0.5 text-neutral-800 dark:text-white/85">{companion.whatIsHappening}</p>
-        </div>
-        <div className="rounded-lg bg-white/80 dark:bg-white/[0.03] p-2.5 border border-emerald-100 dark:border-white/5">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-500 dark:text-white/50">
-            Why it matters
-          </span>
-          <p className="mt-0.5 text-neutral-800 dark:text-white/85">{companion.whyItMatters}</p>
-        </div>
+        <EdenLongitudinalInsightSection
+          source={{
+            state: longitudinal.state,
+            patientId: activePatient.id,
+            viewerRole: state.account?.role,
+            accountPatientId: state.account?.patientId,
+          }}
+          depth={depth}
+          companion={companion}
+        />
         <div
           className="rounded-lg bg-white/80 dark:bg-white/[0.03] p-2.5 border border-emerald-100 dark:border-white/5"
           data-eden-beautiful-next-step="v1"
         >
           <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-300">
-            One Beautiful Next Step ({companion.nextBeautifulStep.stageLabel})
+            03 · What Comes Next · One Beautiful Next Step ({companion.nextBeautifulStep.stageLabel})
           </span>
           <p className="mt-0.5 font-medium text-neutral-900 dark:text-white">{companion.whatYouCanDo}</p>
         </div>
