@@ -17,6 +17,7 @@ import {
   deriveEdenLifeBalanceSynthesis,
   deriveEdenLifeStoryBridge,
   deriveEdenPhysiologyAppreciation,
+  deriveEdenPreventionLongevityRhythm,
   translateClinicalTermToEden,
   EDEN_PLAIN_LANGUAGE_GLOSSARY,
 } from '../../src/domains/clinical-operations/model/careContinuityProjection.ts'
@@ -1965,4 +1966,70 @@ test('deriveEdenPhysiologyAppreciation & CareEpisode: Eden Living Physiology App
   const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
   assert.ok(episodeSource.includes('data-eden-physiology-card="v1"'), 'CareEpisode must include Eden physiology card')
   assert.ok(episodeSource.includes('data-eden-coupled-systems="v1"'), 'CareEpisode must include coupled systems grid')
+})
+
+test('deriveEdenPreventionLongevityRhythm & CareEpisode: Eden Daily Prevention, Longevity Rhythm & Restorative Habit Continuity Bridge (T-CLIN-25 / EDEN-05)', () => {
+  const evaluatedAt = '2026-10-26T05:55:00.000Z'
+
+  // 1. Active rebuilding phase with clinician-verified Edukasi plan item
+  const metabolicEpisode = {
+    id: 'ce_long_metab',
+    title: 'Type 2 Diabetes Glycemic Longevity',
+    diagnosisCode: 'E11',
+    createdAt: '2026-10-15T08:00:00.000Z',
+    updatedAt: '2026-10-25T08:00:00.000Z',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'treatment', status: 'active' },
+    ],
+  }
+  const verifiedPlans = [
+    {
+      id: 'pl_edu_1',
+      category: 'Edukasi',
+      text: '15-minute post-dinner walk and consistent 22:30 sleep window',
+      source: 'Dokter',
+      status: 'diverifikasi',
+      verifiedById: 'dr-andi',
+      verifiedAt: '2026-10-16T09:00:00.000Z',
+    },
+  ]
+
+  const rhythm = deriveEdenPreventionLongevityRhythm(metabolicEpisode, verifiedPlans)
+  assert.equal(rhythm.primaryOrganSystem, 'metabolic_endocrine')
+  assert.equal(rhythm.rhythmPhase, 'active_rebuilding')
+  assert.equal(rhythm.clinicianVerifiedPlanCount, 1)
+  assert.equal(rhythm.nonPrescriptiveEducationalBoundary, true)
+  assert.ok(rhythm.oneGentleDailyHabit.includes('15-minute post-dinner walk'))
+  assert.equal(rhythm.pillars.length, 4)
+
+  // 2. Completed episode -> longevity_maintenance phase
+  const completedEpisode = {
+    id: 'ce_long_done',
+    title: 'Post-Sprain Ankle Rehabilitation',
+    diagnosisCode: 'S93',
+    createdAt: '2026-10-01T08:00:00.000Z',
+    updatedAt: '2026-10-20T08:00:00.000Z',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'outcome', status: 'done' },
+    ],
+  }
+  const maintRhythm = deriveEdenPreventionLongevityRhythm(completedEpisode, [])
+  assert.equal(maintRhythm.primaryOrganSystem, 'musculoskeletal')
+  assert.equal(maintRhythm.rhythmPhase, 'longevity_maintenance')
+
+  // 3. Rollup in evaluateCareJourneyContinuity
+  const projection = evaluateCareJourneyContinuity([metabolicEpisode, completedEpisode], evaluatedAt, verifiedPlans)
+  assert.equal(projection.edenLongevityReadyCount, 2)
+  assert.ok(projection.episodes[0].edenLongevityRhythm)
+  assert.equal(projection.episodes[0].edenLongevityRhythm.rhythmPhase, 'active_rebuilding')
+
+  // 4. UI contracts
+  const panelSource = read('src/domains/clinical-operations/ui/CareContinuityPanel.tsx')
+  assert.ok(panelSource.includes('data-eden-longevity-rhythm="v1"'), 'CareContinuityPanel must include Eden longevity rhythm attribute')
+
+  const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
+  assert.ok(episodeSource.includes('data-eden-longevity-card="v1"'), 'CareEpisode must include Eden longevity card')
+  assert.ok(episodeSource.includes('data-eden-longevity-pillars="v1"'), 'CareEpisode must include Eden 4-pillar longevity grid')
 })

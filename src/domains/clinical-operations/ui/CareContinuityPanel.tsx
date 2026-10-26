@@ -592,6 +592,17 @@ export function CareContinuityPanel({
                   </span>
                 </div>
               )}
+              {careJourneys.edenLongevityReadyCount > 0 && (
+                <div
+                  className="flex justify-between text-amber-200"
+                  data-eden-longevity-rhythm="v1"
+                >
+                  <span>Daily longevity rhythm:</span>
+                  <span className="font-bold">
+                    {careJourneys.edenLongevityReadyCount} 4-pillar active
+                  </span>
+                </div>
+              )}
 
               {careJourneys.episodes.length > 0 && (
                 <div className="mt-3 border-t border-white/8 pt-2">

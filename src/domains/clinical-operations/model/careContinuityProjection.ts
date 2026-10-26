@@ -25,6 +25,9 @@ import type {
   EdenLifeStoryBridge,
   EdenOrganSystemId,
   EdenPhysiologyAppreciation,
+  EdenLongevityPillarId,
+  EdenLongevityPillarRecommendation,
+  EdenPreventionLongevityRhythm,
   LifeDomain,
   LifeEvent,
   Quest,
@@ -115,6 +118,7 @@ export interface CareJourneyEpisodeSummary {
   edenCompanion?: EdenCareCompanionSummary
   edenLifeStoryBridge?: EdenLifeStoryBridge
   edenPhysiologyAppreciation?: EdenPhysiologyAppreciation
+  edenLongevityRhythm?: EdenPreventionLongevityRhythm
 }
 
 export type ReadmissionRiskLevel = 'low' | 'moderate' | 'high'
@@ -197,6 +201,7 @@ export interface CareJourneyContinuityResult {
   edenReadyJourneysCount: number
   edenLifeStoryAlignedCount: number
   edenPhysiologyLinkedCount: number
+  edenLongevityReadyCount: number
   edenLifeBalance: EdenLifeBalanceSynthesis
   hasBlockedStages: boolean
 }
@@ -1690,6 +1695,113 @@ export function deriveEdenPhysiologyAppreciation(
   }
 }
 
+export function deriveEdenPreventionLongevityRhythm(
+  episode: CareEpisode,
+  recordPlanItems?: readonly PlanItem[],
+): EdenPreventionLongevityRhythm {
+  const systemId = classifyEpisodeOrganSystem(episode)
+  const stages = episode.stages ?? []
+  const isCompleted = stages.length > 0 && stages.every((s) => s.status === 'done')
+  const inRebuilding = stages.some(
+    (s) =>
+      (s.stage === 'treatment' || s.stage === 'recovery' || s.stage === 'followUp') &&
+      (s.status === 'active' || s.status === 'done')
+  )
+
+  let rhythmPhase: EdenPreventionLongevityRhythm['rhythmPhase'] = 'acute_restoration'
+  let rhythmPhaseLabel = 'Gentle Restorative Preparation'
+  if (isCompleted) {
+    rhythmPhase = 'longevity_maintenance'
+    rhythmPhaseLabel = 'Longevity & Prevention Maintenance'
+  } else if (inRebuilding) {
+    rhythmPhase = 'active_rebuilding'
+    rhythmPhaseLabel = 'Active Physiological Rebuilding'
+  }
+
+  const safePlans: readonly PlanItem[] = Array.isArray(recordPlanItems) ? recordPlanItems : []
+  const verifiedPlans = safePlans.filter((p) => p.status === 'diverifikasi')
+  const verifiedEdukasi = verifiedPlans.find((p) => p.category === 'Edukasi' || p.category === 'Suportif')
+
+  const movementBySystem: Record<EdenOrganSystemId, string> = {
+    cardiovascular: 'Enjoy calm, steady aerobic walks at a conversational pace as cleared by your clinician.',
+    respiratory: 'Practice unhurried nasal breathing and light posture-opening movement.',
+    metabolic_endocrine: 'Take a gentle 10–15 minute walk after meals to support natural glucose uptake.',
+    musculoskeletal: 'Perform smooth, pain-free range-of-motion exercises and gradual load progression.',
+    neurological: 'Practice gentle balance, coordination, and unhurried outdoor walks.',
+    digestive_hepatobiliary: 'Light upright walking after meals supports gentle digestive motility.',
+    renal_urinary: 'Maintain comfortable daily movement paired with steady hydration.',
+    immune_lymphatic: 'Gentle stretching and walking encourage natural lymphatic circulation.',
+    whole_body_homeostasis: 'Consistent, enjoyable daily movement supports circulation and cellular vitality.',
+  }
+
+  const nourishmentBySystem: Record<EdenOrganSystemId, string> = {
+    cardiovascular: 'Savor potassium-rich whole foods, colorful plants, and balanced hydration.',
+    respiratory: 'Warm fluids and antioxidant-rich whole foods help keep airway mucosa hydrated.',
+    metabolic_endocrine: 'Pair fiber-rich vegetables and quality protein to keep energy curves steady.',
+    musculoskeletal: 'Adequate protein, vitamin D/calcium-rich foods, and hydration nourish tissue repair.',
+    neurological: 'Omega-3-rich foods, steady hydration, and regular meals support neural clarity.',
+    digestive_hepatobiliary: 'Unhurried meals with soluble fiber and clean water ease hepatobiliary workload.',
+    renal_urinary: 'Follow your clinician’s fluid and electrolyte guidance with whole, minimally processed foods.',
+    immune_lymphatic: 'Nutrient-dense soups, colorful fruits/vegetables, and hydration support immune repair.',
+    whole_body_homeostasis: 'Balanced whole-food nutrition and steady water intake fuel daily cellular renewal.',
+  }
+
+  const pillars: EdenLongevityPillarRecommendation[] = [
+    {
+      pillar: 'sleep_circadian',
+      label: 'Sleep & Circadian Repair',
+      gentlePractice: 'Keep a consistent, peaceful wind-down window and morning natural light exposure.',
+      physiologicalRationale: 'Deep sleep coordinates growth hormone release, glymphatic clearance, and tissue repair.',
+      workspaceRoute: '/sleep',
+    },
+    {
+      pillar: 'movement_vitality',
+      label: 'Gentle Movement & Vitality',
+      gentlePractice: movementBySystem[systemId],
+      physiologicalRationale: 'Rhythmic movement enhances microvascular perfusion and mitochondrial resilience.',
+      workspaceRoute: '/fitness',
+    },
+    {
+      pillar: 'nourishment_hydration',
+      label: 'Nourishment & Hydration',
+      gentlePractice: nourishmentBySystem[systemId],
+      physiologicalRationale: 'Steady hydration and micronutrients supply the substrates for enzymatic homeostasis.',
+      workspaceRoute: '/nutrition',
+    },
+    {
+      pillar: 'autonomic_calm',
+      label: 'Autonomic Calm & Peace',
+      gentlePractice: 'Pause for 3 minutes of slow exhalation breathing (4s inhale, 6s exhale) to invite vagal calm.',
+      physiologicalRationale: 'Parasympathetic activation lowers cortisol tone and allows cellular energy to focus on healing.',
+      workspaceRoute: '/mental',
+    },
+  ]
+
+  const oneGentleDailyHabit = verifiedEdukasi?.text
+    ? `Clinician-verified daily focus: ${verifiedEdukasi.text}`
+    : movementBySystem[systemId]
+
+  const compassionateHeadline =
+    rhythmPhase === 'longevity_maintenance'
+      ? `With “${episode.title}” completed, small enjoyable daily rhythms help sustain your long-term vitality without pressure.`
+      : rhythmPhase === 'active_rebuilding'
+      ? `While your body rebuilds through “${episode.title}”, gentle sleep, nourishment, and calm breathing partner with your clinical plan.`
+      : `As you begin “${episode.title}”, peaceful rest and steady daily habits prepare your body’s natural resilience.`
+
+  return {
+    episodeId: episode.id,
+    episodeTitle: episode.title,
+    primaryOrganSystem: systemId,
+    rhythmPhase,
+    rhythmPhaseLabel,
+    compassionateHeadline,
+    oneGentleDailyHabit,
+    pillars,
+    clinicianVerifiedPlanCount: verifiedPlans.length,
+    nonPrescriptiveEducationalBoundary: true,
+  }
+}
+
 export const STAGE_EXPECTED_DAYS: Record<CareEpisodeStageId, number> = {
   problem: 1,
   diagnosis: 2,
@@ -1944,6 +2056,7 @@ export function evaluateCareJourneyContinuity(
     const edenCompanion = deriveEdenCareCompanion(ep)
     const edenLifeStoryBridge = deriveEdenLifeStoryBridge(ep)
     const edenPhysiologyAppreciation = deriveEdenPhysiologyAppreciation(ep)
+    const edenLongevityRhythm = deriveEdenPreventionLongevityRhythm(ep, recordPlanItems)
 
     return {
       id: ep.id,
@@ -1977,6 +2090,7 @@ export function evaluateCareJourneyContinuity(
       edenCompanion,
       edenLifeStoryBridge,
       edenPhysiologyAppreciation,
+      edenLongevityRhythm,
     }
   })
 
@@ -2036,6 +2150,9 @@ export function evaluateCareJourneyContinuity(
   const edenPhysiologyLinkedCount = summaries.filter(
     (s) => Boolean(s.edenPhysiologyAppreciation?.neverFabricatesMeasuredVitals)
   ).length
+  const edenLongevityReadyCount = summaries.filter(
+    (s) => Boolean(s.edenLongevityRhythm?.nonPrescriptiveEducationalBoundary)
+  ).length
   const edenLifeBalance = deriveEdenLifeBalanceSynthesis(episodes, supportiveResults)
 
   return {
@@ -2073,6 +2190,7 @@ export function evaluateCareJourneyContinuity(
     edenReadyJourneysCount,
     edenLifeStoryAlignedCount,
     edenPhysiologyLinkedCount,
+    edenLongevityReadyCount,
     edenLifeBalance,
     hasBlockedStages: blockedJourneys > 0 || stalledCount > 0,
   }
