@@ -34,6 +34,7 @@ import {
   deriveEdenTelomericGenomicIntegrityBridge,
   deriveEdenSenescentInflammagingBridge,
   deriveEdenRegenerativePlasticityBridge,
+  deriveEdenEpigeneticAgeReversalBridge,
   translateClinicalTermToEden,
   EDEN_PLAIN_LANGUAGE_GLOSSARY,
 } from '../../src/domains/clinical-operations/model/careContinuityProjection.ts'
@@ -3189,4 +3190,84 @@ test('deriveEdenRegenerativePlasticityBridge & CareEpisode: Eden Stem Cell Niche
   const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
   assert.ok(episodeSource.includes('data-eden-regenerative-card="v1"'), 'CareEpisode must include regenerative card')
   assert.ok(episodeSource.includes('data-eden-stem-niche-nodes="v1"'), 'CareEpisode must include stem niche nodes grid')
+})
+
+test('deriveEdenEpigeneticAgeReversalBridge & CareEpisode: Eden Epigenetic Biological Age Reversal & Transcriptomic Harmony Synthesizer (T-CLIN-43 / EDEN-23)', () => {
+  const evaluatedAt = '2026-10-26T18:00:00.000Z'
+  const sampleEpisode = {
+    id: 'ce_epigenetic_1',
+    title: 'Epigenetic Clock Rejuvenation & Transcriptomic Harmony',
+    diagnosisCode: 'Z00.00',
+    createdAt: '2026-10-20T08:00:00.000Z',
+    updatedAt: '2026-10-26T08:00:00.000Z',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'diagnosis', status: 'done' },
+      { stage: 'treatment', status: 'done' },
+      { stage: 'recovery', status: 'active' },
+    ],
+  }
+
+  // 1. Pure deterministic derivation
+  const bridge = deriveEdenEpigeneticAgeReversalBridge(sampleEpisode)
+  assert.equal(bridge.version, 'v1')
+  assert.equal(bridge.episodeId, 'ce_epigenetic_1')
+  assert.equal(bridge.epigeneticState, 'youthful_euchromatin_harmony')
+  assert.equal(bridge.epigeneticStateLabel, 'Harmoni Eukromatin Muda & Pembalikan Umur Biologis')
+  assert.equal(bridge.transcriptomicPurity, 'high_fidelity_transcriptomic_stability')
+  assert.equal(bridge.transcriptomicPurityLabel, 'Stabilitas Transkriptomik & Presisi Ekspresi Gen Tinggi')
+  assert.ok(bridge.biologicalAgeDeltaYears < 0, 'biologicalAgeDeltaYears must be negative for rejuvenated state')
+  assert.ok(bridge.epigeneticHarmonyIndex >= 80 && bridge.epigeneticHarmonyIndex <= 99)
+  assert.ok(bridge.transcriptomicFidelityScore >= 80 && bridge.transcriptomicFidelityScore <= 98)
+  assert.equal(bridge.harmonyClusters.length, 4)
+  assert.equal(bridge.harmonyClusters[0].clusterKind, 'horvath_phenoage_clock_alignment')
+  assert.equal(bridge.harmonyClusters[1].clusterKind, 'dna_methylation_dnmt_tet_equilibrium')
+  assert.equal(bridge.harmonyClusters[2].clusterKind, 'histone_acetylation_sirtuin_flux')
+  assert.equal(bridge.harmonyClusters[3].clusterKind, 'chromatin_remodeling_polycomb_surveillance')
+  assert.equal(bridge.truthClass, 'epigenetic_reversal_simulation_proxy')
+  assert.equal(bridge.clinically_reviewed, false)
+  assert.equal(bridge.patientTruthUncompromised, true)
+  assert.equal(bridge.neverManufacturesBiomarkers, true)
+  assert.equal(bridge.epistemicHumilityPreserved, true)
+  assert.ok(bridge.epigeneticNarrativeId.includes('Sintesis pembalikan umur biologis epigenetik'))
+  assert.ok(bridge.epigeneticNarrativeEn.includes('Epigenetic biological age reversal'))
+  assert.ok(bridge.epigeneticReversalStrategy.includes('Pertahankan harmoni eukromatin awet muda'))
+
+  // 2. Blocked stage resilience check
+  const blockedEpisode = {
+    id: 'ce_epigenetic_blocked',
+    title: 'Severe Epigenetic Aging Acceleration & Retrotransposon Derepression Strain',
+    diagnosisCode: 'E11.9',
+    createdAt: '2026-10-20T08:00:00.000Z',
+    updatedAt: '2026-10-26T08:00:00.000Z',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'diagnosis', status: 'blocked', blockedReason: 'Awaiting Horvath DNA methylation microarray and transcriptomic sequencing' },
+    ],
+  }
+  const blockedBridge = deriveEdenEpigeneticAgeReversalBridge(blockedEpisode)
+  assert.equal(blockedBridge.epigeneticState, 'stochastic_methylation_entropy')
+  assert.equal(blockedBridge.epigeneticStateLabel, 'Entropi Metilasi Stokastik & Penyimpangan Epigenetik')
+  assert.equal(blockedBridge.transcriptomicPurity, 'retrotransposon_derepression_strain')
+  assert.equal(blockedBridge.transcriptomicPurityLabel, 'Tekanan Derepresi Retrotransposon / LINE-1')
+  assert.ok(blockedBridge.biologicalAgeDeltaYears > 0, 'biologicalAgeDeltaYears must be positive for accelerated aging state')
+  assert.ok(blockedBridge.epigeneticHarmonyIndex <= 65)
+  assert.ok(blockedBridge.transcriptomicFidelityScore <= 62)
+  assert.ok(blockedBridge.epigeneticReversalStrategy.includes('Redam laju drift epigenetik'))
+
+  // 3. Rollup in evaluateCareJourneyContinuity
+  const projection = evaluateCareJourneyContinuity([sampleEpisode, blockedEpisode], evaluatedAt)
+  assert.equal(projection.edenEpigeneticAgeReversalReadyCount, 2)
+  assert.ok(projection.episodes[0].edenEpigeneticAgeReversal)
+  assert.equal(projection.episodes[0].edenEpigeneticAgeReversal.truthClass, 'epigenetic_reversal_simulation_proxy')
+  assert.equal(projection.episodes[0].edenEpigeneticAgeReversal.patientTruthUncompromised, true)
+  assert.equal(projection.episodes[0].edenEpigeneticAgeReversal.neverManufacturesBiomarkers, true)
+
+  // 4. UI contracts
+  const panelSource = read('src/domains/clinical-operations/ui/CareContinuityPanel.tsx')
+  assert.ok(panelSource.includes('data-eden-epigenetic-reversal="v1"'), 'CareContinuityPanel must include epigenetic-reversal attribute')
+
+  const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
+  assert.ok(episodeSource.includes('data-eden-epigenetic-reversal-card="v1"'), 'CareEpisode must include epigenetic reversal card')
+  assert.ok(episodeSource.includes('data-eden-epigenetic-clusters="v1"'), 'CareEpisode must include epigenetic clusters grid')
 })
