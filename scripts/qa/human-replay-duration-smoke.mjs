@@ -35,6 +35,19 @@ try {
     assert.ok(overlapWidth<=1||overlapHeight<=1,'reference canvas must not cover the metric cards in either responsive layout')
     assert.match(await active.innerText(),/Unknown/);assert.match(await distance.innerText(),/Unknown/)
     await page.getByRole('note').filter({hasText:'Duration unavailable in one or more sessions.'}).waitFor()
+    // WebGL pixels are covered by the separate Body3D acceptance gate. This suite
+    // has already proved the real reference canvas and its metric-panel geometry.
+    // Release that context before unrelated 2D exports/captures: a heavy submitted
+    // SwiftShader frame can otherwise block canvas readback even after drawing stops.
+    // Fail closed if WebGL was unavailable, so cleanup cannot disguise a missing renderer.
+    const referenceBodyReleased=await page.evaluate(()=>{
+      const gl=document.querySelector('section canvas')?.getContext('webgl2')
+      const loseContext=gl?.getExtension('WEBGL_lose_context')
+      if(!gl||!loseContext)return false
+      loseContext.loseContext()
+      return gl.isContextLost()
+    })
+    assert.ok(referenceBodyReleased,'real Human Replay WebGL context must exist before explicit QA cleanup')
     const poster=async expected=>{
       await page.evaluate(()=>{window.__replayPosterText=[]})
       let file
@@ -85,7 +98,7 @@ try {
       const failure={viewport,errors,consoleErrors,failedResponses};await writeFile(`${out}/failure-${viewport.width}.json`,JSON.stringify(failure,null,2));console.error(JSON.stringify(failure))
     }
     assert.deepEqual(errors,[]);assert.deepEqual(consoleErrors,[]);assert.deepEqual(failedResponses,[])
-    evidence.push({viewport,synthetic:true,actualComponentAndEngine:true,actualPoster:true,externalFontCSSStubbed:true,referenceBodyComponentUnchanged:true,webglAcceptanceVerified:false,routeAuthOrDeviceConnectivityVerified:false,unknownAndInvalidUnavailable:true,explicitZeroPreserved:true,cumulativeAndDeltaUnknown:true,keyboardMonthNavigation:true,canvasDoesNotCoverMetrics:true,overflow,pageErrors:errors,consoleErrors,failedResponses})
+    evidence.push({viewport,synthetic:true,actualComponentAndEngine:true,actualPoster:true,externalFontCSSStubbed:true,referenceBodyComponentUnchanged:true,referenceBodyWebGLReleasedAfterGeometry:true,webglAcceptanceVerified:false,routeAuthOrDeviceConnectivityVerified:false,unknownAndInvalidUnavailable:true,explicitZeroPreserved:true,cumulativeAndDeltaUnknown:true,keyboardMonthNavigation:true,canvasDoesNotCoverMetrics:true,overflow,pageErrors:errors,consoleErrors,failedResponses})
     await context.close()
   }
   await writeFile(`${out}/evidence.json`,JSON.stringify(evidence,null,2));console.log('Human Replay actual component/poster: unknown/zero/mixed/cumulative/delta, keyboard, mobile/desktop passed')
