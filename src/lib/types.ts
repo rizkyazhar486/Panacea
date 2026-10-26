@@ -1145,6 +1145,55 @@ export interface EdenEpigeneticAgeReversalBridge {
   epistemicHumilityPreserved: true
 }
 
+export type EdenMitochondrialHeteroplasmyState =
+  | 'homoplasmic_wildtype_resilience'
+  | 'compensated_heteroplasmic_balance'
+  | 'pathogenic_heteroplasmy_shift_risk'
+  | 'mitochondrial_reticular_fragmentation'
+
+export type EdenBioenergeticFusionRateLevel =
+  | 'hyperfused_elongated_network'
+  | 'balanced_fusion_fission_dynamics'
+  | 'fission_predominant_fragmentation'
+  | 'mitophagic_collapse_strain'
+
+export type EdenMitochondrialFusionNodeKind =
+  | 'mitofusin_mfn1_mfn2_tethering'
+  | 'opa1_cristae_remodeling'
+  | 'drp1_fission_quality_control'
+  | 'pink1_parkin_mitophagic_flux'
+
+export interface EdenMitochondrialFusionNode {
+  nodeKind: EdenMitochondrialFusionNodeKind
+  nodeLabel: string
+  fusionEfficiencyScore: number
+  reticularIntegrityIndex: number
+  networkDynamicsStatus: 'optimal_reticular_network' | 'compensated_fission_clearance' | 'fragmentation_strain'
+  mechanisticNote: string
+}
+
+export interface EdenMitochondrialHeteroplasmyBridge {
+  version: 'v1'
+  episodeId: string
+  episodeTitle: string
+  heteroplasmyState: EdenMitochondrialHeteroplasmyState
+  heteroplasmyStateLabel: string
+  fusionRateLevel: EdenBioenergeticFusionRateLevel
+  fusionRateLevelLabel: string
+  mitochondrialVitalityScore: number
+  oxphosEfficiencyIndex: number
+  atpSynthesisCapacity: number
+  fusionNodes: EdenMitochondrialFusionNode[]
+  mitochondrialNarrativeId: string
+  mitochondrialNarrativeEn: string
+  mitochondrialLongevityStrategy: string
+  truthClass: 'mitochondrial_heteroplasmy_simulation_proxy'
+  clinically_reviewed: false
+  patientTruthUncompromised: true
+  neverManufacturesBiomarkers: true
+  epistemicHumilityPreserved: true
+}
+
 export interface CareJourneyExportSummary {
   standard: 'PANACEA-CAREPLAN-FHIR-R4-V1'
   generatedAt: string

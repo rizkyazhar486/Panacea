@@ -35,6 +35,7 @@ import {
   deriveEdenSenescentInflammagingBridge,
   deriveEdenRegenerativePlasticityBridge,
   deriveEdenEpigeneticAgeReversalBridge,
+  deriveEdenMitochondrialHeteroplasmyBridge,
   translateClinicalTermToEden,
   EDEN_PLAIN_LANGUAGE_GLOSSARY,
 } from '../../src/domains/clinical-operations/model/careContinuityProjection.ts'
@@ -3270,4 +3271,84 @@ test('deriveEdenEpigeneticAgeReversalBridge & CareEpisode: Eden Epigenetic Biolo
   const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
   assert.ok(episodeSource.includes('data-eden-epigenetic-reversal-card="v1"'), 'CareEpisode must include epigenetic reversal card')
   assert.ok(episodeSource.includes('data-eden-epigenetic-clusters="v1"'), 'CareEpisode must include epigenetic clusters grid')
+})
+
+test('deriveEdenMitochondrialHeteroplasmyBridge & CareEpisode: Eden Mitochondrial Heteroplasmy & Bioenergetic Fusion Synthesizer (T-CLIN-44 / EDEN-24)', () => {
+  const evaluatedAt = '2026-10-26T18:30:00.000Z'
+  const sampleEpisode = {
+    id: 'ce_mito_1',
+    title: 'Mitochondrial Heteroplasmy Rebalancing & Bioenergetic Fusion Network',
+    diagnosisCode: 'E88.89',
+    createdAt: '2026-10-20T08:00:00.000Z',
+    updatedAt: '2026-10-26T08:00:00.000Z',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'diagnosis', status: 'done' },
+      { stage: 'treatment', status: 'done' },
+      { stage: 'recovery', status: 'active' },
+    ],
+  }
+
+  // 1. Pure deterministic derivation
+  const bridge = deriveEdenMitochondrialHeteroplasmyBridge(sampleEpisode)
+  assert.equal(bridge.version, 'v1')
+  assert.equal(bridge.episodeId, 'ce_mito_1')
+  assert.equal(bridge.heteroplasmyState, 'homoplasmic_wildtype_resilience')
+  assert.equal(bridge.heteroplasmyStateLabel, 'Resiliensi Homoplasmi Wildtype Awet Muda')
+  assert.equal(bridge.fusionRateLevel, 'hyperfused_elongated_network')
+  assert.equal(bridge.fusionRateLevelLabel, 'Jaringan Hiperfusi Memanjang & Sintesis ATP Maksimal')
+  assert.ok(bridge.mitochondrialVitalityScore >= 80 && bridge.mitochondrialVitalityScore <= 99)
+  assert.ok(bridge.oxphosEfficiencyIndex >= 80 && bridge.oxphosEfficiencyIndex <= 98)
+  assert.ok(bridge.atpSynthesisCapacity >= 80 && bridge.atpSynthesisCapacity <= 98)
+  assert.equal(bridge.fusionNodes.length, 4)
+  assert.equal(bridge.fusionNodes[0].nodeKind, 'mitofusin_mfn1_mfn2_tethering')
+  assert.equal(bridge.fusionNodes[1].nodeKind, 'opa1_cristae_remodeling')
+  assert.equal(bridge.fusionNodes[2].nodeKind, 'drp1_fission_quality_control')
+  assert.equal(bridge.fusionNodes[3].nodeKind, 'pink1_parkin_mitophagic_flux')
+  assert.equal(bridge.truthClass, 'mitochondrial_heteroplasmy_simulation_proxy')
+  assert.equal(bridge.clinically_reviewed, false)
+  assert.equal(bridge.patientTruthUncompromised, true)
+  assert.equal(bridge.neverManufacturesBiomarkers, true)
+  assert.equal(bridge.epistemicHumilityPreserved, true)
+  assert.ok(bridge.mitochondrialNarrativeId.includes('Sintesis heteroplasmi mitokondria & fusi bioenergetik'))
+  assert.ok(bridge.mitochondrialNarrativeEn.includes('Mitochondrial heteroplasmy & bioenergetic fusion synthesis'))
+  assert.ok(bridge.mitochondrialLongevityStrategy.includes('Pertahankan jaringan mitokondria hiperfusi'))
+
+  // 2. Blocked stage resilience check
+  const blockedEpisode = {
+    id: 'ce_mito_blocked',
+    title: 'Severe Mitochondrial Respiratory Chain Disruption & Reticular Fragmentation Strain',
+    diagnosisCode: 'G31.83',
+    createdAt: '2026-10-20T08:00:00.000Z',
+    updatedAt: '2026-10-26T08:00:00.000Z',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'diagnosis', status: 'blocked', blockedReason: 'Awaiting high-resolution respirometry and mitochondrial mtDNA sequencing' },
+    ],
+  }
+  const blockedBridge = deriveEdenMitochondrialHeteroplasmyBridge(blockedEpisode)
+  assert.equal(blockedBridge.heteroplasmyState, 'mitochondrial_reticular_fragmentation')
+  assert.equal(blockedBridge.heteroplasmyStateLabel, 'Fragmentasi Jaringan Retikular Mitokondria')
+  assert.equal(blockedBridge.fusionRateLevel, 'mitophagic_collapse_strain')
+  assert.equal(blockedBridge.fusionRateLevelLabel, 'Beban Kolaps Mitofagi & Kerusakan Membran Kristal')
+  assert.ok(blockedBridge.mitochondrialVitalityScore <= 65)
+  assert.ok(blockedBridge.oxphosEfficiencyIndex <= 62)
+  assert.ok(blockedBridge.atpSynthesisCapacity <= 60)
+  assert.ok(blockedBridge.mitochondrialLongevityStrategy.includes('Dukung pemulihan potensial membran'))
+
+  // 3. Rollup in evaluateCareJourneyContinuity
+  const projection = evaluateCareJourneyContinuity([sampleEpisode, blockedEpisode], evaluatedAt)
+  assert.equal(projection.edenMitochondrialHeteroplasmyReadyCount, 2)
+  assert.ok(projection.episodes[0].edenMitochondrialHeteroplasmy)
+  assert.equal(projection.episodes[0].edenMitochondrialHeteroplasmy.truthClass, 'mitochondrial_heteroplasmy_simulation_proxy')
+  assert.equal(projection.episodes[0].edenMitochondrialHeteroplasmy.patientTruthUncompromised, true)
+  assert.equal(projection.episodes[0].edenMitochondrialHeteroplasmy.neverManufacturesBiomarkers, true)
+
+  // 4. UI contracts
+  const panelSource = read('src/domains/clinical-operations/ui/CareContinuityPanel.tsx')
+  assert.ok(panelSource.includes('data-eden-mitochondrial-heteroplasmy="v1"'), 'CareContinuityPanel must include mitochondrial-heteroplasmy attribute')
+
+  const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
+  assert.ok(episodeSource.includes('data-eden-mitochondrial-heteroplasmy-card="v1"'), 'CareEpisode must include mitochondrial heteroplasmy card')
+  assert.ok(episodeSource.includes('data-eden-mitochondrial-fusion-nodes="v1"'), 'CareEpisode must include mitochondrial fusion nodes grid')
 })
