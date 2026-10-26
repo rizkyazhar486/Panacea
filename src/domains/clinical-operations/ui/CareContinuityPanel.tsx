@@ -494,6 +494,14 @@ export function CareContinuityPanel({
                   </span>
                 </div>
               )}
+              {careJourneys.exportableJourneysCount > 0 && (
+                <div className="flex justify-between text-cyan-300" data-care-export-ready="v1">
+                  <span>Continuity handoff:</span>
+                  <span className="font-bold">
+                    {careJourneys.exportableJourneysCount} FHIR packet(s) ready
+                  </span>
+                </div>
+              )}
 
               {careJourneys.episodes.length > 0 && (
                 <div className="mt-3 border-t border-white/8 pt-2">

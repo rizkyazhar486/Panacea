@@ -4,7 +4,7 @@ import { useStore } from '../../lib/store'
 import { api, backendEnabled, type FacilityPriceSubmission } from '../../lib/api'
 import { Card, SectionTitle, Badge, Button, Field, inputClass } from '../../components/ui'
 import { IconPlan, IconPlus } from '../../components/icons'
-import { deriveCareJourneyTimelineEvents } from '../../domains/clinical-operations'
+import { deriveCareJourneyTimelineEvents, exportCareJourneySummary } from '../../domains/clinical-operations'
 import {
   CARE_EPISODE_STAGES,
   STAGE_LABEL,
@@ -433,6 +433,9 @@ function EpisodeCard({
 
       {/* Longitudinal Care Journey Timeline & Event Provenance Audit Trail (T-CLIN-14) */}
       <JourneyTimelineSection episode={episode} />
+
+      {/* Care Journey Continuity Handoff & FHIR-Aligned Summary Export (T-CLIN-16) */}
+      <CareJourneyExportSection episode={episode} />
     </Card>
   )
 }
@@ -676,6 +679,63 @@ function JourneyTimelineSection({ episode }: { episode: CareEpisode }) {
           </div>
         ))}
       </div>
+    </div>
+  )
+}
+
+function CareJourneyExportSection({ episode }: { episode: CareEpisode }) {
+  const [expanded, setExpanded] = useState(false)
+  const [copied, setCopied] = useState(false)
+  const packet = useMemo(() => exportCareJourneySummary(episode), [episode])
+
+  return (
+    <div
+      className="mt-4 rounded-xl border border-neutral-200 dark:border-white/10 bg-neutral-50 dark:bg-white/[0.02] p-3.5"
+      data-care-export-summary="v1"
+    >
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+        <div>
+          <div className="flex items-center gap-2 flex-wrap">
+            <h4 className="text-xs font-bold text-neutral-900 dark:text-white">
+              FHIR-Aligned Continuity Handoff Packet
+            </h4>
+            <Badge tone="brand">
+              <span className="font-mono text-[10px]">{packet.standard}</span>
+            </Badge>
+          </div>
+          <p className="mt-0.5 text-[11px] text-neutral-500 dark:text-white/60 font-mono truncate max-w-md">
+            Digest: {packet.auditDigest}
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            className="!min-h-0 !px-2.5 !py-1 text-[11px]"
+            onClick={() => {
+              if (typeof navigator !== 'undefined' && navigator.clipboard) {
+                navigator.clipboard.writeText(JSON.stringify(packet, null, 2)).catch(() => {})
+              }
+              setCopied(true)
+              setTimeout(() => setCopied(false), 2000)
+            }}
+          >
+            {copied ? 'Copied JSON ✓' : 'Copy Handoff JSON'}
+          </Button>
+          <Button
+            variant="ghost"
+            className="!min-h-0 !px-2.5 !py-1 text-[11px]"
+            onClick={() => setExpanded((v) => !v)}
+          >
+            {expanded ? 'Hide Packet' : 'Inspect Packet'}
+          </Button>
+        </div>
+      </div>
+
+      {expanded && (
+        <pre className="mt-3 max-h-56 overflow-auto rounded-lg border border-neutral-200 dark:border-white/10 bg-neutral-100 dark:bg-white/5 p-2.5 text-[10px] font-mono text-neutral-800 dark:text-white/80">
+          {JSON.stringify(packet, null, 2)}
+        </pre>
+      )}
     </div>
   )
 }

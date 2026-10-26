@@ -12,6 +12,7 @@ import type {
   CareEpisodeStageId,
   CareJourneyTimelineEvent,
   CareJourneyTimelineEventKind,
+  CareJourneyExportSummary,
   PlanItem,
   CarePlanMilestone,
   ClinicalOutcomeRecord,
@@ -88,6 +89,7 @@ export interface CareJourneyEpisodeSummary {
   escalation?: CareJourneyEscalation
   outcomeRecord?: ClinicalOutcomeRecord
   timelineEvents?: CareJourneyTimelineEvent[]
+  exportSummary?: CareJourneyExportSummary
 }
 
 export type CareJourneyEscalationAction =
@@ -136,6 +138,7 @@ export interface CareJourneyContinuityResult {
   patientTimelineEvents: CareJourneyTimelineEvent[]
   totalPatientTimelineEventsCount: number
   activeComorbiditiesCount: number
+  exportableJourneysCount: number
   hasBlockedStages: boolean
 }
 
@@ -659,6 +662,66 @@ export function derivePatientLongitudinalTimeline(
   })
 }
 
+export function exportCareJourneySummary(
+  episode: CareEpisode,
+  evaluatedAt?: string,
+): CareJourneyExportSummary {
+  const stages = episode.stages ?? []
+  const allDone = stages.length > 0 && stages.every((s) => s.status === 'done')
+  const anyBlocked = stages.some((s) => s.status === 'blocked')
+  const status: 'active' | 'on_hold' | 'completed' = allDone
+    ? 'completed'
+    : anyBlocked
+    ? 'on_hold'
+    : 'active'
+
+  const maxEpochMs = evaluatedAt && isValidIsoTimestamp(evaluatedAt, Infinity)
+    ? Date.parse(evaluatedAt)
+    : undefined
+  const timelineEvents = deriveCareJourneyTimelineEvents(episode, maxEpochMs)
+  const milestones = episode.milestones ?? []
+
+  return {
+    standard: 'PANACEA-CAREPLAN-FHIR-R4-V1',
+    episodeId: episode.id,
+    title: episode.title,
+    diagnosisCode: episode.diagnosisCode,
+    linkedComorbidities: episode.linkedComorbidities ?? [],
+    status,
+    generatedAt: evaluatedAt || episode.updatedAt,
+    stages: stages.map((s) => ({
+      stage: s.stage,
+      label: STAGE_LABEL[s.stage] ?? s.stage,
+      status: s.status,
+      updatedAt: s.updatedAt,
+      blockedReason: s.blockedReason,
+    })),
+    milestones: milestones.map((m) => ({
+      id: m.id,
+      title: m.title,
+      category: m.category,
+      targetStage: m.targetStage,
+      status: m.status,
+      resultValue: m.resultValue,
+      completedAt: m.completedAt,
+    })),
+    provider:
+      episode.facilityId || episode.facilityName || episode.costMinIdr != null || episode.costMaxIdr != null
+        ? {
+            facilityId: episode.facilityId,
+            facilityName: episode.facilityName,
+            costRangeIdr:
+              episode.costMinIdr != null && episode.costMaxIdr != null
+                ? { min: episode.costMinIdr, max: episode.costMaxIdr }
+                : undefined,
+          }
+        : undefined,
+    outcome: episode.outcomeRecord,
+    timelineEventCount: timelineEvents.length,
+    auditDigest: `sha256:${episode.id}:${episode.updatedAt}:${stages.length}:${milestones.length}:${status}`,
+  }
+}
+
 export const STAGE_EXPECTED_DAYS: Record<CareEpisodeStageId, number> = {
   problem: 1,
   diagnosis: 2,
@@ -928,6 +991,7 @@ export function evaluateCareJourneyContinuity(
       escalation,
       outcomeRecord: ep.outcomeRecord,
       timelineEvents: deriveCareJourneyTimelineEvents(ep, evaluatedAtMs),
+      exportSummary: exportCareJourneySummary(ep, evaluatedAt),
     }
   })
 
@@ -957,6 +1021,7 @@ export function evaluateCareJourneyContinuity(
     }
   }
   const activeComorbiditiesCount = uniqueComorbidities.size
+  const exportableJourneysCount = summaries.filter((s) => Boolean(s.exportSummary)).length
 
   return {
     totalJourneys: episodes.length,
@@ -979,6 +1044,7 @@ export function evaluateCareJourneyContinuity(
     patientTimelineEvents,
     totalPatientTimelineEventsCount,
     activeComorbiditiesCount,
+    exportableJourneysCount,
     hasBlockedStages: blockedJourneys > 0 || stalledCount > 0,
   }
 }

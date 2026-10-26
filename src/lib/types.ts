@@ -288,6 +288,39 @@ export interface ClinicalOutcomeRecord {
   updatedAt?: string
 }
 
+export interface CareJourneyExportSummary {
+  schemaVersion: '1.0'
+  standard: 'FHIR-R4-CarePlan-EpisodeOfCare-Aligned'
+  generatedAt: string
+  episodeId: string
+  title: string
+  diagnosisCode?: string
+  linkedComorbidities?: string[]
+  status: 'active' | 'completed' | 'on_hold'
+  provider?: {
+    facilityId?: string
+    facilityName?: string
+    providerName?: string
+  }
+  stages: {
+    stage: CareEpisodeStageId
+    label: string
+    status: CareEpisodeStageStatus
+    updatedAt?: string
+  }[]
+  milestones: {
+    id: string
+    title: string
+    category: string
+    status: string
+    resultValue?: string
+    completedAt?: string
+  }[]
+  outcome?: ClinicalOutcomeRecord
+  timelineEventCount: number
+  auditDigest: string
+}
+
 export interface CarePlanMilestone {
   id: string
   planItemId?: string
