@@ -249,6 +249,8 @@ export interface CareEpisode {
   linkedComorbidities?: string[]
   // Inter-facility referral handshake & diagnostic continuity record (T-CLIN-20)
   referralRecord?: CareJourneyReferralRecord
+  // Eden three-depth progressive disclosure preference (T-CLIN-21 / EDEN-01)
+  edenDepthPreference?: EdenDisclosureDepth
 }
 
 export type CareJourneyTimelineEventKind =
@@ -312,6 +314,33 @@ export interface CareJourneyReferralRecord {
   acknowledgedBy?: string
   completedAt?: string
   auditDigest: string
+}
+
+export type EdenDisclosureDepth = 'simple' | 'explore' | 'deep'
+
+export interface EdenPlainLanguageTerm {
+  technicalTerm: string
+  humanTranslation: string
+}
+
+export interface EdenCareCompanionSummary {
+  episodeId: string
+  episodeTitle: string
+  depth: EdenDisclosureDepth
+  depthLabel: 'Simple · Just Live' | 'Explore · Understand More' | 'Deep · Scientific & Clinical'
+  wonderReflection: string
+  whatIsHappening: string
+  whyItMatters: string
+  whatYouCanDo: string
+  whatRemainsUncertain: string
+  nextBeautifulStep: {
+    stage: CareEpisodeStageId
+    stageLabel: string
+    invitation: string
+    urgencyTone: 'calm' | 'attentive' | 'urgent_care'
+  }
+  plainLanguageGlossary: EdenPlainLanguageTerm[]
+  clinicalSafetyPreserved: true
 }
 
 export interface CareJourneyExportSummary {

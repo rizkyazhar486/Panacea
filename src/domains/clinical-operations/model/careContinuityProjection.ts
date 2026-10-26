@@ -15,6 +15,9 @@ import type {
   CareJourneyExportSummary,
   CareJourneyReferralRecord,
   ReferralHandshakeStatus,
+  EdenDisclosureDepth,
+  EdenPlainLanguageTerm,
+  EdenCareCompanionSummary,
   PlanItem,
   CarePlanMilestone,
   ClinicalOutcomeRecord,
@@ -99,6 +102,7 @@ export interface CareJourneyEpisodeSummary {
   costItemsCount: number
   readmissionSurveillance?: CareJourneyReadmissionSurveillance
   referralRecord?: CareJourneyReferralRecord
+  edenCompanion?: EdenCareCompanionSummary
 }
 
 export type ReadmissionRiskLevel = 'low' | 'moderate' | 'high'
@@ -178,6 +182,7 @@ export interface CareJourneyContinuityResult {
   activeReferralsCount: number
   acknowledgedReferralsCount: number
   emergencyReferralsCount: number
+  edenReadyJourneysCount: number
   hasBlockedStages: boolean
 }
 
@@ -973,6 +978,149 @@ export function evaluateReferralHandshakeContinuity(
   }
 }
 
+export const EDEN_PLAIN_LANGUAGE_GLOSSARY: readonly EdenPlainLanguageTerm[] = [
+  {
+    technicalTerm: 'Provenance',
+    humanTranslation: 'Where this information came from',
+  },
+  {
+    technicalTerm: 'Interoperability',
+    humanTranslation: 'Connecting your health information safely',
+  },
+  {
+    technicalTerm: 'Homeostasis',
+    humanTranslation: 'How your body maintains its balance',
+  },
+  {
+    technicalTerm: 'Evidence confidence',
+    humanTranslation: 'How well this information is supported',
+  },
+  {
+    technicalTerm: 'Physiological system',
+    humanTranslation: 'How this part of your body works',
+  },
+  {
+    technicalTerm: 'Trajectory',
+    humanTranslation: 'How things are changing over time',
+  },
+] as const
+
+export function translateClinicalTermToEden(term: string): string {
+  const normalized = term.trim().toLowerCase()
+  const found = EDEN_PLAIN_LANGUAGE_GLOSSARY.find(
+    (entry) => entry.technicalTerm.toLowerCase() === normalized
+  )
+  return found ? found.humanTranslation : term
+}
+
+export function deriveEdenCareCompanion(
+  episode: CareEpisode,
+  depth: EdenDisclosureDepth = episode.edenDepthPreference ?? 'simple',
+): EdenCareCompanionSummary {
+  const stages = Array.isArray(episode.stages) ? episode.stages : []
+  const totalStages = stages.length
+  const completedStages = stages.filter((s) => s.status === 'done').length
+  const isAllDone = totalStages > 0 && completedStages === totalStages
+  const blockedStage = stages.find((s) => s.status === 'blocked')
+  const activeStage = stages.find((s) => s.status === 'active')
+  const pendingStage = stages.find((s) => s.status === 'pending')
+  const currentStage =
+    blockedStage || activeStage || pendingStage || (stages.length > 0 ? stages[stages.length - 1] : undefined)
+  const stageId: CareEpisodeStageId = currentStage ? currentStage.stage : 'problem'
+  const stageLabel = STAGE_LABEL[stageId] ?? stageId
+
+  const milestones = Array.isArray(episode.milestones) ? episode.milestones : []
+  const completedMilestones = milestones.filter((m) => m.status === 'completed').length
+  const hasEmergencyReferral = episode.referralRecord?.urgency === 'emergency'
+
+  const urgencyTone: 'calm' | 'attentive' | 'urgent_care' = hasEmergencyReferral
+    ? 'urgent_care'
+    : blockedStage
+    ? 'attentive'
+    : 'calm'
+
+  const depthLabel =
+    depth === 'simple'
+      ? 'Simple · Just Live'
+      : depth === 'explore'
+      ? 'Explore · Understand More'
+      : 'Deep · Scientific & Clinical'
+
+  const wonderReflection =
+    depth === 'simple'
+      ? 'Every day, your body continuously adapts and works to restore its natural balance.'
+      : depth === 'explore'
+      ? 'How your body maintains its balance (homeostasis) is a coordinated partnership between your physiology and timely, supportive care.'
+      : `Biological resilience and longitudinal trajectory (${completedStages}/${totalStages} stages completed) reflect adaptive physiological recovery.`
+
+  const whatIsHappening = isAllDone
+    ? depth === 'simple'
+      ? `Your care journey for "${episode.title}" has completed all planned steps.`
+      : depth === 'explore'
+      ? `All ${totalStages} stages of "${episode.title}" are complete${episode.outcomeRecord ? ` with outcome recorded as ${episode.outcomeRecord.status.replace('_', ' ')}` : ''}.`
+      : `Episode ${episode.id} (${episode.diagnosisCode || 'unclassified'}) completed ${completedStages}/${totalStages} stages; outcome status: ${episode.outcomeRecord?.status ?? 'pending clinician signature'}.`
+    : blockedStage
+    ? depth === 'simple'
+      ? `We are currently pausing at the "${stageLabel}" step so your care team can help clear a small hurdle.`
+      : depth === 'explore'
+      ? `Stage "${stageLabel}" is temporarily paused (${blockedStage.blockedReason || 'awaiting coordination'}) while ${completedStages} of ${totalStages} steps are already complete.`
+      : `Trajectory stage "${stageId}" (${stageLabel}) is blocked (${blockedStage.blockedReason || 'unspecified'}); ${completedStages}/${totalStages} stages done, ${completedMilestones}/${milestones.length} milestones fulfilled.`
+    : depth === 'simple'
+    ? `You are currently on the "${stageLabel}" step of your "${episode.title}" care journey (${completedStages} of ${totalStages} steps completed).`
+    : depth === 'explore'
+    ? `Your care journey is progressing through "${stageLabel}" (${completedStages}/${totalStages} stages complete, ${completedMilestones}/${milestones.length} care milestones fulfilled).`
+    : `Active trajectory stage: "${stageId}" (${stageLabel}) for "${episode.title}" [ICD-10: ${episode.diagnosisCode || 'N/A'}]; ${completedStages}/${totalStages} stages completed.`
+
+  const whyItMatters =
+    depth === 'simple'
+      ? `Taking "${stageLabel}" one step at a time helps your body recover smoothly without unnecessary stress.`
+      : depth === 'explore'
+      ? `Each step in "${stageLabel}" connects your health information safely so your clinician and care team can support how your body maintains its balance.`
+      : `Longitudinal stage continuity at "${stageLabel}" preserves diagnostic chain-of-custody, provenance integrity, and clinical safety boundary (never-deny-care).`
+
+  const nextInvitation = isAllDone
+    ? episode.outcomeRecord
+      ? 'Maintain your gentle daily wellness routine and scheduled check-ins.'
+      : 'Confirm final outcome summary with your clinician at your next visit.'
+    : blockedStage
+    ? `Share or review what is needed to unblock "${stageLabel}" with your care coordinator.`
+    : `Focus on one calm step today: complete or review "${stageLabel}".`
+
+  const whatYouCanDo =
+    depth === 'simple'
+      ? nextInvitation
+      : depth === 'explore'
+      ? `${nextInvitation} (${milestones.length > 0 ? `${completedMilestones}/${milestones.length} care plan items fulfilled so far` : 'ready for encounter plan sync'}).`
+      : `${nextInvitation} [Stage: ${stageId} · Tone: ${urgencyTone} · Boundary: never-deny-care].`
+
+  const whatRemainsUncertain =
+    episode.outcomeRecord?.verifiedById
+      ? 'Clinical outcome is verified by an authorized clinician; long-term physiological adaptation continues over time.'
+      : episode.costConfidence !== 'verified' && (episode.estimatedCostLow != null || episode.estimatedCostHigh != null)
+      ? 'Final clinical outcome awaits clinician verification, and facility cost figures remain estimated until verified by billing.'
+      : 'Final clinical outcome and physiological response remain under observation until verified by an authorized clinician.'
+
+  return {
+    episodeId: episode.id,
+    episodeTitle: episode.title,
+    depth,
+    depthLabel,
+    wonderReflection,
+    whatIsHappening,
+    whyItMatters,
+    whatYouCanDo,
+    whatRemainsUncertain,
+    nextBeautifulStep: {
+      stage: stageId,
+      stageLabel,
+      invitation: nextInvitation,
+      urgencyTone,
+    },
+    plainLanguageGlossary: [...EDEN_PLAIN_LANGUAGE_GLOSSARY],
+    clinicalSafetyPreserved: true,
+  }
+}
+
 export const STAGE_EXPECTED_DAYS: Record<CareEpisodeStageId, number> = {
   problem: 1,
   diagnosis: 2,
@@ -1224,6 +1372,7 @@ export function evaluateCareJourneyContinuity(
     const costProj = deriveEpisodeCostProjection(ep)
     const readmissionSurveillance = evaluateEpisodeReadmissionRisk(ep, supportiveResults, evaluatedAtMs)
     const referralRecord = evaluateReferralHandshakeContinuity(ep)
+    const edenCompanion = deriveEdenCareCompanion(ep)
 
     return {
       id: ep.id,
@@ -1254,6 +1403,7 @@ export function evaluateCareJourneyContinuity(
       costItemsCount: costProj.costItemsCount,
       readmissionSurveillance,
       referralRecord,
+      edenCompanion,
     }
   })
 
@@ -1304,6 +1454,9 @@ export function evaluateCareJourneyContinuity(
   const emergencyReferralsCount = summaries.filter(
     (s) => s.referralRecord?.urgency === 'emergency' && s.referralRecord.status !== 'completed' && s.referralRecord.status !== 'cancelled'
   ).length
+  const edenReadyJourneysCount = summaries.filter(
+    (s) => Boolean(s.edenCompanion?.clinicalSafetyPreserved)
+  ).length
 
   return {
     totalJourneys: episodes.length,
@@ -1337,6 +1490,7 @@ export function evaluateCareJourneyContinuity(
     activeReferralsCount,
     acknowledgedReferralsCount,
     emergencyReferralsCount,
+    edenReadyJourneysCount,
     hasBlockedStages: blockedJourneys > 0 || stalledCount > 0,
   }
 }
