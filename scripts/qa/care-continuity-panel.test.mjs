@@ -9,6 +9,7 @@ import {
   evaluateCareJourneyContinuity,
   deriveCareJourneyTimelineEvents,
   derivePatientLongitudinalTimeline,
+  exportCareJourneySummary,
 } from '../../src/domains/clinical-operations/model/careContinuityProjection.ts'
 import {
   ensureEpisodeFromVerifiedPlan,
@@ -1280,4 +1281,91 @@ test('derivePatientLongitudinalTimeline & CareEpisode: multi-episode longitudina
 
   const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
   assert.ok(episodeSource.includes('data-care-comorbidities="v1"'), 'CareEpisode must include care comorbidities attribute')
+})
+
+test('exportCareJourneySummary & CareEpisode: FHIR-aligned continuity handoff packet & digest verification (T-CLIN-17)', () => {
+  const evaluatedAt = '2026-10-25T15:00:00.000Z'
+  const episode = {
+    id: 'ce_export_1',
+    title: 'Acute Cholecystitis Surgical Pathway',
+    diagnosisCode: 'K81.0',
+    linkedComorbidities: ['I10', 'E11.9'],
+    createdAt: '2026-10-20T08:00:00.000Z',
+    updatedAt: '2026-10-24T12:00:00.000Z',
+    facilityId: 'fac_rscm',
+    facilityName: 'RSCM Kencana',
+    estimatedCostLow: 18_000_000,
+    estimatedCostHigh: 25_000_000,
+    stages: [
+      { stage: 'problem', status: 'done', updatedAt: '2026-10-20T08:30:00.000Z' },
+      { stage: 'diagnosis', status: 'done', updatedAt: '2026-10-20T09:00:00.000Z' },
+      { stage: 'plan', status: 'done', updatedAt: '2026-10-20T10:00:00.000Z' },
+      { stage: 'provider', status: 'done', updatedAt: '2026-10-21T10:00:00.000Z' },
+      { stage: 'cost', status: 'done', updatedAt: '2026-10-21T11:00:00.000Z' },
+      { stage: 'schedule', status: 'done', updatedAt: '2026-10-22T09:00:00.000Z' },
+      { stage: 'treatment', status: 'done', updatedAt: '2026-10-23T14:00:00.000Z' },
+      { stage: 'recovery', status: 'done', updatedAt: '2026-10-24T09:00:00.000Z' },
+      { stage: 'followUp', status: 'done', updatedAt: '2026-10-24T11:00:00.000Z' },
+      { stage: 'outcome', status: 'done', updatedAt: '2026-10-24T12:00:00.000Z' },
+    ],
+    milestones: [
+      {
+        id: 'ms_lap',
+        title: 'Laparoscopic cholecystectomy',
+        category: 'Definitif',
+        targetStage: 'treatment',
+        status: 'completed',
+        completedAt: '2026-10-23T14:00:00.000Z',
+      },
+    ],
+    outcomeRecord: {
+      status: 'resolved',
+      summary: 'Complete post-operative recovery without complications',
+      verifiedById: 'dr-surgeon-1',
+      verifiedAt: '2026-10-24T12:00:00.000Z',
+    },
+  }
+
+  // 1. Pure exportCareJourneySummary verification
+  const packet = exportCareJourneySummary(episode, evaluatedAt)
+  assert.equal(packet.standard, 'PANACEA-CAREPLAN-FHIR-R4-V1')
+  assert.equal(packet.episodeId, 'ce_export_1')
+  assert.equal(packet.diagnosisCode, 'K81.0')
+  assert.deepEqual(packet.linkedComorbidities, ['I10', 'E11.9'])
+  assert.equal(packet.status, 'completed')
+  assert.equal(packet.generatedAt, evaluatedAt)
+  assert.equal(packet.stages.length, 10)
+  assert.equal(packet.milestones.length, 1)
+  assert.equal(packet.provider?.facilityName, 'RSCM Kencana')
+  assert.deepEqual(packet.provider?.costRangeIdr, { min: 18_000_000, max: 25_000_000 })
+  assert.equal(packet.outcome?.status, 'resolved')
+  assert.ok(packet.timelineEventCount >= 10)
+  assert.equal(
+    packet.auditDigest,
+    'sha256:ce_export_1:2026-10-24T12:00:00.000Z:10:1:completed'
+  )
+
+  // 2. Blocked episode maps to on_hold status
+  const blockedEp = {
+    ...episode,
+    id: 'ce_blocked_export',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'provider', status: 'blocked', blockedReason: 'Awaiting referral letter' },
+    ],
+  }
+  const blockedPacket = exportCareJourneySummary(blockedEp, evaluatedAt)
+  assert.equal(blockedPacket.status, 'on_hold')
+
+  // 3. evaluateCareJourneyContinuity exportableJourneysCount
+  const projection = evaluateCareJourneyContinuity([episode, blockedEp], evaluatedAt)
+  assert.equal(projection.exportableJourneysCount, 2)
+  assert.equal(projection.episodes[0].exportSummary?.standard, 'PANACEA-CAREPLAN-FHIR-R4-V1')
+
+  // 4. UI contracts
+  const panelSource = read('src/domains/clinical-operations/ui/CareContinuityPanel.tsx')
+  assert.ok(panelSource.includes('data-care-export-ready="v1"'), 'CareContinuityPanel must include export readiness attribute')
+
+  const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
+  assert.ok(episodeSource.includes('data-care-export-summary="v1"'), 'CareEpisode must include export summary card attribute')
 })
