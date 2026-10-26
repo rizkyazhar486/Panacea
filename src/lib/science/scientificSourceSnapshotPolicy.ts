@@ -18,14 +18,31 @@ export interface SnapshotDecision {
 }
 
 function validIsoDate(value: string): boolean {
-  const time = Date.parse(value)
-  return Number.isFinite(time)
+  return typeof value === 'string' && Number.isFinite(Date.parse(value))
+}
+
+function normalizedIdentity(value: string | null): string | null {
+  if (typeof value !== 'string') return null
+  const normalized = value.trim()
+  return normalized === '' ? null : normalized
+}
+
+function hasHttpsIdentity(value: string): boolean {
+  return typeof value === 'string' && value.startsWith('https://')
 }
 
 function sameIdentity(a: ScientificSourceSnapshot, b: ScientificSourceSnapshot): boolean {
-  if (a.sourceId !== b.sourceId) return false
-  if (a.sourceVersion && b.sourceVersion) return a.sourceVersion === b.sourceVersion
-  if (a.contentDigest && b.contentDigest) return a.contentDigest === b.contentDigest
+  const aSourceId = normalizedIdentity(a.sourceId)
+  const bSourceId = normalizedIdentity(b.sourceId)
+  if (!aSourceId || !bSourceId || aSourceId !== bSourceId) return false
+
+  const aSourceVersion = normalizedIdentity(a.sourceVersion)
+  const bSourceVersion = normalizedIdentity(b.sourceVersion)
+  if (aSourceVersion && bSourceVersion) return aSourceVersion === bSourceVersion
+
+  const aContentDigest = normalizedIdentity(a.contentDigest)
+  const bContentDigest = normalizedIdentity(b.contentDigest)
+  if (aContentDigest && bContentDigest) return aContentDigest === bContentDigest
   return false
 }
 
@@ -42,7 +59,7 @@ export function decideSnapshotReuse(
   if (!validIsoDate(current.retrievedAt) || !validIsoDate(candidate.retrievedAt)) {
     reasons.push('invalid retrieval timestamp')
   }
-  if (!current.upstreamUrl.startsWith('https://') || !candidate.upstreamUrl.startsWith('https://')) {
+  if (!hasHttpsIdentity(current.upstreamUrl) || !hasHttpsIdentity(candidate.upstreamUrl)) {
     reasons.push('non-https upstream identity')
   }
   if (candidate.licenseState !== 'verified') {
@@ -51,7 +68,7 @@ export function decideSnapshotReuse(
   if (!sameIdentity(current, candidate)) {
     reasons.push('source version or digest identity changed')
   }
-  if (!candidate.immutable && !candidate.sourceVersion && !candidate.contentDigest) {
+  if (!candidate.immutable && !normalizedIdentity(candidate.sourceVersion) && !normalizedIdentity(candidate.contentDigest)) {
     reasons.push('mutable unversioned snapshot lacks digest identity')
   }
 
@@ -60,15 +77,18 @@ export function decideSnapshotReuse(
 }
 
 export function snapshotCacheKey(snapshot: ScientificSourceSnapshot): string | null {
-  const identity = snapshot.sourceVersion ?? snapshot.contentDigest
-  if (!identity || !snapshot.sourceId) return null
-  return `${snapshot.sourceId}:${identity}:${snapshot.kind}`
+  const sourceId = normalizedIdentity(snapshot.sourceId)
+  const identity = normalizedIdentity(snapshot.sourceVersion) ?? normalizedIdentity(snapshot.contentDigest)
+  if (!sourceId || !identity) return null
+  return `${sourceId}:${identity}:${snapshot.kind}`
 }
 
 export function mayClaimSnapshotComplete(snapshot: ScientificSourceSnapshot): boolean {
   return Boolean(
-    snapshot.sourceVersion &&
-      snapshot.contentDigest &&
+    normalizedIdentity(snapshot.sourceId) &&
+      normalizedIdentity(snapshot.sourceVersion) &&
+      normalizedIdentity(snapshot.contentDigest) &&
+      hasHttpsIdentity(snapshot.upstreamUrl) &&
       snapshot.licenseState === 'verified' &&
       snapshot.immutable &&
       validIsoDate(snapshot.retrievedAt),

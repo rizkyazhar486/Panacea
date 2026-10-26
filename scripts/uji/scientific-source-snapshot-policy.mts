@@ -42,8 +42,25 @@ assert.equal(decideSnapshotReuse(mutableUnversioned, mutableUnversioned).reusabl
 
 assert.equal(snapshotCacheKey(base), 'uniprot:2026_04:release-file')
 assert.equal(snapshotCacheKey(mutableUnversioned), null)
+assert.equal(snapshotCacheKey({ ...base, sourceId: ' \t' }), null)
+assert.equal(snapshotCacheKey({ ...base, sourceVersion: ' \t' }), 'uniprot:sha256:abc:release-file')
+const whitespaceSource = { ...base, sourceId: ' \t' }
+assert.equal(decideSnapshotReuse(whitespaceSource, { ...whitespaceSource }).reusable, false)
+const whitespaceVersion = { ...base, sourceVersion: ' \t' }
+assert.equal(decideSnapshotReuse(whitespaceVersion, { ...whitespaceVersion }).reusable, true)
+assert.equal(decideSnapshotReuse(whitespaceVersion, { ...whitespaceVersion, contentDigest: 'sha256:other' }).reusable, false)
+const malformedUpstream = { ...base, upstreamUrl: null } as unknown as ScientificSourceSnapshot
+let malformedUpstreamDecision: ReturnType<typeof decideSnapshotReuse> | null = null
+assert.doesNotThrow(() => {
+  malformedUpstreamDecision = decideSnapshotReuse(malformedUpstream, { ...base })
+})
+assert.equal(malformedUpstreamDecision?.reusable, false)
+assert.ok(malformedUpstreamDecision?.reasons.some((reason) => /non-https/i.test(reason)))
 assert.equal(mayClaimSnapshotComplete(base), true)
 assert.equal(mayClaimSnapshotComplete({ ...base, contentDigest: null }), false)
+assert.equal(mayClaimSnapshotComplete(whitespaceSource), false)
+assert.equal(mayClaimSnapshotComplete({ ...base, sourceVersion: ' \t' }), false)
+assert.equal(mayClaimSnapshotComplete({ ...base, upstreamUrl: 'http://www.uniprot.org/' }), false)
 assert.match(SCIENTIFIC_SNAPSHOT_BOUNDARY, /does not imply full upstream coverage/i)
 assert.match(SCIENTIFIC_SNAPSHOT_BOUNDARY, /clinical validity/i)
 
