@@ -91,3 +91,64 @@ test('same event id with a different digest is an integrity conflict', () => {
     { ...base, eventId: 'evt-1' },
     { ...base, eventId: 'evt-1', payloadDigest: 'sha256:tampered' },
   ]))
+  assert.equal(result.state, 'blocked')
+  assert.deepEqual(result.integrityConflictIds, ['evt-1'])
+})
+
+test('sequence collision between different events fails closed', () => {
+  const result = evaluateClinicalEpisodeResilience(input([
+    { ...base, eventId: 'evt-1' },
+    { ...base, eventId: 'evt-2', payloadDigest: 'sha256:def' },
+  ]))
+  assert.equal(result.state, 'blocked')
+  assert.deepEqual(result.sequenceConflictIds.sort(), ['evt-1', 'evt-2'])
+})
+
+test('foreign patient or episode data cannot be reconciled into this episode', () => {
+  const result = evaluateClinicalEpisodeResilience(input([
+    { ...base, eventId: 'evt-foreign', patientId: 'patient-002' },
+  ]))
+  assert.equal(result.state, 'blocked')
+  assert.deepEqual(result.foreignContextIds, ['evt-foreign'])
+})
+
+test('future timestamp and exhausted retry both block reconciliation', () => {
+  const result = evaluateClinicalEpisodeResilience(input([
+    { ...base, eventId: 'evt-future', authoredAt: '2026-10-05T00:00:00.000Z' },
+    { ...base, eventId: 'evt-retry', sequence: 2, retryCount: 4 },
+  ]))
+  assert.equal(result.state, 'blocked')
+  assert.deepEqual(result.invalidTimestampIds, ['evt-future'])
+  assert.deepEqual(result.retryExhaustedIds, ['evt-retry'])
+})
+
+test('online pending events stay degraded until acknowledged', () => {
+  const result = evaluateClinicalEpisodeResilience(input(
+    [{ ...base, eventId: 'evt-1' }],
+    { connectivity: 'online' },
+  ))
+  assert.equal(result.state, 'degraded')
+  assert.equal(result.pendingCount, 1)
+  assert.match(result.nextOperationalAction, /Drain pending/)
+})
+
+test('fully acknowledged online episode reaches ready transport state', () => {
+  const result = evaluateClinicalEpisodeResilience(input(
+    [{
+      ...base,
+      eventId: 'evt-1',
+      delivery: 'acknowledged',
+      durableLocalCopy: false,
+      encryptedAtRest: false,
+    }],
+    { connectivity: 'online' },
+  ))
+  assert.equal(result.state, 'ready')
+  assert.equal(result.pendingCount, 0)
+  assert.equal(result.acknowledgedCount, 1)
+})
+
+test('transport resilience never claims clinical readiness', () => {
+  const source = String(evaluateClinicalEpisodeResilience)
+  assert.doesNotMatch(source, /diagnos|treat|prescrib/i)
+})
