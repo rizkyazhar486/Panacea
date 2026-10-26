@@ -1129,7 +1129,7 @@ export function deriveEdenLifeBalanceSynthesis(
   episodes: readonly CareEpisode[],
   supportiveResults?: readonly SupportiveResult[],
 ): EdenLifeBalanceSynthesis {
-  const safeEpisodes = Array.isArray(episodes) ? episodes : []
+  const safeEpisodes: readonly CareEpisode[] = Array.isArray(episodes) ? episodes : []
   const total = safeEpisodes.length
   let completed = 0
   let blocked = 0
@@ -1137,7 +1137,7 @@ export function deriveEdenLifeBalanceSynthesis(
   let firstNextStep: string | undefined
 
   for (const ep of safeEpisodes) {
-    const stages = Array.isArray(ep.stages) ? ep.stages : []
+    const stages = ep.stages ?? []
     const isDone = stages.length > 0 && stages.every((s) => s.status === 'done')
     const isBlocked = stages.some((s) => s.status === 'blocked')
     if (isDone) {
@@ -1155,9 +1155,8 @@ export function deriveEdenLifeBalanceSynthesis(
   }
 
   const active = Math.max(0, total - completed)
-  const abnormalResults = Array.isArray(supportiveResults)
-    ? supportiveResults.filter((r) => r.flag === 'critical' || r.flag === 'high')
-    : []
+  const safeResults: readonly SupportiveResult[] = Array.isArray(supportiveResults) ? supportiveResults : []
+  const abnormalResults = safeResults.filter((r) => r.flag === 'critical' || r.flag === 'high')
   const hasCriticalDiag = abnormalResults.some((r) => r.flag === 'critical')
   const costSummary = deriveCareJourneyCostSummary(safeEpisodes)
 
