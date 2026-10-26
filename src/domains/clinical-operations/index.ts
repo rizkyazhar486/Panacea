@@ -59,6 +59,7 @@ export {
   deriveEdenCareCompanion,
   deriveEdenLifeBalanceSynthesis,
   deriveEdenLifeStoryBridge,
+  deriveEdenPhysiologyAppreciation,
   translateClinicalTermToEden,
   EDEN_PLAIN_LANGUAGE_GLOSSARY,
   STAGE_LABEL,

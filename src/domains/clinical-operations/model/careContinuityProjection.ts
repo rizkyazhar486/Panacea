@@ -23,6 +23,8 @@ import type {
   EdenLifeBalanceSynthesis,
   EdenLifeStoryAnchor,
   EdenLifeStoryBridge,
+  EdenOrganSystemId,
+  EdenPhysiologyAppreciation,
   LifeDomain,
   LifeEvent,
   Quest,
@@ -112,6 +114,7 @@ export interface CareJourneyEpisodeSummary {
   referralRecord?: CareJourneyReferralRecord
   edenCompanion?: EdenCareCompanionSummary
   edenLifeStoryBridge?: EdenLifeStoryBridge
+  edenPhysiologyAppreciation?: EdenPhysiologyAppreciation
 }
 
 export type ReadmissionRiskLevel = 'low' | 'moderate' | 'high'
@@ -193,6 +196,7 @@ export interface CareJourneyContinuityResult {
   emergencyReferralsCount: number
   edenReadyJourneysCount: number
   edenLifeStoryAlignedCount: number
+  edenPhysiologyLinkedCount: number
   edenLifeBalance: EdenLifeBalanceSynthesis
   hasBlockedStages: boolean
 }
@@ -1420,6 +1424,272 @@ export function deriveEdenLifeStoryBridge(
   }
 }
 
+interface OrganSystemProfile {
+  id: EdenOrganSystemId
+  label: string
+  bodyTwinRoute: string
+  livingWonderHeadline: string
+  homeostaticMechanismSummary: string
+  coupledSystems: {
+    id: EdenOrganSystemId
+    label: string
+    couplingExplanation: string
+  }[]
+}
+
+const EDEN_ORGAN_SYSTEM_PROFILES: Record<EdenOrganSystemId, OrganSystemProfile> = {
+  cardiovascular: {
+    id: 'cardiovascular',
+    label: 'Cardiovascular & Circulatory System',
+    bodyTwinRoute: '/body',
+    livingWonderHeadline:
+      'Your heart and blood vessels continuously coordinate oxygen and nutrient delivery to billions of cells with every heartbeat.',
+    homeostaticMechanismSummary:
+      'Vascular smooth muscle tone, baroreceptor feedback, and cardiac output adapt dynamically to support steady tissue perfusion.',
+    coupledSystems: [
+      {
+        id: 'respiratory',
+        label: 'Respiratory Gas Exchange',
+        couplingExplanation: 'Pulmonary alveoli oxygenate circulating blood and clear carbon dioxide in synchronized cardiopulmonary rhythm.',
+      },
+      {
+        id: 'renal_urinary',
+        label: 'Renal Fluid & Pressure Balance',
+        couplingExplanation: 'Kidneys regulate intravascular volume and electrolytes to keep arterial pressure within a healthy window.',
+      },
+    ],
+  },
+  respiratory: {
+    id: 'respiratory',
+    label: 'Respiratory & Pulmonary System',
+    bodyTwinRoute: '/body',
+    livingWonderHeadline:
+      'Each calm breath draws oxygen across a delicate alveolar surface to energize cellular metabolism throughout your body.',
+    homeostaticMechanismSummary:
+      'Mucociliary clearance, bronchial tone, and alveolar-capillary diffusion work together to maintain balanced blood oxygenation.',
+    coupledSystems: [
+      {
+        id: 'cardiovascular',
+        label: 'Pulmonary-Cardiac Circulation',
+        couplingExplanation: 'Right and left heart chambers partner with pulmonary vessels to distribute freshly oxygenated blood.',
+      },
+      {
+        id: 'immune_lymphatic',
+        label: 'Mucosal Airway Defense',
+        couplingExplanation: 'Airway immune cells and lymphatic drainage protect and repair respiratory tissues.',
+      },
+    ],
+  },
+  metabolic_endocrine: {
+    id: 'metabolic_endocrine',
+    label: 'Metabolic & Endocrine Signaling System',
+    bodyTwinRoute: '/body',
+    livingWonderHeadline:
+      'Your endocrine glands and metabolic pathways finely tune cellular energy, glucose balance, and hormone rhythms around the clock.',
+    homeostaticMechanismSummary:
+      'Pancreatic, thyroid, hepatic, and cellular receptor feedback loops coordinate fuel utilization and restorative repair.',
+    coupledSystems: [
+      {
+        id: 'cardiovascular',
+        label: 'Vascular Endothelial Health',
+        couplingExplanation: 'Balanced glucose and lipid metabolism protects microcirculation and arterial elasticity.',
+      },
+      {
+        id: 'neurological',
+        label: 'Neuroendocrine & Circadian Rhythm',
+        couplingExplanation: 'Hypothalamic-pituitary signaling aligns sleep, appetite, and cellular energy recovery.',
+      },
+    ],
+  },
+  musculoskeletal: {
+    id: 'musculoskeletal',
+    label: 'Musculoskeletal & Biomechanical System',
+    bodyTwinRoute: '/body',
+    livingWonderHeadline:
+      'Your bones, joints, tendons, and muscle fibers remodel and adapt in response to gentle movement and load.',
+    homeostaticMechanismSummary:
+      'Collagen synthesis, synovial lubrication, and neuromuscular coordination restore structural strength step by step.',
+    coupledSystems: [
+      {
+        id: 'neurological',
+        label: 'Neuromuscular Motor Control',
+        couplingExplanation: 'Proprioceptive nerves and motor pathways guide balanced joint alignment and protective reflexes.',
+      },
+      {
+        id: 'cardiovascular',
+        label: 'Microvascular Tissue Repair',
+        couplingExplanation: 'Local capillary blood flow delivers amino acids, oxygen, and growth factors to healing tissues.',
+      },
+    ],
+  },
+  neurological: {
+    id: 'neurological',
+    label: 'Nervous System & Neuroplasticity',
+    bodyTwinRoute: '/body',
+    livingWonderHeadline:
+      'Billions of neurons and glial cells continuously adapt, regulate autonomic calm, and coordinate sensation and movement.',
+    homeostaticMechanismSummary:
+      'Autonomic vagal balance, synaptic plasticity, and neurovascular coupling support cognitive clarity and restorative rest.',
+    coupledSystems: [
+      {
+        id: 'cardiovascular',
+        label: 'Cerebrovascular Perfusion',
+        couplingExplanation: 'Autoregulated cerebral blood flow matches oxygen and glucose delivery to active neural networks.',
+      },
+      {
+        id: 'metabolic_endocrine',
+        label: 'Autonomic-Endocrine Harmony',
+        couplingExplanation: 'Parasympathetic recovery signals help quiet stress hormones and support cellular repair.',
+      },
+    ],
+  },
+  digestive_hepatobiliary: {
+    id: 'digestive_hepatobiliary',
+    label: 'Digestive & Hepatobiliary System',
+    bodyTwinRoute: '/body',
+    livingWonderHeadline:
+      'Your digestive tract and liver transform nourishment into cellular building blocks while maintaining a protective mucosal barrier.',
+    homeostaticMechanismSummary:
+      'Enzymatic digestion, bile flow, hepatic metabolism, and gut microbiome signaling sustain whole-body nutrition.',
+    coupledSystems: [
+      {
+        id: 'metabolic_endocrine',
+        label: 'Hepatic-Metabolic Nutrient Routing',
+        couplingExplanation: 'Portal circulation and liver enzymes buffer blood nutrients after every meal.',
+      },
+      {
+        id: 'immune_lymphatic',
+        label: 'Gut-Associated Immune Balance',
+        couplingExplanation: 'Intestinal mucosal immunity and lymphatic vessels maintain calm tolerance and defense.',
+      },
+    ],
+  },
+  renal_urinary: {
+    id: 'renal_urinary',
+    label: 'Renal & Fluid Homeostasis System',
+    bodyTwinRoute: '/body',
+    livingWonderHeadline:
+      'Your kidneys filter blood continuously to keep water, minerals, and acid-base balance in a remarkably steady state.',
+    homeostaticMechanismSummary:
+      'Glomerular filtration and tubular reabsorption conserve essential electrolytes while clearing metabolic byproducts.',
+    coupledSystems: [
+      {
+        id: 'cardiovascular',
+        label: 'Hemodynamic & Blood Pressure Balance',
+        couplingExplanation: 'Renal sodium-water regulation partners with arterial vessels to stabilize circulation.',
+      },
+      {
+        id: 'metabolic_endocrine',
+        label: 'Mineral & Erythropoietic Signaling',
+        couplingExplanation: 'Renal hormones support bone mineral balance and red blood cell production.',
+      },
+    ],
+  },
+  immune_lymphatic: {
+    id: 'immune_lymphatic',
+    label: 'Immune Defense & Lymphatic Repair System',
+    bodyTwinRoute: '/body',
+    livingWonderHeadline:
+      'Your immune cells and lymphatic network patrol, clear cellular debris, and guide tissue healing with remarkable precision.',
+    homeostaticMechanismSummary:
+      'Innate and adaptive immune pathways resolve inflammation and restore tissue equilibrium after infection or injury.',
+    coupledSystems: [
+      {
+        id: 'cardiovascular',
+        label: 'Lymphatic-Vascular Fluid Return',
+        couplingExplanation: 'Lymphatic vessels return interstitial fluid and immune messengers back into circulation.',
+      },
+      {
+        id: 'respiratory',
+        label: 'Barrier & Mucosal Surveillance',
+        couplingExplanation: 'Coordinated mucosal defenses protect respiratory and systemic tissues during recovery.',
+      },
+    ],
+  },
+  whole_body_homeostasis: {
+    id: 'whole_body_homeostasis',
+    label: 'Whole-Body Homeostasis & Cellular Resilience',
+    bodyTwinRoute: '/body',
+    livingWonderHeadline:
+      'Across every organ system, your body coordinates circulation, cellular repair, and autonomic balance to support recovery.',
+    homeostaticMechanismSummary:
+      'Integrated cardiovascular, metabolic, immune, and nervous system feedback loops work together to maintain physiological stability.',
+    coupledSystems: [
+      {
+        id: 'cardiovascular',
+        label: 'Systemic Oxygen & Nutrient Delivery',
+        couplingExplanation: 'Steady circulation nourishes tissues and supports every stage of clinical recovery.',
+      },
+      {
+        id: 'neurological',
+        label: 'Restorative Autonomic Rhythm',
+        couplingExplanation: 'Sleep and parasympathetic calm coordinate whole-body cellular repair.',
+      },
+    ],
+  },
+}
+
+function classifyEpisodeOrganSystem(episode: CareEpisode): EdenOrganSystemId {
+  const code = (episode.diagnosisCode ?? '').trim().toUpperCase()
+  if (code.startsWith('I')) return 'cardiovascular'
+  if (code.startsWith('J')) return 'respiratory'
+  if (code.startsWith('E')) return 'metabolic_endocrine'
+  if (code.startsWith('M') || code.startsWith('S')) return 'musculoskeletal'
+  if (code.startsWith('G') || code.startsWith('F')) return 'neurological'
+  if (code.startsWith('K')) return 'digestive_hepatobiliary'
+  if (code.startsWith('N')) return 'renal_urinary'
+  if (code.startsWith('A') || code.startsWith('B') || code.startsWith('D')) return 'immune_lymphatic'
+
+  const title = (episode.title ?? '').toLowerCase()
+  if (/\b(heart|cardiac|hypertension|coronary|vascular|angina|arrhythmia|atrial)\b/.test(title)) {
+    return 'cardiovascular'
+  }
+  if (/\b(lung|asthma|copd|pneumonia|respiratory|bronch|airway|pulmonary)\b/.test(title)) {
+    return 'respiratory'
+  }
+  if (/\b(diabet|thyroid|metabolic|lipid|glucose|endocrine|hba1c)\b/.test(title)) {
+    return 'metabolic_endocrine'
+  }
+  if (/\b(knee|meniscus|fracture|joint|spine|lumbar|orthop|muscle|tendon|rehab)\b/.test(title)) {
+    return 'musculoskeletal'
+  }
+  if (/\b(neuro|migraine|stroke|nerve|sleep|cognitive|seizure)\b/.test(title)) {
+    return 'neurological'
+  }
+  if (/\b(gastr|liver|hepato|gallstone|cholecyst|biliary|digest|colon|ulcer)\b/.test(title)) {
+    return 'digestive_hepatobiliary'
+  }
+  if (/\b(renal|kidney|urinary|nephr)\b/.test(title)) {
+    return 'renal_urinary'
+  }
+  if (/\b(infect|viral|immune|lymph|sepsis|fever)\b/.test(title)) {
+    return 'immune_lymphatic'
+  }
+  return 'whole_body_homeostasis'
+}
+
+export function deriveEdenPhysiologyAppreciation(
+  episode: CareEpisode,
+): EdenPhysiologyAppreciation {
+  const systemId = classifyEpisodeOrganSystem(episode)
+  const profile = EDEN_ORGAN_SYSTEM_PROFILES[systemId]
+
+  return {
+    episodeId: episode.id,
+    episodeTitle: episode.title,
+    primarySystem: {
+      id: profile.id,
+      label: profile.label,
+      bodyTwinRoute: profile.bodyTwinRoute,
+    },
+    coupledSystems: profile.coupledSystems.map((c) => ({ ...c })),
+    livingWonderHeadline: profile.livingWonderHeadline,
+    homeostaticMechanismSummary: profile.homeostaticMechanismSummary,
+    truthClass: 'educational_physiology_reference',
+    neverFabricatesMeasuredVitals: true,
+  }
+}
+
 export const STAGE_EXPECTED_DAYS: Record<CareEpisodeStageId, number> = {
   problem: 1,
   diagnosis: 2,
@@ -1673,6 +1943,7 @@ export function evaluateCareJourneyContinuity(
     const referralRecord = evaluateReferralHandshakeContinuity(ep)
     const edenCompanion = deriveEdenCareCompanion(ep)
     const edenLifeStoryBridge = deriveEdenLifeStoryBridge(ep)
+    const edenPhysiologyAppreciation = deriveEdenPhysiologyAppreciation(ep)
 
     return {
       id: ep.id,
@@ -1705,6 +1976,7 @@ export function evaluateCareJourneyContinuity(
       referralRecord,
       edenCompanion,
       edenLifeStoryBridge,
+      edenPhysiologyAppreciation,
     }
   })
 
@@ -1761,6 +2033,9 @@ export function evaluateCareJourneyContinuity(
   const edenLifeStoryAlignedCount = summaries.filter(
     (s) => Boolean(s.edenLifeStoryBridge?.selfAuthoredNeverInferred)
   ).length
+  const edenPhysiologyLinkedCount = summaries.filter(
+    (s) => Boolean(s.edenPhysiologyAppreciation?.neverFabricatesMeasuredVitals)
+  ).length
   const edenLifeBalance = deriveEdenLifeBalanceSynthesis(episodes, supportiveResults)
 
   return {
@@ -1797,6 +2072,7 @@ export function evaluateCareJourneyContinuity(
     emergencyReferralsCount,
     edenReadyJourneysCount,
     edenLifeStoryAlignedCount,
+    edenPhysiologyLinkedCount,
     edenLifeBalance,
     hasBlockedStages: blockedJourneys > 0 || stalledCount > 0,
   }
