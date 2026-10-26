@@ -1096,6 +1096,55 @@ export interface EdenRegenerativePlasticityBridge {
   epistemicHumilityPreserved: true
 }
 
+export type EdenEpigeneticClockState =
+  | 'youthful_euchromatin_harmony'
+  | 'compensated_epigenetic_adaptation'
+  | 'accelerated_epigenetic_drift_risk'
+  | 'stochastic_methylation_entropy'
+
+export type EdenTranscriptomicPurityLevel =
+  | 'high_fidelity_transcriptomic_stability'
+  | 'physiological_splicing_fidelity'
+  | 'aberrant_transcript_drift'
+  | 'retrotransposon_derepression_strain'
+
+export type EdenEpigeneticHarmonyClusterKind =
+  | 'horvath_phenoage_clock_alignment'
+  | 'dna_methylation_dnmt_tet_equilibrium'
+  | 'histone_acetylation_sirtuin_flux'
+  | 'chromatin_remodeling_polycomb_surveillance'
+
+export interface EdenEpigeneticHarmonyCluster {
+  clusterKind: EdenEpigeneticHarmonyClusterKind
+  clusterLabel: string
+  harmonyScore: number
+  reversalPotentialIndex: number
+  clusterStatus: 'optimal_epigenetic_youth' | 'compensated_remodeling' | 'drift_attenuation_required'
+  mechanisticNote: string
+}
+
+export interface EdenEpigeneticAgeReversalBridge {
+  version: 'v1'
+  episodeId: string
+  episodeTitle: string
+  epigeneticState: EdenEpigeneticClockState
+  epigeneticStateLabel: string
+  transcriptomicPurity: EdenTranscriptomicPurityLevel
+  transcriptomicPurityLabel: string
+  biologicalAgeDeltaYears: number
+  epigeneticHarmonyIndex: number
+  transcriptomicFidelityScore: number
+  harmonyClusters: EdenEpigeneticHarmonyCluster[]
+  epigeneticNarrativeId: string
+  epigeneticNarrativeEn: string
+  epigeneticReversalStrategy: string
+  truthClass: 'epigenetic_reversal_simulation_proxy'
+  clinically_reviewed: false
+  patientTruthUncompromised: true
+  neverManufacturesBiomarkers: true
+  epistemicHumilityPreserved: true
+}
+
 export interface CareJourneyExportSummary {
   standard: 'PANACEA-CAREPLAN-FHIR-R4-V1'
   generatedAt: string

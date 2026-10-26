@@ -29,6 +29,7 @@ import {
   deriveEdenTelomericGenomicIntegrityBridge,
   deriveEdenSenescentInflammagingBridge,
   deriveEdenRegenerativePlasticityBridge,
+  deriveEdenEpigeneticAgeReversalBridge,
 } from '../../domains/clinical-operations'
 import {
   CARE_EPISODE_STAGES,
@@ -667,6 +668,9 @@ function EpisodeCard({
 
       {/* Eden Stem Cell Niches & Regenerative Tissue Plasticity Synthesizer (T-CLIN-42 / EDEN-22) */}
       <EdenRegenerativePlasticitySection episode={episode} />
+
+      {/* Eden Epigenetic Biological Age Reversal & Transcriptomic Harmony Synthesizer (T-CLIN-43 / EDEN-23) */}
+      <EdenEpigeneticAgeReversalSection episode={episode} />
     </Card>
   )
 }
@@ -3021,6 +3025,115 @@ function EdenRegenerativePlasticitySection({ episode }: { episode: CareEpisode }
 
       <div className="mt-2 text-[10px] text-neutral-500 dark:text-white/50 text-right">
         ARGON EDEN ∞ §07 · Stem Cell Niches & Regenerative Tissue Plasticity Synthesizer · Patient Truth Uncompromised · Never Manufactures Biomarkers
+      </div>
+    </div>
+  )
+}
+
+function EdenEpigeneticAgeReversalSection({ episode }: { episode: CareEpisode }) {
+  const [lang, setLang] = useState<'id' | 'en'>('id')
+
+  const bridge = useMemo(
+    () => deriveEdenEpigeneticAgeReversalBridge(episode),
+    [episode]
+  )
+
+  const narrative = lang === 'id' ? bridge.epigeneticNarrativeId : bridge.epigeneticNarrativeEn
+  const deltaFormatted = bridge.biologicalAgeDeltaYears > 0 ? `+${bridge.biologicalAgeDeltaYears}` : `${bridge.biologicalAgeDeltaYears}`
+
+  return (
+    <div
+      className="mt-3 rounded-xl border border-purple-200 dark:border-white/10 bg-purple-50/30 dark:bg-white/[0.02] p-3.5"
+      data-eden-epigenetic-reversal-card="v1"
+    >
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+        <div>
+          <div className="flex items-center gap-2 flex-wrap">
+            <h4 className="text-xs font-bold text-neutral-900 dark:text-white">
+              Eden Epigenetic Biological Age Reversal & Transcriptomic Harmony Synthesizer
+            </h4>
+            <Badge tone="brand">{bridge.epigeneticStateLabel}</Badge>
+            <Badge tone="normal">{bridge.transcriptomicPurityLabel}</Badge>
+            <Badge tone="normal">Bio-Age: {deltaFormatted} yrs</Badge>
+            <Badge tone="normal">Harmony: {bridge.epigeneticHarmonyIndex}%</Badge>
+            <Badge tone="normal">Fidelity: {bridge.transcriptomicFidelityScore}%</Badge>
+          </div>
+          <p className="mt-1 text-xs font-medium text-neutral-800 dark:text-white/85">
+            {narrative}
+          </p>
+        </div>
+        <div className="flex items-center gap-1 shrink-0">
+          <button
+            type="button"
+            onClick={() => setLang('id')}
+            className={`rounded-md px-2 py-0.5 text-[11px] font-medium transition-colors ${
+              lang === 'id'
+                ? 'bg-purple-600 text-white font-bold'
+                : 'bg-white/80 dark:bg-white/5 text-neutral-700 dark:text-white/70 hover:bg-purple-100/50'
+            }`}
+          >
+            Bahasa
+          </button>
+          <button
+            type="button"
+            onClick={() => setLang('en')}
+            className={`rounded-md px-2 py-0.5 text-[11px] font-medium transition-colors ${
+              lang === 'en'
+                ? 'bg-purple-600 text-white font-bold'
+                : 'bg-white/80 dark:bg-white/5 text-neutral-700 dark:text-white/70 hover:bg-purple-100/50'
+            }`}
+          >
+            English
+          </button>
+        </div>
+      </div>
+
+      <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2" data-eden-epigenetic-clusters="v1">
+        {bridge.harmonyClusters.map((c) => {
+          const harmonyPct = Math.round(c.harmonyScore * 100)
+          const reversalPct = Math.round(c.reversalPotentialIndex * 100)
+          return (
+            <div
+              key={c.clusterKind}
+              className="rounded-lg border border-purple-200/50 dark:border-white/10 bg-white/70 dark:bg-white/[0.03] p-2.5"
+            >
+              <div className="text-[11px] font-bold text-neutral-900 dark:text-white truncate">
+                {c.clusterLabel}
+              </div>
+              <div className="mt-1 flex items-baseline justify-between">
+                <span className="text-base font-extrabold text-purple-800 dark:text-purple-300">
+                  {harmonyPct}% <span className="text-[10px] font-normal text-neutral-500 dark:text-white/50">{lang === 'id' ? 'harmoni' : 'harmony'}</span>
+                </span>
+                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
+                  c.clusterStatus === 'optimal_epigenetic_youth'
+                    ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300'
+                    : c.clusterStatus === 'drift_attenuation_required'
+                    ? 'bg-rose-100 text-rose-800 dark:bg-rose-950/60 dark:text-rose-300'
+                    : 'bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300'
+                }`}>
+                  Reversal {reversalPct}%
+                </span>
+              </div>
+              <div className="mt-1 text-[10px] text-neutral-600 dark:text-white/60">
+                {lang === 'id' ? 'Status Klaster:' : 'Cluster Status:'} {c.clusterStatus}
+              </div>
+              <div className="mt-1 text-[9px] text-neutral-500 dark:text-white/50 italic line-clamp-2">
+                {c.mechanisticNote}
+              </div>
+            </div>
+          )
+        })}
+      </div>
+
+      <div className="mt-2.5 rounded-lg border border-purple-200/40 dark:border-white/10 bg-purple-100/30 dark:bg-white/[0.02] p-2.5 text-xs space-y-1">
+        <div className="text-[11px] text-neutral-800 dark:text-white/85">
+          <b>{lang === 'id' ? 'Strategi Pembalikan Epigenetik & Harmoni Transkriptomik:' : 'Epigenetic Reversal & Transcriptomic Strategy:'}</b>{' '}
+          {bridge.epigeneticReversalStrategy}
+        </div>
+      </div>
+
+      <div className="mt-2 text-[10px] text-neutral-500 dark:text-white/50 text-right">
+        ARGON EDEN ∞ §07 · Epigenetic Biological Age Reversal & Transcriptomic Harmony Synthesizer · Patient Truth Uncompromised · Never Manufactures Biomarkers
       </div>
     </div>
   )
