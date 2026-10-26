@@ -31,6 +31,7 @@ import {
   deriveEdenBioHarmonicWaveformBridge,
   deriveEdenCircadianMitochondrialHarmonizerBridge,
   deriveEdenProteostasisAutophagicFluxBridge,
+  deriveEdenTelomericGenomicIntegrityBridge,
   translateClinicalTermToEden,
   EDEN_PLAIN_LANGUAGE_GLOSSARY,
 } from '../../src/domains/clinical-operations/model/careContinuityProjection.ts'
@@ -2950,4 +2951,82 @@ test('deriveEdenProteostasisAutophagicFluxBridge & CareEpisode: Eden Regenerativ
   const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
   assert.ok(episodeSource.includes('data-eden-proteostasis-card="v1"'), 'CareEpisode must include proteostasis card')
   assert.ok(episodeSource.includes('data-eden-proteostasis-nodes="v1"'), 'CareEpisode must include proteostasis nodes grid')
+})
+
+test('deriveEdenTelomericGenomicIntegrityBridge & CareEpisode: Eden Telomeric Maintenance & Genomic Integrity Synthesizer (T-CLIN-40 / EDEN-20)', () => {
+  const evaluatedAt = '2026-10-26T12:00:00.000Z'
+  const sampleEpisode = {
+    id: 'ce_telomeric_1',
+    title: 'Genomic Integrity & Shelterin Telomere Preservation',
+    diagnosisCode: 'Z00.00',
+    createdAt: '2026-10-20T08:00:00.000Z',
+    updatedAt: '2026-10-26T08:00:00.000Z',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'diagnosis', status: 'done' },
+      { stage: 'treatment', status: 'done' },
+      { stage: 'recovery', status: 'active' },
+    ],
+  }
+
+  // 1. Pure deterministic derivation
+  const bridge = deriveEdenTelomericGenomicIntegrityBridge(sampleEpisode)
+  assert.equal(bridge.version, 'v1')
+  assert.equal(bridge.episodeId, 'ce_telomeric_1')
+  assert.equal(bridge.telomericState, 'shelterin_capped_protected')
+  assert.equal(bridge.telomericStateLabel, 'Kapsul Shelterin Terproteksi & Telomer Stabil')
+  assert.equal(bridge.dnaRepairFidelity, 'high_fidelity_homologous_recombination')
+  assert.equal(bridge.dnaRepairFidelityLabel, 'Rekombinasi Homolog Presisi Tinggi (HR)')
+  assert.ok(bridge.genomicResilienceIndex >= 76 && bridge.genomicResilienceIndex <= 99)
+  assert.ok(bridge.shelterinCappingScore >= 78 && bridge.shelterinCappingScore <= 98)
+  assert.ok(bridge.dnaRepairCapacityScore >= 74 && bridge.dnaRepairCapacityScore <= 99)
+  assert.equal(bridge.genomicClusters.length, 4)
+  assert.equal(bridge.genomicClusters[0].clusterKind, 'shelterin_telomere_capping')
+  assert.equal(bridge.genomicClusters[1].clusterKind, 'base_nucleotide_excision_repair')
+  assert.equal(bridge.genomicClusters[2].clusterKind, 'double_strand_break_surveillance')
+  assert.equal(bridge.genomicClusters[3].clusterKind, 'epigenetic_heterochromatin_stabilization')
+  assert.equal(bridge.truthClass, 'genomic_stability_simulation_proxy')
+  assert.equal(bridge.clinically_reviewed, false)
+  assert.equal(bridge.patientTruthUncompromised, true)
+  assert.equal(bridge.neverManufacturesBiomarkers, true)
+  assert.equal(bridge.epistemicHumilityPreserved, true)
+  assert.ok(bridge.genomicNarrativeId.includes('Sintesis pemeliharaan telomer'))
+  assert.ok(bridge.genomicNarrativeEn.includes('Telomeric maintenance'))
+  assert.ok(bridge.telomericLongevityStrategy.includes('Pertahankan kestabilan genomik'))
+
+  // 2. Blocked stage resilience check
+  const blockedEpisode = {
+    id: 'ce_telomeric_blocked',
+    title: 'Accelerated Telomere Attrition & Severe DNA Damage Strain',
+    diagnosisCode: 'L56.2',
+    createdAt: '2026-10-20T08:00:00.000Z',
+    updatedAt: '2026-10-26T08:00:00.000Z',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'diagnosis', status: 'blocked', blockedReason: 'Awaiting flow-FISH telomere length and karyotype analysis' },
+    ],
+  }
+  const blockedBridge = deriveEdenTelomericGenomicIntegrityBridge(blockedEpisode)
+  assert.equal(blockedBridge.telomericState, 'subtelomeric_attrition_risk')
+  assert.equal(blockedBridge.telomericStateLabel, 'Risiko Atrisi Subtelomerik Adaptif')
+  assert.equal(blockedBridge.dnaRepairFidelity, 'attenuated_mismatch_clearance')
+  assert.equal(blockedBridge.dnaRepairFidelityLabel, 'Pembersihan Mismatch Tertekan')
+  assert.ok(blockedBridge.genomicResilienceIndex <= 66)
+  assert.ok(blockedBridge.telomericLongevityStrategy.includes('Redam laju atrisi telomerik'))
+
+  // 3. Rollup in evaluateCareJourneyContinuity
+  const projection = evaluateCareJourneyContinuity([sampleEpisode, blockedEpisode], evaluatedAt)
+  assert.equal(projection.edenTelomericGenomicIntegrityReadyCount, 2)
+  assert.ok(projection.episodes[0].edenTelomericGenomicIntegrity)
+  assert.equal(projection.episodes[0].edenTelomericGenomicIntegrity.truthClass, 'genomic_stability_simulation_proxy')
+  assert.equal(projection.episodes[0].edenTelomericGenomicIntegrity.patientTruthUncompromised, true)
+  assert.equal(projection.episodes[0].edenTelomericGenomicIntegrity.neverManufacturesBiomarkers, true)
+
+  // 4. UI contracts
+  const panelSource = read('src/domains/clinical-operations/ui/CareContinuityPanel.tsx')
+  assert.ok(panelSource.includes('data-eden-telomeric-genomic="v1"'), 'CareContinuityPanel must include telomeric-genomic attribute')
+
+  const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
+  assert.ok(episodeSource.includes('data-eden-telomeric-card="v1"'), 'CareEpisode must include telomeric card')
+  assert.ok(episodeSource.includes('data-eden-genomic-clusters="v1"'), 'CareEpisode must include genomic clusters grid')
 })

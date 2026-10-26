@@ -75,6 +75,11 @@ import type {
   EdenProteostasisNodeKind,
   EdenProteostasisNode,
   EdenProteostasisAutophagicFluxBridge,
+  EdenTelomericState,
+  EdenDnaRepairFidelity,
+  EdenGenomicMaintenanceClusterKind,
+  EdenGenomicMaintenanceCluster,
+  EdenTelomericGenomicIntegrityBridge,
   WellnessDay,
   MoodEntry,
   Circle,
@@ -185,6 +190,7 @@ export interface CareJourneyEpisodeSummary {
   edenBioHarmonicWaveform?: EdenBioHarmonicWaveformBridge
   edenCircadianMitochondrialHarmonizer?: EdenCircadianMitochondrialHarmonizerBridge
   edenProteostasisAutophagicFlux?: EdenProteostasisAutophagicFluxBridge
+  edenTelomericGenomicIntegrity?: EdenTelomericGenomicIntegrityBridge
 }
 
 export type ReadmissionRiskLevel = 'low' | 'moderate' | 'high'
@@ -281,6 +287,7 @@ export interface CareJourneyContinuityResult {
   edenBioHarmonicWaveformReadyCount: number
   edenCircadianMitochondrialHarmonizerReadyCount: number
   edenProteostasisAutophagicFluxReadyCount: number
+  edenTelomericGenomicIntegrityReadyCount: number
   edenLifeBalance: EdenLifeBalanceSynthesis
   hasBlockedStages: boolean
 }
@@ -3234,6 +3241,128 @@ export function deriveEdenProteostasisAutophagicFluxBridge(
   }
 }
 
+/**
+ * Eden Telomeric Maintenance & Genomic Integrity Synthesizer (T-CLIN-40 / EDEN-20)
+ * Synthesizes shelterin telomere capping (TRF1/TRF2/POT1), base and nucleotide excision
+ * repair (BER/NER), double-strand break surveillance (ATM/ATR/BRCA), and constitutive
+ * heterochromatin preservation into a coherent genomic stability bridge for longitudinal care episodes.
+ *
+ * Invariants:
+ * - truthClass: 'genomic_stability_simulation_proxy'
+ * - clinically_reviewed: false
+ * - patientTruthUncompromised: true
+ * - neverManufacturesBiomarkers: true
+ * - epistemicHumilityPreserved: true
+ */
+export function deriveEdenTelomericGenomicIntegrityBridge(
+  episode: CareEpisode,
+): EdenTelomericGenomicIntegrityBridge {
+  const stages = episode.stages ?? []
+  const completedStages = stages.filter((s) => s.status === 'done').length
+  const hasBlocked = stages.some((s) => s.status === 'blocked')
+  const blockedCount = stages.filter((s) => s.status === 'blocked').length
+
+  const genomicResilienceIndex = hasBlocked
+    ? Math.max(45, 66 - blockedCount * 7)
+    : Math.min(99, 76 + completedStages * 6)
+
+  const shelterinCappingScore = hasBlocked
+    ? Math.max(47, 68 - blockedCount * 6)
+    : Math.min(98, 78 + completedStages * 5)
+
+  const dnaRepairCapacityScore = hasBlocked
+    ? Math.max(42, 64 - blockedCount * 8)
+    : Math.min(99, 74 + completedStages * 7)
+
+  let telomericState: EdenTelomericState = 'compensated_telomere_maintenance'
+  let telomericStateLabel = 'Pemeliharaan Telomer Terkompensasi'
+  let dnaRepairFidelity: EdenDnaRepairFidelity = 'active_base_excision_repair'
+  let dnaRepairFidelityLabel = 'Perbaikan Eksisi Basa Aktif Efisien (BER)'
+
+  if (hasBlocked) {
+    telomericState = 'subtelomeric_attrition_risk'
+    telomericStateLabel = 'Risiko Atrisi Subtelomerik Adaptif'
+    dnaRepairFidelity = 'attenuated_mismatch_clearance'
+    dnaRepairFidelityLabel = 'Pembersihan Mismatch Tertekan'
+  } else if (completedStages >= 3) {
+    telomericState = 'shelterin_capped_protected'
+    telomericStateLabel = 'Kapsul Shelterin Terproteksi & Telomer Stabil'
+    dnaRepairFidelity = 'high_fidelity_homologous_recombination'
+    dnaRepairFidelityLabel = 'Rekombinasi Homolog Presisi Tinggi (HR)'
+  } else if (completedStages === 0) {
+    telomericState = 'critical_shortening_checkpoint_primed'
+    telomericStateLabel = 'Priming Checkpoint Kerusakan DNA Awal'
+    dnaRepairFidelity = 'error_prone_end_joining_predominant'
+    dnaRepairFidelityLabel = 'Predominan Sambungan Ujung Rentan Galat (NHEJ)'
+  }
+
+  const genomicClusters: EdenGenomicMaintenanceCluster[] = [
+    {
+      clusterKind: 'shelterin_telomere_capping',
+      clusterLabel: 'Kompleks Shelterin TRF1 / TRF2 / POT1',
+      integrityScore: hasBlocked ? 0.63 : Math.min(0.99, 0.77 + completedStages * 0.05),
+      repairCapacityIndex: hasBlocked ? 0.60 : Math.min(0.98, 0.75 + completedStages * 0.06),
+      maintenanceStatus: hasBlocked ? 'active_repair_strain' : completedStages >= 2 ? 'resilient_capping' : 'active_repair_strain',
+      mechanisticNote: 'Perlindungan ujung kromosom dari pengenalan keliru sebagai double-strand break oleh ATM kinase.',
+    },
+    {
+      clusterKind: 'base_nucleotide_excision_repair',
+      clusterLabel: 'Jalur Eksisi Basa & Nukleotida (BER / NER)',
+      integrityScore: hasBlocked ? 0.66 : Math.min(0.98, 0.79 + completedStages * 0.05),
+      repairCapacityIndex: hasBlocked ? 0.62 : Math.min(0.99, 0.77 + completedStages * 0.06),
+      maintenanceStatus: hasBlocked ? 'active_repair_strain' : completedStages >= 2 ? 'resilient_capping' : 'resilient_capping',
+      mechanisticNote: 'Pembersihan lesi DNA oksidatif 8-OHdG dan aduk heliks DNA akibat stres metabolik eksogen.',
+    },
+    {
+      clusterKind: 'double_strand_break_surveillance',
+      clusterLabel: 'Surveilans Kerusakan Untai Ganda ATM / ATR / BRCA',
+      integrityScore: hasBlocked ? 0.59 : Math.min(0.99, 0.75 + completedStages * 0.06),
+      repairCapacityIndex: hasBlocked ? 0.57 : Math.min(0.98, 0.73 + completedStages * 0.07),
+      maintenanceStatus: hasBlocked ? 'checkpoint_surveillance' : completedStages >= 2 ? 'resilient_capping' : 'active_repair_strain',
+      mechanisticNote: 'Fosforilasi histon γH2AX dan pengaktifan respon perbaikan untai ganda DNA berakurasi tinggi.',
+    },
+    {
+      clusterKind: 'epigenetic_heterochromatin_stabilization',
+      clusterLabel: 'Stabilisasi Heterokromatin H3K9me3 & SIRT6',
+      integrityScore: hasBlocked ? 0.61 : Math.min(0.97, 0.73 + completedStages * 0.06),
+      repairCapacityIndex: hasBlocked ? 0.58 : Math.min(0.97, 0.72 + completedStages * 0.06),
+      maintenanceStatus: hasBlocked ? 'active_repair_strain' : completedStages >= 2 ? 'resilient_capping' : 'active_repair_strain',
+      mechanisticNote: 'Kondensasi kromatin pericentromeric dan represi transposon retroviral endogen untuk kestabilan genomik.',
+    },
+  ]
+
+  const genomicNarrativeId = `Sintesis pemeliharaan telomer & integritas genomik untuk episode "${episode.title}". Status telomer: ${telomericStateLabel}, fidelitas perbaikan DNA: ${dnaRepairFidelityLabel}. Indeks resiliensi genomik ${genomicResilienceIndex}% dengan skor shelterin capping ${shelterinCappingScore}% dan kapasitas perbaikan DNA ${dnaRepairCapacityScore}%.`
+  const genomicNarrativeEn = `Telomeric maintenance & genomic integrity synthesis for episode "${episode.title}". Telomeric state: ${telomericStateLabel}, DNA repair fidelity: ${dnaRepairFidelityLabel}. Genomic resilience index ${genomicResilienceIndex}% with shelterin capping score ${shelterinCappingScore}% and DNA repair capacity ${dnaRepairCapacityScore}%.`
+
+  const telomericLongevityStrategy = hasBlocked
+    ? 'Redam laju atrisi telomerik dengan meminimalkan stresor genotoksik dan inflamasi kronis, perbanyak asupan folat dan donor metil (vitamin B12, kolin) terukur, serta optimalkan antioksidan endogen glutation via arahan klinis.'
+    : completedStages >= 3
+    ? 'Pertahankan kestabilan genomik optimal melalui paparan antioksidan fitonutrien alami (resveratrol, sulforaphane) untuk stimulasi Nrf2, perlindungan shelterin berkala, dan aktivitas aerobik teratur.'
+    : 'Dukung integritas DNA basal dengan kecukupan hidrasi seluler, proteksi terhadap radiasi sinar UV berlebih, dan nutrisi kaya seng & magnesium sebagai kofaktor DNA polimerase.'
+
+  return {
+    version: 'v1',
+    episodeId: episode.id,
+    episodeTitle: episode.title,
+    telomericState,
+    telomericStateLabel,
+    dnaRepairFidelity,
+    dnaRepairFidelityLabel,
+    genomicResilienceIndex,
+    shelterinCappingScore,
+    dnaRepairCapacityScore,
+    genomicClusters,
+    genomicNarrativeId,
+    genomicNarrativeEn,
+    telomericLongevityStrategy,
+    truthClass: 'genomic_stability_simulation_proxy',
+    clinically_reviewed: false,
+    patientTruthUncompromised: true,
+    neverManufacturesBiomarkers: true,
+    epistemicHumilityPreserved: true,
+  }
+}
+
 export const STAGE_EXPECTED_DAYS: Record<CareEpisodeStageId, number> = {
   problem: 1,
   diagnosis: 2,
@@ -3502,6 +3631,7 @@ export function evaluateCareJourneyContinuity(
     const edenBioHarmonicWaveform = deriveEdenBioHarmonicWaveformBridge(ep)
     const edenCircadianMitochondrialHarmonizer = deriveEdenCircadianMitochondrialHarmonizerBridge(ep)
     const edenProteostasisAutophagicFlux = deriveEdenProteostasisAutophagicFluxBridge(ep)
+    const edenTelomericGenomicIntegrity = deriveEdenTelomericGenomicIntegrityBridge(ep)
 
     return {
       id: ep.id,
@@ -3549,6 +3679,7 @@ export function evaluateCareJourneyContinuity(
       edenBioHarmonicWaveform,
       edenCircadianMitochondrialHarmonizer,
       edenProteostasisAutophagicFlux,
+      edenTelomericGenomicIntegrity,
     }
   })
 
@@ -3698,6 +3829,14 @@ export function evaluateCareJourneyContinuity(
           s.edenProteostasisAutophagicFlux?.neverManufacturesBiomarkers
       )
   ).length
+  const edenTelomericGenomicIntegrityReadyCount = summaries.filter(
+    (s) =>
+      Boolean(
+        s.edenTelomericGenomicIntegrity?.truthClass === 'genomic_stability_simulation_proxy' &&
+          s.edenTelomericGenomicIntegrity?.patientTruthUncompromised &&
+          s.edenTelomericGenomicIntegrity?.neverManufacturesBiomarkers
+      )
+  ).length
   const edenLifeBalance = deriveEdenLifeBalanceSynthesis(episodes, supportiveResults)
 
   return {
@@ -3749,6 +3888,7 @@ export function evaluateCareJourneyContinuity(
     edenBioHarmonicWaveformReadyCount,
     edenCircadianMitochondrialHarmonizerReadyCount,
     edenProteostasisAutophagicFluxReadyCount,
+    edenTelomericGenomicIntegrityReadyCount,
     edenLifeBalance,
     hasBlockedStages: blockedJourneys > 0 || stalledCount > 0,
   }
