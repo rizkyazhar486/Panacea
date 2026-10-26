@@ -790,6 +790,17 @@ export function CareContinuityPanel({
                   </span>
                 </div>
               )}
+              {careJourneys.edenMitochondrialHeteroplasmyReadyCount > 0 && (
+                <div
+                  className="flex justify-between text-amber-300"
+                  data-eden-mitochondrial-heteroplasmy="v1"
+                >
+                  <span>Heteroplasmi & fusi retikular mitokondria:</span>
+                  <span className="font-bold">
+                    {careJourneys.edenMitochondrialHeteroplasmyReadyCount} episode terhubung
+                  </span>
+                </div>
+              )}
 
               {careJourneys.episodes.length > 0 && (
                 <div className="mt-3 border-t border-white/8 pt-2">

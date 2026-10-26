@@ -78,6 +78,7 @@ export {
   deriveEdenSenescentInflammagingBridge,
   deriveEdenRegenerativePlasticityBridge,
   deriveEdenEpigeneticAgeReversalBridge,
+  deriveEdenMitochondrialHeteroplasmyBridge,
   translateClinicalTermToEden,
   EDEN_PLAIN_LANGUAGE_GLOSSARY,
   STAGE_LABEL,

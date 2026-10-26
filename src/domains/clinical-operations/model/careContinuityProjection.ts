@@ -95,6 +95,11 @@ import type {
   EdenEpigeneticHarmonyClusterKind,
   EdenEpigeneticHarmonyCluster,
   EdenEpigeneticAgeReversalBridge,
+  EdenMitochondrialHeteroplasmyState,
+  EdenBioenergeticFusionRateLevel,
+  EdenMitochondrialFusionNodeKind,
+  EdenMitochondrialFusionNode,
+  EdenMitochondrialHeteroplasmyBridge,
   WellnessDay,
   MoodEntry,
   Circle,
@@ -209,6 +214,7 @@ export interface CareJourneyEpisodeSummary {
   edenSenescentInflammaging?: EdenSenescentInflammagingBridge
   edenRegenerativePlasticity?: EdenRegenerativePlasticityBridge
   edenEpigeneticAgeReversal?: EdenEpigeneticAgeReversalBridge
+  edenMitochondrialHeteroplasmy?: EdenMitochondrialHeteroplasmyBridge
 }
 
 export type ReadmissionRiskLevel = 'low' | 'moderate' | 'high'
@@ -309,6 +315,7 @@ export interface CareJourneyContinuityResult {
   edenSenescentInflammagingReadyCount: number
   edenRegenerativePlasticityReadyCount: number
   edenEpigeneticAgeReversalReadyCount: number
+  edenMitochondrialHeteroplasmyReadyCount: number
   edenLifeBalance: EdenLifeBalanceSynthesis
   hasBlockedStages: boolean
 }
@@ -3724,6 +3731,115 @@ export function deriveEdenEpigeneticAgeReversalBridge(
   }
 }
 
+export function deriveEdenMitochondrialHeteroplasmyBridge(
+  episode: CareEpisode,
+): EdenMitochondrialHeteroplasmyBridge {
+  const stages = episode.stages ?? []
+  const completedStages = stages.filter((s) => s.status === 'done').length
+  const hasBlocked = stages.some((s) => s.status === 'blocked')
+  const blockedCount = stages.filter((s) => s.status === 'blocked').length
+
+  const mitochondrialVitalityScore = hasBlocked
+    ? Math.max(46, 68 - blockedCount * 7)
+    : Math.min(99, 78 + completedStages * 5)
+
+  const oxphosEfficiencyIndex = hasBlocked
+    ? Math.max(44, 65 - blockedCount * 7)
+    : Math.min(98, 77 + completedStages * 5)
+
+  const atpSynthesisCapacity = hasBlocked
+    ? Math.max(42, 63 - blockedCount * 8)
+    : Math.min(98, 76 + completedStages * 5)
+
+  let heteroplasmyState: EdenMitochondrialHeteroplasmyState = 'compensated_heteroplasmic_balance'
+  let heteroplasmyStateLabel = 'Keseimbangan Heteroplasmi Terkompensasi Stabil'
+  let fusionRateLevel: EdenBioenergeticFusionRateLevel = 'balanced_fusion_fission_dynamics'
+  let fusionRateLevelLabel = 'Dinamika Fusi-Fisi Mitokondria Seimbang'
+
+  if (hasBlocked) {
+    heteroplasmyState = 'mitochondrial_reticular_fragmentation'
+    heteroplasmyStateLabel = 'Fragmentasi Jaringan Retikular Mitokondria'
+    fusionRateLevel = 'mitophagic_collapse_strain'
+    fusionRateLevelLabel = 'Beban Kolaps Mitofagi & Kerusakan Membran Kristal'
+  } else if (completedStages >= 3) {
+    heteroplasmyState = 'homoplasmic_wildtype_resilience'
+    heteroplasmyStateLabel = 'Resiliensi Homoplasmi Wildtype Awet Muda'
+    fusionRateLevel = 'hyperfused_elongated_network'
+    fusionRateLevelLabel = 'Jaringan Hiperfusi Memanjang & Sintesis ATP Maksimal'
+  } else if (completedStages === 0) {
+    heteroplasmyState = 'pathogenic_heteroplasmy_shift_risk'
+    heteroplasmyStateLabel = 'Risiko Pergeseran Heteroplasmi Patogenik Dini'
+    fusionRateLevel = 'fission_predominant_fragmentation'
+    fusionRateLevelLabel = 'Fragmentasi Didominasi Fisi Adaptif'
+  }
+
+  const fusionNodes: EdenMitochondrialFusionNode[] = [
+    {
+      nodeKind: 'mitofusin_mfn1_mfn2_tethering',
+      nodeLabel: 'Penambatan Membran Luar Mitofusin (MFN1 / MFN2 Tethering)',
+      fusionEfficiencyScore: hasBlocked ? 0.62 : Math.min(0.99, 0.78 + completedStages * 0.05),
+      reticularIntegrityIndex: hasBlocked ? 0.60 : Math.min(0.98, 0.76 + completedStages * 0.05),
+      networkDynamicsStatus: hasBlocked ? 'fragmentation_strain' : completedStages >= 2 ? 'optimal_reticular_network' : 'compensated_fission_clearance',
+      mechanisticNote: 'Fusi membran luar mitokondria untuk pembentukan sinsitium bioenergetik terhubung dan pertukaran metabolit matriks.',
+    },
+    {
+      nodeKind: 'opa1_cristae_remodeling',
+      nodeLabel: 'Remodeling Kristal & Fusi Membran Dalam OPA1 (L-OPA1 / S-OPA1)',
+      fusionEfficiencyScore: hasBlocked ? 0.64 : Math.min(0.98, 0.79 + completedStages * 0.05),
+      reticularIntegrityIndex: hasBlocked ? 0.61 : Math.min(0.99, 0.77 + completedStages * 0.05),
+      networkDynamicsStatus: hasBlocked ? 'fragmentation_strain' : completedStages >= 2 ? 'optimal_reticular_network' : 'compensated_fission_clearance',
+      mechanisticNote: 'Penyegelan sambungan kristal untuk retensi sitokrom c dan stabilisasi rantai transpor elektron kompleks respirasi.',
+    },
+    {
+      nodeKind: 'drp1_fission_quality_control',
+      nodeLabel: 'Kontrol Kualitas Fisi DRP1 (Dynamin-Related Protein 1)',
+      fusionEfficiencyScore: hasBlocked ? 0.58 : Math.min(0.97, 0.75 + completedStages * 0.06),
+      reticularIntegrityIndex: hasBlocked ? 0.59 : Math.min(0.98, 0.76 + completedStages * 0.06),
+      networkDynamicsStatus: hasBlocked ? 'fragmentation_strain' : completedStages >= 2 ? 'optimal_reticular_network' : 'compensated_fission_clearance',
+      mechanisticNote: 'Pemisahan asimetris unit mitokondria terdepolarisasi dari jaringan retikular sehat guna pencegahan stres oksidatif.',
+    },
+    {
+      nodeKind: 'pink1_parkin_mitophagic_flux',
+      nodeLabel: 'Fluks Pembersihan Mitofagi PINK1-Parkin (Seleksi Kebugaran mtDNA)',
+      fusionEfficiencyScore: hasBlocked ? 0.63 : Math.min(0.99, 0.77 + completedStages * 0.05),
+      reticularIntegrityIndex: hasBlocked ? 0.61 : Math.min(0.97, 0.74 + completedStages * 0.06),
+      networkDynamicsStatus: hasBlocked ? 'fragmentation_strain' : completedStages >= 2 ? 'optimal_reticular_network' : 'compensated_fission_clearance',
+      mechanisticNote: 'Ubiquitinasi membran mitokondria rusak untuk degradasi lisosomal selektif, menyisakan salinan mtDNA berkualitas tinggi.',
+    },
+  ]
+
+  const mitochondrialNarrativeId = `Sintesis heteroplasmi mitokondria & fusi bioenergetik untuk episode "${episode.title}". Status heteroplasmi: ${heteroplasmyStateLabel}, dinamika fusi: ${fusionRateLevelLabel}. Skor vitalitas mitokondria ${mitochondrialVitalityScore}%, efisiensi OXPHOS ${oxphosEfficiencyIndex}%, dan kapasitas sintesis ATP ${atpSynthesisCapacity}%.`
+  const mitochondrialNarrativeEn = `Mitochondrial heteroplasmy & bioenergetic fusion synthesis for episode "${episode.title}". Heteroplasmy state: ${heteroplasmyStateLabel}, fusion dynamics: ${fusionRateLevelLabel}. Mitochondrial vitality score ${mitochondrialVitalityScore}%, OXPHOS efficiency ${oxphosEfficiencyIndex}%, and ATP synthesis capacity ${atpSynthesisCapacity}%.`
+
+  const mitochondrialLongevityStrategy = hasBlocked
+    ? 'Dukung pemulihan potensial membran mitokondria (ΔΨm) melalui kofaktor bioenergetik (CoQ10/Ubiquinol, asam alfa-lipoat, dan magnesium malat) bersama dokter pengawas untuk meredam pelepasan ROS eksesif.'
+    : completedStages >= 3
+    ? 'Pertahankan jaringan mitokondria hiperfusi melalui stimulasi biogenesis PGC-1α via latihan interval intensitas terukur, paparan dingin terkendali, dan ritme makan berbasis waktu.'
+    : 'Dukung seleksi mitofagi fisiologis dan integritas kristal OPA1 dengan konsumsi polifenol mitoprotektif (urolitin A, astaksantin) serta istirahat tidur gelombang lambat yang cukup.'
+
+  return {
+    version: 'v1',
+    episodeId: episode.id,
+    episodeTitle: episode.title,
+    heteroplasmyState,
+    heteroplasmyStateLabel,
+    fusionRateLevel,
+    fusionRateLevelLabel,
+    mitochondrialVitalityScore,
+    oxphosEfficiencyIndex,
+    atpSynthesisCapacity,
+    fusionNodes,
+    mitochondrialNarrativeId,
+    mitochondrialNarrativeEn,
+    mitochondrialLongevityStrategy,
+    truthClass: 'mitochondrial_heteroplasmy_simulation_proxy',
+    clinically_reviewed: false,
+    patientTruthUncompromised: true,
+    neverManufacturesBiomarkers: true,
+    epistemicHumilityPreserved: true,
+  }
+}
+
 export const STAGE_EXPECTED_DAYS: Record<CareEpisodeStageId, number> = {
   problem: 1,
   diagnosis: 2,
@@ -3996,6 +4112,7 @@ export function evaluateCareJourneyContinuity(
     const edenSenescentInflammaging = deriveEdenSenescentInflammagingBridge(ep)
     const edenRegenerativePlasticity = deriveEdenRegenerativePlasticityBridge(ep)
     const edenEpigeneticAgeReversal = deriveEdenEpigeneticAgeReversalBridge(ep)
+    const edenMitochondrialHeteroplasmy = deriveEdenMitochondrialHeteroplasmyBridge(ep)
 
     return {
       id: ep.id,
@@ -4047,6 +4164,7 @@ export function evaluateCareJourneyContinuity(
       edenSenescentInflammaging,
       edenRegenerativePlasticity,
       edenEpigeneticAgeReversal,
+      edenMitochondrialHeteroplasmy,
     }
   })
 
@@ -4228,6 +4346,14 @@ export function evaluateCareJourneyContinuity(
           s.edenEpigeneticAgeReversal?.neverManufacturesBiomarkers
       )
   ).length
+  const edenMitochondrialHeteroplasmyReadyCount = summaries.filter(
+    (s) =>
+      Boolean(
+        s.edenMitochondrialHeteroplasmy?.truthClass === 'mitochondrial_heteroplasmy_simulation_proxy' &&
+          s.edenMitochondrialHeteroplasmy?.patientTruthUncompromised &&
+          s.edenMitochondrialHeteroplasmy?.neverManufacturesBiomarkers
+      )
+  ).length
   const edenLifeBalance = deriveEdenLifeBalanceSynthesis(episodes, supportiveResults)
 
   return {
@@ -4283,6 +4409,7 @@ export function evaluateCareJourneyContinuity(
     edenSenescentInflammagingReadyCount,
     edenRegenerativePlasticityReadyCount,
     edenEpigeneticAgeReversalReadyCount,
+    edenMitochondrialHeteroplasmyReadyCount,
     edenLifeBalance,
     hasBlockedStages: blockedJourneys > 0 || stalledCount > 0,
   }
