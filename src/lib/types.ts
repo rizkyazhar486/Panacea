@@ -1586,6 +1586,55 @@ export interface EdenLamp2aTranslocationBridge {
   epistemicHumilityPreserved: true
 }
 
+export type EdenNuclearPoreState =
+  | 'impermeable_selective_central_hydrogel_harmony'
+  | 'balanced_importin_rangtp_directional_flux'
+  | 'transient_fg_mesh_permeability_leakiness'
+  | 'critical_nucleoporin_degradation_gradient_collapse'
+
+export type EdenNuclearPoreTier =
+  | 'optimal_nucleocytoplasmic_transport_fidelity'
+  | 'stable_scaffold_nucleoporin_equilibrium'
+  | 'moderate_permeability_barrier_strain'
+  | 'critical_nuclear_envelope_leakage_instability'
+
+export type EdenNuclearPoreNodeKind =
+  | 'nup107_160_scaffold_complex_stability'
+  | 'fg_nucleoporin_permeability_barrier'
+  | 'rangtp_rcc1_nucleocytoplasmic_gradient'
+  | 'importin_karyopherin_cargo_translocation'
+
+export interface EdenNuclearPoreNode {
+  nodeKind: EdenNuclearPoreNodeKind
+  nodeLabel: string
+  transportEfficiencyScore: number
+  permeabilitySelectivityIndex: number
+  npcStatus: 'optimal_barrier_mode' | 'adaptive_transport_state' | 'permeability_leak_stress'
+  mechanisticNote: string
+}
+
+export interface EdenRanGtpTransportBridge {
+  version: 'v1'
+  episodeId: string
+  episodeTitle: string
+  npcState: EdenNuclearPoreState
+  npcStateLabel: string
+  npcTier: EdenNuclearPoreTier
+  npcTierLabel: string
+  transportFidelityScore: number
+  permeabilityBarrierIndex: number
+  ranGtpGradientCapacity: number
+  nuclearPoreNodes: EdenNuclearPoreNode[]
+  npcNarrativeId: string
+  npcNarrativeEn: string
+  npcLongevityStrategy: string
+  truthClass: 'nuclear_pore_rangtp_simulation_proxy'
+  clinically_reviewed: false
+  patientTruthUncompromised: true
+  neverManufacturesBiomarkers: true
+  epistemicHumilityPreserved: true
+}
+
 export interface CareJourneyExportSummary {
   standard: 'PANACEA-CAREPLAN-FHIR-R4-V1'
   generatedAt: string

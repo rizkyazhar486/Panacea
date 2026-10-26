@@ -44,6 +44,7 @@ import {
   deriveEdenMicrovascularResilienceBridge,
   deriveEdenRibosomalQuiescenceBridge,
   deriveEdenLamp2aTranslocationBridge,
+  deriveEdenRanGtpTransportBridge,
   translateClinicalTermToEden,
   EDEN_PLAIN_LANGUAGE_GLOSSARY,
 } from '../../src/domains/clinical-operations/model/careContinuityProjection.ts'
@@ -3963,4 +3964,78 @@ test('CareContinuityPanel: Eden Chaperone-Mediated Autophagy & LAMP2A Lysosomal 
   const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
   assert.ok(episodeSource.includes('data-eden-lamp2a-card="v1"'), 'CareEpisode must include lamp2a card')
   assert.ok(episodeSource.includes('data-eden-lamp2a-nodes="v1"'), 'CareEpisode must include lamp2a nodes grid')
+})
+
+test('CareContinuityPanel: Eden Nuclear Pore Complex & RanGTP Nucleocytoplasmic Transport Synthesizer contract (T-CLIN-53)', () => {
+  const evaluatedAt = '2026-10-24T12:00:00.000Z'
+  const sampleEpisode = {
+    id: 'ce_npc_1',
+    title: 'Nuclear Pore Complex & RanGTP Transport Episode',
+    diagnosisCode: 'G31.84',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'diagnosis', status: 'done' },
+      { stage: 'plan', status: 'done' },
+      { stage: 'treatment', status: 'done' },
+      { stage: 'recovery', status: 'active' },
+    ],
+  }
+
+  // 1. Pure deterministic derivation
+  const bridge = deriveEdenRanGtpTransportBridge(sampleEpisode)
+  assert.equal(bridge.version, 'v1')
+  assert.equal(bridge.episodeId, 'ce_npc_1')
+  assert.equal(bridge.npcState, 'impermeable_selective_central_hydrogel_harmony')
+  assert.equal(bridge.npcStateLabel, 'Harmoni Hidrogel Selektif FG-Nup & Integritas Saringan Inti Sempurna')
+  assert.equal(bridge.npcTier, 'optimal_nucleocytoplasmic_transport_fidelity')
+  assert.equal(bridge.npcTierLabel, 'Fidelitas Transpor Nukleositoplasmik Optimal & Presisi Genomik')
+  assert.ok(bridge.transportFidelityScore >= 85)
+  assert.ok(bridge.permeabilityBarrierIndex >= 85)
+  assert.ok(bridge.ranGtpGradientCapacity >= 85)
+  assert.equal(bridge.nuclearPoreNodes.length, 4)
+  assert.equal(bridge.nuclearPoreNodes[0].nodeKind, 'nup107_160_scaffold_complex_stability')
+  assert.equal(bridge.nuclearPoreNodes[1].nodeKind, 'fg_nucleoporin_permeability_barrier')
+  assert.equal(bridge.nuclearPoreNodes[2].nodeKind, 'rangtp_rcc1_nucleocytoplasmic_gradient')
+  assert.equal(bridge.nuclearPoreNodes[3].nodeKind, 'importin_karyopherin_cargo_translocation')
+  assert.equal(bridge.truthClass, 'nuclear_pore_rangtp_simulation_proxy')
+  assert.equal(bridge.clinically_reviewed, false)
+  assert.equal(bridge.patientTruthUncompromised, true)
+  assert.equal(bridge.neverManufacturesBiomarkers, true)
+  assert.equal(bridge.epistemicHumilityPreserved, true)
+
+  // 2. Blocked stage resilience
+  const blockedEpisode = {
+    id: 'ce_npc_blocked',
+    title: 'Blocked Nuclear Envelope Leakage Episode',
+    diagnosisCode: 'G12.21',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'diagnosis', status: 'blocked', blockedReason: 'Awaiting nucleocytoplasmic Ran gradient quantification and cytoplasmic TDP-43 mislocalization assay' },
+    ],
+  }
+  const blockedBridge = deriveEdenRanGtpTransportBridge(blockedEpisode)
+  assert.equal(blockedBridge.npcState, 'critical_nucleoporin_degradation_gradient_collapse')
+  assert.equal(blockedBridge.npcStateLabel, 'Degradasi Kompleks Nukleoporin & Kolaps Gradien RanGTP/RanGDP')
+  assert.equal(blockedBridge.npcTier, 'critical_nuclear_envelope_leakage_instability')
+  assert.equal(blockedBridge.npcTierLabel, 'Instabilitas Kebocoran Selubung Inti Kritis & Penetrasi Sitoplasma')
+  assert.ok(blockedBridge.transportFidelityScore <= 66)
+  assert.ok(blockedBridge.permeabilityBarrierIndex <= 65)
+  assert.ok(blockedBridge.ranGtpGradientCapacity <= 64)
+  assert.equal(blockedBridge.nuclearPoreNodes.every((n) => n.npcStatus === 'permeability_leak_stress'), true)
+
+  // 3. Rollup in evaluateCareJourneyContinuity
+  const projection = evaluateCareJourneyContinuity([sampleEpisode, blockedEpisode], evaluatedAt)
+  assert.equal(projection.edenRanGtpTransportReadyCount, 2)
+  assert.ok(projection.episodes[0].edenRanGtpTransport)
+  assert.equal(projection.episodes[0].edenRanGtpTransport.truthClass, 'nuclear_pore_rangtp_simulation_proxy')
+  assert.equal(projection.episodes[0].edenRanGtpTransport.patientTruthUncompromised, true)
+  assert.equal(projection.episodes[0].edenRanGtpTransport.neverManufacturesBiomarkers, true)
+
+  // 4. UI contracts
+  const panelSource = read('src/domains/clinical-operations/ui/CareContinuityPanel.tsx')
+  assert.ok(panelSource.includes('data-eden-ran-gtp-transport="v1"'), 'CareContinuityPanel must include ran gtp transport attribute')
+
+  const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
+  assert.ok(episodeSource.includes('data-eden-nuclear-pore-card="v1"'), 'CareEpisode must include nuclear pore card')
+  assert.ok(episodeSource.includes('data-eden-nuclear-pore-nodes="v1"'), 'CareEpisode must include nuclear pore nodes grid')
 })
