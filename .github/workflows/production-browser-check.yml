@@ -19,6 +19,7 @@ on:
       - 'scripts/qa/production-browser-mime-smoke.mjs'
       - 'scripts/qa/production-browser-verdict*'
       - 'scripts/qa/production-browser-report.mjs'
+      - 'scripts/qa/production-browser-summary*'
       - '.github/workflows/production-browser-check.yml'
 
 permissions:
@@ -66,14 +67,17 @@ jobs:
         run: |
           set +e
           node scripts/qa/production-browser-check.mjs
-          code=$?
-          echo "exit=$code" >> "$GITHUB_STEP_SUMMARY"
-          if [ -f production-check/report.json ]; then
-            echo '```json' >> "$GITHUB_STEP_SUMMARY"
-            node -e "const r=require('./production-check/report.json');console.log(JSON.stringify({network:r.network,server:r.server,findings:r.findings,viewports:r.viewports.map(v=>({w:v.width,status:v.status,overflowX:v.overflowX,webgl2:v.webgl2,errors:v.errors.length,body:v.body&&{canvas:v.body.canvasPresent,finalUrl:v.body.finalUrl}}))},null,1))" >> "$GITHUB_STEP_SUMMARY"
-            echo '```' >> "$GITHUB_STEP_SUMMARY"
+          check_code=$?
+          echo "exit=$check_code" >> "$GITHUB_STEP_SUMMARY"
+          echo '```json' >> "$GITHUB_STEP_SUMMARY"
+          node scripts/qa/production-browser-summary.mjs production-check/report.json >> "$GITHUB_STEP_SUMMARY"
+          summary_code=$?
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          # Galat pemeriksa tetap utama; ringkasan yang gagal juga tidak boleh tampak hijau.
+          if [ "$check_code" -ne 0 ]; then
+            exit "$check_code"
           fi
-          exit $code
+          exit "$summary_code"
       - name: Deployed SHA vs main (E7)
         if: always()
         # Pada PR hanya melapor: produksi wajar tertinggal dari main (deploy frontend dibatch), dan itu bukan kesalahan PR ini.
