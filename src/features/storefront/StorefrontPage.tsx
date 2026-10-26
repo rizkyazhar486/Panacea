@@ -199,9 +199,8 @@ export function StorefrontPage() {
           <div className="footer__disclaimer">
             <strong>Medical disclaimer</strong>
             <p>
-              These statements have not been evaluated by the Food and Drug Administration. These products are not intended to diagnose, treat,
-              cure, or prevent any disease. Consult a qualified healthcare professional before using any dietary supplement, especially if you are
-              pregnant, nursing, taking medication, or managing a health condition.
+              Warning: These statements have not been evaluated by the Food and Drug Administration. These products are not intended to diagnose, treat,
+              cure, or prevent any disease. Do not use if pregnant or nursing without consulting a qualified healthcare professional.
             </p>
           </div>
           <div className="footer__bottom">

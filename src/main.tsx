@@ -442,9 +442,9 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/design-demo" element={<DesignDemo />} />
               {/* PanaceaMed Precision Formulas & Private Vault Storefront */}
               <Route path="/store" element={<Storefront />} />
-              <Route path="/vault" element={<Storefront />} />
-              <Route path="/apothecary" element={<Storefront />} />
-              <Route path="/private-vault" element={<Storefront />} />
+              <Route path="/vault" element={<Navigate to="/store" replace />} />
+              <Route path="/apothecary" element={<Navigate to="/store" replace />} />
+              <Route path="/private-vault" element={<Navigate to="/store" replace />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspense>

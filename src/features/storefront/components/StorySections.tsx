@@ -123,7 +123,7 @@ export function ScienceQuality() {
           <div><strong>ISO</strong><span>Quality systems</span></div>
           <div><strong>BPOM</strong><span>Local compliance</span></div>
         </div>
-        <p className="standards__note">Registrations and quality-system references describe manufacturing or regulatory context; they are not efficacy endorsements. FDA registration does not denote FDA approval.</p>
+        <p className="standards__note">Registrations and quality-system references describe manufacturing or regulatory context without denoting FDA approval or efficacy endorsement.</p>
       </div>
     </section>
   )
@@ -136,8 +136,8 @@ export function Services() {
         <Reveal className="services__intro"><p className="eyebrow">The PanaceaMed service</p><h2>Considered care,<br /><em>beyond the jar.</em></h2><p>Less friction between wanting to feel your best and building a routine that makes sense to you.</p></Reveal>
         <div className="services__list">
           <details><summary><span>Personalized formulas</span><Plus size={20} aria-hidden="true" /></summary><div><p>Build a collection around your preferred areas of focus and routine. Recommendations are editable at every step, because personalization should never mean giving up control.</p><button type="button" onClick={() => scrollToSection('vault-builder')} className="text-link">Create your collection <ArrowRight size={15} /></button></div></details>
-          <details><summary><span>Bundle savings</span><Plus size={20} aria-hidden="true" /></summary><div><p>Every Private Vault saves 20% on the formulas inside it. The discount is shown clearly before you add the collection to your cart, with no subscription required.</p><button type="button" onClick={() => scrollToSection('vault-builder')} className="text-link">See your saving <ArrowRight size={15} /></button></div></details>
-          <details><summary><span>Scientifically tested</span><Plus size={20} aria-hidden="true" /></summary><div><p>Our quality approach centers on ingredient review, controlled manufacturing, and product testing. Testing supports quality and consistency; it does not turn a supplement into a treatment or guarantee an outcome.</p><button type="button" onClick={() => scrollToSection('our-standard')} className="text-link">Explore our standard <ArrowRight size={15} /></button></div></details>
+          <details><summary><span>Bundle savings</span><Plus size={20} aria-hidden="true" /></summary><div><p>Every Private Vault saves 20% on all included formulas with visible upfront pricing and no subscription required.</p><button type="button" onClick={() => scrollToSection('vault-builder')} className="text-link">See your saving <ArrowRight size={15} /></button></div></details>
+          <details><summary><span>Scientifically tested</span><Plus size={20} aria-hidden="true" /></summary><div><p>Our quality approach centers on verified ingredient sourcing, controlled manufacturing, and batch testing to support product integrity without claiming disease treatment.</p><button type="button" onClick={() => scrollToSection('our-standard')} className="text-link">Explore our standard <ArrowRight size={15} /></button></div></details>
         </div>
       </div>
     </section>
