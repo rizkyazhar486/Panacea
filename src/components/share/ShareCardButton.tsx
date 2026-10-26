@@ -231,11 +231,11 @@ export function ShareCardButton({
         backgroundColor: latarKartu(targetRef.current),
         scale: Math.min(2, window.devicePixelRatio || 1.5),
         useCORS: true,
-        onclone: (doc: Document, node: HTMLElement) => {
+        onclone: (doc, node) => {
           // Tombol share sendiri berada di dalam simpul yang dipotret, jadi
           // ia ikut tercetak di gambar. Ditandai `data-share-hide` dan
           // dibuang dari klon, bukan disembunyikan di layar.
-          node.querySelectorAll('[data-share-hide]').forEach((el: Element) => el.remove())
+          node.querySelectorAll('[data-share-hide]').forEach((el) => el.remove())
           const gaya = doc.createElement('style')
           gaya.textContent = GAYA_EKSPOR
           doc.head.appendChild(gaya)
