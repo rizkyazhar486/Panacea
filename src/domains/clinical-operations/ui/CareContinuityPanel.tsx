@@ -867,6 +867,17 @@ export function CareContinuityPanel({
                   </span>
                 </div>
               )}
+              {careJourneys.edenRibosomalQuiescenceReadyCount > 0 && (
+                <div
+                  className="flex justify-between text-indigo-300"
+                  data-eden-ribosomal-quiescence="v1"
+                >
+                  <span>Ketenangan nukleolus & fidelitas ribosom:</span>
+                  <span className="font-bold">
+                    {careJourneys.edenRibosomalQuiescenceReadyCount} episode terhubung
+                  </span>
+                </div>
+              )}
 
               {careJourneys.episodes.length > 0 && (
                 <div className="mt-3 border-t border-white/8 pt-2">

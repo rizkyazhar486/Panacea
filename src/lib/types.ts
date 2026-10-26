@@ -1488,6 +1488,55 @@ export interface EdenMicrovascularResilienceBridge {
   epistemicHumilityPreserved: true
 }
 
+export type EdenNucleolarQuiescenceState =
+  | 'quiescent_compact_nucleolar_harmony'
+  | 'balanced_fidelity_ribosomal_translation'
+  | 'nucleolar_stress_rpl11_mdm2_activation'
+  | 'hypertrophic_ribosomopathy_proteotoxic_strain'
+
+export type EdenNucleolarQuiescenceTier =
+  | 'optimal_quiescent_ribosomal_fidelity'
+  | 'stable_nucleolar_proteostatic_equilibrium'
+  | 'transient_ribosomal_biogenesis_stress'
+  | 'critical_nucleolar_hypertrophy_instability'
+
+export type EdenRibosomalNodeKind =
+  | 'pol1_pre_rrna_transcription_fidelity'
+  | 'fibrillarin_dense_fibrillar_compartmentalization'
+  | 'rpl5_rpl11_mdm2_p53_stress_sensor'
+  | 'ribosomal_translation_elongation_accuracy'
+
+export interface EdenRibosomalNode {
+  nodeKind: EdenRibosomalNodeKind
+  nodeLabel: string
+  biogenesisEfficiencyScore: number
+  quiescenceIndex: number
+  nucleolarStatus: 'optimal_quiescent_state' | 'adaptive_ribosomal_mode' | 'hypertrophic_stress'
+  mechanisticNote: string
+}
+
+export interface EdenRibosomalQuiescenceBridge {
+  version: 'v1'
+  episodeId: string
+  episodeTitle: string
+  quiescenceState: EdenNucleolarQuiescenceState
+  quiescenceStateLabel: string
+  quiescenceTier: EdenNucleolarQuiescenceTier
+  quiescenceTierLabel: string
+  nucleolarQuiescenceScore: number
+  translationFidelityIndex: number
+  ribosomalProteostasisCapacity: number
+  ribosomalNodes: EdenRibosomalNode[]
+  nucleolarNarrativeId: string
+  nucleolarNarrativeEn: string
+  nucleolarLongevityStrategy: string
+  truthClass: 'nucleolar_ribosomal_simulation_proxy'
+  clinically_reviewed: false
+  patientTruthUncompromised: true
+  neverManufacturesBiomarkers: true
+  epistemicHumilityPreserved: true
+}
+
 export interface CareJourneyExportSummary {
   standard: 'PANACEA-CAREPLAN-FHIR-R4-V1'
   generatedAt: string
