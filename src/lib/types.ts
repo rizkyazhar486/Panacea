@@ -289,29 +289,34 @@ export interface ClinicalOutcomeRecord {
 }
 
 export interface CareJourneyExportSummary {
-  schemaVersion: '1.0'
-  standard: 'FHIR-R4-CarePlan-EpisodeOfCare-Aligned'
+  standard: 'PANACEA-CAREPLAN-FHIR-R4-V1'
   generatedAt: string
   episodeId: string
   title: string
   diagnosisCode?: string
-  linkedComorbidities?: string[]
+  linkedComorbidities: string[]
   status: 'active' | 'completed' | 'on_hold'
   provider?: {
     facilityId?: string
     facilityName?: string
     providerName?: string
+    costRangeIdr?: {
+      min: number
+      max: number
+    }
   }
   stages: {
     stage: CareEpisodeStageId
     label: string
     status: CareEpisodeStageStatus
     updatedAt?: string
+    blockedReason?: string
   }[]
   milestones: {
     id: string
     title: string
     category: string
+    targetStage: CareEpisodeStageId
     status: string
     resultValue?: string
     completedAt?: string

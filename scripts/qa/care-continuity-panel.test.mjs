@@ -1294,8 +1294,8 @@ test('exportCareJourneySummary & CareEpisode: FHIR-aligned continuity handoff pa
     updatedAt: '2026-10-24T12:00:00.000Z',
     facilityId: 'fac_rscm',
     facilityName: 'RSCM Kencana',
-    costMinIdr: 18_000_000,
-    costMaxIdr: 25_000_000,
+    estimatedCostLow: 18_000_000,
+    estimatedCostHigh: 25_000_000,
     stages: [
       { stage: 'problem', status: 'done', updatedAt: '2026-10-20T08:30:00.000Z' },
       { stage: 'diagnosis', status: 'done', updatedAt: '2026-10-20T09:00:00.000Z' },

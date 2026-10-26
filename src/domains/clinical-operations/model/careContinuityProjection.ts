@@ -707,13 +707,14 @@ export function exportCareJourneySummary(
       completedAt: m.completedAt,
     })),
     provider:
-      episode.facilityId || episode.facilityName || episode.costMinIdr != null || episode.costMaxIdr != null
+      episode.facilityId || episode.facilityName || episode.providerName || episode.estimatedCostLow != null || episode.estimatedCostHigh != null
         ? {
             facilityId: episode.facilityId,
             facilityName: episode.facilityName,
+            providerName: episode.providerName,
             costRangeIdr:
-              episode.costMinIdr != null && episode.costMaxIdr != null
-                ? { min: episode.costMinIdr, max: episode.costMaxIdr }
+              episode.estimatedCostLow != null && episode.estimatedCostHigh != null
+                ? { min: episode.estimatedCostLow, max: episode.estimatedCostHigh }
                 : undefined,
           }
         : undefined,
