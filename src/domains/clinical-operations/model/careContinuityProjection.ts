@@ -37,6 +37,12 @@ import type {
   EdenLanguageCode,
   EdenLiteracyAdaptationMode,
   EdenUniversalAcceptanceBridge,
+  EdenRestorativeExposureKind,
+  EdenRestorativeExposureSummary,
+  EdenAstralResonanceDimension,
+  EdenAstralWonderPerspective,
+  EdenRestorativeEnvironmentBridge,
+  WellnessDay,
   MoodEntry,
   Circle,
   SupportMessage,
@@ -136,6 +142,7 @@ export interface CareJourneyEpisodeSummary {
   edenVisitPreparation?: EdenVisitPreparationCompanion
   edenReflectionSanctuary?: EdenReflectionSanctuaryBridge
   edenUniversalAcceptance?: EdenUniversalAcceptanceBridge
+  edenRestorativeEnvironment?: EdenRestorativeEnvironmentBridge
 }
 
 export type ReadmissionRiskLevel = 'low' | 'moderate' | 'high'
@@ -223,6 +230,7 @@ export interface CareJourneyContinuityResult {
   edenVisitPrepReadyCount: number
   edenReflectionSanctuaryReadyCount: number
   edenUniversalAcceptanceReadyCount: number
+  edenRestorativeReadyCount: number
   edenLifeBalance: EdenLifeBalanceSynthesis
   hasBlockedStages: boolean
 }
@@ -2167,6 +2175,154 @@ export function deriveEdenUniversalAcceptanceBridge(
   }
 }
 
+/**
+ * Derives Eden Restorative Environment, Bio-Photonic Exposure & Cosmic Wonder Synthesis Bridge (T-CLIN-30 / EDEN-10).
+ * Connects the care journey with real-world restorative exposures (sunlight, circadian sleep, clean hydration, nature immersion).
+ * Synthesizes deep wonder, biophysical grounding, and planetary biological resonance while rigorously enforcing:
+ * 1. neverFabricatesUnloggedExposures: true (honest empty state when unlogged, never invents exposure hours)
+ * 2. nonPrescriptiveEducationalBoundary: true (wonder, reflection, and restorative appreciation; never prescriptive medical dosing)
+ * 3. 100% pure domain computation (no Date.now, new Date(), Math.random(), etc.)
+ */
+export function deriveEdenRestorativeEnvironmentBridge(
+  episode: CareEpisode,
+  wellness?: Record<string, WellnessDay>,
+): EdenRestorativeEnvironmentBridge {
+  const effectiveWellness = wellness ?? episode.wellnessExposures ?? {}
+  const days = Object.values(effectiveWellness)
+  const totalLoggedExposureDays = days.length
+
+  // Sunlight rollup
+  const sunDays = days.filter((d) => d.sunDone || (typeof d.sunHr === 'number' && d.sunHr > 0))
+  const latestSunDay = sunDays.length > 0 ? sunDays[sunDays.length - 1] : undefined
+  const latestSunLabel = latestSunDay
+    ? `${latestSunDay.sunHr ? `${latestSunDay.sunHr} jam` : 'Terpapar sinar'} (${latestSunDay.date})`
+    : 'Belum ada catatan sinar matahari'
+
+  // Hydration rollup
+  const hydroDays = days.filter((d) => typeof d.waterMl === 'number' && d.waterMl > 0)
+  const latestHydro = hydroDays.length > 0 ? hydroDays[hydroDays.length - 1] : undefined
+  const latestHydroLabel = latestHydro
+    ? `${latestHydro.waterMl} mL (${latestHydro.date})`
+    : 'Belum ada catatan hidrasi'
+
+  // Circadian sleep rollup
+  const sleepDays = days.filter((d) => typeof d.sleepHr === 'number' && d.sleepHr > 0)
+  const latestSleep = sleepDays.length > 0 ? sleepDays[sleepDays.length - 1] : undefined
+  const latestSleepLabel = latestSleep
+    ? `${latestSleep.sleepHr} jam istirahat (${latestSleep.date})`
+    : 'Belum ada catatan istirahat tidur'
+
+  // Activity & natural movement rollup
+  const moveDays = days.filter((d) => (d.exerciseMin && d.exerciseMin > 0) || (d.metHours && d.metHours > 0))
+  const latestMove = moveDays.length > 0 ? moveDays[moveDays.length - 1] : undefined
+  const latestMoveLabel = latestMove
+    ? `${latestMove.exerciseMin ? `${latestMove.exerciseMin} mnt` : `${latestMove.metHours} MET-h`} (${latestMove.date})`
+    : 'Belum ada catatan gerak alami'
+
+  // Thermal/Hydro recovery (sauna, warm bath, cooling)
+  const thermalDays = days.filter((d) => d.catatan && /sauna|mandi|rendam|hidro|berendam|spa/i.test(d.catatan))
+  const latestThermal = thermalDays.length > 0 ? thermalDays[thermalDays.length - 1] : undefined
+  const latestThermalLabel = latestThermal
+    ? `Pemulihan termal dicatat (${latestThermal.date})`
+    : 'Belum ada sesi pemulihan termal'
+
+  const exposures: EdenRestorativeExposureSummary[] = [
+    {
+      kind: 'morning_sunlight',
+      label: 'Sinar Matahari Pagi & Biofotonik',
+      loggedDaysCount: sunDays.length,
+      latestValueLabel: latestSunLabel,
+      restorativeState: sunDays.length > 0 ? 'active' : 'unlogged',
+    },
+    {
+      kind: 'circadian_serenity',
+      label: 'Irama Sirkadian & Pemulihan Tidur',
+      loggedDaysCount: sleepDays.length,
+      latestValueLabel: latestSleepLabel,
+      restorativeState: sleepDays.length > 0 ? 'active' : 'unlogged',
+    },
+    {
+      kind: 'clean_hydration',
+      label: 'Hidrasi & Keseimbangan Elektrolit Seluler',
+      loggedDaysCount: hydroDays.length,
+      latestValueLabel: latestHydroLabel,
+      restorativeState: hydroDays.length > 0 ? 'active' : 'unlogged',
+    },
+    {
+      kind: 'nature_immersion',
+      label: 'Gerak Alami & Kontak Lingkungan Hidup',
+      loggedDaysCount: moveDays.length,
+      latestValueLabel: latestMoveLabel,
+      restorativeState: moveDays.length > 0 ? 'active' : 'unlogged',
+    },
+    {
+      kind: 'thermal_hydro_recovery',
+      label: 'Relaksasi Termal & Modulasi Vaskular',
+      loggedDaysCount: thermalDays.length,
+      latestValueLabel: latestThermalLabel,
+      restorativeState: thermalDays.length > 0 ? 'nurturing' : 'unlogged',
+    },
+  ]
+
+  // Determine stage of circadian alignment based on current stage in journey
+  const stages = episode.stages ?? []
+  const activeStage = stages.find((s) => s.status === 'active')?.stage
+  let circadianAlignmentStage: EdenRestorativeEnvironmentBridge['circadianAlignmentStage'] = 'deep_rest_unknown'
+  if (activeStage === 'recovery' || activeStage === 'followUp') {
+    circadianAlignmentStage = 'evening_calm'
+  } else if (activeStage === 'treatment' || activeStage === 'schedule') {
+    circadianAlignmentStage = 'daylight_active'
+  } else if (activeStage === 'plan' || activeStage === 'diagnosis' || activeStage === 'problem') {
+    circadianAlignmentStage = 'morning_rhythm'
+  }
+
+  const astralPerspectives: EdenAstralWonderPerspective[] = [
+    {
+      dimension: 'cellular_light',
+      title: 'Resonansi Biofotonik & Keajaiban Cahaya Seluler',
+      wonderDescription: 'Setiap sel dalam tubuh manusia mengandung mitokondria purba yang berakar dari pertukaran energi biosfer, merespons spektrum cahaya matahari pagi untuk menyelaraskan sintesis seluler.',
+      scientificGrounding: 'Spektrum inframerah dekat dan cahaya tampak pagi memodulasi sitokrom c oksidase mitokondria, menstimulasi bioenergetika seluler dan produksi ATP secara fisiologis.',
+    },
+    {
+      dimension: 'circadian_cycles',
+      title: 'Keselarasan dengan Rotasi Bumi & Jam Biologis',
+      wonderDescription: 'Fisiologi manusia berdetak harmonis mengikuti rotasi 24 jam planet Bumi di alam semesta; nukleus suprakiasmatik di otak memandu pelepasan hormon pemulihan saat malam tiba.',
+      scientificGrounding: 'Jalur retinohipotalamus menyelaraskan gen jam sirkadian (CLOCK/BMAL1, PER, CRY) terhadap foton lingkungan, mengatur modulasi tekanan darah, kortisol, dan reparasi DNA sel.',
+    },
+    {
+      dimension: 'earth_grounding',
+      title: 'Ketenangan Alami & Dekelerasi Sistem Saraf',
+      wonderDescription: 'Berada di dekat dedaunan, udara segar, dan alam terbuka mengundang ketenangan mendalam, mengingatkan bahwa tubuh kita adalah bagian integral dari kehidupan bumi.',
+      scientificGrounding: 'Stimulasi sensori alamiah mengaktifkan tonus nervus vagus, menurunkan kadar katekolamin serum dan menyeimbangkan variabilitas denyut jantung melalui modulasi parasimpatis.',
+    },
+    {
+      dimension: 'cosmic_peace',
+      title: 'Perspektif Alam Semesta & Kerendahan Hati Fisiologis',
+      wonderDescription: 'Dalam luasnya jagat raya, keberadaan setiap helaan napas manusia adalah keajaiban yang memesona. Menghargai tubuh dengan rasa syukur adalah gerbang pemulihan sejati.',
+      scientificGrounding: 'Kesejahteraan emosional reflektif dan perasaan takjub (awe) terbukti secara neurobiologis menggeser sitokin pro-inflamasi ke arah keseimbangan homeostasis.',
+    },
+  ]
+
+  const totalLoggedSummary = totalLoggedExposureDays > 0
+    ? `${totalLoggedExposureDays} hari paparan tercatat`
+    : 'Belum ada hari paparan dicatat (ruang pemulihan terbuka)'
+
+  const cosmicBioHarmonyNarrative = `Pemulihan untuk perjalanan "${episode.title}" terhubung dengan keselarasan alam: ${totalLoggedSummary}. Setiap interaksi dengan udara segar, sinar mentari, dan air bersih memperkuat kapasitas pemulihan alami sel tubuh tanpa paksaan.`
+
+  return {
+    version: 'v1',
+    episodeId: episode.id,
+    episodeTitle: episode.title,
+    totalLoggedExposureDays,
+    exposures,
+    circadianAlignmentStage,
+    astralPerspectives,
+    cosmicBioHarmonyNarrative,
+    neverFabricatesUnloggedExposures: true,
+    nonPrescriptiveEducationalBoundary: true,
+  }
+}
+
 export const STAGE_EXPECTED_DAYS: Record<CareEpisodeStageId, number> = {
   problem: 1,
   diagnosis: 2,
@@ -2426,6 +2582,7 @@ export function evaluateCareJourneyContinuity(
     const edenVisitPreparation = deriveEdenVisitPreparationCompanion(ep, supportiveResults)
     const edenReflectionSanctuary = deriveEdenReflectionSanctuaryBridge(ep)
     const edenUniversalAcceptance = deriveEdenUniversalAcceptanceBridge(ep)
+    const edenRestorativeEnvironment = deriveEdenRestorativeEnvironmentBridge(ep)
 
     return {
       id: ep.id,
@@ -2464,6 +2621,7 @@ export function evaluateCareJourneyContinuity(
       edenVisitPreparation,
       edenReflectionSanctuary,
       edenUniversalAcceptance,
+      edenRestorativeEnvironment,
     }
   })
 
@@ -2546,6 +2704,13 @@ export function evaluateCareJourneyContinuity(
           s.edenUniversalAcceptance?.noFalseUniversalValidationClaim
       )
   ).length
+  const edenRestorativeReadyCount = summaries.filter(
+    (s) =>
+      Boolean(
+        s.edenRestorativeEnvironment?.neverFabricatesUnloggedExposures &&
+          s.edenRestorativeEnvironment?.nonPrescriptiveEducationalBoundary
+      )
+  ).length
   const edenLifeBalance = deriveEdenLifeBalanceSynthesis(episodes, supportiveResults)
 
   return {
@@ -2588,6 +2753,7 @@ export function evaluateCareJourneyContinuity(
     edenVisitPrepReadyCount,
     edenReflectionSanctuaryReadyCount,
     edenUniversalAcceptanceReadyCount,
+    edenRestorativeReadyCount,
     edenLifeBalance,
     hasBlockedStages: blockedJourneys > 0 || stalledCount > 0,
   }

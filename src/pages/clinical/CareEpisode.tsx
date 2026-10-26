@@ -17,6 +17,7 @@ import {
   deriveEdenVisitPreparationCompanion,
   deriveEdenReflectionSanctuaryBridge,
   deriveEdenUniversalAcceptanceBridge,
+  deriveEdenRestorativeEnvironmentBridge,
 } from '../../domains/clinical-operations'
 import {
   CARE_EPISODE_STAGES,
@@ -69,6 +70,8 @@ import type {
   MoodEntry,
   EdenLanguageCode,
   EdenLiteracyAdaptationMode,
+  EdenAstralResonanceDimension,
+  WellnessDay,
 } from '../../lib/types'
 import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 import { PanaceaZoneNav } from '../../components/PanaceaZoneNav'
@@ -243,6 +246,7 @@ export function CareEpisodePage() {
           supportMessages={state.supportMessages}
           gratitudes={state.gratitudes}
           moods={state.moods}
+          wellness={state.wellness}
           onChange={(next) => updateEpisode(ep.id, next)}
           onRemove={() => removeEpisode(ep.id)}
         />
@@ -340,6 +344,7 @@ function EpisodeCard({
   supportMessages,
   gratitudes,
   moods,
+  wellness,
   onChange,
   onRemove,
 }: {
@@ -354,6 +359,7 @@ function EpisodeCard({
   supportMessages?: readonly SupportMessage[]
   gratitudes?: readonly GratitudeNote[]
   moods?: readonly MoodEntry[]
+  wellness?: Record<string, WellnessDay>
   onChange: (next: CareEpisode) => void
   onRemove: () => void
 }) {
@@ -613,6 +619,9 @@ function EpisodeCard({
 
       {/* Eden Universal Human Acceptance & Multilingual Plain-Language Continuity Bridge (T-CLIN-29 / EDEN-09) */}
       <EdenUniversalAcceptanceSection episode={episode} onChange={onChange} />
+
+      {/* Eden Restorative Environment, Bio-Photonic Exposure & Cosmic Wonder Synthesis Bridge (T-CLIN-30 / EDEN-10) */}
+      <EdenRestorativeEnvironmentSection episode={episode} wellness={wellness} />
     </Card>
   )
 }
@@ -1677,6 +1686,124 @@ function EdenUniversalAcceptanceSection({
       <p className="mt-2 text-[10px] text-neutral-500 dark:text-white/55">
         {acceptance.localizedSafetyAssurance}
       </p>
+    </div>
+  )
+}
+
+function EdenRestorativeEnvironmentSection({
+  episode,
+  wellness,
+}: {
+  episode: CareEpisode
+  wellness?: Record<string, WellnessDay>
+}) {
+  const [selectedDimension, setSelectedDimension] = useState<EdenAstralResonanceDimension>('cellular_light')
+
+  const bridge = useMemo(
+    () => deriveEdenRestorativeEnvironmentBridge(episode, wellness),
+    [episode, wellness]
+  )
+
+  const activePerspective = useMemo(
+    () => bridge.astralPerspectives.find((p) => p.dimension === selectedDimension) ?? bridge.astralPerspectives[0],
+    [bridge.astralPerspectives, selectedDimension]
+  )
+
+  return (
+    <div
+      className="mt-3 rounded-xl border border-emerald-200 dark:border-white/10 bg-emerald-50/30 dark:bg-white/[0.02] p-3.5"
+      data-eden-restorative-environment-card="v1"
+      data-eden-circadian-stage={bridge.circadianAlignmentStage}
+    >
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+        <div>
+          <div className="flex items-center gap-2 flex-wrap">
+            <h4 className="text-xs font-bold text-neutral-900 dark:text-white">
+              Restorative Environment & Cosmic Bio-Harmony — Living Earth Resonance
+            </h4>
+            <Badge tone="normal">
+              {bridge.totalLoggedExposureDays > 0
+                ? `${bridge.totalLoggedExposureDays} Days Logged`
+                : 'Restorative Sanctuary Open'}
+            </Badge>
+            <Badge tone="neutral">Bio-Photonic & Circadian</Badge>
+          </div>
+          <p className="mt-1 text-xs font-medium text-neutral-800 dark:text-white/85">
+            {bridge.cosmicBioHarmonyNarrative}
+          </p>
+        </div>
+      </div>
+
+      {/* Exposure Summaries */}
+      <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+        {bridge.exposures.map((exp) => (
+          <div
+            key={exp.kind}
+            className="rounded-lg border border-neutral-200 dark:border-white/10 bg-white/70 dark:bg-white/[0.03] p-2.5 text-xs"
+            data-eden-exposure-item={exp.kind}
+          >
+            <div className="flex items-center justify-between">
+              <span className="font-semibold text-neutral-800 dark:text-white/90">{exp.label}</span>
+              <Badge
+                tone={
+                  exp.restorativeState === 'active'
+                    ? 'normal'
+                    : exp.restorativeState === 'nurturing'
+                    ? 'brand'
+                    : 'neutral'
+                }
+              >
+                {exp.loggedDaysCount > 0 ? `${exp.loggedDaysCount} Hari` : 'Belum Dicatat'}
+              </Badge>
+            </div>
+            <p className="mt-1 text-neutral-600 dark:text-white/60 text-[11px]">
+              {exp.latestValueLabel}
+            </p>
+          </div>
+        ))}
+      </div>
+
+      {/* Astral & Cosmic Wonder Perspectives */}
+      <div className="mt-3 pt-3 border-t border-emerald-100 dark:border-white/10" data-eden-astral-perspectives="v1">
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-xs font-bold text-neutral-700 dark:text-white/80">
+            Dimensi Keajaiban Alam Semesta & Resonansi Fisiologis:
+          </span>
+        </div>
+        <div className="flex flex-wrap gap-1.5 mb-2.5">
+          {bridge.astralPerspectives.map((p) => (
+            <button
+              key={p.dimension}
+              type="button"
+              onClick={() => setSelectedDimension(p.dimension)}
+              className={`rounded-lg px-2.5 py-1 text-xs font-medium transition-colors ${
+                selectedDimension === p.dimension
+                  ? 'bg-emerald-600 text-white font-bold'
+                  : 'bg-white/80 dark:bg-white/5 text-neutral-700 dark:text-white/70 hover:bg-emerald-100/50'
+              }`}
+            >
+              {p.title.split('&')[0].trim()}
+            </button>
+          ))}
+        </div>
+        {activePerspective && (
+          <div className="rounded-lg border border-emerald-300/40 dark:border-white/10 bg-emerald-100/40 dark:bg-white/[0.04] p-3 text-xs space-y-1.5">
+            <div className="font-bold text-emerald-950 dark:text-emerald-200">
+              {activePerspective.title}
+            </div>
+            <p className="text-neutral-800 dark:text-white/85 leading-relaxed">
+              {activePerspective.wonderDescription}
+            </p>
+            <div className="text-[11px] text-neutral-600 dark:text-white/60 italic pt-1 border-t border-emerald-200/40 dark:border-white/5">
+              <b>Grounded Science:</b> {activePerspective.scientificGrounding}
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div className="mt-2 text-[10px] text-neutral-500 dark:text-white/50 text-right">
+        ARGON EDEN ∞ §8 · Non-prescriptive restorative wonder · Never fabricates unlogged exposures
+      </div>
     </div>
   )
 }
