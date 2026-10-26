@@ -10,6 +10,7 @@ import {
   evaluateEpisodeReadmissionRisk,
   deriveEdenCareCompanion,
   deriveEdenLifeBalanceSynthesis,
+  deriveEdenLifeStoryBridge,
 } from '../../domains/clinical-operations'
 import {
   CARE_EPISODE_STAGES,
@@ -54,6 +55,8 @@ import type {
   SupportiveResult,
   CareJourneyReferralRecord,
   EdenDisclosureDepth,
+  LifeEvent,
+  Quest,
 } from '../../lib/types'
 import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 import { PanaceaZoneNav } from '../../components/PanaceaZoneNav'
@@ -220,6 +223,9 @@ export function CareEpisodePage() {
           episode={ep}
           recordPlan={record.plan}
           supportiveResults={state.supportive[activePatient.id]}
+          lifeEvents={state.lifeEvents[activePatient.id]}
+          quests={state.quests[activePatient.id]}
+          patientDob={activePatient.dob}
           onChange={(next) => updateEpisode(ep.id, next)}
           onRemove={() => removeEpisode(ep.id)}
         />
@@ -309,12 +315,18 @@ function EpisodeCard({
   episode,
   recordPlan,
   supportiveResults,
+  lifeEvents,
+  quests,
+  patientDob,
   onChange,
   onRemove,
 }: {
   episode: CareEpisode
   recordPlan?: readonly PlanItem[]
   supportiveResults?: readonly SupportiveResult[]
+  lifeEvents?: readonly LifeEvent[]
+  quests?: readonly Quest[]
+  patientDob?: string
   onChange: (next: CareEpisode) => void
   onRemove: () => void
 }) {
@@ -542,6 +554,14 @@ function EpisodeCard({
 
       {/* Eden Three-Depth Progressive Disclosure & Plain-Language Clinical Companion (T-CLIN-21 / EDEN-01) */}
       <EdenCareCompanionSection episode={episode} onChange={onChange} />
+
+      {/* Eden Personal Life Story & Turning-Point Continuity Bridge (T-CLIN-23 / EDEN-03) */}
+      <EdenLifeStorySection
+        episode={episode}
+        lifeEvents={lifeEvents}
+        quests={quests}
+        patientDob={patientDob}
+      />
     </Card>
   )
 }
@@ -1046,6 +1066,108 @@ function EdenCareCompanionSection({
           ))}
         </div>
       )}
+    </div>
+  )
+}
+
+function EdenLifeStorySection({
+  episode,
+  lifeEvents,
+  quests,
+  patientDob,
+}: {
+  episode: CareEpisode
+  lifeEvents?: readonly LifeEvent[]
+  quests?: readonly Quest[]
+  patientDob?: string
+}) {
+  const bridge = useMemo(
+    () => deriveEdenLifeStoryBridge(episode, lifeEvents, quests, patientDob),
+    [episode, lifeEvents, quests, patientDob]
+  )
+
+  return (
+    <div
+      className="mt-3 rounded-xl border border-cyan-200 dark:border-white/10 bg-cyan-50/35 dark:bg-white/[0.02] p-3.5"
+      data-eden-life-story-card="v1"
+      data-life-chapter={bridge.lifeChapterName}
+    >
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+        <div>
+          <div className="flex items-center gap-2 flex-wrap">
+            <h4 className="text-xs font-bold text-neutral-900 dark:text-white">
+              Personal Life Story Continuity — One Unified Life Thread
+            </h4>
+            <Badge tone="brand">
+              Chapter: {bridge.lifeChapterName} ({bridge.lifeChapterAgeRange})
+            </Badge>
+            <Badge tone="neutral">Self-Authored · Never Inferred</Badge>
+          </div>
+          <p className="mt-1 text-xs text-neutral-700 dark:text-white/80">
+            {bridge.storyContinuityNarrative}
+          </p>
+        </div>
+        <Link
+          to="/mental/life-story"
+          className="inline-flex items-center rounded-lg border border-cyan-500/30 bg-cyan-500/10 px-2.5 py-1 text-[11px] font-semibold text-cyan-700 dark:text-cyan-300 hover:bg-cyan-500/20 shrink-0"
+        >
+          Open Life Story →
+        </Link>
+      </div>
+
+      <div className="mt-2.5 flex flex-wrap gap-1.5" data-eden-life-domains="v1">
+        {bridge.activeLifeDomains.map((d) => (
+          <span
+            key={d.domain}
+            className="inline-flex items-center gap-1 rounded-md bg-white/80 dark:bg-white/5 px-2 py-0.5 text-[10px] text-neutral-700 dark:text-white/75 border border-cyan-100 dark:border-white/5"
+          >
+            <strong>{d.label}:</strong> {d.count} thread{d.count === 1 ? '' : 's'}
+          </span>
+        ))}
+      </div>
+
+      {(bridge.selfAuthoredTurningPoints.length > 0 || bridge.activeQuests.length > 0) && (
+        <div className="mt-2.5 grid gap-2 sm:grid-cols-2 text-xs">
+          {bridge.selfAuthoredTurningPoints.length > 0 && (
+            <div className="rounded-lg bg-white/80 dark:bg-white/[0.03] p-2.5 border border-cyan-100 dark:border-white/5">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-500 dark:text-white/50">
+                Your Self-Marked Turning Points ({bridge.selfAuthoredTurningPoints.length})
+              </span>
+              <ul className="mt-1 space-y-1">
+                {bridge.selfAuthoredTurningPoints.slice(0, 2).map((tp) => (
+                  <li key={tp.id} className="text-[11px] text-neutral-800 dark:text-white/85">
+                    ★ <strong>{tp.title}</strong>{' '}
+                    <span className="text-[10px] text-neutral-500 dark:text-white/50">
+                      ({tp.at.slice(0, 10)} · self-rated {tp.impact})
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          {bridge.activeQuests.length > 0 && (
+            <div className="rounded-lg bg-white/80 dark:bg-white/[0.03] p-2.5 border border-cyan-100 dark:border-white/5">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-500 dark:text-white/50">
+                Your Active Life Quests ({bridge.activeQuests.length})
+              </span>
+              <ul className="mt-1 space-y-1">
+                {bridge.activeQuests.slice(0, 2).map((q) => (
+                  <li key={q.id} className="text-[11px] text-neutral-800 dark:text-white/85">
+                    🧭 <strong>{q.title}</strong>{' '}
+                    <span className="text-[10px] text-neutral-500 dark:text-white/50">
+                      ({q.progressCurrent}/{q.progressTarget} {q.unit})
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      )}
+
+      <p className="mt-2 text-[11px] italic text-cyan-800 dark:text-cyan-300">
+        {bridge.gentleReflectionPrompt}
+      </p>
     </div>
   )
 }

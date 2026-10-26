@@ -21,6 +21,11 @@ import type {
   EdenCalmState,
   EdenLifeDimensionStatus,
   EdenLifeBalanceSynthesis,
+  EdenLifeStoryAnchor,
+  EdenLifeStoryBridge,
+  LifeDomain,
+  LifeEvent,
+  Quest,
   PlanItem,
   CarePlanMilestone,
   ClinicalOutcomeRecord,
@@ -106,6 +111,7 @@ export interface CareJourneyEpisodeSummary {
   readmissionSurveillance?: CareJourneyReadmissionSurveillance
   referralRecord?: CareJourneyReferralRecord
   edenCompanion?: EdenCareCompanionSummary
+  edenLifeStoryBridge?: EdenLifeStoryBridge
 }
 
 export type ReadmissionRiskLevel = 'low' | 'moderate' | 'high'
@@ -186,6 +192,7 @@ export interface CareJourneyContinuityResult {
   acknowledgedReferralsCount: number
   emergencyReferralsCount: number
   edenReadyJourneysCount: number
+  edenLifeStoryAlignedCount: number
   edenLifeBalance: EdenLifeBalanceSynthesis
   hasBlockedStages: boolean
 }
@@ -1249,6 +1256,170 @@ export function deriveEdenLifeBalanceSynthesis(
   }
 }
 
+const EDEN_LIFE_DOMAIN_LABELS: Record<LifeDomain, string> = {
+  physical: 'Physical',
+  mental: 'Mental',
+  social: 'Social',
+  relationships: 'Relationships',
+  sex: 'Intimacy',
+  money: 'Financial',
+  career: 'Career',
+  study: 'Study & Knowledge',
+  recreation: 'Recreation & Play',
+  family: 'Family',
+  purpose: 'Purpose',
+  creativity: 'Creativity',
+}
+
+const EDEN_LIFE_CHAPTER_BOUNDS: readonly { name: string; from: number; to: number }[] = [
+  { name: 'Origin', from: -1, to: 12 },
+  { name: 'Growth', from: 13, to: 22 },
+  { name: 'Foundation', from: 23, to: 35 },
+  { name: 'Family & Career', from: 36, to: 50 },
+  { name: 'Mastery', from: 51, to: 65 },
+  { name: 'Legacy', from: 66, to: 999 },
+]
+
+function parseIsoYmd(iso?: string): { year: number; month: number; day: number } | undefined {
+  if (typeof iso !== 'string') return undefined
+  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(iso.trim())
+  if (!m) return undefined
+  return {
+    year: Number(m[1]),
+    month: Number(m[2]),
+    day: Number(m[3]),
+  }
+}
+
+function resolveLifeChapterForEpisode(
+  patientDob?: string,
+  episodeAt?: string,
+): { name: string; ageRange: string } {
+  const birth = parseIsoYmd(patientDob)
+  const event = parseIsoYmd(episodeAt)
+  if (!birth || !event) {
+    return { name: 'Living Chapter', ageRange: 'Ongoing' }
+  }
+  let age = event.year - birth.year
+  if (event.month < birth.month || (event.month === birth.month && event.day < birth.day)) {
+    age -= 1
+  }
+  const bound =
+    EDEN_LIFE_CHAPTER_BOUNDS.find((b) => age >= b.from && age <= b.to) ??
+    EDEN_LIFE_CHAPTER_BOUNDS[EDEN_LIFE_CHAPTER_BOUNDS.length - 1]
+  const ageRange = bound.to >= 999 ? `${bound.from}+` : `${Math.max(bound.from, 0)}–${bound.to}`
+  return { name: bound.name, ageRange }
+}
+
+export function deriveEdenLifeStoryBridge(
+  episode: CareEpisode,
+  lifeEvents?: readonly LifeEvent[],
+  quests?: readonly Quest[],
+  patientDob?: string,
+): EdenLifeStoryBridge {
+  const stages = episode.stages ?? []
+  const isCompleted = stages.length > 0 && stages.every((s) => s.status === 'done')
+  const chapter = resolveLifeChapterForEpisode(patientDob, episode.createdAt)
+
+  const healthStoryAnchors: EdenLifeStoryAnchor[] = [
+    {
+      id: `${episode.id}_started`,
+      at: episode.createdAt,
+      title: `Started: ${episode.title}`,
+      kind: 'started',
+    },
+  ]
+
+  for (const stage of stages) {
+    if (stage.status === 'blocked' && stage.updatedAt) {
+      healthStoryAnchors.push({
+        id: `${episode.id}_blocked_${stage.stage}`,
+        at: stage.updatedAt,
+        title: `Paused for coordination: ${episode.title}`,
+        kind: 'blocked',
+        note: stage.blockedReason,
+      })
+    }
+  }
+
+  if (isCompleted) {
+    healthStoryAnchors.push({
+      id: `${episode.id}_completed`,
+      at: episode.updatedAt,
+      title: `Completed: ${episode.title}`,
+      kind: 'completed',
+    })
+  }
+
+  const safeEvents: readonly LifeEvent[] = Array.isArray(lifeEvents) ? lifeEvents : []
+  const selfAuthoredTurningPoints = safeEvents
+    .filter((e) => Boolean(e.isTurningPoint))
+    .map((e) => ({
+      id: e.id,
+      at: e.at,
+      title: e.title,
+      impact: e.impact,
+      domains: Array.isArray(e.domains) ? [...e.domains] : [],
+    }))
+
+  const safeQuests: readonly Quest[] = Array.isArray(quests) ? quests : []
+  const activeQuests = safeQuests
+    .filter((q) => q.status === 'active')
+    .map((q) => ({
+      id: q.id,
+      title: q.title,
+      domain: q.domain,
+      progressCurrent: q.progressCurrent,
+      progressTarget: q.progressTarget,
+      unit: q.unit,
+      targetNote: q.targetNote,
+    }))
+
+  const domainCounter = new Map<LifeDomain, number>()
+  domainCounter.set('physical', 1)
+  for (const e of safeEvents) {
+    for (const d of e.domains ?? []) {
+      domainCounter.set(d, (domainCounter.get(d) ?? 0) + 1)
+    }
+  }
+  for (const q of activeQuests) {
+    domainCounter.set(q.domain, (domainCounter.get(q.domain) ?? 0) + 1)
+  }
+
+  const activeLifeDomains = [...domainCounter.entries()]
+    .map(([domain, count]) => ({
+      domain,
+      label: EDEN_LIFE_DOMAIN_LABELS[domain] ?? domain,
+      count,
+    }))
+    .sort((a, b) => b.count - a.count)
+
+  const storyContinuityNarrative =
+    selfAuthoredTurningPoints.length > 0 || activeQuests.length > 0
+      ? `In your ${chapter.name} chapter (${chapter.ageRange} yrs), “${episode.title}” weaves alongside ${selfAuthoredTurningPoints.length} self-authored turning point(s) and ${activeQuests.length} active life quest(s)—keeping you as the protagonist of one unified life story.`
+      : `In your ${chapter.name} chapter (${chapter.ageRange} yrs), “${episode.title}” is tracked as one real health thread in your whole life story—meaning and turning points remain yours to author.`
+
+  const gentleReflectionPrompt = isCompleted
+    ? 'This care thread has reached completion—if it marked a meaningful moment in your life, you may record it in your own words in Life Story.'
+    : activeQuests.length > 0
+    ? `As this care journey progresses, notice how your recovery rhythm supports your active quest: “${activeQuests[0].title}”.`
+    : 'Health is one thread in your whole life story—whenever a moment feels meaningful to you, you can log it in your own words in Life Story.'
+
+  return {
+    episodeId: episode.id,
+    episodeTitle: episode.title,
+    lifeChapterName: chapter.name,
+    lifeChapterAgeRange: chapter.ageRange,
+    healthStoryAnchors,
+    selfAuthoredTurningPoints,
+    activeQuests,
+    activeLifeDomains,
+    storyContinuityNarrative,
+    gentleReflectionPrompt,
+    selfAuthoredNeverInferred: true,
+  }
+}
+
 export const STAGE_EXPECTED_DAYS: Record<CareEpisodeStageId, number> = {
   problem: 1,
   diagnosis: 2,
@@ -1501,6 +1672,7 @@ export function evaluateCareJourneyContinuity(
     const readmissionSurveillance = evaluateEpisodeReadmissionRisk(ep, supportiveResults, evaluatedAtMs)
     const referralRecord = evaluateReferralHandshakeContinuity(ep)
     const edenCompanion = deriveEdenCareCompanion(ep)
+    const edenLifeStoryBridge = deriveEdenLifeStoryBridge(ep)
 
     return {
       id: ep.id,
@@ -1532,6 +1704,7 @@ export function evaluateCareJourneyContinuity(
       readmissionSurveillance,
       referralRecord,
       edenCompanion,
+      edenLifeStoryBridge,
     }
   })
 
@@ -1585,6 +1758,9 @@ export function evaluateCareJourneyContinuity(
   const edenReadyJourneysCount = summaries.filter(
     (s) => Boolean(s.edenCompanion?.clinicalSafetyPreserved)
   ).length
+  const edenLifeStoryAlignedCount = summaries.filter(
+    (s) => Boolean(s.edenLifeStoryBridge?.selfAuthoredNeverInferred)
+  ).length
   const edenLifeBalance = deriveEdenLifeBalanceSynthesis(episodes, supportiveResults)
 
   return {
@@ -1620,6 +1796,7 @@ export function evaluateCareJourneyContinuity(
     acknowledgedReferralsCount,
     emergencyReferralsCount,
     edenReadyJourneysCount,
+    edenLifeStoryAlignedCount,
     edenLifeBalance,
     hasBlockedStages: blockedJourneys > 0 || stalledCount > 0,
   }
