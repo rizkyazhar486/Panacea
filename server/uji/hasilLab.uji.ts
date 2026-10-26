@@ -1,6 +1,6 @@
 // Hasil lab + rujukan (Alpha B2–B6, B9). Tanpa jaringan, tanpa jam/acak nyata.
 import assert from 'node:assert/strict'
-import { GENESIS_HASH, transition, verifyTrail } from '../src/modules/labResults/domain/lifecycle.js'
+import { GENESIS_HASH, entryHash, transition, verifyTrail } from '../src/modules/labResults/domain/lifecycle.js'
 import type { Actor } from '../src/modules/labResults/domain/lifecycle.js'
 import { referralLifecycle, resultLifecycle } from '../src/modules/labResults/domain/definitions.js'
 import * as s from '../src/modules/labResults/service/labResultsService.js'
@@ -63,6 +63,27 @@ assert.ok(masalah([e2, e1]).includes('seq-gap'), 'urutan terbalik')
 assert.ok(masalah([e1, { ...e2, prevHash: GENESIS_HASH }]).includes('hash-mismatch'), 'rantai hash diputus')
 assert.ok(masalah([{ ...e1, to: 'reviewed' }]).includes('step-not-allowed'))
 assert.ok(masalah([{ ...e1, to: 'x' }]).includes('unknown-status'))
+// Hash yang dihitung ulang tidak boleh membuat peran atau waktu yang tidak sah menjadi dapat diterima.
+const rehash = (entry: typeof e1): typeof e1 => {
+  const { hash: _hash, ...rest } = entry
+  return { ...rest, hash: entryHash(rest) }
+}
+const nurseReview = rehash({ ...e2, role: 'nurse' })
+assert.ok(masalah([e1, nurseReview]).includes('role-not-permitted'), 'tinjauan perawat tetap ditolak walau hash konsisten')
+assert.ok(masalah([e1, rehash({ ...e2, at: 'bukan-waktu' })]).includes('invalid-timestamp'), 'waktu rusak tetap ditolak walau hash konsisten')
+// Layanan harus gagal tertutup dan tidak memajukan hasil dengan tinjauan berperan tidak sah.
+{
+  const k = ctx()
+  k.hasil.put({
+    id: 'x', tenantId: T0, patientId: 'p-A', status: 'reviewed', item: butir,
+    provenance: { source: 'manual-entry', recordedBy: 'n1', recordedAt: e1.at },
+    trail: [e1, nurseReview],
+  })
+  tolak(s.majukanHasil(k, perawat, 'x', {
+    to: 'communicated', communication: { channel: 'phone', note: 'Hasil dibahas melalui telepon' },
+  }), 'trail-corrupt')
+  assert.equal(k.hasil.get('x')?.status, 'reviewed', 'rekaman rusak tidak boleh bermutasi')
+}
 // pengubahan tidak mengotori hasil sebelum: transition tidak memutasi trail
 assert.equal(lanjut.trail.length, 1)
 
@@ -328,13 +349,13 @@ assert.equal(lanjut.trail.length, 1)
   assert.deepEqual(ids(tanpa), [], 'a nurse without assignment lists nothing'); assert.deepEqual(ids(tanpaLab), [], 'lab staff with an empty assignment lists nothing')
   assert.deepEqual(ids(dok), [hA.id, hB.id].sort(), 'the clinician view is unchanged'); assert.deepEqual(ids(admin), [hA.id, hB.id].sort(), 'the admin view is unchanged')
   tolak(s.bacaHasil(k, perawatA, hB.id), 'not-found'); tolak(s.bacaHasil(k, tanpa, hA.id), 'not-found'); tolak(s.bacaHasil(k, labB, hA.id), 'not-found'); ok(s.bacaHasil(k, perawatA, hA.id)); ok(s.bacaHasil(k, labB, hB.id))
-  tolak(s.terimaHasil(k, perawatA, { patientId: 'p-B', item: butir, source: 'manual-entry' }), 'forbidden'); tolak(s.terimaHasil(k, tanpa, { patientId: 'p-A', item: butir, source: 'manual-entry' }), 'forbidden'); tolak(s.terimaHasil(k, labB, { patientId: 'p-A', item: butir, source: 'lab-intake' }), 'forbidden')
+  tolak(s.terimaHasil(k, perawatA, { patientId: 'p-B', item: butir, source: 'manual-entry' }), 'forbidden'); tolak(s.terimaHasil(k, tanpa, { patientId: 'p-A', item: butir, source: 'manual-entry' }), 'forbidden'); tolak(s.terimaHasil(k, labB, { patientId: 'p-B', item: butir, source: 'manual-entry' }), 'forbidden')
   assert.equal(ok(s.terimaHasil(k, perawatA, { patientId: 'p-A', item: butir, source: 'manual-entry' })).patientId, 'p-A'); assert.equal(ok(s.terimaHasil(k, labB, { patientId: 'p-B', item: butir, source: 'lab-intake' })).patientId, 'p-B')
   tolak(s.majukanHasil(k, perawatA, hB.id, { to: 'pending_review' }), 'not-found'); waktu(1000); assert.equal(ok(s.majukanHasil(k, perawatA, hA.id, { to: 'pending_review' })).status, 'pending_review')
   tolak(s.metrikPenutupan(k, perawatA), 'forbidden'); tolak(s.metrikPenutupan(k, labB), 'forbidden'); tolak(s.metrikPenutupan(k, tanpa), 'forbidden'); ok(s.metrikPenutupan(k, dok)); ok(s.metrikPenutupan(k, admin))
   // Rujukan: staf hanya membaca rujukan pasien yang ditugaskan; membuat rujukan tetap hanya klinisi.
   const r = ok(s.buatRujukan(k, dok, { patientId: 'p-A', kind: 'lab', reason: 'cek', toFacility: 'Lab X' })); ok(s.buatRujukan(k, dok, { patientId: 'p-B', kind: 'lab', reason: 'cek', toFacility: 'Lab X' }))
-  assert.deepEqual(s.daftarRujukan(k, perawatA).map((x) => x.id), [r.id], 'a nurse lists only the assigned patient\'s referrals'); assert.deepEqual(s.daftarRujukan(k, tanpa), [], 'an unassigned nurse lists no referrals'); tolak(s.bacaRujukan(k, tanpa, r.id), 'not-found'); ok(s.bacaRujukan(k, perawatA, r.id))
+  assert.equal(s.daftarRujukan(k, perawatA).map((x) => x.id), [r.id], 'a nurse lists only the assigned patient\'s referrals'); assert.deepEqual(s.daftarRujukan(k, tanpa), [], 'an unassigned nurse lists no referrals'); tolak(s.bacaRujukan(k, tanpa, r.id), 'not-found'); ok(s.bacaRujukan(k, perawatA, r.id))
   tolak(s.buatRujukan(k, perawatA, { patientId: 'p-A', kind: 'lab', reason: 'cek', toFacility: 'Lab X' }), 'forbidden')
 }
 
@@ -346,10 +367,11 @@ await import("./labReferralHttpRbac.uji.js")
 await import("./labShareHttpRbac.uji.js")
 // Real HTTP daily check-in (care plan / report) ownership, integrity, replacement and revocation.
 await import("./careHttpRbac.uji.js")
-// Real HTTP share expiry (end time moved into the past across a restart) on every dependent clinician, care and read-model route.
+// Real HTTP share expiry (end time moved across a restart) on every dependent clinician, care and read-model route.
 await import("./shareExpiryHttp.uji.js")
 // Real HTTP second-opinion queue: patient-only view without the AI draft, verified-clinician completion, single bounded completion.
 await import("./secondOpinionHttpRbac.uji.js")
 
 // Lab & Referral Closure over real HTTP: closing evidence, linked-result re-verification, refusals with audit and no mutation.
 await import("./labReferralClosureHttp.uji.js")
+

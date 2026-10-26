@@ -84,7 +84,9 @@ export function transition<S extends string>(lc: Lifecycle<S>, i: TransitionInpu
   return { ok: true, status: i.target, entry }
 }
 
-export type TrailIssue = 'seq-gap' | 'chain-broken' | 'time-regression' | 'wrong-subject' | 'step-not-allowed' | 'unknown-status' | 'hash-mismatch'
+export type TrailIssue =
+  | 'seq-gap' | 'chain-broken' | 'time-regression' | 'wrong-subject' | 'step-not-allowed'
+  | 'unknown-status' | 'hash-mismatch' | 'invalid-timestamp' | 'role-not-permitted'
 
 /** Status akhir dari jejak yang utuh, atau daftar masalah. Jejak kosong = status awal. */
 export function verifyTrail<S extends string>(lc: Lifecycle<S>, subjectId: string, trail: readonly AuditEntry<S>[]):
@@ -98,7 +100,11 @@ export function verifyTrail<S extends string>(lc: Lifecycle<S>, subjectId: strin
     if (e.seq !== idx + 1) issues.add('seq-gap')
     if (e.from !== status) issues.add('chain-broken')
     if (!lc.edges[e.from].includes(e.to)) issues.add('step-not-allowed')
-    if (prev && Date.parse(e.at) < Date.parse(prev.at)) issues.add('time-regression')
+    // TypeScript dan hash rantai tidak memvalidasi muatan hasil impor/penyimpanan.
+    // Terapkan batas peran dan waktu yang sama seperti saat transisi dibuat.
+    if (!(lc.roles[e.to] ?? []).includes(e.role)) issues.add('role-not-permitted')
+    if (!validTime(e.at)) issues.add('invalid-timestamp')
+    if (prev && validTime(e.at) && validTime(prev.at) && Date.parse(e.at) < Date.parse(prev.at)) issues.add('time-regression')
     const { hash, ...rest } = e
     if (e.prevHash !== (prev?.hash ?? GENESIS_HASH) || hash !== entryHash(rest)) issues.add('hash-mismatch')
     status = e.to
@@ -106,3 +112,4 @@ export function verifyTrail<S extends string>(lc: Lifecycle<S>, subjectId: strin
   })
   return issues.size ? { ok: false, issues: [...issues].sort() } : { ok: true, status }
 }
+
