@@ -502,6 +502,18 @@ export function CareContinuityPanel({
                   </span>
                 </div>
               )}
+              {(careJourneys.costVerifiedJourneysCount > 0 || careJourneys.costEstimatedJourneysCount > 0) && (
+                <div className="flex justify-between text-emerald-300" data-care-cost-rollup="v1">
+                  <span>Cost transparency:</span>
+                  <span className="font-bold">
+                    {careJourneys.costVerifiedJourneysCount > 0
+                      ? `${careJourneys.costVerifiedJourneysCount} verified`
+                      : `${careJourneys.costEstimatedJourneysCount} est.`}
+                    {' · IDR '}
+                    {(careJourneys.totalEstimatedCostLow / 1_000_000).toFixed(1)}M–{(careJourneys.totalEstimatedCostHigh / 1_000_000).toFixed(1)}M
+                  </span>
+                </div>
+              )}
 
               {careJourneys.episodes.length > 0 && (
                 <div className="mt-3 border-t border-white/8 pt-2">

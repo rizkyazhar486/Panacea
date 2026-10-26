@@ -347,7 +347,10 @@ function EpisodeCard({
       </div>
 
       {episode.facilityId && (
-        <div className="mt-4 border-t border-neutral-100 dark:border-white/10 pt-4">
+        <div
+          className="mt-4 border-t border-neutral-100 dark:border-white/10 pt-4"
+          data-care-cost-transparency="v1"
+        >
           <CostEstimateField episode={episode} onChange={onChange} />
         </div>
       )}
