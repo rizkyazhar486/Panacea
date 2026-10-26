@@ -12,6 +12,7 @@ Evidence snapshot `106fe679`, 2026-10-25 (all H0, H1, H2 engineering criteria 32
 
 | ID | Task | Criterion | Lane | Status | PR / evidence |
 |---|---|---|---|---|---|
+| T-H0-PRODUCTION-SUMMARY | Reject invalid production summaries without exposing raw report fields or masking checker failure | ENG-E7-02 | codex | DONE | #2790 merged `fd1289fadfbd48f9fe0a06752c5044ed21408138`; reviewed head `e41812e1d1ba0a1dc92de04df276285e7f0b5a88`: Validate 40255913509 / job 121357587171, Stabilization 40255913463 / job 121357587280, Production Browser Check 40255913505 PASS. Failure-masking and raw-output negative controls fail; 35 targeted/related tests pass. Post-merge CI pending; no deployment claim. |
 | T-H0-REPLAY-CAPTURE | Repair Human Replay screenshot timeout without dropping poster/duration/layout proof | ENG-CI-01 | codex | DONE | #2768, #2770 merged `b3b3f510`. Bounded page clip implemented; 17/17 CI workflows and main stabilization passed cleanly. |
 | T-H0-PARSER | Preserve unsupported encoding/charset HTTP 415 and prove compressed parser limits, auth and private diagnostics | ENG-E4-02 | codex | DONE | #2767 merged `de163eaf`. Parser 415 restored; identity/gzip/deflate boundaries and private auth/error controls pass. |
 | T-H0-01 | Pin runners to Ubuntu 24.04 (Playwright + Mongo) | ENG-CI-02 | integrator | DONE | #2691 merged c57e22fc; #2686 closed as subset |
@@ -74,7 +75,7 @@ Evidence snapshot `106fe679`, 2026-10-25 (all H0, H1, H2 engineering criteria 32
 | T-CLIN-13 | Clinical Encounter Outcome Closure & Episode Completion Bridge | — | gemini | DONE | #2787 merged `6b4ce294`; wire ClinicalOutcomeRecord in types.ts, recordClinicalOutcome in careEpisode.ts, outcome projection in careContinuityProjection & CareContinuityPanel, OutcomeVerificationSection in CareEpisode, 16/16 exact-head CI workflows PASS |
 | T-CLIN-14 | Longitudinal Care Journey Timeline & Event Provenance Audit Trail | — | gemini | DONE | #2788 merged `995b81e1`; wire CareJourneyTimelineEvent in types.ts, appendTimelineEvent in careEpisode.ts, deriveCareJourneyTimelineEvents pure projection in careContinuityProjection, timeline audit in CareContinuityPanel & CareEpisode, 16/16 exact-head CI workflows PASS |
 | T-CLIN-15 | Multi-Episode Longitudinal Patient Timeline & Cross-Journey Comorbidity Projection | — | gemini | IN_PROGRESS | wire linkedComorbidities in types.ts, linkEpisodeComorbidity in careEpisode.ts, derivePatientLongitudinalTimeline in careContinuityProjection, comorbidity & timeline metrics in CareContinuityPanel & CareEpisode, 17/17 contract tests PASS |
-| T-CLIN-16 | Prevent One OS proof from inventing vital-sign provenance when source is absent or blank | — | kimi | IN_REVIEW | #2779: fail-closed vital-provenance projection; missing-source control failed before the fix; explicit, missing and blank-source controls 3/3 PASS after the fix |
+| T-CLIN-16 | Prevent One OS proof from inventing vital-sign provenance when source is absent or blank | — | kimi | DONE | #2779 merged `bd3fc5f099a33404a16a2bd0ebbcc842650bc3b2`; reviewed head `a53b1a57c7c1c444cc239c5b7a5b0295d41a3145`, Stabilization run 40229629832 / job 121278469391 PASS; post-merge Stabilization 40255878808 PASS. Missing-source control failed before fix; explicit/missing/blank source controls pass. |
 
 ## Open PR triage snapshot (2026-10-23, main c57e22fc)
 
