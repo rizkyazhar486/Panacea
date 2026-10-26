@@ -132,6 +132,7 @@ const EXACT_SPACE_ROUTES: Readonly<Record<ProductSpaceId, readonly string[]>> = 
     '/bio-simulators', '/predictive-models-toolkit', '/reality-check', '/longevity',
     '/longevity-science', '/longevity-curriculum', '/longevity-game-center',
     '/wellness-hub', '/aesthetic', '/biological-age', '/architecture',
+    '/store', '/vault',
   ],
   community: ['/community', '/feed', '/messages', '/clubs', '/social'],
   system: [

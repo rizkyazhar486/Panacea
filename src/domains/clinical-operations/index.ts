@@ -104,6 +104,19 @@ export {
 
 export { PoliPatientFlowBoard } from './ui/PoliPatientFlowBoard'
 export { CareContinuityPanel, type CareContinuityPanelProps } from './ui/CareContinuityPanel'
+export { EdenLongitudinalInsightSection } from './ui/EdenLongitudinalInsightSection'
+
+export {
+  deriveEdenLongitudinalInsight,
+  formatEdenInsightDelta,
+  formatEdenInsightValue,
+  type EdenLongitudinalAccess,
+  type EdenLongitudinalChange,
+  type EdenLongitudinalInsight,
+  type EdenLongitudinalInsightSource,
+  type EdenPhysiologyReference,
+  type EdenSeparatedTruthClass,
+} from './model/edenLongitudinalInsight'
 
 export {
   evaluateResultClosure,
