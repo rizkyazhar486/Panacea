@@ -641,6 +641,38 @@ export interface EdenMultiModelRegenerationBridge {
   noAutonomousClinicalIntervention: true
 }
 
+export type EdenQuantumBioPhotonicDimension =
+  | 'mitochondrial_biophoton_flux'
+  | 'coherent_water_dynamics'
+  | 'chromatin_resonance_field'
+  | 'systemic_photonic_vitality'
+
+export type EdenQuantumPhotonicTrajectory =
+  | 'balanced_resonance'
+  | 'entropy_dominated'
+  | 'emerging_coherence'
+  | 'optimized_flux'
+
+export interface EdenQuantumBioPhotonicBridge {
+  version: 'v1'
+  episodeId: string
+  episodeTitle: string
+  primaryDimension: EdenQuantumBioPhotonicDimension
+  dimensionLabel: string
+  photonicTrajectory: EdenQuantumPhotonicTrajectory
+  photonicTrajectoryLabel: string
+  mitochondrialCoherenceScore: number
+  cellularResonanceIndex: number
+  quantumBiophotonicNarrativeId: string
+  quantumBiophotonicNarrativeEn: string
+  mechanisticGroundingId: string
+  mechanisticGroundingEn: string
+  transcendentLongevityTrajectory: string
+  quantumBioPhotonicFieldClass: 'mechanistic_simulation'
+  neverFabricatesBiomarkers: true
+  nonInterventionalResearchBoundary: true
+}
+
 export interface CareJourneyExportSummary {
   standard: 'PANACEA-CAREPLAN-FHIR-R4-V1'
   generatedAt: string
