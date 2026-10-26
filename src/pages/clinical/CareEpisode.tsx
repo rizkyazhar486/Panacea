@@ -28,6 +28,7 @@ import {
   deriveEdenProteostasisAutophagicFluxBridge,
   deriveEdenTelomericGenomicIntegrityBridge,
   deriveEdenSenescentInflammagingBridge,
+  deriveEdenRegenerativePlasticityBridge,
 } from '../../domains/clinical-operations'
 import {
   CARE_EPISODE_STAGES,
@@ -663,6 +664,9 @@ function EpisodeCard({
 
       {/* Eden Senescent Secretome & Inflammaging Attenuation Synthesizer (T-CLIN-41 / EDEN-21) */}
       <EdenSenescentInflammagingSection episode={episode} />
+
+      {/* Eden Stem Cell Niches & Regenerative Tissue Plasticity Synthesizer (T-CLIN-42 / EDEN-22) */}
+      <EdenRegenerativePlasticitySection episode={episode} />
     </Card>
   )
 }
@@ -2909,6 +2913,114 @@ function EdenSenescentInflammagingSection({ episode }: { episode: CareEpisode })
 
       <div className="mt-2 text-[10px] text-neutral-500 dark:text-white/50 text-right">
         ARGON EDEN ∞ §07 · Senescent Secretome & Inflammaging Attenuation Synthesizer · Patient Truth Uncompromised · Never Manufactures Biomarkers
+      </div>
+    </div>
+  )
+}
+
+function EdenRegenerativePlasticitySection({ episode }: { episode: CareEpisode }) {
+  const [lang, setLang] = useState<'id' | 'en'>('id')
+
+  const bridge = useMemo(
+    () => deriveEdenRegenerativePlasticityBridge(episode),
+    [episode]
+  )
+
+  const narrative = lang === 'id' ? bridge.regenerativeNarrativeId : bridge.regenerativeNarrativeEn
+
+  return (
+    <div
+      className="mt-3 rounded-xl border border-emerald-200 dark:border-white/10 bg-emerald-50/30 dark:bg-white/[0.02] p-3.5"
+      data-eden-regenerative-card="v1"
+    >
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+        <div>
+          <div className="flex items-center gap-2 flex-wrap">
+            <h4 className="text-xs font-bold text-neutral-900 dark:text-white">
+              Eden Stem Cell Niches & Regenerative Tissue Plasticity Synthesizer
+            </h4>
+            <Badge tone="brand">{bridge.stemCellNicheStateLabel}</Badge>
+            <Badge tone="normal">{bridge.plasticityLevelLabel}</Badge>
+            <Badge tone="normal">Plasticity: {bridge.regenerativePlasticityScore}%</Badge>
+            <Badge tone="normal">Niche Vitality: {bridge.stemNicheVitalityIndex}%</Badge>
+            <Badge tone="normal">Commitment: {bridge.lineageCommitmentCapacity}%</Badge>
+          </div>
+          <p className="mt-1 text-xs font-medium text-neutral-800 dark:text-white/85">
+            {narrative}
+          </p>
+        </div>
+        <div className="flex items-center gap-1 shrink-0">
+          <button
+            type="button"
+            onClick={() => setLang('id')}
+            className={`rounded-md px-2 py-0.5 text-[11px] font-medium transition-colors ${
+              lang === 'id'
+                ? 'bg-emerald-600 text-white font-bold'
+                : 'bg-white/80 dark:bg-white/5 text-neutral-700 dark:text-white/70 hover:bg-emerald-100/50'
+            }`}
+          >
+            Bahasa
+          </button>
+          <button
+            type="button"
+            onClick={() => setLang('en')}
+            className={`rounded-md px-2 py-0.5 text-[11px] font-medium transition-colors ${
+              lang === 'en'
+                ? 'bg-emerald-600 text-white font-bold'
+                : 'bg-white/80 dark:bg-white/5 text-neutral-700 dark:text-white/70 hover:bg-emerald-100/50'
+            }`}
+          >
+            English
+          </button>
+        </div>
+      </div>
+
+      <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2" data-eden-stem-niche-nodes="v1">
+        {bridge.nicheNodes.map((n) => {
+          const renewalPct = Math.round(n.renewalCapacityScore * 100)
+          const fidelityPct = Math.round(n.lineageFidelityIndex * 100)
+          return (
+            <div
+              key={n.nicheKind}
+              className="rounded-lg border border-emerald-200/50 dark:border-white/10 bg-white/70 dark:bg-white/[0.03] p-2.5"
+            >
+              <div className="text-[11px] font-bold text-neutral-900 dark:text-white truncate">
+                {n.nicheLabel}
+              </div>
+              <div className="mt-1 flex items-baseline justify-between">
+                <span className="text-base font-extrabold text-emerald-800 dark:text-emerald-300">
+                  {renewalPct}% <span className="text-[10px] font-normal text-neutral-500 dark:text-white/50">{lang === 'id' ? 'pembaruan' : 'renewal'}</span>
+                </span>
+                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
+                  n.nicheHomeostasisStatus === 'optimal_asymmetric_balance'
+                    ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300'
+                    : n.nicheHomeostasisStatus === 'stress_accelerated_differentiation'
+                    ? 'bg-rose-100 text-rose-800 dark:bg-rose-950/60 dark:text-rose-300'
+                    : 'bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300'
+                }`}>
+                  Fidelity {fidelityPct}%
+                </span>
+              </div>
+              <div className="mt-1 text-[10px] text-neutral-600 dark:text-white/60">
+                {lang === 'id' ? 'Status Homeostasis:' : 'Homeostasis Status:'} {n.nicheHomeostasisStatus}
+              </div>
+              <div className="mt-1 text-[9px] text-neutral-500 dark:text-white/50 italic line-clamp-2">
+                {n.mechanisticNote}
+              </div>
+            </div>
+          )
+        })}
+      </div>
+
+      <div className="mt-2.5 rounded-lg border border-emerald-200/40 dark:border-white/10 bg-emerald-100/30 dark:bg-white/[0.02] p-2.5 text-xs space-y-1">
+        <div className="text-[11px] text-neutral-800 dark:text-white/85">
+          <b>{lang === 'id' ? 'Strategi Niche Sel Punca & Plastisitas Jaringan:' : 'Stem Cell Niche & Tissue Plasticity Strategy:'}</b>{' '}
+          {bridge.stemCellRegenerativeStrategy}
+        </div>
+      </div>
+
+      <div className="mt-2 text-[10px] text-neutral-500 dark:text-white/50 text-right">
+        ARGON EDEN ∞ §07 · Stem Cell Niches & Regenerative Tissue Plasticity Synthesizer · Patient Truth Uncompromised · Never Manufactures Biomarkers
       </div>
     </div>
   )

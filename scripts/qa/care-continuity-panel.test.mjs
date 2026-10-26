@@ -33,6 +33,7 @@ import {
   deriveEdenProteostasisAutophagicFluxBridge,
   deriveEdenTelomericGenomicIntegrityBridge,
   deriveEdenSenescentInflammagingBridge,
+  deriveEdenRegenerativePlasticityBridge,
   translateClinicalTermToEden,
   EDEN_PLAIN_LANGUAGE_GLOSSARY,
 } from '../../src/domains/clinical-operations/model/careContinuityProjection.ts'
@@ -3109,4 +3110,83 @@ test('deriveEdenSenescentInflammagingBridge & CareEpisode: Eden Senescent Secret
   const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
   assert.ok(episodeSource.includes('data-eden-senescent-card="v1"'), 'CareEpisode must include senescent card')
   assert.ok(episodeSource.includes('data-eden-surveillance-nodes="v1"'), 'CareEpisode must include surveillance nodes grid')
+})
+
+test('deriveEdenRegenerativePlasticityBridge & CareEpisode: Eden Stem Cell Niches & Regenerative Tissue Plasticity Synthesizer (T-CLIN-42 / EDEN-22)', () => {
+  const evaluatedAt = '2026-10-26T16:00:00.000Z'
+  const sampleEpisode = {
+    id: 'ce_stem_cell_1',
+    title: 'Stem Cell Niche Preservation & Pluripotent Regenerative Plasticity',
+    diagnosisCode: 'Z00.00',
+    createdAt: '2026-10-20T08:00:00.000Z',
+    updatedAt: '2026-10-26T08:00:00.000Z',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'diagnosis', status: 'done' },
+      { stage: 'treatment', status: 'done' },
+      { stage: 'recovery', status: 'active' },
+    ],
+  }
+
+  // 1. Pure deterministic derivation
+  const bridge = deriveEdenRegenerativePlasticityBridge(sampleEpisode)
+  assert.equal(bridge.version, 'v1')
+  assert.equal(bridge.episodeId, 'ce_stem_cell_1')
+  assert.equal(bridge.stemCellNicheState, 'balanced_asymmetric_self_renewal')
+  assert.equal(bridge.stemCellNicheStateLabel, 'Pembaruan Asimetris Seimbang & Homeostasis Optimal')
+  assert.equal(bridge.plasticityLevel, 'high_fidelity_pluripotent_plasticity')
+  assert.equal(bridge.plasticityLevelLabel, 'Plastisitas Regeneratif & Diferensiasi Presisi Tinggi')
+  assert.ok(bridge.regenerativePlasticityScore >= 80 && bridge.regenerativePlasticityScore <= 99)
+  assert.ok(bridge.stemNicheVitalityIndex >= 80 && bridge.stemNicheVitalityIndex <= 98)
+  assert.ok(bridge.lineageCommitmentCapacity >= 80 && bridge.lineageCommitmentCapacity <= 98)
+  assert.equal(bridge.nicheNodes.length, 4)
+  assert.equal(bridge.nicheNodes[0].nicheKind, 'hematopoietic_bone_marrow_niche')
+  assert.equal(bridge.nicheNodes[1].nicheKind, 'intestinal_crypt_lgr5_niche')
+  assert.equal(bridge.nicheNodes[2].nicheKind, 'neural_subventricular_niche')
+  assert.equal(bridge.nicheNodes[3].nicheKind, 'skeletal_muscle_satellite_niche')
+  assert.equal(bridge.truthClass, 'stem_cell_niche_simulation_proxy')
+  assert.equal(bridge.clinically_reviewed, false)
+  assert.equal(bridge.patientTruthUncompromised, true)
+  assert.equal(bridge.neverManufacturesBiomarkers, true)
+  assert.equal(bridge.epistemicHumilityPreserved, true)
+  assert.ok(bridge.regenerativeNarrativeId.includes('Sintesis sel punca & plastisitas regeneratif'))
+  assert.ok(bridge.regenerativeNarrativeEn.includes('Stem cell niches & regenerative tissue plasticity'))
+  assert.ok(bridge.stemCellRegenerativeStrategy.includes('Pertahankan pembaruan asimetris optimal'))
+
+  // 2. Blocked stage resilience check
+  const blockedEpisode = {
+    id: 'ce_stem_cell_blocked',
+    title: 'Severe Niche Exhaustion & Fibrotic Metaplastic Strain',
+    diagnosisCode: 'K74.6',
+    createdAt: '2026-10-20T08:00:00.000Z',
+    updatedAt: '2026-10-26T08:00:00.000Z',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'diagnosis', status: 'blocked', blockedReason: 'Awaiting bone marrow biopsy and niche microenvironment panel' },
+    ],
+  }
+  const blockedBridge = deriveEdenRegenerativePlasticityBridge(blockedEpisode)
+  assert.equal(blockedBridge.stemCellNicheState, 'niche_exhaustion_depletion_risk')
+  assert.equal(blockedBridge.stemCellNicheStateLabel, 'Risiko Penipisan Niche Akibat Tekanan Sistemik')
+  assert.equal(blockedBridge.plasticityLevel, 'fibrotic_metaplastic_divergence')
+  assert.equal(blockedBridge.plasticityLevelLabel, 'Divergensi Fibrotik / Metaplastik Reaktif')
+  assert.ok(blockedBridge.regenerativePlasticityScore <= 65)
+  assert.ok(blockedBridge.stemNicheVitalityIndex <= 62)
+  assert.ok(blockedBridge.stemCellRegenerativeStrategy.includes('Lindungi reservoir sel punca'))
+
+  // 3. Rollup in evaluateCareJourneyContinuity
+  const projection = evaluateCareJourneyContinuity([sampleEpisode, blockedEpisode], evaluatedAt)
+  assert.equal(projection.edenRegenerativePlasticityReadyCount, 2)
+  assert.ok(projection.episodes[0].edenRegenerativePlasticity)
+  assert.equal(projection.episodes[0].edenRegenerativePlasticity.truthClass, 'stem_cell_niche_simulation_proxy')
+  assert.equal(projection.episodes[0].edenRegenerativePlasticity.patientTruthUncompromised, true)
+  assert.equal(projection.episodes[0].edenRegenerativePlasticity.neverManufacturesBiomarkers, true)
+
+  // 4. UI contracts
+  const panelSource = read('src/domains/clinical-operations/ui/CareContinuityPanel.tsx')
+  assert.ok(panelSource.includes('data-eden-regenerative-plasticity="v1"'), 'CareContinuityPanel must include regenerative-plasticity attribute')
+
+  const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
+  assert.ok(episodeSource.includes('data-eden-regenerative-card="v1"'), 'CareEpisode must include regenerative card')
+  assert.ok(episodeSource.includes('data-eden-stem-niche-nodes="v1"'), 'CareEpisode must include stem niche nodes grid')
 })
