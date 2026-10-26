@@ -253,6 +253,8 @@ export interface CareEpisode {
   edenDepthPreference?: EdenDisclosureDepth
   // Eden universal language preference (T-CLIN-29 / EDEN-09)
   edenLanguagePreference?: EdenLanguageCode
+  // Eden real-world wellness exposures & restorative environment (T-CLIN-30 / EDEN-10)
+  wellnessExposures?: Record<string, WellnessDay>
 }
 
 export type CareJourneyTimelineEventKind =
@@ -560,6 +562,47 @@ export interface EdenUniversalAcceptanceBridge {
   }
   canonicalPatientTruthPreserved: true
   noFalseUniversalValidationClaim: true
+}
+
+export type EdenRestorativeExposureKind =
+  | 'morning_sunlight'
+  | 'circadian_serenity'
+  | 'nature_immersion'
+  | 'thermal_hydro_recovery'
+  | 'clean_hydration'
+
+export interface EdenRestorativeExposureSummary {
+  kind: EdenRestorativeExposureKind
+  label: string
+  loggedDaysCount: number
+  latestValueLabel: string
+  restorativeState: 'active' | 'nurturing' | 'unlogged'
+}
+
+export type EdenAstralResonanceDimension =
+  | 'cellular_light'
+  | 'circadian_cycles'
+  | 'earth_grounding'
+  | 'cosmic_peace'
+
+export interface EdenAstralWonderPerspective {
+  dimension: EdenAstralResonanceDimension
+  title: string
+  wonderDescription: string
+  scientificGrounding: string
+}
+
+export interface EdenRestorativeEnvironmentBridge {
+  version: 'v1'
+  episodeId: string
+  episodeTitle: string
+  totalLoggedExposureDays: number
+  exposures: EdenRestorativeExposureSummary[]
+  circadianAlignmentStage: 'morning_rhythm' | 'daylight_active' | 'evening_calm' | 'deep_rest_unknown'
+  astralPerspectives: EdenAstralWonderPerspective[]
+  cosmicBioHarmonyNarrative: string
+  neverFabricatesUnloggedExposures: true
+  nonPrescriptiveEducationalBoundary: true
 }
 
 export interface CareJourneyExportSummary {

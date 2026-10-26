@@ -22,6 +22,7 @@ import {
   deriveEdenVisitPreparationCompanion,
   deriveEdenReflectionSanctuaryBridge,
   deriveEdenUniversalAcceptanceBridge,
+  deriveEdenRestorativeEnvironmentBridge,
   translateClinicalTermToEden,
   EDEN_PLAIN_LANGUAGE_GLOSSARY,
 } from '../../src/domains/clinical-operations/model/careContinuityProjection.ts'
@@ -2285,4 +2286,84 @@ test('deriveEdenUniversalAcceptanceBridge & CareEpisode: Eden Universal Human Ac
   const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
   assert.ok(episodeSource.includes('data-eden-universal-acceptance-card="v1"'), 'CareEpisode must include Eden universal acceptance card')
   assert.ok(episodeSource.includes('data-eden-language-switcher="v1"'), 'CareEpisode must include Eden language switcher')
+})
+
+test('deriveEdenRestorativeEnvironmentBridge & CareEpisode: Eden Restorative Environment, Bio-Photonic Exposure & Cosmic Wonder Synthesis Bridge (T-CLIN-30 / EDEN-10)', () => {
+  const evaluatedAt = '2026-10-26T07:45:00.000Z'
+
+  const sampleEpisode = {
+    id: 'ce_restorative_1',
+    title: 'Metabolic Optimization & Longevity Journey',
+    diagnosisCode: 'E11.9',
+    createdAt: '2026-10-15T08:00:00.000Z',
+    updatedAt: '2026-10-25T08:00:00.000Z',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'diagnosis', status: 'done' },
+      { stage: 'treatment', status: 'active' },
+    ],
+  }
+
+  // 1. Negative control: Empty wellness logs returns honest unlogged states without fabricating data
+  const emptyBridge = deriveEdenRestorativeEnvironmentBridge(sampleEpisode, {})
+  assert.equal(emptyBridge.totalLoggedExposureDays, 0)
+  assert.equal(emptyBridge.neverFabricatesUnloggedExposures, true)
+  assert.equal(emptyBridge.nonPrescriptiveEducationalBoundary, true)
+  assert.equal(emptyBridge.exposures.every((e) => e.restorativeState === 'unlogged'), true)
+  assert.equal(emptyBridge.astralPerspectives.length, 4)
+
+  // 2. Positive control: Real logged wellness exposures
+  const sampleWellness = {
+    '2026-10-24': {
+      date: '2026-10-24',
+      sunDone: true,
+      sunHr: 0.5,
+      sleepHr: 7.5,
+      waterMl: 2200,
+      exerciseMin: 30,
+      catatan: 'Sesi sauna sore 15 menit dan jalan santai',
+    },
+    '2026-10-25': {
+      date: '2026-10-25',
+      sunDone: true,
+      sunHr: 1.0,
+      sleepHr: 8.0,
+      waterMl: 2500,
+      exerciseMin: 45,
+    },
+  }
+
+  const activeBridge = deriveEdenRestorativeEnvironmentBridge(sampleEpisode, sampleWellness)
+  assert.equal(activeBridge.totalLoggedExposureDays, 2)
+  assert.equal(activeBridge.neverFabricatesUnloggedExposures, true)
+  assert.equal(activeBridge.nonPrescriptiveEducationalBoundary, true)
+
+  const sunExp = activeBridge.exposures.find((e) => e.kind === 'morning_sunlight')
+  assert.equal(sunExp.loggedDaysCount, 2)
+  assert.equal(sunExp.restorativeState, 'active')
+  assert.ok(sunExp.latestValueLabel.includes('1 jam'))
+
+  const hydroExp = activeBridge.exposures.find((e) => e.kind === 'clean_hydration')
+  assert.equal(hydroExp.loggedDaysCount, 2)
+  assert.ok(hydroExp.latestValueLabel.includes('2500 mL'))
+
+  const thermalExp = activeBridge.exposures.find((e) => e.kind === 'thermal_hydro_recovery')
+  assert.equal(thermalExp.loggedDaysCount, 1)
+  assert.equal(thermalExp.restorativeState, 'nurturing')
+
+  // 3. Rollup in evaluateCareJourneyContinuity
+  const epWithExposures = { ...sampleEpisode, wellnessExposures: sampleWellness }
+  const projection = evaluateCareJourneyContinuity([epWithExposures], evaluatedAt)
+  assert.equal(projection.edenRestorativeReadyCount, 1)
+  assert.ok(projection.episodes[0].edenRestorativeEnvironment)
+  assert.equal(projection.episodes[0].edenRestorativeEnvironment.totalLoggedExposureDays, 2)
+  assert.equal(projection.episodes[0].edenRestorativeEnvironment.neverFabricatesUnloggedExposures, true)
+
+  // 4. UI contracts
+  const panelSource = read('src/domains/clinical-operations/ui/CareContinuityPanel.tsx')
+  assert.ok(panelSource.includes('data-eden-restorative-environment="v1"'), 'CareContinuityPanel must include Eden restorative environment attribute')
+
+  const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
+  assert.ok(episodeSource.includes('data-eden-restorative-environment-card="v1"'), 'CareEpisode must include Eden restorative environment card')
+  assert.ok(episodeSource.includes('data-eden-astral-perspectives="v1"'), 'CareEpisode must include Eden astral perspectives selector')
 })
