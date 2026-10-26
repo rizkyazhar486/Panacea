@@ -897,6 +897,56 @@ export interface EdenCircadianMitochondrialHarmonizerBridge {
   epistemicHumilityPreserved: true
 }
 
+// Eden Regenerative Proteostasis & Autophagic Flux Clearance Synthesizer (T-CLIN-39 / EDEN-19)
+export type EdenProteostasisState =
+  | 'proteolytic_equilibrium'
+  | 'chaperone_assisted_refolding'
+  | 'er_stress_adaptive_upr'
+  | 'proteasomal_overload_risk'
+
+export type EdenAutophagicFluxRate =
+  | 'high_flux_regenerative'
+  | 'basal_physiological_turnover'
+  | 'attenuated_lysosomal_clearance'
+  | 'blocked_autophagosome_degradation'
+
+export type EdenProteostasisNodeKind =
+  | 'ubiquitin_proteasome_system'
+  | 'molecular_chaperone_network'
+  | 'macroautophagy_lysosomal_flux'
+  | 'chaperone_mediated_autophagy'
+
+export interface EdenProteostasisNode {
+  nodeKind: EdenProteostasisNodeKind
+  nodeLabel: string
+  efficiencyScore: number
+  clearanceLatencyHours: number
+  capacityStatus: 'optimal_throughput' | 'compensated_strain' | 'impaired_clearance'
+  mechanisticNote: string
+}
+
+export interface EdenProteostasisAutophagicFluxBridge {
+  version: 'v1'
+  episodeId: string
+  episodeTitle: string
+  proteostasisState: EdenProteostasisState
+  proteostasisStateLabel: string
+  autophagicFluxRate: EdenAutophagicFluxRate
+  autophagicFluxRateLabel: string
+  cellularClearanceIndex: number
+  chaperoneBufferingCapacityScore: number
+  lysosomalResilienceScore: number
+  proteostasisNodes: EdenProteostasisNode[]
+  proteostasisNarrativeId: string
+  proteostasisNarrativeEn: string
+  proteostaticRegenerativeStrategy: string
+  truthClass: 'molecular_proteostasis_simulation_proxy'
+  clinically_reviewed: false
+  patientTruthUncompromised: true
+  neverManufacturesBiomarkers: true
+  epistemicHumilityPreserved: true
+}
+
 export interface CareJourneyExportSummary {
   standard: 'PANACEA-CAREPLAN-FHIR-R4-V1'
   generatedAt: string

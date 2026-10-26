@@ -30,6 +30,7 @@ import {
   deriveEdenMultiAgentHealingCouncilBridge,
   deriveEdenBioHarmonicWaveformBridge,
   deriveEdenCircadianMitochondrialHarmonizerBridge,
+  deriveEdenProteostasisAutophagicFluxBridge,
   translateClinicalTermToEden,
   EDEN_PLAIN_LANGUAGE_GLOSSARY,
 } from '../../src/domains/clinical-operations/model/careContinuityProjection.ts'
@@ -2871,4 +2872,82 @@ test('deriveEdenCircadianMitochondrialHarmonizerBridge & CareEpisode: Eden Circa
   const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
   assert.ok(episodeSource.includes('data-eden-circadian-card="v1"'), 'CareEpisode must include circadian card')
   assert.ok(episodeSource.includes('data-eden-peripheral-clocks="v1"'), 'CareEpisode must include peripheral clocks grid')
+})
+
+test('deriveEdenProteostasisAutophagicFluxBridge & CareEpisode: Eden Regenerative Proteostasis & Autophagic Flux Clearance Synthesizer (T-CLIN-39 / EDEN-19)', () => {
+  const evaluatedAt = '2026-10-26T12:00:00.000Z'
+  const sampleEpisode = {
+    id: 'ce_proteostasis_1',
+    title: 'Cellular Proteome Integrity & Autophagic Clearance Journey',
+    diagnosisCode: 'M35.9',
+    createdAt: '2026-10-20T08:00:00.000Z',
+    updatedAt: '2026-10-26T08:00:00.000Z',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'diagnosis', status: 'done' },
+      { stage: 'treatment', status: 'done' },
+      { stage: 'recovery', status: 'active' },
+    ],
+  }
+
+  // 1. Pure deterministic derivation
+  const bridge = deriveEdenProteostasisAutophagicFluxBridge(sampleEpisode)
+  assert.equal(bridge.version, 'v1')
+  assert.equal(bridge.episodeId, 'ce_proteostasis_1')
+  assert.equal(bridge.proteostasisState, 'proteolytic_equilibrium')
+  assert.equal(bridge.proteostasisStateLabel, 'Harmoni Proteolitik & Lipatan Protein Optimal')
+  assert.equal(bridge.autophagicFluxRate, 'high_flux_regenerative')
+  assert.equal(bridge.autophagicFluxRateLabel, 'Fluks Autofagi Regeneratif Tinggi')
+  assert.ok(bridge.cellularClearanceIndex >= 75 && bridge.cellularClearanceIndex <= 99)
+  assert.ok(bridge.chaperoneBufferingCapacityScore >= 77 && bridge.chaperoneBufferingCapacityScore <= 98)
+  assert.ok(bridge.lysosomalResilienceScore >= 73 && bridge.lysosomalResilienceScore <= 99)
+  assert.equal(bridge.proteostasisNodes.length, 4)
+  assert.equal(bridge.proteostasisNodes[0].nodeKind, 'ubiquitin_proteasome_system')
+  assert.equal(bridge.proteostasisNodes[1].nodeKind, 'molecular_chaperone_network')
+  assert.equal(bridge.proteostasisNodes[2].nodeKind, 'macroautophagy_lysosomal_flux')
+  assert.equal(bridge.proteostasisNodes[3].nodeKind, 'chaperone_mediated_autophagy')
+  assert.equal(bridge.truthClass, 'molecular_proteostasis_simulation_proxy')
+  assert.equal(bridge.clinically_reviewed, false)
+  assert.equal(bridge.patientTruthUncompromised, true)
+  assert.equal(bridge.neverManufacturesBiomarkers, true)
+  assert.equal(bridge.epistemicHumilityPreserved, true)
+  assert.ok(bridge.proteostasisNarrativeId.includes('Sintesis proteostasis'))
+  assert.ok(bridge.proteostasisNarrativeEn.includes('Regenerative proteostasis'))
+  assert.ok(bridge.proteostaticRegenerativeStrategy.includes('Pertahankan fluks autofagi'))
+
+  // 2. Blocked stage resilience check
+  const blockedEpisode = {
+    id: 'ce_proteostasis_blocked',
+    title: 'Severe ER Stress & Protein Aggregation Overload',
+    diagnosisCode: 'G31.84',
+    createdAt: '2026-10-20T08:00:00.000Z',
+    updatedAt: '2026-10-26T08:00:00.000Z',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'diagnosis', status: 'blocked', blockedReason: 'Awaiting specialized cerebrospinal fluid biomarker panel' },
+    ],
+  }
+  const blockedBridge = deriveEdenProteostasisAutophagicFluxBridge(blockedEpisode)
+  assert.equal(blockedBridge.proteostasisState, 'er_stress_adaptive_upr')
+  assert.equal(blockedBridge.proteostasisStateLabel, 'Respons Stres Retikulum Endoplasma Adaptif (UPR)')
+  assert.equal(blockedBridge.autophagicFluxRate, 'attenuated_lysosomal_clearance')
+  assert.equal(blockedBridge.autophagicFluxRateLabel, 'Pembersihan Lisosomal Tertekan')
+  assert.ok(blockedBridge.cellularClearanceIndex <= 65)
+  assert.ok(blockedBridge.proteostaticRegenerativeStrategy.includes('Kurangi beban proteasom'))
+
+  // 3. Rollup in evaluateCareJourneyContinuity
+  const projection = evaluateCareJourneyContinuity([sampleEpisode, blockedEpisode], evaluatedAt)
+  assert.equal(projection.edenProteostasisAutophagicFluxReadyCount, 2)
+  assert.ok(projection.episodes[0].edenProteostasisAutophagicFlux)
+  assert.equal(projection.episodes[0].edenProteostasisAutophagicFlux.truthClass, 'molecular_proteostasis_simulation_proxy')
+  assert.equal(projection.episodes[0].edenProteostasisAutophagicFlux.patientTruthUncompromised, true)
+  assert.equal(projection.episodes[0].edenProteostasisAutophagicFlux.neverManufacturesBiomarkers, true)
+
+  // 4. UI contracts
+  const panelSource = read('src/domains/clinical-operations/ui/CareContinuityPanel.tsx')
+  assert.ok(panelSource.includes('data-eden-proteostasis-flux="v1"'), 'CareContinuityPanel must include proteostasis-flux attribute')
+
+  const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
+  assert.ok(episodeSource.includes('data-eden-proteostasis-card="v1"'), 'CareEpisode must include proteostasis card')
+  assert.ok(episodeSource.includes('data-eden-proteostasis-nodes="v1"'), 'CareEpisode must include proteostasis nodes grid')
 })

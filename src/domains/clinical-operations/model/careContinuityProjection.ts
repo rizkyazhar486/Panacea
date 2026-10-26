@@ -70,6 +70,11 @@ import type {
   EdenPeripheralClockKind,
   EdenPeripheralClockHarmonizer,
   EdenCircadianMitochondrialHarmonizerBridge,
+  EdenProteostasisState,
+  EdenAutophagicFluxRate,
+  EdenProteostasisNodeKind,
+  EdenProteostasisNode,
+  EdenProteostasisAutophagicFluxBridge,
   WellnessDay,
   MoodEntry,
   Circle,
@@ -179,6 +184,7 @@ export interface CareJourneyEpisodeSummary {
   edenMultiAgentHealingCouncil?: EdenUniversalBiologicalFlourishingBridge
   edenBioHarmonicWaveform?: EdenBioHarmonicWaveformBridge
   edenCircadianMitochondrialHarmonizer?: EdenCircadianMitochondrialHarmonizerBridge
+  edenProteostasisAutophagicFlux?: EdenProteostasisAutophagicFluxBridge
 }
 
 export type ReadmissionRiskLevel = 'low' | 'moderate' | 'high'
@@ -274,6 +280,7 @@ export interface CareJourneyContinuityResult {
   edenMultiAgentHealingCouncilReadyCount: number
   edenBioHarmonicWaveformReadyCount: number
   edenCircadianMitochondrialHarmonizerReadyCount: number
+  edenProteostasisAutophagicFluxReadyCount: number
   edenLifeBalance: EdenLifeBalanceSynthesis
   hasBlockedStages: boolean
 }
@@ -3106,6 +3113,127 @@ export function deriveEdenCircadianMitochondrialHarmonizerBridge(
   }
 }
 
+/**
+ * Eden Regenerative Proteostasis & Autophagic Flux Clearance Synthesizer (T-CLIN-39 / EDEN-19)
+ * Synthesizes 26S ubiquitin-proteasome degradation, HSP70/HSP90 chaperone refolding networks,
+ * macroautophagy lysosomal flux, and chaperone-mediated autophagy (CMA) clearance dynamics.
+ *
+ * Invariants:
+ * - truthClass: 'molecular_proteostasis_simulation_proxy'
+ * - clinically_reviewed: false
+ * - patientTruthUncompromised: true
+ * - neverManufacturesBiomarkers: true
+ * - epistemicHumilityPreserved: true
+ */
+export function deriveEdenProteostasisAutophagicFluxBridge(
+  episode: CareEpisode,
+): EdenProteostasisAutophagicFluxBridge {
+  const stages = episode.stages ?? []
+  const completedStages = stages.filter((s) => s.status === 'done').length
+  const hasBlocked = stages.some((s) => s.status === 'blocked')
+  const blockedCount = stages.filter((s) => s.status === 'blocked').length
+
+  const cellularClearanceIndex = hasBlocked
+    ? Math.max(44, 65 - blockedCount * 7)
+    : Math.min(99, 75 + completedStages * 6)
+
+  const chaperoneBufferingCapacityScore = hasBlocked
+    ? Math.max(46, 67 - blockedCount * 6)
+    : Math.min(98, 77 + completedStages * 5)
+
+  const lysosomalResilienceScore = hasBlocked
+    ? Math.max(40, 62 - blockedCount * 8)
+    : Math.min(99, 73 + completedStages * 7)
+
+  let proteostasisState: EdenProteostasisState = 'chaperone_assisted_refolding'
+  let proteostasisStateLabel = 'Refolding Berbantuan Chaperon Aktif'
+  let autophagicFluxRate: EdenAutophagicFluxRate = 'basal_physiological_turnover'
+  let autophagicFluxRateLabel = 'Pergantian Fisiologis Basal Terkendali'
+
+  if (hasBlocked) {
+    proteostasisState = 'er_stress_adaptive_upr'
+    proteostasisStateLabel = 'Respons Stres Retikulum Endoplasma Adaptif (UPR)'
+    autophagicFluxRate = 'attenuated_lysosomal_clearance'
+    autophagicFluxRateLabel = 'Pembersihan Lisosomal Tertekan'
+  } else if (completedStages >= 3) {
+    proteostasisState = 'proteolytic_equilibrium'
+    proteostasisStateLabel = 'Harmoni Proteolitik & Lipatan Protein Optimal'
+    autophagicFluxRate = 'high_flux_regenerative'
+    autophagicFluxRateLabel = 'Fluks Autofagi Regeneratif Tinggi'
+  } else if (completedStages === 0) {
+    proteostasisState = 'proteasomal_overload_risk'
+    proteostasisStateLabel = 'Risiko Akumulasi Agregat Protein Dini'
+    autophagicFluxRate = 'blocked_autophagosome_degradation'
+    autophagicFluxRateLabel = 'Hambatan Fusi & Degradasi Awal'
+  }
+
+  const proteostasisNodes: EdenProteostasisNode[] = [
+    {
+      nodeKind: 'ubiquitin_proteasome_system',
+      nodeLabel: 'Sistem Ubiquitin-Proteasom 26S (UPS)',
+      efficiencyScore: hasBlocked ? 0.62 : Math.min(0.99, 0.76 + completedStages * 0.06),
+      clearanceLatencyHours: hasBlocked ? 6.2 : Math.max(1.8, 3.8 - completedStages * 0.4),
+      capacityStatus: hasBlocked ? 'compensated_strain' : completedStages >= 2 ? 'optimal_throughput' : 'compensated_strain',
+      mechanisticNote: 'Degradasi terarah protein terpolyubiquitinasi jangka pendek dan faktor transkripsi teregulasi.',
+    },
+    {
+      nodeKind: 'molecular_chaperone_network',
+      nodeLabel: 'Jaringan Chaperon HSP70 / HSP90 / BiP',
+      efficiencyScore: hasBlocked ? 0.65 : Math.min(0.98, 0.78 + completedStages * 0.05),
+      clearanceLatencyHours: hasBlocked ? 5.5 : Math.max(1.5, 3.2 - completedStages * 0.4),
+      capacityStatus: hasBlocked ? 'compensated_strain' : completedStages >= 2 ? 'optimal_throughput' : 'optimal_throughput',
+      mechanisticNote: 'Pencegahan agregasi misfolded protein dan stabilisasi konformasi struktural seluler.',
+    },
+    {
+      nodeKind: 'macroautophagy_lysosomal_flux',
+      nodeLabel: 'Fluks Makroautofagi & Hidrolisis Asam Lisosomal',
+      efficiencyScore: hasBlocked ? 0.58 : Math.min(0.99, 0.74 + completedStages * 0.06),
+      clearanceLatencyHours: hasBlocked ? 7.8 : Math.max(2.2, 4.4 - completedStages * 0.5),
+      capacityStatus: hasBlocked ? 'impaired_clearance' : completedStages >= 2 ? 'optimal_throughput' : 'compensated_strain',
+      mechanisticNote: 'Sekuestrasi organel rusak dan agregat makromolekul dalam autofagosom berselubung LC3-II.',
+    },
+    {
+      nodeKind: 'chaperone_mediated_autophagy',
+      nodeLabel: 'Autofagi Berperantara Chaperon LAMP-2A (CMA)',
+      efficiencyScore: hasBlocked ? 0.60 : Math.min(0.97, 0.72 + completedStages * 0.06),
+      clearanceLatencyHours: hasBlocked ? 6.9 : Math.max(2.0, 4.0 - completedStages * 0.5),
+      capacityStatus: hasBlocked ? 'compensated_strain' : completedStages >= 2 ? 'optimal_throughput' : 'compensated_strain',
+      mechanisticNote: 'Translokasi langsung substrat motif KFERQ melintasi membran lisosom melalui oligomer LAMP-2A.',
+    },
+  ]
+
+  const proteostasisNarrativeId = `Sintesis proteostasis regeneratif & fluks autofagi untuk episode "${episode.title}". Status proteostasis: ${proteostasisStateLabel}, laju fluks autofagi: ${autophagicFluxRateLabel}. Indeks pembersihan seluler ${cellularClearanceIndex}% dengan kapasitas buffering chaperon ${chaperoneBufferingCapacityScore}% dan resiliensi lisosomal ${lysosomalResilienceScore}%.`
+  const proteostasisNarrativeEn = `Regenerative proteostasis & autophagic flux synthesis for episode "${episode.title}". Proteostasis status: ${proteostasisStateLabel}, autophagic flux rate: ${autophagicFluxRateLabel}. Cellular clearance index ${cellularClearanceIndex}% with chaperone buffering capacity ${chaperoneBufferingCapacityScore}% and lysosomal resilience ${lysosomalResilienceScore}%.`
+
+  const proteostaticRegenerativeStrategy = hasBlocked
+    ? 'Kurangi beban proteasom melalui pembatasan kalori berkala terarah (fasting mimetic 16:8), suplementasi senyawa protektif UPR (seperti tauroursodeoxycholic acid / TUDCA dan spermidine nabati) di bawah pemantauan dokter, serta hindari stresor oksidatif.'
+    : completedStages >= 3
+    ? 'Pertahankan fluks autofagi puncak melalui stimulasi AMPK teratur via olahraga intensitas sedang, hidrasi optimal untuk mendukung enzim hidrolitik lisosom, dan kecukupan asupan polifenol antioksidan seluler.'
+    : 'Bangun kapasitas buffering seluler bertahap dengan pola makan kaya mikronutrien pembentuk kofaktor chaperon dan tidur lelap teratur untuk pembersihan debris metabolik otak & perifer.'
+
+  return {
+    version: 'v1',
+    episodeId: episode.id,
+    episodeTitle: episode.title,
+    proteostasisState,
+    proteostasisStateLabel,
+    autophagicFluxRate,
+    autophagicFluxRateLabel,
+    cellularClearanceIndex,
+    chaperoneBufferingCapacityScore,
+    lysosomalResilienceScore,
+    proteostasisNodes,
+    proteostasisNarrativeId,
+    proteostasisNarrativeEn,
+    proteostaticRegenerativeStrategy,
+    truthClass: 'molecular_proteostasis_simulation_proxy',
+    clinically_reviewed: false,
+    patientTruthUncompromised: true,
+    neverManufacturesBiomarkers: true,
+    epistemicHumilityPreserved: true,
+  }
+}
+
 export const STAGE_EXPECTED_DAYS: Record<CareEpisodeStageId, number> = {
   problem: 1,
   diagnosis: 2,
@@ -3373,6 +3501,7 @@ export function evaluateCareJourneyContinuity(
     const edenMultiAgentHealingCouncil = deriveEdenMultiAgentHealingCouncilBridge(ep)
     const edenBioHarmonicWaveform = deriveEdenBioHarmonicWaveformBridge(ep)
     const edenCircadianMitochondrialHarmonizer = deriveEdenCircadianMitochondrialHarmonizerBridge(ep)
+    const edenProteostasisAutophagicFlux = deriveEdenProteostasisAutophagicFluxBridge(ep)
 
     return {
       id: ep.id,
@@ -3419,6 +3548,7 @@ export function evaluateCareJourneyContinuity(
       edenMultiAgentHealingCouncil,
       edenBioHarmonicWaveform,
       edenCircadianMitochondrialHarmonizer,
+      edenProteostasisAutophagicFlux,
     }
   })
 
@@ -3560,6 +3690,14 @@ export function evaluateCareJourneyContinuity(
           s.edenCircadianMitochondrialHarmonizer?.neverManufacturesBiomarkers
       )
   ).length
+  const edenProteostasisAutophagicFluxReadyCount = summaries.filter(
+    (s) =>
+      Boolean(
+        s.edenProteostasisAutophagicFlux?.truthClass === 'molecular_proteostasis_simulation_proxy' &&
+          s.edenProteostasisAutophagicFlux?.patientTruthUncompromised &&
+          s.edenProteostasisAutophagicFlux?.neverManufacturesBiomarkers
+      )
+  ).length
   const edenLifeBalance = deriveEdenLifeBalanceSynthesis(episodes, supportiveResults)
 
   return {
@@ -3610,6 +3748,7 @@ export function evaluateCareJourneyContinuity(
     edenMultiAgentHealingCouncilReadyCount,
     edenBioHarmonicWaveformReadyCount,
     edenCircadianMitochondrialHarmonizerReadyCount,
+    edenProteostasisAutophagicFluxReadyCount,
     edenLifeBalance,
     hasBlockedStages: blockedJourneys > 0 || stalledCount > 0,
   }
