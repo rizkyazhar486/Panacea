@@ -21,6 +21,7 @@ import {
   deriveEdenSupportCircleBridge,
   deriveEdenVisitPreparationCompanion,
   deriveEdenReflectionSanctuaryBridge,
+  deriveEdenUniversalAcceptanceBridge,
   translateClinicalTermToEden,
   EDEN_PLAIN_LANGUAGE_GLOSSARY,
 } from '../../src/domains/clinical-operations/model/careContinuityProjection.ts'
@@ -2232,4 +2233,56 @@ test('deriveEdenReflectionSanctuaryBridge & CareEpisode: Eden Multi-Perspective 
   const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
   assert.ok(episodeSource.includes('data-eden-reflection-sanctuary-card="v1"'), 'CareEpisode must include Eden reflection sanctuary card')
   assert.ok(episodeSource.includes('data-eden-perspective-lenses="v1"'), 'CareEpisode must include Eden 4-lens perspective grid')
+})
+
+test('deriveEdenUniversalAcceptanceBridge & CareEpisode: Eden Universal Human Acceptance & Multilingual Plain-Language Continuity Bridge (T-CLIN-29 / EDEN-09)', () => {
+  const evaluatedAt = '2026-10-26T07:25:00.000Z'
+
+  const sampleEpisode = {
+    id: 'ce_univ_1',
+    title: 'Essential Hypertension Control',
+    diagnosisCode: 'I10',
+    createdAt: '2026-10-20T08:00:00.000Z',
+    updatedAt: '2026-10-25T08:00:00.000Z',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'diagnosis', status: 'done' },
+      { stage: 'treatment', status: 'active' },
+    ],
+  }
+
+  // 1. Bahasa Indonesia ('id') everyday_warm adaptation
+  const idBridge = deriveEdenUniversalAcceptanceBridge(sampleEpisode, 'id', 'everyday_warm')
+  assert.equal(idBridge.language, 'id')
+  assert.equal(idBridge.languageLabel, 'Bahasa Indonesia · Hangat & Jelas')
+  assert.equal(idBridge.literacyMode, 'everyday_warm')
+  assert.ok(idBridge.localizedWhatIsHappening.includes('Terapi & Tindakan'))
+  assert.ok(idBridge.localizedWhatIsHappening.includes('2/3'))
+  assert.equal(idBridge.canonicalPatientTruthPreserved, true)
+  assert.equal(idBridge.noFalseUniversalValidationClaim, true)
+  assert.equal(idBridge.accessibilityAndConnectivityGuarantees.lowBandwidthTextComplete, true)
+
+  // 2. English ('en') clinical_structured adaptation preserves exact same stage truth (2/3) and ICD-10
+  const enBridge = deriveEdenUniversalAcceptanceBridge(sampleEpisode, 'en', 'clinical_structured')
+  assert.equal(enBridge.language, 'en')
+  assert.equal(enBridge.languageLabel, 'English · Warm & Clear')
+  assert.equal(enBridge.literacyMode, 'clinical_structured')
+  assert.ok(enBridge.localizedHeadline.includes('ICD-10: I10'))
+  assert.ok(enBridge.localizedWhatIsHappening.includes('Treatment'))
+  assert.ok(enBridge.localizedWhatIsHappening.includes('2/3'))
+  assert.equal(enBridge.canonicalPatientTruthPreserved, true)
+
+  // 3. Rollup in evaluateCareJourneyContinuity
+  const projection = evaluateCareJourneyContinuity([sampleEpisode], evaluatedAt)
+  assert.equal(projection.edenUniversalAcceptanceReadyCount, 1)
+  assert.ok(projection.episodes[0].edenUniversalAcceptance)
+  assert.equal(projection.episodes[0].edenUniversalAcceptance.canonicalPatientTruthPreserved, true)
+
+  // 4. UI contracts
+  const panelSource = read('src/domains/clinical-operations/ui/CareContinuityPanel.tsx')
+  assert.ok(panelSource.includes('data-eden-universal-acceptance="v1"'), 'CareContinuityPanel must include Eden universal acceptance attribute')
+
+  const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
+  assert.ok(episodeSource.includes('data-eden-universal-acceptance-card="v1"'), 'CareEpisode must include Eden universal acceptance card')
+  assert.ok(episodeSource.includes('data-eden-language-switcher="v1"'), 'CareEpisode must include Eden language switcher')
 })

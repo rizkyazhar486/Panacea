@@ -16,6 +16,7 @@ import {
   deriveEdenSupportCircleBridge,
   deriveEdenVisitPreparationCompanion,
   deriveEdenReflectionSanctuaryBridge,
+  deriveEdenUniversalAcceptanceBridge,
 } from '../../domains/clinical-operations'
 import {
   CARE_EPISODE_STAGES,
@@ -66,6 +67,8 @@ import type {
   SupportMessage,
   GratitudeNote,
   MoodEntry,
+  EdenLanguageCode,
+  EdenLiteracyAdaptationMode,
 } from '../../lib/types'
 import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 import { PanaceaZoneNav } from '../../components/PanaceaZoneNav'
@@ -607,6 +610,9 @@ function EpisodeCard({
 
       {/* Eden Multi-Perspective Reflection, Epistemic Humility & Peace Sanctuary Bridge (T-CLIN-28 / EDEN-08) */}
       <EdenReflectionSanctuarySection episode={episode} moods={moods} />
+
+      {/* Eden Universal Human Acceptance & Multilingual Plain-Language Continuity Bridge (T-CLIN-29 / EDEN-09) */}
+      <EdenUniversalAcceptanceSection episode={episode} onChange={onChange} />
     </Card>
   )
 }
@@ -1574,6 +1580,102 @@ function EdenReflectionSanctuarySection({
 
       <p className="mt-2 text-[11px] italic text-sky-800 dark:text-sky-300">
         {sanctuary.openReflectionInvitation}
+      </p>
+    </div>
+  )
+}
+
+function EdenUniversalAcceptanceSection({
+  episode,
+  onChange,
+}: {
+  episode: CareEpisode
+  onChange: (next: CareEpisode) => void
+}) {
+  const [language, setLanguage] = useState<EdenLanguageCode>(episode.edenLanguagePreference ?? 'id')
+  const [literacyMode, setLiteracyMode] = useState<EdenLiteracyAdaptationMode>('everyday_warm')
+
+  const acceptance = useMemo(
+    () => deriveEdenUniversalAcceptanceBridge(episode, language, literacyMode),
+    [episode, language, literacyMode]
+  )
+
+  function selectLanguage(nextLang: EdenLanguageCode) {
+    setLanguage(nextLang)
+    onChange({ ...episode, edenLanguagePreference: nextLang })
+  }
+
+  return (
+    <div
+      className="mt-3 rounded-xl border border-lime-200 dark:border-white/10 bg-lime-50/35 dark:bg-white/[0.02] p-3.5"
+      data-eden-universal-acceptance-card="v1"
+      data-eden-lang={language}
+      data-eden-literacy={literacyMode}
+    >
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+        <div>
+          <div className="flex items-center gap-2 flex-wrap">
+            <h4 className="text-xs font-bold text-neutral-900 dark:text-white">
+              Universal Human Acceptance — Multilingual & Literacy-Adaptive Continuity
+            </h4>
+            <Badge tone="normal">{acceptance.languageLabel}</Badge>
+            <Badge tone="neutral">Canonical Truth Preserved</Badge>
+          </div>
+          <p className="mt-1 text-xs font-medium text-neutral-800 dark:text-white/85">
+            {acceptance.localizedHeadline}
+          </p>
+        </div>
+
+        <div className="flex items-center gap-1.5 flex-wrap" data-eden-language-switcher="v1">
+          {(['id', 'en'] as const).map((lang) => (
+            <button
+              key={lang}
+              type="button"
+              onClick={() => selectLanguage(lang)}
+              className={`rounded-lg px-2.5 py-1 text-[10px] font-semibold transition-colors ${
+                language === lang
+                  ? 'bg-emerald-600 text-white'
+                  : 'bg-neutral-200 dark:bg-white/10 text-neutral-700 dark:text-white/75 hover:bg-neutral-300 dark:hover:bg-white/20'
+              }`}
+            >
+              {lang === 'id' ? 'Bahasa Indonesia' : 'English'}
+            </button>
+          ))}
+          <button
+            type="button"
+            onClick={() =>
+              setLiteracyMode((m) =>
+                m === 'everyday_warm' ? 'clinical_structured' : 'everyday_warm'
+              )
+            }
+            className="rounded-lg bg-neutral-200 dark:bg-white/10 px-2.5 py-1 text-[10px] font-semibold text-neutral-700 dark:text-white/75 hover:bg-neutral-300 dark:hover:bg-white/20"
+          >
+            {literacyMode === 'everyday_warm' ? 'Mode: Hangat/Warm' : 'Mode: Klinis/Clinical'}
+          </button>
+        </div>
+      </div>
+
+      <div className="mt-2.5 grid gap-2 sm:grid-cols-2 text-xs">
+        <div className="rounded-lg bg-white/80 dark:bg-white/[0.03] p-2.5 border border-lime-100 dark:border-white/5">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-500 dark:text-white/50">
+            {language === 'id' ? 'Status Perjalanan Saat Ini' : 'Current Journey Status'}
+          </span>
+          <p className="mt-0.5 text-neutral-800 dark:text-white/85">
+            {acceptance.localizedWhatIsHappening}
+          </p>
+        </div>
+        <div className="rounded-lg bg-white/80 dark:bg-white/[0.03] p-2.5 border border-lime-100 dark:border-white/5">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-300">
+            {language === 'id' ? 'Langkah Tenang Berikutnya' : 'Next Calm Step'}
+          </span>
+          <p className="mt-0.5 font-medium text-neutral-900 dark:text-white">
+            {acceptance.localizedNextStep}
+          </p>
+        </div>
+      </div>
+
+      <p className="mt-2 text-[10px] text-neutral-500 dark:text-white/55">
+        {acceptance.localizedSafetyAssurance}
       </p>
     </div>
   )

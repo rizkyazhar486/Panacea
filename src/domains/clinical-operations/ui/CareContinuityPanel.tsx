@@ -636,6 +636,17 @@ export function CareContinuityPanel({
                   </span>
                 </div>
               )}
+              {careJourneys.edenUniversalAcceptanceReadyCount > 0 && (
+                <div
+                  className="flex justify-between text-lime-200"
+                  data-eden-universal-acceptance="v1"
+                >
+                  <span>Universal acceptance:</span>
+                  <span className="font-bold">
+                    {careJourneys.edenUniversalAcceptanceReadyCount} ID/EN adaptive
+                  </span>
+                </div>
+              )}
 
               {careJourneys.episodes.length > 0 && (
                 <div className="mt-3 border-t border-white/8 pt-2">
