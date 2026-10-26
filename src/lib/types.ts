@@ -1684,6 +1684,55 @@ export interface EdenPeroxisomalCatalaseBridge {
   epistemicHumilityPreserved: true
 }
 
+export type EdenErUprState =
+  | 'optimal_er_proteostasis_xbp1s_surveillance'
+  | 'balanced_adaptive_upr_atf6_ire1_resolution'
+  | 'transient_er_lumen_misfolded_protein_strain'
+  | 'critical_proteostatic_collapse_apoptotic_upr'
+
+export type EdenErUprTier =
+  | 'optimal_er_proteostatic_fidelity'
+  | 'balanced_adaptive_upr_equilibrium'
+  | 'moderate_chaperone_saturation_strain'
+  | 'critical_misfolded_er_load_instability'
+
+export type EdenErUprNodeKind =
+  | 'bip_grp78_lumenal_chaperone_binding'
+  | 'ire1a_xbp1s_endoribonuclease_splicing'
+  | 'atf6_golgi_s1p_s2p_proteolytic_cleavage'
+  | 'sel1l_hrd1_erad_retrotranslocation_clearance'
+
+export interface EdenErUprNode {
+  nodeKind: EdenErUprNodeKind
+  nodeLabel: string
+  chaperoneFidelityScore: number
+  foldingClearanceIndex: number
+  uprStatus: 'optimal_folding_state' | 'adaptive_upr_mode' | 'er_proteostatic_stress'
+  mechanisticNote: string
+}
+
+export interface EdenErProteostasisBridge {
+  version: 'v1'
+  episodeId: string
+  episodeTitle: string
+  uprState: EdenErUprState
+  uprStateLabel: string
+  uprTier: EdenErUprTier
+  uprTierLabel: string
+  erProteostasisScore: number
+  chaperoneBindingCapacity: number
+  eradRetrotranslocationIndex: number
+  uprNodes: EdenErUprNode[]
+  uprNarrativeId: string
+  uprNarrativeEn: string
+  uprLongevityStrategy: string
+  truthClass: 'er_upr_proteostasis_simulation_proxy'
+  clinically_reviewed: false
+  patientTruthUncompromised: true
+  neverManufacturesBiomarkers: true
+  epistemicHumilityPreserved: true
+}
+
 export interface CareJourneyExportSummary {
   standard: 'PANACEA-CAREPLAN-FHIR-R4-V1'
   generatedAt: string

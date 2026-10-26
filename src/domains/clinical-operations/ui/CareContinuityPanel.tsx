@@ -911,6 +911,17 @@ export function CareContinuityPanel({
                   </span>
                 </div>
               )}
+              {careJourneys.edenErProteostasisReadyCount > 0 && (
+                <div
+                  className="flex justify-between text-indigo-300"
+                  data-eden-er-upr="v1"
+                >
+                  <span>Proteostasis retikulum endoplasma & UPR:</span>
+                  <span className="font-bold">
+                    {careJourneys.edenErProteostasisReadyCount} episode terhubung
+                  </span>
+                </div>
+              )}
 
               {careJourneys.episodes.length > 0 && (
                 <div className="mt-3 border-t border-white/8 pt-2">
