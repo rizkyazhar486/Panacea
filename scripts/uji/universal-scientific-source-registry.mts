@@ -65,6 +65,8 @@ assert.equal(mayClaimSourceComplete({ sourceId: 'x', indexedEntities: 100, expos
 const completeSnapshot = { sourceId: 'x', indexedEntities: 100, exposedEntities: 100, measuredAt: '2026-09-13', sourceVersion: 'v1' }
 assert.equal(mayClaimSourceComplete({ ...completeSnapshot, sourceVersion: '   ' }), false)
 assert.equal(mayClaimSourceComplete({ ...completeSnapshot, measuredAt: '\t' }), false)
+assert.equal(mayClaimSourceComplete({ ...completeSnapshot, sourceId: '' }), false)
+assert.equal(mayClaimSourceComplete({ ...completeSnapshot, sourceId: ' \t' }), false)
 assert.equal(mayClaimSourceComplete(completeSnapshot), true)
 
 console.log('universal-scientific-source-registry: ok')
