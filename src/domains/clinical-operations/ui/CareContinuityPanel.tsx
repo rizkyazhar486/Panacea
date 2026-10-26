@@ -603,6 +603,17 @@ export function CareContinuityPanel({
                   </span>
                 </div>
               )}
+              {careJourneys.edenSupportCircleReadyCount > 0 && (
+                <div
+                  className="flex justify-between text-pink-200"
+                  data-eden-support-circle="v1"
+                >
+                  <span>Circle of care:</span>
+                  <span className="font-bold">
+                    {careJourneys.edenSupportCircleReadyCount} opt-in ready
+                  </span>
+                </div>
+              )}
 
               {careJourneys.episodes.length > 0 && (
                 <div className="mt-3 border-t border-white/8 pt-2">

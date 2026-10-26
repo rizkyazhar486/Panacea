@@ -13,6 +13,7 @@ import {
   deriveEdenLifeStoryBridge,
   deriveEdenPhysiologyAppreciation,
   deriveEdenPreventionLongevityRhythm,
+  deriveEdenSupportCircleBridge,
 } from '../../domains/clinical-operations'
 import {
   CARE_EPISODE_STAGES,
@@ -59,6 +60,9 @@ import type {
   EdenDisclosureDepth,
   LifeEvent,
   Quest,
+  Circle,
+  SupportMessage,
+  GratitudeNote,
 } from '../../lib/types'
 import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 import { PanaceaZoneNav } from '../../components/PanaceaZoneNav'
@@ -228,6 +232,10 @@ export function CareEpisodePage() {
           lifeEvents={state.lifeEvents[activePatient.id]}
           quests={state.quests[activePatient.id]}
           patientDob={activePatient.dob}
+          buddyName={state.buddyName}
+          circles={state.circles}
+          supportMessages={state.supportMessages}
+          gratitudes={state.gratitudes}
           onChange={(next) => updateEpisode(ep.id, next)}
           onRemove={() => removeEpisode(ep.id)}
         />
@@ -320,6 +328,10 @@ function EpisodeCard({
   lifeEvents,
   quests,
   patientDob,
+  buddyName,
+  circles,
+  supportMessages,
+  gratitudes,
   onChange,
   onRemove,
 }: {
@@ -329,6 +341,10 @@ function EpisodeCard({
   lifeEvents?: readonly LifeEvent[]
   quests?: readonly Quest[]
   patientDob?: string
+  buddyName?: string
+  circles?: readonly Circle[]
+  supportMessages?: readonly SupportMessage[]
+  gratitudes?: readonly GratitudeNote[]
   onChange: (next: CareEpisode) => void
   onRemove: () => void
 }) {
@@ -570,6 +586,15 @@ function EpisodeCard({
 
       {/* Eden Daily Prevention, Longevity Rhythm & Restorative Habit Continuity Bridge (T-CLIN-25 / EDEN-05) */}
       <EdenLongevityRhythmSection episode={episode} recordPlan={recordPlan} />
+
+      {/* Eden Trusted Support Circle & Family/Caregiver Encouragement Bridge (T-CLIN-26 / EDEN-06) */}
+      <EdenSupportCircleSection
+        episode={episode}
+        buddyName={buddyName}
+        circles={circles}
+        supportMessages={supportMessages}
+        gratitudes={gratitudes}
+      />
     </Card>
   )
 }
@@ -1300,6 +1325,104 @@ function EdenLongevityRhythmSection({
           </div>
         ))}
       </div>
+    </div>
+  )
+}
+
+function EdenSupportCircleSection({
+  episode,
+  buddyName,
+  circles,
+  supportMessages,
+  gratitudes,
+}: {
+  episode: CareEpisode
+  buddyName?: string
+  circles?: readonly Circle[]
+  supportMessages?: readonly SupportMessage[]
+  gratitudes?: readonly GratitudeNote[]
+}) {
+  const supportBridge = useMemo(
+    () =>
+      deriveEdenSupportCircleBridge(episode, {
+        buddyName,
+        circles,
+        supportMessages,
+        gratitudes,
+      }),
+    [episode, buddyName, circles, supportMessages, gratitudes]
+  )
+
+  return (
+    <div
+      className="mt-3 rounded-xl border border-pink-200 dark:border-white/10 bg-pink-50/35 dark:bg-white/[0.02] p-3.5"
+      data-eden-support-circle-card="v1"
+    >
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+        <div>
+          <div className="flex items-center gap-2 flex-wrap">
+            <h4 className="text-xs font-bold text-neutral-900 dark:text-white">
+              Trusted Circle of Care — Shared Encouragement & Family Update
+            </h4>
+            <Badge tone="brand">Opt-In Privacy Preserved</Badge>
+            <Badge tone="neutral">Real Connections · Never Fabricated</Badge>
+          </div>
+          <p className="mt-1 text-xs text-neutral-700 dark:text-white/80">
+            {supportBridge.connectionHeadline}
+          </p>
+        </div>
+        <Link
+          to="/social/komunitas"
+          className="inline-flex items-center rounded-lg border border-pink-500/30 bg-pink-500/10 px-2.5 py-1 text-[11px] font-semibold text-pink-700 dark:text-pink-300 hover:bg-pink-500/20 shrink-0"
+        >
+          Open Circle of Care →
+        </Link>
+      </div>
+
+      <div
+        className="mt-2.5 rounded-lg bg-white/80 dark:bg-white/[0.03] p-2.5 border border-pink-100 dark:border-white/5"
+        data-eden-shareable-update="v1"
+      >
+        <span className="text-[10px] font-bold uppercase tracking-wider text-pink-800 dark:text-pink-300">
+          Plain-Language Family & Caregiver Update (Opt-In Share)
+        </span>
+        <p className="mt-0.5 text-xs text-neutral-800 dark:text-white/85">
+          {supportBridge.shareablePlainUpdate}
+        </p>
+      </div>
+
+      {(supportBridge.trustedCircles.length > 0 || supportBridge.recentEncouragements.length > 0) && (
+        <div className="mt-2.5 grid gap-2 sm:grid-cols-2 text-xs">
+          {supportBridge.trustedCircles.length > 0 && (
+            <div className="rounded-lg bg-white/80 dark:bg-white/[0.03] p-2.5 border border-pink-100 dark:border-white/5">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-500 dark:text-white/50">
+                Your Trusted Circles ({supportBridge.trustedCircles.length})
+              </span>
+              <ul className="mt-1 space-y-1">
+                {supportBridge.trustedCircles.map((c) => (
+                  <li key={c.id} className="text-[11px] text-neutral-800 dark:text-white/85">
+                    🫂 <strong>{c.name}</strong> ({c.memberCount} member{c.memberCount === 1 ? '' : 's'})
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          {supportBridge.recentEncouragements.length > 0 && (
+            <div className="rounded-lg bg-white/80 dark:bg-white/[0.03] p-2.5 border border-pink-100 dark:border-white/5">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-500 dark:text-white/50">
+                Recent Encouragement & Gratitude
+              </span>
+              <ul className="mt-1 space-y-1">
+                {supportBridge.recentEncouragements.slice(0, 2).map((enc) => (
+                  <li key={enc.id} className="text-[11px] text-neutral-800 dark:text-white/85">
+                    💌 <strong>{enc.fromName}:</strong> “{enc.text}”
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   )
 }
