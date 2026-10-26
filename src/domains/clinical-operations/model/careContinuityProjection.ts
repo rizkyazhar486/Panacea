@@ -135,6 +135,11 @@ import type {
   EdenRibosomalNodeKind,
   EdenRibosomalNode,
   EdenRibosomalQuiescenceBridge,
+  EdenChaperoneAutophagyState,
+  EdenChaperoneAutophagyTier,
+  EdenLamp2aNodeKind,
+  EdenLamp2aNode,
+  EdenLamp2aTranslocationBridge,
   WellnessDay,
   MoodEntry,
   Circle,
@@ -257,6 +262,7 @@ export interface CareJourneyEpisodeSummary {
   edenMitophagicPriming?: EdenMitophagicPrimingBridge
   edenMicrovascularResilience?: EdenMicrovascularResilienceBridge
   edenRibosomalQuiescence?: EdenRibosomalQuiescenceBridge
+  edenLamp2aTranslocation?: EdenLamp2aTranslocationBridge
 }
 
 export type ReadmissionRiskLevel = 'low' | 'moderate' | 'high'
@@ -365,6 +371,7 @@ export interface CareJourneyContinuityResult {
   edenMitophagicPrimingReadyCount: number
   edenMicrovascularResilienceReadyCount: number
   edenRibosomalQuiescenceReadyCount: number
+  edenLamp2aTranslocationReadyCount: number
   edenLifeBalance: EdenLifeBalanceSynthesis
   hasBlockedStages: boolean
 }
@@ -4652,6 +4659,115 @@ export function deriveEdenRibosomalQuiescenceBridge(
   }
 }
 
+export function deriveEdenLamp2aTranslocationBridge(
+  episode: CareEpisode,
+): EdenLamp2aTranslocationBridge {
+  const stages = episode.stages ?? []
+  const completedStages = stages.filter((s) => s.status === 'done').length
+  const hasBlocked = stages.some((s) => s.status === 'blocked')
+  const blockedCount = stages.filter((s) => s.status === 'blocked').length
+
+  const cmaTranslocationScore = hasBlocked
+    ? Math.max(45, 65 - blockedCount * 7)
+    : Math.min(99, 80 + completedStages * 5)
+
+  const lamp2aMultimerizationIndex = hasBlocked
+    ? Math.max(44, 64 - blockedCount * 7)
+    : Math.min(98, 79 + completedStages * 5)
+
+  const kferqProteostasisCapacity = hasBlocked
+    ? Math.max(42, 63 - blockedCount * 8)
+    : Math.min(98, 78 + completedStages * 5)
+
+  let cmaState: EdenChaperoneAutophagyState = 'balanced_hsc70_kferq_translocation'
+  let cmaStateLabel = 'Pengenalan Motif KFERQ & Translokasi LAMP2A Seimbang'
+  let cmaTier: EdenChaperoneAutophagyTier = 'stable_chaperone_translocation_flux'
+  let cmaTierLabel = 'Fluks Translokasi Pendamping Lisosom Stabil'
+
+  if (hasBlocked) {
+    cmaState = 'chaperone_mediated_autophagic_blockade'
+    cmaStateLabel = 'Blokade Autofagi Termediasi Pendamping & Beban Proteotoksik Lisosom'
+    cmaTier = 'critical_cma_blockade_proteotoxic_strain'
+    cmaTierLabel = 'Hambatan Kritis Jalur CMA & Agregasi Protein KFERQ'
+  } else if (completedStages >= 3) {
+    cmaState = 'optimal_lamp2a_multimerization_flux'
+    cmaStateLabel = 'Multimerisasi Reseptor LAMP2A Optimal & Klirens Proteomik Presisi'
+    cmaTier = 'optimal_cma_lysosomal_clearance'
+    cmaTierLabel = 'Klirens Lisosomal Termediasi Pendamping Sempurna'
+  } else if (completedStages === 0) {
+    cmaState = 'attenuated_lysosomal_lamp2a_clearance'
+    cmaStateLabel = 'Atenuasi Translokasi LAMP2A Lisosom & Pengawasan Adaptif Dini'
+    cmaTier = 'moderate_cma_lysosomal_attenuation'
+    cmaTierLabel = 'Atenuasi Fluks Lisosom CMA Transien Dini'
+  }
+
+  const lamp2aNodes: EdenLamp2aNode[] = [
+    {
+      nodeKind: 'hsc70_kferq_motif_recognition',
+      nodeLabel: 'Pengenalan Motif Pentapeptida KFERQ Sitoprotektif oleh Chaperone Sitotik Hsc70/HSPA8',
+      translocationEfficiencyScore: hasBlocked ? 0.61 : Math.min(0.99, 0.81 + completedStages * 0.05),
+      lysosomalClearanceIndex: hasBlocked ? 0.59 : Math.min(0.98, 0.78 + completedStages * 0.05),
+      cmaStatus: hasBlocked ? 'cma_attenuation_stress' : completedStages >= 2 ? 'optimal_translocation_mode' : 'adaptive_clearance_state',
+      mechanisticNote: 'Pengikatan selektif chaperone konstitutif Hsc70 dan ko-faktor (Hsp40/Hip/Hop) pada motif sekuens KFERQ substrat terlarut untuk memandu translokasi ke membran lisosom.',
+    },
+    {
+      nodeKind: 'lamp2a_lysosomal_multimerization',
+      nodeLabel: 'Multimerisasi Dinamis Reseptor Membran LAMP2A Menjadi Kompleks Translokasi 700 kDa',
+      translocationEfficiencyScore: hasBlocked ? 0.60 : Math.min(0.98, 0.80 + completedStages * 0.05),
+      lysosomalClearanceIndex: hasBlocked ? 0.58 : Math.min(0.99, 0.77 + completedStages * 0.05),
+      cmaStatus: hasBlocked ? 'cma_attenuation_stress' : completedStages >= 2 ? 'optimal_translocation_mode' : 'adaptive_clearance_state',
+      mechanisticNote: 'Ekor sitosolik LAMP2A memicu perakitan oligomer fungsional berbobot tinggi pada membran lisosom tanpa fusi vesikel makroautofagi, memfasilitasi translokasi pori protein.',
+    },
+    {
+      nodeKind: 'lysosomal_hsc70_luminal_translocation',
+      nodeLabel: 'Translokasi Matriks Luminal & Pembongkaran Substrat Berbantuan Chaperone lys-Hsc70',
+      translocationEfficiencyScore: hasBlocked ? 0.62 : Math.min(0.99, 0.79 + completedStages * 0.05),
+      lysosomalClearanceIndex: hasBlocked ? 0.60 : Math.min(0.98, 0.79 + completedStages * 0.05),
+      cmaStatus: hasBlocked ? 'cma_attenuation_stress' : completedStages >= 2 ? 'optimal_translocation_mode' : 'adaptive_clearance_state',
+      mechanisticNote: 'Isoform Hsc70 luminal (lys-Hsc70) menarik substrat terbentang ke dalam rongga asam lisosom dan mendorong disosiasi oligomer LAMP2A untuk siklus degradasi berikutnya.',
+    },
+    {
+      nodeKind: 'cathepsin_acid_hydrolase_proteolysis',
+      nodeLabel: 'Proteolisis Cepat Enzim Hidrolase Asam Katepsin (B, D, L) & Daur Ulang Asam Amino Substrat',
+      translocationEfficiencyScore: hasBlocked ? 0.58 : Math.min(0.97, 0.77 + completedStages * 0.06),
+      lysosomalClearanceIndex: hasBlocked ? 0.57 : Math.min(0.97, 0.76 + completedStages * 0.06),
+      cmaStatus: hasBlocked ? 'cma_attenuation_stress' : completedStages >= 2 ? 'optimal_translocation_mode' : 'adaptive_clearance_state',
+      mechanisticNote: 'Degradasi enzimatik luminal lengkap atas protein agregatif (alpha-synuclein, tau terfosforilasi) mengembalikan simpanan metabolit asam amino tanpa memicu stres vakuolar.',
+    },
+  ]
+
+  const cmaNarrativeId = `Sintesis autofagi termediasi pendamping & translokasi LAMP2A untuk episode "${episode.title}". Status CMA: ${cmaStateLabel}, tingkat resiliensi lisosomal: ${cmaTierLabel}. Skor translokasi CMA ${cmaTranslocationScore}%, indeks multimerisasi LAMP2A ${lamp2aMultimerizationIndex}%, dan kapasitas proteostasis KFERQ ${kferqProteostasisCapacity}%.`
+  const cmaNarrativeEn = `Chaperone-mediated autophagy & LAMP2A translocation synthesis for episode "${episode.title}". CMA state: ${cmaStateLabel}, lysosomal resilience tier: ${cmaTierLabel}. CMA translocation score ${cmaTranslocationScore}%, LAMP2A multimerization index ${lamp2aMultimerizationIndex}%, and KFERQ proteostasis capacity ${kferqProteostasisCapacity}%.`
+
+  const cmaLongevityStrategy = hasBlocked
+    ? 'Mitigasi hambatan translokasi lisosomal CMA dan akumulasi protein neurotoksik melalui stabilisasi komposisi lipid membran lisosom (hindari kelebihan kolesterol teroksidasi), aktivasi protektif jalur degradasi proteasom, dan pengawasan klinis ketat.'
+    : completedStages >= 3
+    ? 'Pertahankan densitas reseptor LAMP2A dan efisiensi translokasi substrat KFERQ melalui ritme puasa berkala penstimulasi CMA, dukungan asam amino esensial terkontrol, fitokimia penginduksi ekspresi LAMP2A (seperti turunan retinoid terkontrol), dan istirahat metabolik.'
+    : 'Dukung integritas fungsional autofagi termediasi pendamping dengan nutrisi anti-inflamasi pelindung lisosom, hidrasi adekuat, dan manajemen stres metabolik preventif.'
+
+  return {
+    version: 'v1',
+    episodeId: episode.id,
+    episodeTitle: episode.title,
+    cmaState,
+    cmaStateLabel,
+    cmaTier,
+    cmaTierLabel,
+    cmaTranslocationScore,
+    lamp2aMultimerizationIndex,
+    kferqProteostasisCapacity,
+    lamp2aNodes,
+    cmaNarrativeId,
+    cmaNarrativeEn,
+    cmaLongevityStrategy,
+    truthClass: 'chaperone_autophagy_lamp2a_simulation_proxy',
+    clinically_reviewed: false,
+    patientTruthUncompromised: true,
+    neverManufacturesBiomarkers: true,
+    epistemicHumilityPreserved: true,
+  }
+}
+
 export const STAGE_EXPECTED_DAYS: Record<CareEpisodeStageId, number> = {
   problem: 1,
   diagnosis: 2,
@@ -4932,6 +5048,7 @@ export function evaluateCareJourneyContinuity(
     const edenMitophagicPriming = deriveEdenMitophagicPrimingBridge(ep)
     const edenMicrovascularResilience = deriveEdenMicrovascularResilienceBridge(ep)
     const edenRibosomalQuiescence = deriveEdenRibosomalQuiescenceBridge(ep)
+    const edenLamp2aTranslocation = deriveEdenLamp2aTranslocationBridge(ep)
 
     return {
       id: ep.id,
@@ -4991,6 +5108,7 @@ export function evaluateCareJourneyContinuity(
       edenMitophagicPriming,
       edenMicrovascularResilience,
       edenRibosomalQuiescence,
+      edenLamp2aTranslocation,
     }
   })
 
@@ -5236,6 +5354,14 @@ export function evaluateCareJourneyContinuity(
           s.edenRibosomalQuiescence?.neverManufacturesBiomarkers
       )
   ).length
+  const edenLamp2aTranslocationReadyCount = summaries.filter(
+    (s) =>
+      Boolean(
+        s.edenLamp2aTranslocation?.truthClass === 'chaperone_autophagy_lamp2a_simulation_proxy' &&
+          s.edenLamp2aTranslocation?.patientTruthUncompromised &&
+          s.edenLamp2aTranslocation?.neverManufacturesBiomarkers
+      )
+  ).length
   const edenLifeBalance = deriveEdenLifeBalanceSynthesis(episodes, supportiveResults)
 
   return {
@@ -5299,6 +5425,7 @@ export function evaluateCareJourneyContinuity(
     edenMitophagicPrimingReadyCount,
     edenMicrovascularResilienceReadyCount,
     edenRibosomalQuiescenceReadyCount,
+    edenLamp2aTranslocationReadyCount,
     edenLifeBalance,
     hasBlockedStages: blockedJourneys > 0 || stalledCount > 0,
   }

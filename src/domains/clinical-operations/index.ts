@@ -86,6 +86,7 @@ export {
   deriveEdenMitophagicPrimingBridge,
   deriveEdenMicrovascularResilienceBridge,
   deriveEdenRibosomalQuiescenceBridge,
+  deriveEdenLamp2aTranslocationBridge,
   translateClinicalTermToEden,
   EDEN_PLAIN_LANGUAGE_GLOSSARY,
   STAGE_LABEL,

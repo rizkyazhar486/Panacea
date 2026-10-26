@@ -43,6 +43,7 @@ import {
   deriveEdenMitophagicPrimingBridge,
   deriveEdenMicrovascularResilienceBridge,
   deriveEdenRibosomalQuiescenceBridge,
+  deriveEdenLamp2aTranslocationBridge,
   translateClinicalTermToEden,
   EDEN_PLAIN_LANGUAGE_GLOSSARY,
 } from '../../src/domains/clinical-operations/model/careContinuityProjection.ts'
@@ -3888,4 +3889,78 @@ test('CareContinuityPanel: Eden Ribosomal Biogenesis Stress & Nucleolar Quiescen
   const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
   assert.ok(episodeSource.includes('data-eden-ribosomal-quiescence-card="v1"'), 'CareEpisode must include ribosomal quiescence card')
   assert.ok(episodeSource.includes('data-eden-ribosomal-quiescence-nodes="v1"'), 'CareEpisode must include ribosomal quiescence nodes grid')
+})
+
+test('CareContinuityPanel: Eden Chaperone-Mediated Autophagy & LAMP2A Lysosomal Translocation Synthesizer contract (T-CLIN-52)', () => {
+  const evaluatedAt = '2026-10-24T12:00:00.000Z'
+  const sampleEpisode = {
+    id: 'ce_cma_1',
+    title: 'Chaperone-Mediated Autophagy & LAMP2A Translocation Episode',
+    diagnosisCode: 'G30.9',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'diagnosis', status: 'done' },
+      { stage: 'plan', status: 'done' },
+      { stage: 'treatment', status: 'done' },
+      { stage: 'recovery', status: 'active' },
+    ],
+  }
+
+  // 1. Pure deterministic derivation
+  const bridge = deriveEdenLamp2aTranslocationBridge(sampleEpisode)
+  assert.equal(bridge.version, 'v1')
+  assert.equal(bridge.episodeId, 'ce_cma_1')
+  assert.equal(bridge.cmaState, 'optimal_lamp2a_multimerization_flux')
+  assert.equal(bridge.cmaStateLabel, 'Multimerisasi Reseptor LAMP2A Optimal & Klirens Proteomik Presisi')
+  assert.equal(bridge.cmaTier, 'optimal_cma_lysosomal_clearance')
+  assert.equal(bridge.cmaTierLabel, 'Klirens Lisosomal Termediasi Pendamping Sempurna')
+  assert.ok(bridge.cmaTranslocationScore >= 85)
+  assert.ok(bridge.lamp2aMultimerizationIndex >= 85)
+  assert.ok(bridge.kferqProteostasisCapacity >= 85)
+  assert.equal(bridge.lamp2aNodes.length, 4)
+  assert.equal(bridge.lamp2aNodes[0].nodeKind, 'hsc70_kferq_motif_recognition')
+  assert.equal(bridge.lamp2aNodes[1].nodeKind, 'lamp2a_lysosomal_multimerization')
+  assert.equal(bridge.lamp2aNodes[2].nodeKind, 'lysosomal_hsc70_luminal_translocation')
+  assert.equal(bridge.lamp2aNodes[3].nodeKind, 'cathepsin_acid_hydrolase_proteolysis')
+  assert.equal(bridge.truthClass, 'chaperone_autophagy_lamp2a_simulation_proxy')
+  assert.equal(bridge.clinically_reviewed, false)
+  assert.equal(bridge.patientTruthUncompromised, true)
+  assert.equal(bridge.neverManufacturesBiomarkers, true)
+  assert.equal(bridge.epistemicHumilityPreserved, true)
+
+  // 2. Blocked stage resilience
+  const blockedEpisode = {
+    id: 'ce_cma_blocked',
+    title: 'Blocked CMA Translocation Strain Episode',
+    diagnosisCode: 'G20',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'diagnosis', status: 'blocked', blockedReason: 'Awaiting high-resolution lysosomal membrane lipidomics and alpha-synuclein oligomer assay' },
+    ],
+  }
+  const blockedBridge = deriveEdenLamp2aTranslocationBridge(blockedEpisode)
+  assert.equal(blockedBridge.cmaState, 'chaperone_mediated_autophagic_blockade')
+  assert.equal(blockedBridge.cmaStateLabel, 'Blokade Autofagi Termediasi Pendamping & Beban Proteotoksik Lisosom')
+  assert.equal(blockedBridge.cmaTier, 'critical_cma_blockade_proteotoxic_strain')
+  assert.equal(blockedBridge.cmaTierLabel, 'Hambatan Kritis Jalur CMA & Agregasi Protein KFERQ')
+  assert.ok(blockedBridge.cmaTranslocationScore <= 66)
+  assert.ok(blockedBridge.lamp2aMultimerizationIndex <= 65)
+  assert.ok(blockedBridge.kferqProteostasisCapacity <= 64)
+  assert.equal(blockedBridge.lamp2aNodes.every((n) => n.cmaStatus === 'cma_attenuation_stress'), true)
+
+  // 3. Rollup in evaluateCareJourneyContinuity
+  const projection = evaluateCareJourneyContinuity([sampleEpisode, blockedEpisode], evaluatedAt)
+  assert.equal(projection.edenLamp2aTranslocationReadyCount, 2)
+  assert.ok(projection.episodes[0].edenLamp2aTranslocation)
+  assert.equal(projection.episodes[0].edenLamp2aTranslocation.truthClass, 'chaperone_autophagy_lamp2a_simulation_proxy')
+  assert.equal(projection.episodes[0].edenLamp2aTranslocation.patientTruthUncompromised, true)
+  assert.equal(projection.episodes[0].edenLamp2aTranslocation.neverManufacturesBiomarkers, true)
+
+  // 4. UI contracts
+  const panelSource = read('src/domains/clinical-operations/ui/CareContinuityPanel.tsx')
+  assert.ok(panelSource.includes('data-eden-lamp2a-translocation="v1"'), 'CareContinuityPanel must include lamp2a translocation attribute')
+
+  const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
+  assert.ok(episodeSource.includes('data-eden-lamp2a-card="v1"'), 'CareEpisode must include lamp2a card')
+  assert.ok(episodeSource.includes('data-eden-lamp2a-nodes="v1"'), 'CareEpisode must include lamp2a nodes grid')
 })
