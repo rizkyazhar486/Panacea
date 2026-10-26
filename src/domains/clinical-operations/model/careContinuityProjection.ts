@@ -28,6 +28,10 @@ import type {
   EdenLongevityPillarId,
   EdenLongevityPillarRecommendation,
   EdenPreventionLongevityRhythm,
+  EdenSupportCircleBridge,
+  Circle,
+  SupportMessage,
+  GratitudeNote,
   LifeDomain,
   LifeEvent,
   Quest,
@@ -119,6 +123,7 @@ export interface CareJourneyEpisodeSummary {
   edenLifeStoryBridge?: EdenLifeStoryBridge
   edenPhysiologyAppreciation?: EdenPhysiologyAppreciation
   edenLongevityRhythm?: EdenPreventionLongevityRhythm
+  edenSupportCircle?: EdenSupportCircleBridge
 }
 
 export type ReadmissionRiskLevel = 'low' | 'moderate' | 'high'
@@ -202,6 +207,7 @@ export interface CareJourneyContinuityResult {
   edenLifeStoryAlignedCount: number
   edenPhysiologyLinkedCount: number
   edenLongevityReadyCount: number
+  edenSupportCircleReadyCount: number
   edenLifeBalance: EdenLifeBalanceSynthesis
   hasBlockedStages: boolean
 }
@@ -1802,6 +1808,77 @@ export function deriveEdenPreventionLongevityRhythm(
   }
 }
 
+export interface EdenSupportCircleInput {
+  buddyName?: string
+  circles?: readonly Circle[]
+  supportMessages?: readonly SupportMessage[]
+  gratitudes?: readonly GratitudeNote[]
+}
+
+export function deriveEdenSupportCircleBridge(
+  episode: CareEpisode,
+  input?: EdenSupportCircleInput,
+): EdenSupportCircleBridge {
+  const companion = deriveEdenCareCompanion(episode, 'simple')
+  const cleanBuddy = input?.buddyName?.trim() ? input.buddyName.trim() : undefined
+
+  const safeCircles: readonly Circle[] = Array.isArray(input?.circles) ? input!.circles : []
+  const trustedCircles = safeCircles.map((c) => {
+    const members = Array.isArray(c.memberNames) ? c.memberNames.filter((m) => Boolean(m?.trim())) : []
+    return {
+      id: c.id,
+      name: c.name,
+      memberCount: members.length,
+      memberNames: [...members],
+    }
+  })
+
+  const safeMessages: readonly SupportMessage[] = Array.isArray(input?.supportMessages)
+    ? input!.supportMessages
+    : []
+  const safeGratitudes: readonly GratitudeNote[] = Array.isArray(input?.gratitudes)
+    ? input!.gratitudes
+    : []
+
+  const recentEncouragements = [
+    ...safeMessages.map((m) => ({
+      id: m.id,
+      fromName: m.fromName,
+      toName: m.toName,
+      text: m.text,
+      at: m.at,
+    })),
+    ...safeGratitudes.map((g) => ({
+      id: g.id,
+      fromName: g.fromName,
+      toName: g.toName,
+      text: g.text,
+      at: g.at,
+    })),
+  ].slice(0, 4)
+
+  const shareablePlainUpdate = `Care update for “${episode.title}”: currently at ${companion.nextBeautifulStep.stageLabel}. ${companion.whatIsHappening} Next step: ${companion.nextBeautifulStep.invitation}`
+
+  const connectionHeadline =
+    trustedCircles.length > 0 || cleanBuddy
+      ? `Connected with ${
+          cleanBuddy ? `Health Buddy ${cleanBuddy}` : `${trustedCircles.length} trusted Circle(s) of Care`
+        }—you can share a calm, plain-language update whenever you choose.`
+      : 'Healing is lighter when shared—you can invite family or a trusted friend into your Circle of Care whenever you wish.'
+
+  return {
+    episodeId: episode.id,
+    episodeTitle: episode.title,
+    healthBuddyName: cleanBuddy,
+    trustedCircles,
+    recentEncouragements,
+    shareablePlainUpdate,
+    connectionHeadline,
+    optInPrivacyPreserved: true,
+    noFabricatedSocialAccounts: true,
+  }
+}
+
 export const STAGE_EXPECTED_DAYS: Record<CareEpisodeStageId, number> = {
   problem: 1,
   diagnosis: 2,
@@ -2057,6 +2134,7 @@ export function evaluateCareJourneyContinuity(
     const edenLifeStoryBridge = deriveEdenLifeStoryBridge(ep)
     const edenPhysiologyAppreciation = deriveEdenPhysiologyAppreciation(ep)
     const edenLongevityRhythm = deriveEdenPreventionLongevityRhythm(ep, recordPlanItems)
+    const edenSupportCircle = deriveEdenSupportCircleBridge(ep)
 
     return {
       id: ep.id,
@@ -2091,6 +2169,7 @@ export function evaluateCareJourneyContinuity(
       edenLifeStoryBridge,
       edenPhysiologyAppreciation,
       edenLongevityRhythm,
+      edenSupportCircle,
     }
   })
 
@@ -2153,6 +2232,9 @@ export function evaluateCareJourneyContinuity(
   const edenLongevityReadyCount = summaries.filter(
     (s) => Boolean(s.edenLongevityRhythm?.nonPrescriptiveEducationalBoundary)
   ).length
+  const edenSupportCircleReadyCount = summaries.filter(
+    (s) => Boolean(s.edenSupportCircle?.optInPrivacyPreserved)
+  ).length
   const edenLifeBalance = deriveEdenLifeBalanceSynthesis(episodes, supportiveResults)
 
   return {
@@ -2191,6 +2273,7 @@ export function evaluateCareJourneyContinuity(
     edenLifeStoryAlignedCount,
     edenPhysiologyLinkedCount,
     edenLongevityReadyCount,
+    edenSupportCircleReadyCount,
     edenLifeBalance,
     hasBlockedStages: blockedJourneys > 0 || stalledCount > 0,
   }

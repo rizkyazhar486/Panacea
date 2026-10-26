@@ -18,6 +18,7 @@ import {
   deriveEdenLifeStoryBridge,
   deriveEdenPhysiologyAppreciation,
   deriveEdenPreventionLongevityRhythm,
+  deriveEdenSupportCircleBridge,
   translateClinicalTermToEden,
   EDEN_PLAIN_LANGUAGE_GLOSSARY,
 } from '../../src/domains/clinical-operations/model/careContinuityProjection.ts'
@@ -2032,4 +2033,69 @@ test('deriveEdenPreventionLongevityRhythm & CareEpisode: Eden Daily Prevention, 
   const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
   assert.ok(episodeSource.includes('data-eden-longevity-card="v1"'), 'CareEpisode must include Eden longevity card')
   assert.ok(episodeSource.includes('data-eden-longevity-pillars="v1"'), 'CareEpisode must include Eden 4-pillar longevity grid')
+})
+
+test('deriveEdenSupportCircleBridge & CareEpisode: Eden Trusted Support Circle & Family/Caregiver Encouragement Bridge (T-CLIN-26 / EDEN-06)', () => {
+  const evaluatedAt = '2026-10-26T06:15:00.000Z'
+
+  const sampleEpisode = {
+    id: 'ce_circle_1',
+    title: 'Post-Appendectomy Recovery',
+    createdAt: '2026-10-20T08:00:00.000Z',
+    updatedAt: '2026-10-25T08:00:00.000Z',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'treatment', status: 'done' },
+      { stage: 'recovery', status: 'active' },
+    ],
+  }
+
+  const supportBridge = deriveEdenSupportCircleBridge(sampleEpisode, {
+    buddyName: 'Siti Rahma',
+    circles: [
+      { id: 'c_1', name: 'Keluarga Inti', memberNames: ['Ibu', 'Ayah', 'Adik'] },
+    ],
+    supportMessages: [
+      {
+        id: 'sm_1',
+        fromEmail: 'ibu@example.com',
+        fromName: 'Ibu',
+        toName: 'Kamu',
+        text: 'Semangat pemulihannya, kami selalu mendoakan.',
+        at: '2026-10-25T09:00:00.000Z',
+      },
+    ],
+    gratitudes: [
+      {
+        id: 'gr_1',
+        fromName: 'Kamu',
+        toName: 'Tim Perawat',
+        text: 'Terima kasih atas pendampingan yang sabar.',
+        at: '2026-10-25T10:00:00.000Z',
+      },
+    ],
+  })
+
+  assert.equal(supportBridge.healthBuddyName, 'Siti Rahma')
+  assert.equal(supportBridge.trustedCircles.length, 1)
+  assert.equal(supportBridge.trustedCircles[0].memberCount, 3)
+  assert.equal(supportBridge.recentEncouragements.length, 2)
+  assert.equal(supportBridge.optInPrivacyPreserved, true)
+  assert.equal(supportBridge.noFabricatedSocialAccounts, true)
+  assert.ok(supportBridge.shareablePlainUpdate.includes('Post-Appendectomy Recovery'))
+  assert.ok(supportBridge.connectionHeadline.includes('Siti Rahma'))
+
+  // Rollup in evaluateCareJourneyContinuity
+  const projection = evaluateCareJourneyContinuity([sampleEpisode], evaluatedAt)
+  assert.equal(projection.edenSupportCircleReadyCount, 1)
+  assert.ok(projection.episodes[0].edenSupportCircle)
+  assert.equal(projection.episodes[0].edenSupportCircle.optInPrivacyPreserved, true)
+
+  // UI contracts
+  const panelSource = read('src/domains/clinical-operations/ui/CareContinuityPanel.tsx')
+  assert.ok(panelSource.includes('data-eden-support-circle="v1"'), 'CareContinuityPanel must include Eden support circle attribute')
+
+  const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
+  assert.ok(episodeSource.includes('data-eden-support-circle-card="v1"'), 'CareEpisode must include Eden support circle card')
+  assert.ok(episodeSource.includes('data-eden-shareable-update="v1"'), 'CareEpisode must include shareable plain update box')
 })

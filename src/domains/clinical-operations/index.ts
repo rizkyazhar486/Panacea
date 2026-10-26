@@ -61,6 +61,7 @@ export {
   deriveEdenLifeStoryBridge,
   deriveEdenPhysiologyAppreciation,
   deriveEdenPreventionLongevityRhythm,
+  deriveEdenSupportCircleBridge,
   translateClinicalTermToEden,
   EDEN_PLAIN_LANGUAGE_GLOSSARY,
   STAGE_LABEL,

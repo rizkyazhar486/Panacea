@@ -465,6 +465,29 @@ export interface EdenPreventionLongevityRhythm {
   nonPrescriptiveEducationalBoundary: true
 }
 
+export interface EdenSupportCircleBridge {
+  episodeId: string
+  episodeTitle: string
+  healthBuddyName?: string
+  trustedCircles: {
+    id: string
+    name: string
+    memberCount: number
+    memberNames: string[]
+  }[]
+  recentEncouragements: {
+    id: string
+    fromName: string
+    toName: string
+    text: string
+    at: string
+  }[]
+  shareablePlainUpdate: string
+  connectionHeadline: string
+  optInPrivacyPreserved: true
+  noFabricatedSocialAccounts: true
+}
+
 export interface CareJourneyExportSummary {
   standard: 'PANACEA-CAREPLAN-FHIR-R4-V1'
   generatedAt: string
