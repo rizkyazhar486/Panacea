@@ -34,6 +34,7 @@ import {
   deriveEdenCircadianAutophagyPulseBridge,
   deriveEdenRetrotransposonSilencingBridge,
   deriveEdenSirtuinNadParp1Bridge,
+  deriveEdenShelterinCapProtectionBridge,
 } from '../../domains/clinical-operations'
 import {
   CARE_EPISODE_STAGES,
@@ -687,6 +688,9 @@ function EpisodeCard({
 
       {/* Eden Sirtuin-NAD+ Metabolomic Resonance & PARP1 Genomic Repair Synthesizer (T-CLIN-47 / EDEN-27) */}
       <EdenSirtuinNadParp1Section episode={episode} />
+
+      {/* Eden Telomeric Shelterin Complex & Chromosomal End-Capping Synthesizer (T-CLIN-48 / EDEN-28) */}
+      <EdenShelterinCapProtectionSection episode={episode} />
     </Card>
   )
 }
@@ -3624,6 +3628,128 @@ function EdenSirtuinNadParp1Section({ episode }: { episode: CareEpisode }) {
 
       <div className="mt-2 text-[10px] text-neutral-500 dark:text-white/50 text-right">
         ARGON EDEN ∞ §07 · Sirtuin-NAD+ Metabolomic Resonance & PARP1 Genomic Repair Synthesizer · Patient Truth Uncompromised · Never Manufactures Biomarkers
+      </div>
+    </div>
+  )
+}
+
+function EdenShelterinCapProtectionSection({ episode }: { episode: CareEpisode }) {
+  const [lang, setLang] = useState<'id' | 'en'>('id')
+
+  const bridge = useMemo(
+    () => deriveEdenShelterinCapProtectionBridge(episode),
+    [episode]
+  )
+
+  const narrative = lang === 'id' ? bridge.cappingNarrativeId : bridge.cappingNarrativeEn
+
+  return (
+    <div
+      className="mt-3 rounded-xl border border-emerald-200 dark:border-white/10 bg-emerald-50/30 dark:bg-white/[0.02] p-3.5"
+      data-eden-shelterin-card="v1"
+    >
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+        <div>
+          <div className="flex items-center gap-2 flex-wrap">
+            <h4 className="text-xs font-bold text-neutral-900 dark:text-white">
+              {lang === 'id'
+                ? 'Kompleks Shelterin Telomerik & Proteksi Dekap Kromosomal'
+                : 'Telomeric Shelterin Complex & Chromosomal End-Capping Protection'}
+            </h4>
+            <span className="rounded-full bg-emerald-100 dark:bg-white/10 px-2 py-0.5 text-[10px] font-bold text-emerald-800 dark:text-emerald-300">
+              {bridge.shelterinStateLabel}
+            </span>
+          </div>
+          <p className="mt-0.5 text-[11px] text-neutral-600 dark:text-white/70">
+            {bridge.protectionTierLabel}
+          </p>
+        </div>
+        <div className="flex items-center gap-2 self-start sm:self-auto">
+          <div className="flex rounded-md border border-emerald-200 dark:border-white/10 p-0.5 text-[10px]">
+            <button
+              type="button"
+              onClick={() => setLang('id')}
+              className={`px-1.5 py-0.5 rounded ${lang === 'id' ? 'bg-emerald-600 text-white font-bold' : 'text-neutral-600 dark:text-white/60'}`}
+            >
+              ID
+            </button>
+            <button
+              type="button"
+              onClick={() => setLang('en')}
+              className={`px-1.5 py-0.5 rounded ${lang === 'en' ? 'bg-emerald-600 text-white font-bold' : 'text-neutral-600 dark:text-white/60'}`}
+            >
+              EN
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-2.5 grid grid-cols-1 sm:grid-cols-3 gap-2">
+        <div className="rounded-lg bg-emerald-100/40 dark:bg-white/[0.03] p-2 text-center">
+          <span className="text-[10px] text-neutral-500 dark:text-white/60 block">
+            {lang === 'id' ? 'Integritas Heksamer Shelterin' : 'Shelterin Hexamer Integrity'}
+          </span>
+          <span className="text-sm font-extrabold text-emerald-700 dark:text-emerald-400">
+            {bridge.shelterinHexamerIntegrityScore}%
+          </span>
+        </div>
+        <div className="rounded-lg bg-emerald-100/40 dark:bg-white/[0.03] p-2 text-center">
+          <span className="text-[10px] text-neutral-500 dark:text-white/60 block">
+            {lang === 'id' ? 'Stabilitas T-Loop' : 'T-Loop Stability'}
+          </span>
+          <span className="text-sm font-extrabold text-emerald-700 dark:text-emerald-400">
+            {bridge.tloopStabilityIndex}%
+          </span>
+        </div>
+        <div className="rounded-lg bg-emerald-100/40 dark:bg-white/[0.03] p-2 text-center">
+          <span className="text-[10px] text-neutral-500 dark:text-white/60 block">
+            {lang === 'id' ? 'Supresi Respon Kerusakan DNA' : 'DDR Kinase Suppression'}
+          </span>
+          <span className="text-sm font-extrabold text-emerald-700 dark:text-emerald-400">
+            {bridge.ddrKinaseSuppressionCapacity}%
+          </span>
+        </div>
+      </div>
+
+      <p className="mt-2 text-xs text-neutral-700 dark:text-white/80 leading-relaxed">
+        {narrative}
+      </p>
+
+      <div className="mt-2.5 space-y-1.5" data-eden-shelterin-nodes="v1">
+        <div className="text-[10px] font-bold text-neutral-500 dark:text-white/60 uppercase tracking-wider">
+          {lang === 'id' ? 'Subunit Perlindungan Heksamer Shelterin (4 Subunit)' : 'Shelterin Hexamer Protection Subunits (4 Subunits)'}
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-1.5">
+          {bridge.subunitNodes.map((node) => (
+            <div
+              key={node.nodeKind}
+              className="rounded-lg border border-emerald-200/50 dark:border-white/10 bg-white/60 dark:bg-white/[0.02] p-2 text-xs"
+            >
+              <div className="flex items-center justify-between gap-1">
+                <span className="font-bold text-neutral-800 dark:text-white truncate">
+                  {node.nodeLabel}
+                </span>
+                <span className="text-[10px] font-bold text-emerald-700 dark:text-emerald-300">
+                  {Math.round(node.protectionEfficiencyScore * 100)}%
+                </span>
+              </div>
+              <div className="mt-0.5 text-[10px] text-neutral-500 dark:text-white/60">
+                {node.mechanisticNote}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="mt-2.5 rounded-lg border border-emerald-200/40 dark:border-white/10 bg-emerald-100/30 dark:bg-white/[0.02] p-2.5 text-xs space-y-1">
+        <div className="text-[11px] text-neutral-800 dark:text-white/85">
+          <b>{lang === 'id' ? 'Strategi Penjagaan Proteksi & Arsitektur Shelterin Telomer:' : 'Telomeric Shelterin Architecture & End-Protection Strategy:'}</b>{' '}
+          {bridge.telomericEndProtectionStrategy}
+        </div>
+      </div>
+
+      <div className="mt-2 text-[10px] text-neutral-500 dark:text-white/50 text-right">
+        ARGON EDEN ∞ §07 · Telomeric Shelterin Complex & Chromosomal End-Capping Synthesizer · Patient Truth Uncompromised · Never Manufactures Biomarkers
       </div>
     </div>
   )

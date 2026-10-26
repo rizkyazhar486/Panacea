@@ -1341,6 +1341,55 @@ export interface EdenSirtuinNadParp1Bridge {
   epistemicHumilityPreserved: true
 }
 
+export type EdenShelterinCappingState =
+  | 'robust_shelterin_hexamer_quiescence'
+  | 'compensated_tloop_protection'
+  | 'shelterin_uncapping_ddr_alarm'
+  | 'severe_telomeric_decap_crisis'
+
+export type EdenChromosomalEndProtectionTier =
+  | 'high_fidelity_tloop_capping'
+  | 'adequate_g_quadruplex_shielding'
+  | 'fragile_telomeric_instability'
+  | 'critical_end_to_end_fusion_hazard'
+
+export type EdenShelterinSubunitNodeKind =
+  | 'trf1_trf2_duplex_telomere_anchoring'
+  | 'pot1_tpp1_single_strand_shielding'
+  | 'tin2_central_bridge_scaffolding'
+  | 'rap1_subtelomeric_heterochromatin_silencing'
+
+export interface EdenShelterinSubunitNode {
+  nodeKind: EdenShelterinSubunitNodeKind
+  nodeLabel: string
+  protectionEfficiencyScore: number
+  cappingIntegrityIndex: number
+  subunitState: 'optimal_capping_shield' | 'adaptive_protective_flux' | 'uncapping_strain'
+  mechanisticNote: string
+}
+
+export interface EdenShelterinCapProtectionBridge {
+  version: 'v1'
+  episodeId: string
+  episodeTitle: string
+  shelterinState: EdenShelterinCappingState
+  shelterinStateLabel: string
+  protectionTier: EdenChromosomalEndProtectionTier
+  protectionTierLabel: string
+  shelterinHexamerIntegrityScore: number
+  tloopStabilityIndex: number
+  ddrKinaseSuppressionCapacity: number
+  subunitNodes: EdenShelterinSubunitNode[]
+  cappingNarrativeId: string
+  cappingNarrativeEn: string
+  telomericEndProtectionStrategy: string
+  truthClass: 'shelterin_capping_protection_simulation_proxy'
+  clinically_reviewed: false
+  patientTruthUncompromised: true
+  neverManufacturesBiomarkers: true
+  epistemicHumilityPreserved: true
+}
+
 export interface CareJourneyExportSummary {
   standard: 'PANACEA-CAREPLAN-FHIR-R4-V1'
   generatedAt: string

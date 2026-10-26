@@ -39,6 +39,7 @@ import {
   deriveEdenCircadianAutophagyPulseBridge,
   deriveEdenRetrotransposonSilencingBridge,
   deriveEdenSirtuinNadParp1Bridge,
+  deriveEdenShelterinCapProtectionBridge,
   translateClinicalTermToEden,
   EDEN_PLAIN_LANGUAGE_GLOSSARY,
 } from '../../src/domains/clinical-operations/model/careContinuityProjection.ts'
@@ -3588,4 +3589,78 @@ test('deriveEdenSirtuinNadParp1Bridge & CareEpisode: Eden Sirtuin-NAD+ Metabolom
   const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
   assert.ok(episodeSource.includes('data-eden-sirtuin-card="v1"'), 'CareEpisode must include sirtuin card')
   assert.ok(episodeSource.includes('data-eden-sirtuin-nodes="v1"'), 'CareEpisode must include sirtuin nodes grid')
+})
+
+test('deriveEdenShelterinCapProtectionBridge & CareEpisode: Eden Telomeric Shelterin Complex & Chromosomal End-Capping Synthesizer (T-CLIN-48 / EDEN-28)', () => {
+  const evaluatedAt = '2026-10-26T19:50:00.000Z'
+  const sampleEpisode = {
+    id: 'ce_shelterin_1',
+    title: 'Telomeric Shelterin Complex & Chromosomal End-Capping Protection Pathway',
+    diagnosisCode: 'Z00.00',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'diagnosis', status: 'done' },
+      { stage: 'plan', status: 'done' },
+      { stage: 'treatment', status: 'done' },
+      { stage: 'recovery', status: 'active' },
+    ],
+  }
+
+  // 1. Pure deterministic derivation
+  const bridge = deriveEdenShelterinCapProtectionBridge(sampleEpisode)
+  assert.equal(bridge.version, 'v1')
+  assert.equal(bridge.episodeId, 'ce_shelterin_1')
+  assert.equal(bridge.shelterinState, 'robust_shelterin_hexamer_quiescence')
+  assert.equal(bridge.shelterinStateLabel, 'Integritas Heksamer Shelterin Kokoh & Proteksi T-Loop Maksimal')
+  assert.equal(bridge.protectionTier, 'high_fidelity_tloop_capping')
+  assert.equal(bridge.protectionTierLabel, 'Proteksi T-Loop Presisi Tinggi & Supresi Respon Kerusakan DNA Titik Akhir')
+  assert.ok(bridge.shelterinHexamerIntegrityScore >= 85)
+  assert.ok(bridge.tloopStabilityIndex >= 85)
+  assert.ok(bridge.ddrKinaseSuppressionCapacity >= 85)
+  assert.equal(bridge.subunitNodes.length, 4)
+  assert.equal(bridge.subunitNodes[0].nodeKind, 'trf1_trf2_duplex_telomere_anchoring')
+  assert.equal(bridge.subunitNodes[1].nodeKind, 'pot1_tpp1_single_strand_shielding')
+  assert.equal(bridge.subunitNodes[2].nodeKind, 'tin2_central_bridge_scaffolding')
+  assert.equal(bridge.subunitNodes[3].nodeKind, 'rap1_subtelomeric_heterochromatin_silencing')
+  assert.equal(bridge.truthClass, 'shelterin_capping_protection_simulation_proxy')
+  assert.equal(bridge.clinically_reviewed, false)
+  assert.equal(bridge.patientTruthUncompromised, true)
+  assert.equal(bridge.neverManufacturesBiomarkers, true)
+  assert.equal(bridge.epistemicHumilityPreserved, true)
+
+  // 2. Blocked stage resilience
+  const blockedEpisode = {
+    id: 'ce_shelterin_blocked',
+    title: 'Blocked Shelterin Uncapping Crisis Episode',
+    diagnosisCode: 'Q87.89',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'diagnosis', status: 'blocked', blockedReason: 'Awaiting telomeric repeat elongation and TRF2 phosphorylation western blot analysis' },
+    ],
+  }
+  const blockedBridge = deriveEdenShelterinCapProtectionBridge(blockedEpisode)
+  assert.equal(blockedBridge.shelterinState, 'severe_telomeric_decap_crisis')
+  assert.equal(blockedBridge.shelterinStateLabel, 'Krisis Dekap Telomerik Kritis & Alarm Kerusakan DNA')
+  assert.equal(blockedBridge.protectionTier, 'critical_end_to_end_fusion_hazard')
+  assert.equal(blockedBridge.protectionTierLabel, 'Bahaya Fusi Kromosom Ujung-ke-Ujung & Respon ATM/ATR Parah')
+  assert.ok(blockedBridge.shelterinHexamerIntegrityScore <= 65)
+  assert.ok(blockedBridge.tloopStabilityIndex <= 65)
+  assert.ok(blockedBridge.ddrKinaseSuppressionCapacity <= 65)
+  assert.equal(blockedBridge.subunitNodes.every((n) => n.subunitState === 'uncapping_strain'), true)
+
+  // 3. Rollup in evaluateCareJourneyContinuity
+  const projection = evaluateCareJourneyContinuity([sampleEpisode, blockedEpisode], evaluatedAt)
+  assert.equal(projection.edenShelterinCapProtectionReadyCount, 2)
+  assert.ok(projection.episodes[0].edenShelterinCapProtection)
+  assert.equal(projection.episodes[0].edenShelterinCapProtection.truthClass, 'shelterin_capping_protection_simulation_proxy')
+  assert.equal(projection.episodes[0].edenShelterinCapProtection.patientTruthUncompromised, true)
+  assert.equal(projection.episodes[0].edenShelterinCapProtection.neverManufacturesBiomarkers, true)
+
+  // 4. UI contracts
+  const panelSource = read('src/domains/clinical-operations/ui/CareContinuityPanel.tsx')
+  assert.ok(panelSource.includes('data-eden-shelterin-cap="v1"'), 'CareContinuityPanel must include shelterin-cap attribute')
+
+  const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
+  assert.ok(episodeSource.includes('data-eden-shelterin-card="v1"'), 'CareEpisode must include shelterin card')
+  assert.ok(episodeSource.includes('data-eden-shelterin-nodes="v1"'), 'CareEpisode must include shelterin nodes grid')
 })
