@@ -570,6 +570,17 @@ export function CareContinuityPanel({
                   <span className="font-bold">{careJourneys.edenLifeBalance.calmStateLabel}</span>
                 </div>
               )}
+              {careJourneys.edenLifeStoryAlignedCount > 0 && (
+                <div
+                  className="flex justify-between text-cyan-200"
+                  data-eden-life-story-bridge="v1"
+                >
+                  <span>Life story threads:</span>
+                  <span className="font-bold">
+                    {careJourneys.edenLifeStoryAlignedCount} linked (self-authored)
+                  </span>
+                </div>
+              )}
 
               {careJourneys.episodes.length > 0 && (
                 <div className="mt-3 border-t border-white/8 pt-2">

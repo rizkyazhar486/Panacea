@@ -368,6 +368,46 @@ export interface EdenLifeBalanceSynthesis {
   clinicalSafetyGuarantee: 'never-deny-care'
 }
 
+export interface EdenLifeStoryAnchor {
+  id: string
+  at: string
+  title: string
+  kind: 'started' | 'blocked' | 'completed'
+  note?: string
+}
+
+export interface EdenLifeStoryBridge {
+  episodeId: string
+  episodeTitle: string
+  lifeChapterName: string
+  lifeChapterAgeRange: string
+  healthStoryAnchors: EdenLifeStoryAnchor[]
+  selfAuthoredTurningPoints: {
+    id: string
+    at: string
+    title: string
+    impact: LifeEvent['impact']
+    domains: LifeDomain[]
+  }[]
+  activeQuests: {
+    id: string
+    title: string
+    domain: LifeDomain
+    progressCurrent: number
+    progressTarget: number
+    unit: string
+    targetNote: string
+  }[]
+  activeLifeDomains: {
+    domain: LifeDomain
+    label: string
+    count: number
+  }[]
+  storyContinuityNarrative: string
+  gentleReflectionPrompt: string
+  selfAuthoredNeverInferred: true
+}
+
 export interface CareJourneyExportSummary {
   standard: 'PANACEA-CAREPLAN-FHIR-R4-V1'
   generatedAt: string

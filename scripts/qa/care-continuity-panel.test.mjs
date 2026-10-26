@@ -15,6 +15,7 @@ import {
   evaluateReferralHandshakeContinuity,
   deriveEdenCareCompanion,
   deriveEdenLifeBalanceSynthesis,
+  deriveEdenLifeStoryBridge,
   translateClinicalTermToEden,
   EDEN_PLAIN_LANGUAGE_GLOSSARY,
 } from '../../src/domains/clinical-operations/model/careContinuityProjection.ts'
@@ -1808,4 +1809,111 @@ test('deriveEdenLifeBalanceSynthesis & CareEpisode: Eden One Control whole-perso
   const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
   assert.ok(episodeSource.includes('data-eden-one-control="v1"'), 'CareEpisode must include Eden One Control header')
   assert.ok(episodeSource.includes('data-eden-unified-focus="v1"'), 'CareEpisode must include One Unified Focus card')
+})
+
+test('deriveEdenLifeStoryBridge & CareEpisode: Eden Personal Life Story & Turning-Point Continuity Bridge (T-CLIN-23 / EDEN-03)', () => {
+  const evaluatedAt = '2026-10-26T05:00:00.000Z'
+
+  const sampleEpisode = {
+    id: 'ce_story_1',
+    title: 'Knee Meniscus Rehabilitation',
+    createdAt: '2026-10-18T10:00:00.000Z',
+    updatedAt: '2026-10-25T10:00:00.000Z',
+    stages: [
+      { stage: 'problem', status: 'done', updatedAt: '2026-10-18T10:00:00.000Z' },
+      { stage: 'treatment', status: 'active', updatedAt: '2026-10-21T10:00:00.000Z' },
+      { stage: 'schedule', status: 'blocked', updatedAt: '2026-10-22T10:00:00.000Z', blockedReason: 'Awaiting evening physio slot' },
+    ],
+  }
+
+  const sampleLifeEvents = [
+    {
+      id: 'le_1',
+      at: '2026-08-10',
+      title: 'Welcomed second child into our family',
+      domains: ['family', 'purpose', 'relationships'],
+      impact: 'positive',
+      isTurningPoint: true,
+    },
+    {
+      id: 'le_2',
+      at: '2026-09-15',
+      title: 'Weekend hiking trip with friends',
+      domains: ['recreation', 'social'],
+      impact: 'positive',
+      isTurningPoint: false,
+    },
+  ]
+
+  const sampleQuests = [
+    {
+      id: 'q_1',
+      title: 'Walk pain-free with family in the park',
+      domain: 'family',
+      createdAt: '2026-10-19',
+      targetNote: '30-minute walk without knee brace',
+      progressCurrent: 2,
+      progressTarget: 5,
+      unit: 'walks',
+      status: 'active',
+    },
+    {
+      id: 'q_2',
+      title: 'Read 10 books this year',
+      domain: 'study',
+      createdAt: '2026-01-01',
+      targetNote: 'Finish 10 books',
+      progressCurrent: 10,
+      progressTarget: 10,
+      unit: 'books',
+      status: 'done',
+    },
+  ]
+
+  const bridge = deriveEdenLifeStoryBridge(
+    sampleEpisode,
+    sampleLifeEvents,
+    sampleQuests,
+    '1988-06-15'
+  )
+
+  // Age 38 in Oct 2026 -> Family & Career (36-50)
+  assert.equal(bridge.lifeChapterName, 'Family & Career')
+  assert.equal(bridge.lifeChapterAgeRange, '36–50')
+  assert.equal(bridge.selfAuthoredNeverInferred, true)
+
+  // Health story anchors: started + blocked
+  assert.equal(bridge.healthStoryAnchors.length, 2)
+  assert.equal(bridge.healthStoryAnchors[0].kind, 'started')
+  assert.equal(bridge.healthStoryAnchors[1].kind, 'blocked')
+  assert.equal(bridge.healthStoryAnchors[1].note, 'Awaiting evening physio slot')
+
+  // Self-authored turning points: only le_1 (isTurningPoint === true), preserving exact self-rated impact
+  assert.equal(bridge.selfAuthoredTurningPoints.length, 1)
+  assert.equal(bridge.selfAuthoredTurningPoints[0].id, 'le_1')
+  assert.equal(bridge.selfAuthoredTurningPoints[0].impact, 'positive')
+
+  // Active quests: only q_1 (status === 'active'), preserving exact progressCurrent/progressTarget
+  assert.equal(bridge.activeQuests.length, 1)
+  assert.equal(bridge.activeQuests[0].id, 'q_1')
+  assert.equal(bridge.activeQuests[0].progressCurrent, 2)
+  assert.equal(bridge.activeQuests[0].progressTarget, 5)
+  assert.ok(bridge.gentleReflectionPrompt.includes('Walk pain-free with family in the park'))
+
+  // Domain counts: family (2: le_1 + q_1), physical (1: episode), etc.
+  assert.equal(bridge.activeLifeDomains[0].domain, 'family')
+  assert.equal(bridge.activeLifeDomains[0].count, 2)
+
+  // Rollup in evaluateCareJourneyContinuity
+  const projection = evaluateCareJourneyContinuity([sampleEpisode], evaluatedAt)
+  assert.equal(projection.edenLifeStoryAlignedCount, 1)
+  assert.ok(projection.episodes[0].edenLifeStoryBridge)
+  assert.equal(projection.episodes[0].edenLifeStoryBridge.selfAuthoredNeverInferred, true)
+
+  // UI contracts
+  const panelSource = read('src/domains/clinical-operations/ui/CareContinuityPanel.tsx')
+  assert.ok(panelSource.includes('data-eden-life-story-bridge="v1"'), 'CareContinuityPanel must include Eden life story bridge attribute')
+
+  const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
+  assert.ok(episodeSource.includes('data-eden-life-story-card="v1"'), 'CareEpisode must include Eden life story card')
 })
