@@ -150,6 +150,11 @@ import type {
   EdenPeroxisomalNodeKind,
   EdenPeroxisomalNode,
   EdenPeroxisomalCatalaseBridge,
+  EdenErUprState,
+  EdenErUprTier,
+  EdenErUprNodeKind,
+  EdenErUprNode,
+  EdenErProteostasisBridge,
   WellnessDay,
   MoodEntry,
   Circle,
@@ -275,6 +280,7 @@ export interface CareJourneyEpisodeSummary {
   edenLamp2aTranslocation?: EdenLamp2aTranslocationBridge
   edenRanGtpTransport?: EdenRanGtpTransportBridge
   edenPeroxisomalCatalase?: EdenPeroxisomalCatalaseBridge
+  edenErProteostasis?: EdenErProteostasisBridge
 }
 
 export type ReadmissionRiskLevel = 'low' | 'moderate' | 'high'
@@ -386,6 +392,7 @@ export interface CareJourneyContinuityResult {
   edenLamp2aTranslocationReadyCount: number
   edenRanGtpTransportReadyCount: number
   edenPeroxisomalCatalaseReadyCount: number
+  edenErProteostasisReadyCount: number
   edenLifeBalance: EdenLifeBalanceSynthesis
   hasBlockedStages: boolean
 }
@@ -5000,6 +5007,115 @@ export function deriveEdenPeroxisomalCatalaseBridge(
   }
 }
 
+export function deriveEdenErProteostasisBridge(
+  episode: CareEpisode,
+): EdenErProteostasisBridge {
+  const stages = episode.stages ?? []
+  const completedStages = stages.filter((s) => s.status === 'done').length
+  const hasBlocked = stages.some((s) => s.status === 'blocked')
+  const blockedCount = stages.filter((s) => s.status === 'blocked').length
+
+  const erProteostasisScore = hasBlocked
+    ? Math.max(46, 66 - blockedCount * 7)
+    : Math.min(99, 81 + completedStages * 5)
+
+  const chaperoneBindingCapacity = hasBlocked
+    ? Math.max(45, 65 - blockedCount * 7)
+    : Math.min(98, 80 + completedStages * 5)
+
+  const eradRetrotranslocationIndex = hasBlocked
+    ? Math.max(43, 63 - blockedCount * 8)
+    : Math.min(98, 79 + completedStages * 5)
+
+  let uprState: EdenErUprState = 'balanced_adaptive_upr_atf6_ire1_resolution'
+  let uprStateLabel = 'Resolusi UPR Adaptif ATF6 & IRE1 dengan Keseimbangan Pelipatan Protein ER'
+  let uprTier: EdenErUprTier = 'balanced_adaptive_upr_equilibrium'
+  let uprTierLabel = 'Ekuilibrium UPR Adaptif & Kapasitas Pelipatan Chaperon Stabil'
+
+  if (hasBlocked) {
+    uprState = 'critical_proteostatic_collapse_apoptotic_upr'
+    uprStateLabel = 'Kolaps Proteostasis ER Kritis & Pensinyalan UPR Pro-Apoptotik Maladaptif'
+    uprTier = 'critical_misfolded_er_load_instability'
+    uprTierLabel = 'Instabilitas Beban Protein Tak Terlipat Kritis & Kejenuhan Chaperon Lumenal'
+  } else if (completedStages >= 3) {
+    uprState = 'optimal_er_proteostasis_xbp1s_surveillance'
+    uprStateLabel = 'Surveilans Proteostasis ER Optimal & Pengikatan Chaperon BiP/GRP78 Paripurna'
+    uprTier = 'optimal_er_proteostatic_fidelity'
+    uprTierLabel = 'Fidelitas Proteostatik Retikulum Endoplasma Optimal & Klirens ERAD Sempurna'
+  } else if (completedStages === 0) {
+    uprState = 'transient_er_lumen_misfolded_protein_strain'
+    uprStateLabel = 'Regangan Protein Tak Terlipat Lumen ER Transien & Pelepasan BiP Inisial'
+    uprTier = 'moderate_chaperone_saturation_strain'
+    uprTierLabel = 'Regangan Kejenuhan Chaperon Lumenal Moderat Transien'
+  }
+
+  const uprNodes: EdenErUprNode[] = [
+    {
+      nodeKind: 'bip_grp78_lumenal_chaperone_binding',
+      nodeLabel: 'Pengikatan Chaperon Lumenal BiP/GRP78 (HSPA5) pada Residu Hidrofobik',
+      chaperoneFidelityScore: hasBlocked ? 0.62 : Math.min(0.99, 0.82 + completedStages * 0.05),
+      foldingClearanceIndex: hasBlocked ? 0.60 : Math.min(0.98, 0.79 + completedStages * 0.05),
+      uprStatus: hasBlocked ? 'er_proteostatic_stress' : completedStages >= 2 ? 'optimal_folding_state' : 'adaptive_upr_mode',
+      mechanisticNote: 'Master regulator BiP mengikat domain lumenal IRE1/ATF6 dalam kondisi basal; misfolded protein memicu disosiasi BiP untuk mengaktifkan kaskade UPR.',
+    },
+    {
+      nodeKind: 'ire1a_xbp1s_endoribonuclease_splicing',
+      nodeLabel: 'Oligomerisasi IRE1α & Pemotongan Intron Non-Konvensional mRNA XBP1 (XBP1s)',
+      chaperoneFidelityScore: hasBlocked ? 0.61 : Math.min(0.98, 0.81 + completedStages * 0.05),
+      foldingClearanceIndex: hasBlocked ? 0.59 : Math.min(0.99, 0.78 + completedStages * 0.05),
+      uprStatus: hasBlocked ? 'er_proteostatic_stress' : completedStages >= 2 ? 'optimal_folding_state' : 'adaptive_upr_mode',
+      mechanisticNote: 'Domain endoribonuklease sitosolik IRE1α memotong intron 26-nukleotida pada mRNA XBP1u, menghasilkan faktor transkripsi XBP1s aktif untuk transkripsi gen chaperon ER.',
+    },
+    {
+      nodeKind: 'atf6_golgi_s1p_s2p_proteolytic_cleavage',
+      nodeLabel: 'Transpor Vesikular ATF6 ke Golgi & Pembelahan Proteolitik Bertingkat S1P/S2P',
+      chaperoneFidelityScore: hasBlocked ? 0.63 : Math.min(0.99, 0.80 + completedStages * 0.05),
+      foldingClearanceIndex: hasBlocked ? 0.61 : Math.min(0.98, 0.80 + completedStages * 0.05),
+      uprStatus: hasBlocked ? 'er_proteostatic_stress' : completedStages >= 2 ? 'optimal_folding_state' : 'adaptive_upr_mode',
+      mechanisticNote: 'ATF6 p90 bertranslokasi melalui vesikel COPII ke aparatus Golgi, di mana protease S1P dan S2P membebaskan fragmen N-terminal ATF6(N) aktif ke nukleus.',
+    },
+    {
+      nodeKind: 'sel1l_hrd1_erad_retrotranslocation_clearance',
+      nodeLabel: 'Kompleks Ubiquitin Ligase SEL1L–HRD1 & Retrotranslokasi Dislokon ERAD',
+      chaperoneFidelityScore: hasBlocked ? 0.59 : Math.min(0.97, 0.78 + completedStages * 0.06),
+      foldingClearanceIndex: hasBlocked ? 0.58 : Math.min(0.97, 0.77 + completedStages * 0.06),
+      uprStatus: hasBlocked ? 'er_proteostatic_stress' : completedStages >= 2 ? 'optimal_folding_state' : 'adaptive_upr_mode',
+      mechanisticNote: 'Glikoprotein ER termutilasi dikenali oleh lektin OS9/EDEM dan ditransfer ke kompleks membran SEL1L-HRD1 untuk poliubikuitinasi dan degradasi di proteasom 26S sitosol.',
+    },
+  ]
+
+  const uprNarrativeId = `Sintesis respons protein tak terlipat (UPR) retikulum endoplasma & kendali mutu proteostasis untuk episode "${episode.title}". Status UPR: ${uprStateLabel}, tingkat resiliensi: ${uprTierLabel}. Skor proteostasis ER ${erProteostasisScore}%, kapasitas chaperon ${chaperoneBindingCapacity}%, dan indeks retrotranslokasi ERAD ${eradRetrotranslocationIndex}%.`
+  const uprNarrativeEn = `Endoplasmic reticulum unfolded protein response (UPR) & proteostatic quality control synthesis for episode "${episode.title}". UPR state: ${uprStateLabel}, resilience tier: ${uprTierLabel}. ER proteostasis score ${erProteostasisScore}%, chaperone binding capacity ${chaperoneBindingCapacity}%, and ERAD retrotranslocation index ${eradRetrotranslocationIndex}%.`
+
+  const uprLongevityStrategy = hasBlocked
+    ? 'Meredakan stres retikulum endoplasma berat melalui pembatasan lonjakan glukosa dan lipid pro-inflamasi, suplementasi tauroursodeoxycholic acid (TUDCA) atau 4-phenylbutyrate (4-PBA) berbasis rekomendasi medis, dan stabilisasi homeostasis kalsium intraseluler.'
+    : completedStages >= 3
+    ? 'Mempertahankan kapasitas pelipatan protein ER optimal melalui asupan polifenol sitoprotektif, stimulasi proteostasis dengan paparan panas ringan berirama (sauna), dan periode puasa terjadwal untuk pembersihan ERAD.'
+    : 'Mendukung kapasitas pelipatan chaperon lumenal dan mencegah beban glikolisis berlebih dengan hidrasi seimbang, mikronutrien pembentuk kofaktor lipatan, dan istirahat restoratif berkala.'
+
+  return {
+    version: 'v1',
+    episodeId: episode.id,
+    episodeTitle: episode.title,
+    uprState,
+    uprStateLabel,
+    uprTier,
+    uprTierLabel,
+    erProteostasisScore,
+    chaperoneBindingCapacity,
+    eradRetrotranslocationIndex,
+    uprNodes,
+    uprNarrativeId,
+    uprNarrativeEn,
+    uprLongevityStrategy,
+    truthClass: 'er_upr_proteostasis_simulation_proxy',
+    clinically_reviewed: false,
+    patientTruthUncompromised: true,
+    neverManufacturesBiomarkers: true,
+    epistemicHumilityPreserved: true,
+  }
+}
+
 export const STAGE_EXPECTED_DAYS: Record<CareEpisodeStageId, number> = {
   problem: 1,
   diagnosis: 2,
@@ -5283,6 +5399,7 @@ export function evaluateCareJourneyContinuity(
     const edenLamp2aTranslocation = deriveEdenLamp2aTranslocationBridge(ep)
     const edenRanGtpTransport = deriveEdenRanGtpTransportBridge(ep)
     const edenPeroxisomalCatalase = deriveEdenPeroxisomalCatalaseBridge(ep)
+    const edenErProteostasis = deriveEdenErProteostasisBridge(ep)
 
     return {
       id: ep.id,
@@ -5345,6 +5462,7 @@ export function evaluateCareJourneyContinuity(
       edenLamp2aTranslocation,
       edenRanGtpTransport,
       edenPeroxisomalCatalase,
+      edenErProteostasis,
     }
   })
 
@@ -5614,6 +5732,14 @@ export function evaluateCareJourneyContinuity(
           s.edenPeroxisomalCatalase?.neverManufacturesBiomarkers
       )
   ).length
+  const edenErProteostasisReadyCount = summaries.filter(
+    (s) =>
+      Boolean(
+        s.edenErProteostasis?.truthClass === 'er_upr_proteostasis_simulation_proxy' &&
+          s.edenErProteostasis?.patientTruthUncompromised &&
+          s.edenErProteostasis?.neverManufacturesBiomarkers
+      )
+  ).length
   const edenLifeBalance = deriveEdenLifeBalanceSynthesis(episodes, supportiveResults)
 
   return {
@@ -5680,6 +5806,7 @@ export function evaluateCareJourneyContinuity(
     edenLamp2aTranslocationReadyCount,
     edenRanGtpTransportReadyCount,
     edenPeroxisomalCatalaseReadyCount,
+    edenErProteostasisReadyCount,
     edenLifeBalance,
     hasBlockedStages: blockedJourneys > 0 || stalledCount > 0,
   }

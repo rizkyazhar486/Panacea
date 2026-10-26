@@ -89,6 +89,7 @@ export {
   deriveEdenLamp2aTranslocationBridge,
   deriveEdenRanGtpTransportBridge,
   deriveEdenPeroxisomalCatalaseBridge,
+  deriveEdenErProteostasisBridge,
   translateClinicalTermToEden,
   EDEN_PLAIN_LANGUAGE_GLOSSARY,
   STAGE_LABEL,

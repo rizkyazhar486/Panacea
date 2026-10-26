@@ -46,6 +46,7 @@ import {
   deriveEdenLamp2aTranslocationBridge,
   deriveEdenRanGtpTransportBridge,
   deriveEdenPeroxisomalCatalaseBridge,
+  deriveEdenErProteostasisBridge,
   translateClinicalTermToEden,
   EDEN_PLAIN_LANGUAGE_GLOSSARY,
 } from '../../src/domains/clinical-operations/model/careContinuityProjection.ts'
@@ -4113,4 +4114,78 @@ test('CareContinuityPanel: Eden Peroxisomal Beta-Oxidation & Catalase Redox Home
   const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
   assert.ok(episodeSource.includes('data-eden-peroxisomal-card="v1"'), 'CareEpisode must include peroxisomal card')
   assert.ok(episodeSource.includes('data-eden-peroxisomal-nodes="v1"'), 'CareEpisode must include peroxisomal nodes grid')
+})
+
+test('CareContinuityPanel: Eden Endoplasmic Reticulum UPR & ATF6/IRE1 Proteostatic Quality Control Synthesizer contract (T-CLIN-55)', () => {
+  const evaluatedAt = '2026-10-27T00:00:00.000Z'
+  const sampleEpisode = {
+    id: 'ce_er_upr_1',
+    title: 'Post-Metabolic Recovery ER Proteostasis Episode',
+    diagnosisCode: 'E11.9',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'diagnosis', status: 'done' },
+      { stage: 'plan', status: 'done' },
+      { stage: 'treatment', status: 'done' },
+      { stage: 'recovery', status: 'active' },
+    ],
+  }
+
+  // 1. Pure deterministic derivation
+  const bridge = deriveEdenErProteostasisBridge(sampleEpisode)
+  assert.equal(bridge.version, 'v1')
+  assert.equal(bridge.episodeId, 'ce_er_upr_1')
+  assert.equal(bridge.uprState, 'optimal_er_proteostasis_xbp1s_surveillance')
+  assert.equal(bridge.uprStateLabel, 'Surveilans Proteostasis ER Optimal & Pengikatan Chaperon BiP/GRP78 Paripurna')
+  assert.equal(bridge.uprTier, 'optimal_er_proteostatic_fidelity')
+  assert.equal(bridge.uprTierLabel, 'Fidelitas Proteostatik Retikulum Endoplasma Optimal & Klirens ERAD Sempurna')
+  assert.ok(bridge.erProteostasisScore >= 85)
+  assert.ok(bridge.chaperoneBindingCapacity >= 85)
+  assert.ok(bridge.eradRetrotranslocationIndex >= 85)
+  assert.equal(bridge.uprNodes.length, 4)
+  assert.equal(bridge.uprNodes[0].nodeKind, 'bip_grp78_lumenal_chaperone_binding')
+  assert.equal(bridge.uprNodes[1].nodeKind, 'ire1a_xbp1s_endoribonuclease_splicing')
+  assert.equal(bridge.uprNodes[2].nodeKind, 'atf6_golgi_s1p_s2p_proteolytic_cleavage')
+  assert.equal(bridge.uprNodes[3].nodeKind, 'sel1l_hrd1_erad_retrotranslocation_clearance')
+  assert.equal(bridge.truthClass, 'er_upr_proteostasis_simulation_proxy')
+  assert.equal(bridge.clinically_reviewed, false)
+  assert.equal(bridge.patientTruthUncompromised, true)
+  assert.equal(bridge.neverManufacturesBiomarkers, true)
+  assert.equal(bridge.epistemicHumilityPreserved, true)
+
+  // 2. Blocked stage resilience
+  const blockedEpisode = {
+    id: 'ce_er_upr_blocked',
+    title: 'Blocked Diabetic Proteotoxic ER Stress Episode',
+    diagnosisCode: 'E11.21',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'diagnosis', status: 'blocked', blockedReason: 'Awaiting ER stress transcriptomic biomarker assay and HbA1c verification' },
+    ],
+  }
+  const blockedBridge = deriveEdenErProteostasisBridge(blockedEpisode)
+  assert.equal(blockedBridge.uprState, 'critical_proteostatic_collapse_apoptotic_upr')
+  assert.equal(blockedBridge.uprStateLabel, 'Kolaps Proteostasis ER Kritis & Pensinyalan UPR Pro-Apoptotik Maladaptif')
+  assert.equal(blockedBridge.uprTier, 'critical_misfolded_er_load_instability')
+  assert.equal(blockedBridge.uprTierLabel, 'Instabilitas Beban Protein Tak Terlipat Kritis & Kejenuhan Chaperon Lumenal')
+  assert.ok(blockedBridge.erProteostasisScore <= 67)
+  assert.ok(blockedBridge.chaperoneBindingCapacity <= 66)
+  assert.ok(blockedBridge.eradRetrotranslocationIndex <= 64)
+  assert.equal(blockedBridge.uprNodes.every((n) => n.uprStatus === 'er_proteostatic_stress'), true)
+
+  // 3. Rollup in evaluateCareJourneyContinuity
+  const projection = evaluateCareJourneyContinuity([sampleEpisode, blockedEpisode], evaluatedAt)
+  assert.equal(projection.edenErProteostasisReadyCount, 2)
+  assert.ok(projection.episodes[0].edenErProteostasis)
+  assert.equal(projection.episodes[0].edenErProteostasis.truthClass, 'er_upr_proteostasis_simulation_proxy')
+  assert.equal(projection.episodes[0].edenErProteostasis.patientTruthUncompromised, true)
+  assert.equal(projection.episodes[0].edenErProteostasis.neverManufacturesBiomarkers, true)
+
+  // 4. UI contracts
+  const panelSource = read('src/domains/clinical-operations/ui/CareContinuityPanel.tsx')
+  assert.ok(panelSource.includes('data-eden-er-upr="v1"'), 'CareContinuityPanel must include ER UPR attribute')
+
+  const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
+  assert.ok(episodeSource.includes('data-eden-er-upr-card="v1"'), 'CareEpisode must include ER UPR card')
+  assert.ok(episodeSource.includes('data-eden-er-upr-nodes="v1"'), 'CareEpisode must include ER UPR nodes grid')
 })
