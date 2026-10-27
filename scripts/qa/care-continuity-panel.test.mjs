@@ -49,6 +49,7 @@ import {
   deriveEdenErProteostasisBridge,
   deriveEdenPerkIsrBridge,
   deriveEdenGolgiGlycosylationBridge,
+  deriveEdenUpsProteasomeBridge,
   translateClinicalTermToEden,
   EDEN_PLAIN_LANGUAGE_GLOSSARY,
 } from '../../src/domains/clinical-operations/model/careContinuityProjection.ts'
@@ -4338,4 +4339,78 @@ test('CareContinuityPanel: Eden Golgi Vesicular Trafficking & Glycosylation Fide
   const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
   assert.ok(episodeSource.includes('data-eden-golgi-card="v1"'), 'CareEpisode must include Golgi card')
   assert.ok(episodeSource.includes('data-eden-golgi-nodes="v1"'), 'CareEpisode must include Golgi nodes grid')
+})
+
+test('CareContinuityPanel: Eden 26S Ubiquitin-Proteasome System (UPS) & Polyubiquitin Degradation Synthesizer contract (T-CLIN-59)', () => {
+  const evaluatedAt = '2026-10-27T00:00:00.000Z'
+  const sampleEpisode = {
+    id: 'ce_ups_1',
+    title: 'Post-CABG Comprehensive Proteasomal Clearance & UPS Surveillance Episode',
+    diagnosisCode: 'I25.10',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'diagnosis', status: 'done' },
+      { stage: 'plan', status: 'done' },
+      { stage: 'treatment', status: 'done' },
+      { stage: 'recovery', status: 'active' },
+    ],
+  }
+
+  // 1. Pure deterministic derivation
+  const bridge = deriveEdenUpsProteasomeBridge(sampleEpisode)
+  assert.equal(bridge.version, 'v1')
+  assert.equal(bridge.episodeId, 'ce_ups_1')
+  assert.equal(bridge.upsState, 'optimal_26s_proteasomal_flux_clearance')
+  assert.equal(bridge.upsStateLabel, 'Klirens Proteolitik Proteasom 26S Optimal & Daur Ulang Ubikuitin Paripurna')
+  assert.equal(bridge.upsTier, 'optimal_proteasome_catalytic_fidelity')
+  assert.equal(bridge.upsTierLabel, 'Fidelitas Katalitik Partikel Inti 20S & Efisiensi Translokasi 19S Optimal')
+  assert.ok(bridge.upsScore >= 85)
+  assert.ok(bridge.polyubiquitinClearanceIndex >= 85)
+  assert.ok(bridge.proteasomeGateCapacity >= 85)
+  assert.equal(bridge.upsNodes.length, 4)
+  assert.equal(bridge.upsNodes[0].nodeKind, 'e1_e2_e3_ubiquitination_cascade')
+  assert.equal(bridge.upsNodes[1].nodeKind, 'rpn_ubiquitin_receptor_and_dub_recycling')
+  assert.equal(bridge.upsNodes[2].nodeKind, 'rpt_aaa_atpase_unfolding_and_gate_opening')
+  assert.equal(bridge.upsNodes[3].nodeKind, 'cp_20s_threonine_peptidase_proteolysis')
+  assert.equal(bridge.truthClass, 'ups_proteasome_degradation_simulation_proxy')
+  assert.equal(bridge.clinically_reviewed, false)
+  assert.equal(bridge.patientTruthUncompromised, true)
+  assert.equal(bridge.neverManufacturesBiomarkers, true)
+  assert.equal(bridge.epistemicHumilityPreserved, true)
+
+  // 2. Blocked stage resilience
+  const blockedEpisode = {
+    id: 'ce_ups_blocked',
+    title: 'Blocked Proteasome Exhaustion and Ubiquitinated Aggregate Accumulation Episode',
+    diagnosisCode: 'G30.9',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'diagnosis', status: 'blocked', blockedReason: 'Awaiting 20S proteasome fluorogenic peptidase assay and polyubiquitin chain linkage proteomics' },
+    ],
+  }
+  const blockedBridge = deriveEdenUpsProteasomeBridge(blockedEpisode)
+  assert.equal(blockedBridge.upsState, 'critical_proteasomal_exhaustion_proteotoxicity')
+  assert.equal(blockedBridge.upsStateLabel, 'Kelelahan Proteasom 26S Kritis & Akumulasi Agregat Poliubikuitin Terhambat')
+  assert.equal(blockedBridge.upsTier, 'critical_proteasomal_inhibition_instability')
+  assert.equal(blockedBridge.upsTierLabel, 'Instabilitas Inhibisi Proteasom Kritis & Stres Proteotoksisitas Akumulatif')
+  assert.ok(blockedBridge.upsScore <= 66)
+  assert.ok(blockedBridge.polyubiquitinClearanceIndex <= 65)
+  assert.ok(blockedBridge.proteasomeGateCapacity <= 63)
+  assert.equal(blockedBridge.upsNodes.every((n) => n.upsStatus === 'proteasomal_exhaustion_stress'), true)
+
+  // 3. Rollup in evaluateCareJourneyContinuity
+  const projection = evaluateCareJourneyContinuity([sampleEpisode, blockedEpisode], evaluatedAt)
+  assert.equal(projection.edenUpsProteasomeReadyCount, 2)
+  assert.ok(projection.episodes[0].edenUpsProteasome)
+  assert.equal(projection.episodes[0].edenUpsProteasome.truthClass, 'ups_proteasome_degradation_simulation_proxy')
+  assert.equal(projection.episodes[0].edenUpsProteasome.patientTruthUncompromised, true)
+  assert.equal(projection.episodes[0].edenUpsProteasome.neverManufacturesBiomarkers, true)
+
+  // 4. UI contracts
+  const panelSource = read('src/domains/clinical-operations/ui/CareContinuityPanel.tsx')
+  assert.ok(panelSource.includes('data-eden-ups="v1"'), 'CareContinuityPanel must include UPS attribute')
+
+  const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
+  assert.ok(episodeSource.includes('data-eden-ups-card="v1"'), 'CareEpisode must include UPS card')
+  assert.ok(episodeSource.includes('data-eden-ups-nodes="v1"'), 'CareEpisode must include UPS nodes grid')
 })
