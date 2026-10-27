@@ -1880,6 +1880,55 @@ export interface EdenUpsProteasomeBridge {
   epistemicHumilityPreserved: true
 }
 
+export type EdenLysosomalAutophagyState =
+  | 'optimal_autophagic_flux_tfeb_clear_activation'
+  | 'balanced_basal_lysosomal_turnover'
+  | 'transient_acidification_attenuation_mtorc1_strain'
+  | 'critical_lysosomal_storage_proteolytic_exhaustion'
+
+export type EdenLysosomalAutophagyTier =
+  | 'high_fidelity_tfeb_clear_orchestration'
+  | 'adequate_v_atpase_luminal_acidification'
+  | 'stalled_autophagosome_lysosome_fusion_strain'
+  | 'critical_lysosomal_membrane_permeabilization_risk'
+
+export type EdenLysosomalNodeKind =
+  | 'tfeb_clear_network_transcriptional_biogenesis'
+  | 'v_atpase_proton_pump_acidification'
+  | 'autophagosome_lysosome_fusion_machinery'
+  | 'nutrient_sensing_rag_mtorc1_lysosomal_surface'
+
+export interface EdenLysosomalNode {
+  nodeKind: EdenLysosomalNodeKind
+  nodeLabel: string
+  fluxEfficiencyScore: number
+  luminalAcidificationIndex: number
+  lysosomalStatus: 'optimal_clear_flux' | 'adaptive_autophagy_mode' | 'lysosomal_exhaustion_stress'
+  mechanisticNote: string
+}
+
+export interface EdenLysosomalAutophagyBridge {
+  version: 'v1'
+  episodeId: string
+  episodeTitle: string
+  lysosomalState: EdenLysosomalAutophagyState
+  lysosomalStateLabel: string
+  lysosomalTier: EdenLysosomalAutophagyTier
+  lysosomalTierLabel: string
+  autophagicFluxScore: number
+  tfebNuclearTranslocationIndex: number
+  vAtpaseAcidificationCapacity: number
+  lysosomalNodes: EdenLysosomalNode[]
+  lysosomalNarrativeId: string
+  lysosomalNarrativeEn: string
+  lysosomalLongevityStrategy: string
+  truthClass: 'lysosomal_autophagy_tfeb_simulation_proxy'
+  clinically_reviewed: false
+  patientTruthUncompromised: true
+  neverManufacturesBiomarkers: true
+  epistemicHumilityPreserved: true
+}
+
 export interface CareJourneyExportSummary {
   standard: 'PANACEA-CAREPLAN-FHIR-R4-V1'
   generatedAt: string

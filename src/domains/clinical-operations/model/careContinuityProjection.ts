@@ -170,6 +170,11 @@ import type {
   EdenUpsNodeKind,
   EdenUpsNode,
   EdenUpsProteasomeBridge,
+  EdenLysosomalAutophagyState,
+  EdenLysosomalAutophagyTier,
+  EdenLysosomalNodeKind,
+  EdenLysosomalNode,
+  EdenLysosomalAutophagyBridge,
   WellnessDay,
   MoodEntry,
   Circle,
@@ -299,6 +304,7 @@ export interface CareJourneyEpisodeSummary {
   edenPerkIsr?: EdenPerkIsrBridge
   edenGolgiGlycosylation?: EdenGolgiGlycosylationBridge
   edenUpsProteasome?: EdenUpsProteasomeBridge
+  edenLysosomalAutophagy?: EdenLysosomalAutophagyBridge
 }
 
 export type ReadmissionRiskLevel = 'low' | 'moderate' | 'high'
@@ -414,6 +420,7 @@ export interface CareJourneyContinuityResult {
   edenPerkIsrReadyCount: number
   edenGolgiGlycosylationReadyCount: number
   edenUpsProteasomeReadyCount: number
+  edenLysosomalAutophagyReadyCount: number
   edenLifeBalance: EdenLifeBalanceSynthesis
   hasBlockedStages: boolean
 }
@@ -5473,6 +5480,124 @@ export function deriveEdenUpsProteasomeBridge(
   }
 }
 
+export function deriveEdenLysosomalAutophagyBridge(
+  episode: CareEpisode,
+): EdenLysosomalAutophagyBridge {
+  const stages = episode.stages ?? []
+  const completedStages = stages.filter((s) => s.status === 'done').length
+  const hasBlocked = stages.some((s) => s.status === 'blocked')
+  const blockedCount = stages.filter((s) => s.status === 'blocked').length
+
+  const autophagicFluxScore = hasBlocked
+    ? Math.max(45, 65 - blockedCount * 7)
+    : Math.min(99, 83 + completedStages * 5)
+
+  const tfebNuclearTranslocationIndex = hasBlocked
+    ? Math.max(42, 62 - blockedCount * 7)
+    : Math.min(98, 81 + completedStages * 5)
+
+  const vAtpaseAcidificationCapacity = hasBlocked
+    ? Math.max(44, 63 - blockedCount * 8)
+    : Math.min(99, 82 + completedStages * 5)
+
+  let lysosomalState: EdenLysosomalAutophagyState = 'balanced_basal_lysosomal_turnover'
+  let lysosomalStateLabel = 'Turnover Lisosomal Basal Seimbang & Homeostasis Degradasi Makroautofagi'
+  let lysosomalTier: EdenLysosomalAutophagyTier = 'adequate_v_atpase_luminal_acidification'
+  let lysosomalTierLabel = 'Asidifikasi Luminal V-ATPase Adekuat & Aktivitas Hidrolase Asam Terjaga'
+
+  if (hasBlocked) {
+    lysosomalState = 'critical_lysosomal_storage_proteolytic_exhaustion'
+    lysosomalStateLabel = 'Kelelahan Proteolitik Lisosom Kritis & Penumpukan Substrat Makromolekul Terhambat'
+    lysosomalTier = 'critical_lysosomal_membrane_permeabilization_risk'
+    lysosomalTierLabel = 'Risiko Permeabilitas Membran Lisosom Kritis & Kebocoran Katepsin Sitotoksik'
+  } else if (completedStages >= 3) {
+    lysosomalState = 'optimal_autophagic_flux_tfeb_clear_activation'
+    lysosomalStateLabel = 'Fluks Autofagi Lisosomal Optimal & Aktivasi Jaringan Gen CLEAR via Translokasi TFEB'
+    lysosomalTier = 'high_fidelity_tfeb_clear_orchestration'
+    lysosomalTierLabel = 'Orkestrasi Biogenesis Lisosom TFEB-CLEAR Presisi Tinggi & Fusi Autofagosom Paripurna'
+  } else if (completedStages === 0) {
+    lysosomalState = 'transient_acidification_attenuation_mtorc1_strain'
+    lysosomalStateLabel = 'Atenuasi Asidifikasi Transien & Regangan Supresi Gen CLEAR oleh Sinyal mTORC1'
+    lysosomalTier = 'stalled_autophagosome_lysosome_fusion_strain'
+    lysosomalTierLabel = 'Regangan Fusi Autofagosom-Lisosom Transien & Penumpukan Vesikel Autofagik'
+  }
+
+  const lysosomalNodes: EdenLysosomalNode[] = [
+    {
+      nodeKind: 'tfeb_clear_network_transcriptional_biogenesis',
+      nodeLabel: 'Translokasi Nuklear TFEB/TFE3 & Transkripsi Jaringan Gen Biogenesis Lisosomal CLEAR',
+      fluxEfficiencyScore: hasBlocked ? 0.60 : Math.min(0.99, 0.83 + completedStages * 0.05),
+      luminalAcidificationIndex: hasBlocked ? 0.59 : Math.min(0.98, 0.81 + completedStages * 0.05),
+      lysosomalStatus: hasBlocked ? 'lysosomal_exhaustion_stress' : completedStages >= 2 ? 'optimal_clear_flux' : 'adaptive_autophagy_mode',
+      mechanisticNote: 'Defosforilasi residu Ser211 oleh kalsineurin membebaskan faktor transkripsi TFEB/TFE3 dari retensi sitosolik 14-3-3 menuju inti sel, mengikat motif promotor CLEAR (GTCACGTGAC) guna menginduksi sintesis hidrolase dan protein membran LAMP1/2.',
+    },
+    {
+      nodeKind: 'v_atpase_proton_pump_acidification',
+      nodeLabel: 'Pompa Proton Rotary V-ATPase (V1/V0) & Gradien Asidifikasi Luminal (pH 4.5–5.0)',
+      fluxEfficiencyScore: hasBlocked ? 0.62 : Math.min(0.99, 0.84 + completedStages * 0.05),
+      luminalAcidificationIndex: hasBlocked ? 0.61 : Math.min(0.99, 0.82 + completedStages * 0.05),
+      lysosomalStatus: hasBlocked ? 'lysosomal_exhaustion_stress' : completedStages >= 2 ? 'optimal_clear_flux' : 'adaptive_autophagy_mode',
+      mechanisticNote: 'Kompleks multi-subunit V-ATPase memompa proton secara aktif melawan gradien elektrokimia ke dalam lumen lisosom, memelihara pH optimal 4.5-5.0 yang mutlak diperlukan untuk aktivitas katalitik ~60 enzim hidrolase asam (katepsin B, D, L).',
+    },
+    {
+      nodeKind: 'autophagosome_lysosome_fusion_machinery',
+      nodeLabel: 'Kompleks Penambatan HOPS, GTPase Rab7 & Pasangan SNARE Trans-Membran (STX17-SNAP29-VAMP8)',
+      fluxEfficiencyScore: hasBlocked ? 0.58 : Math.min(0.98, 0.80 + completedStages * 0.05),
+      luminalAcidificationIndex: hasBlocked ? 0.58 : Math.min(0.98, 0.80 + completedStages * 0.05),
+      lysosomalStatus: hasBlocked ? 'lysosomal_exhaustion_stress' : completedStages >= 2 ? 'optimal_clear_flux' : 'adaptive_autophagy_mode',
+      mechanisticNote: 'Kompleks penambatan tethering HOPS berinteraksi dengan GTPase teraktivasi Rab7 untuk memandu penggabungan autofagosom membran ganda dengan lisosom melalui perakitan bundel 4-heliks trans-SNARE Syntaxin-17, SNAP29, dan VAMP8.',
+    },
+    {
+      nodeKind: 'nutrient_sensing_rag_mtorc1_lysosomal_surface',
+      nodeLabel: 'Sensor Nutrisi Asam Amino Lisosomal, Kompleks Ragulator-RagGTPase & Dinamika mTORC1',
+      fluxEfficiencyScore: hasBlocked ? 0.61 : Math.min(0.99, 0.82 + completedStages * 0.05),
+      luminalAcidificationIndex: hasBlocked ? 0.60 : Math.min(0.98, 0.81 + completedStages * 0.05),
+      lysosomalStatus: hasBlocked ? 'lysosomal_exhaustion_stress' : completedStages >= 2 ? 'optimal_clear_flux' : 'adaptive_autophagy_mode',
+      mechanisticNote: 'Transporter asam amino SLC38A9 dan kompleks Ragulator mengaktifkan heterodimer RagA/B-RagC/D di permukaan membran lisosom, mengendalikan rekrutmen mTORC1 untuk menghentikan autofagi saat nutrisi melimpah atau melepas supresi TFEB saat puasa seluler.',
+    },
+  ]
+
+  const lysosomalNarrativeId = hasBlocked
+    ? `Terdeteksi hambatan fusi dan degradasi lisosomal pada episode "${episode.title}". Fluks autofagi mengalami regangan akibat penumpukan substrat atau gangguan pompa V-ATPase (skor fluks: ${autophagicFluxScore}%, translokasi TFEB: ${tfebNuclearTranslocationIndex}%, kapasitas V-ATPase: ${vAtpaseAcidificationCapacity}%). Diperlukan aktivasi kalsineurin dan induksi biogenesis lisosom.`
+    : completedStages >= 3
+    ? `Episode "${episode.title}" menunjukkan fluks autofagi lisosomal yang sangat optimal (skor fluks: ${autophagicFluxScore}%, translokasi TFEB: ${tfebNuclearTranslocationIndex}%, kapasitas V-ATPase: ${vAtpaseAcidificationCapacity}%). Translokasi nuklear TFEB dan asidifikasi lumen lisosom bekerja harmonis dalam membersihkan agregat protein seluler.`
+    : `Episode "${episode.title}" berada dalam fase adaptif degradasi lisosomal (skor fluks: ${autophagicFluxScore}%, translokasi TFEB: ${tfebNuclearTranslocationIndex}%, kapasitas V-ATPase: ${vAtpaseAcidificationCapacity}%). Mesin penambatan HOPS-Rab7 dan dinamika penginderaan nutrisi mTORC1 berada dalam ekuilibrium protektif.`
+
+  const lysosomalNarrativeEn = hasBlocked
+    ? `Lysosomal fusion and degradation bottleneck detected in episode "${episode.title}". Autophagic flux is experiencing strain from substrate accumulation or V-ATPase proton pump disruption (flux score: ${autophagicFluxScore}%, TFEB translocation: ${tfebNuclearTranslocationIndex}%, V-ATPase capacity: ${vAtpaseAcidificationCapacity}%). Calcineurin activation and lysosomal biogenesis induction are recommended.`
+    : completedStages >= 3
+    ? `Episode "${episode.title}" demonstrates optimal lysosomal autophagic flux (flux score: ${autophagicFluxScore}%, TFEB translocation: ${tfebNuclearTranslocationIndex}%, V-ATPase capacity: ${vAtpaseAcidificationCapacity}%). Nuclear TFEB translocation and luminal acidification function in perfect harmony to clear cellular aggregates.`
+    : `Episode "${episode.title}" operates in an adaptive lysosomal degradation state (flux score: ${autophagicFluxScore}%, TFEB translocation: ${tfebNuclearTranslocationIndex}%, V-ATPase capacity: ${vAtpaseAcidificationCapacity}%). HOPS-Rab7 tethering machinery and mTORC1 nutrient-sensing dynamics maintain a protective equilibrium.`
+
+  const lysosomalLongevityStrategy = hasBlocked
+    ? 'Mengatasi kelelahan lisosomal melalui siklus puasa intermiten (16:8) untuk melepaskan supresi mTORC1, aktivasi TFEB via induksi stres panas sauna teratur, dan suplementasi trehalosa/spermidin untuk stimulasi biogenesis lisosom.'
+    : completedStages >= 3
+    ? 'Mempertahankan asidifikasi luminal lisosomal dan integritas membran melalui konsumsi polifenol penginduksi autofagi (resveratrol, urolitin A), kecukupan ion seng (Zn2+) dan magnesium, serta pola sirkadian makan konsisten.'
+    : 'Mendukung fusi autofagosom-lisosom dan pembersihan organel melalui latihan aerobik zona 2 terstruktur yang menstimulasi AMPK sitosolik dan mengoptimalkan fungsi SNARE STX17-SNAP29-VAMP8.'
+
+  return {
+    version: 'v1',
+    episodeId: episode.id,
+    episodeTitle: episode.title,
+    lysosomalState,
+    lysosomalStateLabel,
+    lysosomalTier,
+    lysosomalTierLabel,
+    autophagicFluxScore,
+    tfebNuclearTranslocationIndex,
+    vAtpaseAcidificationCapacity,
+    lysosomalNodes,
+    lysosomalNarrativeId,
+    lysosomalNarrativeEn,
+    lysosomalLongevityStrategy,
+    truthClass: 'lysosomal_autophagy_tfeb_simulation_proxy',
+    clinically_reviewed: false,
+    patientTruthUncompromised: true,
+    neverManufacturesBiomarkers: true,
+    epistemicHumilityPreserved: true,
+  }
+}
+
 export const STAGE_EXPECTED_DAYS: Record<CareEpisodeStageId, number> = {
   problem: 1,
   diagnosis: 2,
@@ -5760,6 +5885,7 @@ export function evaluateCareJourneyContinuity(
     const edenPerkIsr = deriveEdenPerkIsrBridge(ep)
     const edenGolgiGlycosylation = deriveEdenGolgiGlycosylationBridge(ep)
     const edenUpsProteasome = deriveEdenUpsProteasomeBridge(ep)
+    const edenLysosomalAutophagy = deriveEdenLysosomalAutophagyBridge(ep)
 
     return {
       id: ep.id,
@@ -5826,6 +5952,7 @@ export function evaluateCareJourneyContinuity(
       edenPerkIsr,
       edenGolgiGlycosylation,
       edenUpsProteasome,
+      edenLysosomalAutophagy,
     }
   })
 
@@ -6127,6 +6254,14 @@ export function evaluateCareJourneyContinuity(
           s.edenUpsProteasome?.neverManufacturesBiomarkers
       )
   ).length
+  const edenLysosomalAutophagyReadyCount = summaries.filter(
+    (s) =>
+      Boolean(
+        s.edenLysosomalAutophagy?.truthClass === 'lysosomal_autophagy_tfeb_simulation_proxy' &&
+          s.edenLysosomalAutophagy?.patientTruthUncompromised &&
+          s.edenLysosomalAutophagy?.neverManufacturesBiomarkers
+      )
+  ).length
   const edenLifeBalance = deriveEdenLifeBalanceSynthesis(episodes, supportiveResults)
 
   return {
@@ -6197,6 +6332,7 @@ export function evaluateCareJourneyContinuity(
     edenPerkIsrReadyCount,
     edenGolgiGlycosylationReadyCount,
     edenUpsProteasomeReadyCount,
+    edenLysosomalAutophagyReadyCount,
     edenLifeBalance,
     hasBlockedStages: blockedJourneys > 0 || stalledCount > 0,
   }
