@@ -148,3 +148,13 @@ export {
   type TrajectoryPoint,
   type TranscendentTrajectoryResult,
 } from './model/transcendentLongevityTrajectory'
+
+export {
+  evaluateClosedLoopResultRouting,
+  getSeverityWindowMinutes,
+  type DiagnosticResultOrder,
+  type DiagnosticResultSeverity,
+  type ClosedLoopClosureStatus,
+  type ClosedLoopRoutingEvaluation,
+} from './model/closedLoopResultRouting'
+
