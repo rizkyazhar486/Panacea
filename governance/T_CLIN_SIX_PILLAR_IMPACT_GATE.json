@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "1.0.0",
+  "schemaVersion": "1.1.0",
   "policy": "SIX_PILLAR_HUMAN_BENEFIT_GATE_V1",
   "baselineAuditedThrough": "T-CLIN-110",
   "pillars": [
@@ -28,7 +28,7 @@
       "title": "Adoption & Real-World Impact"
     }
   ],
-  "scope": "Only the audit registry's current top-five clinical candidates are gated in v1; this is not a clinical validation claim.",
+  "scope": "Nine evidence-bounded anchor mappings spanning all six primary product pillars (including the canonical audit's top-five clinical candidates); no clinical benefit is claimed.",
   "entries": [
     {
       "id": "T-CLIN-06",
@@ -55,7 +55,9 @@
       "independentlyValidatedBenefit": false,
       "humanAuthority": "AUTHORISED_CLINICIAN",
       "safetyBoundary": "Coding suggestions must remain drafts until qualified clinician review; do not write diagnoses autonomously",
-      "sourceRegistry": "governance/CLINICAL_UTILITY_AUDIT.json"
+      "sourceRegistry": "governance/CLINICAL_UTILITY_AUDIT.json",
+      "category": "A_DIRECT_CLINICAL_WORKFLOW",
+      "clinicalValidationStatus": "PARTIALLY_VALIDATED"
     },
     {
       "id": "T-CLIN-11",
@@ -82,7 +84,9 @@
       "independentlyValidatedBenefit": false,
       "humanAuthority": "AUTHORISED_CLINICIAN",
       "safetyBoundary": "Fulfillment alone is not clinician review or sign-off; mismatched IDs fail closed",
-      "sourceRegistry": "governance/CLINICAL_UTILITY_AUDIT.json"
+      "sourceRegistry": "governance/CLINICAL_UTILITY_AUDIT.json",
+      "category": "A_DIRECT_CLINICAL_WORKFLOW",
+      "clinicalValidationStatus": "PARTIALLY_VALIDATED"
     },
     {
       "id": "T-CLIN-13",
@@ -109,7 +113,9 @@
       "independentlyValidatedBenefit": false,
       "humanAuthority": "AUTHORISED_CLINICIAN",
       "safetyBoundary": "No AI-signed clinical outcomes; unresolved critical obligations block closure",
-      "sourceRegistry": "governance/CLINICAL_UTILITY_AUDIT.json"
+      "sourceRegistry": "governance/CLINICAL_UTILITY_AUDIT.json",
+      "category": "A_DIRECT_CLINICAL_WORKFLOW",
+      "clinicalValidationStatus": "PARTIALLY_VALIDATED"
     },
     {
       "id": "T-CLIN-16",
@@ -136,7 +142,9 @@
       "independentlyValidatedBenefit": false,
       "humanAuthority": "AUTHORISED_CLINICIAN",
       "safetyBoundary": "Absence is not zero; simulated values may never become signed patient measurements",
-      "sourceRegistry": "governance/CLINICAL_UTILITY_AUDIT.json"
+      "sourceRegistry": "governance/CLINICAL_UTILITY_AUDIT.json",
+      "category": "A_DIRECT_CLINICAL_WORKFLOW",
+      "clinicalValidationStatus": "VALIDATED"
     },
     {
       "id": "T-CLIN-17",
@@ -163,6 +171,124 @@
       "independentlyValidatedBenefit": false,
       "humanAuthority": "AUTHORISED_CLINICIAN",
       "safetyBoundary": "FHIR-aligned export is not proof of exchange interoperability or receiving-clinician acknowledgement",
+      "sourceRegistry": "governance/CLINICAL_UTILITY_AUDIT.json",
+      "category": "A_DIRECT_CLINICAL_WORKFLOW",
+      "clinicalValidationStatus": "PARTIALLY_VALIDATED"
+    },
+    {
+      "id": "T-CLIN-21",
+      "primaryPillar": "EDUCATION_WORKFLOW",
+      "supportingPillars": [
+        "TRUST_SAFETY_VALIDATION",
+        "ADOPTION_REAL_WORLD_IMPACT"
+      ],
+      "userRole": "Patient / family caregiver",
+      "humanProblem": "Medical plans and discharge instructions may be difficult to understand without plain-language layered explanations",
+      "observableWorkflowOutcome": "Clinician-reviewed patient comprehension rate",
+      "outcomeMetric": {
+        "name": "Clinician-reviewed patient comprehension rate",
+        "numerator": "Participants correctly explaining prespecified diagnosis, warning signs and next steps after using reviewed plain-language content",
+        "denominator": "Participants completing a structured post-explanation comprehension assessment",
+        "unit": "ratio",
+        "baselineValue": null,
+        "observedValue": null,
+        "measurementStatus": "NOT_MEASURED",
+        "measurementPlan": "Compare comprehension against a standard clinician-approved explanation using prospective paired or randomized evaluations; record health literacy strata"
+      },
+      "category": "B_PATIENT_UNDERSTANDING_PREVENTION",
+      "evidenceTier": "E1_HEURISTIC",
+      "clinicalValidationStatus": "NOT_VALIDATED",
+      "clinicallyValidatedBenefit": false,
+      "independentlyValidatedBenefit": false,
+      "humanAuthority": "AUTHORISED_CLINICIAN",
+      "safetyBoundary": "Education only: no independent diagnosis, dosage modifications or concealment of red flags; clinician-signed plan remains authoritative",
+      "sourceRegistry": "governance/CLINICAL_UTILITY_AUDIT.json"
+    },
+    {
+      "id": "T-CLIN-71",
+      "primaryPillar": "BODY_EXPOSURE",
+      "supportingPillars": [
+        "EDUCATION_WORKFLOW",
+        "TRUST_SAFETY_VALIDATION"
+      ],
+      "userRole": "Anatomy educator / cell atlas researcher",
+      "humanProblem": "Organ-to-cell reference navigation can confuse expression-based clusters with biological lineage or patient-specific pathology",
+      "observableWorkflowOutcome": "Reference cell ontology concordance rate",
+      "outcomeMetric": {
+        "name": "Reference cell ontology concordance rate",
+        "numerator": "Eligible atlas mappings independently concordant with a held-out annotated Cell Ontology reference",
+        "denominator": "Eligible reference atlas mappings selected through a prespecified evaluation protocol",
+        "unit": "ratio",
+        "baselineValue": null,
+        "observedValue": null,
+        "measurementStatus": "NOT_MEASURED",
+        "measurementPlan": "Reproduce organ-to-cell harmonization on properly licensed public reference data and compare blinded Cell Ontology assignments"
+      },
+      "category": "C_CLINICAL_RESEARCH_INFRASTRUCTURE",
+      "evidenceTier": "E2_WORKFLOW",
+      "clinicalValidationStatus": "PARTIALLY_VALIDATED",
+      "clinicallyValidatedBenefit": false,
+      "independentlyValidatedBenefit": false,
+      "humanAuthority": "RESEARCH_ONLY_QUALIFIED_REVIEWER",
+      "safetyBoundary": "Cell atlas display is a research reference, not a measured patient's cell state, cell lineage proof or validated diagnostic test",
+      "sourceRegistry": "governance/CLINICAL_UTILITY_AUDIT.json"
+    },
+    {
+      "id": "T-CLIN-110",
+      "primaryPillar": "DEVICE_MONITORING",
+      "supportingPillars": [
+        "CLINICAL_ONE_OS",
+        "TRUST_SAFETY_VALIDATION"
+      ],
+      "userRole": "Endocrinologist / diabetes educator",
+      "humanProblem": "CGM traces without sufficient provenance and hypoglycemia review can lead to unsafe insulin decision support",
+      "observableWorkflowOutcome": "Traceable clinician-reviewed CGM safety summary rate",
+      "outcomeMetric": {
+        "name": "Traceable clinician-reviewed CGM safety summary rate",
+        "numerator": "Eligible 14-day CGM reviews with accepted source provenance, hypoglycemia flags and authorized clinician verification",
+        "denominator": "Eligible permissioned CGM review encounters with adequate source data during the cohort period",
+        "unit": "ratio",
+        "baselineValue": null,
+        "observedValue": null,
+        "measurementStatus": "NOT_MEASURED",
+        "measurementPlan": "Review synthetically generated and independently permissioned CGM traces against clinician rubric; document missingness and false-negative hypoglycemia alerts"
+      },
+      "category": "A_DIRECT_CLINICAL_WORKFLOW",
+      "evidenceTier": "E2_WORKFLOW",
+      "clinicalValidationStatus": "PARTIALLY_VALIDATED",
+      "clinicallyValidatedBenefit": false,
+      "independentlyValidatedBenefit": false,
+      "humanAuthority": "AUTHORISED_CLINICIAN",
+      "safetyBoundary": "CGM summaries are not autonomous medication orders; missing or unverified measurements fail closed and any treatment changes require clinician authority",
+      "sourceRegistry": "governance/CLINICAL_UTILITY_AUDIT.json"
+    },
+    {
+      "id": "T-CLIN-19",
+      "primaryPillar": "ADOPTION_REAL_WORLD_IMPACT",
+      "supportingPillars": [
+        "CLINICAL_ONE_OS",
+        "TRUST_SAFETY_VALIDATION"
+      ],
+      "userRole": "Care coordinator / discharge clinician",
+      "humanProblem": "Post-discharge follow-up can be missed when operational care-continuity responsibilities are not acknowledged",
+      "observableWorkflowOutcome": "Timely closed-loop post-discharge outreach rate",
+      "outcomeMetric": {
+        "name": "Timely closed-loop post-discharge outreach rate",
+        "numerator": "Eligible discharge episodes receiving documented outreach and resolution or appropriate escalation within prespecified timeframe",
+        "denominator": "Discharge episodes meeting documented operational care-continuity outreach eligibility criteria",
+        "unit": "ratio",
+        "baselineValue": null,
+        "observedValue": null,
+        "measurementStatus": "NOT_MEASURED",
+        "measurementPlan": "Prospective comparison of outreach acknowledgement and unresolved escalation vs standard discharge follow-up; prespecify timeframe and exclusions"
+      },
+      "category": "A_DIRECT_CLINICAL_WORKFLOW",
+      "evidenceTier": "E1_HEURISTIC",
+      "clinicalValidationStatus": "PARTIALLY_VALIDATED",
+      "clinicallyValidatedBenefit": false,
+      "independentlyValidatedBenefit": false,
+      "humanAuthority": "AUTHORISED_CLINICIAN",
+      "safetyBoundary": "Operational care-coordination flags are not calibrated readmission risk or individualized prognostic probabilities",
       "sourceRegistry": "governance/CLINICAL_UTILITY_AUDIT.json"
     }
   ]
