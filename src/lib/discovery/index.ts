@@ -11,4 +11,8 @@ export * from './cellCycleCheckpointEngine'
 export * from './precisionGenomeEditingEngine'
 export * from './rnaEpitranscriptomicsEngine'
 export * from './pluripotencyLineageEngine'
+export * from './dnaRepairPathwayChoiceEngine'
+export * from './crisprDiagnosticsCollateralEngine'
+export * from './bivalentChromatinDynamicsEngine'
+export * from './targetedProteinDegradationEngine'
 

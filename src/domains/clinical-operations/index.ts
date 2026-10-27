@@ -158,3 +158,11 @@ export {
   type ClosedLoopRoutingEvaluation,
 } from './model/closedLoopResultRouting'
 
+export {
+  evaluateReferralHandoffContinuity,
+  type ReferralHandoffOrder,
+  type ReferralHandoffStatus,
+  type ReferralReconciliationEvaluation,
+  type ReferralUrgencyTier,
+} from './model/referralHandoffReconciliation'
+
