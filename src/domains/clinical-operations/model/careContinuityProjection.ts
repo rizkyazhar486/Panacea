@@ -333,6 +333,23 @@ export interface CareJourneyEpisodeSummary {
 
 export type ReadmissionRiskLevel = 'low' | 'moderate' | 'high'
 
+export interface CareContinuityConcern {
+  concernLevel: ReadmissionRiskLevel
+  concernType: 'operational_escalation'
+  workflowIndicators: string[]
+  escalationTier: 'routine' | 'coordinator_check' | 'urgent_safety_protocol'
+  protocolSource: 'operational_care_coordination_heuristic' | 'verified_safety_protocol'
+}
+
+export interface ClinicalReadmissionRisk {
+  isModelValidated: false
+  predictionStatus: 'NOT_VALIDATED' | 'CALIBRATED_MODEL' | 'UNAVAILABLE'
+  prognosticProbability: null | number
+  evidenceTier: 'E0_HYPOTHESIS' | 'E1_HEURISTIC' | 'E2_WORKFLOW' | 'E3_FIELD' | 'E4_EXTERNAL'
+  timeHorizonDays: null | number
+  validationDisclaimer: string
+}
+
 export interface CareJourneyReadmissionSurveillance {
   episodeId: string
   episodeTitle: string
@@ -340,6 +357,11 @@ export interface CareJourneyReadmissionSurveillance {
   riskFactors: string[]
   followUpWindowClosed: boolean
   recommendedAction: string
+  // Clinical Reality & Rigorous Separation (T-CLIN-19 refinement)
+  continuityConcern: CareContinuityConcern
+  clinicalPrediction: ClinicalReadmissionRisk
+  isPrognosticPrediction: false
+  operationalEscalationReason: string
 }
 
 export interface CareJourneyCostSummary {
@@ -1219,6 +1241,45 @@ export function evaluateEpisodeReadmissionRisk(
       ? 'Post-discharge follow-up window closed with verified outcome'
       : 'Continue routine longitudinal monitoring'
 
+  const escalationTier =
+    riskLevel === 'high'
+      ? 'urgent_safety_protocol'
+      : riskLevel === 'moderate'
+      ? 'coordinator_check'
+      : 'routine'
+
+  const protocolSource =
+    hasCriticalResult || hasBlockedPostDischarge
+      ? 'verified_safety_protocol'
+      : 'operational_care_coordination_heuristic'
+
+  const continuityConcern: CareContinuityConcern = {
+    concernLevel: riskLevel,
+    concernType: 'operational_escalation',
+    workflowIndicators: [...riskFactors],
+    escalationTier,
+    protocolSource,
+  }
+
+  const clinicalPrediction: ClinicalReadmissionRisk = {
+    isModelValidated: false,
+    predictionStatus: 'NOT_VALIDATED',
+    prognosticProbability: null,
+    evidenceTier: 'E1_HEURISTIC',
+    timeHorizonDays: null,
+    validationDisclaimer:
+      'Administrative workflow flags and milestone delays identify operational care-coordination bottlenecks, but are NOT calibrated clinical prognostic predictions of post-discharge readmission.',
+  }
+
+  const operationalEscalationReason =
+    riskLevel === 'high'
+      ? `Operational escalation triggered by ${riskFactors.length} care-continuity barrier(s) (${protocolSource === 'verified_safety_protocol' ? 'critical lab/stage block safety protocol' : 'milestone/coordination delay heuristic'}).`
+      : riskLevel === 'moderate'
+      ? `Operational check triggered by ${riskFactors.length} pending milestone or window warning.`
+      : followUpWindowClosed
+      ? 'Routine monitoring: follow-up milestones fulfilled and outcome closed.'
+      : 'Routine monitoring: no operational care-continuity bottlenecks identified.'
+
   return {
     episodeId: episode.id,
     episodeTitle: episode.title,
@@ -1226,6 +1287,10 @@ export function evaluateEpisodeReadmissionRisk(
     riskFactors,
     followUpWindowClosed,
     recommendedAction,
+    continuityConcern,
+    clinicalPrediction,
+    isPrognosticPrediction: false,
+    operationalEscalationReason,
   }
 }
 

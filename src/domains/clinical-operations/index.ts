@@ -107,6 +107,8 @@ export {
   type CareJourneyEpisodeSummary,
   type CareJourneyCostSummary,
   type CareJourneyReadmissionSurveillance,
+  type CareContinuityConcern,
+  type ClinicalReadmissionRisk,
   type ReadmissionRiskLevel,
   type CarePlanMilestoneSummary,
 } from './model/careContinuityProjection'
