@@ -1929,13 +1929,16 @@ export interface EdenLysosomalAutophagyBridge {
   epistemicHumilityPreserved: true
 }
 
+// Legacy states retained for historical records; no workflow-derived physiology.
 export type EdenMitochondrialEtcState =
+  | 'not_assessed'
   | 'optimal_supercomplex_respirasome_flux'
   | 'balanced_cristae_chemiosmotic_homeostasis'
   | 'transient_proton_leak_mild_uncoupling'
   | 'critical_etc_electron_leakage_ros_collapse'
 
 export type EdenMitochondrialEtcTier =
+  | 'not_assessed'
   | 'optimal_respirasome_tunneling_fidelity'
   | 'adequate_cristae_proton_gradient_capacity'
   | 'moderate_supercomplex_disassembly_strain'
@@ -1950,9 +1953,10 @@ export type EdenMitochondrialEtcNodeKind =
 export interface EdenMitochondrialEtcNode {
   nodeKind: EdenMitochondrialEtcNodeKind
   nodeLabel: string
-  tunnelingFidelityScore: number
-  protonPumpingCapacity: number
-  etcStatus: 'optimal_respirasome_state' | 'adaptive_bioenergetic_mode' | 'electron_leak_ros_stress'
+  // No measured physiological parameters exist in a care-episode stage.
+  tunnelingFidelityScore: number | null
+  protonPumpingCapacity: number | null
+  etcStatus: 'not_assessed' | 'optimal_respirasome_state' | 'adaptive_bioenergetic_mode' | 'electron_leak_ros_stress'
   mechanisticNote: string
 }
 
@@ -1960,18 +1964,19 @@ export interface EdenMitochondrialEtcBridge {
   version: 'v1'
   episodeId: string
   episodeTitle: string
+  measurementStatus: 'not_measured'
   etcState: EdenMitochondrialEtcState
   etcStateLabel: string
   etcTier: EdenMitochondrialEtcTier
   etcTierLabel: string
-  bioenergeticEfficiencyScore: number
-  protonMotiveForceIndex: number
-  rosQuenchingCapacity: number
+  bioenergeticEfficiencyScore: number | null
+  protonMotiveForceIndex: number | null
+  rosQuenchingCapacity: number | null
   etcNodes: EdenMitochondrialEtcNode[]
   etcNarrativeId: string
   etcNarrativeEn: string
   etcLongevityStrategy: string
-  truthClass: 'mitochondrial_etc_cristae_simulation_proxy'
+  truthClass: 'mitochondrial_etc_reference_education' | 'mitochondrial_etc_cristae_simulation_proxy'
   clinically_reviewed: false
   patientTruthUncompromised: true
   neverManufacturesBiomarkers: true
