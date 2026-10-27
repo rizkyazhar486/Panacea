@@ -78,9 +78,15 @@ export function advanceEncounterStage(
   requestingPatientId: string,
   requestingEncounterId: string,
   signature?: ClinicalSignatureRecord,
-  obligationUpdates?: { id: string; isResolved: boolean }[]
+  obligationUpdates?: { id: string; isResolved: boolean }[],
+  expectedVersion?: number
 ): ClinicalJourneyState {
-  // 1. Identity & Context Integrity Checks
+  // 1. Concurrency & Version Check
+  if (expectedVersion !== undefined && currentState.version !== expectedVersion) {
+    throw new Error('Clinical Concurrency Error: Stale encounter version detected.');
+  }
+
+  // 2. Identity & Context Integrity Checks
   if (currentState.patientId !== requestingPatientId || currentState.encounterId !== requestingEncounterId) {
     throw new Error('Clinical Security Error: Patient or Encounter identity mismatch.');
   }
@@ -88,13 +94,13 @@ export function advanceEncounterStage(
     throw new Error('Clinical Authorization Error: Actor clinician is not authorized for this encounter.');
   }
 
-  // 2. Validate Stage Transition Path
+  // 3. Validate Stage Transition Path
   const allowedNextStages = ALLOWED_TRANSITIONS[currentState.currentStage] || [];
   if (!allowedNextStages.includes(targetStage)) {
     throw new Error(`Clinical Workflow Error: Invalid transition from '${currentState.currentStage}' to '${targetStage}'.`);
   }
 
-  // 3. Update Obligations if provided
+  // 4. Update Obligations if provided
   let updatedObligations = [...currentState.obligations];
   if (obligationUpdates) {
     updatedObligations = updatedObligations.map(obs => {
@@ -103,7 +109,7 @@ export function advanceEncounterStage(
     });
   }
 
-  // 4. Specific Stage Guardrails & Negative Controls
+  // 5. Specific Stage Guardrails & Negative Controls
   if (targetStage === 'follow_up_closed') {
     const unresolvedMandatory = updatedObligations.filter(o => o.requiredForClosure && !o.isResolved);
     if (unresolvedMandatory.length > 0) {
@@ -112,8 +118,8 @@ export function advanceEncounterStage(
   }
 
   if (targetStage === 'signed_plan') {
-    if (!signature || !signature.isVerified || signature.signerId !== actorClinicianId) {
-      throw new Error('Clinical Authority Error: Valid verified clinician signature is strictly required to sign the plan.');
+    if (!signature || !signature.isVerified || signature.signerId !== actorClinicianId || !signature.provenanceHash) {
+      throw new Error('Clinical Authority Error: Valid verified clinician signature with provenance hash is strictly required to sign the plan.');
     }
   }
 
