@@ -7,4 +7,8 @@ export * from './quantumBiologyBiophysicsEngine'
 export * from './eurasianCellAtlasFederation'
 export * from './immersiveLifeScienceSandboxEngine'
 export * from './dualUseNeuroethicsKernel'
+export * from './cellCycleCheckpointEngine'
+export * from './precisionGenomeEditingEngine'
+export * from './rnaEpitranscriptomicsEngine'
+export * from './pluripotencyLineageEngine'
 
