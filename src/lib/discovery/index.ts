@@ -15,4 +15,8 @@ export * from './dnaRepairPathwayChoiceEngine'
 export * from './crisprDiagnosticsCollateralEngine'
 export * from './bivalentChromatinDynamicsEngine'
 export * from './targetedProteinDegradationEngine'
+export * from './metabolomicResilienceClockEngine'
+export * from './retinalPhotoreceptorRegenerationEngine'
+export * from './neuralSpectralEntropyDecoder'
+export * from './senolyticSelectivityScapEngine'
 
