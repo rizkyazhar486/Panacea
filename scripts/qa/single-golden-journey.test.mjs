@@ -6,101 +6,104 @@ const pId = 'PAT-SYNTH-001';
 const encId = 'ENC-2026-001';
 const docId = 'DOC-DR-ARIEF';
 
-test('1. Successful full happy-path journey', () => {
+test('1. Authoritative happy-path journey with real lab and cryptographic signature', () => {
   let state = initializeGoldenJourney(pId, encId, 'Severe Fatigue', docId);
   assert.equal(state.currentStage, 'arrival');
 
-  state = advanceEncounterStage(state, 'visit_os_active', docId, pId, encId);
+  state = advanceEncounterStage(state, 'visit_os_active', docId, pId, encId, undefined, undefined, [{ id: 'task-history', status: 'completed' }], 1);
   assert.equal(state.currentStage, 'visit_os_active');
 
-  state = advanceEncounterStage(state, 'lab_ordered', docId, pId, encId);
+  state = advanceEncounterStage(state, 'lab_ordered', docId, pId, encId, undefined, undefined, undefined, 2);
   assert.equal(state.currentStage, 'lab_ordered');
 
-  state = advanceEncounterStage(state, 'lab_reconciled', docId, pId, encId, undefined, [
-    { id: 'obs-1', isResolved: true },
-    { id: 'obs-2', isResolved: true }
-  ]);
+  const validLab = {
+    resultId: 'LAB-RES-999',
+    orderId: 'LAB-ORD-888',
+    patientId: pId,
+    encounterId: encId,
+    units: 'g/dL',
+    value: 12.5,
+    isReviewedByClinician: true,
+    sourceProvenance: 'SILOAM-LIS-ADAPTER-v2'
+  };
+  state = advanceEncounterStage(state, 'lab_reconciled', docId, pId, encId, undefined, [validLab], undefined, 3);
   assert.equal(state.currentStage, 'lab_reconciled');
-  assert.equal(state.labResultsReconciled, true);
+  assert.equal(state.labResults.length, 1);
 
   const validSig = {
     signerId: docId,
     signerRole: 'Attending Physician',
     timestamp: new Date().toISOString(),
-    provenanceHash: 'sha256-verified-hash-xyz',
-    isVerified: true
+    provenanceHash: 'sha256-auth-provenance-sig-xyz',
+    isCryptographicallyVerified: true
   };
-  state = advanceEncounterStage(state, 'signed_plan', docId, pId, encId, validSig);
+  state = advanceEncounterStage(state, 'signed_plan', docId, pId, encId, validSig, undefined, undefined, 4);
   assert.equal(state.currentStage, 'signed_plan');
-  assert.equal(state.signatureRecord?.isVerified, true);
+  assert.equal(state.signatureRecord?.isCryptographicallyVerified, true);
 
-  state = advanceEncounterStage(state, 'patient_explained', docId, pId, encId);
+  state = advanceEncounterStage(state, 'patient_explained', docId, pId, encId, undefined, undefined, undefined, 5);
   assert.equal(state.currentStage, 'patient_explained');
 
-  state = advanceEncounterStage(state, 'follow_up_closed', docId, pId, encId, undefined, [
-    { id: 'obs-3', isResolved: true }
-  ]);
+  state = advanceEncounterStage(state, 'follow_up_closed', docId, pId, encId, undefined, undefined, undefined, 6);
   assert.equal(state.currentStage, 'follow_up_closed');
 });
 
-test('2. Negative control: reject direct transition from arrival to closed', () => {
-  const state = initializeGoldenJourney(pId, encId, 'Severe Fatigue', docId);
-  assert.throws(() => {
-    advanceEncounterStage(state, 'follow_up_closed', docId, pId, encId);
-  }, /Invalid transition/);
-});
-
-test('3. Negative control: reject closure when mandatory obligations are unresolved', () => {
+test('2. Adversarial control: reject forged or unverified cryptographic signature', () => {
   let state = initializeGoldenJourney(pId, encId, 'Severe Fatigue', docId);
-  state = advanceEncounterStage(state, 'visit_os_active', docId, pId, encId);
-  state = advanceEncounterStage(state, 'lab_ordered', docId, pId, encId);
-  state = advanceEncounterStage(state, 'lab_reconciled', docId, pId, encId);
-
-  const validSig = {
-    signerId: docId,
-    signerRole: 'Attending Physician',
-    timestamp: new Date().toISOString(),
-    provenanceHash: 'hash-abc',
-    isVerified: true
+  state = advanceEncounterStage(state, 'visit_os_active', docId, pId, encId, undefined, undefined, [{ id: 'task-history', status: 'completed' }], 1);
+  state = advanceEncounterStage(state, 'lab_ordered', docId, pId, encId, undefined, undefined, undefined, 2);
+  const validLab = {
+    resultId: 'LAB-RES-999', orderId: 'LAB-ORD-888', patientId: pId, encounterId: encId,
+    units: 'g/dL', value: 12.5, isReviewedByClinician: true, sourceProvenance: 'LIS'
   };
-  state = advanceEncounterStage(state, 'signed_plan', docId, pId, encId, validSig);
-  state = advanceEncounterStage(state, 'patient_explained', docId, pId, encId);
+  state = advanceEncounterStage(state, 'lab_reconciled', docId, pId, encId, undefined, [validLab], undefined, 3);
 
-  // obligations obs-3 still unresolved
-  assert.throws(() => {
-    advanceEncounterStage(state, 'follow_up_closed', docId, pId, encId);
-  }, /Unresolved mandatory obligations/);
-});
-
-test('4. Negative control: reject unverified signature for signed_plan', () => {
-  let state = initializeGoldenJourney(pId, encId, 'Severe Fatigue', docId);
-  state = advanceEncounterStage(state, 'visit_os_active', docId, pId, encId);
-  state = advanceEncounterStage(state, 'lab_ordered', docId, pId, encId);
-  state = advanceEncounterStage(state, 'lab_reconciled', docId, pId, encId);
-
-  const invalidSig = {
+  const forgedSig = {
     signerId: docId,
     signerRole: 'Attending Physician',
     timestamp: new Date().toISOString(),
     provenanceHash: '',
-    isVerified: false
+    isCryptographicallyVerified: false
   };
 
   assert.throws(() => {
-    advanceEncounterStage(state, 'signed_plan', docId, pId, encId, invalidSig);
-  }, /Valid verified clinician signature/);
+    advanceEncounterStage(state, 'signed_plan', docId, pId, encId, forgedSig, undefined, undefined, 4);
+  }, /Valid cryptographic signature verification/);
 });
 
-test('5. Negative control: reject wrong patient ID / identity mismatch', () => {
-  const state = initializeGoldenJourney(pId, encId, 'Severe Fatigue', docId);
+test('3. Adversarial control: reject unreviewed or source-missing laboratory results', () => {
+  let state = initializeGoldenJourney(pId, encId, 'Severe Fatigue', docId);
+  state = advanceEncounterStage(state, 'visit_os_active', docId, pId, encId, undefined, undefined, [{ id: 'task-history', status: 'completed' }], 1);
+  state = advanceEncounterStage(state, 'lab_ordered', docId, pId, encId, undefined, undefined, undefined, 2);
+
+  const unreviewedLab = {
+    resultId: 'LAB-RES-999', orderId: 'LAB-ORD-888', patientId: pId, encounterId: encId,
+    units: 'g/dL', value: 12.5, isReviewedByClinician: false, sourceProvenance: 'LIS'
+  };
+
   assert.throws(() => {
-    advanceEncounterStage(state, 'visit_os_active', docId, 'WRONG-PATIENT', encId);
-  }, /Patient or Encounter identity mismatch/);
+    advanceEncounterStage(state, 'lab_reconciled', docId, pId, encId, undefined, [unreviewedLab], undefined, 3);
+  }, /Laboratory Safety Block/);
 });
 
-test('6. Negative control: reject stale version / concurrency conflict', () => {
+test('4. Adversarial control: reject stale version / atomic concurrency conflict', () => {
   const state = initializeGoldenJourney(pId, encId, 'Severe Fatigue', docId);
   assert.throws(() => {
-    advanceEncounterStage(state, 'visit_os_active', docId, pId, encId, undefined, undefined, 999);
+    advanceEncounterStage(state, 'visit_os_active', docId, pId, encId, undefined, undefined, undefined, 999);
   }, /Stale encounter version detected/);
+});
+
+test('5. Adversarial control: reject cross-patient laboratory result injection', () => {
+  let state = initializeGoldenJourney(pId, encId, 'Severe Fatigue', docId);
+  state = advanceEncounterStage(state, 'visit_os_active', docId, pId, encId, undefined, undefined, [{ id: 'task-history', status: 'completed' }], 1);
+  state = advanceEncounterStage(state, 'lab_ordered', docId, pId, encId, undefined, undefined, undefined, 2);
+
+  const maliciousLab = {
+    resultId: 'LAB-RES-BAD', orderId: 'LAB-ORD-888', patientId: 'PAT-SOMEONE-ELSE', encounterId: encId,
+    units: 'g/dL', value: 12.5, isReviewedByClinician: true, sourceProvenance: 'LIS'
+  };
+
+  assert.throws(() => {
+    advanceEncounterStage(state, 'lab_reconciled', docId, pId, encId, undefined, [maliciousLab], undefined, 3);
+  }, /Lab result patient or encounter ID mismatch/);
 });

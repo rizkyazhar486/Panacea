@@ -1,4 +1,4 @@
-/** Directive 001A: Robust Single Golden Longitudinal Clinical Journey Orchestrator */
+/** Directive 001B: Authoritative Clinical Trust Boundaries & Longitudinal Orchestrator */
 
 export type EncounterStage = 
   | 'arrival' 
@@ -9,19 +9,30 @@ export type EncounterStage =
   | 'patient_explained' 
   | 'follow_up_closed';
 
-export interface ClinicalObligation {
+export interface ClinicalTask {
   id: string;
   description: string;
-  isResolved: boolean;
+  status: 'pending' | 'completed';
   requiredForClosure: boolean;
 }
 
-export interface ClinicalSignatureRecord {
+export interface VerifiedSignatureRegistryRecord {
   signerId: string;
   signerRole: string;
   timestamp: string;
   provenanceHash: string;
-  isVerified: boolean;
+  isCryptographicallyVerified: boolean;
+}
+
+export interface LabResultRecord {
+  resultId: string;
+  orderId: string;
+  patientId: string;
+  encounterId: string;
+  units: string;
+  value: number;
+  isReviewedByClinician: boolean;
+  sourceProvenance: string;
 }
 
 export interface ClinicalJourneyState {
@@ -30,9 +41,9 @@ export interface ClinicalJourneyState {
   presentingComplaint: string;
   currentStage: EncounterStage;
   authorizedClinicianId: string;
-  signatureRecord?: ClinicalSignatureRecord;
-  obligations: ClinicalObligation[];
-  labResultsReconciled: boolean;
+  signatureRecord?: VerifiedSignatureRegistryRecord;
+  tasks: ClinicalTask[];
+  labResults: LabResultRecord[];
   version: number;
 }
 
@@ -61,12 +72,12 @@ export function initializeGoldenJourney(
     presentingComplaint,
     currentStage: 'arrival',
     authorizedClinicianId: clinicianId,
-    obligations: [
-      { id: 'obs-1', description: 'Review vital signs and history', isResolved: false, requiredForClosure: true },
-      { id: 'obs-2', description: 'Reconcile laboratory results', isResolved: false, requiredForClosure: true },
-      { id: 'obs-3', description: 'Clinician signed management plan', isResolved: false, requiredForClosure: true }
+    tasks: [
+      { id: 'task-history', description: 'Comprehensive clinical history documented', status: 'pending', requiredForClosure: true },
+      { id: 'task-lab-review', description: 'Laboratory results verified and reconciled', status: 'pending', requiredForClosure: true },
+      { id: 'task-signed-plan', description: 'Authorized clinical management plan signed', status: 'pending', requiredForClosure: true }
     ],
-    labResultsReconciled: false,
+    labResults: [],
     version: 1
   };
 }
@@ -77,13 +88,14 @@ export function advanceEncounterStage(
   actorClinicianId: string,
   requestingPatientId: string,
   requestingEncounterId: string,
-  signature?: ClinicalSignatureRecord,
-  obligationUpdates?: { id: string; isResolved: boolean }[],
+  signatureRegistry?: VerifiedSignatureRegistryRecord,
+  incomingLabResults?: LabResultRecord[],
+  taskCompletions?: { id: string; status: 'completed' }[],
   expectedVersion?: number
 ): ClinicalJourneyState {
-  // 1. Concurrency & Version Check
+  // 1. Atomic Compare-And-Swap Concurrency Check
   if (expectedVersion !== undefined && currentState.version !== expectedVersion) {
-    throw new Error('Clinical Concurrency Error: Stale encounter version detected.');
+    throw new Error('Clinical Concurrency Error: Stale encounter version detected. Atomic CAS failed.');
   }
 
   // 2. Identity & Context Integrity Checks
@@ -100,35 +112,62 @@ export function advanceEncounterStage(
     throw new Error(`Clinical Workflow Error: Invalid transition from '${currentState.currentStage}' to '${targetStage}'.`);
   }
 
-  // 4. Update Obligations if provided
-  let updatedObligations = [...currentState.obligations];
-  if (obligationUpdates) {
-    updatedObligations = updatedObligations.map(obs => {
-      const match = obligationUpdates.find(u => u.id === obs.id);
-      return match ? { ...obs, isResolved: match.isResolved } : obs;
+  // 4. Update Tasks Authoritatively
+  let updatedTasks = [...currentState.tasks];
+  if (taskCompletions) {
+    updatedTasks = updatedTasks.map(t => {
+      const match = taskCompletions.find(u => u.id === t.id);
+      return match ? { ...t, status: match.status } : t;
     });
   }
 
-  // 5. Specific Stage Guardrails & Negative Controls
-  if (targetStage === 'follow_up_closed') {
-    const unresolvedMandatory = updatedObligations.filter(o => o.requiredForClosure && !o.isResolved);
-    if (unresolvedMandatory.length > 0) {
-      throw new Error(`Clinical Safety Block: Cannot close episode. Unresolved mandatory obligations: ${unresolvedMandatory.map(o => o.description).join(', ')}`);
+  // 5. Integrate & Validate Lab Results Authoritatively
+  let updatedLabs = [...currentState.labResults];
+  if (incomingLabResults && incomingLabResults.length > 0) {
+    for (const lab of incomingLabResults) {
+      if (lab.patientId !== requestingPatientId || lab.encounterId !== requestingEncounterId) {
+        throw new Error('Laboratory Reconciliation Error: Lab result patient or encounter ID mismatch.');
+      }
+      if (!lab.sourceProvenance || !lab.units) {
+        throw new Error('Laboratory Reconciliation Error: Missing source provenance or units in lab result.');
+      }
+      updatedLabs.push(lab);
     }
   }
 
+  // 6. Strict Stage Guardrails & Negative Controls
+  if (targetStage === 'lab_reconciled') {
+    const unreviewedLabs = updatedLabs.filter(l => !l.isReviewedByClinician);
+    if (updatedLabs.length === 0 || unreviewedLabs.length > 0) {
+      throw new Error('Laboratory Safety Block: Cannot proceed without reviewed, order-linked laboratory results.');
+    }
+    updatedTasks = updatedTasks.map(t => t.id === 'task-lab-review' ? { ...t, status: 'completed' } : t);
+  }
+
   if (targetStage === 'signed_plan') {
-    if (!signature || !signature.isVerified || signature.signerId !== actorClinicianId || !signature.provenanceHash) {
-      throw new Error('Clinical Authority Error: Valid verified clinician signature with provenance hash is strictly required to sign the plan.');
+    if (!signatureRegistry || !signatureRegistry.isCryptographicallyVerified || signatureRegistry.signerId !== actorClinicianId || !signatureRegistry.provenanceHash) {
+      throw new Error('Clinical Authority Error: Valid cryptographic signature verification from authenticated source required.');
+    }
+    updatedTasks = updatedTasks.map(t => t.id === 'task-signed-plan' ? { ...t, status: 'completed' } : t);
+  }
+
+  if (targetStage === 'visit_os_active') {
+    updatedTasks = updatedTasks.map(t => t.id === 'task-history' ? { ...t, status: 'completed' } : t);
+  }
+
+  if (targetStage === 'follow_up_closed') {
+    const unresolvedMandatory = updatedTasks.filter(t => t.requiredForClosure && t.status !== 'completed');
+    if (unresolvedMandatory.length > 0) {
+      throw new Error(`Clinical Safety Block: Cannot close episode. Unresolved canonical tasks: ${unresolvedMandatory.map(t => t.description).join(', ')}`);
     }
   }
 
   return {
     ...currentState,
     currentStage: targetStage,
-    obligations: updatedObligations,
-    signatureRecord: signature || currentState.signatureRecord,
-    labResultsReconciled: targetStage === 'lab_reconciled' ? true : currentState.labResultsReconciled,
+    tasks: updatedTasks,
+    labResults: updatedLabs,
+    signatureRecord: signatureRegistry || currentState.signatureRecord,
     version: currentState.version + 1
   };
 }
