@@ -166,3 +166,14 @@ export {
   type ReferralUrgencyTier,
 } from './model/referralHandoffReconciliation'
 
+export {
+  evaluateCypPharmacogenomicSafety,
+  type Pharmacogene,
+  type MetabolizerPhenotype,
+  type PharmacogenomicAlertSeverity,
+  type InteractionMechanism,
+  type PatientGenotypeRecord,
+  type PrescribedMedicationOrder,
+  type PharmacogenomicSafetyEvaluation,
+} from './model/cypPharmacogenomicSafety'
+
