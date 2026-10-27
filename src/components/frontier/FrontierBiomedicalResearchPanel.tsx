@@ -322,7 +322,7 @@ export function FrontierBiomedicalResearchPanel() {
             <select
               value={bciIntention}
               onChange={(e) => setBciIntention(e.target.value as any)}
-              className="rounded border border-white/10 bg-black px-2 py-1 text-xs text-white"
+              className="dark rounded border border-white/10 bg-black px-2 py-1 text-xs text-white"
             >
               <option value="hand_grasp">Hand Grasp</option>
               <option value="hand_open">Hand Open</option>
@@ -333,7 +333,7 @@ export function FrontierBiomedicalResearchPanel() {
               type="number"
               value={bciSnr}
               onChange={(e) => setBciSnr(Number(e.target.value))}
-              className="w-16 rounded border border-white/10 bg-black px-2 py-1 text-xs text-white"
+              className="dark w-16 rounded border border-white/10 bg-black px-2 py-1 text-xs text-white"
             />
           </div>
           <div className="rounded-lg bg-black/40 p-2.5 text-xs space-y-1 font-mono">
@@ -360,14 +360,14 @@ export function FrontierBiomedicalResearchPanel() {
               type="number"
               value={reviveBaseline}
               onChange={(e) => setReviveBaseline(Number(e.target.value))}
-              className="w-16 rounded border border-white/10 bg-black px-2 py-1 text-xs text-white"
+              className="dark w-16 rounded border border-white/10 bg-black px-2 py-1 text-xs text-white"
             />
             <label className="text-white/60 ml-2">12-Mo (m):</label>
             <input
               type="number"
               value={revive12Mo}
               onChange={(e) => setRevive12Mo(Number(e.target.value))}
-              className="w-16 rounded border border-white/10 bg-black px-2 py-1 text-xs text-white"
+              className="dark w-16 rounded border border-white/10 bg-black px-2 py-1 text-xs text-white"
             />
             <label className="flex items-center gap-1 text-white/60 ml-2 cursor-pointer">
               <input
@@ -402,14 +402,14 @@ export function FrontierBiomedicalResearchPanel() {
               type="number"
               value={ferroLip}
               onChange={(e) => setFerroLip(Number(e.target.value))}
-              className="w-16 rounded border border-white/10 bg-black px-2 py-1 text-xs text-white"
+              className="dark w-16 rounded border border-white/10 bg-black px-2 py-1 text-xs text-white"
             />
             <label className="text-white/60 ml-2">Vitamin C (µM):</label>
             <input
               type="number"
               value={ferroVitC}
               onChange={(e) => setFerroVitC(Number(e.target.value))}
-              className="w-16 rounded border border-white/10 bg-black px-2 py-1 text-xs text-white"
+              className="dark w-16 rounded border border-white/10 bg-black px-2 py-1 text-xs text-white"
             />
           </div>
           <div className="rounded-lg bg-black/40 p-2.5 text-xs space-y-1 font-mono">
@@ -436,14 +436,14 @@ export function FrontierBiomedicalResearchPanel() {
               type="number"
               value={clockChrono}
               onChange={(e) => setClockChrono(Number(e.target.value))}
-              className="w-16 rounded border border-white/10 bg-black px-2 py-1 text-xs text-white"
+              className="dark w-16 rounded border border-white/10 bg-black px-2 py-1 text-xs text-white"
             />
             <label className="text-white/60 ml-2">Bio Age:</label>
             <input
               type="number"
               value={clockBio}
               onChange={(e) => setClockBio(Number(e.target.value))}
-              className="w-16 rounded border border-white/10 bg-black px-2 py-1 text-xs text-white"
+              className="dark w-16 rounded border border-white/10 bg-black px-2 py-1 text-xs text-white"
             />
           </div>
           <div className="rounded-lg bg-black/40 p-2.5 text-xs space-y-1 font-mono">
