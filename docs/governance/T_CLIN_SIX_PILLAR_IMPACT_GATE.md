@@ -1,4 +1,4 @@
-# T-CLIN Six-Pillar Human-Impact Gate (v1)
+# T-CLIN Six-Pillar Human-Impact Gate (v1.1)
 
 **Status:** Engineering governance, not clinical validation or medical-device authorization.  
 **Canonical source:** [Clinical Utility Audit](../../governance/CLINICAL_UTILITY_AUDIT.json).  
@@ -18,9 +18,9 @@ T-CLIN may expand toward 1000+ only when scientific rigor and coherent human ben
 
 These are six destinations within **one** operating system, not six parallel clinical databases. The existing Longitudinal Clinical Encounter Orchestrator remains the shipping priority under [Frontier Biomedical Discovery Directive](../../PANACEA_FRONTIER_BIOMEDICAL_DISCOVERY_DIRECTIVE.md) and [Current Wedge](../../governance/doctrine/PANACEA_CURRENT_WEDGE.md).
 
-## Evidence-bounded pilot for five priority modules
+## Evidence-bounded pilot across six product pillars
 
-The current scope follows the top-five clinical candidates selected by the existing audit. The test fails if a selected candidate lacks a contract.
+The machine-checked pilot contains **nine** anchor contracts. It retains all five highest-priority clinical candidates selected by the canonical audit and adds four complementary modules to ensure every product pillar has at least one primary anchor. The new anchors are research, patient education, device support and continuity-of-care workflows, **not** proof of benefit or readiness for patient use.
 
 | T-CLIN | Primary pillar | Prospective measurable endpoint | Baseline/result |
 | --- | --- | --- | --- |
@@ -29,8 +29,12 @@ The current scope follows the top-five clinical candidates selected by the exist
 | 13 — Episode closure | Clinical One OS | Safe signed episode closures / eligible closure episodes | Not measured |
 | 16 — Vital provenance | Trust, Safety & Validation | Rejected synthetic/unverified inputs / intentionally invalid vital inputs | Not measured |
 | 17 — Referral handoff | Clinical One OS | Acknowledged and reconciled handoffs / eligible cross-facility handoffs | Not measured |
+| 19 — Post-discharge outreach | Adoption & Real-World Impact | Documented timely outreach / eligible follow-up episodes | Not measured |
+| 21 — Plain-language companion | Education Workflow | Comprehension demonstrated / evaluated participants | Not measured |
+| 71 — Cell atlas reference | Body Exposure | Cell Ontology mappings concordant with reference / evaluated reference mappings | Not measured |
+| 110 — CGM review | Device & Monitoring | Provenance-verified clinician reviews / eligible CGM review encounters | Not measured |
 
-The canonical audit records all five as E1_HEURISTIC; none has field benefit established by these contracts. Outcome numerator and denominator are *planned definitions*, not observations.
+The canonical audit records T-CLIN-06/11/13/16/17/19/21 as E1_HEURISTIC and T-CLIN-71/110 as E2_WORKFLOW. These are **repository evidence classifications**, not clinical validation, and T-CLIN-71 remains research-only. None has externally established human benefit through this gate. Numerators/denominators are **prospective measurement definitions**, not observations.
 
 For a prespecified, nonzero eligible cohort denominator:
 
@@ -60,9 +64,9 @@ where C = intended clinical/educational benefit, I = six-pillar integration, E =
 ## Enforcement and honest limits
 
 - The new test is discovered by the existing build command: node --test scripts/qa/*.test.mjs.
-- It requires all six unique pillars, complete mappings for the top five audit candidates, coherent numerator/denominator, aligned evidence tier, clinician authority, and no invented measured result or validated-benefit claim.
-- Negative controls mutate the contracts to check fake pillar, removed candidate, fabricated measured result, false validation, wrong evidence tier, missing denominator, duplicate IDs and missing pillar.
-- **v1 scope is deliberately five audited modules only**. It does not certify T-CLIN-01..120, future modules, predictive reliability, biological simulations, real-world efficacy or release acceptance. Broaden scope with separately reviewed registry migrations and tests.
+- It requires all six unique pillars to have a primary anchor; exactly nine contracts including the audit's top five; coherent numerator/denominator; canonical source category, validation status and evidence tier; appropriate authority for research vs clinician workflows; and no fabricated measured outcome or clinical-benefit claim.
+- Thirteen negative controls mutate the contracts to check fake pillar, missing anchor, fabricated measured result, unjustified validation, wrong evidence tier, category promotion, forged validation status, wrong authority, missing denominator, duplicate IDs and incomplete six-pillar coverage.
+- **v1.1 scope is deliberately nine audit-backed anchors only**. It does not certify every T-CLIN-01..120, future modules, predictive reliability, biological simulations, real-world efficacy or release acceptance. Broaden scope with a separately reviewed schema migration and test revision.
 - No patient record, production clinical action, UI, treatment recommendation or signature authorization is modified in this PR.
 
 **Required verification:** run the new test, existing clinical-utility audit test, and exact-head CI before merge. Green unit tests establish engineering properties, not patient outcome validation.
