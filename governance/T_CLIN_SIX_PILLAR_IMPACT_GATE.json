@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "1.1.0",
+  "schemaVersion": "1.2.0",
   "policy": "SIX_PILLAR_HUMAN_BENEFIT_GATE_V1",
   "baselineAuditedThrough": "T-CLIN-110",
   "pillars": [
@@ -28,7 +28,7 @@
       "title": "Adoption & Real-World Impact"
     }
   ],
-  "scope": "Nine evidence-bounded anchor mappings spanning all six primary product pillars (including the canonical audit's top-five clinical candidates); no clinical benefit is claimed.",
+  "scope": "Expandable audit-backed six-pillar outcome contract registry. Nine mandatory anchors cover all six primary product pillars and canonical top-five candidates; future entries require prior Clinical Utility Audit registration, remain unmeasured until separately governed field evidence, and cannot self-promote research into clinical authority.",
   "entries": [
     {
       "id": "T-CLIN-06",
