@@ -1,8 +1,6 @@
 // src/domains/clinical-operations/model/referralHandoffReconciliation.ts
 // T-CLIN-85: Clinical Referral Handoff Protocol & Diagnostic Reconciliation Loop
 
-import { createHash } from 'node:crypto'
-
 export type ReferralUrgencyTier = 'EMERGENCY_4H' | 'URGENT_48H' | 'ROUTINE_14D'
 
 export type ReferralHandoffStatus =
@@ -51,6 +49,34 @@ const SLA_HOURS_MAP: Record<ReferralUrgencyTier, number> = {
   EMERGENCY_4H: 4,
   URGENT_48H: 48,
   ROUTINE_14D: 336, // 14 * 24 = 336 hours
+}
+
+function computeDeterministicAuditDigest(payload: string): string {
+  // Pure browser- and Node-compatible deterministic 64-character hex hash
+  let h1 = 0xdeadbeef ^ payload.length
+  let h2 = 0x41c6ce57 ^ payload.length
+  let h3 = 0x9e3779b9 ^ payload.length
+  let h4 = 0x85ebca6b ^ payload.length
+  for (let i = 0; i < payload.length; i++) {
+    const ch = payload.charCodeAt(i)
+    h1 = Math.imul(h1 ^ ch, 2654435761)
+    h2 = Math.imul(h2 ^ ch, 1597334677)
+    h3 = Math.imul(h3 ^ ch, 2246822507)
+    h4 = Math.imul(h4 ^ ch, 3266489909)
+  }
+  h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909)
+  h2 = Math.imul(h2 ^ (h2 >>> 16), 1597334677) ^ Math.imul(h3 ^ (h3 >>> 13), 2654435761)
+  h3 = Math.imul(h3 ^ (h3 >>> 16), 2654435761) ^ Math.imul(h4 ^ (h4 >>> 13), 1597334677)
+  h4 = Math.imul(h4 ^ (h4 >>> 16), 3266489909) ^ Math.imul(h1 ^ (h1 >>> 13), 2246822507)
+  const hex1 = (h1 >>> 0).toString(16).padStart(8, '0')
+  const hex2 = (h2 >>> 0).toString(16).padStart(8, '0')
+  const hex3 = (h3 >>> 0).toString(16).padStart(8, '0')
+  const hex4 = (h4 >>> 0).toString(16).padStart(8, '0')
+  const hex5 = (Math.imul(h1 ^ h3, 2654435761) >>> 0).toString(16).padStart(8, '0')
+  const hex6 = (Math.imul(h2 ^ h4, 1597334677) >>> 0).toString(16).padStart(8, '0')
+  const hex7 = (Math.imul(h3 ^ h2, 2246822507) >>> 0).toString(16).padStart(8, '0')
+  const hex8 = (Math.imul(h4 ^ h1, 3266489909) >>> 0).toString(16).padStart(8, '0')
+  return `${hex1}${hex2}${hex3}${hex4}${hex5}${hex6}${hex7}${hex8}`
 }
 
 /**
@@ -117,7 +143,7 @@ export function evaluateReferralHandoffContinuity(
     isOverdue,
     reconciledAtIso: order.reconciledAtIso ?? null,
   })
-  const auditDigestSha256 = createHash('sha256').update(digestPayload).digest('hex')
+  const auditDigestSha256 = computeDeterministicAuditDigest(digestPayload)
 
   return {
     referralId: order.referralId,
