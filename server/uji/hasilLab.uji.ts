@@ -349,13 +349,13 @@ assert.equal(lanjut.trail.length, 1)
   assert.deepEqual(ids(tanpa), [], 'a nurse without assignment lists nothing'); assert.deepEqual(ids(tanpaLab), [], 'lab staff with an empty assignment lists nothing')
   assert.deepEqual(ids(dok), [hA.id, hB.id].sort(), 'the clinician view is unchanged'); assert.deepEqual(ids(admin), [hA.id, hB.id].sort(), 'the admin view is unchanged')
   tolak(s.bacaHasil(k, perawatA, hB.id), 'not-found'); tolak(s.bacaHasil(k, tanpa, hA.id), 'not-found'); tolak(s.bacaHasil(k, labB, hA.id), 'not-found'); ok(s.bacaHasil(k, perawatA, hA.id)); ok(s.bacaHasil(k, labB, hB.id))
-  tolak(s.terimaHasil(k, perawatA, { patientId: 'p-B', item: butir, source: 'manual-entry' }), 'forbidden'); tolak(s.terimaHasil(k, tanpa, { patientId: 'p-A', item: butir, source: 'manual-entry' }), 'forbidden'); tolak(s.terimaHasil(k, labB, { patientId: 'p-B', item: butir, source: 'manual-entry' }), 'forbidden')
+  tolak(s.terimaHasil(k, perawatA, { patientId: 'p-B', item: butir, source: 'manual-entry' }), 'forbidden'); tolak(s.terimaHasil(k, tanpa, { patientId: 'p-A', item: butir, source: 'manual-entry' }), 'forbidden'); tolak(s.terimaHasil(k, labB, { patientId: 'p-A', item: butir, source: 'lab-intake' }), 'forbidden')
   assert.equal(ok(s.terimaHasil(k, perawatA, { patientId: 'p-A', item: butir, source: 'manual-entry' })).patientId, 'p-A'); assert.equal(ok(s.terimaHasil(k, labB, { patientId: 'p-B', item: butir, source: 'lab-intake' })).patientId, 'p-B')
   tolak(s.majukanHasil(k, perawatA, hB.id, { to: 'pending_review' }), 'not-found'); waktu(1000); assert.equal(ok(s.majukanHasil(k, perawatA, hA.id, { to: 'pending_review' })).status, 'pending_review')
   tolak(s.metrikPenutupan(k, perawatA), 'forbidden'); tolak(s.metrikPenutupan(k, labB), 'forbidden'); tolak(s.metrikPenutupan(k, tanpa), 'forbidden'); ok(s.metrikPenutupan(k, dok)); ok(s.metrikPenutupan(k, admin))
   // Rujukan: staf hanya membaca rujukan pasien yang ditugaskan; membuat rujukan tetap hanya klinisi.
   const r = ok(s.buatRujukan(k, dok, { patientId: 'p-A', kind: 'lab', reason: 'cek', toFacility: 'Lab X' })); ok(s.buatRujukan(k, dok, { patientId: 'p-B', kind: 'lab', reason: 'cek', toFacility: 'Lab X' }))
-  assert.equal(s.daftarRujukan(k, perawatA).map((x) => x.id), [r.id], 'a nurse lists only the assigned patient\'s referrals'); assert.deepEqual(s.daftarRujukan(k, tanpa), [], 'an unassigned nurse lists no referrals'); tolak(s.bacaRujukan(k, tanpa, r.id), 'not-found'); ok(s.bacaRujukan(k, perawatA, r.id))
+  assert.deepEqual(s.daftarRujukan(k, perawatA).map((x) => x.id), [r.id], 'a nurse lists only the assigned patient\'s referrals'); assert.deepEqual(s.daftarRujukan(k, tanpa), [], 'an unassigned nurse lists no referrals'); tolak(s.bacaRujukan(k, tanpa, r.id), 'not-found'); ok(s.bacaRujukan(k, perawatA, r.id))
   tolak(s.buatRujukan(k, perawatA, { patientId: 'p-A', kind: 'lab', reason: 'cek', toFacility: 'Lab X' }), 'forbidden')
 }
 
