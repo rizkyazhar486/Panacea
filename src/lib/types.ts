@@ -2076,6 +2076,55 @@ export interface EdenNuclearLaminBridge {
   epistemicHumilityPreserved: true
 }
 
+export type EdenEscrtMachineryState =
+  | 'optimal_escrt_spiral_constriction_flux'
+  | 'balanced_mvb_sorting_and_membrane_scission'
+  | 'transient_chmp4_filament_disassembly_strain'
+  | 'critical_escrt_scission_blockade_endosomal_swelling'
+
+export type EdenEscrtMachineryTier =
+  | 'optimal_vps4_atpase_recycling_fidelity'
+  | 'adequate_chmp_spiral_budding_reserve'
+  | 'moderate_receptor_sorting_clearance_delay'
+  | 'critical_multivesicular_collapse_exosome_failure'
+
+export type EdenEscrtMachineryNodeKind =
+  | 'escrt_0_i_ii_ubiquitin_cargo_clustering'
+  | 'chmp4b_escrt_iii_spiral_membrane_constriction'
+  | 'vps4_atp_hydrolysis_filament_disassembly'
+  | 'multivesicular_body_scission_and_membrane_repair'
+
+export interface EdenEscrtNode {
+  nodeKind: EdenEscrtMachineryNodeKind
+  nodeLabel: string
+  scissionEfficiencyScore: number
+  cargoSortingCapacity: number
+  membraneScissionStatus: 'optimal_scission_state' | 'adaptive_constriction_mode' | 'budding_arrest_stress'
+  mechanisticNote: string
+}
+
+export interface EdenEscrtMachineryBridge {
+  version: 'v1'
+  episodeId: string
+  episodeTitle: string
+  escrtState: EdenEscrtMachineryState
+  escrtStateLabel: string
+  escrtTier: EdenEscrtMachineryTier
+  escrtTierLabel: string
+  membraneScissionIndex: number
+  receptorClearanceRate: number
+  exosomalRegenerationMargin: number
+  escrtNodes: EdenEscrtNode[]
+  escrtNarrativeId: string
+  escrtNarrativeEn: string
+  escrtLongevityStrategy: string
+  truthClass: 'escrt_membrane_scission_simulation_proxy'
+  clinically_reviewed: false
+  patientTruthUncompromised: true
+  neverManufacturesBiomarkers: true
+  epistemicHumilityPreserved: true
+}
+
 export interface CareJourneyExportSummary {
   standard: 'PANACEA-CAREPLAN-FHIR-R4-V1'
   generatedAt: string

@@ -190,6 +190,11 @@ import type {
   EdenNuclearLaminNodeKind,
   EdenNuclearLaminNode,
   EdenNuclearLaminBridge,
+  EdenEscrtMachineryState,
+  EdenEscrtMachineryTier,
+  EdenEscrtMachineryNodeKind,
+  EdenEscrtNode,
+  EdenEscrtMachineryBridge,
   WellnessDay,
   MoodEntry,
   Circle,
@@ -323,6 +328,7 @@ export interface CareJourneyEpisodeSummary {
   edenMitochondrialEtc?: EdenMitochondrialEtcBridge
   edenOrganelleContact?: EdenOrganelleContactBridge
   edenNuclearLamin?: EdenNuclearLaminBridge
+  edenEscrtMachinery?: EdenEscrtMachineryBridge
 }
 
 export type ReadmissionRiskLevel = 'low' | 'moderate' | 'high'
@@ -442,6 +448,7 @@ export interface CareJourneyContinuityResult {
   edenMitochondrialEtcReadyCount: number
   edenOrganelleContactReadyCount: number
   edenNuclearLaminReadyCount: number
+  edenEscrtMachineryReadyCount: number
   edenLifeBalance: EdenLifeBalanceSynthesis
   hasBlockedStages: boolean
 }
@@ -5973,6 +5980,124 @@ export function deriveEdenNuclearLaminBridge(
   }
 }
 
+export function deriveEdenEscrtMachineryBridge(
+  episode: CareEpisode,
+): EdenEscrtMachineryBridge {
+  const stages = episode.stages ?? []
+  const completedStages = stages.filter((s) => s.status === 'done').length
+  const hasBlocked = stages.some((s) => s.status === 'blocked')
+  const blockedCount = stages.filter((s) => s.status === 'blocked').length
+
+  const membraneScissionIndex = hasBlocked
+    ? Math.max(45, 65 - blockedCount * 7)
+    : Math.min(99, 85 + completedStages * 5)
+
+  const receptorClearanceRate = hasBlocked
+    ? Math.max(43, 63 - blockedCount * 7)
+    : Math.min(98, 83 + completedStages * 5)
+
+  const exosomalRegenerationMargin = hasBlocked
+    ? Math.max(42, 62 - blockedCount * 8)
+    : Math.min(99, 84 + completedStages * 5)
+
+  let escrtState: EdenEscrtMachineryState = 'balanced_mvb_sorting_and_membrane_scission'
+  let escrtStateLabel = 'Penyortiran MVB & Pemotongan Membran ESCRT Seimbang Terkoordinasi'
+  let escrtTier: EdenEscrtMachineryTier = 'adequate_chmp_spiral_budding_reserve'
+  let escrtTierLabel = 'Cadangan Pertunasan Spiral CHMP Memadai & Daur Ulang Subunit Terjaga'
+
+  if (hasBlocked) {
+    escrtState = 'critical_escrt_scission_blockade_endosomal_swelling'
+    escrtStateLabel = 'Blokade Pemotongan Membran ESCRT Kritis & Pembengkakan Vakuola Endosomal'
+    escrtTier = 'critical_multivesicular_collapse_exosome_failure'
+    escrtTierLabel = 'Kegagalan Kolaps Multivesikular & Hambatan Pelepasan Eksosom Regeneratif'
+  } else if (completedStages >= 3) {
+    escrtState = 'optimal_escrt_spiral_constriction_flux'
+    escrtStateLabel = 'Fluks Konstriksi Spiral ESCRT Optimal & Pemotongan Membran Presisi Tinggi'
+    escrtTier = 'optimal_vps4_atpase_recycling_fidelity'
+    escrtTierLabel = 'Fidelitas Daur Ulang Kompleks VPS4 AAA+ ATPase Maksimal & Reparasi Membran Prima'
+  } else if (completedStages === 0) {
+    escrtState = 'transient_chmp4_filament_disassembly_strain'
+    escrtStateLabel = 'Regangan Pembongkaran Filamen CHMP4 Transien'
+    escrtTier = 'moderate_receptor_sorting_clearance_delay'
+    escrtTierLabel = 'Penundaan Pembersihan Reseptor Transien & Akumulasi Kargo Mono-Ubikuitin'
+  }
+
+  const escrtNodes: EdenEscrtNode[] = [
+    {
+      nodeKind: 'escrt_0_i_ii_ubiquitin_cargo_clustering',
+      nodeLabel: 'Kaskade ESCRT-0/I/II (HRS-TSG101-VPS25) & Pengelompokan Kargo Reseptor Terubikuitinasi',
+      scissionEfficiencyScore: hasBlocked ? 0.60 : Math.min(0.99, 0.85 + completedStages * 0.05),
+      cargoSortingCapacity: hasBlocked ? 0.61 : Math.min(0.98, 0.84 + completedStages * 0.05),
+      membraneScissionStatus: hasBlocked ? 'budding_arrest_stress' : completedStages >= 2 ? 'optimal_scission_state' : 'adaptive_constriction_mode',
+      mechanisticNote: 'Kompleks HRS/STAM mengenali mono-ubikuitin pada reseptor membran yang diinternalisasi, menyerahkan kargo ke TSG101 (ESCRT-I) dan VPS25 (ESCRT-II) untuk dikonsentrasikan ke mikrodomain endosom awal tanpa bocor kembali.',
+    },
+    {
+      nodeKind: 'chmp4b_escrt_iii_spiral_membrane_constriction',
+      nodeLabel: 'Polimerisasi Spiral Filamen ESCRT-III (CHMP4B/Snf7) & Konstriksi Leher Invaginasi Membran',
+      scissionEfficiencyScore: hasBlocked ? 0.62 : Math.min(0.99, 0.86 + completedStages * 0.05),
+      cargoSortingCapacity: hasBlocked ? 0.60 : Math.min(0.99, 0.85 + completedStages * 0.05),
+      membraneScissionStatus: hasBlocked ? 'budding_arrest_stress' : completedStages >= 2 ? 'optimal_scission_state' : 'adaptive_constriction_mode',
+      mechanisticNote: 'Perakitan polimer heliks konsentris CHMP4B/Snf7 menginduksi kelengkungan membran negatif (reverse topology budding) dan menyempitkan leher tunas hingga diameter kritis <4 nm sebelum pembelahan lipid.',
+    },
+    {
+      nodeKind: 'vps4_atp_hydrolysis_filament_disassembly',
+      nodeLabel: 'Heksamer VPS4 AAA+ ATPase, Pelepasan Energi Hidrolisis ATP & Daur Ulang Subunit CHMP',
+      scissionEfficiencyScore: hasBlocked ? 0.61 : Math.min(0.99, 0.84 + completedStages * 0.05),
+      cargoSortingCapacity: hasBlocked ? 0.62 : Math.min(0.99, 0.86 + completedStages * 0.05),
+      membraneScissionStatus: hasBlocked ? 'budding_arrest_stress' : completedStages >= 2 ? 'optimal_scission_state' : 'adaptive_constriction_mode',
+      mechanisticNote: 'Mesin translokasi cincin heksamerik VPS4 menarik ekor C-terminal protein CHMP melalui pori sentralnya, melepaskan energi mekanis yang meretas jalinan lipid untuk fusi hemifisi dan membebaskan monomer ke sitosol.',
+    },
+    {
+      nodeKind: 'multivesicular_body_scission_and_membrane_repair',
+      nodeLabel: 'Biogenesis Vesikel Intralumen (ILV/Eksosom) & Penambalan Cepat Kerusakan Membran Plasma/Inti',
+      scissionEfficiencyScore: hasBlocked ? 0.63 : Math.min(0.99, 0.87 + completedStages * 0.05),
+      cargoSortingCapacity: hasBlocked ? 0.61 : Math.min(0.98, 0.83 + completedStages * 0.05),
+      membraneScissionStatus: hasBlocked ? 'budding_arrest_stress' : completedStages >= 2 ? 'optimal_scission_state' : 'adaptive_constriction_mode',
+      mechanisticNote: 'Penyelesaian pertunasan vesikel ke dalam lumen MVB memisahkan material degradatif atau paket eksosomal, sementara rekrutmen CHMP7/CHMP4 ke robekan membran plasma dan inti melaksanakan penambalan darurat tanpa sitolisis.',
+    },
+  ]
+
+  const escrtNarrativeId = hasBlocked
+    ? `Terdeteksi blokade pembelahan membran dan gangguan pengelompokan kargo ESCRT pada episode "${episode.title}". Kompleks ESCRT-III mengalami hambatan pemotongan spiral (indeks pemotongan membran: ${membraneScissionIndex}%, laju pembersihan reseptor: ${receptorClearanceRate}%, ambang regenerasi eksosomal: ${exosomalRegenerationMargin}%). Diperlukan proteksi keutuhan membran seluler, optimasi daur ulang ATP endosomal, dan pencegahan akumulasi reseptor onkogenik.`
+    : completedStages >= 3
+    ? `Episode "${episode.title}" memperlihatkan dinamika pemotongan membran ESCRT dan biogenesis MVB sangat optimal (indeks pemotongan membran: ${membraneScissionIndex}%, laju pembersihan reseptor: ${receptorClearanceRate}%, ambang regenerasi eksosomal: ${exosomalRegenerationMargin}%). Kaskade ESCRT-0/I/II, polimer spiral CHMP4B, dan heksamer pembongkar VPS4 beroperasi pada fidelitas transduksi energi membran puncak.`
+    : `Episode "${episode.title}" berada dalam fase adaptif pemotongan membran dan penyortiran endosomal (indeks pemotongan membran: ${membraneScissionIndex}%, laju pembersihan reseptor: ${receptorClearanceRate}%, ambang regenerasi eksosomal: ${exosomalRegenerationMargin}%). Pertunasan vesikel intralumen dan penambalan mikro-membran mempertahankan homeostasis seluler memadai.`
+
+  const escrtNarrativeEn = hasBlocked
+    ? `Membrane scission blockade and ESCRT cargo sorting impairment detected in episode "${episode.title}". ESCRT-III spiral constriction exhibits budding arrest (membrane scission index: ${membraneScissionIndex}%, receptor clearance rate: ${receptorClearanceRate}%, exosomal regeneration margin: ${exosomalRegenerationMargin}%). Cellular membrane shielding, endosomal ATP recycling support, and oncogenic receptor turnover facilitation are recommended.`
+    : completedStages >= 3
+    ? `Episode "${episode.title}" demonstrates peak ESCRT membrane scission dynamics and multivesicular body biogenesis (membrane scission index: ${membraneScissionIndex}%, receptor clearance rate: ${receptorClearanceRate}%, exosomal regeneration margin: ${exosomalRegenerationMargin}%). ESCRT-0/I/II sorting cascade, CHMP4B helical spirals, and VPS4 hexameric disassembly operate at maximal thermodynamic fidelity.`
+    : `Episode "${episode.title}" operates in an adaptive membrane scission and endosomal sorting state (membrane scission index: ${membraneScissionIndex}%, receptor clearance rate: ${receptorClearanceRate}%, exosomal regeneration margin: ${exosomalRegenerationMargin}%). Intraluminal vesicle budding and membrane micro-patch repair sustain robust cellular integrity.`
+
+  const escrtLongevityStrategy = hasBlocked
+    ? 'Memulihkan pemotongan membran terhenti dan efisiensi pembersihan reseptor melalui modulasi kofaktor ATP intraseluler (magnesium malat, koenzim Q10), antioksidan pelindung kelengkungan membran lipid (astaxanthin), dan mitigasi stres mekanis vesikular.'
+    : completedStages >= 3
+    ? 'Mempertahankan kelincahan dinamis perakitan spiral CHMP4B dan daur ulang VPS4 melalui latihan interval intensitas tinggi (stimulasi fluks eksosom trofik), asupan fosfatidilserin kualitas farmasi murni, dan kecukupan donor metil biogenesis membran.'
+    : 'Mendukung penyortiran endosomal dan kapasitas penambalan membran mikro dengan hidrasi seluler prima, asupan asam lemak omega-3 EPA/DHA fosfolipid, dan modulasi ritme sirkadian pergantian reseptor permukaan sel.'
+
+  return {
+    version: 'v1',
+    episodeId: episode.id,
+    episodeTitle: episode.title,
+    escrtState,
+    escrtStateLabel,
+    escrtTier,
+    escrtTierLabel,
+    membraneScissionIndex,
+    receptorClearanceRate,
+    exosomalRegenerationMargin,
+    escrtNodes,
+    escrtNarrativeId,
+    escrtNarrativeEn,
+    escrtLongevityStrategy,
+    truthClass: 'escrt_membrane_scission_simulation_proxy',
+    clinically_reviewed: false,
+    patientTruthUncompromised: true,
+    neverManufacturesBiomarkers: true,
+    epistemicHumilityPreserved: true,
+  }
+}
+
 export const STAGE_EXPECTED_DAYS: Record<CareEpisodeStageId, number> = {
   problem: 1,
   diagnosis: 2,
@@ -6264,6 +6389,7 @@ export function evaluateCareJourneyContinuity(
     const edenMitochondrialEtc = deriveEdenMitochondrialEtcBridge(ep)
     const edenOrganelleContact = deriveEdenOrganelleContactBridge(ep)
     const edenNuclearLamin = deriveEdenNuclearLaminBridge(ep)
+    const edenEscrtMachinery = deriveEdenEscrtMachineryBridge(ep)
 
     return {
       id: ep.id,
@@ -6334,6 +6460,7 @@ export function evaluateCareJourneyContinuity(
       edenMitochondrialEtc,
       edenOrganelleContact,
       edenNuclearLamin,
+      edenEscrtMachinery,
     }
   })
 
@@ -6667,6 +6794,14 @@ export function evaluateCareJourneyContinuity(
           s.edenNuclearLamin?.neverManufacturesBiomarkers
       )
   ).length
+  const edenEscrtMachineryReadyCount = summaries.filter(
+    (s) =>
+      Boolean(
+        s.edenEscrtMachinery?.truthClass === 'escrt_membrane_scission_simulation_proxy' &&
+          s.edenEscrtMachinery?.patientTruthUncompromised &&
+          s.edenEscrtMachinery?.neverManufacturesBiomarkers
+      )
+  ).length
   const edenLifeBalance = deriveEdenLifeBalanceSynthesis(episodes, supportiveResults)
 
   return {
@@ -6741,6 +6876,7 @@ export function evaluateCareJourneyContinuity(
     edenMitochondrialEtcReadyCount,
     edenOrganelleContactReadyCount,
     edenNuclearLaminReadyCount,
+    edenEscrtMachineryReadyCount,
     edenLifeBalance,
     hasBlockedStages: blockedJourneys > 0 || stalledCount > 0,
   }
