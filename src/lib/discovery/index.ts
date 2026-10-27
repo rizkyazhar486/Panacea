@@ -3,4 +3,4 @@ export * from './frontierResearchRegistry'
 export * from './humanEnsembleCellAtlasAdapter'
 export * from './frontierComputationalEngines'
 export * from './evidenceTranslationBridge'
-export * from './translationalAccelerationOS'
+

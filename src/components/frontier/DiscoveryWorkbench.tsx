@@ -199,7 +199,7 @@ export function DiscoveryWorkbench() {
         </details>
       )}
 
-      <details className="rounded-2xl border border-cyan-500/30 bg-cyan-950/20 p-3" defaultOpen>
+      <details className="rounded-2xl border border-cyan-500/30 bg-cyan-950/20 p-3" open>
         <summary className="min-h-11 cursor-pointer text-xs font-black text-cyan-400">
           Frontier Biomedical Discovery & Multiscale Simulation Engine (T-CLIN-65..71)
         </summary>
