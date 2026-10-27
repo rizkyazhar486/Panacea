@@ -47,6 +47,7 @@ import {
   deriveEdenGolgiGlycosylationBridge,
   deriveEdenUpsProteasomeBridge,
   deriveEdenLysosomalAutophagyBridge,
+  deriveEdenMitochondrialEtcBridge,
   EdenLongitudinalInsightSection,
 } from '../../domains/clinical-operations'
 import {
@@ -737,6 +738,9 @@ function EpisodeCard({
 
       {/* Eden Lysosomal Autophagic Flux & TFEB/mTORC1 Nutrient-Sensing Synthesizer (T-CLIN-60 / EDEN-39) */}
       <EdenLysosomalAutophagySection episode={episode} />
+
+      {/* Eden Mitochondrial ETC Complex I–V Cristae Bioenergetics & ROS Homeostasis Synthesizer (T-CLIN-61 / EDEN-40) */}
+      <EdenMitochondrialEtcSection episode={episode} />
     </Card>
   )
 }
@@ -5136,6 +5140,128 @@ function EdenLysosomalAutophagySection({ episode }: { episode: CareEpisode }) {
 
       <div className="mt-2 text-[10px] text-neutral-500 dark:text-white/50 text-right">
         ARGON EDEN ∞ §10 · Lysosomal Autophagic Flux & TFEB/mTORC1 Nutrient-Sensing Synthesizer · Patient Truth Uncompromised · Never Manufactures Biomarkers
+      </div>
+    </div>
+  )
+}
+
+function EdenMitochondrialEtcSection({ episode }: { episode: CareEpisode }) {
+  const [lang, setLang] = useState<'id' | 'en'>('id')
+
+  const bridge = useMemo(
+    () => deriveEdenMitochondrialEtcBridge(episode),
+    [episode]
+  )
+
+  const narrative = lang === 'id' ? bridge.etcNarrativeId : bridge.etcNarrativeEn
+
+  return (
+    <div
+      className="mt-3 rounded-xl border border-amber-200 dark:border-white/10 bg-amber-50/30 dark:bg-white/[0.02] p-3.5"
+      data-eden-etc-card="v1"
+    >
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+        <div>
+          <div className="flex items-center gap-2 flex-wrap">
+            <h4 className="text-xs font-bold text-neutral-900 dark:text-white">
+              {lang === 'id'
+                ? 'Bioenergetika Cristae Mitokondria & Rantai Transpor Elektron Kompleks I–V'
+                : 'Mitochondrial ETC Complex I–V Cristae Bioenergetics & ROS Homeostasis Synthesizer'}
+            </h4>
+            <span className="rounded-full bg-amber-100 dark:bg-white/10 px-2 py-0.5 text-[10px] font-bold text-amber-800 dark:text-amber-300">
+              {bridge.etcStateLabel}
+            </span>
+          </div>
+          <p className="mt-0.5 text-[11px] text-neutral-600 dark:text-white/70">
+            {bridge.etcTierLabel}
+          </p>
+        </div>
+        <div className="flex items-center gap-2 self-start sm:self-auto">
+          <div className="flex rounded-md border border-amber-200 dark:border-white/10 p-0.5 text-[10px]">
+            <button
+              type="button"
+              onClick={() => setLang('id')}
+              className={`px-1.5 py-0.5 rounded ${lang === 'id' ? 'bg-amber-600 text-white font-bold' : 'text-neutral-600 dark:text-white/60'}`}
+            >
+              ID
+            </button>
+            <button
+              type="button"
+              onClick={() => setLang('en')}
+              className={`px-1.5 py-0.5 rounded ${lang === 'en' ? 'bg-amber-600 text-white font-bold' : 'text-neutral-600 dark:text-white/60'}`}
+            >
+              EN
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-2.5 grid grid-cols-1 sm:grid-cols-3 gap-2">
+        <div className="rounded-lg bg-amber-100/40 dark:bg-white/[0.03] p-2 text-center">
+          <span className="text-[10px] text-neutral-500 dark:text-white/60 block">
+            {lang === 'id' ? 'Skor Bioenergetika' : 'Bioenergetic Score'}
+          </span>
+          <span className="text-sm font-extrabold text-amber-700 dark:text-amber-400">
+            {bridge.bioenergeticEfficiencyScore}%
+          </span>
+        </div>
+        <div className="rounded-lg bg-amber-100/40 dark:bg-white/[0.03] p-2 text-center">
+          <span className="text-[10px] text-neutral-500 dark:text-white/60 block">
+            {lang === 'id' ? 'Daya Penggerak Proton (pmf)' : 'Proton Motive Force (pmf)'}
+          </span>
+          <span className="text-sm font-extrabold text-amber-700 dark:text-amber-400">
+            {bridge.protonMotiveForceIndex}%
+          </span>
+        </div>
+        <div className="rounded-lg bg-amber-100/40 dark:bg-white/[0.03] p-2 text-center">
+          <span className="text-[10px] text-neutral-500 dark:text-white/60 block">
+            {lang === 'id' ? 'Kapasitas Redam ROS' : 'ROS Quenching Capacity'}
+          </span>
+          <span className="text-sm font-extrabold text-amber-700 dark:text-amber-400">
+            {bridge.rosQuenchingCapacity}%
+          </span>
+        </div>
+      </div>
+
+      <p className="mt-2 text-xs text-neutral-700 dark:text-white/80 leading-relaxed">
+        {narrative}
+      </p>
+
+      <div className="mt-2.5 space-y-1.5" data-eden-etc-nodes="v1">
+        <div className="text-[10px] font-bold text-neutral-500 dark:text-white/60 uppercase tracking-wider">
+          {lang === 'id' ? 'Nodus Mesin Respirasom Mitokondria & Kemiosmosis (4 Nodus)' : 'Mitochondrial Respirasome & Chemiosmosis Nodes (4 Nodes)'}
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-1.5">
+          {bridge.etcNodes.map((node) => (
+            <div
+              key={node.nodeKind}
+              className="rounded-lg border border-amber-200/50 dark:border-white/10 bg-white/60 dark:bg-white/[0.02] p-2 text-xs"
+            >
+              <div className="flex items-center justify-between gap-1">
+                <span className="font-bold text-neutral-800 dark:text-white truncate">
+                  {node.nodeLabel}
+                </span>
+                <span className="text-[10px] font-bold text-amber-700 dark:text-amber-300">
+                  {Math.round(node.tunnelingFidelityScore * 100)}%
+                </span>
+              </div>
+              <div className="mt-0.5 text-[10px] text-neutral-500 dark:text-white/60">
+                {node.mechanisticNote}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="mt-2.5 rounded-lg border border-amber-200/40 dark:border-white/10 bg-amber-100/30 dark:bg-white/[0.02] p-2.5 text-xs space-y-1">
+        <div className="text-[11px] text-neutral-800 dark:text-white/85">
+          <b>{lang === 'id' ? 'Strategi Modulasi Respirasom & Longevitas Seluler:' : 'Respirasome Modulation & Cellular Longevity Strategy:'}</b>{' '}
+          {bridge.etcLongevityStrategy}
+        </div>
+      </div>
+
+      <div className="mt-2 text-[10px] text-neutral-500 dark:text-white/50 text-right">
+        ARGON EDEN ∞ §11 · Mitochondrial ETC Cristae Bioenergetics & ROS Homeostasis Synthesizer · Patient Truth Uncompromised · Never Manufactures Biomarkers
       </div>
     </div>
   )

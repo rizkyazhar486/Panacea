@@ -51,6 +51,7 @@ import {
   deriveEdenGolgiGlycosylationBridge,
   deriveEdenUpsProteasomeBridge,
   deriveEdenLysosomalAutophagyBridge,
+  deriveEdenMitochondrialEtcBridge,
   translateClinicalTermToEden,
   EDEN_PLAIN_LANGUAGE_GLOSSARY,
 } from '../../src/domains/clinical-operations/model/careContinuityProjection.ts'
@@ -4488,4 +4489,77 @@ test('CareContinuityPanel: Eden Lysosomal Autophagic Flux & TFEB/mTORC1 Nutrient
   const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
   assert.ok(episodeSource.includes('data-eden-lysosome-card="v1"'), 'CareEpisode must include Lysosome card')
   assert.ok(episodeSource.includes('data-eden-lysosome-nodes="v1"'), 'CareEpisode must include Lysosome nodes grid')
+})
+
+test('T-CLIN-61 / EDEN-40: Eden Mitochondrial ETC Complex I–V Cristae Bioenergetics & ROS Homeostasis Synthesizer', () => {
+  const evaluatedAt = '2026-10-27T08:00:00.000Z'
+  const sampleEpisode = {
+    id: 'ce_etc_1',
+    title: 'Post-Exertional Mitochondrial Bioenergetics and Cristae Polarization Trajectory',
+    diagnosisCode: 'G71.3',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'diagnosis', status: 'done' },
+      { stage: 'treatment', status: 'done' },
+      { stage: 'recovery', status: 'active' },
+    ],
+  }
+
+  // 1. Pure deterministic derivation
+  const bridge = deriveEdenMitochondrialEtcBridge(sampleEpisode)
+  assert.equal(bridge.version, 'v1')
+  assert.equal(bridge.episodeId, 'ce_etc_1')
+  assert.equal(bridge.etcState, 'optimal_supercomplex_respirasome_flux')
+  assert.equal(bridge.etcStateLabel, 'Fluks Respirasom Superkompleks I-III-IV Optimal & Efisiensi Kemiosmotik Puncak')
+  assert.equal(bridge.etcTier, 'optimal_respirasome_tunneling_fidelity')
+  assert.equal(bridge.etcTierLabel, 'Fidelitas Quantum Tunneling Elektron & Perakitan Respirasom Presisi Tinggi')
+  assert.ok(bridge.bioenergeticEfficiencyScore >= 85)
+  assert.ok(bridge.protonMotiveForceIndex >= 85)
+  assert.ok(bridge.rosQuenchingCapacity >= 85)
+  assert.equal(bridge.etcNodes.length, 4)
+  assert.equal(bridge.etcNodes[0].nodeKind, 'complex_i_nadh_dehydrogenase_fe_s_relay')
+  assert.equal(bridge.etcNodes[1].nodeKind, 'complex_iii_q_cycle_cytochrome_c_reduction')
+  assert.equal(bridge.etcNodes[2].nodeKind, 'complex_iv_cytochrome_c_oxidase_terminal_o2')
+  assert.equal(bridge.etcNodes[3].nodeKind, 'complex_v_f1_fo_atp_synthase_rotary_chemiosmosis')
+  assert.equal(bridge.truthClass, 'mitochondrial_etc_cristae_simulation_proxy')
+  assert.equal(bridge.clinically_reviewed, false)
+  assert.equal(bridge.patientTruthUncompromised, true)
+  assert.equal(bridge.neverManufacturesBiomarkers, true)
+  assert.equal(bridge.epistemicHumilityPreserved, true)
+
+  // 2. Blocked stage resilience
+  const blockedEpisode = {
+    id: 'ce_etc_blocked',
+    title: 'Blocked Mitochondrial Respiratory Chain Complex Failure Episode',
+    diagnosisCode: 'G71.3',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'diagnosis', status: 'blocked', blockedReason: 'Awaiting high-resolution respirometry and mitochondrial cristae cryo-EM analysis' },
+    ],
+  }
+  const blockedBridge = deriveEdenMitochondrialEtcBridge(blockedEpisode)
+  assert.equal(blockedBridge.etcState, 'critical_etc_electron_leakage_ros_collapse')
+  assert.equal(blockedBridge.etcStateLabel, 'Kolaps Rantai Transpor Elektron Kritis & Kebocoran Elektron/ROS Merusak')
+  assert.equal(blockedBridge.etcTier, 'critical_mitochondrial_permeability_transition_risk')
+  assert.equal(blockedBridge.etcTierLabel, 'Risiko Transisi Permeabilitas Mitokondria (mPTP) Kritis & Hilangnya Potensial Membran')
+  assert.ok(blockedBridge.bioenergeticEfficiencyScore <= 66)
+  assert.ok(blockedBridge.protonMotiveForceIndex <= 63)
+  assert.ok(blockedBridge.rosQuenchingCapacity <= 64)
+  assert.equal(blockedBridge.etcNodes.every((n) => n.etcStatus === 'electron_leak_ros_stress'), true)
+
+  // 3. Rollup in evaluateCareJourneyContinuity
+  const projection = evaluateCareJourneyContinuity([sampleEpisode, blockedEpisode], evaluatedAt)
+  assert.equal(projection.edenMitochondrialEtcReadyCount, 2)
+  assert.ok(projection.episodes[0].edenMitochondrialEtc)
+  assert.equal(projection.episodes[0].edenMitochondrialEtc.truthClass, 'mitochondrial_etc_cristae_simulation_proxy')
+  assert.equal(projection.episodes[0].edenMitochondrialEtc.patientTruthUncompromised, true)
+  assert.equal(projection.episodes[0].edenMitochondrialEtc.neverManufacturesBiomarkers, true)
+
+  // 4. UI contracts
+  const panelSource = read('src/domains/clinical-operations/ui/CareContinuityPanel.tsx')
+  assert.ok(panelSource.includes('data-eden-etc="v1"'), 'CareContinuityPanel must include ETC attribute')
+
+  const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
+  assert.ok(episodeSource.includes('data-eden-etc-card="v1"'), 'CareEpisode must include ETC card')
+  assert.ok(episodeSource.includes('data-eden-etc-nodes="v1"'), 'CareEpisode must include ETC nodes grid')
 })

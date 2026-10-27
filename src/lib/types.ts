@@ -1929,6 +1929,55 @@ export interface EdenLysosomalAutophagyBridge {
   epistemicHumilityPreserved: true
 }
 
+export type EdenMitochondrialEtcState =
+  | 'optimal_supercomplex_respirasome_flux'
+  | 'balanced_cristae_chemiosmotic_homeostasis'
+  | 'transient_proton_leak_mild_uncoupling'
+  | 'critical_etc_electron_leakage_ros_collapse'
+
+export type EdenMitochondrialEtcTier =
+  | 'optimal_respirasome_tunneling_fidelity'
+  | 'adequate_cristae_proton_gradient_capacity'
+  | 'moderate_supercomplex_disassembly_strain'
+  | 'critical_mitochondrial_permeability_transition_risk'
+
+export type EdenMitochondrialEtcNodeKind =
+  | 'complex_i_nadh_dehydrogenase_fe_s_relay'
+  | 'complex_iii_q_cycle_cytochrome_c_reduction'
+  | 'complex_iv_cytochrome_c_oxidase_terminal_o2'
+  | 'complex_v_f1_fo_atp_synthase_rotary_chemiosmosis'
+
+export interface EdenMitochondrialEtcNode {
+  nodeKind: EdenMitochondrialEtcNodeKind
+  nodeLabel: string
+  tunnelingFidelityScore: number
+  protonPumpingCapacity: number
+  etcStatus: 'optimal_respirasome_state' | 'adaptive_bioenergetic_mode' | 'electron_leak_ros_stress'
+  mechanisticNote: string
+}
+
+export interface EdenMitochondrialEtcBridge {
+  version: 'v1'
+  episodeId: string
+  episodeTitle: string
+  etcState: EdenMitochondrialEtcState
+  etcStateLabel: string
+  etcTier: EdenMitochondrialEtcTier
+  etcTierLabel: string
+  bioenergeticEfficiencyScore: number
+  protonMotiveForceIndex: number
+  rosQuenchingCapacity: number
+  etcNodes: EdenMitochondrialEtcNode[]
+  etcNarrativeId: string
+  etcNarrativeEn: string
+  etcLongevityStrategy: string
+  truthClass: 'mitochondrial_etc_cristae_simulation_proxy'
+  clinically_reviewed: false
+  patientTruthUncompromised: true
+  neverManufacturesBiomarkers: true
+  epistemicHumilityPreserved: true
+}
+
 export interface CareJourneyExportSummary {
   standard: 'PANACEA-CAREPLAN-FHIR-R4-V1'
   generatedAt: string
