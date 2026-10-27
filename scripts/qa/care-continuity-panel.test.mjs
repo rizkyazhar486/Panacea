@@ -53,6 +53,7 @@ import {
   deriveEdenLysosomalAutophagyBridge,
   deriveEdenMitochondrialEtcBridge,
   deriveEdenOrganelleContactBridge,
+  deriveEdenNuclearLaminBridge,
   translateClinicalTermToEden,
   EDEN_PLAIN_LANGUAGE_GLOSSARY,
 } from '../../src/domains/clinical-operations/model/careContinuityProjection.ts'
@@ -4636,4 +4637,77 @@ test('T-CLIN-62 / EDEN-41: Eden Peroxisome–ER–Mitochondria Organelle Contact
   const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
   assert.ok(episodeSource.includes('data-eden-organelle-contact-card="v1"'), 'CareEpisode must include Organelle Contact card')
   assert.ok(episodeSource.includes('data-eden-organelle-contact-nodes="v1"'), 'CareEpisode must include Organelle Contact nodes grid')
+})
+
+test('T-CLIN-63 / EDEN-42: Eden Nuclear Lamin A/C & Nuclear Envelope Mechanotransduction Synthesizer', () => {
+  const evaluatedAt = '2026-10-27T08:00:00.000Z'
+  const sampleEpisode = {
+    id: 'ce_lamin_1',
+    title: 'Nuclear Envelope Mechanoprotection and Lamin A/C Viscoelastic Resonance Trajectory',
+    diagnosisCode: 'G71.0',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'diagnosis', status: 'done' },
+      { stage: 'treatment', status: 'done' },
+      { stage: 'recovery', status: 'active' },
+    ],
+  }
+
+  // 1. Pure deterministic derivation
+  const bridge = deriveEdenNuclearLaminBridge(sampleEpisode)
+  assert.equal(bridge.version, 'v1')
+  assert.equal(bridge.episodeId, 'ce_lamin_1')
+  assert.equal(bridge.laminState, 'optimal_linc_lamina_viscoelastic_resonance')
+  assert.equal(bridge.laminStateLabel, 'Resonansi Viskoelastis LINC-Lamina Optimal & Integritas Genomik Kokoh')
+  assert.equal(bridge.laminTier, 'optimal_sun_kash_force_transmission')
+  assert.equal(bridge.laminTierLabel, 'Transmisi Gaya Kompleks SUN-KASH Optimal & Kapasitas Reparasi BAF Maksimal')
+  assert.ok(bridge.nuclearStiffnessIndex >= 86)
+  assert.ok(bridge.envelopeIntegrityScore >= 84)
+  assert.ok(bridge.cgasStingImmunityMargin >= 85)
+  assert.equal(bridge.laminNodes.length, 4)
+  assert.equal(bridge.laminNodes[0].nodeKind, 'linc_complex_sun_kash_transduction')
+  assert.equal(bridge.laminNodes[1].nodeKind, 'lamin_a_c_meshwork_viscoelastic_cushioning')
+  assert.equal(bridge.laminNodes[2].nodeKind, 'emerin_baf_barrier_to_autointegration_repair')
+  assert.equal(bridge.laminNodes[3].nodeKind, 'mechanosensitive_chromatin_lad_anchoring')
+  assert.equal(bridge.truthClass, 'nuclear_lamin_mechanotransduction_simulation_proxy')
+  assert.equal(bridge.clinically_reviewed, false)
+  assert.equal(bridge.patientTruthUncompromised, true)
+  assert.equal(bridge.neverManufacturesBiomarkers, true)
+  assert.equal(bridge.epistemicHumilityPreserved, true)
+
+  // 2. Blocked stage resilience
+  const blockedEpisode = {
+    id: 'ce_lamin_blocked',
+    title: 'Blocked Nuclear Envelope Rupture and cGAS-STING Leakage Episode',
+    diagnosisCode: 'G71.0',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'diagnosis', status: 'blocked', blockedReason: 'Awaiting high-resolution nuclear envelope strain tomography and progerin expression assay' },
+    ],
+  }
+  const blockedBridge = deriveEdenNuclearLaminBridge(blockedEpisode)
+  assert.equal(blockedBridge.laminState, 'critical_lamina_rupture_cgas_sting_leakage')
+  assert.equal(blockedBridge.laminStateLabel, 'Risiko Ruptur Lamina Inti Kritis & Kebocoran DNA Sitoplasma cGAS-STING')
+  assert.equal(blockedBridge.laminTier, 'critical_progeroid_nuclear_collapse_sting_activation')
+  assert.equal(blockedBridge.laminTierLabel, 'Dismorfologi Nukleus Menyerupai Progeroid & Aktivasi Jalur Inflamasi DNA Asing')
+  assert.ok(blockedBridge.nuclearStiffnessIndex <= 66)
+  assert.ok(blockedBridge.envelopeIntegrityScore <= 64)
+  assert.ok(blockedBridge.cgasStingImmunityMargin <= 61)
+  assert.equal(blockedBridge.laminNodes.every((n) => n.mechanotransductionStatus === 'envelope_rupture_stress'), true)
+
+  // 3. Rollup in evaluateCareJourneyContinuity
+  const projection = evaluateCareJourneyContinuity([sampleEpisode, blockedEpisode], evaluatedAt)
+  assert.equal(projection.edenNuclearLaminReadyCount, 2)
+  assert.ok(projection.episodes[0].edenNuclearLamin)
+  assert.equal(projection.episodes[0].edenNuclearLamin.truthClass, 'nuclear_lamin_mechanotransduction_simulation_proxy')
+  assert.equal(projection.episodes[0].edenNuclearLamin.patientTruthUncompromised, true)
+  assert.equal(projection.episodes[0].edenNuclearLamin.neverManufacturesBiomarkers, true)
+
+  // 4. UI contracts
+  const panelSource = read('src/domains/clinical-operations/ui/CareContinuityPanel.tsx')
+  assert.ok(panelSource.includes('data-eden-lamin="v1"'), 'CareContinuityPanel must include Lamin attribute')
+
+  const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
+  assert.ok(episodeSource.includes('data-eden-lamin-card="v1"'), 'CareEpisode must include Lamin card')
+  assert.ok(episodeSource.includes('data-eden-lamin-nodes="v1"'), 'CareEpisode must include Lamin nodes grid')
 })
