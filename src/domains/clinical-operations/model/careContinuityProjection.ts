@@ -6702,7 +6702,8 @@ export function evaluateCareJourneyContinuity(
   const edenMitochondrialEtcReadyCount = summaries.filter(
     (s) =>
       Boolean(
-        s.edenMitochondrialEtc?.truthClass === 'mitochondrial_etc_cristae_simulation_proxy' &&
+        s.edenMitochondrialEtc?.truthClass === 'mitochondrial_etc_reference_education' &&
+          s.edenMitochondrialEtc?.measurementStatus === 'not_measured' &&
           s.edenMitochondrialEtc?.patientTruthUncompromised &&
           s.edenMitochondrialEtc?.neverManufacturesBiomarkers
       )
