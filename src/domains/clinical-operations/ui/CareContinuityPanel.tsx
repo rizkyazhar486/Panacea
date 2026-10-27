@@ -944,6 +944,17 @@ export function CareContinuityPanel({
                   </span>
                 </div>
               )}
+              {careJourneys.edenUpsProteasomeReadyCount > 0 && (
+                <div
+                  className="flex justify-between text-amber-300"
+                  data-eden-ups="v1"
+                >
+                  <span>Sistem ubikuitin-proteasom 26S & proteolisis:</span>
+                  <span className="font-bold">
+                    {careJourneys.edenUpsProteasomeReadyCount} episode terhubung
+                  </span>
+                </div>
+              )}
 
               {careJourneys.episodes.length > 0 && (
                 <div className="mt-3 border-t border-white/8 pt-2">

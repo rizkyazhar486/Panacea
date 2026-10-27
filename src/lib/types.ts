@@ -1831,6 +1831,55 @@ export interface EdenGolgiGlycosylationBridge {
   epistemicHumilityPreserved: true
 }
 
+export type EdenUpsDegradationState =
+  | 'optimal_26s_proteasomal_flux_clearance'
+  | 'balanced_adaptive_ups_equilibrium'
+  | 'transient_proteasomal_choke_ubiquitin_aggregation'
+  | 'critical_proteasomal_exhaustion_proteotoxicity'
+
+export type EdenUpsDegradationTier =
+  | 'optimal_proteasome_catalytic_fidelity'
+  | 'balanced_ubiquitination_deubiquitination_equilibrium'
+  | 'moderate_proteasomal_processing_strain'
+  | 'critical_proteasomal_inhibition_instability'
+
+export type EdenUpsNodeKind =
+  | 'e1_e2_e3_ubiquitination_cascade'
+  | 'rpn_ubiquitin_receptor_and_dub_recycling'
+  | 'rpt_aaa_atpase_unfolding_and_gate_opening'
+  | 'cp_20s_threonine_peptidase_proteolysis'
+
+export interface EdenUpsNode {
+  nodeKind: EdenUpsNodeKind
+  nodeLabel: string
+  degradationFidelityScore: number
+  proteasomeFluxIndex: number
+  upsStatus: 'optimal_ups_state' | 'adaptive_clearance_mode' | 'proteasomal_exhaustion_stress'
+  mechanisticNote: string
+}
+
+export interface EdenUpsProteasomeBridge {
+  version: 'v1'
+  episodeId: string
+  episodeTitle: string
+  upsState: EdenUpsDegradationState
+  upsStateLabel: string
+  upsTier: EdenUpsDegradationTier
+  upsTierLabel: string
+  upsScore: number
+  polyubiquitinClearanceIndex: number
+  proteasomeGateCapacity: number
+  upsNodes: EdenUpsNode[]
+  upsNarrativeId: string
+  upsNarrativeEn: string
+  upsLongevityStrategy: string
+  truthClass: 'ups_proteasome_degradation_simulation_proxy'
+  clinically_reviewed: false
+  patientTruthUncompromised: true
+  neverManufacturesBiomarkers: true
+  epistemicHumilityPreserved: true
+}
+
 export interface CareJourneyExportSummary {
   standard: 'PANACEA-CAREPLAN-FHIR-R4-V1'
   generatedAt: string

@@ -165,6 +165,11 @@ import type {
   EdenGolgiNodeKind,
   EdenGolgiNode,
   EdenGolgiGlycosylationBridge,
+  EdenUpsDegradationState,
+  EdenUpsDegradationTier,
+  EdenUpsNodeKind,
+  EdenUpsNode,
+  EdenUpsProteasomeBridge,
   WellnessDay,
   MoodEntry,
   Circle,
@@ -293,6 +298,7 @@ export interface CareJourneyEpisodeSummary {
   edenErProteostasis?: EdenErProteostasisBridge
   edenPerkIsr?: EdenPerkIsrBridge
   edenGolgiGlycosylation?: EdenGolgiGlycosylationBridge
+  edenUpsProteasome?: EdenUpsProteasomeBridge
 }
 
 export type ReadmissionRiskLevel = 'low' | 'moderate' | 'high'
@@ -407,6 +413,7 @@ export interface CareJourneyContinuityResult {
   edenErProteostasisReadyCount: number
   edenPerkIsrReadyCount: number
   edenGolgiGlycosylationReadyCount: number
+  edenUpsProteasomeReadyCount: number
   edenLifeBalance: EdenLifeBalanceSynthesis
   hasBlockedStages: boolean
 }
@@ -5348,6 +5355,124 @@ export function deriveEdenGolgiGlycosylationBridge(
   }
 }
 
+export function deriveEdenUpsProteasomeBridge(
+  episode: CareEpisode,
+): EdenUpsProteasomeBridge {
+  const stages = episode.stages ?? []
+  const completedStages = stages.filter((s) => s.status === 'done').length
+  const hasBlocked = stages.some((s) => s.status === 'blocked')
+  const blockedCount = stages.filter((s) => s.status === 'blocked').length
+
+  const upsScore = hasBlocked
+    ? Math.max(45, 65 - blockedCount * 7)
+    : Math.min(99, 82 + completedStages * 5)
+
+  const polyubiquitinClearanceIndex = hasBlocked
+    ? Math.max(44, 64 - blockedCount * 7)
+    : Math.min(98, 80 + completedStages * 5)
+
+  const proteasomeGateCapacity = hasBlocked
+    ? Math.max(42, 62 - blockedCount * 8)
+    : Math.min(98, 79 + completedStages * 5)
+
+  let upsState: EdenUpsDegradationState = 'balanced_adaptive_ups_equilibrium'
+  let upsStateLabel = 'Ekuilibrium Sistem Ubikuitin-Proteasom 26S & Fluks Proteolisis Seimbang'
+  let upsTier: EdenUpsDegradationTier = 'balanced_ubiquitination_deubiquitination_equilibrium'
+  let upsTierLabel = 'Ekuilibrium Ubikuitinasi-Deubikuitinasi & Kapasitas Degradasi Proteasom Seimbang'
+
+  if (hasBlocked) {
+    upsState = 'critical_proteasomal_exhaustion_proteotoxicity'
+    upsStateLabel = 'Kelelahan Proteasom 26S Kritis & Akumulasi Agregat Poliubikuitin Terhambat'
+    upsTier = 'critical_proteasomal_inhibition_instability'
+    upsTierLabel = 'Instabilitas Inhibisi Proteasom Kritis & Stres Proteotoksisitas Akumulatif'
+  } else if (completedStages >= 3) {
+    upsState = 'optimal_26s_proteasomal_flux_clearance'
+    upsStateLabel = 'Klirens Proteolitik Proteasom 26S Optimal & Daur Ulang Ubikuitin Paripurna'
+    upsTier = 'optimal_proteasome_catalytic_fidelity'
+    upsTierLabel = 'Fidelitas Katalitik Partikel Inti 20S & Efisiensi Translokasi 19S Optimal'
+  } else if (completedStages === 0) {
+    upsState = 'transient_proteasomal_choke_ubiquitin_aggregation'
+    upsStateLabel = 'Penyumbatan Proteasom Transien & Perlambatan Pemrosesan Substrat Polipeptida'
+    upsTier = 'moderate_proteasomal_processing_strain'
+    upsTierLabel = 'Regangan Pemrosesan Substrat Proteasom Moderat Transien'
+  }
+
+  const upsNodes: EdenUpsNode[] = [
+    {
+      nodeKind: 'e1_e2_e3_ubiquitination_cascade',
+      nodeLabel: 'Kaskade Enzimatis E1-E2-E3 & Penandaan Rantai Poliubikuitin Lys48 Spesifik',
+      degradationFidelityScore: hasBlocked ? 0.61 : Math.min(0.99, 0.82 + completedStages * 0.05),
+      proteasomeFluxIndex: hasBlocked ? 0.60 : Math.min(0.98, 0.80 + completedStages * 0.05),
+      upsStatus: hasBlocked ? 'proteasomal_exhaustion_stress' : completedStages >= 2 ? 'optimal_ups_state' : 'adaptive_clearance_mode',
+      mechanisticNote: 'Enzim pengaktif E1 (UBA1), konjugasi E2, dan ligase E3 mentransfer ubikuitin teraktivasi ke lisin substrat sasaran terarah untuk membentuk rantai degradasi K48.',
+    },
+    {
+      nodeKind: 'rpn_ubiquitin_receptor_and_dub_recycling',
+      nodeLabel: 'Reseptor Ubikuitin 19S (Rpn10/Rpn13) & Enzim Deubikuitinase (DUB/Rpn11)',
+      degradationFidelityScore: hasBlocked ? 0.62 : Math.min(0.98, 0.81 + completedStages * 0.05),
+      proteasomeFluxIndex: hasBlocked ? 0.59 : Math.min(0.99, 0.79 + completedStages * 0.05),
+      upsStatus: hasBlocked ? 'proteasomal_exhaustion_stress' : completedStages >= 2 ? 'optimal_ups_state' : 'adaptive_clearance_mode',
+      mechanisticNote: 'Partikel regulatori 19S mengenali kargo terubikuitinasi dan metaloprotease Rpn11 memotong rantai ubikuitin untuk didaur ulang menjadi kumpulan monoubikuitin bebas.',
+    },
+    {
+      nodeKind: 'rpt_aaa_atpase_unfolding_and_gate_opening',
+      nodeLabel: 'Cincin Heksamerik Rpt1-6 AAA+ ATPase, Pembukaan Gerbang Cincin-α & Unfolding Substrat',
+      degradationFidelityScore: hasBlocked ? 0.60 : Math.min(0.99, 0.83 + completedStages * 0.05),
+      proteasomeFluxIndex: hasBlocked ? 0.58 : Math.min(0.98, 0.81 + completedStages * 0.05),
+      upsStatus: hasBlocked ? 'proteasomal_exhaustion_stress' : completedStages >= 2 ? 'optimal_ups_state' : 'adaptive_clearance_mode',
+      mechanisticNote: 'Motor ATPase Rpt membuka cincin alfa gerbang 20S melalui interaksi motif HbYX dan secara mekanis merentangkan lipatan protein globular dengan hidrolisis ATP.',
+    },
+    {
+      nodeKind: 'cp_20s_threonine_peptidase_proteolysis',
+      nodeLabel: 'Proteolisis Peptidase Treonin Ruang Katalitik 20S (Subunit β1, β2, dan β5)',
+      degradationFidelityScore: hasBlocked ? 0.63 : Math.min(0.99, 0.84 + completedStages * 0.05),
+      proteasomeFluxIndex: hasBlocked ? 0.61 : Math.min(0.98, 0.82 + completedStages * 0.05),
+      upsStatus: hasBlocked ? 'proteasomal_exhaustion_stress' : completedStages >= 2 ? 'optimal_ups_state' : 'adaptive_clearance_mode',
+      mechanisticNote: 'Situs aktif treonin pada subunit β5 (kimotripsin-like), β2 (tripsin-like), dan β1 (kaspase-like) memotong substrat polipeptida menjadi oligopeptida pendek yang aman bagi sitosol.',
+    },
+  ]
+
+  const upsNarrativeId = hasBlocked
+    ? `Terdeteksi hambatan proteolitik pada episode "${episode.title}". Sistem proteasom 26S mengalami regangan akibat akumulasi substrat terubikuitinasi (skor UPS: ${upsScore}%, indeks klirens: ${polyubiquitinClearanceIndex}%, kapasitas gerbang: ${proteasomeGateCapacity}%). Diperlukan modulasi kofaktor proteasom dan reduksi beban stres oksidatif sitosolik.`
+    : completedStages >= 3
+    ? `Episode "${episode.title}" menunjukkan fluks proteasom 26S yang sangat optimal (skor UPS: ${upsScore}%, indeks klirens: ${polyubiquitinClearanceIndex}%, kapasitas gerbang: ${proteasomeGateCapacity}%). Aktivitas treonin peptidase 20S dan efisiensi unfolding ATPase 19S berada pada performa proteostasis seluler puncak.`
+    : `Episode "${episode.title}" berada dalam fase adaptif proteasomal (skor UPS: ${upsScore}%, indeks klirens: ${polyubiquitinClearanceIndex}%, kapasitas gerbang: ${proteasomeGateCapacity}%). Kaskade penandaan ubikuitin E1-E2-E3 dan proses deubikuitinasi Rpn11 berjalan stabil.`
+
+  const upsNarrativeEn = hasBlocked
+    ? `Proteolytic bottleneck detected in episode "${episode.title}". The 26S proteasome system is experiencing processing strain from accumulation of polyubiquitinated substrates (UPS score: ${upsScore}%, clearance index: ${polyubiquitinClearanceIndex}%, gate capacity: ${proteasomeGateCapacity}%). Proteasomal cofactor support and cytosolic oxidative stress reduction are recommended.`
+    : completedStages >= 3
+    ? `Episode "${episode.title}" demonstrates optimal 26S proteasomal flux and substrate clearance (UPS score: ${upsScore}%, clearance index: ${polyubiquitinClearanceIndex}%, gate capacity: ${proteasomeGateCapacity}%). The 20S core threonine peptidase and 19S ATPase unfolding activities are functioning at peak cellular proteostasis fidelity.`
+    : `Episode "${episode.title}" operates in an adaptive proteasomal state (UPS score: ${upsScore}%, clearance index: ${polyubiquitinClearanceIndex}%, gate capacity: ${proteasomeGateCapacity}%). E1-E2-E3 ubiquitination cascade and Rpn11 deubiquitination recycling maintain stable equilibrium.`
+
+  const upsLongevityStrategy = hasBlocked
+    ? 'Mengurangi kelelahan proteasom dan agregasi poliubikuitin dengan aktivator jalur Nrf1/NFE2L1 (induser transkripsi subunit proteasom), restriksi energi berkala untuk stimulasi autofagi proteasom, dan antioksidan penstabil cincin 20S.'
+    : completedStages >= 3
+    ? 'Mempertahankan aktivitas peptidase treonin 20S dan homeostasis ubikuitin melalui asupan fitonutrien bioaktif pemelihara proteasom (seperti sulforafan dan kurkumin terstandar), kecukupan ATP mitokondrial, dan hidrasi sitosolik optimal.'
+    : 'Mendukung efisiensi kaskade E1-E2-E3 dan pembukaan gerbang 19S dengan tidur restoratif gelombang lambat, manajemen beban glukotoksisitas, dan latihan fisik interval moderat.'
+
+  return {
+    version: 'v1',
+    episodeId: episode.id,
+    episodeTitle: episode.title,
+    upsState,
+    upsStateLabel,
+    upsTier,
+    upsTierLabel,
+    upsScore,
+    polyubiquitinClearanceIndex,
+    proteasomeGateCapacity,
+    upsNodes,
+    upsNarrativeId,
+    upsNarrativeEn,
+    upsLongevityStrategy,
+    truthClass: 'ups_proteasome_degradation_simulation_proxy',
+    clinically_reviewed: false,
+    patientTruthUncompromised: true,
+    neverManufacturesBiomarkers: true,
+    epistemicHumilityPreserved: true,
+  }
+}
+
 export const STAGE_EXPECTED_DAYS: Record<CareEpisodeStageId, number> = {
   problem: 1,
   diagnosis: 2,
@@ -5634,6 +5759,7 @@ export function evaluateCareJourneyContinuity(
     const edenErProteostasis = deriveEdenErProteostasisBridge(ep)
     const edenPerkIsr = deriveEdenPerkIsrBridge(ep)
     const edenGolgiGlycosylation = deriveEdenGolgiGlycosylationBridge(ep)
+    const edenUpsProteasome = deriveEdenUpsProteasomeBridge(ep)
 
     return {
       id: ep.id,
@@ -5699,6 +5825,7 @@ export function evaluateCareJourneyContinuity(
       edenErProteostasis,
       edenPerkIsr,
       edenGolgiGlycosylation,
+      edenUpsProteasome,
     }
   })
 
@@ -5992,6 +6119,14 @@ export function evaluateCareJourneyContinuity(
           s.edenGolgiGlycosylation?.neverManufacturesBiomarkers
       )
   ).length
+  const edenUpsProteasomeReadyCount = summaries.filter(
+    (s) =>
+      Boolean(
+        s.edenUpsProteasome?.truthClass === 'ups_proteasome_degradation_simulation_proxy' &&
+          s.edenUpsProteasome?.patientTruthUncompromised &&
+          s.edenUpsProteasome?.neverManufacturesBiomarkers
+      )
+  ).length
   const edenLifeBalance = deriveEdenLifeBalanceSynthesis(episodes, supportiveResults)
 
   return {
@@ -6061,6 +6196,7 @@ export function evaluateCareJourneyContinuity(
     edenErProteostasisReadyCount,
     edenPerkIsrReadyCount,
     edenGolgiGlycosylationReadyCount,
+    edenUpsProteasomeReadyCount,
     edenLifeBalance,
     hasBlockedStages: blockedJourneys > 0 || stalledCount > 0,
   }
