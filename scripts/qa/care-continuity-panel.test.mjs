@@ -50,6 +50,7 @@ import {
   deriveEdenPerkIsrBridge,
   deriveEdenGolgiGlycosylationBridge,
   deriveEdenUpsProteasomeBridge,
+  deriveEdenLysosomalAutophagyBridge,
   translateClinicalTermToEden,
   EDEN_PLAIN_LANGUAGE_GLOSSARY,
 } from '../../src/domains/clinical-operations/model/careContinuityProjection.ts'
@@ -4413,4 +4414,78 @@ test('CareContinuityPanel: Eden 26S Ubiquitin-Proteasome System (UPS) & Polyubiq
   const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
   assert.ok(episodeSource.includes('data-eden-ups-card="v1"'), 'CareEpisode must include UPS card')
   assert.ok(episodeSource.includes('data-eden-ups-nodes="v1"'), 'CareEpisode must include UPS nodes grid')
+})
+
+test('CareContinuityPanel: Eden Lysosomal Autophagic Flux & TFEB/mTORC1 Nutrient-Sensing Synthesizer contract (T-CLIN-60)', () => {
+  const evaluatedAt = '2026-10-27T00:00:00.000Z'
+  const sampleEpisode = {
+    id: 'ce_lysosome_1',
+    title: 'Comprehensive Neurovascular Autophagic Clearance & TFEB CLEAR Network Activation Episode',
+    diagnosisCode: 'G31.84',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'diagnosis', status: 'done' },
+      { stage: 'plan', status: 'done' },
+      { stage: 'treatment', status: 'done' },
+      { stage: 'recovery', status: 'active' },
+    ],
+  }
+
+  // 1. Pure deterministic derivation
+  const bridge = deriveEdenLysosomalAutophagyBridge(sampleEpisode)
+  assert.equal(bridge.version, 'v1')
+  assert.equal(bridge.episodeId, 'ce_lysosome_1')
+  assert.equal(bridge.lysosomalState, 'optimal_autophagic_flux_tfeb_clear_activation')
+  assert.equal(bridge.lysosomalStateLabel, 'Fluks Autofagi Lisosomal Optimal & Aktivasi Jaringan Gen CLEAR via Translokasi TFEB')
+  assert.equal(bridge.lysosomalTier, 'high_fidelity_tfeb_clear_orchestration')
+  assert.equal(bridge.lysosomalTierLabel, 'Orkestrasi Biogenesis Lisosom TFEB-CLEAR Presisi Tinggi & Fusi Autofagosom Paripurna')
+  assert.ok(bridge.autophagicFluxScore >= 85)
+  assert.ok(bridge.tfebNuclearTranslocationIndex >= 85)
+  assert.ok(bridge.vAtpaseAcidificationCapacity >= 85)
+  assert.equal(bridge.lysosomalNodes.length, 4)
+  assert.equal(bridge.lysosomalNodes[0].nodeKind, 'tfeb_clear_network_transcriptional_biogenesis')
+  assert.equal(bridge.lysosomalNodes[1].nodeKind, 'v_atpase_proton_pump_acidification')
+  assert.equal(bridge.lysosomalNodes[2].nodeKind, 'autophagosome_lysosome_fusion_machinery')
+  assert.equal(bridge.lysosomalNodes[3].nodeKind, 'nutrient_sensing_rag_mtorc1_lysosomal_surface')
+  assert.equal(bridge.truthClass, 'lysosomal_autophagy_tfeb_simulation_proxy')
+  assert.equal(bridge.clinically_reviewed, false)
+  assert.equal(bridge.patientTruthUncompromised, true)
+  assert.equal(bridge.neverManufacturesBiomarkers, true)
+  assert.equal(bridge.epistemicHumilityPreserved, true)
+
+  // 2. Blocked stage resilience
+  const blockedEpisode = {
+    id: 'ce_lysosome_blocked',
+    title: 'Blocked Lysosomal Storage and Acidification Failure Episode',
+    diagnosisCode: 'E75.22',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'diagnosis', status: 'blocked', blockedReason: 'Awaiting lysosomal luminal pH ratiometric imaging and acid sphingomyelinase enzymatic assay' },
+    ],
+  }
+  const blockedBridge = deriveEdenLysosomalAutophagyBridge(blockedEpisode)
+  assert.equal(blockedBridge.lysosomalState, 'critical_lysosomal_storage_proteolytic_exhaustion')
+  assert.equal(blockedBridge.lysosomalStateLabel, 'Kelelahan Proteolitik Lisosom Kritis & Penumpukan Substrat Makromolekul Terhambat')
+  assert.equal(blockedBridge.lysosomalTier, 'critical_lysosomal_membrane_permeabilization_risk')
+  assert.equal(blockedBridge.lysosomalTierLabel, 'Risiko Permeabilitas Membran Lisosom Kritis & Kebocoran Katepsin Sitotoksik')
+  assert.ok(blockedBridge.autophagicFluxScore <= 66)
+  assert.ok(blockedBridge.tfebNuclearTranslocationIndex <= 63)
+  assert.ok(blockedBridge.vAtpaseAcidificationCapacity <= 64)
+  assert.equal(blockedBridge.lysosomalNodes.every((n) => n.lysosomalStatus === 'lysosomal_exhaustion_stress'), true)
+
+  // 3. Rollup in evaluateCareJourneyContinuity
+  const projection = evaluateCareJourneyContinuity([sampleEpisode, blockedEpisode], evaluatedAt)
+  assert.equal(projection.edenLysosomalAutophagyReadyCount, 2)
+  assert.ok(projection.episodes[0].edenLysosomalAutophagy)
+  assert.equal(projection.episodes[0].edenLysosomalAutophagy.truthClass, 'lysosomal_autophagy_tfeb_simulation_proxy')
+  assert.equal(projection.episodes[0].edenLysosomalAutophagy.patientTruthUncompromised, true)
+  assert.equal(projection.episodes[0].edenLysosomalAutophagy.neverManufacturesBiomarkers, true)
+
+  // 4. UI contracts
+  const panelSource = read('src/domains/clinical-operations/ui/CareContinuityPanel.tsx')
+  assert.ok(panelSource.includes('data-eden-lysosome="v1"'), 'CareContinuityPanel must include Lysosome attribute')
+
+  const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
+  assert.ok(episodeSource.includes('data-eden-lysosome-card="v1"'), 'CareEpisode must include Lysosome card')
+  assert.ok(episodeSource.includes('data-eden-lysosome-nodes="v1"'), 'CareEpisode must include Lysosome nodes grid')
 })
