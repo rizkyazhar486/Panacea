@@ -382,3 +382,30 @@ test('T-CLIN-80: valid escalation boundaries stay deterministic', () => {
     assert.deepEqual(evaluateClosedLoopResultRouting(routingOrder, at + minutes * 60000), first)
   }
 })
+
+test('T-CLIN-80: timely acknowledgement does not become overdue as evaluation time advances', () => {
+  const result = evaluateClosedLoopResultRouting(acknowledgedRoutingOrder, routingNow)
+  assert.equal(result.status, 'ACKNOWLEDGED_ACTION_PENDING')
+  assert.equal(result.acknowledgementOverdue, false)
+  assert.equal(result.elapsedMinutesSinceResult, 180)
+  assert.equal(result.isClosed, false)
+})
+
+test('T-CLIN-80: closure preserves actual acknowledgement lateness across severity boundaries', () => {
+  const at = Date.parse(routingResultAt)
+  for (const [severity, window] of [['CRITICAL_EMERGENCY', 60], ['ABNORMAL_PRIORITY', 1440], ['ROUTINE_INFORMATIONAL', 10080]]) {
+    for (const [offsetMinutes, overdue] of [[window, false], [window + 1, true]]) {
+      const acknowledgedAt = new Date(at + offsetMinutes * 60000).toISOString()
+      const evaluatedAtMs = at + (window + 120) * 60000
+      const acknowledged = { ...acknowledgedRoutingOrder, severity, acknowledgedAt }
+      const pendingAction = evaluateClosedLoopResultRouting(acknowledged, evaluatedAtMs)
+      assert.equal(pendingAction.acknowledgementOverdue, overdue)
+      const closed = evaluateClosedLoopResultRouting({
+        ...closedRoutingOrder, severity, acknowledgedAt, closedAt: acknowledgedAt,
+      }, evaluatedAtMs)
+      assert.equal(closed.status, 'CLOSED_WITH_CLINICAL_ACTION')
+      assert.equal(closed.isClosed, true)
+      assert.equal(closed.acknowledgementOverdue, overdue, 'closing a result must not erase late acknowledgement')
+    }
+  }
+})

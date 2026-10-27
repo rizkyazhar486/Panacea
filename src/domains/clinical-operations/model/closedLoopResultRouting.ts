@@ -119,7 +119,10 @@ export function evaluateClosedLoopResultRouting(
   }
 
   const elapsedMinutes = Math.floor((evaluatedAtMs - resultMs) / 60000)
-  const isOverdue = elapsedMinutes > maxWindow
+  // Once acknowledged, elapsed review time is historical. Later evaluation or
+  // closure cannot make an on-time acknowledgement late, or erase a late one.
+  const acknowledgedMs = order.acknowledgedAt === undefined ? evaluatedAtMs : Date.parse(order.acknowledgedAt)
+  const isOverdue = Math.floor((acknowledgedMs - resultMs) / 60000) > maxWindow
 
   // Check if fully closed with clinician action
   if (order.closedAt && order.closedById && order.mandatedClinicalAction?.trim()) {
@@ -130,7 +133,7 @@ export function evaluateClosedLoopResultRouting(
       status: 'CLOSED_WITH_CLINICAL_ACTION',
       elapsedMinutesSinceResult: elapsedMinutes,
       maxAllowedAcknowledgementWindowMinutes: maxWindow,
-      acknowledgementOverdue: false,
+      acknowledgementOverdue: isOverdue,
       auditDigest: `sha256:closed:${order.orderId}:${order.closedById}:${order.closedAt}`,
       safetyActionRequired: 'Result loop fully closed with documented physician action',
       isClosed: true,
