@@ -1074,12 +1074,14 @@ function ReadmissionSurveillanceSection({
       className="mt-4 rounded-xl border border-neutral-200 dark:border-white/10 bg-neutral-50 dark:bg-white/[0.02] p-3.5"
       data-care-followup-surveillance="v1"
       data-readmission-risk={surveillance.riskLevel}
+      data-prognostic-prediction={String(surveillance.isPrognosticPrediction)}
+      data-operational-escalation-tier={surveillance.continuityConcern.escalationTier}
     >
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
         <div>
           <div className="flex items-center gap-2 flex-wrap">
             <h4 className="text-xs font-bold text-neutral-900 dark:text-white">
-              Post-Discharge Follow-Up & Readmission Surveillance
+              Post-Discharge Follow-Up & Care Continuity Surveillance
             </h4>
             <Badge
               tone={
@@ -1090,24 +1092,39 @@ function ReadmissionSurveillanceSection({
                   : 'normal'
               }
             >
-              {surveillance.riskLevel.toUpperCase()} RISK
+              {surveillance.riskLevel.toUpperCase()} OPERATIONAL CONCERN
+            </Badge>
+            <Badge tone="normal">
+              Clinical Readmission Model: NOT VALIDATED
             </Badge>
             {surveillance.followUpWindowClosed && (
               <Badge tone="normal">Follow-Up Closed</Badge>
             )}
           </div>
-          <p className="mt-1 text-xs text-neutral-600 dark:text-white/75">
+          <p className="mt-1 text-xs text-neutral-600 dark:text-white/75 font-medium">
             {surveillance.recommendedAction}
+          </p>
+          <p className="mt-0.5 text-[11px] text-neutral-500 dark:text-white/60">
+            {surveillance.operationalEscalationReason}
           </p>
         </div>
       </div>
 
+      <div className="mt-2 rounded-lg border border-amber-500/20 bg-amber-500/5 px-2.5 py-1.5 text-[11px] text-amber-800 dark:text-amber-300">
+        <span className="font-semibold">Clinical Reality Boundary:</span> {surveillance.clinicalPrediction.validationDisclaimer}
+      </div>
+
       {surveillance.riskFactors.length > 0 && (
-        <ul className="mt-2 space-y-1 text-[11px] text-neutral-600 dark:text-white/70 list-disc list-inside">
-          {surveillance.riskFactors.map((rf, idx) => (
-            <li key={idx}>{rf}</li>
-          ))}
-        </ul>
+        <div className="mt-2">
+          <p className="text-[11px] font-semibold text-neutral-700 dark:text-white/80">
+            Operational Workflow Indicators:
+          </p>
+          <ul className="mt-1 space-y-1 text-[11px] text-neutral-600 dark:text-white/70 list-disc list-inside">
+            {surveillance.riskFactors.map((rf, idx) => (
+              <li key={idx}>{rf}</li>
+            ))}
+          </ul>
+        </div>
       )}
     </div>
   )

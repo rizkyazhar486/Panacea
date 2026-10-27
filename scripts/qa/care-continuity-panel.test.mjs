@@ -1531,6 +1531,16 @@ test('evaluateEpisodeReadmissionRisk & CareContinuityPanel: post-discharge follo
   assert.equal(highRisk.riskLevel, 'high')
   assert.equal(highRisk.followUpWindowClosed, false)
   assert.ok(highRisk.riskFactors.length >= 2)
+  // T-CLIN-19 Clinical Safety Correction: separation of operational concern vs validated clinical prediction
+  assert.equal(highRisk.isPrognosticPrediction, false, 'Administrative workflow flags must NEVER be labeled as prognostic predictions')
+  assert.equal(highRisk.clinicalPrediction.isModelValidated, false, 'Readmission prediction model must remain strictly unvalidated without clinical study')
+  assert.equal(highRisk.clinicalPrediction.prognosticProbability, null, 'Must not fabricate a percentage probability from administrative indicators')
+  assert.equal(highRisk.clinicalPrediction.predictionStatus, 'NOT_VALIDATED')
+  assert.equal(highRisk.continuityConcern.concernType, 'operational_escalation')
+  assert.equal(highRisk.continuityConcern.concernLevel, 'high')
+  assert.equal(highRisk.continuityConcern.escalationTier, 'urgent_safety_protocol')
+  assert.equal(highRisk.continuityConcern.protocolSource, 'verified_safety_protocol')
+  assert.ok(highRisk.operationalEscalationReason.includes('Operational escalation triggered'))
 
   // 2. Moderate-risk episode: active recovery with 1 unfulfilled monitoring milestone
   const moderateRiskEpisode = {
@@ -1558,6 +1568,10 @@ test('evaluateEpisodeReadmissionRisk & CareContinuityPanel: post-discharge follo
   const modRisk = evaluateEpisodeReadmissionRisk(moderateRiskEpisode, [], evaluatedAtMs)
   assert.equal(modRisk.riskLevel, 'moderate')
   assert.equal(modRisk.riskFactors.length, 1)
+  assert.equal(modRisk.isPrognosticPrediction, false)
+  assert.equal(modRisk.continuityConcern.concernLevel, 'moderate')
+  assert.equal(modRisk.continuityConcern.escalationTier, 'coordinator_check')
+  assert.equal(modRisk.continuityConcern.protocolSource, 'operational_care_coordination_heuristic')
 
   // 3. Low-risk / closed follow-up window (negative control)
   const closedEpisode = {
@@ -1584,6 +1598,8 @@ test('evaluateEpisodeReadmissionRisk & CareContinuityPanel: post-discharge follo
   assert.equal(lowRisk.riskLevel, 'low')
   assert.equal(lowRisk.followUpWindowClosed, true)
   assert.equal(lowRisk.riskFactors.length, 0)
+  assert.equal(lowRisk.isPrognosticPrediction, false)
+  assert.equal(lowRisk.clinicalPrediction.prognosticProbability, null)
 
   // 4. evaluateCareJourneyContinuity rollup
   const projection = evaluateCareJourneyContinuity(
@@ -1594,12 +1610,30 @@ test('evaluateEpisodeReadmissionRisk & CareContinuityPanel: post-discharge follo
   assert.equal(projection.moderateReadmissionRiskCount, 1)
   assert.equal(projection.followUpWindowClosedCount, 1)
 
-  // 5. UI contracts
+  // 5. Negative Control: ensure administrative indicators cannot be coerced into a calibrated probability
+  assert.throws(
+    () => {
+      if (highRisk.isPrognosticPrediction) {
+        throw new Error('Safety violation: administrative indicators represented as prognostic prediction')
+      }
+      if (highRisk.clinicalPrediction.prognosticProbability !== null) {
+        throw new Error('Safety violation: uncalibrated probability calculated from workflow flags')
+      }
+      throw new Error('EXPECTED_PROTECTION_PASS')
+    },
+    /EXPECTED_PROTECTION_PASS/,
+    'Negative control must verify that administrative flags fail-closed against prognostic claims'
+  )
+
+  // 6. UI contracts
   const panelSource = read('src/domains/clinical-operations/ui/CareContinuityPanel.tsx')
   assert.ok(panelSource.includes('data-care-readmission-surveillance="v1"'), 'CareContinuityPanel must include readmission surveillance attribute')
 
   const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
   assert.ok(episodeSource.includes('data-care-followup-surveillance="v1"'), 'CareEpisode must include follow-up surveillance attribute')
+  assert.ok(episodeSource.includes('data-prognostic-prediction='), 'CareEpisode must declare data-prognostic-prediction')
+  assert.ok(episodeSource.includes('Clinical Readmission Model: NOT VALIDATED'), 'CareEpisode must state that readmission model is not validated')
+  assert.ok(episodeSource.includes('OPERATIONAL CONCERN'), 'CareEpisode must label risk level as operational concern')
 })
 
 test('evaluateReferralHandshakeContinuity & CareContinuityPanel: inter-facility referral handshake & diagnostic continuity bridge (T-CLIN-20)', () => {
