@@ -988,6 +988,17 @@ export function CareContinuityPanel({
                   </span>
                 </div>
               )}
+              {careJourneys.edenNuclearLaminReadyCount > 0 && (
+                <div
+                  className="flex justify-between text-indigo-300"
+                  data-eden-lamin="v1"
+                >
+                  <span>Mekanoproteksi selubung inti & lamina A/C:</span>
+                  <span className="font-bold">
+                    {careJourneys.edenNuclearLaminReadyCount} episode terhubung
+                  </span>
+                </div>
+              )}
 
               {careJourneys.episodes.length > 0 && (
                 <div className="mt-3 border-t border-white/8 pt-2">

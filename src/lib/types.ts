@@ -2027,6 +2027,55 @@ export interface EdenOrganelleContactBridge {
   epistemicHumilityPreserved: true
 }
 
+export type EdenNuclearLaminState =
+  | 'optimal_linc_lamina_viscoelastic_resonance'
+  | 'balanced_nuclear_envelope_mechanoprotection'
+  | 'transient_lamin_strain_envelope_microdeformation'
+  | 'critical_lamina_rupture_cgas_sting_leakage'
+
+export type EdenNuclearLaminTier =
+  | 'optimal_sun_kash_force_transmission'
+  | 'adequate_lamin_a_c_cushioning_reserve'
+  | 'moderate_emerin_delocalization_envelope_strain'
+  | 'critical_progeroid_nuclear_collapse_sting_activation'
+
+export type EdenNuclearLaminNodeKind =
+  | 'linc_complex_sun_kash_transduction'
+  | 'lamin_a_c_meshwork_viscoelastic_cushioning'
+  | 'emerin_baf_barrier_to_autointegration_repair'
+  | 'mechanosensitive_chromatin_lad_anchoring'
+
+export interface EdenNuclearLaminNode {
+  nodeKind: EdenNuclearLaminNodeKind
+  nodeLabel: string
+  nuclearStiffnessScore: number
+  envelopeIntegrityCapacity: number
+  mechanotransductionStatus: 'optimal_viscoelastic_state' | 'adaptive_mechanoprotection_mode' | 'envelope_rupture_stress'
+  mechanisticNote: string
+}
+
+export interface EdenNuclearLaminBridge {
+  version: 'v1'
+  episodeId: string
+  episodeTitle: string
+  laminState: EdenNuclearLaminState
+  laminStateLabel: string
+  laminTier: EdenNuclearLaminTier
+  laminTierLabel: string
+  nuclearStiffnessIndex: number
+  envelopeIntegrityScore: number
+  cgasStingImmunityMargin: number
+  laminNodes: EdenNuclearLaminNode[]
+  laminNarrativeId: string
+  laminNarrativeEn: string
+  nuclearLongevityStrategy: string
+  truthClass: 'nuclear_lamin_mechanotransduction_simulation_proxy'
+  clinically_reviewed: false
+  patientTruthUncompromised: true
+  neverManufacturesBiomarkers: true
+  epistemicHumilityPreserved: true
+}
+
 export interface CareJourneyExportSummary {
   standard: 'PANACEA-CAREPLAN-FHIR-R4-V1'
   generatedAt: string

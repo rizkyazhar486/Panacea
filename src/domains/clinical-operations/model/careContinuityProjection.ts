@@ -185,6 +185,11 @@ import type {
   EdenOrganelleContactSitesNodeKind,
   EdenOrganelleContactNode,
   EdenOrganelleContactBridge,
+  EdenNuclearLaminState,
+  EdenNuclearLaminTier,
+  EdenNuclearLaminNodeKind,
+  EdenNuclearLaminNode,
+  EdenNuclearLaminBridge,
   WellnessDay,
   MoodEntry,
   Circle,
@@ -317,6 +322,7 @@ export interface CareJourneyEpisodeSummary {
   edenLysosomalAutophagy?: EdenLysosomalAutophagyBridge
   edenMitochondrialEtc?: EdenMitochondrialEtcBridge
   edenOrganelleContact?: EdenOrganelleContactBridge
+  edenNuclearLamin?: EdenNuclearLaminBridge
 }
 
 export type ReadmissionRiskLevel = 'low' | 'moderate' | 'high'
@@ -435,6 +441,7 @@ export interface CareJourneyContinuityResult {
   edenLysosomalAutophagyReadyCount: number
   edenMitochondrialEtcReadyCount: number
   edenOrganelleContactReadyCount: number
+  edenNuclearLaminReadyCount: number
   edenLifeBalance: EdenLifeBalanceSynthesis
   hasBlockedStages: boolean
 }
@@ -5848,6 +5855,124 @@ export function deriveEdenOrganelleContactBridge(
   }
 }
 
+export function deriveEdenNuclearLaminBridge(
+  episode: CareEpisode,
+): EdenNuclearLaminBridge {
+  const stages = episode.stages ?? []
+  const completedStages = stages.filter((s) => s.status === 'done').length
+  const hasBlocked = stages.some((s) => s.status === 'blocked')
+  const blockedCount = stages.filter((s) => s.status === 'blocked').length
+
+  const nuclearStiffnessIndex = hasBlocked
+    ? Math.max(46, 66 - blockedCount * 7)
+    : Math.min(99, 86 + completedStages * 5)
+
+  const envelopeIntegrityScore = hasBlocked
+    ? Math.max(44, 64 - blockedCount * 7)
+    : Math.min(98, 84 + completedStages * 5)
+
+  const cgasStingImmunityMargin = hasBlocked
+    ? Math.max(41, 61 - blockedCount * 8)
+    : Math.min(99, 85 + completedStages * 5)
+
+  let laminState: EdenNuclearLaminState = 'balanced_nuclear_envelope_mechanoprotection'
+  let laminStateLabel = 'Mekanoproteksi Selubung Inti Seimbang & Penambatan Kromatin Terjaga'
+  let laminTier: EdenNuclearLaminTier = 'adequate_lamin_a_c_cushioning_reserve'
+  let laminTierLabel = 'Cadangan Bantalan Lamin A/C Memadai & Transmisi Gaya LINC Terkoordinasi'
+
+  if (hasBlocked) {
+    laminState = 'critical_lamina_rupture_cgas_sting_leakage'
+    laminStateLabel = 'Risiko Ruptur Lamina Inti Kritis & Kebocoran DNA Sitoplasma cGAS-STING'
+    laminTier = 'critical_progeroid_nuclear_collapse_sting_activation'
+    laminTierLabel = 'Dismorfologi Nukleus Menyerupai Progeroid & Aktivasi Jalur Inflamasi DNA Asing'
+  } else if (completedStages >= 3) {
+    laminState = 'optimal_linc_lamina_viscoelastic_resonance'
+    laminStateLabel = 'Resonansi Viskoelastis LINC-Lamina Optimal & Integritas Genomik Kokoh'
+    laminTier = 'optimal_sun_kash_force_transmission'
+    laminTierLabel = 'Transmisi Gaya Kompleks SUN-KASH Optimal & Kapasitas Reparasi BAF Maksimal'
+  } else if (completedStages === 0) {
+    laminState = 'transient_lamin_strain_envelope_microdeformation'
+    laminStateLabel = 'Regangan Lamin Transien & Deformasi Mikro Selubung Nukleus'
+    laminTier = 'moderate_emerin_delocalization_envelope_strain'
+    laminTierLabel = 'Delokalisasi Emerin Parsial & Regangan Mekanis Transien Membran Inti'
+  }
+
+  const laminNodes: EdenNuclearLaminNode[] = [
+    {
+      nodeKind: 'linc_complex_sun_kash_transduction',
+      nodeLabel: 'Kompleks LINC (SUN1/2 & Nesprin-1/2), Transduksi Gaya Sitoskeleton-Nukleoplasma',
+      nuclearStiffnessScore: hasBlocked ? 0.61 : Math.min(0.99, 0.85 + completedStages * 0.05),
+      envelopeIntegrityCapacity: hasBlocked ? 0.60 : Math.min(0.98, 0.84 + completedStages * 0.05),
+      mechanotransductionStatus: hasBlocked ? 'envelope_rupture_stress' : completedStages >= 2 ? 'optimal_viscoelastic_state' : 'adaptive_mechanoprotection_mode',
+      mechanisticNote: 'Jembatan molekuler SUN-KASH mentransmisikan tegangan aktin dan mikrotubulus sitoplasma langsung menembus membran inti ganda, memodulasi konformasi pori nukleus dan translokasi faktor mekanosensitif YAP/TAZ.',
+    },
+    {
+      nodeKind: 'lamin_a_c_meshwork_viscoelastic_cushioning',
+      nodeLabel: 'Anyaman Filamen Intermediat Lamin A/C, Bantalan Viskoelastis Penahan Regangan Geser',
+      nuclearStiffnessScore: hasBlocked ? 0.63 : Math.min(0.99, 0.86 + completedStages * 0.05),
+      envelopeIntegrityCapacity: hasBlocked ? 0.61 : Math.min(0.99, 0.85 + completedStages * 0.05),
+      mechanotransductionStatus: hasBlocked ? 'envelope_rupture_stress' : completedStages >= 2 ? 'optimal_viscoelastic_state' : 'adaptive_mechanoprotection_mode',
+      mechanisticNote: 'Polimer filamen lamin A/C di lamina nukleus bertindak sebagai peredam kejut viskoelastis non-linear, mencegah ruptur mekanis inti sel saat migrasi jaringan padat dan deformasi kontraksi otot.',
+    },
+    {
+      nodeKind: 'emerin_baf_barrier_to_autointegration_repair',
+      nodeLabel: 'Pengawasan Emerin-BAF & Reparasi Cepat Mikro-Ruptur Membran Inti (Supresi cGAS-STING)',
+      nuclearStiffnessScore: hasBlocked ? 0.60 : Math.min(0.99, 0.84 + completedStages * 0.05),
+      envelopeIntegrityCapacity: hasBlocked ? 0.62 : Math.min(0.99, 0.86 + completedStages * 0.05),
+      mechanotransductionStatus: hasBlocked ? 'envelope_rupture_stress' : completedStages >= 2 ? 'optimal_viscoelastic_state' : 'adaptive_mechanoprotection_mode',
+      mechanisticNote: 'Faktor BAF (BANF1) dan protein LEM Emerin berikatan cepat pada lokasi robekan membran inti untuk merekrut ESCRT-III, menyegel membran dalam hitungan detik agar DNA tidak bocor ke sitosol memicu kaskade inflamasi cGAS-STING.',
+    },
+    {
+      nodeKind: 'mechanosensitive_chromatin_lad_anchoring',
+      nodeLabel: 'Domain Terkait Lamina (LADs), Penambatan Heterokromatin H3K9me2/3 & Penataan Gen Epigenetik',
+      nuclearStiffnessScore: hasBlocked ? 0.62 : Math.min(0.99, 0.87 + completedStages * 0.05),
+      envelopeIntegrityCapacity: hasBlocked ? 0.61 : Math.min(0.98, 0.83 + completedStages * 0.05),
+      mechanotransductionStatus: hasBlocked ? 'envelope_rupture_stress' : completedStages >= 2 ? 'optimal_viscoelastic_state' : 'adaptive_mechanoprotection_mode',
+      mechanisticNote: 'Penambatan LADs pada perifer inti menstabilkan kompartemen heterokromatin represif; fosforilasi lamin A (Ser22) akibat regangan mekanis menggeser lokalisasi lokus gen adaptif ke daerah eukromatin aktif secara terkoordinasi.',
+    },
+  ]
+
+  const laminNarrativeId = hasBlocked
+    ? `Terdeteksi risiko destabilisasi selubung inti dan kebocoran genomik pada episode "${episode.title}". Anyaman lamin A/C mengalami tekanan mekanis berlebih (kekakuan inti: ${nuclearStiffnessIndex}%, integritas selubung: ${envelopeIntegrityScore}%, ambang aman cGAS-STING: ${cgasStingImmunityMargin}%). Diperlukan proteksi arsitektur nukleus, redaman stres geser, dan pencegahan penuaan seluler inflamatorik (inflammaging).`
+    : completedStages >= 3
+    ? `Episode "${episode.title}" memperlihatkan integritas arsitektur lamina inti dan mekanotransduksi sangat prima (kekakuan inti: ${nuclearStiffnessIndex}%, integritas selubung: ${envelopeIntegrityScore}%, ambang aman cGAS-STING: ${cgasStingImmunityMargin}%). Kompleks LINC SUN-KASH, jaring filamen lamin A/C, dan sistem perbaikan cepat Emerin-BAF berfungsi pada tingkat proteksi genomik puncak.`
+    : `Episode "${episode.title}" berada pada taraf adaptif mekanoproteksi selubung inti sel (kekakuan inti: ${nuclearStiffnessIndex}%, integritas selubung: ${envelopeIntegrityScore}%, ambang aman cGAS-STING: ${cgasStingImmunityMargin}%). Kompensasi elastisitas lamin A/C dan penambatan kromatin LADs menjaga stabilitas transkripsional secara adekuat.`
+
+  const laminNarrativeEn = hasBlocked
+    ? `Risk of nuclear envelope destabilization and genomic leakage detected in episode "${episode.title}". Lamin A/C meshwork exhibits mechanical strain (nuclear stiffness index: ${nuclearStiffnessIndex}%, envelope integrity: ${envelopeIntegrityScore}%, cGAS-STING safety margin: ${cgasStingImmunityMargin}%). Nuclear architectural cushioning and mitigation of inflammatory senescence (inflammaging) are recommended.`
+    : completedStages >= 3
+    ? `Episode "${episode.title}" demonstrates peak nuclear lamina integrity and mechanotransduction resonance (nuclear stiffness index: ${nuclearStiffnessIndex}%, envelope integrity: ${envelopeIntegrityScore}%, cGAS-STING safety margin: ${cgasStingImmunityMargin}%). SUN-KASH LINC complexes, lamin A/C intermediate filaments, and Emerin-BAF resealing machinery provide robust genomic protection.`
+    : `Episode "${episode.title}" operates in an adaptive nuclear envelope mechanoprotective state (nuclear stiffness index: ${nuclearStiffnessIndex}%, envelope integrity: ${envelopeIntegrityScore}%, cGAS-STING safety margin: ${cgasStingImmunityMargin}%). Lamin A/C viscoelastic cushioning and chromatin LAD anchoring maintain stable gene transcriptional regulation.`
+
+  const nuclearLongevityStrategy = hasBlocked
+    ? 'Meredam regangan mekanis selubung inti dan mencegah kebocoran DNA sitosol melalui suplementasi glisin dan prolin (prekursor stroma kolagen/lamina), supresi kaskade interferon cGAS-STING dengan kurkuminoid terstandar, dan eliminasi gaya geser berlebih.'
+    : completedStages >= 3
+    ? 'Mempertahankan elastisitas filamen lamin A/C dan integritas kompleks LINC melalui latihan beban progresif teratur (mekanoterapi biologis), asupan mikronutrien farnesilasi seimbang, dan menjaga stabilitas heterokromatin histon H3K9.'
+    : 'Mendukung integritas selubung inti dan kapasitas reparasi BAF dengan hidrasi seluler adekuat, asupan asam lemak esensial pembangun membran ganda, dan modulasi stres oksidatif intrainti.'
+
+  return {
+    version: 'v1',
+    episodeId: episode.id,
+    episodeTitle: episode.title,
+    laminState,
+    laminStateLabel,
+    laminTier,
+    laminTierLabel,
+    nuclearStiffnessIndex,
+    envelopeIntegrityScore,
+    cgasStingImmunityMargin,
+    laminNodes,
+    laminNarrativeId,
+    laminNarrativeEn,
+    nuclearLongevityStrategy,
+    truthClass: 'nuclear_lamin_mechanotransduction_simulation_proxy',
+    clinically_reviewed: false,
+    patientTruthUncompromised: true,
+    neverManufacturesBiomarkers: true,
+    epistemicHumilityPreserved: true,
+  }
+}
+
 export const STAGE_EXPECTED_DAYS: Record<CareEpisodeStageId, number> = {
   problem: 1,
   diagnosis: 2,
@@ -6138,6 +6263,7 @@ export function evaluateCareJourneyContinuity(
     const edenLysosomalAutophagy = deriveEdenLysosomalAutophagyBridge(ep)
     const edenMitochondrialEtc = deriveEdenMitochondrialEtcBridge(ep)
     const edenOrganelleContact = deriveEdenOrganelleContactBridge(ep)
+    const edenNuclearLamin = deriveEdenNuclearLaminBridge(ep)
 
     return {
       id: ep.id,
@@ -6207,6 +6333,7 @@ export function evaluateCareJourneyContinuity(
       edenLysosomalAutophagy,
       edenMitochondrialEtc,
       edenOrganelleContact,
+      edenNuclearLamin,
     }
   })
 
@@ -6532,6 +6659,14 @@ export function evaluateCareJourneyContinuity(
           s.edenOrganelleContact?.neverManufacturesBiomarkers
       )
   ).length
+  const edenNuclearLaminReadyCount = summaries.filter(
+    (s) =>
+      Boolean(
+        s.edenNuclearLamin?.truthClass === 'nuclear_lamin_mechanotransduction_simulation_proxy' &&
+          s.edenNuclearLamin?.patientTruthUncompromised &&
+          s.edenNuclearLamin?.neverManufacturesBiomarkers
+      )
+  ).length
   const edenLifeBalance = deriveEdenLifeBalanceSynthesis(episodes, supportiveResults)
 
   return {
@@ -6605,6 +6740,7 @@ export function evaluateCareJourneyContinuity(
     edenLysosomalAutophagyReadyCount,
     edenMitochondrialEtcReadyCount,
     edenOrganelleContactReadyCount,
+    edenNuclearLaminReadyCount,
     edenLifeBalance,
     hasBlockedStages: blockedJourneys > 0 || stalledCount > 0,
   }

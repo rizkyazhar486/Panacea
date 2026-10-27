@@ -96,6 +96,7 @@ export {
   deriveEdenLysosomalAutophagyBridge,
   deriveEdenMitochondrialEtcBridge,
   deriveEdenOrganelleContactBridge,
+  deriveEdenNuclearLaminBridge,
   translateClinicalTermToEden,
   EDEN_PLAIN_LANGUAGE_GLOSSARY,
   STAGE_LABEL,
