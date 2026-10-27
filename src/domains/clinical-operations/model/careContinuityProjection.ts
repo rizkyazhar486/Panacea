@@ -5626,117 +5626,46 @@ export function deriveEdenLysosomalAutophagyBridge(
   }
 }
 
-export function deriveEdenMitochondrialEtcBridge(
-  episode: CareEpisode,
-): EdenMitochondrialEtcBridge {
-  const stages = episode.stages ?? []
-  const completedStages = stages.filter((s) => s.status === 'done').length
-  const hasBlocked = stages.some((s) => s.status === 'blocked')
-  const blockedCount = stages.filter((s) => s.status === 'blocked').length
-
-  const bioenergeticEfficiencyScore = hasBlocked
-    ? Math.max(45, 66 - blockedCount * 7)
-    : Math.min(99, 84 + completedStages * 5)
-
-  const protonMotiveForceIndex = hasBlocked
-    ? Math.max(42, 63 - blockedCount * 7)
-    : Math.min(98, 82 + completedStages * 5)
-
-  const rosQuenchingCapacity = hasBlocked
-    ? Math.max(44, 64 - blockedCount * 8)
-    : Math.min(99, 83 + completedStages * 5)
-
-  let etcState: EdenMitochondrialEtcState = 'balanced_cristae_chemiosmotic_homeostasis'
-  let etcStateLabel = 'Homeostasis Kemiosmotik Cristae & Gradien Proton Rantai Respirasi Seimbang'
-  let etcTier: EdenMitochondrialEtcTier = 'adequate_cristae_proton_gradient_capacity'
-  let etcTierLabel = 'Kapasitas Gradien Proton Cristae Adekuat & Sintesis ATP F1/Fo Terjaga'
-
-  if (hasBlocked) {
-    etcState = 'critical_etc_electron_leakage_ros_collapse'
-    etcStateLabel = 'Kolaps Rantai Transpor Elektron Kritis & Kebocoran Elektron/ROS Merusak'
-    etcTier = 'critical_mitochondrial_permeability_transition_risk'
-    etcTierLabel = 'Risiko Transisi Permeabilitas Mitokondria (mPTP) Kritis & Hilangnya Potensial Membran'
-  } else if (completedStages >= 3) {
-    etcState = 'optimal_supercomplex_respirasome_flux'
-    etcStateLabel = 'Fluks Respirasom Superkompleks I-III-IV Optimal & Efisiensi Kemiosmotik Puncak'
-    etcTier = 'optimal_respirasome_tunneling_fidelity'
-    etcTierLabel = 'Fidelitas Quantum Tunneling Elektron & Perakitan Respirasom Presisi Tinggi'
-  } else if (completedStages === 0) {
-    etcState = 'transient_proton_leak_mild_uncoupling'
-    etcStateLabel = 'Kebocoran Proton Transien & Uncoupling Kemiosmotik Ringan'
-    etcTier = 'moderate_supercomplex_disassembly_strain'
-    etcTierLabel = 'Regangan Disosiasi Superkompleks Transien & Peningkatan Beban Superoksida'
-  }
-
+/**
+ * T-CLIN-61: ETC mechanism education, not patient-specific physiology.
+ * Workflow stages cannot measure ROS, ATP, electron leakage or proton gradients.
+ */
+export function deriveEdenMitochondrialEtcBridge(episode: CareEpisode): EdenMitochondrialEtcBridge {
+  const etcState: EdenMitochondrialEtcState = 'not_assessed'
+  const etcTier: EdenMitochondrialEtcTier = 'not_assessed'
+  const makeNode = (
+    nodeKind: EdenMitochondrialEtcNode['nodeKind'],
+    nodeLabel: string,
+    mechanisticNote: string,
+  ): EdenMitochondrialEtcNode => ({
+    nodeKind, nodeLabel, mechanisticNote,
+    tunnelingFidelityScore: null,
+    protonPumpingCapacity: null,
+    etcStatus: 'not_assessed',
+  })
   const etcNodes: EdenMitochondrialEtcNode[] = [
-    {
-      nodeKind: 'complex_i_nadh_dehydrogenase_fe_s_relay',
-      nodeLabel: 'Kompleks I (NADH Dehidrogenase), Relay 8 Klaster Fe-S & Translokasi 4H+',
-      tunnelingFidelityScore: hasBlocked ? 0.61 : Math.min(0.99, 0.84 + completedStages * 0.05),
-      protonPumpingCapacity: hasBlocked ? 0.60 : Math.min(0.98, 0.82 + completedStages * 0.05),
-      etcStatus: hasBlocked ? 'electron_leak_ros_stress' : completedStages >= 2 ? 'optimal_respirasome_state' : 'adaptive_bioenergetic_mode',
-      mechanisticNote: 'Oksidasi NADH di kofaktor FMN mentransfer 2 elektron melalui kaskade 8 klaster Fe-S (N3->N1b->N4->N5->N6a->N6b->N2) menuju ubikuinon, menggerakkan lengan membran untuk memompa 4 proton ke ruang antarmembran.',
-    },
-    {
-      nodeKind: 'complex_iii_q_cycle_cytochrome_c_reduction',
-      nodeLabel: 'Kompleks III (Sitokrom bc1), Siklus-Q Bifurkasi Mitchell & Reduksi Sitokrom c',
-      tunnelingFidelityScore: hasBlocked ? 0.62 : Math.min(0.99, 0.83 + completedStages * 0.05),
-      protonPumpingCapacity: hasBlocked ? 0.61 : Math.min(0.99, 0.83 + completedStages * 0.05),
-      etcStatus: hasBlocked ? 'electron_leak_ros_stress' : completedStages >= 2 ? 'optimal_respirasome_state' : 'adaptive_bioenergetic_mode',
-      mechanisticNote: 'Oksidasi terbagi ubikuinol (QH2) pada situs Qo dan Qi mentransfer satu elektron ke protein Fe-S Rieske dan satu ke heksamer heme b, memompa 4 proton dan mereduksi dua molekul sitokrom c terlarut.',
-    },
-    {
-      nodeKind: 'complex_iv_cytochrome_c_oxidase_terminal_o2',
-      nodeLabel: 'Kompleks IV (Sitokrom c Oksidase), Pusat Binuklear Heme a3-CuB & Reduksi Terminal O2',
-      tunnelingFidelityScore: hasBlocked ? 0.59 : Math.min(0.99, 0.85 + completedStages * 0.05),
-      protonPumpingCapacity: hasBlocked ? 0.59 : Math.min(0.98, 0.81 + completedStages * 0.05),
-      etcStatus: hasBlocked ? 'electron_leak_ros_stress' : completedStages >= 2 ? 'optimal_respirasome_state' : 'adaptive_bioenergetic_mode',
-      mechanisticNote: 'Reduksi terminal 4-elektron molekul O2 menjadi 2 H2O pada pusat katalitik binuklear heme a3-CuB mencegah pelepasan spesies radikal bebas serta mentranslokasikan 2 proton melintasi membran dalam.',
-    },
-    {
-      nodeKind: 'complex_v_f1_fo_atp_synthase_rotary_chemiosmosis',
-      nodeLabel: 'Kompleks V (F1/Fo ATP Synthase), Motor Nanorotari Cincin-c & Fosforilasi ADP-ATP',
-      tunnelingFidelityScore: hasBlocked ? 0.60 : Math.min(0.99, 0.86 + completedStages * 0.05),
-      protonPumpingCapacity: hasBlocked ? 0.62 : Math.min(0.99, 0.84 + completedStages * 0.05),
-      etcStatus: hasBlocked ? 'electron_leak_ros_stress' : completedStages >= 2 ? 'optimal_respirasome_state' : 'adaptive_bioenergetic_mode',
-      mechanisticNote: 'Fluks proton yang kembali ke matriks melalui saluran subunit a memutar rotor cincin-c dan tangkai sentral gamma-epsilon, menginduksi perubahan konformasi pada kepala katalitik alfa3-beta3 untuk mensintesis ATP dari ADP dan Pi.',
-    },
+    makeNode('complex_i_nadh_dehydrogenase_fe_s_relay', 'Kompleks I — NADH dehidrogenase', 'Referensi: elektron NADH diteruskan ke ubikuinon melalui kompleks I. Fungsi pasien belum diukur.'),
+    makeNode('complex_iii_q_cycle_cytochrome_c_reduction', 'Kompleks III — siklus Q', 'Referensi: kompleks III meneruskan elektron ke sitokrom c. Fungsi pasien belum diukur.'),
+    makeNode('complex_iv_cytochrome_c_oxidase_terminal_o2', 'Kompleks IV — sitokrom c oksidase', 'Referensi: kompleks IV mereduksi oksigen menjadi air. Fungsi pasien belum diukur.'),
+    makeNode('complex_v_f1_fo_atp_synthase_rotary_chemiosmosis', 'Kompleks V — ATP sintase', 'Referensi: ATP sintase menggunakan gradien elektrokimia proton. Produksi ATP pasien belum diukur.'),
   ]
-
-  const etcNarrativeId = hasBlocked
-    ? `Terdeteksi gangguan kemiosmotik dan kebocoran elektron pada episode "${episode.title}". Rantai transpor elektron mengalami regangan dengan peningkatan risiko pembentukan superoksida (skor bioenergetik: ${bioenergeticEfficiencyScore}%, daya penggerak proton: ${protonMotiveForceIndex}%, kapasitas redam ROS: ${rosQuenchingCapacity}%). Diperlukan proteksi kardiolipin dan suplementasi koenzim Q10.`
-    : completedStages >= 3
-    ? `Episode "${episode.title}" menunjukkan fluks respirasom superkompleks yang sangat optimal (skor bioenergetik: ${bioenergeticEfficiencyScore}%, daya penggerak proton: ${protonMotiveForceIndex}%, kapasitas redam ROS: ${rosQuenchingCapacity}%). Tunneling elektron Kompleks I-IV dan rotasi sintase ATP Kompleks V berada pada performa bioenergetika seluler puncak.`
-    : `Episode "${episode.title}" berada dalam fase adaptif bioenergetika mitokondria (skor bioenergetik: ${bioenergeticEfficiencyScore}%, daya penggerak proton: ${protonMotiveForceIndex}%, kapasitas redam ROS: ${rosQuenchingCapacity}%). Siklus-Q dan reduksi oksigen terminal berjalan stabil tanpa akumulasi stres oksidatif berlebih.`
-
-  const etcNarrativeEn = hasBlocked
-    ? `Chemiosmotic strain and electron leakage detected in episode "${episode.title}". The electron transport chain is experiencing bioenergetic stress with elevated superoxide formation risk (bioenergetic score: ${bioenergeticEfficiencyScore}%, proton motive force: ${protonMotiveForceIndex}%, ROS quenching: ${rosQuenchingCapacity}%). Cardiolipin preservation and coenzyme Q10 support are recommended.`
-    : completedStages >= 3
-    ? `Episode "${episode.title}" demonstrates optimal supercomplex respirasome flux (bioenergetic score: ${bioenergeticEfficiencyScore}%, proton motive force: ${protonMotiveForceIndex}%, ROS quenching: ${rosQuenchingCapacity}%). Complex I-IV quantum electron tunneling and Complex V ATP synthase rotation operate at peak bioenergetic cellular fidelity.`
-    : `Episode "${episode.title}" operates in an adaptive mitochondrial bioenergetic state (bioenergetic score: ${bioenergeticEfficiencyScore}%, proton motive force: ${protonMotiveForceIndex}%, ROS quenching: ${rosQuenchingCapacity}%). Q-cycle bifurcation and terminal oxygen reduction maintain balanced protective equilibrium.`
-
-  const etcLongevityStrategy = hasBlocked
-    ? 'Mengurangi kebocoran elektron dan menjaga potensial membran dengan suplementasi CoQ10/ubikuinol aktif, asam alfa lipoat terstabilisasi, N-asetil-sistein (NAC), dan penghindaran toksin inhibitor kompleks mitokondria.'
-    : completedStages >= 3
-    ? 'Mempertahankan integritas respirasom cristae melalui latihan aerobik zona 2 teratur (memacu biogenesis mitokondria PGC-1alpha), asupan asam lemak omega-3 pemelihara kardiolipin, dan puasa sirkadian seimbang.'
-    : 'Mendukung sintesis ATP kemiosmotik dan gradien proton dengan asupan mikronutrien pembangun klaster Fe-S (zat besi terikat heme aman, belerang organik), magnesium malat, dan hidrasi elektrolit seluler optimal.'
-
   return {
     version: 'v1',
     episodeId: episode.id,
     episodeTitle: episode.title,
+    measurementStatus: 'not_measured',
     etcState,
-    etcStateLabel,
+    etcStateLabel: 'Status ETC belum diukur',
     etcTier,
-    etcTierLabel,
-    bioenergeticEfficiencyScore,
-    protonMotiveForceIndex,
-    rosQuenchingCapacity,
+    etcTierLabel: 'Referensi edukasi, bukan penilaian fungsi mitokondria pasien',
+    bioenergeticEfficiencyScore: null,
+    protonMotiveForceIndex: null,
+    rosQuenchingCapacity: null,
     etcNodes,
-    etcNarrativeId,
-    etcNarrativeEn,
-    etcLongevityStrategy,
-    truthClass: 'mitochondrial_etc_cristae_simulation_proxy',
+    etcNarrativeId: 'Tahapan pelayanan bukan pengukuran fungsi mitokondria. Kebocoran elektron, ROS, gradien proton, dan bioenergetika pasien tidak dapat disimpulkan dari status episode ini.',
+    etcNarrativeEn: 'Care-workflow stages do not measure mitochondrial function. Electron leakage, ROS, proton-motive force and patient bioenergetics cannot be inferred from this episode.',
+    etcLongevityStrategy: 'Edukasi saja; modul ini tidak merekomendasikan suplemen, pemeriksaan, ataupun terapi untuk individu.',
+    truthClass: 'mitochondrial_etc_reference_education',
     clinically_reviewed: false,
     patientTruthUncompromised: true,
     neverManufacturesBiomarkers: true,
