@@ -971,7 +971,7 @@ export function CareContinuityPanel({
                   className="flex justify-between text-amber-300"
                   data-eden-etc="v1"
                 >
-                  <span>Bioenergetika ETC cristae I-V & gradien proton:</span>
+                  <span>Referensi edukasi ETC mitokondria (fungsi pasien belum diukur):</span>
                   <span className="font-bold">
                     {careJourneys.edenMitochondrialEtcReadyCount} episode terhubung
                   </span>
