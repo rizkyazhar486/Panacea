@@ -12,7 +12,7 @@ Evidence snapshot `106fe679`, 2026-10-25 (all H0, H1, H2 engineering criteria 32
 
 | ID | Task | Criterion | Lane | Status | PR / evidence |
 |---|---|---|---|---|---|
-| T-CLIN-OFFLINE-PROOF | Missing secure-storage evidence must never authorize offline clinical continuation | — | codex | IN_PROGRESS | Reproducing the projection's implicit secure-storage claim; no storage adapter or clinical authorization added. |
+| T-CLIN-OFFLINE-PROOF | Missing secure-storage evidence must never authorize offline clinical continuation | — | codex | IN_REVIEW | #2859: 90 focused tests pass; restoring the unsafe default fails all 3 missing-evidence controls. Exact-head CI and independent review pending; no storage adapter or clinical authorization added. |
 | T-H0-REPLAY-CAPTURE | Repair Human Replay screenshot timeout without dropping poster/duration/layout proof | ENG-CI-01 | codex | DONE | #2768, #2770 merged `b3b3f510`. Bounded page clip implemented; 17/17 CI workflows and main stabilization passed cleanly. |
 | T-H0-PARSER | Preserve unsupported encoding/charset HTTP 415 and prove compressed parser limits, auth and private diagnostics | ENG-E4-02 | codex | DONE | #2767 merged `de163eaf`. Parser 415 restored; identity/gzip/deflate boundaries and private auth/error controls pass. |
 | T-H0-01 | Pin runners to Ubuntu 24.04 (Playwright + Mongo) | ENG-CI-02 | integrator | DONE | #2691 merged c57e22fc; #2686 closed as subset |
