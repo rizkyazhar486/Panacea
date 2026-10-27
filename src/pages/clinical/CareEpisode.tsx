@@ -48,6 +48,7 @@ import {
   deriveEdenUpsProteasomeBridge,
   deriveEdenLysosomalAutophagyBridge,
   deriveEdenMitochondrialEtcBridge,
+  deriveEdenOrganelleContactBridge,
   EdenLongitudinalInsightSection,
 } from '../../domains/clinical-operations'
 import {
@@ -741,6 +742,9 @@ function EpisodeCard({
 
       {/* Eden Mitochondrial ETC Complex I–V Cristae Bioenergetics & ROS Homeostasis Synthesizer (T-CLIN-61 / EDEN-40) */}
       <EdenMitochondrialEtcSection episode={episode} />
+
+      {/* Eden Peroxisome–ER–Mitochondria Organelle Contact Sites & Lipid Transfer Synthesizer (T-CLIN-62 / EDEN-41) */}
+      <EdenOrganelleContactSection episode={episode} />
     </Card>
   )
 }
@@ -5262,6 +5266,128 @@ function EdenMitochondrialEtcSection({ episode }: { episode: CareEpisode }) {
 
       <div className="mt-2 text-[10px] text-neutral-500 dark:text-white/50 text-right">
         ARGON EDEN ∞ §11 · Mitochondrial ETC Cristae Bioenergetics & ROS Homeostasis Synthesizer · Patient Truth Uncompromised · Never Manufactures Biomarkers
+      </div>
+    </div>
+  )
+}
+
+function EdenOrganelleContactSection({ episode }: { episode: CareEpisode }) {
+  const [lang, setLang] = useState<'id' | 'en'>('id')
+
+  const bridge = useMemo(
+    () => deriveEdenOrganelleContactBridge(episode),
+    [episode]
+  )
+
+  const narrative = lang === 'id' ? bridge.contactNarrativeId : bridge.contactNarrativeEn
+
+  return (
+    <div
+      className="mt-3 rounded-xl border border-teal-200 dark:border-white/10 bg-teal-50/30 dark:bg-white/[0.02] p-3.5"
+      data-eden-organelle-contact-card="v1"
+    >
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+        <div>
+          <div className="flex items-center gap-2 flex-wrap">
+            <h4 className="text-xs font-bold text-neutral-900 dark:text-white">
+              {lang === 'id'
+                ? 'Situs Kontak Membran Organel ER-Mito-Peroksisom & Transfer Lipid Non-Vesikular'
+                : 'Peroxisome–ER–Mitochondria Organelle Contact Sites & Lipid Transfer Synthesizer'}
+            </h4>
+            <span className="rounded-full bg-teal-100 dark:bg-white/10 px-2 py-0.5 text-[10px] font-bold text-teal-800 dark:text-teal-300">
+              {bridge.contactStateLabel}
+            </span>
+          </div>
+          <p className="mt-0.5 text-[11px] text-neutral-600 dark:text-white/70">
+            {bridge.contactTierLabel}
+          </p>
+        </div>
+        <div className="flex items-center gap-2 self-start sm:self-auto">
+          <div className="flex rounded-md border border-teal-200 dark:border-white/10 p-0.5 text-[10px]">
+            <button
+              type="button"
+              onClick={() => setLang('id')}
+              className={`px-1.5 py-0.5 rounded ${lang === 'id' ? 'bg-teal-600 text-white font-bold' : 'text-neutral-600 dark:text-white/60'}`}
+            >
+              ID
+            </button>
+            <button
+              type="button"
+              onClick={() => setLang('en')}
+              className={`px-1.5 py-0.5 rounded ${lang === 'en' ? 'bg-teal-600 text-white font-bold' : 'text-neutral-600 dark:text-white/60'}`}
+            >
+              EN
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-2.5 grid grid-cols-1 sm:grid-cols-3 gap-2">
+        <div className="rounded-lg bg-teal-100/40 dark:bg-white/[0.03] p-2 text-center">
+          <span className="text-[10px] text-neutral-500 dark:text-white/60 block">
+            {lang === 'id' ? 'Integritas Penambatan' : 'Tethering Integrity'}
+          </span>
+          <span className="text-sm font-extrabold text-teal-700 dark:text-teal-400">
+            {bridge.tetheringIntegrityIndex}%
+          </span>
+        </div>
+        <div className="rounded-lg bg-teal-100/40 dark:bg-white/[0.03] p-2 text-center">
+          <span className="text-[10px] text-neutral-500 dark:text-white/60 block">
+            {lang === 'id' ? 'Fluks Lipid Antarorganel' : 'Interorganellar Lipid Flux'}
+          </span>
+          <span className="text-sm font-extrabold text-teal-700 dark:text-teal-400">
+            {bridge.interorganellarLipidFlux}%
+          </span>
+        </div>
+        <div className="rounded-lg bg-teal-100/40 dark:bg-white/[0.03] p-2 text-center">
+          <span className="text-[10px] text-neutral-500 dark:text-white/60 block">
+            {lang === 'id' ? 'Batas Aman Sinyal Ca2+' : 'Ca2+ Signaling Safety Margin'}
+          </span>
+          <span className="text-sm font-extrabold text-teal-700 dark:text-teal-400">
+            {bridge.calciumSignalingSafetyMargin}%
+          </span>
+        </div>
+      </div>
+
+      <p className="mt-2 text-xs text-neutral-700 dark:text-white/80 leading-relaxed">
+        {narrative}
+      </p>
+
+      <div className="mt-2.5 space-y-1.5" data-eden-organelle-contact-nodes="v1">
+        <div className="text-[10px] font-bold text-neutral-500 dark:text-white/60 uppercase tracking-wider">
+          {lang === 'id' ? 'Nodus Mesin Situs Kontak Organel & Sumbu MAM (4 Nodus)' : 'Organelle Membrane Contact Machinery & MAM Nodes (4 Nodes)'}
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-1.5">
+          {bridge.contactNodes.map((node) => (
+            <div
+              key={node.nodeKind}
+              className="rounded-lg border border-teal-200/50 dark:border-white/10 bg-white/60 dark:bg-white/[0.02] p-2 text-xs"
+            >
+              <div className="flex items-center justify-between gap-1">
+                <span className="font-bold text-neutral-800 dark:text-white truncate">
+                  {node.nodeLabel}
+                </span>
+                <span className="text-[10px] font-bold text-teal-700 dark:text-teal-300">
+                  {Math.round(node.tetheringIntegrityScore * 100)}%
+                </span>
+              </div>
+              <div className="mt-0.5 text-[10px] text-neutral-500 dark:text-white/60">
+                {node.mechanisticNote}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="mt-2.5 rounded-lg border border-teal-200/40 dark:border-white/10 bg-teal-100/30 dark:bg-white/[0.02] p-2.5 text-xs space-y-1">
+        <div className="text-[11px] text-neutral-800 dark:text-white/85">
+          <b>{lang === 'id' ? 'Strategi Modulasi Situs Kontak Organel & Longevitas Membran:' : 'Organelle Contact Site Modulation & Membrane Longevity Strategy:'}</b>{' '}
+          {bridge.contactLongevityStrategy}
+        </div>
+      </div>
+
+      <div className="mt-2 text-[10px] text-neutral-500 dark:text-white/50 text-right">
+        ARGON EDEN ∞ §12 · Organelle Contact Sites & Lipid Transfer Synthesizer · Patient Truth Uncompromised · Never Manufactures Biomarkers
       </div>
     </div>
   )

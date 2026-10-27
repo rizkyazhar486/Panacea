@@ -1978,6 +1978,55 @@ export interface EdenMitochondrialEtcBridge {
   epistemicHumilityPreserved: true
 }
 
+export type EdenOrganelleContactSitesState =
+  | 'optimal_multiorganellar_tethering_flux'
+  | 'balanced_er_mito_peroxisome_homeostasis'
+  | 'transient_contact_site_lipid_tether_strain'
+  | 'critical_organellar_contact_rupture_ca2_overload'
+
+export type EdenOrganelleContactSitesTier =
+  | 'optimal_vps13_bridge_channel_fidelity'
+  | 'adequate_mam_calcium_and_lipid_flux'
+  | 'moderate_tethering_complex_destabilization'
+  | 'critical_mitochondrial_permeability_ca2_collapse'
+
+export type EdenOrganelleContactSitesNodeKind =
+  | 'mitochondria_associated_er_membranes_mam_ca2_signaling'
+  | 'vps13_lipid_bridge_non_vesicular_transport'
+  | 'peroxisome_er_contact_sites_plasmalogen_ether_lipid'
+  | 'mitochondria_peroxisome_crosstalk_ros_metabolic_buffering'
+
+export interface EdenOrganelleContactNode {
+  nodeKind: EdenOrganelleContactSitesNodeKind
+  nodeLabel: string
+  tetheringIntegrityScore: number
+  fluxTransferCapacity: number
+  contactStatus: 'optimal_tether_state' | 'adaptive_contact_mode' | 'tether_breakdown_stress'
+  mechanisticNote: string
+}
+
+export interface EdenOrganelleContactBridge {
+  version: 'v1'
+  episodeId: string
+  episodeTitle: string
+  contactState: EdenOrganelleContactSitesState
+  contactStateLabel: string
+  contactTier: EdenOrganelleContactSitesTier
+  contactTierLabel: string
+  tetheringIntegrityIndex: number
+  interorganellarLipidFlux: number
+  calciumSignalingSafetyMargin: number
+  contactNodes: EdenOrganelleContactNode[]
+  contactNarrativeId: string
+  contactNarrativeEn: string
+  contactLongevityStrategy: string
+  truthClass: 'organellar_contact_sites_simulation_proxy'
+  clinically_reviewed: false
+  patientTruthUncompromised: true
+  neverManufacturesBiomarkers: true
+  epistemicHumilityPreserved: true
+}
+
 export interface CareJourneyExportSummary {
   standard: 'PANACEA-CAREPLAN-FHIR-R4-V1'
   generatedAt: string
