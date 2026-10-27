@@ -194,7 +194,8 @@ test('T-CLIN-95: Cockcroft-Gault creatinine clearance, pathogen coverage & nephr
   assert.equal(meropenemRenalEval.recommendedIntervalHours, 12)
   assert.equal(meropenemRenalEval.requiresClinicianAcknowledgment, true)
   assert.equal(meropenemRenalEval.truthClass, 'clinical_decision_support_guideline_proxy')
-  assert.equal(meropenemRenalEval.auditDigestSha256.length, 64)
+  assert.equal(meropenemRenalEval.auditDigestSha256, null)
+  assert.equal(meropenemRenalEval.auditIntegrity, 'NOT_ATTESTED')
 
   // 2. Vancomycin + Piperacillin-Tazobactam nephrotoxic synergy warning
   const vancZosynSynergy = evaluateAntimicrobialStewardship(
@@ -368,5 +369,19 @@ test('T-CLIN-95: every supported unreviewed regimen stays review-bound and deter
     assert.deepEqual(evaluateAntimicrobialStewardship(patient, order, antimicrobialAt), result)
     assert.deepEqual(patient, renalPatient)
     assert.deepEqual(order, { ...antimicrobialOrder, antibioticName })
+  }
+})
+
+
+test('T-CLIN-95: a synchronous proxy never manufactures cryptographic attestation', () => {
+  for (const antibioticName of ['VANCOMYCIN', 'MEROPENEM', 'CEFEPIME', 'PIPERACILLIN_TAZOBACTAM', 'CIPROFLOXACIN']) {
+    const result = evaluateAntimicrobialStewardship(renalPatient, { ...antimicrobialOrder, antibioticName }, antimicrobialAt)
+    assert.equal(result.auditDigestSha256, null, 'a 64-character fingerprint is not evidence of SHA-256')
+    assert.equal(result.auditIntegrity, 'NOT_ATTESTED')
+    const transported = JSON.parse(JSON.stringify(result))
+    assert.equal(transported.auditDigestSha256, null)
+    assert.equal(transported.auditIntegrity, 'NOT_ATTESTED')
+    assert.equal(result.requiresClinicianAcknowledgment, true)
+    assert.equal(result.clinically_reviewed, false)
   }
 })
