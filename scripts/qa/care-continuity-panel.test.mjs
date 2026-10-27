@@ -48,6 +48,7 @@ import {
   deriveEdenPeroxisomalCatalaseBridge,
   deriveEdenErProteostasisBridge,
   deriveEdenPerkIsrBridge,
+  deriveEdenGolgiGlycosylationBridge,
   translateClinicalTermToEden,
   EDEN_PLAIN_LANGUAGE_GLOSSARY,
 } from '../../src/domains/clinical-operations/model/careContinuityProjection.ts'
@@ -4263,4 +4264,78 @@ test('CareContinuityPanel: Eden PERK–eIF2α–ATF4 Integrated Stress Response 
   const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
   assert.ok(episodeSource.includes('data-eden-perk-card="v1"'), 'CareEpisode must include PERK ISR card')
   assert.ok(episodeSource.includes('data-eden-perk-nodes="v1"'), 'CareEpisode must include PERK ISR nodes grid')
+})
+
+test('CareContinuityPanel: Eden Golgi Vesicular Trafficking & Glycosylation Fidelity Synthesizer contract (T-CLIN-58)', () => {
+  const evaluatedAt = '2026-10-27T00:00:00.000Z'
+  const sampleEpisode = {
+    id: 'ce_golgi_1',
+    title: 'Post-CABG Comprehensive Glycome & Vesicular Trafficking Evaluation',
+    diagnosisCode: 'I25.10',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'diagnosis', status: 'done' },
+      { stage: 'plan', status: 'done' },
+      { stage: 'treatment', status: 'done' },
+      { stage: 'recovery', status: 'active' },
+    ],
+  }
+
+  // 1. Pure deterministic derivation
+  const bridge = deriveEdenGolgiGlycosylationBridge(sampleEpisode)
+  assert.equal(bridge.version, 'v1')
+  assert.equal(bridge.episodeId, 'ce_golgi_1')
+  assert.equal(bridge.golgiState, 'optimal_cis_trans_vesicular_flow_sialylation')
+  assert.equal(bridge.golgiStateLabel, 'Aliran Polarisasi Cis-Trans Optimal & Sialisasi Terminal Glikoprotein Paripurna')
+  assert.equal(bridge.golgiTier, 'optimal_glycosylation_trafficking_fidelity')
+  assert.equal(bridge.golgiTierLabel, 'Fidelitas Glikosilasi Kompleks & Transpor Vesikular Polaritas Golgi Optimal')
+  assert.ok(bridge.golgiScore >= 85)
+  assert.ok(bridge.vesicularSortingIndex >= 85)
+  assert.ok(bridge.terminalSialylationCapacity >= 85)
+  assert.equal(bridge.golgiNodes.length, 4)
+  assert.equal(bridge.golgiNodes[0].nodeKind, 'copii_anterograde_er_to_golgi_flux')
+  assert.equal(bridge.golgiNodes[1].nodeKind, 'copi_kdel_retrograde_retrieval_flux')
+  assert.equal(bridge.golgiNodes[2].nodeKind, 'cis_trans_sequential_glycosylation_machinery')
+  assert.equal(bridge.golgiNodes[3].nodeKind, 'tgn_clathrin_m6pr_lysosomal_sorting')
+  assert.equal(bridge.truthClass, 'golgi_vesicular_glycosylation_simulation_proxy')
+  assert.equal(bridge.clinically_reviewed, false)
+  assert.equal(bridge.patientTruthUncompromised, true)
+  assert.equal(bridge.neverManufacturesBiomarkers, true)
+  assert.equal(bridge.epistemicHumilityPreserved, true)
+
+  // 2. Blocked stage resilience
+  const blockedEpisode = {
+    id: 'ce_golgi_blocked',
+    title: 'Blocked Congenital Disorder of Glycosylation (CDG) Episode',
+    diagnosisCode: 'E77.8',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'diagnosis', status: 'blocked', blockedReason: 'Awaiting transferrin isoelectric focusing and mass spectrometry glycomic fingerprint' },
+    ],
+  }
+  const blockedBridge = deriveEdenGolgiGlycosylationBridge(blockedEpisode)
+  assert.equal(blockedBridge.golgiState, 'critical_golgi_fragmentation_dysglycosylation')
+  assert.equal(blockedBridge.golgiStateLabel, 'Fragmentasi Cisternae Golgi Kritis & Disglikosilasi Akibat Stres Proteotoksik Berat')
+  assert.equal(blockedBridge.golgiTier, 'critical_golgi_fragmentation_instability')
+  assert.equal(blockedBridge.golgiTierLabel, 'Instabilitas Arsitektur Aparatus Golgi Kritis & Kegagalan Penyortiran Vesikel TGN')
+  assert.ok(blockedBridge.golgiScore <= 66)
+  assert.ok(blockedBridge.vesicularSortingIndex <= 65)
+  assert.ok(blockedBridge.terminalSialylationCapacity <= 63)
+  assert.equal(blockedBridge.golgiNodes.every((n) => n.golgiStatus === 'golgi_fragmentation_stress'), true)
+
+  // 3. Rollup in evaluateCareJourneyContinuity
+  const projection = evaluateCareJourneyContinuity([sampleEpisode, blockedEpisode], evaluatedAt)
+  assert.equal(projection.edenGolgiGlycosylationReadyCount, 2)
+  assert.ok(projection.episodes[0].edenGolgiGlycosylation)
+  assert.equal(projection.episodes[0].edenGolgiGlycosylation.truthClass, 'golgi_vesicular_glycosylation_simulation_proxy')
+  assert.equal(projection.episodes[0].edenGolgiGlycosylation.patientTruthUncompromised, true)
+  assert.equal(projection.episodes[0].edenGolgiGlycosylation.neverManufacturesBiomarkers, true)
+
+  // 4. UI contracts
+  const panelSource = read('src/domains/clinical-operations/ui/CareContinuityPanel.tsx')
+  assert.ok(panelSource.includes('data-eden-golgi="v1"'), 'CareContinuityPanel must include Golgi attribute')
+
+  const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
+  assert.ok(episodeSource.includes('data-eden-golgi-card="v1"'), 'CareEpisode must include Golgi card')
+  assert.ok(episodeSource.includes('data-eden-golgi-nodes="v1"'), 'CareEpisode must include Golgi nodes grid')
 })

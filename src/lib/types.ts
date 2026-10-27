@@ -1782,6 +1782,55 @@ export interface EdenPerkIsrBridge {
   epistemicHumilityPreserved: true
 }
 
+export type EdenGolgiTraffickingState =
+  | 'optimal_cis_trans_vesicular_flow_sialylation'
+  | 'balanced_adaptive_copi_copii_equilibrium'
+  | 'transient_golgi_cisternal_congestion'
+  | 'critical_golgi_fragmentation_dysglycosylation'
+
+export type EdenGolgiTraffickingTier =
+  | 'optimal_glycosylation_trafficking_fidelity'
+  | 'balanced_copi_copii_retrieval_equilibrium'
+  | 'moderate_cisternal_sorting_strain'
+  | 'critical_golgi_fragmentation_instability'
+
+export type EdenGolgiNodeKind =
+  | 'copii_anterograde_er_to_golgi_flux'
+  | 'copi_kdel_retrograde_retrieval_flux'
+  | 'cis_trans_sequential_glycosylation_machinery'
+  | 'tgn_clathrin_m6pr_lysosomal_sorting'
+
+export interface EdenGolgiNode {
+  nodeKind: EdenGolgiNodeKind
+  nodeLabel: string
+  traffickingFidelityScore: number
+  glycanMaturationIndex: number
+  golgiStatus: 'optimal_trafficking_state' | 'adaptive_sorting_mode' | 'golgi_fragmentation_stress'
+  mechanisticNote: string
+}
+
+export interface EdenGolgiGlycosylationBridge {
+  version: 'v1'
+  episodeId: string
+  episodeTitle: string
+  golgiState: EdenGolgiTraffickingState
+  golgiStateLabel: string
+  golgiTier: EdenGolgiTraffickingTier
+  golgiTierLabel: string
+  golgiScore: number
+  vesicularSortingIndex: number
+  terminalSialylationCapacity: number
+  golgiNodes: EdenGolgiNode[]
+  golgiNarrativeId: string
+  golgiNarrativeEn: string
+  golgiLongevityStrategy: string
+  truthClass: 'golgi_vesicular_glycosylation_simulation_proxy'
+  clinically_reviewed: false
+  patientTruthUncompromised: true
+  neverManufacturesBiomarkers: true
+  epistemicHumilityPreserved: true
+}
+
 export interface CareJourneyExportSummary {
   standard: 'PANACEA-CAREPLAN-FHIR-R4-V1'
   generatedAt: string

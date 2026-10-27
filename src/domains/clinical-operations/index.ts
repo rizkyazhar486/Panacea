@@ -91,6 +91,7 @@ export {
   deriveEdenPeroxisomalCatalaseBridge,
   deriveEdenErProteostasisBridge,
   deriveEdenPerkIsrBridge,
+  deriveEdenGolgiGlycosylationBridge,
   translateClinicalTermToEden,
   EDEN_PLAIN_LANGUAGE_GLOSSARY,
   STAGE_LABEL,

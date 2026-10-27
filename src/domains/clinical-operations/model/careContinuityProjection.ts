@@ -160,6 +160,11 @@ import type {
   EdenPerkIsrNodeKind,
   EdenPerkIsrNode,
   EdenPerkIsrBridge,
+  EdenGolgiTraffickingState,
+  EdenGolgiTraffickingTier,
+  EdenGolgiNodeKind,
+  EdenGolgiNode,
+  EdenGolgiGlycosylationBridge,
   WellnessDay,
   MoodEntry,
   Circle,
@@ -287,6 +292,7 @@ export interface CareJourneyEpisodeSummary {
   edenPeroxisomalCatalase?: EdenPeroxisomalCatalaseBridge
   edenErProteostasis?: EdenErProteostasisBridge
   edenPerkIsr?: EdenPerkIsrBridge
+  edenGolgiGlycosylation?: EdenGolgiGlycosylationBridge
 }
 
 export type ReadmissionRiskLevel = 'low' | 'moderate' | 'high'
@@ -400,6 +406,7 @@ export interface CareJourneyContinuityResult {
   edenPeroxisomalCatalaseReadyCount: number
   edenErProteostasisReadyCount: number
   edenPerkIsrReadyCount: number
+  edenGolgiGlycosylationReadyCount: number
   edenLifeBalance: EdenLifeBalanceSynthesis
   hasBlockedStages: boolean
 }
@@ -5232,6 +5239,115 @@ export function deriveEdenPerkIsrBridge(
   }
 }
 
+export function deriveEdenGolgiGlycosylationBridge(
+  episode: CareEpisode,
+): EdenGolgiGlycosylationBridge {
+  const stages = episode.stages ?? []
+  const completedStages = stages.filter((s) => s.status === 'done').length
+  const hasBlocked = stages.some((s) => s.status === 'blocked')
+  const blockedCount = stages.filter((s) => s.status === 'blocked').length
+
+  const golgiScore = hasBlocked
+    ? Math.max(46, 66 - blockedCount * 7)
+    : Math.min(99, 81 + completedStages * 5)
+
+  const vesicularSortingIndex = hasBlocked
+    ? Math.max(45, 65 - blockedCount * 7)
+    : Math.min(98, 80 + completedStages * 5)
+
+  const terminalSialylationCapacity = hasBlocked
+    ? Math.max(42, 63 - blockedCount * 8)
+    : Math.min(98, 79 + completedStages * 5)
+
+  let golgiState: EdenGolgiTraffickingState = 'balanced_adaptive_copi_copii_equilibrium'
+  let golgiStateLabel = 'Ekuilibrium Fluks Vesikular COPI/COPII & Pematangan Glikan Golgi Seimbang'
+  let golgiTier: EdenGolgiTraffickingTier = 'balanced_copi_copii_retrieval_equilibrium'
+  let golgiTierLabel = 'Ekuilibrium Transpor Pengambilan Balik Chaperon & Polari Cis-Trans Stabil'
+
+  if (hasBlocked) {
+    golgiState = 'critical_golgi_fragmentation_dysglycosylation'
+    golgiStateLabel = 'Fragmentasi Cisternae Golgi Kritis & Disglikosilasi Akibat Stres Proteotoksik Berat'
+    golgiTier = 'critical_golgi_fragmentation_instability'
+    golgiTierLabel = 'Instabilitas Arsitektur Aparatus Golgi Kritis & Kegagalan Penyortiran Vesikel TGN'
+  } else if (completedStages >= 3) {
+    golgiState = 'optimal_cis_trans_vesicular_flow_sialylation'
+    golgiStateLabel = 'Aliran Polarisasi Cis-Trans Optimal & Sialisasi Terminal Glikoprotein Paripurna'
+    golgiTier = 'optimal_glycosylation_trafficking_fidelity'
+    golgiTierLabel = 'Fidelitas Glikosilasi Kompleks & Transpor Vesikular Polaritas Golgi Optimal'
+  } else if (completedStages === 0) {
+    golgiState = 'transient_golgi_cisternal_congestion'
+    golgiStateLabel = 'Kongesti Cisternae Golgi Transien & Keterlambatan Pemangkasan Mannosa Dini'
+    golgiTier = 'moderate_cisternal_sorting_strain'
+    golgiTierLabel = 'Regangan Kongesti Penyortiran Cisternae Golgi Moderat Transien'
+  }
+
+  const golgiNodes: EdenGolgiNode[] = [
+    {
+      nodeKind: 'copii_anterograde_er_to_golgi_flux',
+      nodeLabel: 'Fluks Anterograd Vesikel COPII (Sec23/24-Sec13/31) dari ER ke Cis-Golgi',
+      traffickingFidelityScore: hasBlocked ? 0.62 : Math.min(0.99, 0.82 + completedStages * 0.05),
+      glycanMaturationIndex: hasBlocked ? 0.60 : Math.min(0.98, 0.80 + completedStages * 0.05),
+      golgiStatus: hasBlocked ? 'golgi_fragmentation_stress' : completedStages >= 2 ? 'optimal_trafficking_state' : 'adaptive_sorting_mode',
+      mechanisticNote: 'Kompleks GTPase Sar1 dan selubung COPII mengenali motif ekspor kargo sitosolik pada membran ER untuk membentuk vesikel transport terarah ke jaringan cis-Golgi.',
+    },
+    {
+      nodeKind: 'copi_kdel_retrograde_retrieval_flux',
+      nodeLabel: 'Fluks Pengambilan Balik Retrograd COPI & Reseptor KDEL Penyelamat Chaperon Lumenal',
+      traffickingFidelityScore: hasBlocked ? 0.61 : Math.min(0.98, 0.81 + completedStages * 0.05),
+      glycanMaturationIndex: hasBlocked ? 0.59 : Math.min(0.99, 0.79 + completedStages * 0.05),
+      golgiStatus: hasBlocked ? 'golgi_fragmentation_stress' : completedStages >= 2 ? 'optimal_trafficking_state' : 'adaptive_sorting_mode',
+      mechanisticNote: 'Reseptor KDEL mengikat chaperon BiP/kalretikulin yang lolos ke Golgi pada pH asam cis-Golgi, menginduksi rekrutmen selubung COPI heptamerik untuk transport balik ke retikulum endoplasma.',
+    },
+    {
+      nodeKind: 'cis_trans_sequential_glycosylation_machinery',
+      nodeLabel: 'Mesin Glikosilasi Berurutan Cis-Medial-Trans: Mannosidase II, MGAT1/2 & Sialiltransferase',
+      traffickingFidelityScore: hasBlocked ? 0.63 : Math.min(0.99, 0.80 + completedStages * 0.05),
+      glycanMaturationIndex: hasBlocked ? 0.61 : Math.min(0.98, 0.81 + completedStages * 0.05),
+      golgiStatus: hasBlocked ? 'golgi_fragmentation_stress' : completedStages >= 2 ? 'optimal_trafficking_state' : 'adaptive_sorting_mode',
+      mechanisticNote: 'Glukan inti N-terkait diproses berjenjang dari oligomannosa menjadi glikan kompleks bercabang dengan penambahan GlcNAc, galaktosa, dan asam sialat terminal protektif.',
+    },
+    {
+      nodeKind: 'tgn_clathrin_m6pr_lysosomal_sorting',
+      nodeLabel: 'Penyortiran Trans-Golgi Network (TGN): Reseptor M6PR, Klatrin-AP1 & Jalur Lisosom',
+      traffickingFidelityScore: hasBlocked ? 0.59 : Math.min(0.97, 0.78 + completedStages * 0.06),
+      glycanMaturationIndex: hasBlocked ? 0.58 : Math.min(0.97, 0.77 + completedStages * 0.06),
+      golgiStatus: hasBlocked ? 'golgi_fragmentation_stress' : completedStages >= 2 ? 'optimal_trafficking_state' : 'adaptive_sorting_mode',
+      mechanisticNote: 'Enzim hidrolase lisosom bertanda manosa-6-fosfat diikat oleh M6PR di TGN dan dikemas ke dalam vesikel klatrin/AP-1 untuk pengantaran presisi ke endosom/lisosom tanpa sekresi ektopik.',
+    },
+  ]
+
+  const golgiNarrativeId = `Sintesis transpor vesikular & fidelitas glikosilasi Golgi untuk episode "${episode.title}". Status Golgi: ${golgiStateLabel}, tingkat resiliensi: ${golgiTierLabel}. Skor Golgi ${golgiScore}%, indeks penyortiran vesikular ${vesicularSortingIndex}%, dan kapasitas sialisasi terminal ${terminalSialylationCapacity}%.`
+  const golgiNarrativeEn = `Golgi vesicular trafficking & glycosylation fidelity synthesis for episode "${episode.title}". Golgi state: ${golgiStateLabel}, resilience tier: ${golgiTierLabel}. Golgi score ${golgiScore}%, vesicular sorting index ${vesicularSortingIndex}%, and terminal sialylation capacity ${terminalSialylationCapacity}%.`
+
+  const golgiLongevityStrategy = hasBlocked
+    ? 'Mitigasi fragmentasi aparatus Golgi dan disglikosilasi protein melalui pemulihan homeostasis ion logam divalen (mangan Mn2+ dan seng Zn2+ kofaktor glikosiltransferase), pencegahan beban glikasi lanjut (AGEs), dan pengurangan stres osmotik intraseluler.'
+    : completedStages >= 3
+    ? 'Mempertahankan kelenturan arsitektur cisterna Golgi dan integritas sialisasi terminal melalui asupan donor glikan fisiologis (sumber sialat dan galaktosa alami), olahraga ketahanan aerobik teratur, dan ritme sirkadian metabolisme yang stabil.'
+    : 'Mendukung integritas selubung vesikular COPI/COPII dengan hidrasi optimal, antioksidan polifenol pelindung lipid membran golgi, dan istirahat metabolik nokturnal.'
+
+  return {
+    version: 'v1',
+    episodeId: episode.id,
+    episodeTitle: episode.title,
+    golgiState,
+    golgiStateLabel,
+    golgiTier,
+    golgiTierLabel,
+    golgiScore,
+    vesicularSortingIndex,
+    terminalSialylationCapacity,
+    golgiNodes,
+    golgiNarrativeId,
+    golgiNarrativeEn,
+    golgiLongevityStrategy,
+    truthClass: 'golgi_vesicular_glycosylation_simulation_proxy',
+    clinically_reviewed: false,
+    patientTruthUncompromised: true,
+    neverManufacturesBiomarkers: true,
+    epistemicHumilityPreserved: true,
+  }
+}
+
 export const STAGE_EXPECTED_DAYS: Record<CareEpisodeStageId, number> = {
   problem: 1,
   diagnosis: 2,
@@ -5517,6 +5633,7 @@ export function evaluateCareJourneyContinuity(
     const edenPeroxisomalCatalase = deriveEdenPeroxisomalCatalaseBridge(ep)
     const edenErProteostasis = deriveEdenErProteostasisBridge(ep)
     const edenPerkIsr = deriveEdenPerkIsrBridge(ep)
+    const edenGolgiGlycosylation = deriveEdenGolgiGlycosylationBridge(ep)
 
     return {
       id: ep.id,
@@ -5581,6 +5698,7 @@ export function evaluateCareJourneyContinuity(
       edenPeroxisomalCatalase,
       edenErProteostasis,
       edenPerkIsr,
+      edenGolgiGlycosylation,
     }
   })
 
@@ -5866,6 +5984,14 @@ export function evaluateCareJourneyContinuity(
           s.edenPerkIsr?.neverManufacturesBiomarkers
       )
   ).length
+  const edenGolgiGlycosylationReadyCount = summaries.filter(
+    (s) =>
+      Boolean(
+        s.edenGolgiGlycosylation?.truthClass === 'golgi_vesicular_glycosylation_simulation_proxy' &&
+          s.edenGolgiGlycosylation?.patientTruthUncompromised &&
+          s.edenGolgiGlycosylation?.neverManufacturesBiomarkers
+      )
+  ).length
   const edenLifeBalance = deriveEdenLifeBalanceSynthesis(episodes, supportiveResults)
 
   return {
@@ -5934,6 +6060,7 @@ export function evaluateCareJourneyContinuity(
     edenPeroxisomalCatalaseReadyCount,
     edenErProteostasisReadyCount,
     edenPerkIsrReadyCount,
+    edenGolgiGlycosylationReadyCount,
     edenLifeBalance,
     hasBlockedStages: blockedJourneys > 0 || stalledCount > 0,
   }
