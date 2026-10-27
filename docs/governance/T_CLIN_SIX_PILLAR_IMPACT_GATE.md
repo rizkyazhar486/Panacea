@@ -1,4 +1,4 @@
-# T-CLIN Six-Pillar Human-Impact Gate (v1.1)
+# T-CLIN Six-Pillar Human-Impact Gate (v1.2)
 
 **Status:** Engineering governance, not clinical validation or medical-device authorization.  
 **Canonical source:** [Clinical Utility Audit](../../governance/CLINICAL_UTILITY_AUDIT.json).  
@@ -20,7 +20,7 @@ These are six destinations within **one** operating system, not six parallel cli
 
 ## Evidence-bounded pilot across six product pillars
 
-The machine-checked pilot contains **nine** anchor contracts. It retains all five highest-priority clinical candidates selected by the canonical audit and adds four complementary modules to ensure every product pillar has at least one primary anchor. The new anchors are research, patient education, device support and continuity-of-care workflows, **not** proof of benefit or readiness for patient use.
+The machine-checked gate preserves **nine mandatory launch anchors**. It retains all five highest-priority clinical candidates selected by the canonical audit and adds four complementary modules to ensure every product pillar has at least one primary anchor. **Additional T-CLIN mappings may now be appended without changing a hard-coded allowlist, but only when the module already exists in the canonical Clinical Utility Audit and passes the same evidence, category, measurement, and authority checks.** The new anchors are research, patient education, device support and continuity-of-care workflows, **not** proof of benefit or readiness for patient use.
 
 | T-CLIN | Primary pillar | Prospective measurable endpoint | Baseline/result |
 | --- | --- | --- | --- |
@@ -64,9 +64,9 @@ where C = intended clinical/educational benefit, I = six-pillar integration, E =
 ## Enforcement and honest limits
 
 - The new test is discovered by the existing build command: node --test scripts/qa/*.test.mjs.
-- It requires all six unique pillars to have a primary anchor; exactly nine contracts including the audit's top five; coherent numerator/denominator; canonical source category, validation status and evidence tier; appropriate authority for research vs clinician workflows; and no fabricated measured outcome or clinical-benefit claim.
-- Thirteen negative controls mutate the contracts to check fake pillar, missing anchor, fabricated measured result, unjustified validation, wrong evidence tier, category promotion, forged validation status, wrong authority, missing denominator, duplicate IDs and incomplete six-pillar coverage.
-- **v1.1 scope is deliberately nine audit-backed anchors only**. It does not certify every T-CLIN-01..120, future modules, predictive reliability, biological simulations, real-world efficacy or release acceptance. Broaden scope with a separately reviewed schema migration and test revision.
+- It requires all six unique pillars to have a primary anchor, a minimum of nine retained anchor contracts including the canonical audit's top five, a meaningful numerator/denominator, canonical category/validation status/evidence tier, appropriate research versus clinician authority, and no fabricated measured outcome or clinical-benefit claim. Extra registry entries are accepted only when they exist in the canonical audit.
+- Positive extension cases verify that an audited patient-education module (T-CLIN-27) and an educational cell-cycle simulation (T-CLIN-76) can be registered without changing hard-coded anchors. Fifteen negative controls check fake pillar, missing anchor, fabricated measured result, unjustified validation, wrong evidence tier, category promotion, forged validation status, wrong authority, missing denominator, duplicate IDs, unknown IDs and incomplete pillar coverage.
+- **v1.2 currently maps nine audit-backed anchors**, but the validator accepts additional audited modules under the same constraints without a code revision. This still does not certify every T-CLIN-01..120, future research modules, predictive reliability, biological simulations, real-world efficacy or release acceptance. An unaudited T-CLIN-111+ remains blocked from registry enrollment until the Clinical Utility Audit is updated and reviewed. Actual measurements and validation claims require a separate evidence-aware governance process; v1.2 intentionally keeps observed and baseline values null.
 - No patient record, production clinical action, UI, treatment recommendation or signature authorization is modified in this PR.
 
 **Required verification:** run the new test, existing clinical-utility audit test, and exact-head CI before merge. Green unit tests establish engineering properties, not patient outcome validation.
