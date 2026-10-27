@@ -1,0 +1,169 @@
+{
+  "schemaVersion": "1.0.0",
+  "policy": "SIX_PILLAR_HUMAN_BENEFIT_GATE_V1",
+  "baselineAuditedThrough": "T-CLIN-110",
+  "pillars": [
+    {
+      "id": "CLINICAL_ONE_OS",
+      "title": "Clinical One OS"
+    },
+    {
+      "id": "EDUCATION_WORKFLOW",
+      "title": "Education Workflow"
+    },
+    {
+      "id": "BODY_EXPOSURE",
+      "title": "Body Exposure"
+    },
+    {
+      "id": "DEVICE_MONITORING",
+      "title": "Device & Monitoring"
+    },
+    {
+      "id": "TRUST_SAFETY_VALIDATION",
+      "title": "Trust, Safety & Validation"
+    },
+    {
+      "id": "ADOPTION_REAL_WORLD_IMPACT",
+      "title": "Adoption & Real-World Impact"
+    }
+  ],
+  "scope": "Only the audit registry's current top-five clinical candidates are gated in v1; this is not a clinical validation claim.",
+  "entries": [
+    {
+      "id": "T-CLIN-06",
+      "primaryPillar": "CLINICAL_ONE_OS",
+      "supportingPillars": [
+        "TRUST_SAFETY_VALIDATION",
+        "ADOPTION_REAL_WORLD_IMPACT"
+      ],
+      "userRole": "Clinician / clinical coder",
+      "humanProblem": "Unreviewed or mismatched diagnosis coding can propagate into a longitudinal encounter",
+      "observableWorkflowOutcome": "Clinician-approved ICD-10 provenance linkage rate",
+      "outcomeMetric": {
+        "name": "Clinician-approved ICD-10 provenance linkage rate",
+        "numerator": "Eligible encounter diagnoses with clinician-approved, provenance-linked ICD-10 code",
+        "denominator": "Eligible encounter diagnoses requiring ICD-10 coding",
+        "unit": "ratio",
+        "baselineValue": null,
+        "observedValue": null,
+        "measurementStatus": "NOT_MEASURED",
+        "measurementPlan": "Prospective paired coding concordance audit vs certified clinical coders; stratify by diagnosis complexity"
+      },
+      "evidenceTier": "E1_HEURISTIC",
+      "clinicallyValidatedBenefit": false,
+      "independentlyValidatedBenefit": false,
+      "humanAuthority": "AUTHORISED_CLINICIAN",
+      "safetyBoundary": "Coding suggestions must remain drafts until qualified clinician review; do not write diagnoses autonomously",
+      "sourceRegistry": "governance/CLINICAL_UTILITY_AUDIT.json"
+    },
+    {
+      "id": "T-CLIN-11",
+      "primaryPillar": "CLINICAL_ONE_OS",
+      "supportingPillars": [
+        "ADOPTION_REAL_WORLD_IMPACT",
+        "TRUST_SAFETY_VALIDATION"
+      ],
+      "userRole": "Clinician / laboratory coordinator",
+      "humanProblem": "Lab results can be left unreconciled with diagnostic orders and longitudinal milestones",
+      "observableWorkflowOutcome": "Verified diagnostic result reconciliation rate",
+      "outcomeMetric": {
+        "name": "Verified diagnostic result reconciliation rate",
+        "numerator": "Eligible diagnostic results reconciled to the correct order and reviewed by authorized clinician",
+        "denominator": "All eligible diagnostic results returned for the study cohort",
+        "unit": "ratio",
+        "baselineValue": null,
+        "observedValue": null,
+        "measurementStatus": "NOT_MEASURED",
+        "measurementPlan": "Compare time-to-reconciliation and orphaned-result rates with a baseline lab inbox; audit accession identifiers"
+      },
+      "evidenceTier": "E1_HEURISTIC",
+      "clinicallyValidatedBenefit": false,
+      "independentlyValidatedBenefit": false,
+      "humanAuthority": "AUTHORISED_CLINICIAN",
+      "safetyBoundary": "Fulfillment alone is not clinician review or sign-off; mismatched IDs fail closed",
+      "sourceRegistry": "governance/CLINICAL_UTILITY_AUDIT.json"
+    },
+    {
+      "id": "T-CLIN-13",
+      "primaryPillar": "CLINICAL_ONE_OS",
+      "supportingPillars": [
+        "TRUST_SAFETY_VALIDATION",
+        "ADOPTION_REAL_WORLD_IMPACT"
+      ],
+      "userRole": "Attending clinician / care coordinator",
+      "humanProblem": "Administrative closure can hide unresolved problems or unsigned clinical decisions",
+      "observableWorkflowOutcome": "Clinician-signed safe episode closure rate",
+      "outcomeMetric": {
+        "name": "Clinician-signed safe episode closure rate",
+        "numerator": "Eligible completed episodes with signed outcome and no unresolved mandatory clinical obligations",
+        "denominator": "All episodes eligible for closure in a predefined cohort",
+        "unit": "ratio",
+        "baselineValue": null,
+        "observedValue": null,
+        "measurementStatus": "NOT_MEASURED",
+        "measurementPlan": "Blinded review of closure records against chart and unresolved-task reference standard"
+      },
+      "evidenceTier": "E1_HEURISTIC",
+      "clinicallyValidatedBenefit": false,
+      "independentlyValidatedBenefit": false,
+      "humanAuthority": "AUTHORISED_CLINICIAN",
+      "safetyBoundary": "No AI-signed clinical outcomes; unresolved critical obligations block closure",
+      "sourceRegistry": "governance/CLINICAL_UTILITY_AUDIT.json"
+    },
+    {
+      "id": "T-CLIN-16",
+      "primaryPillar": "TRUST_SAFETY_VALIDATION",
+      "supportingPillars": [
+        "DEVICE_MONITORING",
+        "CLINICAL_ONE_OS"
+      ],
+      "userRole": "Nurse / clinician",
+      "humanProblem": "Missing or synthetic vital signs can be mistaken for real normal measurements",
+      "observableWorkflowOutcome": "Unverified vital-sign rejection rate",
+      "outcomeMetric": {
+        "name": "Unverified vital-sign rejection rate",
+        "numerator": "Known unverified or synthetic vital-sign inputs rejected at ingestion",
+        "denominator": "All known unverified or synthetic vital-sign inputs presented during a prespecified evaluation",
+        "unit": "ratio",
+        "baselineValue": null,
+        "observedValue": null,
+        "measurementStatus": "NOT_MEASURED",
+        "measurementPlan": "Test synthetic and corrupted inputs; separately assess real authorized device ingestion for false rejection"
+      },
+      "evidenceTier": "E1_HEURISTIC",
+      "clinicallyValidatedBenefit": false,
+      "independentlyValidatedBenefit": false,
+      "humanAuthority": "AUTHORISED_CLINICIAN",
+      "safetyBoundary": "Absence is not zero; simulated values may never become signed patient measurements",
+      "sourceRegistry": "governance/CLINICAL_UTILITY_AUDIT.json"
+    },
+    {
+      "id": "T-CLIN-17",
+      "primaryPillar": "CLINICAL_ONE_OS",
+      "supportingPillars": [
+        "ADOPTION_REAL_WORLD_IMPACT",
+        "TRUST_SAFETY_VALIDATION"
+      ],
+      "userRole": "Referring and receiving clinician",
+      "humanProblem": "Clinical handoffs can lose pending tests, provenance, and responsibility across facilities",
+      "observableWorkflowOutcome": "Acknowledged clinical handoff reconciliation rate",
+      "outcomeMetric": {
+        "name": "Acknowledged clinical handoff reconciliation rate",
+        "numerator": "Eligible cross-facility handoffs acknowledged with patient identity and pending tasks reconciled",
+        "denominator": "All eligible cross-facility handoffs in the measured cohort",
+        "unit": "ratio",
+        "baselineValue": null,
+        "observedValue": null,
+        "measurementStatus": "NOT_MEASURED",
+        "measurementPlan": "Paired receiving-clinician retrieval and checklist comparison to existing transfer summaries"
+      },
+      "evidenceTier": "E1_HEURISTIC",
+      "clinicallyValidatedBenefit": false,
+      "independentlyValidatedBenefit": false,
+      "humanAuthority": "AUTHORISED_CLINICIAN",
+      "safetyBoundary": "FHIR-aligned export is not proof of exchange interoperability or receiving-clinician acknowledgement",
+      "sourceRegistry": "governance/CLINICAL_UTILITY_AUDIT.json"
+    }
+  ]
+}
