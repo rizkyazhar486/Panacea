@@ -54,6 +54,7 @@ import {
   deriveEdenMitochondrialEtcBridge,
   deriveEdenOrganelleContactBridge,
   deriveEdenNuclearLaminBridge,
+  deriveEdenEscrtMachineryBridge,
   translateClinicalTermToEden,
   EDEN_PLAIN_LANGUAGE_GLOSSARY,
 } from '../../src/domains/clinical-operations/model/careContinuityProjection.ts'
@@ -4710,4 +4711,77 @@ test('T-CLIN-63 / EDEN-42: Eden Nuclear Lamin A/C & Nuclear Envelope Mechanotran
   const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
   assert.ok(episodeSource.includes('data-eden-lamin-card="v1"'), 'CareEpisode must include Lamin card')
   assert.ok(episodeSource.includes('data-eden-lamin-nodes="v1"'), 'CareEpisode must include Lamin nodes grid')
+})
+
+test('T-CLIN-64 / EDEN-43: Eden Endosomal Sorting Complex Required for Transport (ESCRT-I/II/III) & Membrane Scission Synthesizer', () => {
+  const evaluatedAt = '2026-10-27T08:00:00.000Z'
+  const sampleEpisode = {
+    id: 'ce_escrt_1',
+    title: 'ESCRT Membrane Scission and Multivesicular Body Biogenesis Trajectory',
+    diagnosisCode: 'E75.2',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'diagnosis', status: 'done' },
+      { stage: 'treatment', status: 'done' },
+      { stage: 'recovery', status: 'active' },
+    ],
+  }
+
+  // 1. Pure deterministic derivation
+  const bridge = deriveEdenEscrtMachineryBridge(sampleEpisode)
+  assert.equal(bridge.version, 'v1')
+  assert.equal(bridge.episodeId, 'ce_escrt_1')
+  assert.equal(bridge.escrtState, 'optimal_escrt_spiral_constriction_flux')
+  assert.equal(bridge.escrtStateLabel, 'Fluks Konstriksi Spiral ESCRT Optimal & Pemotongan Membran Presisi Tinggi')
+  assert.equal(bridge.escrtTier, 'optimal_vps4_atpase_recycling_fidelity')
+  assert.equal(bridge.escrtTierLabel, 'Fidelitas Daur Ulang Kompleks VPS4 AAA+ ATPase Maksimal & Reparasi Membran Prima')
+  assert.ok(bridge.membraneScissionIndex >= 85)
+  assert.ok(bridge.receptorClearanceRate >= 83)
+  assert.ok(bridge.exosomalRegenerationMargin >= 84)
+  assert.equal(bridge.escrtNodes.length, 4)
+  assert.equal(bridge.escrtNodes[0].nodeKind, 'escrt_0_i_ii_ubiquitin_cargo_clustering')
+  assert.equal(bridge.escrtNodes[1].nodeKind, 'chmp4b_escrt_iii_spiral_membrane_constriction')
+  assert.equal(bridge.escrtNodes[2].nodeKind, 'vps4_atp_hydrolysis_filament_disassembly')
+  assert.equal(bridge.escrtNodes[3].nodeKind, 'multivesicular_body_scission_and_membrane_repair')
+  assert.equal(bridge.truthClass, 'escrt_membrane_scission_simulation_proxy')
+  assert.equal(bridge.clinically_reviewed, false)
+  assert.equal(bridge.patientTruthUncompromised, true)
+  assert.equal(bridge.neverManufacturesBiomarkers, true)
+  assert.equal(bridge.epistemicHumilityPreserved, true)
+
+  // 2. Blocked stage resilience
+  const blockedEpisode = {
+    id: 'ce_escrt_blocked',
+    title: 'Blocked ESCRT Membrane Scission and Endosomal Swelling Episode',
+    diagnosisCode: 'E75.2',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'diagnosis', status: 'blocked', blockedReason: 'Awaiting high-voltage electron microscopy of endosomal buds and VPS4 ATPase activity assay' },
+    ],
+  }
+  const blockedBridge = deriveEdenEscrtMachineryBridge(blockedEpisode)
+  assert.equal(blockedBridge.escrtState, 'critical_escrt_scission_blockade_endosomal_swelling')
+  assert.equal(blockedBridge.escrtStateLabel, 'Blokade Pemotongan Membran ESCRT Kritis & Pembengkakan Vakuola Endosomal')
+  assert.equal(blockedBridge.escrtTier, 'critical_multivesicular_collapse_exosome_failure')
+  assert.equal(blockedBridge.escrtTierLabel, 'Kegagalan Kolaps Multivesikular & Hambatan Pelepasan Eksosom Regeneratif')
+  assert.ok(blockedBridge.membraneScissionIndex <= 65)
+  assert.ok(blockedBridge.receptorClearanceRate <= 63)
+  assert.ok(blockedBridge.exosomalRegenerationMargin <= 62)
+  assert.equal(blockedBridge.escrtNodes.every((n) => n.membraneScissionStatus === 'budding_arrest_stress'), true)
+
+  // 3. Rollup in evaluateCareJourneyContinuity
+  const projection = evaluateCareJourneyContinuity([sampleEpisode, blockedEpisode], evaluatedAt)
+  assert.equal(projection.edenEscrtMachineryReadyCount, 2)
+  assert.ok(projection.episodes[0].edenEscrtMachinery)
+  assert.equal(projection.episodes[0].edenEscrtMachinery.truthClass, 'escrt_membrane_scission_simulation_proxy')
+  assert.equal(projection.episodes[0].edenEscrtMachinery.patientTruthUncompromised, true)
+  assert.equal(projection.episodes[0].edenEscrtMachinery.neverManufacturesBiomarkers, true)
+
+  // 4. UI contracts
+  const panelSource = read('src/domains/clinical-operations/ui/CareContinuityPanel.tsx')
+  assert.ok(panelSource.includes('data-eden-escrt="v1"'), 'CareContinuityPanel must include ESCRT attribute')
+
+  const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
+  assert.ok(episodeSource.includes('data-eden-escrt-card="v1"'), 'CareEpisode must include ESCRT card')
+  assert.ok(episodeSource.includes('data-eden-escrt-nodes="v1"'), 'CareEpisode must include ESCRT nodes grid')
 })

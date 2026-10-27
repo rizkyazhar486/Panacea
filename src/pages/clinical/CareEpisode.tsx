@@ -50,6 +50,7 @@ import {
   deriveEdenMitochondrialEtcBridge,
   deriveEdenOrganelleContactBridge,
   deriveEdenNuclearLaminBridge,
+  deriveEdenEscrtMachineryBridge,
   EdenLongitudinalInsightSection,
 } from '../../domains/clinical-operations'
 import {
@@ -749,6 +750,9 @@ function EpisodeCard({
 
       {/* Eden Nuclear Lamin A/C & Nuclear Envelope Mechanotransduction Synthesizer (T-CLIN-63 / EDEN-42) */}
       <EdenNuclearLaminSection episode={episode} />
+
+      {/* Eden Endosomal Sorting Complex Required for Transport (ESCRT-I/II/III) & Membrane Scission Synthesizer (T-CLIN-64 / EDEN-43) */}
+      <EdenEscrtMachinerySection episode={episode} />
     </Card>
   )
 }
@@ -5514,6 +5518,128 @@ function EdenNuclearLaminSection({ episode }: { episode: CareEpisode }) {
 
       <div className="mt-2 text-[10px] text-neutral-500 dark:text-white/50 text-right">
         ARGON EDEN ∞ §13 · Nuclear Lamin A/C & Mechanotransduction Synthesizer · Patient Truth Uncompromised · Never Manufactures Biomarkers
+      </div>
+    </div>
+  )
+}
+
+function EdenEscrtMachinerySection({ episode }: { episode: CareEpisode }) {
+  const [lang, setLang] = useState<'id' | 'en'>('id')
+
+  const bridge = useMemo(
+    () => deriveEdenEscrtMachineryBridge(episode),
+    [episode]
+  )
+
+  const narrative = lang === 'id' ? bridge.escrtNarrativeId : bridge.escrtNarrativeEn
+
+  return (
+    <div
+      className="mt-3 rounded-xl border border-cyan-200 dark:border-white/10 bg-cyan-50/30 dark:bg-white/[0.02] p-3.5"
+      data-eden-escrt-card="v1"
+    >
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+        <div>
+          <div className="flex items-center gap-2 flex-wrap">
+            <h4 className="text-xs font-bold text-neutral-900 dark:text-white">
+              {lang === 'id'
+                ? 'Kompleks Pemotongan Membran ESCRT-I/II/III & Biogenesis Badan Multivesikular (MVB)'
+                : 'ESCRT Membrane Scission & Multivesicular Body Biogenesis Synthesizer'}
+            </h4>
+            <span className="rounded-full bg-cyan-100 dark:bg-white/10 px-2 py-0.5 text-[10px] font-bold text-cyan-800 dark:text-cyan-300">
+              {bridge.escrtStateLabel}
+            </span>
+          </div>
+          <p className="mt-0.5 text-[11px] text-neutral-600 dark:text-white/70">
+            {bridge.escrtTierLabel}
+          </p>
+        </div>
+        <div className="flex items-center gap-2 self-start sm:self-auto">
+          <div className="flex rounded-md border border-cyan-200 dark:border-white/10 p-0.5 text-[10px]">
+            <button
+              type="button"
+              onClick={() => setLang('id')}
+              className={`px-1.5 py-0.5 rounded ${lang === 'id' ? 'bg-cyan-600 text-white font-bold' : 'text-neutral-600 dark:text-white/60'}`}
+            >
+              ID
+            </button>
+            <button
+              type="button"
+              onClick={() => setLang('en')}
+              className={`px-1.5 py-0.5 rounded ${lang === 'en' ? 'bg-cyan-600 text-white font-bold' : 'text-neutral-600 dark:text-white/60'}`}
+            >
+              EN
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-2.5 grid grid-cols-1 sm:grid-cols-3 gap-2">
+        <div className="rounded-lg bg-cyan-100/40 dark:bg-white/[0.03] p-2 text-center">
+          <span className="text-[10px] text-neutral-500 dark:text-white/60 block">
+            {lang === 'id' ? 'Indeks Pemotongan Membran' : 'Membrane Scission Index'}
+          </span>
+          <span className="text-sm font-extrabold text-cyan-700 dark:text-cyan-400">
+            {bridge.membraneScissionIndex}%
+          </span>
+        </div>
+        <div className="rounded-lg bg-cyan-100/40 dark:bg-white/[0.03] p-2 text-center">
+          <span className="text-[10px] text-neutral-500 dark:text-white/60 block">
+            {lang === 'id' ? 'Laju Pembersihan Reseptor' : 'Receptor Clearance Rate'}
+          </span>
+          <span className="text-sm font-extrabold text-cyan-700 dark:text-cyan-400">
+            {bridge.receptorClearanceRate}%
+          </span>
+        </div>
+        <div className="rounded-lg bg-cyan-100/40 dark:bg-white/[0.03] p-2 text-center">
+          <span className="text-[10px] text-neutral-500 dark:text-white/60 block">
+            {lang === 'id' ? 'Ambang Regenerasi Eksosomal' : 'Exosomal Regeneration Margin'}
+          </span>
+          <span className="text-sm font-extrabold text-cyan-700 dark:text-cyan-400">
+            {bridge.exosomalRegenerationMargin}%
+          </span>
+        </div>
+      </div>
+
+      <p className="mt-2 text-xs text-neutral-700 dark:text-white/80 leading-relaxed">
+        {narrative}
+      </p>
+
+      <div className="mt-2.5 space-y-1.5" data-eden-escrt-nodes="v1">
+        <div className="text-[10px] font-bold text-neutral-500 dark:text-white/60 uppercase tracking-wider">
+          {lang === 'id' ? 'Nodus Mesin Pemotongan Membran ESCRT & Daur Ulang VPS4 (4 Nodus)' : 'ESCRT Membrane Scission Machinery & VPS4 Recycling Nodes (4 Nodes)'}
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-1.5">
+          {bridge.escrtNodes.map((node) => (
+            <div
+              key={node.nodeKind}
+              className="rounded-lg border border-cyan-200/50 dark:border-white/10 bg-white/60 dark:bg-white/[0.02] p-2 text-xs"
+            >
+              <div className="flex items-center justify-between gap-1">
+                <span className="font-bold text-neutral-800 dark:text-white truncate">
+                  {node.nodeLabel}
+                </span>
+                <span className="text-[10px] font-bold text-cyan-700 dark:text-cyan-300">
+                  {Math.round(node.scissionEfficiencyScore * 100)}%
+                </span>
+              </div>
+              <div className="mt-0.5 text-[10px] text-neutral-500 dark:text-white/60">
+                {node.mechanisticNote}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="mt-2.5 rounded-lg border border-cyan-200/40 dark:border-white/10 bg-cyan-100/30 dark:bg-white/[0.02] p-2.5 text-xs space-y-1">
+        <div className="text-[11px] text-neutral-800 dark:text-white/85">
+          <b>{lang === 'id' ? 'Strategi Longevitas Dinamika Membran & Penambalan Vesikular:' : 'Membrane Dynamics Longevity & Vesicular Repair Strategy:'}</b>{' '}
+          {bridge.escrtLongevityStrategy}
+        </div>
+      </div>
+
+      <div className="mt-2 text-[10px] text-neutral-500 dark:text-white/50 text-right">
+        ARGON EDEN ∞ §14 · ESCRT Membrane Scission & MVB Biogenesis Synthesizer · Patient Truth Uncompromised · Never Manufactures Biomarkers
       </div>
     </div>
   )
