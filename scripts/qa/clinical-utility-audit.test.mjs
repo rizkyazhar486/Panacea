@@ -15,8 +15,8 @@ test('CLINICAL_UTILITY_AUDIT.json: schema validity and completeness', () => {
 
   assert.equal(payload.schemaVersion, '1.0.0')
   assert.equal(payload.governanceStandard, 'PANACEAMED_CLINICAL_REALITY_V1')
-  assert.equal(payload.summary.totalModulesAudited, 80)
-  assert.equal(payload.modules.length, 80)
+  assert.equal(payload.summary.totalModulesAudited, 85)
+  assert.equal(payload.modules.length, 85)
 
   const allowedCategories = new Set([
     'A_DIRECT_CLINICAL_WORKFLOW',
