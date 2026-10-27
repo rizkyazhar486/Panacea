@@ -18,14 +18,33 @@ import {
   calculateFerroAgingKinetics,
   calculateBiologicalAgingClock,
 } from '../../lib/discovery/frontierComputationalEngines'
-import type { FrontierResearchStudyRecord } from '../../lib/discovery/frontierBiomedicalTypes'
+import {
+  calculateQuantumProtonTunneling,
+  calculateRadicalPairSpinDynamics,
+} from '../../lib/discovery/quantumBiologyBiophysicsEngine'
+import {
+  EURASIAN_CELL_ATLAS_CATALOG,
+  buildEurasianLineageGraph,
+} from '../../lib/discovery/eurasianCellAtlasFederation'
+import {
+  GAME_MISSIONS,
+  evaluateGameSimulationStep,
+} from '../../lib/discovery/immersiveLifeScienceSandboxEngine'
+import {
+  NEUROETHICAL_CANONICAL_PRINCIPLES,
+  screenDualUseAndNeuroethics,
+} from '../../lib/discovery/dualUseNeuroethicsKernel'
+import type {
+  FrontierResearchStudyRecord,
+  GameMissionId,
+} from '../../lib/discovery/frontierBiomedicalTypes'
 
 export function FrontierBiomedicalResearchPanel() {
   const [activeTClinId, setActiveTClinId] = useState<string>('T-CLIN-65')
   const [organQuery, setOrganQuery] = useState<string>('Heart')
   const [markerQuery, setMarkerQuery] = useState<string>('ACSL4')
 
-  // Simulator states
+  // Simulator states (Tracks A, B, D, E)
   const [bciIntention, setBciIntention] = useState<'rest' | 'hand_grasp' | 'hand_open'>('hand_grasp')
   const [bciSnr, setBciSnr] = useState<number>(12.0)
 
@@ -38,6 +57,24 @@ export function FrontierBiomedicalResearchPanel() {
 
   const [clockChrono, setClockChrono] = useState<number>(58)
   const [clockBio, setClockBio] = useState<number>(53.4)
+
+  // Track H: Quantum Tunneling State
+  const [quantumWidth, setQuantumWidth] = useState<number>(0.55)
+  const [quantumHeight, setQuantumHeight] = useState<number>(0.42)
+  const [quantumIsotope, setQuantumIsotope] = useState<'H' | 'D'>('H')
+
+  // Track J: Gamified Simulation Lab State
+  const [activeMissionId, setActiveMissionId] = useState<GameMissionId>('mission_cardiac_syncytium')
+  const [gameStepCount, setGameStepCount] = useState<number>(0)
+  const [gameParams, setGameParams] = useState<Record<string, number>>({
+    graftDoseMillions: 45,
+    connexin43Coupling: 0.65,
+    actionPotentialDuration: 310,
+  })
+
+  // Track K: Dual-Use Screening State
+  const [durcTestDirectNeuralControl, setDurcTestDirectNeuralControl] = useState<boolean>(false)
+  const [durcTestPathogenToxin, setDurcTestPathogenToxin] = useState<boolean>(false)
 
   const activeStudy: FrontierResearchStudyRecord = useMemo(() => {
     return getFrontierStudyByTClinId(activeTClinId) || FRONTIER_RESEARCH_REGISTRY[0]
@@ -94,21 +131,64 @@ export function FrontierBiomedicalResearchPanel() {
     })
   }, [clockChrono, clockBio])
 
-  const sampleLineage = useMemo(() => {
-    return getHierarchicalAtlasLineage('Heart', 'Cardiomyocyte')
+  const quantumTunnelingResult = useMemo(() => {
+    return calculateQuantumProtonTunneling({
+      barrierWidthAngstroms: quantumWidth,
+      barrierHeightElectronVolts: quantumHeight,
+      temperatureKelvin: 310.15,
+      isotope: quantumIsotope,
+      activeSite: 'mitochondrial_complex_I',
+    })
+  }, [quantumWidth, quantumHeight, quantumIsotope])
+
+  const eurasianLineage = useMemo(() => {
+    return buildEurasianLineageGraph()
   }, [])
+
+  const currentMission = useMemo(() => {
+    return GAME_MISSIONS.find((m) => m.id === activeMissionId) || GAME_MISSIONS[0]
+  }, [activeMissionId])
+
+  const gameChallengeState = useMemo(() => {
+    return evaluateGameSimulationStep(activeMissionId, gameParams, gameStepCount)
+  }, [activeMissionId, gameParams, gameStepCount])
+
+  const durcScreeningReport = useMemo(() => {
+    return screenDualUseAndNeuroethics({
+      proposedResearchTitle: 'Multiscale Translational Neuroprosthetic & Senolytic Platform',
+      domain: 'neurotechnology',
+      involvesDirectNeuralRead: true,
+      involvesDirectNeuralStimulationOrControl: durcTestDirectNeuralControl,
+      involvesAutonomousDeviceActuation: false,
+      involvesPathogenEnhancementOrToxinEngineering: durcTestPathogenToxin,
+      involvesNonConsensualIntervention: false,
+    })
+  }, [durcTestDirectNeuralControl, durcTestPathogenToxin])
+
+  const handleMissionSelect = (id: GameMissionId) => {
+    setActiveMissionId(id)
+    const m = GAME_MISSIONS.find((item) => item.id === id)
+    if (m) {
+      const defaults: Record<string, number> = {}
+      for (const p of m.keyParameters) {
+        defaults[p.id] = p.defaultValue
+      }
+      setGameParams(defaults)
+      setGameStepCount(0)
+    }
+  }
 
   return (
     <div
       className="space-y-6 rounded-2xl border border-white/10 bg-slate-950/80 p-4 sm:p-6 text-white"
-      data-frontier-research-panel="v1"
+      data-frontier-research-panel="v2"
     >
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-white/10 pb-4">
         <div>
           <div className="flex items-center gap-2">
             <span className="rounded-full bg-cyan-500/20 px-2.5 py-0.5 text-xs font-bold text-cyan-400">
-              INVICTUS OMEGA · T-CLIN-65 → T-CLIN-71
+              INVICTUS OMEGA · T-CLIN-65 → T-CLIN-75
             </span>
             <span className="text-xs text-white/50">Scientific Cutoff: 27 October 2026</span>
           </div>
@@ -116,205 +196,342 @@ export function FrontierBiomedicalResearchPanel() {
             Frontier Biomedical Discovery & Multiscale Simulation Engine
           </h2>
           <p className="text-xs text-white/60">
-            Integrating Chinese and international translational research into PanaceaMed’s computational human platform.
+            Integrating Chinese, Eurasian, and international translational research into PanaceaMed’s computational human platform.
           </p>
         </div>
-        <div className="text-right text-[11px] text-white/50 space-y-0.5">
-          <div>hECA v2.0: {(TOTAL_HECA_V2_CELL_COUNT / 1e6).toFixed(2)}M cells ({TOTAL_HECA_V2_ORGANS_COUNT} organs)</div>
-          <div>CIMA 2026: {(TOTAL_CIMA_2026_CELL_COUNT / 1e6).toFixed(0)}M immune profiles (428 adults)</div>
+        <div className="flex items-center gap-3">
+          <div className="text-right">
+            <div className="text-xs font-bold text-emerald-400">11 Active Research Tracks</div>
+            <div className="text-[10px] text-white/50">32.8M+ Harmonized Cells · 42 Organs</div>
+          </div>
         </div>
       </div>
 
-      {/* Track Selector Ribbon */}
-      <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-none">
+      {/* Track Selection Ribbon */}
+      <div className="flex flex-wrap gap-1.5 border-b border-white/5 pb-3">
         {FRONTIER_RESEARCH_REGISTRY.map((study) => {
           const isSelected = study.tClinId === activeTClinId
           return (
             <button
               key={study.tClinId}
-              type="button"
               onClick={() => setActiveTClinId(study.tClinId)}
-              className={`flex-shrink-0 rounded-xl px-3 py-2 text-left transition-all ${
+              className={`rounded-lg px-3 py-1.5 text-xs font-bold transition-all ${
                 isSelected
-                  ? 'border border-cyan-400 bg-cyan-950/60 text-white shadow-lg shadow-cyan-950/50'
-                  : 'border border-white/5 bg-white/[0.02] text-white/60 hover:border-white/20 hover:text-white'
+                  ? 'bg-cyan-500 text-black shadow-lg shadow-cyan-500/20'
+                  : 'bg-white/5 text-white/70 hover:bg-white/10 hover:text-white'
               }`}
             >
-              <div className="flex items-center gap-2">
-                <span className="text-[10px] font-bold uppercase text-cyan-300">
-                  {study.tClinId}
-                </span>
-                <span className="rounded bg-white/10 px-1 py-0.2 text-[9px] text-white/70">
-                  {study.evidenceStage}
-                </span>
-              </div>
-              <div className="text-xs font-semibold truncate max-w-[190px]">
-                {study.shortLabel}
-              </div>
+              <span className="font-mono">{study.tClinId}</span>: {study.title.split(':')[0]}
             </button>
           )
         })}
       </div>
 
-      {/* Active Study Dossier Card */}
+      {/* Section 1: Active Study Dossier */}
       <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4 space-y-3">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/5 pb-2">
           <div>
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-sm font-bold text-white">{activeStudy.title}</span>
-              <span className="rounded-md bg-emerald-500/20 px-2 py-0.5 text-[10px] font-bold text-emerald-300">
-                Stage: {activeStudy.claimLedgerStage}
-              </span>
-              <span className="rounded-md bg-indigo-500/20 px-2 py-0.5 text-[10px] font-bold text-indigo-300">
-                Policy: {activeStudy.datasetAccessPolicy}
-              </span>
-            </div>
-            <div className="mt-1 text-xs text-white/70">
-              <b>Primary Precedent:</b> {activeStudy.primaryPrecedent} ({activeStudy.publicationYear})
-              {activeStudy.primaryDoi && <span className="ml-2 text-cyan-300">DOI: {activeStudy.primaryDoi}</span>}
-              {activeStudy.clinicalTrialId && <span className="ml-2 text-amber-300">NCT: {activeStudy.clinicalTrialId}</span>}
-            </div>
+            <span className="text-[10px] font-mono uppercase tracking-wider text-cyan-400">
+              {activeStudy.trackId} · Stage {activeStudy.evidenceStage}
+            </span>
+            <h3 className="text-sm font-bold text-white">{activeStudy.title}</h3>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="rounded bg-white/10 px-2 py-0.5 text-[10px] font-bold text-white">
+              {activeStudy.claimLedgerStage}
+            </span>
+            <span
+              className={`rounded px-2 py-0.5 text-[10px] font-bold ${
+                activeStudy.datasetAccessPolicy === 'public_open_access'
+                  ? 'bg-emerald-950 text-emerald-300'
+                  : activeStudy.datasetAccessPolicy === 'controlled_access_dac_required'
+                  ? 'bg-amber-950 text-amber-300'
+                  : 'bg-neutral-800 text-neutral-300'
+              }`}
+            >
+              {activeStudy.datasetAccessPolicy}
+            </span>
           </div>
         </div>
 
-        {/* Falsifiable Hypothesis & Question */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
-          <div className="rounded-lg bg-black/40 p-3 text-xs space-y-1">
-            <div className="font-bold text-cyan-300 uppercase text-[10px] tracking-wider">
-              Scientific Question
-            </div>
-            <div className="text-white/80">{activeStudy.scientificQuestion}</div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+          <div>
+            <span className="font-bold text-white/50">Primary Precedent:</span>
+            <p className="mt-0.5 text-white/90">{activeStudy.primaryPrecedent}</p>
+            {activeStudy.primaryDoi && (
+              <p className="mt-1 font-mono text-[11px] text-cyan-400">DOI: {activeStudy.primaryDoi}</p>
+            )}
+            {activeStudy.pmid && (
+              <p className="font-mono text-[11px] text-emerald-400">PMID: {activeStudy.pmid}</p>
+            )}
+            {activeStudy.clinicalTrialId && (
+              <p className="font-mono text-[11px] text-amber-400">ClinicalTrials.gov: {activeStudy.clinicalTrialId}</p>
+            )}
           </div>
-          <div className="rounded-lg bg-black/40 p-3 text-xs space-y-1">
-            <div className="font-bold text-emerald-300 uppercase text-[10px] tracking-wider">
-              Falsifiable Hypothesis
-            </div>
-            <div className="text-white/80">{activeStudy.falsifiableHypothesis}</div>
+          <div>
+            <span className="font-bold text-white/50">Scientific Question:</span>
+            <p className="mt-0.5 text-white/90">{activeStudy.scientificQuestion}</p>
           </div>
         </div>
 
-        {/* Erratum Notice if Applicable (e.g. Track D) */}
-        {activeStudy.hasErratum && activeStudy.errata && (
-          <div className="rounded-lg border border-amber-500/40 bg-amber-950/30 p-3 text-xs space-y-1 text-amber-200">
-            <div className="flex items-center gap-2 font-bold text-amber-300">
-              <span>⚠️ Published Scientific Erratum Accounted For</span>
-              <span className="text-[10px] text-white/60">DOI: {activeStudy.errata[0].doi}</span>
-            </div>
-            <div>{activeStudy.errata[0].description}</div>
-            <div className="text-[11px] text-amber-100 font-mono mt-1">
-              Impact: {activeStudy.errata[0].parameterImpact}
-            </div>
-          </div>
-        )}
+        <div className="rounded-lg bg-black/40 p-3 text-xs space-y-2">
+          <div className="font-bold text-cyan-300">Falsifiable Hypothesis:</div>
+          <p className="text-white/80">{activeStudy.falsifiableHypothesis}</p>
+        </div>
 
-        {/* Endpoints & Limitations */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-          <div>
-            <div className="font-bold text-white/50 text-[10px] uppercase mb-1">
-              Key Endpoint Criteria ({activeStudy.endpointDefinitions.length})
-            </div>
-            <ul className="list-disc pl-4 space-y-0.5 text-white/70">
-              {activeStudy.endpointDefinitions.map((ep, i) => (
-                <li key={i}>{ep}</li>
+        {/* Known Limitations & Safety Boundaries */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2 text-xs">
+          <div className="rounded-lg border border-amber-500/20 bg-amber-950/10 p-3">
+            <span className="font-bold text-amber-400">Epistemic Limitations:</span>
+            <ul className="mt-1.5 list-disc list-inside space-y-1 text-white/70 text-[11px]">
+              {activeStudy.knownLimitations.map((lim, idx) => (
+                <li key={idx}>{lim}</li>
               ))}
             </ul>
           </div>
-          <div>
-            <div className="font-bold text-white/50 text-[10px] uppercase mb-1">
-              Safety Boundaries & Negative Limits
-            </div>
-            <ul className="list-disc pl-4 space-y-0.5 text-white/70">
-              {activeStudy.safetyBoundaries.map((sb, i) => (
-                <li key={i}>{sb}</li>
+          <div className="rounded-lg border border-rose-500/20 bg-rose-950/10 p-3">
+            <span className="font-bold text-rose-400">Safety & Governance Boundaries:</span>
+            <ul className="mt-1.5 list-disc list-inside space-y-1 text-white/70 text-[11px]">
+              {activeStudy.safetyBoundaries.map((bnd, idx) => (
+                <li key={idx}>{bnd}</li>
               ))}
             </ul>
           </div>
         </div>
       </div>
 
-      {/* Section 2: Multiscale Human Cellular Reference Explorer (hECA & CIMA) */}
+      {/* Section 2: Multiscale Human Cellular Reference Explorer (hECA, CIMA & Eurasian Federation) */}
       <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4 space-y-3">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/5 pb-2">
           <div>
             <h3 className="text-sm font-bold text-white">
-              Multiscale Cellular Atlas Navigator (hECA v2.0 & CIMA 2026)
+              Multiscale Cellular Atlas Navigator (hECA v2.0, CIMA 2026 & Eurasian Federation)
             </h3>
             <p className="text-xs text-white/60">
-              Hierarchical whole-body reference with Cell Ontology (CL) harmonization and dataset access governance.
+              Hierarchical whole-body reference with Cell Ontology (CL) harmonization, empirical lineage verification, and DAC dataset access governance.
             </p>
           </div>
+          <div className="flex items-center gap-2 text-xs font-mono">
+            <span className="rounded bg-cyan-950 px-2 py-0.5 text-cyan-300">
+              {TOTAL_HECA_V2_ORGANS_COUNT} Organs
+            </span>
+            <span className="rounded bg-emerald-950 px-2 py-0.5 text-emerald-300">
+              {TOTAL_HECA_V2_CELL_COUNT} hECA
+            </span>
+            <span className="rounded bg-purple-950 px-2 py-0.5 text-purple-300">
+              {TOTAL_CIMA_2026_CELL_COUNT} CIMA
+            </span>
+          </div>
+        </div>
+
+        {/* Query Controls */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
           <div className="flex items-center gap-2">
+            <label className="text-white/60">Search Organ:</label>
             <input
               type="text"
               value={organQuery}
               onChange={(e) => setOrganQuery(e.target.value)}
-              placeholder="Search organ..."
-              className="rounded-lg border border-white/10 bg-black/50 px-2.5 py-1 text-xs text-white focus:outline-none focus:border-cyan-400"
+              placeholder="e.g. Heart, Brain, Immune"
+              className="dark rounded-lg border border-white/10 bg-black/50 px-2.5 py-1 text-xs text-white focus:outline-none focus:border-cyan-400"
             />
+          </div>
+          <div className="flex items-center gap-2">
+            <label className="text-white/60">Search Marker:</label>
             <input
               type="text"
               value={markerQuery}
               onChange={(e) => setMarkerQuery(e.target.value)}
-              placeholder="Marker (e.g. ACSL4)..."
-              className="rounded-lg border border-white/10 bg-black/50 px-2.5 py-1 text-xs text-white focus:outline-none focus:border-cyan-400"
+              placeholder="e.g. ACSL4, FOXO3, TNNT2"
+              className="dark rounded-lg border border-white/10 bg-black/50 px-2.5 py-1 text-xs text-white focus:outline-none focus:border-cyan-400"
             />
           </div>
         </div>
 
-        {/* Canonical Hierarchy Breadcrumb */}
-        <div className="rounded-lg bg-black/40 p-2.5 text-xs">
-          <div className="text-[10px] font-bold uppercase text-white/40 mb-1">
-            Canonical Scale Hierarchy (Whole Body → Organ → Cell → Pathway → Genome)
+        {/* Eurasian Lineage Graph Preview */}
+        <div className="rounded-lg bg-black/30 p-3 space-y-2">
+          <div className="flex items-center justify-between text-xs">
+            <span className="font-bold text-cyan-400">Federated Developmental Lineage Graph (T-CLIN-73)</span>
+            <span className="text-[10px] text-white/40">Cluster similarity ≠ developmental descent</span>
           </div>
-          <div className="flex flex-wrap items-center gap-1.5 text-[11px]">
-            {sampleLineage.map((lvl, idx) => (
-              <React.Fragment key={lvl.scale}>
-                <span className="rounded bg-white/5 px-2 py-0.5 text-cyan-300 font-mono">
-                  {lvl.scale}: <b>{lvl.name}</b>
-                </span>
-                {idx < sampleLineage.length - 1 && <span className="text-white/30">→</span>}
-              </React.Fragment>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
+            {eurasianLineage.nodes.slice(0, 6).map((node) => (
+              <div key={node.id} className="rounded-lg border border-white/10 bg-white/[0.03] p-2 space-y-1">
+                <div className="flex items-center justify-between">
+                  <span className="font-mono text-[10px] text-cyan-300">{node.clId}</span>
+                  <span className={`text-[9px] px-1 rounded ${node.empiricalLineageTracingEvidence ? 'bg-emerald-950 text-emerald-300' : 'bg-amber-950 text-amber-300'}`}>
+                    {node.empiricalLineageTracingEvidence ? 'Barcode Verified' : 'Cluster Proxy'}
+                  </span>
+                </div>
+                <div className="font-bold text-white text-[11px] truncate">{node.name}</div>
+                <div className="text-[10px] text-white/50">{node.organ} · {node.potency}</div>
+              </div>
             ))}
           </div>
         </div>
+      </div>
 
-        {/* Atlas Query Results Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-          {organSearchResult.matchedNodes.slice(0, 4).map((node) => (
-            <div
-              key={node.cellOntologyId}
-              className="rounded-lg border border-white/5 bg-white/[0.015] p-2.5 text-xs space-y-1"
-            >
-              <div className="flex items-center justify-between">
-                <span className="font-bold text-white">{node.cellTypeName}</span>
-                <span className="rounded bg-cyan-500/10 px-1.5 py-0.5 text-[10px] text-cyan-300 font-mono">
-                  {node.cellOntologyId}
-                </span>
-              </div>
-              <div className="text-[11px] text-white/60">
-                {node.organName} · {node.tissueName} ({node.sourceAtlas})
-              </div>
-              <div className="text-[11px] text-emerald-300 font-mono truncate">
-                Markers: {node.rnaExpressionMarkers.join(', ')}
-              </div>
-              <div className="text-[10px] text-white/40">
-                Profiles: {node.singleCellProfileCount.toLocaleString()} · Access: {node.accessPolicy}
-              </div>
+      {/* Section 3: Interactive Life-Science Discovery Sandbox & Gamified Mission Lab (T-CLIN-74) */}
+      <div className="rounded-xl border border-cyan-500/30 bg-cyan-950/10 p-4 space-y-3">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-cyan-500/20 pb-2">
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="rounded bg-cyan-500/20 px-2 py-0.5 text-[10px] font-bold text-cyan-300 uppercase">
+                Gamified Life Science Lab · T-CLIN-74
+              </span>
+              <span className="text-[10px] text-white/50">Tactile Interactive Learning</span>
             </div>
+            <h3 className="text-sm font-bold text-white mt-1">
+              {currentMission.title}
+            </h3>
+            <p className="text-xs text-white/70">{currentMission.description}</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className={`rounded px-2.5 py-1 text-xs font-bold ${
+              gameChallengeState.targetAchieved ? 'bg-emerald-900 text-emerald-200' : 'bg-cyan-900 text-cyan-200'
+            }`}>
+              Score: {gameChallengeState.score}/100 · Stability: {(gameChallengeState.stabilityIndex * 100).toFixed(0)}%
+            </span>
+          </div>
+        </div>
+
+        {/* Mission Tabs */}
+        <div className="flex flex-wrap gap-1.5">
+          {GAME_MISSIONS.map((m) => (
+            <button
+              key={m.id}
+              onClick={() => handleMissionSelect(m.id)}
+              className={`rounded px-2.5 py-1 text-xs font-bold transition-all ${
+                activeMissionId === m.id
+                  ? 'bg-cyan-400 text-black'
+                  : 'bg-white/5 text-white/70 hover:bg-white/10 hover:text-white'
+              }`}
+            >
+              {m.title.split(':')[0]}
+            </button>
           ))}
+        </div>
+
+        {/* Interactive Parameter Sliders */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs bg-black/40 p-3 rounded-lg">
+          {currentMission.keyParameters.map((param) => {
+            const val = gameParams[param.id] ?? param.defaultValue
+            return (
+              <div key={param.id} className="space-y-1">
+                <div className="flex justify-between text-[11px]">
+                  <span className="text-white/70">{param.label}</span>
+                  <span className="font-mono text-cyan-300">{val} {param.unit}</span>
+                </div>
+                <input
+                  type="range"
+                  min={param.min}
+                  max={param.max}
+                  step={(param.max - param.min) / 100}
+                  value={val}
+                  onChange={(e) => {
+                    const newVal = Number(e.target.value)
+                    setGameParams((prev) => ({ ...prev, [param.id]: newVal }))
+                    setGameStepCount((prev) => prev + 1)
+                  }}
+                  className="w-full accent-cyan-400 cursor-pointer"
+                />
+              </div>
+            )
+          })}
+        </div>
+
+        {/* Mission State & Reality Check Reminder */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+          <div className="rounded-lg bg-black/50 p-3 space-y-1.5 border border-white/5 font-mono">
+            <div className="text-cyan-300 font-bold">Simulation Step #{gameChallengeState.stepCount} · {gameChallengeState.loopState.toUpperCase()}</div>
+            <div className="text-white/90">{gameChallengeState.message}</div>
+            <div className="text-[11px] text-white/50">{gameChallengeState.educationalTakeaway}</div>
+          </div>
+          <div className="rounded-lg bg-amber-950/20 p-3 space-y-1.5 border border-amber-500/30">
+            <div className="text-amber-400 font-bold flex items-center gap-1.5">
+              <span>⚠️ Reality Check Reminder:</span>
+            </div>
+            <p className="text-[11px] text-white/80">{gameChallengeState.realityCheckReminder}</p>
+          </div>
         </div>
       </div>
 
-      {/* Section 3: Interactive Computational Simulators */}
+      {/* Section 4: Quantum Biology & Biophysical Tunneling Studio (T-CLIN-72) */}
+      <div className="rounded-xl border border-purple-500/30 bg-purple-950/10 p-4 space-y-3">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-purple-500/20 pb-2">
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="rounded bg-purple-500/20 px-2 py-0.5 text-[10px] font-bold text-purple-300 uppercase">
+                Quantum Biology Studio · T-CLIN-72
+              </span>
+              <span className="text-[10px] text-white/50">Sub-nanometer WKB Tunneling</span>
+            </div>
+            <h3 className="text-sm font-bold text-white mt-1">
+              Quantum Proton Tunneling & Kinetic Isotope Effect (KIE)
+            </h3>
+            <p className="text-xs text-white/70">
+              Evaluates non-Arrhenius enzymatic rate acceleration and deuterium isotope sensitivity in Complex I & DNA repair active sites.
+            </p>
+          </div>
+          <div className="flex items-center gap-2 text-xs">
+            <label className="text-white/60">Isotope:</label>
+            <button
+              onClick={() => setQuantumIsotope('H')}
+              className={`px-2 py-0.5 rounded text-xs font-bold ${quantumIsotope === 'H' ? 'bg-purple-500 text-black' : 'bg-white/10 text-white'}`}
+            >
+              1H (Proton)
+            </button>
+            <button
+              onClick={() => setQuantumIsotope('D')}
+              className={`px-2 py-0.5 rounded text-xs font-bold ${quantumIsotope === 'D' ? 'bg-purple-500 text-black' : 'bg-white/10 text-white'}`}
+            >
+              2H (Deuteron)
+            </button>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+          <div className="flex items-center gap-2">
+            <label className="text-white/60">H-Bond Barrier Width (Å):</label>
+            <input
+              type="number"
+              step="0.05"
+              value={quantumWidth}
+              onChange={(e) => setQuantumWidth(Number(e.target.value))}
+              className="dark w-20 rounded border border-white/10 bg-black px-2 py-1 text-xs text-white"
+            />
+          </div>
+          <div className="flex items-center gap-2">
+            <label className="text-white/60">Barrier Height (eV):</label>
+            <input
+              type="number"
+              step="0.05"
+              value={quantumHeight}
+              onChange={(e) => setQuantumHeight(Number(e.target.value))}
+              className="dark w-20 rounded border border-white/10 bg-black px-2 py-1 text-xs text-white"
+            />
+          </div>
+        </div>
+
+        <div className="rounded-lg bg-black/40 p-3 text-xs space-y-1 font-mono">
+          <div>Transmission Probability: <b className="text-purple-300">{quantumTunnelingResult.transmissionProbability}</b></div>
+          <div>Kinetic Isotope Effect (KIE = k_H/k_D): <b className="text-emerald-300">{quantumTunnelingResult.kineticIsotopeEffect}</b> (Classical upper bound is 1.41)</div>
+          <div>Rate Acceleration Factor: {quantumTunnelingResult.enzymaticRateAccelerationFactor}x · Decoherence Time: {quantumTunnelingResult.decoherenceTimeFemtoseconds} fs</div>
+          <div className="text-white/70">{quantumTunnelingResult.classicalArrheniusComparison}</div>
+          <div className="text-[10px] text-white/40">Microscopic biophysics proxy · Does not support macroscopic quantum healing claims</div>
+        </div>
+      </div>
+
+      {/* Section 5: Computational Simulators (Tracks A, B, D, E) */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* Simulator 1: NEO BCI Decoder */}
+        {/* Simulator 1: NEO BCI Engine */}
         <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4 space-y-2.5">
           <div className="flex items-center justify-between">
             <h4 className="text-xs font-bold uppercase tracking-wider text-cyan-300">
-              Track A · NEO Epidural BCI Decoder
+              Track A · NEO Epidural BCI Motor Decoder
             </h4>
             <span className="rounded bg-cyan-950 px-2 py-0.5 text-[10px] font-bold text-cyan-300">
-              Non-Actuated Simulation
+              NMPA Indication
             </span>
           </div>
           <div className="flex items-center gap-2 text-xs">
@@ -374,26 +591,27 @@ export function FrontierBiomedicalResearchPanel() {
                 type="checkbox"
                 checked={reviveArrhythmia}
                 onChange={(e) => setReviveArrhythmia(e.target.checked)}
+                className="accent-rose-500"
               />
-              <span>VT Event</span>
+              <span className="text-[11px] text-rose-300">Arrhythmia</span>
             </label>
           </div>
           <div className="rounded-lg bg-black/40 p-2.5 text-xs space-y-1 font-mono">
-            <div>Delta 6MWD: <b className="text-amber-300">{reviveSimResult.delta6MwdMeters} m</b> (95% CI: [{reviveSimResult.confidenceInterval95Percent.join(', ')}])</div>
-            <div>Contrast vs Control: {reviveSimResult.treatmentContrastEstimatedMeters} m</div>
-            <div>Safety Status: <span className={reviveArrhythmia ? 'text-red-400 font-bold' : 'text-emerald-300'}>{reviveSimResult.arrhythmiaSafetyStatus}</span></div>
-            <div className="text-[10px] text-white/40">Phase III investigational model · Not an approved therapy</div>
+            <div>Δ6MWD: <b className="text-emerald-300">+{reviveSimResult.delta6MwdMeters} m</b> (Contrast: +{reviveSimResult.treatmentContrastEstimatedMeters ?? 0} m)</div>
+            <div>Safety: {reviveSimResult.arrhythmiaSafetyStatus}</div>
+            <div>Phase: {reviveSimResult.trialPhase}</div>
+            <div className="text-[10px] text-white/40">Investigational Phase III model · Not approved for general clinical therapy</div>
           </div>
         </div>
 
-        {/* Simulator 3: ACSL4 Ferro-Aging Kinetics */}
+        {/* Simulator 3: ACSL4 Ferro-Aging Kinetics with 2026 Erratum */}
         <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4 space-y-2.5">
           <div className="flex items-center justify-between">
             <h4 className="text-xs font-bold uppercase tracking-wider text-rose-300">
-              Track D · ACSL4 Ferro-Aging (Erratum Corrected)
+              Track D · ACSL4 Ferro-Aging Engine
             </h4>
             <span className="rounded bg-rose-950 px-2 py-0.5 text-[10px] font-bold text-rose-300">
-              Aug 2026 Erratum Applied
+              Erratum-Corrected (2026)
             </span>
           </div>
           <div className="flex items-center gap-2 text-xs">
@@ -455,10 +673,66 @@ export function FrontierBiomedicalResearchPanel() {
         </div>
       </div>
 
+      {/* Section 6: Dual-Use Biosecurity & Neuroethical Governance Monitor (T-CLIN-75) */}
+      <div className="rounded-xl border border-rose-500/30 bg-rose-950/10 p-4 space-y-3">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-rose-500/20 pb-2">
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="rounded bg-rose-500/20 px-2 py-0.5 text-[10px] font-bold text-rose-300 uppercase">
+                Governance Kernel · T-CLIN-75
+              </span>
+              <span className="text-[10px] text-white/50">Fail-Closed Invariants</span>
+            </div>
+            <h3 className="text-sm font-bold text-white mt-1">
+              Dual-Use Biosecurity & Neuroethical Governance Monitor
+            </h3>
+            <p className="text-xs text-white/70">
+              Guarantees translational therapeutic harnessing while permanently blocking coercive neuro-control and biological weaponization.
+            </p>
+          </div>
+          <div>
+            <span className={`rounded px-2.5 py-1 text-xs font-bold ${
+              durcScreeningReport.isPermitted ? 'bg-emerald-900 text-emerald-200' : 'bg-rose-900 text-rose-200'
+            }`}>
+              {durcScreeningReport.governanceDecision}
+            </span>
+          </div>
+        </div>
+
+        {/* Interactive Negative Control Probe */}
+        <div className="flex flex-wrap items-center gap-4 text-xs bg-black/40 p-3 rounded-lg">
+          <span className="font-bold text-white/70">Test Negative Control Probes:</span>
+          <label className="flex items-center gap-1.5 cursor-pointer text-white/80">
+            <input
+              type="checkbox"
+              checked={durcTestDirectNeuralControl}
+              onChange={(e) => setDurcTestDirectNeuralControl(e.target.checked)}
+              className="accent-rose-500"
+            />
+            <span>Simulate Coercive Neural Stimulation</span>
+          </label>
+          <label className="flex items-center gap-1.5 cursor-pointer text-white/80">
+            <input
+              type="checkbox"
+              checked={durcTestPathogenToxin}
+              onChange={(e) => setDurcTestPathogenToxin(e.target.checked)}
+              className="accent-rose-500"
+            />
+            <span>Simulate Pathogen/Toxin Synthesis</span>
+          </label>
+        </div>
+
+        <div className="rounded-lg bg-black/50 p-3 text-xs space-y-1 font-mono">
+          <div className="font-bold text-rose-300">Screening Status: {durcScreeningReport.reasons.join(' | ')}</div>
+          <div className="text-[11px] text-white/80">{durcScreeningReport.realityCheckSummary}</div>
+          <div className="text-[10px] text-white/40">China BCI Ethics 2024 & UNESCO Bioethics Aligned · Read-Only Assistive Interfaces Only</div>
+        </div>
+      </div>
+
       {/* Epistemic Footer */}
       <div className="border-t border-white/10 pt-3 flex flex-col sm:flex-row items-center justify-between text-[11px] text-white/50">
         <div>
-          PANACEAMED ∞ INVICTUS OMEGA · T-CLIN-65..71 · Grounded in Chinese & International Research Precedents
+          PANACEAMED ∞ INVICTUS OMEGA · T-CLIN-65..75 · Grounded in Chinese, Eurasian & International Research Precedents
         </div>
         <div className="font-mono text-cyan-400">
           truthClass: frontier_biomedical_research_proxy · patientTruthUncompromised

@@ -3,4 +3,8 @@ export * from './frontierResearchRegistry'
 export * from './humanEnsembleCellAtlasAdapter'
 export * from './frontierComputationalEngines'
 export * from './evidenceTranslationBridge'
+export * from './quantumBiologyBiophysicsEngine'
+export * from './eurasianCellAtlasFederation'
+export * from './immersiveLifeScienceSandboxEngine'
+export * from './dualUseNeuroethicsKernel'
 
