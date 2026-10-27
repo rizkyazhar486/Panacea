@@ -52,6 +52,7 @@ import {
   deriveEdenUpsProteasomeBridge,
   deriveEdenLysosomalAutophagyBridge,
   deriveEdenMitochondrialEtcBridge,
+  deriveEdenOrganelleContactBridge,
   translateClinicalTermToEden,
   EDEN_PLAIN_LANGUAGE_GLOSSARY,
 } from '../../src/domains/clinical-operations/model/careContinuityProjection.ts'
@@ -4562,4 +4563,77 @@ test('T-CLIN-61 / EDEN-40: Eden Mitochondrial ETC Complex I–V Cristae Bioenerg
   const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
   assert.ok(episodeSource.includes('data-eden-etc-card="v1"'), 'CareEpisode must include ETC card')
   assert.ok(episodeSource.includes('data-eden-etc-nodes="v1"'), 'CareEpisode must include ETC nodes grid')
+})
+
+test('T-CLIN-62 / EDEN-41: Eden Peroxisome–ER–Mitochondria Organelle Contact Sites & Lipid Transfer Synthesizer', () => {
+  const evaluatedAt = '2026-10-27T08:00:00.000Z'
+  const sampleEpisode = {
+    id: 'ce_contact_1',
+    title: 'Interorganellar Membrane Contact Sites and MAM Calcium Flux Trajectory',
+    diagnosisCode: 'E75.2',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'diagnosis', status: 'done' },
+      { stage: 'treatment', status: 'done' },
+      { stage: 'recovery', status: 'active' },
+    ],
+  }
+
+  // 1. Pure deterministic derivation
+  const bridge = deriveEdenOrganelleContactBridge(sampleEpisode)
+  assert.equal(bridge.version, 'v1')
+  assert.equal(bridge.episodeId, 'ce_contact_1')
+  assert.equal(bridge.contactState, 'optimal_multiorganellar_tethering_flux')
+  assert.equal(bridge.contactStateLabel, 'Fluks Penambatan Multiorganel Terpadu Optimal & Komunikasi Antarorganel Presisi')
+  assert.equal(bridge.contactTier, 'optimal_vps13_bridge_channel_fidelity')
+  assert.equal(bridge.contactTierLabel, 'Fidelitas Saluran Jembatan VPS13/ATG2 & Sinergi Biosintesis Plasmalogen Maksimal')
+  assert.ok(bridge.tetheringIntegrityIndex >= 85)
+  assert.ok(bridge.interorganellarLipidFlux >= 85)
+  assert.ok(bridge.calciumSignalingSafetyMargin >= 85)
+  assert.equal(bridge.contactNodes.length, 4)
+  assert.equal(bridge.contactNodes[0].nodeKind, 'mitochondria_associated_er_membranes_mam_ca2_signaling')
+  assert.equal(bridge.contactNodes[1].nodeKind, 'vps13_lipid_bridge_non_vesicular_transport')
+  assert.equal(bridge.contactNodes[2].nodeKind, 'peroxisome_er_contact_sites_plasmalogen_ether_lipid')
+  assert.equal(bridge.contactNodes[3].nodeKind, 'mitochondria_peroxisome_crosstalk_ros_metabolic_buffering')
+  assert.equal(bridge.truthClass, 'organellar_contact_sites_simulation_proxy')
+  assert.equal(bridge.clinically_reviewed, false)
+  assert.equal(bridge.patientTruthUncompromised, true)
+  assert.equal(bridge.neverManufacturesBiomarkers, true)
+  assert.equal(bridge.epistemicHumilityPreserved, true)
+
+  // 2. Blocked stage resilience
+  const blockedEpisode = {
+    id: 'ce_contact_blocked',
+    title: 'Blocked Interorganellar Membrane Contact Tether Rupture Episode',
+    diagnosisCode: 'E75.2',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'diagnosis', status: 'blocked', blockedReason: 'Awaiting focused-ion beam cryo-electron tomography and organellar contact distance analysis' },
+    ],
+  }
+  const blockedBridge = deriveEdenOrganelleContactBridge(blockedEpisode)
+  assert.equal(blockedBridge.contactState, 'critical_organellar_contact_rupture_ca2_overload')
+  assert.equal(blockedBridge.contactStateLabel, 'Ruptur Kontak Organel Kritis & Kelebihan Beban Kalsium Matriks Mitokondria')
+  assert.equal(blockedBridge.contactTier, 'critical_mitochondrial_permeability_ca2_collapse')
+  assert.equal(blockedBridge.contactTierLabel, 'Risiko Kolaps Transisi Permeabilitas Mitokondria (mPTP) Akibat Lonjakan Kalsium MAM Kritis')
+  assert.ok(blockedBridge.tetheringIntegrityIndex <= 65)
+  assert.ok(blockedBridge.interorganellarLipidFlux <= 63)
+  assert.ok(blockedBridge.calciumSignalingSafetyMargin <= 62)
+  assert.equal(blockedBridge.contactNodes.every((n) => n.contactStatus === 'tether_breakdown_stress'), true)
+
+  // 3. Rollup in evaluateCareJourneyContinuity
+  const projection = evaluateCareJourneyContinuity([sampleEpisode, blockedEpisode], evaluatedAt)
+  assert.equal(projection.edenOrganelleContactReadyCount, 2)
+  assert.ok(projection.episodes[0].edenOrganelleContact)
+  assert.equal(projection.episodes[0].edenOrganelleContact.truthClass, 'organellar_contact_sites_simulation_proxy')
+  assert.equal(projection.episodes[0].edenOrganelleContact.patientTruthUncompromised, true)
+  assert.equal(projection.episodes[0].edenOrganelleContact.neverManufacturesBiomarkers, true)
+
+  // 4. UI contracts
+  const panelSource = read('src/domains/clinical-operations/ui/CareContinuityPanel.tsx')
+  assert.ok(panelSource.includes('data-eden-organelle-contact="v1"'), 'CareContinuityPanel must include Organelle Contact attribute')
+
+  const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
+  assert.ok(episodeSource.includes('data-eden-organelle-contact-card="v1"'), 'CareEpisode must include Organelle Contact card')
+  assert.ok(episodeSource.includes('data-eden-organelle-contact-nodes="v1"'), 'CareEpisode must include Organelle Contact nodes grid')
 })

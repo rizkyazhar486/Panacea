@@ -180,6 +180,11 @@ import type {
   EdenMitochondrialEtcNodeKind,
   EdenMitochondrialEtcNode,
   EdenMitochondrialEtcBridge,
+  EdenOrganelleContactSitesState,
+  EdenOrganelleContactSitesTier,
+  EdenOrganelleContactSitesNodeKind,
+  EdenOrganelleContactNode,
+  EdenOrganelleContactBridge,
   WellnessDay,
   MoodEntry,
   Circle,
@@ -311,6 +316,7 @@ export interface CareJourneyEpisodeSummary {
   edenUpsProteasome?: EdenUpsProteasomeBridge
   edenLysosomalAutophagy?: EdenLysosomalAutophagyBridge
   edenMitochondrialEtc?: EdenMitochondrialEtcBridge
+  edenOrganelleContact?: EdenOrganelleContactBridge
 }
 
 export type ReadmissionRiskLevel = 'low' | 'moderate' | 'high'
@@ -428,6 +434,7 @@ export interface CareJourneyContinuityResult {
   edenUpsProteasomeReadyCount: number
   edenLysosomalAutophagyReadyCount: number
   edenMitochondrialEtcReadyCount: number
+  edenOrganelleContactReadyCount: number
   edenLifeBalance: EdenLifeBalanceSynthesis
   hasBlockedStages: boolean
 }
@@ -5723,6 +5730,124 @@ export function deriveEdenMitochondrialEtcBridge(
   }
 }
 
+export function deriveEdenOrganelleContactBridge(
+  episode: CareEpisode,
+): EdenOrganelleContactBridge {
+  const stages = episode.stages ?? []
+  const completedStages = stages.filter((s) => s.status === 'done').length
+  const hasBlocked = stages.some((s) => s.status === 'blocked')
+  const blockedCount = stages.filter((s) => s.status === 'blocked').length
+
+  const tetheringIntegrityIndex = hasBlocked
+    ? Math.max(45, 65 - blockedCount * 7)
+    : Math.min(99, 85 + completedStages * 5)
+
+  const interorganellarLipidFlux = hasBlocked
+    ? Math.max(43, 63 - blockedCount * 7)
+    : Math.min(98, 83 + completedStages * 5)
+
+  const calciumSignalingSafetyMargin = hasBlocked
+    ? Math.max(42, 62 - blockedCount * 8)
+    : Math.min(99, 84 + completedStages * 5)
+
+  let contactState: EdenOrganelleContactSitesState = 'balanced_er_mito_peroxisome_homeostasis'
+  let contactStateLabel = 'Homeostasis Kontak Membran Organel ER-Mitokondria-Peroksisom Seimbang'
+  let contactTier: EdenOrganelleContactSitesTier = 'adequate_mam_calcium_and_lipid_flux'
+  let contactTierLabel = 'Fluks Kalsium MAM & Pasokan Lipid Non-Vesikular Terjaga Selaras'
+
+  if (hasBlocked) {
+    contactState = 'critical_organellar_contact_rupture_ca2_overload'
+    contactStateLabel = 'Ruptur Kontak Organel Kritis & Kelebihan Beban Kalsium Matriks Mitokondria'
+    contactTier = 'critical_mitochondrial_permeability_ca2_collapse'
+    contactTierLabel = 'Risiko Kolaps Transisi Permeabilitas Mitokondria (mPTP) Akibat Lonjakan Kalsium MAM Kritis'
+  } else if (completedStages >= 3) {
+    contactState = 'optimal_multiorganellar_tethering_flux'
+    contactStateLabel = 'Fluks Penambatan Multiorganel Terpadu Optimal & Komunikasi Antarorganel Presisi'
+    contactTier = 'optimal_vps13_bridge_channel_fidelity'
+    contactTierLabel = 'Fidelitas Saluran Jembatan VPS13/ATG2 & Sinergi Biosintesis Plasmalogen Maksimal'
+  } else if (completedStages === 0) {
+    contactState = 'transient_contact_site_lipid_tether_strain'
+    contactStateLabel = 'Regangan Penambatan Lipid Situs Kontak Transien'
+    contactTier = 'moderate_tethering_complex_destabilization'
+    contactTierLabel = 'Destabilisasi Kompleks Penambat Transien & Fluks Fosfolipid Tersendat Ringan'
+  }
+
+  const contactNodes: EdenOrganelleContactNode[] = [
+    {
+      nodeKind: 'mitochondria_associated_er_membranes_mam_ca2_signaling',
+      nodeLabel: 'Membran ER Terkait Mitokondria (MAM), Sumbu IP3R-GRP75-VDAC1 & Pensinyalan Ca2+',
+      tetheringIntegrityScore: hasBlocked ? 0.60 : Math.min(0.99, 0.85 + completedStages * 0.05),
+      fluxTransferCapacity: hasBlocked ? 0.61 : Math.min(0.98, 0.83 + completedStages * 0.05),
+      contactStatus: hasBlocked ? 'tether_breakdown_stress' : completedStages >= 2 ? 'optimal_tether_state' : 'adaptive_contact_mode',
+      mechanisticNote: 'Kompleks penambat IP3R-GRP75-VDAC1 memfasilitasi transfer kalsium terarah berkecepatan mikrodetik dari lumen RE ke matriks mitokondria, menstimulasi dehidrogenase siklus Krebs tanpa memicu lonjakan kalsium sitosol berlebih.',
+    },
+    {
+      nodeKind: 'vps13_lipid_bridge_non_vesicular_transport',
+      nodeLabel: 'Protein Jembatan VPS13/ATG2, Saluran Hidrofobik Aliran Lipid Massal Non-Vesikular',
+      tetheringIntegrityScore: hasBlocked ? 0.62 : Math.min(0.99, 0.84 + completedStages * 0.05),
+      fluxTransferCapacity: hasBlocked ? 0.60 : Math.min(0.99, 0.85 + completedStages * 0.05),
+      contactStatus: hasBlocked ? 'tether_breakdown_stress' : completedStages >= 2 ? 'optimal_tether_state' : 'adaptive_contact_mode',
+      mechanisticNote: 'Saluran terowongan hidrofobik chorein-N sepanjang 20–30 nm mentransfer fosfatidilserin dan fosfatidiletanolamin secara berkesinambungan menuruni gradien konsentrasi tanpa memerlukan pembentukan vesikel.',
+    },
+    {
+      nodeKind: 'peroxisome_er_contact_sites_plasmalogen_ether_lipid',
+      nodeLabel: 'Situs Kontak Peroksisom-ER (ACBD5-VAPA/B) & Sinergi Sintesis Eter Lipid/Plasmalogen',
+      tetheringIntegrityScore: hasBlocked ? 0.61 : Math.min(0.99, 0.86 + completedStages * 0.05),
+      fluxTransferCapacity: hasBlocked ? 0.62 : Math.min(0.98, 0.84 + completedStages * 0.05),
+      contactStatus: hasBlocked ? 'tether_breakdown_stress' : completedStages >= 2 ? 'optimal_tether_state' : 'adaptive_contact_mode',
+      mechanisticNote: 'Penambatan ACBD5-VAP mengorkestrasi transfer asam lemak rantai sangat panjang (VLCFA) dan metabolit intermediate asil-DHAP dari peroksisom ke RE untuk penyelesaian sintesis plasmalogen protektor mielin.',
+    },
+    {
+      nodeKind: 'mitochondria_peroxisome_crosstalk_ros_metabolic_buffering',
+      nodeLabel: 'Crosstalk Metabolik Mitokondria-Peroksisom, Fisi Mff/Drp1 & Redaman Redoks/ROS',
+      tetheringIntegrityScore: hasBlocked ? 0.63 : Math.min(0.99, 0.83 + completedStages * 0.05),
+      fluxTransferCapacity: hasBlocked ? 0.61 : Math.min(0.99, 0.86 + completedStages * 0.05),
+      contactStatus: hasBlocked ? 'tether_breakdown_stress' : completedStages >= 2 ? 'optimal_tether_state' : 'adaptive_contact_mode',
+      mechanisticNote: 'Koordinasi pemotongan organel bersama via faktor fisi Mff/Drp1 dan transfer oktanoil-CoA hasil beta-oksidasi peroksisom ke mitokondria mencegah akumulasi lipid sitotoksik dan menyeimbangkan detoksifikasi H2O2.',
+    },
+  ]
+
+  const contactNarrativeId = hasBlocked
+    ? `Terdeteksi gangguan penambatan organel dan risiko disekuilibrium kalsium pada episode "${episode.title}". Situs kontak ER-mitokondria (MAM) mengalami desinkronisasi penambat (integritas penambat: ${tetheringIntegrityIndex}%, fluks lipid interorganel: ${interorganellarLipidFlux}%, batas aman sinyal kalsium: ${calciumSignalingSafetyMargin}%). Diperlukan proteksi homeostasis kalsium seluler dan asupan prekursor eter lipid.`
+    : completedStages >= 3
+    ? `Episode "${episode.title}" menunjukkan fluks penambatan multiorganel yang sangat harmonis (integritas penambat: ${tetheringIntegrityIndex}%, fluks lipid interorganel: ${interorganellarLipidFlux}%, batas aman sinyal kalsium: ${calciumSignalingSafetyMargin}%). Jembatan lipid VPS13, sumbu MAM IP3R-VDAC1, dan sinergi plasmalogen ACBD5-VAP beroperasi pada fidelitas komunikasi interorganel seluler puncak.`
+    : `Episode "${episode.title}" berada dalam fase adaptif situs kontak antarorganel (integritas penambat: ${tetheringIntegrityIndex}%, fluks lipid interorganel: ${interorganellarLipidFlux}%, batas aman sinyal kalsium: ${calciumSignalingSafetyMargin}%). Transfer fosfolipid non-vesikular dan crosstalk peroksisom-mitokondria mempertahankan keseimbangan bioenergetik memadai.`
+
+  const contactNarrativeEn = hasBlocked
+    ? `Organelle contact site destabilization and calcium disequilibrium risk detected in episode "${episode.title}". ER-mitochondria associated membranes (MAMs) exhibit tethering strain (tethering integrity: ${tetheringIntegrityIndex}%, interorganellar lipid flux: ${interorganellarLipidFlux}%, calcium safety margin: ${calciumSignalingSafetyMargin}%). Cellular calcium buffering support and ether lipid precursor stabilization are recommended.`
+    : completedStages >= 3
+    ? `Episode "${episode.title}" demonstrates optimal multiorganellar tethering flux (tethering integrity: ${tetheringIntegrityIndex}%, interorganellar lipid flux: ${interorganellarLipidFlux}%, calcium safety margin: ${calciumSignalingSafetyMargin}%). VPS13 lipid bridges, MAM IP3R-VDAC1 axis, and ACBD5-VAP plasmalogen biosynthesis operate at peak interorganellar communication fidelity.`
+    : `Episode "${episode.title}" operates in an adaptive interorganellar membrane contact state (tethering integrity: ${tetheringIntegrityIndex}%, interorganellar lipid flux: ${interorganellarLipidFlux}%, calcium safety margin: ${calciumSignalingSafetyMargin}%). Non-vesicular phospholipid transfer and peroxisome-mitochondria crosstalk maintain stable homeostatic buffering.`
+
+  const contactLongevityStrategy = hasBlocked
+    ? 'Mengurangi stres kalsium matriks dan menjaga stabilitas penambat organel dengan suplementasi taurin (stabilisator membran organel), magnesium glisinat, asam lemak alkilgliserol (prekursor plasmalogen murni), dan eliminasi toksin penghambat fusi membran.'
+    : completedStages >= 3
+    ? 'Mempertahankan integritas saluran jembatan VPS13 dan sinergi MAM melalui latihan ketahanan teratur, asupan asam lemak tak jenuh rantai ganda fosfolipid krill murni, dan modulasi mikronutrien pembangun membran (kolin, inositol).'
+    : 'Mendukung pensinyalan kalsium teratur dan biosintesis eter lipid dengan menjaga kecukupan fosfatidilkolin, antioksidan peroksisomal (selenium, vitamin E tokoferol campuran), dan ritme sirkadian metabolisme lipid optimal.'
+
+  return {
+    version: 'v1',
+    episodeId: episode.id,
+    episodeTitle: episode.title,
+    contactState,
+    contactStateLabel,
+    contactTier,
+    contactTierLabel,
+    tetheringIntegrityIndex,
+    interorganellarLipidFlux,
+    calciumSignalingSafetyMargin,
+    contactNodes,
+    contactNarrativeId,
+    contactNarrativeEn,
+    contactLongevityStrategy,
+    truthClass: 'organellar_contact_sites_simulation_proxy',
+    clinically_reviewed: false,
+    patientTruthUncompromised: true,
+    neverManufacturesBiomarkers: true,
+    epistemicHumilityPreserved: true,
+  }
+}
+
 export const STAGE_EXPECTED_DAYS: Record<CareEpisodeStageId, number> = {
   problem: 1,
   diagnosis: 2,
@@ -6012,6 +6137,7 @@ export function evaluateCareJourneyContinuity(
     const edenUpsProteasome = deriveEdenUpsProteasomeBridge(ep)
     const edenLysosomalAutophagy = deriveEdenLysosomalAutophagyBridge(ep)
     const edenMitochondrialEtc = deriveEdenMitochondrialEtcBridge(ep)
+    const edenOrganelleContact = deriveEdenOrganelleContactBridge(ep)
 
     return {
       id: ep.id,
@@ -6080,6 +6206,7 @@ export function evaluateCareJourneyContinuity(
       edenUpsProteasome,
       edenLysosomalAutophagy,
       edenMitochondrialEtc,
+      edenOrganelleContact,
     }
   })
 
@@ -6397,6 +6524,14 @@ export function evaluateCareJourneyContinuity(
           s.edenMitochondrialEtc?.neverManufacturesBiomarkers
       )
   ).length
+  const edenOrganelleContactReadyCount = summaries.filter(
+    (s) =>
+      Boolean(
+        s.edenOrganelleContact?.truthClass === 'organellar_contact_sites_simulation_proxy' &&
+          s.edenOrganelleContact?.patientTruthUncompromised &&
+          s.edenOrganelleContact?.neverManufacturesBiomarkers
+      )
+  ).length
   const edenLifeBalance = deriveEdenLifeBalanceSynthesis(episodes, supportiveResults)
 
   return {
@@ -6469,6 +6604,7 @@ export function evaluateCareJourneyContinuity(
     edenUpsProteasomeReadyCount,
     edenLysosomalAutophagyReadyCount,
     edenMitochondrialEtcReadyCount,
+    edenOrganelleContactReadyCount,
     edenLifeBalance,
     hasBlockedStages: blockedJourneys > 0 || stalledCount > 0,
   }

@@ -977,6 +977,17 @@ export function CareContinuityPanel({
                   </span>
                 </div>
               )}
+              {careJourneys.edenOrganelleContactReadyCount > 0 && (
+                <div
+                  className="flex justify-between text-teal-300"
+                  data-eden-organelle-contact="v1"
+                >
+                  <span>Situs kontak organel ER-Mito-Peroksisom & MAM:</span>
+                  <span className="font-bold">
+                    {careJourneys.edenOrganelleContactReadyCount} episode terhubung
+                  </span>
+                </div>
+              )}
 
               {careJourneys.episodes.length > 0 && (
                 <div className="mt-3 border-t border-white/8 pt-2">
