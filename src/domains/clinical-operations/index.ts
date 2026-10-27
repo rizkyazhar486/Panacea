@@ -207,3 +207,16 @@ export {
   type CgmClinicalDecisionSupportEvaluation,
 } from './model/glycemicHypoglycemiaCgmCds'
 
+export {
+  evaluateAnticoagulationAfibSafety,
+  type PatientAfibRegimenInput,
+  type AnticoagulationDecisionEvaluation,
+} from './model/anticoagulationAfibRiskCds'
+
+export {
+  evaluateHeartFailureGdmtOptimization,
+  type PatientHfRefProfileInput,
+  type HfRefGdmtOptimizationEvaluation,
+  type GdmtPillarTitrationItem,
+} from './model/heartFailureGdmtQuadrupleCds'
+
