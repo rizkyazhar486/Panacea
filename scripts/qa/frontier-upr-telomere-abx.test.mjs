@@ -165,12 +165,13 @@ test('T-CLIN-94: ECM collagen crosslinking by LOX, tissue stiffness & YAP/TAZ me
 // ==========================================
 // T-CLIN-95: Clinical Antimicrobial Stewardship & Renal CDS Engine
 // ==========================================
-test('T-CLIN-95: Cockcroft-Gault eGFR titration, pathogen coverage & nephrotoxicity CDS', () => {
+test('T-CLIN-95: Cockcroft-Gault creatinine clearance, pathogen coverage & nephrotoxicity CDS', () => {
   // 1. Moderate/severe renal impairment requiring Meropenem dose reduction
   const meropenemRenalEval = evaluateAntimicrobialStewardship(
     {
       patientId: 'PAT-ABX-001',
       ageYears: 72,
+      isHemodialysisDependent: false,
       sex: 'MALE',
       weightKg: 68,
       serumCreatinineMgDl: 2.4, // CrCl ~ 28 mL/min
@@ -182,7 +183,7 @@ test('T-CLIN-95: Cockcroft-Gault eGFR titration, pathogen coverage & nephrotoxic
       requestedDoseIntervalHours: 8,
       infectionSyndrome: 'INTRA_ABDOMINAL_SEPSIS',
       suspectedOrCulturedPathogen: 'ESBL_PRODUCING_ENTEROBACTERALES',
-    }
+    }, '2026-10-27T10:00:00.000Z'
   )
 
   assert.equal(meropenemRenalEval.renalFunctionCategory, 'SEVERE_IMPAIRMENT')
@@ -200,6 +201,7 @@ test('T-CLIN-95: Cockcroft-Gault eGFR titration, pathogen coverage & nephrotoxic
     {
       patientId: 'PAT-ABX-002',
       ageYears: 55,
+      isHemodialysisDependent: false,
       sex: 'FEMALE',
       weightKg: 70,
       serumCreatinineMgDl: 1.0,
@@ -212,7 +214,7 @@ test('T-CLIN-95: Cockcroft-Gault eGFR titration, pathogen coverage & nephrotoxic
       infectionSyndrome: 'HOSPITAL_ACQUIRED_PNEUMONIA',
       suspectedOrCulturedPathogen: 'METHICILLIN_RESISTANT_S_AUREUS_MRSA',
       concomitantNephrotoxins: ['PIPERACILLIN_TAZOBACTAM'],
-    }
+    }, '2026-10-27T10:00:00.000Z'
   )
 
   assert.equal(vancZosynSynergy.dosingSafetyAlert, 'NEPHROTOXIC_SYNERGY_AVOID')
@@ -225,6 +227,7 @@ test('T-CLIN-95: Cockcroft-Gault eGFR titration, pathogen coverage & nephrotoxic
     {
       patientId: 'PAT-ABX-003',
       ageYears: 35,
+      isHemodialysisDependent: false,
       sex: 'MALE',
       weightKg: 75,
       serumCreatinineMgDl: 0.9,
@@ -236,10 +239,134 @@ test('T-CLIN-95: Cockcroft-Gault eGFR titration, pathogen coverage & nephrotoxic
       requestedDoseIntervalHours: 12,
       infectionSyndrome: 'COMPLICATED_URINARY_TRACT_INFECTION',
       suspectedOrCulturedPathogen: 'EMPIRIC_COVERAGE_NO_ISOLATE_YET',
-    }
+    }, '2026-10-27T10:00:00.000Z'
   )
 
   assert.equal(normalRenal.renalFunctionCategory, 'NORMAL_FUNCTION')
   assert.equal(normalRenal.dosingSafetyAlert, 'SAFE_STANDARD_DOSING')
-  assert.equal(normalRenal.requiresClinicianAcknowledgment, false)
+  assert.equal(normalRenal.requiresClinicianAcknowledgment, true, 'Unreviewed dosing proxies always require clinician acknowledgement')
+})
+
+const antimicrobialAt = '2026-10-27T10:00:00.000Z'
+const renalPatient = {
+  patientId: 'synthetic-renal-patient', ageYears: 35, sex: 'MALE', weightKg: 75, serumCreatinineMgDl: 0.9,
+  isHemodialysisDependent: false,
+}
+const antimicrobialOrder = {
+  orderId: 'synthetic-antimicrobial-order', antibioticName: 'CIPROFLOXACIN', requestedDoseMg: 400,
+  requestedDoseIntervalHours: 12, infectionSyndrome: 'COMPLICATED_URINARY_TRACT_INFECTION',
+  suspectedOrCulturedPathogen: 'EMPIRIC_COVERAGE_NO_ISOLATE_YET',
+}
+
+function rejectsAntimicrobial(patient, order, field, at = antimicrobialAt) {
+  const before = structuredClone({ patient, order })
+  assert.throws(() => evaluateAntimicrobialStewardship(patient, order, at), {
+    name: 'TypeError', message: `Invalid antimicrobial CDS input: ${field}`,
+  })
+  assert.deepEqual({ patient, order }, before, 'rejection must not rewrite patient inputs or the prescription')
+}
+
+test('T-CLIN-95: malformed renal measurements cannot fall through to standard-safe dosing', () => {
+  for (const field of ['ageYears', 'weightKg', 'serumCreatinineMgDl']) {
+    for (const value of [undefined, null, '', '1', NaN, Infinity, -Infinity, 0, -1]) {
+      rejectsAntimicrobial({ ...renalPatient, [field]: value }, antimicrobialOrder, field)
+    }
+  }
+})
+
+test('T-CLIN-95: unsupported input ranges are rejected instead of silently clamped', () => {
+  for (const [field, value] of [['ageYears', 17.999], ['ageYears', 105.001],
+    ['weightKg', 29.999], ['weightKg', 220.001], ['serumCreatinineMgDl', 0.299]]) {
+    rejectsAntimicrobial({ ...renalPatient, [field]: value }, antimicrobialOrder, field)
+  }
+  // These are the existing implementation envelope, not validated clinical ranges.
+  for (const [field, value] of [['ageYears', 18], ['ageYears', 105], ['weightKg', 30],
+    ['weightKg', 220], ['serumCreatinineMgDl', 0.3]]) {
+    const result = evaluateAntimicrobialStewardship({ ...renalPatient, [field]: value }, antimicrobialOrder, antimicrobialAt)
+    const patient = { ...renalPatient, [field]: value }
+    const expected = Number((((140 - patient.ageYears) * patient.weightKg) / (72 * patient.serumCreatinineMgDl)).toFixed(1))
+    assert.equal(result.calculatedCreatinineClearanceMlMin, expected)
+    assert.equal(result.clinically_reviewed, false)
+  }
+})
+
+test('T-CLIN-95: missing sex is never guessed as male', () => {
+  for (const sex of [undefined, null, 0, '', 'female', 'UNKNOWN']) {
+    rejectsAntimicrobial({ ...renalPatient, sex }, antimicrobialOrder, 'sex')
+  }
+  // Cockcroft & Gault, Nephron 1976;16:31-41, DOI:10.1159/000180580.
+  // CrCl=((140-ageYears)*weightKg)/(72*ScrMgDl), multiplied by 0.85 for FEMALE.
+  assert.equal(evaluateAntimicrobialStewardship(renalPatient, antimicrobialOrder, antimicrobialAt).calculatedCreatinineClearanceMlMin, 121.5)
+  assert.equal(evaluateAntimicrobialStewardship({ ...renalPatient, sex: 'FEMALE' }, antimicrobialOrder, antimicrobialAt).calculatedCreatinineClearanceMlMin, 103.3)
+})
+
+test('T-CLIN-95: absent patient/order objects or identities cannot produce recommendations', () => {
+  for (const value of [undefined, null, [], 'invalid']) {
+    rejectsAntimicrobial(value, antimicrobialOrder, 'patient')
+    rejectsAntimicrobial(renalPatient, value, 'order')
+  }
+  for (const value of [undefined, null, 0, {}, '', ' ']) {
+    rejectsAntimicrobial({ ...renalPatient, patientId: value }, antimicrobialOrder, 'patientId')
+    rejectsAntimicrobial(renalPatient, { ...antimicrobialOrder, orderId: value }, 'orderId')
+  }
+})
+
+test('T-CLIN-95: invalid or unimplemented antimicrobial regimens fail closed', () => {
+  for (const antibioticName of [undefined, null, '', 'ciprofloxacin', 'UNKNOWN', 'COLISTIN', 'constructor']) {
+    rejectsAntimicrobial(renalPatient, { ...antimicrobialOrder, antibioticName }, 'antibioticName')
+  }
+  for (const field of ['infectionSyndrome', 'suspectedOrCulturedPathogen']) {
+    for (const value of [undefined, null, '', {}, 1, 'UNKNOWN']) {
+      rejectsAntimicrobial(renalPatient, { ...antimicrobialOrder, [field]: value }, field)
+    }
+  }
+})
+
+test('T-CLIN-95: dialysis cannot inherit a non-dialysis dosing proxy', () => {
+  for (const isHemodialysisDependent of [undefined, true, null, 'false', 0, 1]) {
+    rejectsAntimicrobial({ ...renalPatient, isHemodialysisDependent }, antimicrobialOrder, 'isHemodialysisDependent')
+  }
+  assert.deepEqual(
+    evaluateAntimicrobialStewardship({ ...renalPatient, isHemodialysisDependent: false }, antimicrobialOrder, antimicrobialAt),
+    evaluateAntimicrobialStewardship(renalPatient, antimicrobialOrder, antimicrobialAt),
+  )
+})
+
+test('T-CLIN-95: dose and interval must be finite positive numbers', () => {
+  for (const field of ['requestedDoseMg', 'requestedDoseIntervalHours']) {
+    for (const value of [undefined, null, '', '12', NaN, Infinity, -Infinity, 0, -1]) {
+      rejectsAntimicrobial(renalPatient, { ...antimicrobialOrder, [field]: value }, field)
+    }
+  }
+})
+
+test('T-CLIN-95: malformed nephrotoxin lists cannot bypass interaction review', () => {
+  for (const concomitantNephrotoxins of [null, 'PIPERACILLIN_TAZOBACTAM', {}, [undefined], [null], [0], [''], [' '], Array(1)]) {
+    rejectsAntimicrobial(renalPatient, { ...antimicrobialOrder, concomitantNephrotoxins }, 'concomitantNephrotoxins')
+  }
+  assert.equal(evaluateAntimicrobialStewardship(renalPatient, { ...antimicrobialOrder, concomitantNephrotoxins: [] }, antimicrobialAt).requiresClinicianAcknowledgment, true)
+})
+
+test('T-CLIN-95: evaluation time is explicit, timezone-qualified and calendar-valid', () => {
+  for (const at of [undefined, null, 0, '', 'invalid', '2026-10-27', '2026-10-27T10:00:00', '2026-02-30T10:00:00Z']) {
+    assert.throws(() => evaluateAntimicrobialStewardship(renalPatient, antimicrobialOrder, at), {
+      name: 'TypeError', message: 'Invalid antimicrobial CDS input: evaluationIsoTimestamp',
+    })
+  }
+})
+
+test('T-CLIN-95: every supported unreviewed regimen stays review-bound and deterministic', () => {
+  for (const antibioticName of ['VANCOMYCIN', 'MEROPENEM', 'CEFEPIME', 'PIPERACILLIN_TAZOBACTAM', 'CIPROFLOXACIN']) {
+    const patient = Object.freeze({ ...renalPatient })
+    const order = Object.freeze({ ...antimicrobialOrder, antibioticName })
+    const result = evaluateAntimicrobialStewardship(patient, order, antimicrobialAt)
+    assert.equal(result.requiresClinicianAcknowledgment, true)
+    assert.equal(result.clinically_reviewed, false)
+    assert.equal(result.neverManufacturesBiomarkers, true)
+    assert.equal(result.truthClass, 'clinical_decision_support_guideline_proxy')
+    assert.equal(result.evaluatedAtIso, antimicrobialAt)
+    assert.deepEqual(evaluateAntimicrobialStewardship(patient, order, antimicrobialAt), result)
+    assert.deepEqual(patient, renalPatient)
+    assert.deepEqual(order, { ...antimicrobialOrder, antibioticName })
+  }
 })
