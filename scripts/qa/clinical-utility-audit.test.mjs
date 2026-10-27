@@ -15,8 +15,8 @@ test('CLINICAL_UTILITY_AUDIT.json: schema validity and completeness', () => {
 
   assert.equal(payload.schemaVersion, '1.0.0')
   assert.equal(payload.governanceStandard, 'PANACEAMED_CLINICAL_REALITY_V1')
-  assert.equal(payload.summary.totalModulesAudited, 100)
-  assert.equal(payload.modules.length, 100)
+  assert.equal(payload.summary.totalModulesAudited, 110)
+  assert.equal(payload.modules.length, 110)
 
   const allowedCategories = new Set([
     'A_DIRECT_CLINICAL_WORKFLOW',
@@ -40,7 +40,7 @@ test('CLINICAL_UTILITY_AUDIT.json: schema validity and completeness', () => {
     'NOT_VALIDATED',
   ])
 
-  for (let i = 1; i <= 100; i++) {
+  for (let i = 1; i <= 110; i++) {
     const expectedId = `T-CLIN-${String(i).padStart(2, '0')}`
     const mod = payload.modules.find((m) => m.id === expectedId)
     assert.ok(mod, `Module ${expectedId} must be audited in registry`)
