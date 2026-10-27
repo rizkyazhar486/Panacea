@@ -1,6 +1,6 @@
 // Hasil lab + rujukan (Alpha B2–B6, B9). Tanpa jaringan, tanpa jam/acak nyata.
 import assert from 'node:assert/strict'
-import { GENESIS_HASH, transition, verifyTrail } from '../src/modules/labResults/domain/lifecycle.js'
+import { GENESIS_HASH, entryHash, transition, verifyTrail } from '../src/modules/labResults/domain/lifecycle.js'
 import type { Actor } from '../src/modules/labResults/domain/lifecycle.js'
 import { referralLifecycle, resultLifecycle } from '../src/modules/labResults/domain/definitions.js'
 import * as s from '../src/modules/labResults/service/labResultsService.js'
@@ -63,6 +63,27 @@ assert.ok(masalah([e2, e1]).includes('seq-gap'), 'urutan terbalik')
 assert.ok(masalah([e1, { ...e2, prevHash: GENESIS_HASH }]).includes('hash-mismatch'), 'rantai hash diputus')
 assert.ok(masalah([{ ...e1, to: 'reviewed' }]).includes('step-not-allowed'))
 assert.ok(masalah([{ ...e1, to: 'x' }]).includes('unknown-status'))
+// Hash yang dihitung ulang tidak boleh membuat peran atau waktu yang tidak sah menjadi dapat diterima.
+const rehash = (entry: typeof e1): typeof e1 => {
+  const { hash: _hash, ...rest } = entry
+  return { ...rest, hash: entryHash(rest) }
+}
+const nurseReview = rehash({ ...e2, role: 'nurse' })
+assert.ok(masalah([e1, nurseReview]).includes('role-not-permitted'), 'tinjauan perawat tetap ditolak walau hash konsisten')
+assert.ok(masalah([e1, rehash({ ...e2, at: 'bukan-waktu' })]).includes('invalid-timestamp'), 'waktu rusak tetap ditolak walau hash konsisten')
+// Layanan harus gagal tertutup dan tidak memajukan hasil dengan tinjauan berperan tidak sah.
+{
+  const k = ctx()
+  k.hasil.put({
+    id: 'x', tenantId: T0, patientId: 'p-A', status: 'reviewed', item: butir,
+    provenance: { source: 'manual-entry', recordedBy: 'n1', recordedAt: e1.at },
+    trail: [e1, nurseReview],
+  })
+  tolak(s.majukanHasil(k, perawat, 'x', {
+    to: 'communicated', communication: { channel: 'phone', note: 'Hasil dibahas melalui telepon' },
+  }), 'trail-corrupt')
+  assert.equal(k.hasil.get('x')?.status, 'reviewed', 'rekaman rusak tidak boleh bermutasi')
+}
 // pengubahan tidak mengotori hasil sebelum: transition tidak memutasi trail
 assert.equal(lanjut.trail.length, 1)
 
@@ -346,10 +367,11 @@ await import("./labReferralHttpRbac.uji.js")
 await import("./labShareHttpRbac.uji.js")
 // Real HTTP daily check-in (care plan / report) ownership, integrity, replacement and revocation.
 await import("./careHttpRbac.uji.js")
-// Real HTTP share expiry (end time moved into the past across a restart) on every dependent clinician, care and read-model route.
+// Real HTTP share expiry (end time moved across a restart) on every dependent clinician, care and read-model route.
 await import("./shareExpiryHttp.uji.js")
 // Real HTTP second-opinion queue: patient-only view without the AI draft, verified-clinician completion, single bounded completion.
 await import("./secondOpinionHttpRbac.uji.js")
 
 // Lab & Referral Closure over real HTTP: closing evidence, linked-result re-verification, refusals with audit and no mutation.
 await import("./labReferralClosureHttp.uji.js")
+
