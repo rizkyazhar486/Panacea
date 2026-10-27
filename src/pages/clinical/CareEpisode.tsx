@@ -649,7 +649,7 @@ function EpisodeCard({
       <EdenReflectionSanctuarySection episode={episode} moods={moods} />
 
       {/* Eden Universal Human Acceptance & Multilingual Plain-Language Continuity Bridge (T-CLIN-29 / EDEN-09) */}
-      <EdenUniversalAcceptanceSection episode={episode} onChange={onChange} />
+      <EdenUniversalAcceptanceSection episode={episode} />
 
       {/* Eden Restorative Environment, Bio-Photonic Exposure & Cosmic Wonder Synthesis Bridge (T-CLIN-30 / EDEN-10) */}
       <EdenRestorativeEnvironmentSection episode={episode} wellness={wellness} />
@@ -1741,10 +1741,8 @@ function EdenReflectionSanctuarySection({
 
 function EdenUniversalAcceptanceSection({
   episode,
-  onChange,
 }: {
   episode: CareEpisode
-  onChange: (next: CareEpisode) => void
 }) {
   const [language, setLanguage] = useState<EdenLanguageCode>(episode.edenLanguagePreference ?? 'id')
   const [literacyMode, setLiteracyMode] = useState<EdenLiteracyAdaptationMode>('everyday_warm')
@@ -1755,8 +1753,8 @@ function EdenUniversalAcceptanceSection({
   )
 
   function selectLanguage(nextLang: EdenLanguageCode) {
+    // Preferensi tampilan tidak boleh menyimpan ulang rekam klinis yang sudah ditandatangani.
     setLanguage(nextLang)
-    onChange({ ...episode, edenLanguagePreference: nextLang })
   }
 
   return (
