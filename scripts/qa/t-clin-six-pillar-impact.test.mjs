@@ -33,7 +33,7 @@ const meaningful = (value) => typeof value === 'string' && value.trim().length >
 
 function validateGate(gate, audit) {
   const errors = []
-  if (gate.schemaVersion !== '1.1.0') errors.push('unsupported impact gate schema')
+  if (gate.schemaVersion !== '1.2.0') errors.push('unsupported impact gate schema')
   if (gate.policy !== 'SIX_PILLAR_HUMAN_BENEFIT_GATE_V1') errors.push('wrong policy')
   if (!Array.isArray(gate.pillars) || gate.pillars.length !== EXPECTED_PILLARS.size ||
     new Set(gate.pillars.map((pillar) => pillar.id)).size !== EXPECTED_PILLARS.size ||
@@ -47,8 +47,8 @@ function validateGate(gate, audit) {
   const entries = Array.isArray(gate.entries) ? gate.entries : []
   const seen = new Set()
   const coveredPrimary = new Set()
-  if (entries.length !== REQUIRED_ANCHORS.size) {
-    errors.push('pilot anchor count differs from registered nine-module scope')
+  if (entries.length < REQUIRED_ANCHORS.size) {
+    errors.push('fewer impact entries than the nine required launch anchors')
   }
 
   for (const item of entries) {
@@ -58,9 +58,8 @@ function validateGate(gate, audit) {
     }
     if (seen.has(item.id)) errors.push('duplicate T-CLIN impact entry: ' + item.id)
     seen.add(item.id)
-    if (!REQUIRED_ANCHORS.has(item.id)) errors.push('unregistered pilot anchor: ' + item.id)
-    if (REQUIRED_ANCHORS.get(item.id) !== item.primaryPillar) {
-      errors.push('pilot anchor primary pillar mismatch: ' + item.id)
+    if (REQUIRED_ANCHORS.has(item.id) && REQUIRED_ANCHORS.get(item.id) !== item.primaryPillar) {
+      errors.push('required anchor primary pillar mismatch: ' + item.id)
     }
     coveredPrimary.add(item.primaryPillar)
     const original = audited.get(item.id)
@@ -95,7 +94,14 @@ function validateGate(gate, audit) {
     if (item.clinicallyValidatedBenefit !== false || item.independentlyValidatedBenefit !== false) {
       errors.push('unverified human benefit must not claim clinical validation: ' + item.id)
     }
-    const researchOnly = original && original.category === 'C_CLINICAL_RESEARCH_INFRASTRUCTURE'
+    // Direct clinical workflow and patient-facing education require clinician control.
+    // Research infrastructure, simulations, and speculative tracks cannot self-promote
+    // into patient-level authority merely by receiving a six-pillar mapping.
+    const researchOnly = original && [
+      'C_CLINICAL_RESEARCH_INFRASTRUCTURE',
+      'D_EDUCATIONAL_MECHANISTIC_SIMULATION',
+      'E_SPECULATIVE_UNSUPPORTED',
+    ].includes(original.category)
     const expectedAuthority = researchOnly ? 'RESEARCH_ONLY_QUALIFIED_REVIEWER' : 'AUTHORISED_CLINICIAN'
     if (item.humanAuthority !== expectedAuthority) {
       errors.push('human authority does not match canonical use boundary: ' + item.id)
@@ -114,10 +120,32 @@ function validateGate(gate, audit) {
   return errors
 }
 
-test('all current highest-priority T-CLINs have six-pillar evidence-bounded outcome contracts', () => {
+test('required anchors and extensible audit-backed T-CLIN mappings preserve evidence boundaries', () => {
   const gate = load(IMPACT_PATH)
   const audit = load(AUDIT_PATH)
   assert.deepEqual(validateGate(gate, audit), [])
+
+  // A legitimately audited candidate can be added without changing the gate's
+  // hard-coded anchor list, lowering engineering friction for later T-CLINs.
+  const extended = structuredClone(gate)
+  const educationAnchor = extended.entries.find((item) => item.id === 'T-CLIN-21')
+  assert.ok(educationAnchor)
+  extended.entries.push({ ...structuredClone(educationAnchor), id: 'T-CLIN-27' })
+  assert.deepEqual(validateGate(extended, audit), [])
+
+  // The same extensibility must hold for education-only mechanistic simulations,
+  // but such models never gain patient-facing clinician authority.
+  const simulation = structuredClone(gate)
+  const researchAnchor = simulation.entries.find((item) => item.id === 'T-CLIN-71')
+  assert.ok(researchAnchor)
+  simulation.entries.push({
+    ...structuredClone(researchAnchor),
+    id: 'T-CLIN-76',
+    category: 'D_EDUCATIONAL_MECHANISTIC_SIMULATION',
+    evidenceTier: 'E1_HEURISTIC',
+    clinicalValidationStatus: 'NOT_VALIDATED',
+  })
+  assert.deepEqual(validateGate(simulation, audit), [])
 })
 
 test('negative controls reject invented outcomes, missing mappings, unjustified validation and altered evidence', () => {
@@ -140,6 +168,18 @@ test('negative controls reject invented outcomes, missing mappings, unjustified 
   assert.match(change((g) => { g.entries[5].category = 'A_DIRECT_CLINICAL_WORKFLOW' }), /canonical clinical utility category mismatch/)
   assert.match(change((g) => { g.entries[6].clinicalValidationStatus = 'VALIDATED' }), /canonical validation status mismatch/)
   assert.match(change((g) => { g.entries[6].humanAuthority = 'AUTHORISED_CLINICIAN' }), /human authority does not match/)
-  assert.match(change((g) => { g.entries[8].primaryPillar = 'CLINICAL_ONE_OS' }), /pilot anchor primary pillar mismatch|product pillar has no primary/)
-  assert.match(change((g) => { g.entries[5].id = 'T-CLIN-999' }), /unregistered pilot anchor/)
+  assert.match(change((g) => { g.entries[8].primaryPillar = 'CLINICAL_ONE_OS' }), /required anchor primary pillar mismatch|product pillar has no primary/)
+  assert.match(change((g) => { g.entries[5].id = 'T-CLIN-999' }), /impact entry not present in audit registry/)
+  assert.match(change((g) => {
+    g.entries.push({
+      ...structuredClone(g.entries[6]),
+      id: 'T-CLIN-76',
+      category: 'D_EDUCATIONAL_MECHANISTIC_SIMULATION',
+      clinicalValidationStatus: 'NOT_VALIDATED',
+    })
+  }), /evidence tier differs|human authority does not match/)
+  assert.match(change((g) => {
+    g.entries.push({ ...structuredClone(g.entries[5]), id: 'T-CLIN-27' })
+    g.entries[g.entries.length - 1].category = 'A_DIRECT_CLINICAL_WORKFLOW'
+  }), /canonical clinical utility category mismatch/)
 })
