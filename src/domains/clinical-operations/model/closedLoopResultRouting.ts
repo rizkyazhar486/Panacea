@@ -1,6 +1,8 @@
 // src/domains/clinical-operations/model/closedLoopResultRouting.ts
 // PanaceaMed T-CLIN-80: Closed-Loop Diagnostic Result Closure & High-Consequence Alert Routing Protocol (PAN-EXP-2026-01)
 
+import { isValidIsoTimestamp } from '../../../shared/kernel/isoTimestamp.ts'
+
 export type DiagnosticResultSeverity = 'CRITICAL_EMERGENCY' | 'ABNORMAL_PRIORITY' | 'ROUTINE_INFORMATIONAL'
 
 export type ClosedLoopClosureStatus =
@@ -54,22 +56,73 @@ export function getSeverityWindowMinutes(severity: DiagnosticResultSeverity): nu
       return 1440 // 24 hours mandatory window
     case 'ROUTINE_INFORMATIONAL':
       return 10080 // 7 days window
+    default:
+      return invalidRoutingInput('severity')
   }
 }
 
+function invalidRoutingInput(field: string): never {
+  // Field names only: patient identifiers, result values and clinical notes
+  // must not leak through validation errors or their logs.
+  throw new TypeError(`Invalid diagnostic routing input: ${field}`)
+}
+
+function requireText(value: unknown, field: string): void {
+  if (typeof value !== 'string' || !value.trim()) invalidRoutingInput(field)
+}
+
+function requireTimestamp(value: unknown, field: string, earliest: number, latest: number): number {
+  if (!isValidIsoTimestamp(value)) invalidRoutingInput(field)
+  const parsed = Date.parse(value)
+  if (parsed < earliest || parsed > latest) invalidRoutingInput(field)
+  return parsed
+}
+
 /**
- * Evaluates the real-time closed-loop routing and escalation state of a diagnostic result.
+ * Pure routing projection, using an explicit clock. Invalid input throws before
+ * any successful routing/closure state is produced; it never rewrites the order.
+ * elapsedMinutes = floor((evaluatedAtMs - resultTimestampMs) / 60000).
+ * Existing protocol windows are not clinical validation or dispatch authority.
+ * Upstream authenticated services remain responsible for clinician authorization.
  */
 export function evaluateClosedLoopResultRouting(
   order: DiagnosticResultOrder,
-  evaluatedAtMs = Date.now()
+  evaluatedAtMs: number
 ): ClosedLoopRoutingEvaluation {
-  const resultMs = Date.parse(order.resultTimestamp)
-  const elapsedMs = Math.max(0, evaluatedAtMs - (Number.isFinite(resultMs) ? resultMs : evaluatedAtMs))
-  const elapsedMinutes = Math.floor(elapsedMs / 60000)
+  if (!order || typeof order !== 'object' || Array.isArray(order)) invalidRoutingInput('order')
+  if (typeof evaluatedAtMs !== 'number' || !Number.isFinite(evaluatedAtMs)
+    || !Number.isFinite(new Date(evaluatedAtMs).getTime())) invalidRoutingInput('evaluatedAtMs')
+  for (const field of ['orderId', 'accessionNumber', 'patientId', 'orderingClinicianId', 'testName', 'resultValue'] as const) {
+    requireText(order[field], field)
+  }
 
   const maxWindow = getSeverityWindowMinutes(order.severity)
-  const isOverdue = elapsedMinutes > maxWindow
+  const resultMs = requireTimestamp(order.resultTimestamp, 'resultTimestamp', -Infinity, evaluatedAtMs)
+  if (order.numericValue !== undefined) {
+    if (typeof order.numericValue !== 'number' || !Number.isFinite(order.numericValue)) invalidRoutingInput('numericValue')
+    requireText(order.unit, 'unit')
+  }
+  for (const field of ['unit', 'referenceRange', 'mandatedClinicalAction'] as const) {
+    if (order[field] !== undefined) requireText(order[field], field)
+  }
+
+  const hasClosure = order.closedAt !== undefined || order.closedById !== undefined
+  const hasAcknowledgement = order.acknowledgedAt !== undefined || order.acknowledgedById !== undefined
+  if (hasAcknowledgement || hasClosure) {
+    const acknowledgedMs = requireTimestamp(order.acknowledgedAt, 'acknowledgedAt', resultMs, evaluatedAtMs)
+    requireText(order.acknowledgedById, 'acknowledgedById')
+    if (hasClosure) {
+      requireTimestamp(order.closedAt, 'closedAt', acknowledgedMs, evaluatedAtMs)
+      requireText(order.closedById, 'closedById')
+      requireText(order.mandatedClinicalAction, 'mandatedClinicalAction')
+    }
+  }
+
+  const elapsedMinutes = Math.floor((evaluatedAtMs - resultMs) / 60000)
+  // Once acknowledged, elapsed review time is historical. Later evaluation or
+  // closure cannot make an on-time acknowledgement late, or erase a late one.
+  const acknowledgedMs = order.acknowledgedAt === undefined ? evaluatedAtMs : Date.parse(order.acknowledgedAt)
+  const isOverdue = Math.floor((acknowledgedMs - resultMs) / 60000) > maxWindow
 
   // Check if fully closed with clinician action
   if (order.closedAt && order.closedById && order.mandatedClinicalAction?.trim()) {
@@ -80,7 +133,7 @@ export function evaluateClosedLoopResultRouting(
       status: 'CLOSED_WITH_CLINICAL_ACTION',
       elapsedMinutesSinceResult: elapsedMinutes,
       maxAllowedAcknowledgementWindowMinutes: maxWindow,
-      acknowledgementOverdue: false,
+      acknowledgementOverdue: isOverdue,
       auditDigest: `sha256:closed:${order.orderId}:${order.closedById}:${order.closedAt}`,
       safetyActionRequired: 'Result loop fully closed with documented physician action',
       isClosed: true,

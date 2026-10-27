@@ -258,3 +258,154 @@ test('T-CLIN-80: Closed-loop diagnostic result routing & fail-closed escalation 
   assert.equal(getSeverityWindowMinutes('ABNORMAL_PRIORITY'), 1440)
   assert.equal(getSeverityWindowMinutes('ROUTINE_INFORMATIONAL'), 10080)
 })
+
+const routingResultAt = '2026-10-27T10:00:00.000Z'
+const routingNow = Date.parse('2026-10-27T13:00:00.000Z')
+const routingOrder = {
+  orderId: 'synthetic-order-80', accessionNumber: 'synthetic-accession-80',
+  patientId: 'synthetic-patient', orderingClinicianId: 'synthetic-clinician',
+  testName: 'Synthetic diagnostic result', resultValue: 'Pending review',
+  severity: 'CRITICAL_EMERGENCY', resultTimestamp: routingResultAt,
+}
+const acknowledgedRoutingOrder = {
+  ...routingOrder,
+  acknowledgedAt: '2026-10-27T10:20:00.000Z', acknowledgedById: 'synthetic-reviewer',
+}
+const closedRoutingOrder = {
+  ...acknowledgedRoutingOrder,
+  closedAt: '2026-10-27T10:25:00.000Z', closedById: 'synthetic-clinician',
+  mandatedClinicalAction: 'Documented clinician follow-up plan',
+}
+
+function rejectsRouting(patch, field, base = routingOrder, now = routingNow) {
+  const order = { ...base, ...patch }
+  const before = structuredClone(order)
+  assert.throws(() => evaluateClosedLoopResultRouting(order, now), {
+    name: 'TypeError', message: `Invalid diagnostic routing input: ${field}`,
+  })
+  assert.deepEqual(order, before, 'rejected data must not mutate the original order')
+}
+
+test('T-CLIN-80: rejects malformed, ambiguous, impossible and future result timestamps', () => {
+  for (const resultTimestamp of [undefined, null, 0, '', 'not-a-time', '2026-10-27',
+    '2026-10-27T10:00:00', '2026-02-30T10:00:00Z', '2026-10-27T13:00:00.001Z']) {
+    rejectsRouting({ resultTimestamp }, 'resultTimestamp')
+  }
+  const result = evaluateClosedLoopResultRouting({ ...routingOrder, resultTimestamp: '2026-10-27T17:00:00+07:00' }, routingNow)
+  assert.equal(result.elapsedMinutesSinceResult, 180)
+  assert.equal(result.status, 'ESCALATED_CRITICAL_SAFETY')
+})
+
+test('T-CLIN-80: evaluation requires an explicit finite representable clock', () => {
+  for (const now of [undefined, null, '1793106000000', NaN, Infinity, -Infinity, 8.64e15 + 1]) {
+    assert.throws(() => evaluateClosedLoopResultRouting(routingOrder, now), {
+      name: 'TypeError', message: 'Invalid diagnostic routing input: evaluatedAtMs',
+    })
+  }
+  const atResult = evaluateClosedLoopResultRouting(routingOrder, Date.parse(routingResultAt))
+  assert.equal(atResult.elapsedMinutesSinceResult, 0)
+  assert.equal(atResult.isClosed, false)
+})
+
+test('T-CLIN-80: rejects missing order objects and required identity/result fields', () => {
+  for (const order of [null, undefined, [], 'result']) {
+    assert.throws(() => evaluateClosedLoopResultRouting(order, routingNow), {
+      name: 'TypeError', message: 'Invalid diagnostic routing input: order',
+    })
+  }
+  for (const field of ['orderId', 'accessionNumber', 'patientId', 'orderingClinicianId', 'testName', 'resultValue']) {
+    for (const value of [undefined, null, 0, {}, '', ' \t']) rejectsRouting({ [field]: value }, field)
+  }
+})
+
+test('T-CLIN-80: unknown severity cannot suppress escalation or yield an undefined window', () => {
+  for (const severity of [undefined, null, '', 'critical', 'constructor', '__proto__', 0, {}]) {
+    rejectsRouting({ severity }, 'severity')
+    assert.throws(() => getSeverityWindowMinutes(severity), {
+      name: 'TypeError', message: 'Invalid diagnostic routing input: severity',
+    })
+  }
+})
+
+test('T-CLIN-80: numeric zero is valid but nonfinite results or missing units are rejected', () => {
+  for (const numericValue of [NaN, Infinity, -Infinity, null, '0']) {
+    rejectsRouting({ numericValue, unit: 'mmol/L' }, 'numericValue')
+  }
+  for (const unit of [undefined, null, '', ' ', 0]) rejectsRouting({ numericValue: 0, unit }, 'unit')
+  for (const field of ['unit', 'referenceRange']) {
+    for (const value of [null, 0, {}, '', ' ']) rejectsRouting({ [field]: value }, field)
+  }
+  assert.equal(evaluateClosedLoopResultRouting({ ...routingOrder, numericValue: 0, unit: 'mmol/L' }, routingNow).isClosed, false)
+})
+
+test('T-CLIN-80: partial or invalid acknowledgements never hide an outstanding alert', () => {
+  rejectsRouting({ acknowledgedById: 'synthetic-reviewer' }, 'acknowledgedAt')
+  for (const acknowledgedById of [undefined, null, 0, '', ' ']) {
+    rejectsRouting({ acknowledgedAt: routingResultAt, acknowledgedById }, 'acknowledgedById')
+  }
+  for (const acknowledgedAt of ['invalid', '2026-02-30T10:00:00Z', '2026-10-27T09:59:59.999Z', '2026-10-27T13:00:00.001Z']) {
+    rejectsRouting({ acknowledgedAt }, 'acknowledgedAt', acknowledgedRoutingOrder)
+  }
+  assert.equal(evaluateClosedLoopResultRouting(acknowledgedRoutingOrder, routingNow).status, 'ACKNOWLEDGED_ACTION_PENDING')
+})
+
+test('T-CLIN-80: corrupt closure cannot be promoted to a completed clinical action', () => {
+  rejectsRouting({ closedById: 'synthetic-clinician' }, 'closedAt', acknowledgedRoutingOrder)
+  for (const closedAt of ['invalid', '2026-02-30T10:00:00Z', '2026-10-27T10:19:59.999Z', '2026-10-27T13:00:00.001Z']) {
+    rejectsRouting({ closedAt }, 'closedAt', closedRoutingOrder)
+  }
+  for (const closedById of [undefined, null, 0, '', ' ']) rejectsRouting({ closedById }, 'closedById', closedRoutingOrder)
+  for (const mandatedClinicalAction of [undefined, null, 0, {}, '', ' ']) {
+    rejectsRouting({ mandatedClinicalAction }, 'mandatedClinicalAction', closedRoutingOrder)
+  }
+  rejectsRouting({ acknowledgedAt: undefined, acknowledgedById: undefined }, 'acknowledgedAt', closedRoutingOrder)
+  const valid = Object.freeze({ ...closedRoutingOrder })
+  assert.equal(evaluateClosedLoopResultRouting(valid, routingNow).isClosed, true)
+  assert.deepEqual(valid, closedRoutingOrder)
+})
+
+test('T-CLIN-80: chronology admits simultaneous events and equivalent offset timestamps', () => {
+  const result = evaluateClosedLoopResultRouting({
+    ...closedRoutingOrder, resultTimestamp: '2026-10-27T17:00:00+07:00',
+    acknowledgedAt: routingResultAt, closedAt: routingResultAt,
+  }, Date.parse(routingResultAt))
+  assert.equal(result.isClosed, true)
+  assert.equal(result.elapsedMinutesSinceResult, 0)
+})
+
+test('T-CLIN-80: valid escalation boundaries stay deterministic', () => {
+  const at = Date.parse(routingResultAt)
+  for (const [minutes, status] of [[60, 'PENDING_CLINICIAN_REVIEW'], [61, 'ESCALATED_TO_ON_CALL'],
+    [120, 'ESCALATED_TO_ON_CALL'], [121, 'ESCALATED_CRITICAL_SAFETY']]) {
+    const first = evaluateClosedLoopResultRouting(routingOrder, at + minutes * 60000)
+    assert.equal(first.status, status)
+    assert.deepEqual(evaluateClosedLoopResultRouting(routingOrder, at + minutes * 60000), first)
+  }
+})
+
+test('T-CLIN-80: timely acknowledgement does not become overdue as evaluation time advances', () => {
+  const result = evaluateClosedLoopResultRouting(acknowledgedRoutingOrder, routingNow)
+  assert.equal(result.status, 'ACKNOWLEDGED_ACTION_PENDING')
+  assert.equal(result.acknowledgementOverdue, false)
+  assert.equal(result.elapsedMinutesSinceResult, 180)
+  assert.equal(result.isClosed, false)
+})
+
+test('T-CLIN-80: closure preserves actual acknowledgement lateness across severity boundaries', () => {
+  const at = Date.parse(routingResultAt)
+  for (const [severity, window] of [['CRITICAL_EMERGENCY', 60], ['ABNORMAL_PRIORITY', 1440], ['ROUTINE_INFORMATIONAL', 10080]]) {
+    for (const [offsetMinutes, overdue] of [[window, false], [window + 1, true]]) {
+      const acknowledgedAt = new Date(at + offsetMinutes * 60000).toISOString()
+      const evaluatedAtMs = at + (window + 120) * 60000
+      const acknowledged = { ...acknowledgedRoutingOrder, severity, acknowledgedAt }
+      const pendingAction = evaluateClosedLoopResultRouting(acknowledged, evaluatedAtMs)
+      assert.equal(pendingAction.acknowledgementOverdue, overdue)
+      const closed = evaluateClosedLoopResultRouting({
+        ...closedRoutingOrder, severity, acknowledgedAt, closedAt: acknowledgedAt,
+      }, evaluatedAtMs)
+      assert.equal(closed.status, 'CLOSED_WITH_CLINICAL_ACTION')
+      assert.equal(closed.isClosed, true)
+      assert.equal(closed.acknowledgementOverdue, overdue, 'closing a result must not erase late acknowledgement')
+    }
+  }
+})
