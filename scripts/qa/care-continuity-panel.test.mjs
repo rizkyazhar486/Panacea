@@ -47,6 +47,7 @@ import {
   deriveEdenRanGtpTransportBridge,
   deriveEdenPeroxisomalCatalaseBridge,
   deriveEdenErProteostasisBridge,
+  deriveEdenPerkIsrBridge,
   translateClinicalTermToEden,
   EDEN_PLAIN_LANGUAGE_GLOSSARY,
 } from '../../src/domains/clinical-operations/model/careContinuityProjection.ts'
@@ -4188,4 +4189,78 @@ test('CareContinuityPanel: Eden Endoplasmic Reticulum UPR & ATF6/IRE1 Proteostat
   const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
   assert.ok(episodeSource.includes('data-eden-er-upr-card="v1"'), 'CareEpisode must include ER UPR card')
   assert.ok(episodeSource.includes('data-eden-er-upr-nodes="v1"'), 'CareEpisode must include ER UPR nodes grid')
+})
+
+test('CareContinuityPanel: Eden PERK–eIF2α–ATF4 Integrated Stress Response (ISR) & Translational Attenuation Synthesizer contract (T-CLIN-57)', () => {
+  const evaluatedAt = '2026-10-27T00:00:00.000Z'
+  const sampleEpisode = {
+    id: 'ce_perk_isr_1',
+    title: 'Post-Proteotoxic Translational Recovery Episode',
+    diagnosisCode: 'E11.9',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'diagnosis', status: 'done' },
+      { stage: 'plan', status: 'done' },
+      { stage: 'treatment', status: 'done' },
+      { stage: 'recovery', status: 'active' },
+    ],
+  }
+
+  // 1. Pure deterministic derivation
+  const bridge = deriveEdenPerkIsrBridge(sampleEpisode)
+  assert.equal(bridge.version, 'v1')
+  assert.equal(bridge.episodeId, 'ce_perk_isr_1')
+  assert.equal(bridge.isrState, 'optimal_eif2a_basal_protein_synthesis')
+  assert.equal(bridge.isrStateLabel, 'Sintesis Protein Basal eIF2α Optimal & Homeostasis Translasi Paripurna')
+  assert.equal(bridge.isrTier, 'optimal_translational_homeostasis')
+  assert.equal(bridge.isrTierLabel, 'Homeostasis Translasi Eukariotik Optimal & Umpan Balik Fosfatase GADD34 Efektif')
+  assert.ok(bridge.perkIsrScore >= 85)
+  assert.ok(bridge.translationalEfficiencyIndex >= 85)
+  assert.ok(bridge.atf4AdaptiveCapacity >= 85)
+  assert.equal(bridge.isrNodes.length, 4)
+  assert.equal(bridge.isrNodes[0].nodeKind, 'perk_dimerization_eif2a_ser51_phosphorylation')
+  assert.equal(bridge.isrNodes[1].nodeKind, 'eif2b_ternary_complex_translational_attenuation')
+  assert.equal(bridge.isrNodes[2].nodeKind, 'atf4_uorf_bypass_transcriptional_adaptation')
+  assert.equal(bridge.isrNodes[3].nodeKind, 'gadd34_feedback_vs_chop_apoptotic_switch')
+  assert.equal(bridge.truthClass, 'perk_eif2a_isr_simulation_proxy')
+  assert.equal(bridge.clinically_reviewed, false)
+  assert.equal(bridge.patientTruthUncompromised, true)
+  assert.equal(bridge.neverManufacturesBiomarkers, true)
+  assert.equal(bridge.epistemicHumilityPreserved, true)
+
+  // 2. Blocked stage resilience
+  const blockedEpisode = {
+    id: 'ce_perk_isr_blocked',
+    title: 'Blocked Severe Proteotoxic Stress Episode with CHOP Induction',
+    diagnosisCode: 'G30.9',
+    stages: [
+      { stage: 'problem', status: 'done' },
+      { stage: 'diagnosis', status: 'blocked', blockedReason: 'Awaiting neurodegenerative proteostasis biomarker panel and phosphorylated eIF2α quantitation' },
+    ],
+  }
+  const blockedBridge = deriveEdenPerkIsrBridge(blockedEpisode)
+  assert.equal(blockedBridge.isrState, 'chronic_maladaptive_chop_apoptotic_switch')
+  assert.equal(blockedBridge.isrStateLabel, 'Aktivasi CHOP Maladaptif Kronis & Kerentanan Apoptosis Akibat Stres Translasi Persisten')
+  assert.equal(blockedBridge.isrTier, 'critical_chop_proteotoxicity_instability')
+  assert.equal(blockedBridge.isrTierLabel, 'Instabilitas Proteotoksisitas Kritis & Sakelar Kematian Seluler CHOP/GADD153')
+  assert.ok(blockedBridge.perkIsrScore <= 66)
+  assert.ok(blockedBridge.translationalEfficiencyIndex <= 65)
+  assert.ok(blockedBridge.atf4AdaptiveCapacity <= 64)
+  assert.equal(blockedBridge.isrNodes.every((n) => n.isrStatus === 'proteotoxic_isr_stress'), true)
+
+  // 3. Rollup in evaluateCareJourneyContinuity
+  const projection = evaluateCareJourneyContinuity([sampleEpisode, blockedEpisode], evaluatedAt)
+  assert.equal(projection.edenPerkIsrReadyCount, 2)
+  assert.ok(projection.episodes[0].edenPerkIsr)
+  assert.equal(projection.episodes[0].edenPerkIsr.truthClass, 'perk_eif2a_isr_simulation_proxy')
+  assert.equal(projection.episodes[0].edenPerkIsr.patientTruthUncompromised, true)
+  assert.equal(projection.episodes[0].edenPerkIsr.neverManufacturesBiomarkers, true)
+
+  // 4. UI contracts
+  const panelSource = read('src/domains/clinical-operations/ui/CareContinuityPanel.tsx')
+  assert.ok(panelSource.includes('data-eden-perk-isr="v1"'), 'CareContinuityPanel must include PERK ISR attribute')
+
+  const episodeSource = read('src/pages/clinical/CareEpisode.tsx')
+  assert.ok(episodeSource.includes('data-eden-perk-card="v1"'), 'CareEpisode must include PERK ISR card')
+  assert.ok(episodeSource.includes('data-eden-perk-nodes="v1"'), 'CareEpisode must include PERK ISR nodes grid')
 })

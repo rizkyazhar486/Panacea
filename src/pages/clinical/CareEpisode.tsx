@@ -43,6 +43,7 @@ import {
   deriveEdenRanGtpTransportBridge,
   deriveEdenPeroxisomalCatalaseBridge,
   deriveEdenErProteostasisBridge,
+  deriveEdenPerkIsrBridge,
   EdenLongitudinalInsightSection,
 } from '../../domains/clinical-operations'
 import {
@@ -721,6 +722,9 @@ function EpisodeCard({
 
       {/* Eden Endoplasmic Reticulum UPR & ATF6/IRE1 Proteostatic Quality Control Synthesizer (T-CLIN-55 / EDEN-35) */}
       <EdenErProteostasisSection episode={episode} />
+
+      {/* Eden PERK–eIF2α–ATF4 Integrated Stress Response (ISR) & Translational Attenuation Synthesizer (T-CLIN-57 / EDEN-36) */}
+      <EdenPerkIsrSection episode={episode} />
     </Card>
   )
 }
@@ -4634,6 +4638,128 @@ function EdenErProteostasisSection({ episode }: { episode: CareEpisode }) {
 
       <div className="mt-2 text-[10px] text-neutral-500 dark:text-white/50 text-right">
         ARGON EDEN ∞ §07 · ER Proteostasis & UPR Quality Control Synthesizer · Patient Truth Uncompromised · Never Manufactures Biomarkers
+      </div>
+    </div>
+  )
+}
+
+function EdenPerkIsrSection({ episode }: { episode: CareEpisode }) {
+  const [lang, setLang] = useState<'id' | 'en'>('id')
+
+  const bridge = useMemo(
+    () => deriveEdenPerkIsrBridge(episode),
+    [episode]
+  )
+
+  const narrative = lang === 'id' ? bridge.isrNarrativeId : bridge.isrNarrativeEn
+
+  return (
+    <div
+      className="mt-3 rounded-xl border border-indigo-200 dark:border-white/10 bg-indigo-50/30 dark:bg-white/[0.02] p-3.5"
+      data-eden-perk-card="v1"
+    >
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+        <div>
+          <div className="flex items-center gap-2 flex-wrap">
+            <h4 className="text-xs font-bold text-neutral-900 dark:text-white">
+              {lang === 'id'
+                ? 'Respon Stres Terintegrasi PERK-eIF2α & Atenuasi Translasi'
+                : 'PERK-eIF2α Integrated Stress Response & Translational Attenuation'}
+            </h4>
+            <span className="rounded-full bg-indigo-100 dark:bg-white/10 px-2 py-0.5 text-[10px] font-bold text-indigo-800 dark:text-indigo-300">
+              {bridge.isrStateLabel}
+            </span>
+          </div>
+          <p className="mt-0.5 text-[11px] text-neutral-600 dark:text-white/70">
+            {bridge.isrTierLabel}
+          </p>
+        </div>
+        <div className="flex items-center gap-2 self-start sm:self-auto">
+          <div className="flex rounded-md border border-indigo-200 dark:border-white/10 p-0.5 text-[10px]">
+            <button
+              type="button"
+              onClick={() => setLang('id')}
+              className={`px-1.5 py-0.5 rounded ${lang === 'id' ? 'bg-indigo-600 text-white font-bold' : 'text-neutral-600 dark:text-white/60'}`}
+            >
+              ID
+            </button>
+            <button
+              type="button"
+              onClick={() => setLang('en')}
+              className={`px-1.5 py-0.5 rounded ${lang === 'en' ? 'bg-indigo-600 text-white font-bold' : 'text-neutral-600 dark:text-white/60'}`}
+            >
+              EN
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-2.5 grid grid-cols-1 sm:grid-cols-3 gap-2">
+        <div className="rounded-lg bg-indigo-100/40 dark:bg-white/[0.03] p-2 text-center">
+          <span className="text-[10px] text-neutral-500 dark:text-white/60 block">
+            {lang === 'id' ? 'Skor ISR' : 'ISR Score'}
+          </span>
+          <span className="text-sm font-extrabold text-indigo-700 dark:text-indigo-400">
+            {bridge.perkIsrScore}%
+          </span>
+        </div>
+        <div className="rounded-lg bg-indigo-100/40 dark:bg-white/[0.03] p-2 text-center">
+          <span className="text-[10px] text-neutral-500 dark:text-white/60 block">
+            {lang === 'id' ? 'Indeks Efisiensi Translasi' : 'Translational Efficiency'}
+          </span>
+          <span className="text-sm font-extrabold text-indigo-700 dark:text-indigo-400">
+            {bridge.translationalEfficiencyIndex}%
+          </span>
+        </div>
+        <div className="rounded-lg bg-indigo-100/40 dark:bg-white/[0.03] p-2 text-center">
+          <span className="text-[10px] text-neutral-500 dark:text-white/60 block">
+            {lang === 'id' ? 'Kapasitas Adaptif ATF4' : 'ATF4 Adaptive Capacity'}
+          </span>
+          <span className="text-sm font-extrabold text-indigo-700 dark:text-indigo-400">
+            {bridge.atf4AdaptiveCapacity}%
+          </span>
+        </div>
+      </div>
+
+      <p className="mt-2 text-xs text-neutral-700 dark:text-white/80 leading-relaxed">
+        {narrative}
+      </p>
+
+      <div className="mt-2.5 space-y-1.5" data-eden-perk-nodes="v1">
+        <div className="text-[10px] font-bold text-neutral-500 dark:text-white/60 uppercase tracking-wider">
+          {lang === 'id' ? 'Nodus Jalur Respon Stres PERK-eIF2α & ATF4 (4 Nodus)' : 'PERK-eIF2α & ATF4 Stress Response Nodes (4 Nodes)'}
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-1.5">
+          {bridge.isrNodes.map((node) => (
+            <div
+              key={node.nodeKind}
+              className="rounded-lg border border-indigo-200/50 dark:border-white/10 bg-white/60 dark:bg-white/[0.02] p-2 text-xs"
+            >
+              <div className="flex items-center justify-between gap-1">
+                <span className="font-bold text-neutral-800 dark:text-white truncate">
+                  {node.nodeLabel}
+                </span>
+                <span className="text-[10px] font-bold text-indigo-700 dark:text-indigo-300">
+                  {Math.round(node.attenuationFidelityScore * 100)}%
+                </span>
+              </div>
+              <div className="mt-0.5 text-[10px] text-neutral-500 dark:text-white/60">
+                {node.mechanisticNote}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="mt-2.5 rounded-lg border border-indigo-200/40 dark:border-white/10 bg-indigo-100/30 dark:bg-white/[0.02] p-2.5 text-xs space-y-1">
+        <div className="text-[11px] text-neutral-800 dark:text-white/85">
+          <b>{lang === 'id' ? 'Strategi Modulasi ISR & Resiliensi Translasi:' : 'ISR Modulation & Translational Resilience Strategy:'}</b>{' '}
+          {bridge.isrLongevityStrategy}
+        </div>
+      </div>
+
+      <div className="mt-2 text-[10px] text-neutral-500 dark:text-white/50 text-right">
+        ARGON EDEN ∞ §07 · PERK-eIF2α ISR & Translational Attenuation Synthesizer · Patient Truth Uncompromised · Never Manufactures Biomarkers
       </div>
     </div>
   )

@@ -1733,6 +1733,55 @@ export interface EdenErProteostasisBridge {
   epistemicHumilityPreserved: true
 }
 
+export type EdenPerkIsrState =
+  | 'optimal_eif2a_basal_protein_synthesis'
+  | 'balanced_adaptive_perk_eif2a_attenuation'
+  | 'transient_eif2b_guanine_exchange_inhibition'
+  | 'chronic_maladaptive_chop_apoptotic_switch'
+
+export type EdenPerkIsrTier =
+  | 'optimal_translational_homeostasis'
+  | 'balanced_adaptive_isr_equilibrium'
+  | 'moderate_translational_attenuation_strain'
+  | 'critical_chop_proteotoxicity_instability'
+
+export type EdenPerkIsrNodeKind =
+  | 'perk_dimerization_eif2a_ser51_phosphorylation'
+  | 'eif2b_ternary_complex_translational_attenuation'
+  | 'atf4_uorf_bypass_transcriptional_adaptation'
+  | 'gadd34_feedback_vs_chop_apoptotic_switch'
+
+export interface EdenPerkIsrNode {
+  nodeKind: EdenPerkIsrNodeKind
+  nodeLabel: string
+  attenuationFidelityScore: number
+  cytoprotectiveIndex: number
+  isrStatus: 'optimal_translation_state' | 'adaptive_isr_mode' | 'proteotoxic_isr_stress'
+  mechanisticNote: string
+}
+
+export interface EdenPerkIsrBridge {
+  version: 'v1'
+  episodeId: string
+  episodeTitle: string
+  isrState: EdenPerkIsrState
+  isrStateLabel: string
+  isrTier: EdenPerkIsrTier
+  isrTierLabel: string
+  perkIsrScore: number
+  translationalEfficiencyIndex: number
+  atf4AdaptiveCapacity: number
+  isrNodes: EdenPerkIsrNode[]
+  isrNarrativeId: string
+  isrNarrativeEn: string
+  isrLongevityStrategy: string
+  truthClass: 'perk_eif2a_isr_simulation_proxy'
+  clinically_reviewed: false
+  patientTruthUncompromised: true
+  neverManufacturesBiomarkers: true
+  epistemicHumilityPreserved: true
+}
+
 export interface CareJourneyExportSummary {
   standard: 'PANACEA-CAREPLAN-FHIR-R4-V1'
   generatedAt: string

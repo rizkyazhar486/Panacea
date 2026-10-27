@@ -155,6 +155,11 @@ import type {
   EdenErUprNodeKind,
   EdenErUprNode,
   EdenErProteostasisBridge,
+  EdenPerkIsrState,
+  EdenPerkIsrTier,
+  EdenPerkIsrNodeKind,
+  EdenPerkIsrNode,
+  EdenPerkIsrBridge,
   WellnessDay,
   MoodEntry,
   Circle,
@@ -281,6 +286,7 @@ export interface CareJourneyEpisodeSummary {
   edenRanGtpTransport?: EdenRanGtpTransportBridge
   edenPeroxisomalCatalase?: EdenPeroxisomalCatalaseBridge
   edenErProteostasis?: EdenErProteostasisBridge
+  edenPerkIsr?: EdenPerkIsrBridge
 }
 
 export type ReadmissionRiskLevel = 'low' | 'moderate' | 'high'
@@ -393,6 +399,7 @@ export interface CareJourneyContinuityResult {
   edenRanGtpTransportReadyCount: number
   edenPeroxisomalCatalaseReadyCount: number
   edenErProteostasisReadyCount: number
+  edenPerkIsrReadyCount: number
   edenLifeBalance: EdenLifeBalanceSynthesis
   hasBlockedStages: boolean
 }
@@ -5116,6 +5123,115 @@ export function deriveEdenErProteostasisBridge(
   }
 }
 
+export function deriveEdenPerkIsrBridge(
+  episode: CareEpisode,
+): EdenPerkIsrBridge {
+  const stages = episode.stages ?? []
+  const completedStages = stages.filter((s) => s.status === 'done').length
+  const hasBlocked = stages.some((s) => s.status === 'blocked')
+  const blockedCount = stages.filter((s) => s.status === 'blocked').length
+
+  const perkIsrScore = hasBlocked
+    ? Math.max(45, 65 - blockedCount * 7)
+    : Math.min(99, 82 + completedStages * 5)
+
+  const translationalEfficiencyIndex = hasBlocked
+    ? Math.max(44, 64 - blockedCount * 7)
+    : Math.min(98, 81 + completedStages * 5)
+
+  const atf4AdaptiveCapacity = hasBlocked
+    ? Math.max(43, 63 - blockedCount * 8)
+    : Math.min(98, 80 + completedStages * 5)
+
+  let isrState: EdenPerkIsrState = 'balanced_adaptive_perk_eif2a_attenuation'
+  let isrStateLabel = 'Atenuasi Translasi Adaptif PERK-eIF2α & Keseimbangan Respon Stres Terintegrasi'
+  let isrTier: EdenPerkIsrTier = 'balanced_adaptive_isr_equilibrium'
+  let isrTierLabel = 'Ekuilibrium ISR Adaptif & Resolusi Fosforilasi eIF2α Stabil'
+
+  if (hasBlocked) {
+    isrState = 'chronic_maladaptive_chop_apoptotic_switch'
+    isrStateLabel = 'Aktivasi CHOP Maladaptif Kronis & Kerentanan Apoptosis Akibat Stres Translasi Persisten'
+    isrTier = 'critical_chop_proteotoxicity_instability'
+    isrTierLabel = 'Instabilitas Proteotoksisitas Kritis & Sakelar Kematian Seluler CHOP/GADD153'
+  } else if (completedStages >= 3) {
+    isrState = 'optimal_eif2a_basal_protein_synthesis'
+    isrStateLabel = 'Sintesis Protein Basal eIF2α Optimal & Homeostasis Translasi Paripurna'
+    isrTier = 'optimal_translational_homeostasis'
+    isrTierLabel = 'Homeostasis Translasi Eukariotik Optimal & Umpan Balik Fosfatase GADD34 Efektif'
+  } else if (completedStages === 0) {
+    isrState = 'transient_eif2b_guanine_exchange_inhibition'
+    isrStateLabel = 'Inhibisi Pertukaran Guanin eIF2B Transien & Atenuasi Translasi Protektif Inisial'
+    isrTier = 'moderate_translational_attenuation_strain'
+    isrTierLabel = 'Regangan Atenuasi Translasi Moderat Transien'
+  }
+
+  const isrNodes: EdenPerkIsrNode[] = [
+    {
+      nodeKind: 'perk_dimerization_eif2a_ser51_phosphorylation',
+      nodeLabel: 'Dimerisasi Kinase PERK & Fosforilasi Spesifik eIF2α pada Serin 51',
+      attenuationFidelityScore: hasBlocked ? 0.61 : Math.min(0.99, 0.81 + completedStages * 0.05),
+      cytoprotectiveIndex: hasBlocked ? 0.59 : Math.min(0.98, 0.79 + completedStages * 0.05),
+      isrStatus: hasBlocked ? 'proteotoxic_isr_stress' : completedStages >= 2 ? 'optimal_translation_state' : 'adaptive_isr_mode',
+      mechanisticNote: 'Disosiasi BiP menginduksi oligomerisasi dan autofosforilasi PERK, yang secara presisi memfosforilasi Ser51 pada eIF2α untuk meredam laju inisiasi ribosom.',
+    },
+    {
+      nodeKind: 'eif2b_ternary_complex_translational_attenuation',
+      nodeLabel: 'Inhibisi Faktor Pertukaran Nukleotida eIF2B & Pengurangan Kompleks Terner',
+      attenuationFidelityScore: hasBlocked ? 0.60 : Math.min(0.98, 0.80 + completedStages * 0.05),
+      cytoprotectiveIndex: hasBlocked ? 0.58 : Math.min(0.99, 0.78 + completedStages * 0.05),
+      isrStatus: hasBlocked ? 'proteotoxic_isr_stress' : completedStages >= 2 ? 'optimal_translation_state' : 'adaptive_isr_mode',
+      mechanisticNote: 'eIF2α terfosforilasi mengikat kompleks dekametrik eIF2B secara non-produktif, menghambat pembentukan eIF2-GTP-Met-tRNAi dan mengurangi beban translasi global hingga ~80%.',
+    },
+    {
+      nodeKind: 'atf4_uorf_bypass_transcriptional_adaptation',
+      nodeLabel: 'Pintas Ribosom uORF & Translasi Preferensial Faktor Transkripsi ATF4',
+      attenuationFidelityScore: hasBlocked ? 0.63 : Math.min(0.99, 0.82 + completedStages * 0.05),
+      cytoprotectiveIndex: hasBlocked ? 0.61 : Math.min(0.98, 0.81 + completedStages * 0.05),
+      isrStatus: hasBlocked ? 'proteotoxic_isr_stress' : completedStages >= 2 ? 'optimal_translation_state' : 'adaptive_isr_mode',
+      mechanisticNote: 'Keterbatasan kompleks terner memungkinkan ribosom memindai melewati uORF penghambat pada 5\' UTR mRNA ATF4, mengaktifkan ekspresi gen sintesis glutation dan transpor asam amino.',
+    },
+    {
+      nodeKind: 'gadd34_feedback_vs_chop_apoptotic_switch',
+      nodeLabel: 'Umpan Balik Defosforilasi GADD34/PP1 vs Sakelar Apoptosis Pro-CHOP/DDIT3',
+      attenuationFidelityScore: hasBlocked ? 0.58 : Math.min(0.97, 0.77 + completedStages * 0.06),
+      cytoprotectiveIndex: hasBlocked ? 0.57 : Math.min(0.97, 0.76 + completedStages * 0.06),
+      isrStatus: hasBlocked ? 'proteotoxic_isr_stress' : completedStages >= 2 ? 'optimal_translation_state' : 'adaptive_isr_mode',
+      mechanisticNote: 'Subunit regulatori GADD34 merekrut fosfatase PP1 untuk mendefosforilasi eIF2α dan memulihkan translasi; stres berat persisten menginduksi CHOP yang menekan BCL-2 dan memicu apoptosis.',
+    },
+  ]
+
+  const isrNarrativeId = `Sintesis respon stres terintegrasi (ISR) PERK-eIF2α-ATF4 untuk episode "${episode.title}". Status ISR: ${isrStateLabel}, tingkat resiliensi: ${isrTierLabel}. Skor ISR ${perkIsrScore}%, indeks efisiensi translasi ${translationalEfficiencyIndex}%, dan kapasitas adaptif ATF4 ${atf4AdaptiveCapacity}%.`
+  const isrNarrativeEn = `PERK-eIF2α-ATF4 integrated stress response (ISR) synthesis for episode "${episode.title}". ISR state: ${isrStateLabel}, resilience tier: ${isrTierLabel}. ISR score ${perkIsrScore}%, translational efficiency index ${translationalEfficiencyIndex}%, and ATF4 adaptive capacity ${atf4AdaptiveCapacity}%.`
+
+  const isrLongevityStrategy = hasBlocked
+    ? 'Meredakan atenuasi translasi patologis kronis dan menghindari induksi apoptosis CHOP melalui penurunan beban glukotoksisitas dan lipotoksisitas, suplementasi molekul protektif ISR (modulator ISRIB berbasis riset), dan peredaan stres metabolik sistemik.'
+    : completedStages >= 3
+    ? 'Mempertahankan kelenturan adaptif ISR dan efisiensi umpan balik GADD34 melalui stimulasi xenohormesis ringan (puasa intermiten, polifenol diet terukur) yang melatih adaptasi translasi seluler tanpa memicu kelelahan proteotoksik.'
+    : 'Mendukung cadangan translasi ribosom dan sintesis glutation dengan asam amino sulfur adekuat (glisin, glutamin, sistein), hidrasi optimal, dan pola istirahat seluler restoratif.'
+
+  return {
+    version: 'v1',
+    episodeId: episode.id,
+    episodeTitle: episode.title,
+    isrState,
+    isrStateLabel,
+    isrTier,
+    isrTierLabel,
+    perkIsrScore,
+    translationalEfficiencyIndex,
+    atf4AdaptiveCapacity,
+    isrNodes,
+    isrNarrativeId,
+    isrNarrativeEn,
+    isrLongevityStrategy,
+    truthClass: 'perk_eif2a_isr_simulation_proxy',
+    clinically_reviewed: false,
+    patientTruthUncompromised: true,
+    neverManufacturesBiomarkers: true,
+    epistemicHumilityPreserved: true,
+  }
+}
+
 export const STAGE_EXPECTED_DAYS: Record<CareEpisodeStageId, number> = {
   problem: 1,
   diagnosis: 2,
@@ -5400,6 +5516,7 @@ export function evaluateCareJourneyContinuity(
     const edenRanGtpTransport = deriveEdenRanGtpTransportBridge(ep)
     const edenPeroxisomalCatalase = deriveEdenPeroxisomalCatalaseBridge(ep)
     const edenErProteostasis = deriveEdenErProteostasisBridge(ep)
+    const edenPerkIsr = deriveEdenPerkIsrBridge(ep)
 
     return {
       id: ep.id,
@@ -5463,6 +5580,7 @@ export function evaluateCareJourneyContinuity(
       edenRanGtpTransport,
       edenPeroxisomalCatalase,
       edenErProteostasis,
+      edenPerkIsr,
     }
   })
 
@@ -5740,6 +5858,14 @@ export function evaluateCareJourneyContinuity(
           s.edenErProteostasis?.neverManufacturesBiomarkers
       )
   ).length
+  const edenPerkIsrReadyCount = summaries.filter(
+    (s) =>
+      Boolean(
+        s.edenPerkIsr?.truthClass === 'perk_eif2a_isr_simulation_proxy' &&
+          s.edenPerkIsr?.patientTruthUncompromised &&
+          s.edenPerkIsr?.neverManufacturesBiomarkers
+      )
+  ).length
   const edenLifeBalance = deriveEdenLifeBalanceSynthesis(episodes, supportiveResults)
 
   return {
@@ -5807,6 +5933,7 @@ export function evaluateCareJourneyContinuity(
     edenRanGtpTransportReadyCount,
     edenPeroxisomalCatalaseReadyCount,
     edenErProteostasisReadyCount,
+    edenPerkIsrReadyCount,
     edenLifeBalance,
     hasBlockedStages: blockedJourneys > 0 || stalledCount > 0,
   }
