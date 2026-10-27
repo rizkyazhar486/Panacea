@@ -16,12 +16,24 @@ const EXPECTED_PILLARS = new Set([
   'ADOPTION_REAL_WORLD_IMPACT',
 ])
 
+const REQUIRED_ANCHORS = new Map([
+  ['T-CLIN-06', 'CLINICAL_ONE_OS'],
+  ['T-CLIN-11', 'CLINICAL_ONE_OS'],
+  ['T-CLIN-13', 'CLINICAL_ONE_OS'],
+  ['T-CLIN-16', 'TRUST_SAFETY_VALIDATION'],
+  ['T-CLIN-17', 'CLINICAL_ONE_OS'],
+  ['T-CLIN-19', 'ADOPTION_REAL_WORLD_IMPACT'],
+  ['T-CLIN-21', 'EDUCATION_WORKFLOW'],
+  ['T-CLIN-71', 'BODY_EXPOSURE'],
+  ['T-CLIN-110', 'DEVICE_MONITORING'],
+])
+
 const load = (path) => JSON.parse(readFileSync(path, 'utf8'))
 const meaningful = (value) => typeof value === 'string' && value.trim().length >= 12
 
 function validateGate(gate, audit) {
   const errors = []
-  if (gate.schemaVersion !== '1.0.0') errors.push('unsupported impact gate schema')
+  if (gate.schemaVersion !== '1.1.0') errors.push('unsupported impact gate schema')
   if (gate.policy !== 'SIX_PILLAR_HUMAN_BENEFIT_GATE_V1') errors.push('wrong policy')
   if (!Array.isArray(gate.pillars) || gate.pillars.length !== EXPECTED_PILLARS.size ||
     new Set(gate.pillars.map((pillar) => pillar.id)).size !== EXPECTED_PILLARS.size ||
@@ -34,6 +46,10 @@ function validateGate(gate, audit) {
   if (requiredIds.size !== 5) errors.push('exactly five auditable priority candidates are required')
   const entries = Array.isArray(gate.entries) ? gate.entries : []
   const seen = new Set()
+  const coveredPrimary = new Set()
+  if (entries.length !== REQUIRED_ANCHORS.size) {
+    errors.push('pilot anchor count differs from registered nine-module scope')
+  }
 
   for (const item of entries) {
     if (!item || typeof item !== 'object') {
@@ -42,6 +58,11 @@ function validateGate(gate, audit) {
     }
     if (seen.has(item.id)) errors.push('duplicate T-CLIN impact entry: ' + item.id)
     seen.add(item.id)
+    if (!REQUIRED_ANCHORS.has(item.id)) errors.push('unregistered pilot anchor: ' + item.id)
+    if (REQUIRED_ANCHORS.get(item.id) !== item.primaryPillar) {
+      errors.push('pilot anchor primary pillar mismatch: ' + item.id)
+    }
+    coveredPrimary.add(item.primaryPillar)
     const original = audited.get(item.id)
     if (!original) errors.push('impact entry not present in audit registry: ' + item.id)
     if (!EXPECTED_PILLARS.has(item.primaryPillar)) errors.push('invalid primary pillar: ' + item.id)
@@ -65,20 +86,31 @@ function validateGate(gate, audit) {
     if (original && item.evidenceTier !== original.evidenceTier) {
       errors.push('evidence tier differs from canonical audit: ' + item.id)
     }
-    if (original && original.category !== 'A_DIRECT_CLINICAL_WORKFLOW') {
-      errors.push('priority clinical gate cannot relabel nonclinical research as workflow: ' + item.id)
+    if (original && item.category !== original.category) {
+      errors.push('canonical clinical utility category mismatch: ' + item.id)
+    }
+    if (original && item.clinicalValidationStatus !== original.clinicalValidationStatus) {
+      errors.push('canonical validation status mismatch: ' + item.id)
     }
     if (item.clinicallyValidatedBenefit !== false || item.independentlyValidatedBenefit !== false) {
       errors.push('unverified human benefit must not claim clinical validation: ' + item.id)
     }
-    if (item.humanAuthority !== 'AUTHORISED_CLINICIAN') {
-      errors.push('clinician authority boundary missing: ' + item.id)
+    const researchOnly = original && original.category === 'C_CLINICAL_RESEARCH_INFRASTRUCTURE'
+    const expectedAuthority = researchOnly ? 'RESEARCH_ONLY_QUALIFIED_REVIEWER' : 'AUTHORISED_CLINICIAN'
+    if (item.humanAuthority !== expectedAuthority) {
+      errors.push('human authority does not match canonical use boundary: ' + item.id)
     }
     if (item.sourceRegistry !== 'governance/CLINICAL_UTILITY_AUDIT.json') {
       errors.push('provenance pointer missing: ' + item.id)
     }
   }
   for (const id of requiredIds) if (!seen.has(id)) errors.push('priority candidate missing impact contract: ' + id)
+  for (const id of REQUIRED_ANCHORS.keys()) {
+    if (!seen.has(id)) errors.push('six-pillar pilot anchor missing impact contract: ' + id)
+  }
+  for (const pillar of EXPECTED_PILLARS) {
+    if (!coveredPrimary.has(pillar)) errors.push('product pillar has no primary T-CLIN anchor: ' + pillar)
+  }
   return errors
 }
 
@@ -105,4 +137,9 @@ test('negative controls reject invented outcomes, missing mappings, unjustified 
   assert.match(change((g) => { g.entries[0].outcomeMetric.denominator = '' }), /missing metric denominator/)
   assert.match(change((g) => { g.entries.push(structuredClone(g.entries[0])) }), /duplicate T-CLIN/)
   assert.match(change((g) => { g.pillars.pop() }), /six-pillar taxonomy/)
+  assert.match(change((g) => { g.entries[5].category = 'A_DIRECT_CLINICAL_WORKFLOW' }), /canonical clinical utility category mismatch/)
+  assert.match(change((g) => { g.entries[6].clinicalValidationStatus = 'VALIDATED' }), /canonical validation status mismatch/)
+  assert.match(change((g) => { g.entries[6].humanAuthority = 'AUTHORISED_CLINICIAN' }), /human authority does not match/)
+  assert.match(change((g) => { g.entries[8].primaryPillar = 'CLINICAL_ONE_OS' }), /pilot anchor primary pillar mismatch|product pillar has no primary/)
+  assert.match(change((g) => { g.entries[5].id = 'T-CLIN-999' }), /unregistered pilot anchor/)
 })
