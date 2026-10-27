@@ -129,7 +129,7 @@ test('negative controls reject invented outcomes, missing mappings, unjustified 
     return validateGate(candidate, audit).join(' | ')
   }
 
-  assert.match(change((g) => { g.entries.pop() }), /priority candidate missing impact contract/)
+  assert.match(change((g) => { g.entries = g.entries.filter((item) => item.id !== 'T-CLIN-06') }), /priority candidate missing impact contract/)
   assert.match(change((g) => { g.entries[0].primaryPillar = 'INVENTED' }), /invalid primary pillar/)
   assert.match(change((g) => { g.entries[0].outcomeMetric.observedValue = 0.98 }), /unverified field results/)
   assert.match(change((g) => { g.entries[0].clinicallyValidatedBenefit = true }), /must not claim clinical validation/)
