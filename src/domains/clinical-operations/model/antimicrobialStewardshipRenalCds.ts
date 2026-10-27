@@ -2,6 +2,8 @@
 // T-CLIN-95: Clinical Antimicrobial Stewardship & Renal-Dosed Pathogen Sensitivity CDS Engine
 // Aligned with IDSA Guidelines & Sanford Guide Renal Dosing Protocol
 
+import { isValidIsoTimestamp } from '../../../shared/kernel/isoTimestamp.ts'
+
 export type BiologicalSex = 'MALE' | 'FEMALE'
 
 export type InfectionSyndrome =
@@ -25,7 +27,8 @@ export interface PatientRenalParameters {
   sex: BiologicalSex
   weightKg: number
   serumCreatinineMgDl: number // normal 0.7 - 1.2 mg/dL
-  isHemodialysisDependent?: boolean
+  /** Required explicitly: unknown dialysis status cannot authorize this non-dialysis proxy. */
+  isHemodialysisDependent: boolean
 }
 
 export interface PrescribedAntimicrobialOrder {
@@ -51,51 +54,80 @@ export interface AntimicrobialStewardshipEvaluation {
   therapeuticDrugMonitoringRequired: boolean // e.g. Vancomycin trough or AUC24/MIC targeting
   nephrotoxicityWarningSummary?: string
   guidelineCitation: string
-  requiresClinicianAcknowledgment: boolean
+  requiresClinicianAcknowledgment: true
   truthClass: 'clinical_decision_support_guideline_proxy'
   clinically_reviewed: false
   neverManufacturesBiomarkers: true
   evaluatedAtIso: string
-  auditDigestSha256: string
+  /** No digest is supplied until a real audit attestation is implemented. */
+  auditDigestSha256: null
+  auditIntegrity: 'NOT_ATTESTED'
 }
 
-function computeDeterministicAuditDigest(payload: string): string {
-  let h1 = 0xdeadbeef ^ payload.length
-  let h2 = 0x41c6ce57 ^ payload.length
-  let h3 = 0x9e3779b9 ^ payload.length
-  let h4 = 0x85ebca6b ^ payload.length
+function invalidAntimicrobialInput(field: string): never {
+  // Never include identifiers, measurements or clinical notes in errors/logs.
+  throw new TypeError(`Invalid antimicrobial CDS input: ${field}`)
+}
 
-  for (let i = 0; i < payload.length; i++) {
-    const ch = payload.charCodeAt(i)
-    h1 = Math.imul(h1 ^ ch, 2654435761)
-    h2 = Math.imul(h2 ^ ch, 1597334677)
-    h3 = Math.imul(h3 ^ ch, 2246822507)
-    h4 = Math.imul(h4 ^ ch, 3266489909)
+function requireNumber(value: unknown, field: string, minimum: number, maximum = Infinity): void {
+  if (typeof value !== 'number' || !Number.isFinite(value) || value < minimum || value > maximum) {
+    invalidAntimicrobialInput(field)
   }
-
-  h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909)
-  h2 = Math.imul(h2 ^ (h2 >>> 16), 1597334677) ^ Math.imul(h3 ^ (h3 >>> 13), 2654435761)
-  h3 = Math.imul(h3 ^ (h3 >>> 16), 2654435761) ^ Math.imul(h4 ^ (h4 >>> 13), 1597334677)
-  h4 = Math.imul(h4 ^ (h4 >>> 16), 3266489909) ^ Math.imul(h1 ^ (h1 >>> 13), 2246822507)
-
-  const toHex = (n: number) => (n >>> 0).toString(16).padStart(8, '0')
-  return `${toHex(h1)}${toHex(h2)}${toHex(h3)}${toHex(h4)}${toHex(h2 ^ h3)}${toHex(h1 ^ h4)}${toHex(h1 ^ h2)}${toHex(h3 ^ h4)}`
 }
 
 /**
- * Evaluates patient creatinine clearance (Cockcroft-Gault), adjusts antibiotic regimen, and screens for nephrotoxicity and coverage mismatch.
+ * Unreviewed, non-prescriptive proxy using an explicit clock. Invalid inputs and
+ * unsupported regimens throw before a dosing-safety result is produced.
+ * CrCl = ((140 - ageYears) * weightKg) / (72 * ScrMgDl), x 0.85 for FEMALE.
+ * Cockcroft & Gault (1976), Nephron 16:31-41, DOI:10.1159/000180580.
+ * This estimates creatinine clearance, not measured GFR. The existing numerical
+ * envelope below is an implementation limit, not a validated clinical range.
+ * Neither this equation nor input validation validates the drug dosing rules.
  */
 export function evaluateAntimicrobialStewardship(
   patient: PatientRenalParameters,
   order: PrescribedAntimicrobialOrder,
-  evaluationIsoTimestamp?: string
+  evaluationIsoTimestamp: string
 ): AntimicrobialStewardshipEvaluation {
-  const evaluatedAtIso = evaluationIsoTimestamp ?? new Date().toISOString()
+  if (!patient || typeof patient !== 'object' || Array.isArray(patient)) invalidAntimicrobialInput('patient')
+  if (!order || typeof order !== 'object' || Array.isArray(order)) invalidAntimicrobialInput('order')
+  if (!isValidIsoTimestamp(evaluationIsoTimestamp)) invalidAntimicrobialInput('evaluationIsoTimestamp')
+  const evaluatedAtIso = evaluationIsoTimestamp
+
+  if (typeof patient.patientId !== 'string' || !patient.patientId.trim()) invalidAntimicrobialInput('patientId')
+  if (typeof order.orderId !== 'string' || !order.orderId.trim()) invalidAntimicrobialInput('orderId')
+  requireNumber(patient.ageYears, 'ageYears', 18, 105)
+  requireNumber(patient.weightKg, 'weightKg', 30, 220)
+  requireNumber(patient.serumCreatinineMgDl, 'serumCreatinineMgDl', 0.3)
+  if (patient.sex !== 'MALE' && patient.sex !== 'FEMALE') invalidAntimicrobialInput('sex')
+  // No validated dialysis-specific regimen is implemented. Do not substitute
+  // a creatinine-based non-dialysis schedule, even if calculated clearance is high.
+  if (patient.isHemodialysisDependent !== false) {
+    invalidAntimicrobialInput('isHemodialysisDependent')
+  }
+  if (!['VANCOMYCIN', 'PIPERACILLIN_TAZOBACTAM', 'MEROPENEM', 'CEFEPIME', 'CIPROFLOXACIN'].includes(order.antibioticName)) {
+    invalidAntimicrobialInput('antibioticName')
+  }
+  if (!['HOSPITAL_ACQUIRED_PNEUMONIA', 'COMPLICATED_URINARY_TRACT_INFECTION', 'INTRA_ABDOMINAL_SEPSIS',
+    'SKIN_SOFT_TISSUE_MRSA', 'BACTEREMIA_SEPTIC_SHOCK'].includes(order.infectionSyndrome)) {
+    invalidAntimicrobialInput('infectionSyndrome')
+  }
+  if (!['PSEUDOMONAS_AERUGINOSA', 'METHICILLIN_RESISTANT_S_AUREUS_MRSA', 'ESBL_PRODUCING_ENTEROBACTERALES',
+    'ENTEROCOCCUS_FAECALIS', 'STREPTOCOCCUS_PNEUMONIAE', 'EMPIRIC_COVERAGE_NO_ISOLATE_YET'].includes(order.suspectedOrCulturedPathogen)) {
+    invalidAntimicrobialInput('suspectedOrCulturedPathogen')
+  }
+  requireNumber(order.requestedDoseMg, 'requestedDoseMg', Number.MIN_VALUE)
+  requireNumber(order.requestedDoseIntervalHours, 'requestedDoseIntervalHours', Number.MIN_VALUE)
+  if (order.concomitantNephrotoxins !== undefined
+    && (!Array.isArray(order.concomitantNephrotoxins)
+      || !Array.from(order.concomitantNephrotoxins).every((value) => typeof value === 'string' && value.trim()))) {
+    invalidAntimicrobialInput('concomitantNephrotoxins')
+  }
 
   // Cockcroft-Gault Equation: ((140 - age) * weight) / (72 * Scr) * (0.85 if female)
-  const age = Math.max(18, Math.min(105, patient.ageYears))
-  const weight = Math.max(30, Math.min(220, patient.weightKg))
-  const scr = Math.max(0.3, patient.serumCreatinineMgDl)
+  const age = patient.ageYears
+  const weight = patient.weightKg
+  const scr = patient.serumCreatinineMgDl
 
   let crCl = ((140 - age) * weight) / (72 * scr)
   if (patient.sex === 'FEMALE') {
@@ -123,7 +155,6 @@ export function evaluateAntimicrobialStewardship(
   let doseAlert: 'SAFE_STANDARD_DOSING' | 'DOSE_REDUCTION_REQUIRED' | 'INTERVAL_EXTENSION_REQUIRED' | 'NEPHROTOXIC_SYNERGY_AVOID' = 'SAFE_STANDARD_DOSING'
   let tdmRequired = false
   let warningSummary: string | undefined = undefined
-  let requiresClinicianAck = false
 
   switch (order.antibioticName) {
     case 'VANCOMYCIN':
@@ -132,12 +163,10 @@ export function evaluateAntimicrobialStewardship(
         recDose = 1000
         recInterval = 48
         doseAlert = 'INTERVAL_EXTENSION_REQUIRED'
-        requiresClinicianAck = true
       } else if (calcCrCl < 50.0) {
         recDose = 1000
         recInterval = 24
         doseAlert = 'INTERVAL_EXTENSION_REQUIRED'
-        requiresClinicianAck = true
       } else {
         recDose = 1000
         recInterval = 12
@@ -148,7 +177,6 @@ export function evaluateAntimicrobialStewardship(
       if (order.concomitantNephrotoxins && order.concomitantNephrotoxins.some((t) => t.toUpperCase().includes('PIPERACILLIN') || t.toUpperCase().includes('TAZOBAC'))) {
         doseAlert = 'NEPHROTOXIC_SYNERGY_AVOID'
         warningSummary = 'High risk of acute kidney injury (AKI) from concomitant Vancomycin + Piperacillin-Tazobactam synergy. Consider Cefepime or Meropenem alternative.'
-        requiresClinicianAck = true
       }
       break
 
@@ -157,17 +185,14 @@ export function evaluateAntimicrobialStewardship(
         recDose = 500
         recInterval = 24
         doseAlert = 'DOSE_REDUCTION_REQUIRED'
-        requiresClinicianAck = true
       } else if (calcCrCl < 26.0) {
         recDose = 500
         recInterval = 12
         doseAlert = 'DOSE_REDUCTION_REQUIRED'
-        requiresClinicianAck = true
       } else if (calcCrCl < 50.0) {
         recDose = 1000
         recInterval = 12
         doseAlert = 'INTERVAL_EXTENSION_REQUIRED'
-        requiresClinicianAck = true
       } else {
         recDose = 1000
         recInterval = 8
@@ -182,12 +207,10 @@ export function evaluateAntimicrobialStewardship(
         recInterval = 24
         doseAlert = 'INTERVAL_EXTENSION_REQUIRED'
         warningSummary = 'Unadjusted Cefepime in severe renal impairment causes drug accumulation and severe encephalopathy / non-convulsive status epilepticus.'
-        requiresClinicianAck = true
       } else if (calcCrCl < 60.0) {
         recDose = 1000
         recInterval = 12
         doseAlert = 'DOSE_REDUCTION_REQUIRED'
-        requiresClinicianAck = true
       } else {
         recDose = 2000
         recInterval = 8
@@ -200,12 +223,10 @@ export function evaluateAntimicrobialStewardship(
         recDose = 2250
         recInterval = 8
         doseAlert = 'DOSE_REDUCTION_REQUIRED'
-        requiresClinicianAck = true
       } else if (calcCrCl <= 50.0) {
         recDose = 3375
         recInterval = 6
         doseAlert = 'DOSE_REDUCTION_REQUIRED'
-        requiresClinicianAck = true
       } else {
         recDose = 4500
         recInterval = 6
@@ -218,7 +239,6 @@ export function evaluateAntimicrobialStewardship(
         recDose = 250
         recInterval = 12
         doseAlert = 'DOSE_REDUCTION_REQUIRED'
-        requiresClinicianAck = true
       } else {
         recDose = 400
         recInterval = 12
@@ -243,14 +263,12 @@ export function evaluateAntimicrobialStewardship(
       concordance = 'OPTIMAL_TARGETED'
     } else {
       concordance = 'MISMATCH_INSUFFICIENT_SPECTRUM'
-      requiresClinicianAck = true
     }
   } else if (path === 'PSEUDOMONAS_AERUGINOSA') {
     if (['PIPERACILLIN_TAZOBACTAM', 'MEROPENEM', 'CEFEPIME', 'CIPROFLOXACIN'].includes(abx)) {
       concordance = 'OPTIMAL_TARGETED'
     } else {
       concordance = 'MISMATCH_INSUFFICIENT_SPECTRUM'
-      requiresClinicianAck = true
     }
   } else if (path === 'ESBL_PRODUCING_ENTEROBACTERALES') {
     if (abx === 'MEROPENEM') {
@@ -258,7 +276,6 @@ export function evaluateAntimicrobialStewardship(
     } else if (['PIPERACILLIN_TAZOBACTAM', 'CEFEPIME'].includes(abx)) {
       concordance = 'MISMATCH_INSUFFICIENT_SPECTRUM'
       warningSummary = (warningSummary ? warningSummary + ' ' : '') + 'ESBL isolate demonstrated: beta-lactamase hydrolysis renders piperacillin/cefepime subtherapeutic. Carbapenem indicated.'
-      requiresClinicianAck = true
     }
   } else if (path === 'STREPTOCOCCUS_PNEUMONIAE') {
     if (abx === 'MEROPENEM') {
@@ -269,18 +286,6 @@ export function evaluateAntimicrobialStewardship(
     }
   }
 
-  const rawAuditPayload = JSON.stringify({
-    patientId: patient.patientId,
-    orderId: order.orderId,
-    abx: order.antibioticName,
-    calcCrCl,
-    renalCat,
-    recDose,
-    recInterval,
-    doseAlert,
-    concordance,
-    evaluatedAtIso,
-  })
 
   return {
     patientId: patient.patientId,
@@ -295,11 +300,12 @@ export function evaluateAntimicrobialStewardship(
     therapeuticDrugMonitoringRequired: tdmRequired,
     nephrotoxicityWarningSummary: warningSummary,
     guidelineCitation: 'IDSA Guidance on Antimicrobial Stewardship & Sanford Guide to Antimicrobial Therapy 2026',
-    requiresClinicianAcknowledgment: requiresClinicianAck,
+    requiresClinicianAcknowledgment: true,
     truthClass: 'clinical_decision_support_guideline_proxy',
     clinically_reviewed: false,
     neverManufacturesBiomarkers: true,
     evaluatedAtIso,
-    auditDigestSha256: computeDeterministicAuditDigest(rawAuditPayload),
+    auditDigestSha256: null,
+    auditIntegrity: 'NOT_ATTESTED',
   }
 }
