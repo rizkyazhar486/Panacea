@@ -5,6 +5,7 @@ import {
   evidenceReadiness,
   type DiscoveryMode,
 } from '../../lib/discoveryWorkbench'
+import { FrontierBiomedicalResearchPanel } from './FrontierBiomedicalResearchPanel'
 
 const SynapseMicro3DLab = lazy(() => import('../../pages/discovery/SynapseMicro3DLab'))
 const MentalStateCircuit3DLab = lazy(() => import('./MentalStateCircuit3DLab'))
@@ -197,6 +198,15 @@ export function DiscoveryWorkbench() {
           </div>
         </details>
       )}
+
+      <details className="rounded-2xl border border-cyan-500/30 bg-cyan-950/20 p-3" defaultOpen>
+        <summary className="min-h-11 cursor-pointer text-xs font-black text-cyan-400">
+          Frontier Biomedical Discovery & Multiscale Simulation Engine (T-CLIN-65..71)
+        </summary>
+        <div className="mt-3">
+          <FrontierBiomedicalResearchPanel />
+        </div>
+      </details>
     </section>
   )
 }
