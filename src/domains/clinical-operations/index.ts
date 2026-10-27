@@ -193,3 +193,17 @@ export {
   type CenturyMilestoneVerificationResult,
 } from './model/oneOsCenturyMilestoneVerification'
 
+export {
+  evaluateAnticholinergicSedativeBurden,
+  type PatientGeriatricRegimen,
+  type PrescribedMedicationItem,
+  type AnticholinergicBurdenEvaluation,
+  type AcbRiskTier,
+} from './model/anticholinergicSedativeBurdenCds'
+
+export {
+  evaluateCgmGlycemicSafety,
+  type PatientCgm14DayProfile,
+  type CgmClinicalDecisionSupportEvaluation,
+} from './model/glycemicHypoglycemiaCgmCds'
+
