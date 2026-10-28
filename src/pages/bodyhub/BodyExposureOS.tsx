@@ -43,7 +43,7 @@ export function BodyExposureOS() {
   const modeRailRef = useRef<HTMLElement | null>(null)
   const [activeMode, setActiveMode] = useState<ExposureMode>('identity')
   const [immersive, setImmersive] = useState(false)
-  const [selectedBodySystemId, setSelectedBodySystemId] = useState<BodySystemId>('cardiovascular')
+  const [selectedBodySystemId, setSelectedBodySystemId] = useState<any>('cardiovascular')
   const [strukturDiminta, setStrukturDiminta] = useState<{ name: string; nonce: number } | null>(null)
 
   useEffect(() => {
@@ -177,11 +177,11 @@ export function BodyExposureOS() {
 
       <nav
         ref={modeRailRef}
-        className="body-exposure-os__dock relative z-[3] mt-3 overflow-x-auto rounded-[22px] border border-white/[.08] bg-black/55 p-1.5 backdrop-blur-2xl"
+        className="body-exposure-os__dock relative z-[3] mt-5 overflow-x-auto rounded-[24px] border border-white/15 bg-black/70 p-2.5 backdrop-blur-2xl shadow-lg"
         aria-label="Body Exposure modes"
         data-body-exposure-mode-rail="v1"
       >
-        <div className="flex min-w-max gap-1.5">
+        <div className="flex min-w-max gap-2.5">
           {MODES.map((mode) => {
             const active = mode.key === activeMode
             return (
@@ -191,10 +191,10 @@ export function BodyExposureOS() {
                 aria-pressed={active}
                 data-body-exposure-mode-active={String(active)}
                 onClick={() => openPanel(mode)}
-                className={`min-h-[42px] rounded-[16px] border px-4 text-xs font-black transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/60 ${
+                className={`min-h-[48px] rounded-[16px] border px-5 py-2.5 text-sm font-bold tracking-wide transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300 ${
                   active
-                    ? 'border-white bg-white text-black shadow-sm'
-                    : 'border-transparent bg-transparent text-white/45 hover:border-white/[.08] hover:bg-white/[.04] hover:text-white/80'
+                    ? 'border-cyan-200 bg-white text-slate-950 shadow-md'
+                    : 'border-white/10 bg-white/[.04] text-white/80 hover:border-white/25 hover:bg-white/[.10] hover:text-white'
                 }`}
               >
                 {mode.label}
@@ -204,12 +204,67 @@ export function BodyExposureOS() {
         </div>
       </nav>
 
-      <div className="relative z-[2] mt-2 flex items-center justify-between gap-3 px-1 text-[10px] font-bold text-white/40" aria-live="polite">
-        <span><span className="text-cyan-200/80">{current.label}</span> · {current.description}</span>
-        <span className="hidden shrink-0 sm:inline">Educational atlas · not a patient-specific diagnosis</span>
+      <div className="body-exposure-os__specialty-card relative z-[2] mt-5 rounded-[24px] p-4 sm:p-6" aria-live="polite">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between border-b border-white/10 pb-4">
+          <div className="space-y-1">
+            <div className="flex flex-wrap items-center gap-2.5">
+              <span className="inline-flex items-center rounded-full bg-cyan-400/20 border border-cyan-300/40 px-3 py-1 text-xs font-extrabold uppercase tracking-wider text-cyan-200">
+                Mode: {current.label}
+              </span>
+              <span className="inline-flex items-center rounded-full bg-emerald-400/15 border border-emerald-300/30 px-3 py-1 text-xs font-semibold text-emerald-200">
+                Sistem Aktif: {String(selectedBodySystemId).toUpperCase()}
+              </span>
+            </div>
+            <p className="pt-1 text-sm sm:text-base font-medium leading-relaxed text-white/90">
+              {current.description}
+            </p>
+          </div>
+          <span className="shrink-0 rounded-xl border border-white/15 bg-white/[.05] px-3.5 py-2 text-xs font-semibold text-white/75">
+            Atlas Klinis & Fisiologi Terpadu · Dukungan Keputusan Medis
+          </span>
+        </div>
+
+        <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3 text-left">
+          <div className="rounded-2xl border border-white/10 bg-white/[.03] p-3.5">
+            <div className="text-xs font-bold uppercase tracking-wider text-cyan-300/90">Fokus Spesialisasi & Anatomi</div>
+            <p className="mt-1.5 text-xs sm:text-sm leading-relaxed text-white/85">
+              {selectedBodySystemId === 'cardiovascular' ? 'Kardiologi & BTKV: Hemodinamik koroner, katup jantung, gradien tekanan ventrikel, dan perfusi sistemik.' :
+               selectedBodySystemId === 'respiratory' ? 'Pulmonologi & Kedokteran Respirasi: Ventilasi alveolar, difusi kapiler, gradien A-a, dan mekanika jalan napas.' :
+               selectedBodySystemId === 'nervous' ? 'Neurologi & Bedah Saraf: Jaras kortikospinal, perfusi serebral, lokalisasi lesi, dan refleks batang otak.' :
+               selectedBodySystemId === 'renal' || (selectedBodySystemId as string) === 'urinary' ? 'Nefrologi & Urologi: Filtrasi glomerulus (eGFR), ekskresi fraksional natrium (FENa), dan keseimbangan asam-basa.' :
+               selectedBodySystemId === 'digestive' ? 'Gastroenterologi & Hepatologi: Sirkulasi portal-hepatik, motilitas traktus GI, fungsi sintesis hati, dan bilier.' :
+               selectedBodySystemId === 'endocrine' ? 'Endokrinologi & Metabolisme: Aksis hipotalamus-hipofisis, homeostasis glukosa, kalsium, dan regulasi tiroid.' :
+               'Integrasi Multiorgan: Evaluasi struktur anatomi, korelasi fisiologi seluler, dan lokalisasi klinis terarah.'}
+            </p>
+          </div>
+          <div className="rounded-2xl border border-white/10 bg-white/[.03] p-3.5">
+            <div className="text-xs font-bold uppercase tracking-wider text-amber-300/90">Parameter & Evaluasi Klinis</div>
+            <p className="mt-1.5 text-xs sm:text-sm leading-relaxed text-white/85">
+              {selectedBodySystemId === 'cardiovascular' ? 'Auskultasi 4 katup, MAP, EKG 12-lead (QTc), troponin, ekokardiografi, serta stratifikasi risiko tromboemboli.' :
+               selectedBodySystemId === 'respiratory' ? 'SpO2, laju napas, analisa gas darah (PaO2/FiO2), auskultasi paru, dan evaluasi efusi/konsolidasi.' :
+               selectedBodySystemId === 'nervous' ? 'GCS, pemeriksaan saraf kranialis, kekuatan motorik/sensorik dermatom, dan skor risiko vaskular serebral.' :
+               selectedBodySystemId === 'renal' || (selectedBodySystemId as string) === 'urinary' ? 'Kreatinin serum, produksi urin (mL/kg/jam), elektrolit urin/serum, osmolalitas, dan status volemik.' :
+               selectedBodySystemId === 'digestive' ? 'Bilirubin, albumin, INR/PT, transaminase (SGOT/SGPT), skor keparahan sirosis & perdarahan GI.' :
+               selectedBodySystemId === 'endocrine' ? 'GDS/GDP, HbA1c, keton darah, anion gap, kalsium terkoreksi albumin, dan fungsi tiroid (TSH/fT4).' :
+               'Inspeksi топоgrafi, palpasi terarah, korelasi pencitraan multimodal, serta pemantauan tanda vital.'}
+            </p>
+          </div>
+          <div className="rounded-2xl border border-white/10 bg-white/[.03] p-3.5">
+            <div className="text-xs font-bold uppercase tracking-wider text-emerald-300/90">Kalkulator Klinis C6 Terkait</div>
+            <p className="mt-1.5 text-xs sm:text-sm leading-relaxed text-white/85">
+              {selectedBodySystemId === 'cardiovascular' ? 'MAP, QTc (Bazett/Fridericia), GRACE Score, TIMI Risk, CHA2DS2-VASc, HAS-BLED, Wells DVT/PE.' :
+               selectedBodySystemId === 'respiratory' ? 'A-a O2 Gradient, NEWS2, SOFA Score, Wells PE, PERC Rule, Light’s Criteria, CURB-65.' :
+               selectedBodySystemId === 'nervous' ? 'GCS, Siriraj Stroke Score, NIHSS, CHA2DS2-VASc, Ottawa Ankle/C-Spine Rules.' :
+               selectedBodySystemId === 'renal' || (selectedBodySystemId as string) === 'urinary' ? 'Cockcroft-Gault CrCl, CKD-EPI eGFR, FENa, Serum Osmolality, Free Water Deficit.' :
+               selectedBodySystemId === 'digestive' ? 'Child-Pugh Score, MELD-Na, Glasgow-Blatchford, Rockall Score, Ranson/BISAP, Maddrey DF.' :
+               selectedBodySystemId === 'endocrine' ? 'Corrected Calcium (Albumin), Pediatric DKA Fluid/Insulin, FINDRISC, LDL Friedewald.' :
+               'NEWS2, SOFA Score, Holliday-Segar Fluid, Ideal Body Weight, Serum Osmolality.'}
+            </p>
+          </div>
+        </div>
       </div>
 
-      <div ref={systemsRef} className="relative z-[2] mt-3 scroll-mt-4">
+      <div ref={systemsRef} className="relative z-[2] mt-6 scroll-mt-6 space-y-5">
         <BodyExposurePatientOverlay selectedSystemId={selectedBodySystemId} onClinicalView={() => setActiveMode('clinical')} onShowStructure={(s) => { setSelectedBodySystemId(s.systemId); setStrukturDiminta((k) => ({ name: s.name, nonce: (k?.nonce ?? 0) + 1 })) }} />
         <SinyalPribadiDiTubuh selectedSystemId={selectedBodySystemId} onSelectSystem={setSelectedBodySystemId} />
         <Suspense fallback={<div className="grid min-h-56 place-items-center rounded-[28px] border border-white/[.08] bg-black/35 text-xs font-bold text-white/35">Loading unified human simulation projector…</div>}>
@@ -223,7 +278,7 @@ export function BodyExposureOS() {
         </Suspense>
       </div>
 
-      <Fold label="Multiscale" className="relative z-[2] mt-3">
+      <Fold label="Multiscale" className="relative z-[2] mt-6">
         <Suspense fallback={null}>
           <PanelKoplingMultiSkala />
         </Suspense>
@@ -234,14 +289,14 @@ export function BodyExposureOS() {
         </div>
       </Fold>
 
-      <details className="body-exposure-os__labs relative z-[1] mt-3 overflow-hidden rounded-[28px] border border-white/[.08] bg-black/35">
-        <summary className="flex min-h-[54px] cursor-pointer list-none items-center justify-between gap-3 px-4 text-xs font-black text-white/65 transition hover:text-white">
+      <details open className="body-exposure-os__labs relative z-[1] mt-6 overflow-hidden rounded-[28px] border border-white/15 bg-black/50 shadow-xl">
+        <summary className="flex min-h-[56px] cursor-pointer list-none items-center justify-between gap-4 px-6 py-3 text-sm sm:text-base font-bold text-white/90 transition hover:bg-white/[.04] hover:text-white">
           <span>Deep reference labs</span>
-          <span className="text-[9px] font-bold uppercase tracking-[.14em] text-white/30">all existing tools preserved · open on demand</span>
+          <span className="text-xs font-semibold uppercase tracking-wider text-cyan-200/80">Eksplorasi Mendalam Per Spesialisasi · Klik untuk Buka/Tutup</span>
         </summary>
         <div
           id="body-exposure-core"
-          className="body-exposure-os__core border-t border-white/[.08] p-2 sm:p-3"
+          className="body-exposure-os__core border-t border-white/15 p-4 sm:p-6"
         >
           <BodyExplorer />
         </div>
