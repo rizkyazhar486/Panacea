@@ -9,7 +9,7 @@ const pkg = JSON.parse(await readFile(new URL('../../package.json', import.meta.
 assert.match(runner, /spawnSync\(process\.execPath/)
 assert.match(runner, /typeScriptRunnerArgs\(process\.versions\.node\)/)
 assert.match(compatibility, /--experimental-transform-types/)
-assert.match(compatibility, /major < 25/)
+assert.match(compatibility, /major < 26/)
 assert.match(runner, /typescript-resolver\.mjs/)
 assert.doesNotMatch(runner, /spawnSync\(['"]npx['"]/)
 assert.doesNotMatch(runner, /--import=tsx/)
