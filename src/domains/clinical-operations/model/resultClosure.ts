@@ -47,7 +47,7 @@ export interface ResultClosureInput {
 
 export type ResultClosureState = 'closed' | 'open-not-due' | 'open-no-deadline' | 'overdue' | 'invalid'
 export type ResultInvalidReason =
-  | 'foreign-patient' | 'duplicate-id' | 'invalid-timestamp' | 'evidence-in-future' | 'evidence-before-result' | 'due-before-result'
+  | 'foreign-patient' | 'duplicate-id' | 'invalid-timestamp' | 'result-in-future' | 'evidence-in-future' | 'evidence-before-result' | 'due-before-result'
 
 export interface ResultClosureItem {
   resultId: string
@@ -108,6 +108,7 @@ export function evaluateResultClosure(input: ResultClosureInput): ResultClosureR
     const dueBy = typeof r.dueBy === 'string' ? ms(r.dueBy) : Number.NaN
     if (!Number.isFinite(resultedAt) || (!deadlineUnknown && !Number.isFinite(dueBy))) invalid.add('invalid-timestamp')
     else if (!deadlineUnknown && dueBy < resultedAt) invalid.add('due-before-result')
+    if (Number.isFinite(resultedAt) && Number.isFinite(evaluatedAt) && resultedAt > evaluatedAt) invalid.add('result-in-future')
     if (Number.isFinite(resultedAt) && !badInput) {
       evidenceInvalid(r.review, resultedAt, evaluatedAt, invalid)
       evidenceInvalid(r.explanation, resultedAt, evaluatedAt, invalid)

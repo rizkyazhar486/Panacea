@@ -509,13 +509,14 @@ export function deriveCareContinuityState(input: CareContinuityProjectionInput):
   )
 
   // 1. Result Follow-Up Closure (PRD §8.5)
-  const validSupportive = (input.supportiveResults ?? []).filter((item) =>
+  const supportiveResults = input.supportiveResults ?? []
+  const validSupportive = supportiveResults.filter((item) =>
     isValidIsoTimestamp(item.takenAt, nowMs)
   )
 
   let closure: ResultClosureResult | null = null
-  if (validSupportive.length > 0) {
-    const results: ResultClosureRecord[] = validSupportive.map((item) => {
+  if (supportiveResults.length > 0) {
+    const results: ResultClosureRecord[] = supportiveResults.map((item) => {
       const isCriticalOrHigh = item.flag === 'critical' || item.flag === 'high'
       return {
         resultId: item.id,

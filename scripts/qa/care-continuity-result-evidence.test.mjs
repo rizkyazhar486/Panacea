@@ -199,3 +199,35 @@ test('closed results with no deadline do not imply verified timeliness', () => {
   assert.match(html,/Result timing unknown/)
   assert.doesNotMatch(html,/Results up to date/)
 })
+
+test('invalid and future result timestamps remain visible instead of appearing absent', () => {
+  for (const takenAt of ['not-a-date','2026-10-29T08:00:00.000Z']) {
+    const closure=deriveCareContinuityState({...fixture,supportiveResults:[{...fixture.supportiveResults[0],takenAt}]}).closure
+    assert.ok(closure)
+    assert.equal(closure.items.length,1)
+    assert.equal(closure.items[0].state,'invalid')
+    assert.deepEqual(closure.invalidIds,['synthetic-result'])
+    assert.equal(closure.dueCount,null)
+    assert.equal(closure.closedCount,null)
+    const html=renderToStaticMarkup(React.createElement(CareContinuityPanel,{patientName:'Synthetic patient',closure}))
+    assert.match(html,/Results pending/)
+    assert.doesNotMatch(html,/No results in scope/)
+  }
+})
+
+test('invalid timestamps do not enter other valid-observation projections', () => {
+  const result=deriveCareContinuityState({...fixture,supportiveResults:[
+    fixture.supportiveResults[0],
+    {...fixture.supportiveResults[0],id:'synthetic-invalid-result',takenAt:'not-a-date'},
+  ]})
+  assert.equal(result.closure.items.length,2)
+  assert.deepEqual(result.closure.invalidIds,['synthetic-invalid-result'])
+  assert.equal(result.episodeResilience.acknowledgedCount,1)
+})
+
+test('a future result cannot close even when no action is required', () => {
+  const closure=evaluate({...record,resultedAt:'2026-10-29T08:00:00.000Z',dueBy:null,required:{review:false,explanation:false,'follow-up':false},review:undefined,explanation:undefined,followUp:undefined})
+  assert.equal(closure.items[0].state,'invalid')
+  assert.ok(closure.items[0].invalidReasons.includes('result-in-future'))
+  assert.equal(closure.closedCount,null)
+})
