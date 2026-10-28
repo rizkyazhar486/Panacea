@@ -1,3 +1,4 @@
+import { computeQuantumTelemetry } from '../../lib/bodyExposure/BodyQuantumTelemetryEngine';
 import { lazy, Suspense, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import type { BodySystemId } from '../../lib/bodySystemSourceWave'
 import type { SimulationDomain } from './UnifiedHumanSimulationProjector'
