@@ -105,7 +105,7 @@ export function evaluateResultClosure(input: ResultClosureInput): ResultClosureR
     if ((idCounts.get(r.resultId) ?? 0) > 1) invalid.add('duplicate-id')
     const resultedAt = ms(r.resultedAt)
     const deadlineUnknown = r.dueBy == null
-    const dueBy = deadlineUnknown ? Number.NaN : ms(r.dueBy)
+    const dueBy = typeof r.dueBy === 'string' ? ms(r.dueBy) : Number.NaN
     if (!Number.isFinite(resultedAt) || (!deadlineUnknown && !Number.isFinite(dueBy))) invalid.add('invalid-timestamp')
     else if (!deadlineUnknown && dueBy < resultedAt) invalid.add('due-before-result')
     if (Number.isFinite(resultedAt) && !badInput) {
