@@ -517,15 +517,12 @@ export function deriveCareContinuityState(input: CareContinuityProjectionInput):
   if (validSupportive.length > 0) {
     const results: ResultClosureRecord[] = validSupportive.map((item) => {
       const isCriticalOrHigh = item.flag === 'critical' || item.flag === 'high'
-      const itemTakenMs = Date.parse(item.takenAt)
-      // Result follow-up is assessed against the active encounter evaluation window
-      const dueBy = new Date(Math.min(itemTakenMs + 24 * 3600 * 1000, nowMs)).toISOString()
-
       return {
         resultId: item.id,
         patientId: input.patientId,
         resultedAt: item.takenAt,
-        dueBy,
+        // Tidak ada tenggat protokol khusus hasil dalam masukan ini.
+        dueBy: null,
         required: {
           review: true,
           explanation: true,

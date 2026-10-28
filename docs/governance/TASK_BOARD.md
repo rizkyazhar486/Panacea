@@ -12,8 +12,7 @@ Evidence snapshot `106fe679`, 2026-10-25 (all H0, H1, H2 engineering criteria 32
 
 | ID | Task | Criterion | Lane | Status | PR / evidence |
 |---|---|---|---|---|---|
-| T-CLIN-OFFLINE-PROOF | Missing secure-storage evidence must never authorize offline clinical continuation | — | codex | DONE | #2875 merged `caf332e0e0c37af43f8a36bec5c656f4592e1948`; exact-head Validate 40560359577 and Stabilization 40560359647 passed with independent engineering review. Post-merge checks pending; no storage adapter or clinical authorization added. |
-| T-CLIN-RESULT-EVIDENCE | Never infer result review, patient explanation, or follow-up completion from a generic encounter | — | codex | IN_REVIEW | #2878 addresses #2876: 116 focused tests pass; restoring inferred evidence fails 5 controls. Exact-head CI and independent review pending; verified result-evidence adapter still needed. |
+| T-CLIN-OFFLINE-PROOF | Missing secure-storage evidence must never authorize offline clinical continuation | — | codex | IN_REVIEW | #2875 supersedes #2859 after rebasing onto main: 90 focused tests pass; restoring the unsafe default fails all 3 missing-evidence controls. New exact-head CI and review pending; no storage adapter or clinical authorization added. |
 | T-H0-REPLAY-CAPTURE | Repair Human Replay screenshot timeout without dropping poster/duration/layout proof | ENG-CI-01 | codex | DONE | #2768, #2770 merged `b3b3f510`. Bounded page clip implemented; 17/17 CI workflows and main stabilization passed cleanly. |
 | T-H0-PARSER | Preserve unsupported encoding/charset HTTP 415 and prove compressed parser limits, auth and private diagnostics | ENG-E4-02 | codex | DONE | #2767 merged `de163eaf`. Parser 415 restored; identity/gzip/deflate boundaries and private auth/error controls pass. |
 | T-H0-01 | Pin runners to Ubuntu 24.04 (Playwright + Mongo) | ENG-CI-02 | integrator | DONE | #2691 merged c57e22fc; #2686 closed as subset |

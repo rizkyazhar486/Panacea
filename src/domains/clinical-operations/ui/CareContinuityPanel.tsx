@@ -72,6 +72,9 @@ export function CareContinuityPanel({
   className = '',
 }: CareContinuityPanelProps) {
   const hasOverdue = closure ? closure.overdueIds.length > 0 : false
+  const hasResults = Boolean(closure && closure.items.length > 0)
+  const hasOpenResults = closure ? closure.items.some((item) => item.state !== 'closed') : false
+  const hasUnknownResultTiming = closure ? closure.items.some((item) => item.closedLate === null) : false
   const hasDiagnosticGap = careAccess ? careAccess.diagnosticContinuity.state === 'gap' : false
   const isTransportDegraded = episodeResilience ? episodeResilience.state !== 'ready' : false
 
@@ -100,6 +103,18 @@ export function CareContinuityPanel({
           {hasOverdue ? (
             <span className="inline-flex items-center gap-1 rounded-full border border-red-400/40 bg-red-400/10 px-2.5 py-0.5 text-[10px] font-bold text-red-200">
               <IconAlertTriangle size={12} /> Overdue results
+            </span>
+          ) : !hasResults ? (
+            <span className="inline-flex items-center gap-1 rounded-full border border-white/10 px-2.5 py-0.5 text-[10px] font-bold text-white/70">
+              No results in scope
+            </span>
+          ) : hasOpenResults ? (
+            <span className="inline-flex items-center gap-1 rounded-full border border-amber-300/40 bg-amber-300/10 px-2.5 py-0.5 text-[10px] font-bold text-amber-200">
+              Results pending
+            </span>
+          ) : hasUnknownResultTiming ? (
+            <span className="inline-flex items-center gap-1 rounded-full border border-amber-300/40 bg-amber-300/10 px-2.5 py-0.5 text-[10px] font-bold text-amber-200">
+              Result timing unknown
             </span>
           ) : (
             <span className="inline-flex items-center gap-1 rounded-full border border-emerald-400/30 bg-emerald-400/10 px-2.5 py-0.5 text-[10px] font-bold text-emerald-200">
@@ -170,11 +185,11 @@ export function CareContinuityPanel({
             <div className="mt-2.5 space-y-2 text-xs">
               <div className="flex justify-between text-white/70">
                 <span>Due in window:</span>
-                <span className="font-semibold text-white">{closure.dueCount}</span>
+                <span className="font-semibold text-white">{closure.dueCount ?? '—'}</span>
               </div>
               <div className="flex justify-between text-white/70">
                 <span>Clinician-closed:</span>
-                <span className="font-semibold text-emerald-300">{closure.closedCount}</span>
+                <span className="font-semibold text-emerald-300">{closure.closedCount ?? '—'}</span>
               </div>
               {closure.overdueIds.length > 0 && (
                 <div className="flex justify-between text-red-300">

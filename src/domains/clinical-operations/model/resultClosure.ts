@@ -28,8 +28,8 @@ export interface ResultClosureRecord {
   resultId: string
   patientId: string
   resultedAt: string
-  /** Batas tutup menurut aturan protokol yang ditetapkan pemanggil. */
-  dueBy: string
+  /** Batas tutup protokol dari pemanggil; null/tidak ada berarti belum diketahui. */
+  dueBy?: string | null
   required: Readonly<Record<ClosureStep, boolean>>
   review?: ClosureEvidence
   explanation?: ClosureEvidence
@@ -45,7 +45,7 @@ export interface ResultClosureInput {
   results: readonly ResultClosureRecord[]
 }
 
-export type ResultClosureState = 'closed' | 'open-not-due' | 'overdue' | 'invalid'
+export type ResultClosureState = 'closed' | 'open-not-due' | 'open-no-deadline' | 'overdue' | 'invalid'
 export type ResultInvalidReason =
   | 'foreign-patient' | 'duplicate-id' | 'invalid-timestamp' | 'evidence-in-future' | 'evidence-before-result' | 'due-before-result'
 
@@ -53,18 +53,19 @@ export interface ResultClosureItem {
   resultId: string
   state: ResultClosureState
   unmetSteps: ClosureStep[]
-  /** Tutup setelah batas tutup (tetap dihitung tutup, tetapi terlihat). */
-  closedLate: boolean
+  /** null bila ketepatan waktu tidak dapat diukur tanpa tenggat. */
+  closedLate: boolean | null
   invalidReasons: ResultInvalidReason[]
 }
 
 export interface ResultClosureResult {
   items: ResultClosureItem[]
-  dueCount: number
-  closedCount: number
+  /** null bila data atau tenggat belum cukup untuk menghitung jendela secara lengkap. */
+  dueCount: number | null
+  closedCount: number | null
   overdueIds: string[]
   invalidIds: string[]
-  /** null = tidak terukur (penyebut nol, atau ada rekaman tak sahih / masukan evaluasi tak sahih). */
+  /** null = tidak terukur (penyebut nol, tenggat tidak diketahui, atau masukan tak sahih). */
   closureRate: number | null
   unmeasuredReason: string | null
 }
@@ -97,14 +98,16 @@ export function evaluateResultClosure(input: ResultClosureInput): ResultClosureR
   const items: ResultClosureItem[] = []
   let dueCount = 0
   let closedCount = 0
+  let unknownDeadlineCount = 0
   for (const r of input.results) {
     const invalid = new Set<ResultInvalidReason>()
     if (r.patientId !== input.targetPatientId) invalid.add('foreign-patient')
     if ((idCounts.get(r.resultId) ?? 0) > 1) invalid.add('duplicate-id')
     const resultedAt = ms(r.resultedAt)
-    const dueBy = ms(r.dueBy)
-    if (!Number.isFinite(resultedAt) || !Number.isFinite(dueBy)) invalid.add('invalid-timestamp')
-    else if (dueBy < resultedAt) invalid.add('due-before-result')
+    const deadlineUnknown = r.dueBy == null
+    const dueBy = deadlineUnknown ? Number.NaN : ms(r.dueBy)
+    if (!Number.isFinite(resultedAt) || (!deadlineUnknown && !Number.isFinite(dueBy))) invalid.add('invalid-timestamp')
+    else if (!deadlineUnknown && dueBy < resultedAt) invalid.add('due-before-result')
     if (Number.isFinite(resultedAt) && !badInput) {
       evidenceInvalid(r.review, resultedAt, evaluatedAt, invalid)
       evidenceInvalid(r.explanation, resultedAt, evaluatedAt, invalid)
@@ -123,15 +126,16 @@ export function evaluateResultClosure(input: ResultClosureInput): ResultClosureR
       const naOk = typeof fu?.notApplicableReason === 'string' && input.validNotApplicableReasons.includes(fu.notApplicableReason)
       if (!(counts(fu?.evidence, false) || naOk)) unmet.push('follow-up')
     }
-    const due = dueBy >= start && dueBy <= end && dueBy <= evaluatedAt
+    if (deadlineUnknown) unknownDeadlineCount += 1
+    const due = !deadlineUnknown && dueBy >= start && dueBy <= end && dueBy <= evaluatedAt
     const closed = unmet.length === 0
     if (due) { dueCount += 1; if (closed) closedCount += 1 }
     const latest = Math.max(...[r.review, r.explanation, r.followUp?.evidence].filter((e): e is ClosureEvidence => !!e && counts(e, false)).map((e) => ms(e.at)), resultedAt)
     items.push({
       resultId: r.resultId,
-      state: closed ? 'closed' : dueBy <= evaluatedAt ? 'overdue' : 'open-not-due',
+      state: closed ? 'closed' : deadlineUnknown ? 'open-no-deadline' : dueBy <= evaluatedAt ? 'overdue' : 'open-not-due',
       unmetSteps: unmet,
-      closedLate: closed && latest > dueBy,
+      closedLate: deadlineUnknown ? null : closed && latest > dueBy,
       invalidReasons: [],
     })
   }
@@ -141,9 +145,12 @@ export function evaluateResultClosure(input: ResultClosureInput): ResultClosureR
   let unmeasuredReason: string | null = null
   if (badInput) unmeasuredReason = 'evaluation inputs are invalid (timestamps or window)'
   else if (invalidIds.length > 0) unmeasuredReason = 'one or more result records are invalid'
+  else if (unknownDeadlineCount > 0) unmeasuredReason = 'one or more results have no protocol deadline'
   else if (dueCount === 0) unmeasuredReason = 'no results due in the evaluation window'
+  const aggregateUnknown = badInput || invalidIds.length > 0 || unknownDeadlineCount > 0
   return {
-    items, dueCount, closedCount, overdueIds, invalidIds,
+    items, dueCount: aggregateUnknown ? null : dueCount,
+    closedCount: aggregateUnknown ? null : closedCount, overdueIds, invalidIds,
     closureRate: unmeasuredReason === null ? closedCount / dueCount : null,
     unmeasuredReason,
   }

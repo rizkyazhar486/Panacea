@@ -189,8 +189,10 @@ test('deriveCareContinuityState: signed encounter without result evidence remain
   })
 
   assert.ok(projection.closure, 'closure result is present')
-  assert.equal(projection.closure.closedCount, 0)
-  assert.notEqual(projection.closure.closureRate, 1.0)
+  assert.equal(projection.closure.closedCount, null)
+  assert.equal(projection.closure.dueCount, null)
+  assert.equal(projection.closure.closureRate, null)
+  assert.equal(projection.closure.items[0].state, 'open-no-deadline')
   assert.deepEqual(projection.closure.items[0].unmetSteps, ['review', 'explanation'])
   assert.equal(projection.careAccess.clinicalCare.financialStateMayDenyCare, false)
   assert.equal(projection.careAccess.financialWorkflow.claimSubmissionReady, true)
@@ -241,9 +243,11 @@ test('deriveCareContinuityState: negative control - unsigned record cannot close
   })
 
   assert.ok(projection.closure, 'closure result is present')
-  assert.equal(projection.closure.closedCount, 0)
-  assert.equal(projection.closure.closureRate, 0.0)
-  assert.deepEqual(projection.closure.overdueIds, ['lab-critical-k'])
+  assert.equal(projection.closure.closedCount, null)
+  assert.equal(projection.closure.dueCount, null)
+  assert.equal(projection.closure.closureRate, null)
+  assert.deepEqual(projection.closure.overdueIds, [])
+  assert.equal(projection.closure.items[0].state, 'open-no-deadline')
   assert.ok(
     projection.careAccess.financialWorkflow.missingClaimEvidence.includes('signed clinical record') ||
     projection.careAccess.financialWorkflow.missingClaimEvidence.includes('clinicalRecordSigned'),
