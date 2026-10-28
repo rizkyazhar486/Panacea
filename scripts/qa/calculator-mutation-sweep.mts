@@ -3,11 +3,12 @@
 // AssertionError; any other failure (syntax error, thrown TypeError, timeout) is reported as CRASHED and never counted as proof.
 // SURVIVORS are the evidence: a literal the reference suites cannot see. Some survivors are equivalent mutants (an index, a rounding
 // digit, a default never reached); this tool lists them, it does not decide which are harmless.
-// Usage: node --experimental-transform-types --import=./scripts/uji/typescript-resolver.mjs scripts/qa/calculator-mutation-sweep.mts
+// Usage (Node 26+): node --import=./scripts/uji/typescript-resolver.mjs scripts/qa/calculator-mutation-sweep.mts
 //   ENGINES=a,b  limit to engines;  OUT=file.json  write the full report;  MAX_PER_ENGINE=n  cap literals per engine.
 import { spawn } from 'node:child_process'
 import { readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { executableCode, exportedCalculators, invokes } from '../uji/calculator-reference-coverage.mts'
+import { typeScriptRunnerArgs } from '../uji/node-runtime-flags.mjs'
 
 const ROOT = new URL('../../', import.meta.url)
 const ENGINE_DIR = new URL('src/domains/clinical-calculators/engine/', ROOT)
@@ -47,7 +48,7 @@ export function numericLiterals(src: string): Literal[] {
 export const mutate = (text: string) => String(Number(text) + 1)
 
 const runSuite = (file: string): Promise<{ code: number | null; stderr: string }> => new Promise((resolve) => {
-  const child = spawn(process.execPath, ['--experimental-transform-types', `--import=${new URL('typescript-resolver.mjs', UJI_DIR).href}`, new URL(file, UJI_DIR).pathname], { cwd: ROOT.pathname, stdio: ['ignore', 'ignore', 'pipe'] })
+  const child = spawn(process.execPath, [...typeScriptRunnerArgs(process.versions.node), `--import=${new URL('typescript-resolver.mjs', UJI_DIR).href}`, new URL(file, UJI_DIR).pathname], { cwd: ROOT.pathname, stdio: ['ignore', 'ignore', 'pipe'] })
   let stderr = ''
   child.stderr.on('data', (b: Buffer) => { stderr += b.toString() })
   const timer = setTimeout(() => child.kill('SIGKILL'), 60_000)
