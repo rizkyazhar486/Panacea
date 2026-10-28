@@ -3,14 +3,14 @@ import assert from 'node:assert/strict'
 import { spawnSync } from 'node:child_process'
 import { typeScriptRunnerArgs } from '../uji/node-runtime-flags.mjs'
 
-test('supported Node 22/23/24 use the legacy transform flag', () => {
-  for (const version of ['22.18.0', '23.11.0', '24.12.0']) {
+test('supported Node 22/23/24/25 use the legacy transform flag', () => {
+  for (const version of ['22.18.0', '23.11.0', '24.12.0', '25.2.0']) {
     assert.deepEqual(typeScriptRunnerArgs(version), ['--experimental-transform-types'])
   }
 })
 
-test('Node 25/26+ never receive the removed transform flag', () => {
-  for (const version of ['25.2.0', '26.0.0', '26.12.1', '27.0.0']) {
+test('Node 26+ never receive the removed transform flag', () => {
+  for (const version of ['26.0.0', '26.12.1', '27.0.0']) {
     assert.deepEqual(typeScriptRunnerArgs(version), [])
   }
 })
