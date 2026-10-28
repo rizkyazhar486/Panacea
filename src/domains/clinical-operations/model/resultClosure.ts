@@ -6,6 +6,8 @@
  * Fungsi murni: waktu dievaluasi disuntikkan (`evaluatedAt`), tanpa jam atau I/O. Ini bukti kontrol alur kerja, BUKAN bukti
  * kebenaran klinis; peninjauan klinis tetap pada klinisi terotorisasi.
  */
+import { isValidIsoTimestamp } from '../../../shared/kernel/isoTimestamp.ts'
+
 export type ClosureStep = 'review' | 'explanation' | 'follow-up'
 
 export interface ClosureEvidence {
@@ -70,7 +72,7 @@ export interface ResultClosureResult {
   unmeasuredReason: string | null
 }
 
-const ms = (iso: string): number => (typeof iso === 'string' ? Date.parse(iso) : Number.NaN)
+const ms = (iso: string): number => (isValidIsoTimestamp(iso) ? Date.parse(iso) : Number.NaN)
 
 function evidenceInvalid(e: ClosureEvidence | undefined, resultedAt: number, evaluatedAt: number, out: Set<ResultInvalidReason>): void {
   if (!e) return

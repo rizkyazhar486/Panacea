@@ -232,6 +232,7 @@ import {
   type OneOsProofResult,
 } from './oneOsCareProof.ts'
 import { projectLongevityTrajectory } from './transcendentLongevityTrajectory.ts'
+import { isValidIsoTimestamp as isRealIsoTimestamp } from '../../../shared/kernel/isoTimestamp.ts'
 
 export interface CareContinuityProjectionInput {
   patientId: string
@@ -484,7 +485,7 @@ export interface CareContinuityProjection {
 }
 
 function isValidIsoTimestamp(val: unknown, maxEpochMs: number): boolean {
-  if (typeof val !== 'string' || !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?(?:Z|[+-]\d{2}:\d{2})$/.test(val)) {
+  if (!isRealIsoTimestamp(val)) {
     return false
   }
   const epoch = Date.parse(val)
@@ -496,7 +497,7 @@ export function deriveCareContinuityState(input: CareContinuityProjectionInput):
     throw new Error('patientId is required')
   }
   const nowMs = Date.parse(input.evaluatedAt)
-  if (!Number.isFinite(nowMs)) {
+  if (!isRealIsoTimestamp(input.evaluatedAt) || !Number.isFinite(nowMs)) {
     throw new Error('evaluatedAt must be a valid timestamp')
   }
 

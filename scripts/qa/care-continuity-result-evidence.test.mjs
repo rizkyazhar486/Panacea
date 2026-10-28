@@ -201,7 +201,7 @@ test('closed results with no deadline do not imply verified timeliness', () => {
 })
 
 test('invalid and future result timestamps remain visible instead of appearing absent', () => {
-  for (const takenAt of ['not-a-date','2026-10-29T08:00:00.000Z']) {
+  for (const takenAt of ['not-a-date','2026-10-29T08:00:00.000Z','2026-10-28','2026-10-28T08:00:00','2026-02-30T08:00:00Z']) {
     const closure=deriveCareContinuityState({...fixture,supportiveResults:[{...fixture.supportiveResults[0],takenAt}]}).closure
     assert.ok(closure)
     assert.equal(closure.items.length,1)
@@ -209,6 +209,7 @@ test('invalid and future result timestamps remain visible instead of appearing a
     assert.deepEqual(closure.invalidIds,['synthetic-result'])
     assert.equal(closure.dueCount,null)
     assert.equal(closure.closedCount,null)
+    assert.ok(closure.items[0].invalidReasons.includes(takenAt==='2026-10-29T08:00:00.000Z'?'result-in-future':'invalid-timestamp'))
     const html=renderToStaticMarkup(React.createElement(CareContinuityPanel,{patientName:'Synthetic patient',closure}))
     assert.match(html,/Results pending/)
     assert.doesNotMatch(html,/No results in scope/)
@@ -230,4 +231,35 @@ test('a future result cannot close even when no action is required', () => {
   assert.equal(closure.items[0].state,'invalid')
   assert.ok(closure.items[0].invalidReasons.includes('result-in-future'))
   assert.equal(closure.closedCount,null)
+})
+
+test('valid timezone offsets and leap-day result timestamps stay accepted', () => {
+  for (const takenAt of ['2026-10-28T15:00:00+07:00','2024-02-29T08:00:00Z']) {
+    const result=deriveCareContinuityState({...fixture,supportiveResults:[{...fixture.supportiveResults[0],takenAt}]})
+    assert.equal(result.closure.items[0].state,'open-no-deadline')
+    assert.deepEqual(result.closure.invalidIds,[])
+    assert.equal(result.episodeResilience.acknowledgedCount,1)
+  }
+})
+
+test('closure boundary rejects ambiguous or impossible result, deadline and evidence times', () => {
+  for (const invalid of ['2026-10-28','2026-10-28T08:00:00','2026-02-30T08:00:00Z']) {
+    for (const bad of [
+      {...record,resultedAt:invalid}, {...record,dueBy:invalid},
+      {...record,review:{...record.review,at:invalid}},
+      {...record,explanation:{...person,at:invalid}},
+      {...record,followUp:{evidence:{...person,at:invalid}}},
+    ]) {
+      const result=evaluate(bad)
+      assert.equal(result.items[0].state,'invalid')
+      assert.ok(result.items[0].invalidReasons.includes('invalid-timestamp'))
+      assert.equal(result.closedCount,null)
+    }
+  }
+})
+
+test('projection rejects ambiguous or impossible evaluation timestamps', () => {
+  for (const evaluatedAt of ['2026-10-28','2026-10-28T08:00:00','2026-02-30T08:00:00Z']) {
+    assert.throws(()=>deriveCareContinuityState({...fixture,evaluatedAt}),/evaluatedAt must be a valid timestamp/)
+  }
 })
