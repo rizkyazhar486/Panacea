@@ -232,6 +232,7 @@ import {
   type OneOsProofResult,
 } from './oneOsCareProof.ts'
 import { projectLongevityTrajectory } from './transcendentLongevityTrajectory.ts'
+import { isValidIsoTimestamp as isRealIsoTimestamp } from '../../../shared/kernel/isoTimestamp.ts'
 
 export interface CareContinuityProjectionInput {
   patientId: string
@@ -484,7 +485,7 @@ export interface CareContinuityProjection {
 }
 
 function isValidIsoTimestamp(val: unknown, maxEpochMs: number): boolean {
-  if (typeof val !== 'string' || !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?(?:Z|[+-]\d{2}:\d{2})$/.test(val)) {
+  if (!isRealIsoTimestamp(val)) {
     return false
   }
   const epoch = Date.parse(val)
@@ -496,7 +497,7 @@ export function deriveCareContinuityState(input: CareContinuityProjectionInput):
     throw new Error('patientId is required')
   }
   const nowMs = Date.parse(input.evaluatedAt)
-  if (!Number.isFinite(nowMs)) {
+  if (!isRealIsoTimestamp(input.evaluatedAt) || !Number.isFinite(nowMs)) {
     throw new Error('evaluatedAt must be a valid timestamp')
   }
 
@@ -509,56 +510,27 @@ export function deriveCareContinuityState(input: CareContinuityProjectionInput):
   )
 
   // 1. Result Follow-Up Closure (PRD §8.5)
-  const validSupportive = (input.supportiveResults ?? []).filter((item) =>
+  const supportiveResults = input.supportiveResults ?? []
+  const validSupportive = supportiveResults.filter((item) =>
     isValidIsoTimestamp(item.takenAt, nowMs)
   )
 
   let closure: ResultClosureResult | null = null
-  if (validSupportive.length > 0) {
-    const results: ResultClosureRecord[] = validSupportive.map((item) => {
+  if (supportiveResults.length > 0) {
+    const results: ResultClosureRecord[] = supportiveResults.map((item) => {
       const isCriticalOrHigh = item.flag === 'critical' || item.flag === 'high'
-      const itemTakenMs = Date.parse(item.takenAt)
-      // Result follow-up is assessed against the active encounter evaluation window
-      const dueBy = new Date(Math.min(itemTakenMs + 24 * 3600 * 1000, nowMs)).toISOString()
-
       return {
         resultId: item.id,
         patientId: input.patientId,
         resultedAt: item.takenAt,
-        dueBy,
+        // Tidak ada tenggat protokol khusus hasil dalam masukan ini.
+        dueBy: null,
         required: {
           review: true,
           explanation: true,
           'follow-up': isCriticalOrHigh,
         } as Record<ClosureStep, boolean>,
-        review: isRecordSignedByClinician && record?.signedAt
-          ? {
-              at: record.signedAt,
-              actorId: record.signedById!,
-              recordedBy: 'person',
-              authorizedClinician: true,
-            }
-          : undefined,
-        explanation: record?.anamnesis?.rps || record?.anamnesis?.keluhanUtama || record?.labEkgInterpretation
-          ? {
-              at: record.updatedAt,
-              actorId: record.signedById || 'dr-active',
-              recordedBy: 'person',
-            }
-          : undefined,
-        followUp: isCriticalOrHigh
-          ? record?.plan && record.plan.length > 0
-            ? {
-                evidence: {
-                  at: record.updatedAt,
-                  actorId: record.signedById || 'dr-active',
-                  recordedBy: 'person',
-                },
-              }
-            : undefined
-          : {
-              notApplicableReason: 'non-critical-result',
-            },
+        // Catatan umum bukan bukti tindakan manusia untuk hasil tertentu.
       }
     })
 

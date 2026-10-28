@@ -6,6 +6,28 @@ rules:
   - "Link mitigations to code/tests/evidence where possible."
 
 risks:
+  - risk_id: risk.result_closure_inferred_evidence_and_deadlines
+    category: clinical_data_integrity
+    severity: high
+    state: open
+    description: >-
+      VisitOS inferred result review, patient explanation and follow-up from a
+      generic chart and fabricated immediate deadlines. This could present
+      unsupported clinician-closed or overdue status and measured aggregates.
+    mitigation: >-
+      PR 2878 removes inferred human evidence and represents missing protocol
+      deadlines explicitly. Invalid or incomplete denominators remain null;
+      known overdue results remain visible. Focused synthetic, sabotage and
+      component controls support the candidate. Exact-head review, CI and
+      integration are still required. A trusted result-specific backend evidence
+      adapter is not implemented; no clinical validation is claimed.
+    evidence:
+      - src/domains/clinical-operations/model/careContinuityProjection.ts
+      - src/domains/clinical-operations/model/resultClosure.ts
+      - src/domains/clinical-operations/ui/CareContinuityPanel.tsx
+      - scripts/qa/care-continuity-result-evidence.test.mjs
+      - scripts/qa/result-closure.test.mjs
+
   - risk_id: risk.mongo_save_order_and_shutdown_drain
     category: patient_data_integrity
     severity: high
