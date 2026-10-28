@@ -626,7 +626,8 @@ export function deriveCareContinuityState(input: CareContinuityProjectionInput):
     patientId: input.patientId,
     episodeId: record?.id || 'enc-current',
     connectivity: input.connectivity ?? 'online',
-    secureLocalStorageAvailable: input.secureLocalStorageAvailable ?? true,
+    // Bukti penyimpanan yang tidak tersedia tidak boleh dianggap aman untuk mode offline.
+    secureLocalStorageAvailable: input.secureLocalStorageAvailable ?? false,
     evaluatedAt: input.evaluatedAt,
     maxRetryCount: 3,
     events,

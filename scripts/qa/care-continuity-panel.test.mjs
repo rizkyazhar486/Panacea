@@ -146,6 +146,7 @@ test('deriveCareContinuityState: positive control - clinician-signed encounter c
   const projection = deriveCareContinuityState({
     patientId: 'patient-signed-1',
     evaluatedAt: now,
+    secureLocalStorageAvailable: true,
     vitals: [
       {
         takenAt: '2026-10-25T08:00:00.000Z',
@@ -264,6 +265,7 @@ test('deriveCareContinuityState: empty supportive results returns graceful null 
   const projection = deriveCareContinuityState({
     patientId: 'patient-empty-3',
     evaluatedAt: now,
+    secureLocalStorageAvailable: true,
     supportiveResults: [],
   })
 
