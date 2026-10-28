@@ -4,8 +4,12 @@
  * berfungsi; ID permintaan memungkinkan laporan pengguna dicocokkan dengan log server.
  */
 export class GalatApi extends Error {
-  constructor(message: string, readonly status: number, readonly requestId: string | null) {
-    super(message)
+  readonly status: number;
+  readonly requestId: string | null;
+  constructor(message: string, status: number, requestId: string | null) {
+    super(message);
+    this.status = status;
+    this.requestId = requestId;
     this.name = 'GalatApi'
   }
 }
