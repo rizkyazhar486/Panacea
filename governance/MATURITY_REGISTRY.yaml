@@ -162,7 +162,7 @@ workflows:
       safety_security: medium
       observability_testing: unknown
     acceptance_evidence:
-      - "Source and equations documented in docs/research/OMNICAUSALIS.md; no clinical acceptance promoted."
+      - "Source and equations documented in DOCS/research/OMNICAUSALIS.md; no clinical acceptance promoted."
     known_gaps: [exact_head_browser_acceptance, biological_calibration, independent_external_validation]
     next_action: verify_route_and_ci_then_request_independent_scientific_challenge
     last_audited_commit: null

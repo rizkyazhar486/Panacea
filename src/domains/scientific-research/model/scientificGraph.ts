@@ -84,10 +84,11 @@ export function validateScientificGraph(value: unknown): string[] {
   const errors: string[] = []
   const ids = new Set<string>()
   const edgeIds = new Set<string>()
+  const unvalidatedTargets = new Set<string>()
   for (const n of value.nodes) {
     if (!record(n)) { errors.push('INVALID_NODE'); continue }
     if (!text(n.id) || ids.has(n.id)) errors.push('DUPLICATE_OR_MISSING_NODE_ID')
-    else ids.add(n.id)
+    else { ids.add(n.id); if (n.spatialScale === 'organ' || n.spatialScale === 'clinical') unvalidatedTargets.add(n.id) }
     for (const key of ['label', 'domain', 'temporalScale', 'compartment', 'uncertainty', 'sourceVersion']) if (!text(n[key])) errors.push(`NODE_MISSING_${key}`)
     if (!['tissue', 'organelle', 'chemical', 'cellular', 'organ', 'clinical'].includes(String(n.spatialScale))) errors.push('INVALID_SCALE')
     if (n.ontology !== null && !text(n.ontology)) errors.push('INVALID_ONTOLOGY')
@@ -104,7 +105,7 @@ export function validateScientificGraph(value: unknown): string[] {
     if (!['source-to-target', 'unresolved'].includes(String(e.direction))) errors.push('INVALID_DIRECTION')
     if (!['increases', 'reduces', 'context-dependent', 'unknown'].includes(String(e.effectSign))) errors.push('INVALID_SIGN')
     if ((e.relationshipType === 'statistical-association' || e.relationshipType === 'unknown') && (e.direction !== 'unresolved' || e.effectSign !== 'unknown')) errors.push('UNSUPPORTED_CAUSAL_ESCALATION')
-    if ((e.source === 'inflammation' && e.target === 'organ' || e.target === 'clinical') && e.relationshipType !== 'unknown') errors.push('UNVALIDATED_TRANSLATION')
+    if (unvalidatedTargets.has(String(e.target)) && e.relationshipType !== 'unknown') errors.push('UNVALIDATED_TRANSLATION')
     if (!references(e.evidenceReferences) || (e.relationshipType !== 'unknown' && !e.evidenceReferences.length)) errors.push('INVALID_EDGE_PROVENANCE')
     if (e.confidence !== null && (typeof e.confidence !== 'number' || !Number.isFinite(e.confidence) || e.confidence < 0 || e.confidence > 1)) errors.push('INVALID_CONFIDENCE')
     if (e.temporalLag !== null && (typeof e.temporalLag !== 'number' || !Number.isFinite(e.temporalLag) || e.temporalLag < 0)) errors.push('INVALID_LAG')

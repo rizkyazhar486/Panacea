@@ -39,6 +39,8 @@ for (const [name, mutate, reason] of [
   ['invented confidence', g => { g.edges[0].confidence = 0.99 }, 'UNSOURCED_QUANTIFICATION'],
   ['invented delay', g => { g.edges[0].temporalLag = 1 }, 'UNSOURCED_QUANTIFICATION'],
   ['promoted organ translation', g => { Object.assign(g.edges.find(e => e.id === 'inflammation-organ'), { relationshipType: 'experimental-mechanism', direction: 'source-to-target', effectSign: 'increases' }) }, 'UNVALIDATED_TRANSLATION'],
+  ['new organ translation', g => { g.edges.push({ ...g.edges[0], id: 'redox-organ', source: 'redox', target: 'organ' }) }, 'UNVALIDATED_TRANSLATION'],
+  ['renamed organ translation', g => { g.nodes.push({ ...g.nodes.find(n => n.id === 'organ'), id: 'renamed-organ' }); g.edges.push({ ...g.edges[0], id: 'redox-renamed-organ', source: 'redox', target: 'renamed-organ' }) }, 'UNVALIDATED_TRANSLATION'],
 ]) test(`graph rejects ${name}`, () => { const g = copy(); mutate(g); assert.ok(validateScientificGraph(g).includes(reason)) })
 
 test('associations remain representable without a causal arrow or effect sign', () => {
