@@ -531,34 +531,7 @@ export function deriveCareContinuityState(input: CareContinuityProjectionInput):
           explanation: true,
           'follow-up': isCriticalOrHigh,
         } as Record<ClosureStep, boolean>,
-        review: isRecordSignedByClinician && record?.signedAt
-          ? {
-              at: record.signedAt,
-              actorId: record.signedById!,
-              recordedBy: 'person',
-              authorizedClinician: true,
-            }
-          : undefined,
-        explanation: record?.anamnesis?.rps || record?.anamnesis?.keluhanUtama || record?.labEkgInterpretation
-          ? {
-              at: record.updatedAt,
-              actorId: record.signedById || 'dr-active',
-              recordedBy: 'person',
-            }
-          : undefined,
-        followUp: isCriticalOrHigh
-          ? record?.plan && record.plan.length > 0
-            ? {
-                evidence: {
-                  at: record.updatedAt,
-                  actorId: record.signedById || 'dr-active',
-                  recordedBy: 'person',
-                },
-              }
-            : undefined
-          : {
-              notApplicableReason: 'non-critical-result',
-            },
+        // Catatan umum bukan bukti tindakan manusia untuk hasil tertentu.
       }
     })
 
