@@ -28,8 +28,10 @@ try {
     const active=page.getByText('active min',{exact:true}).locator('..')
     const select=async name=>{await page.getByRole('button',{name:`${name} history`,exact:true}).click()}
     const distance=page.getByText('km',{exact:true}).locator('..')
-    await active.waitFor()
-    const canvasBox=await page.locator('section canvas').first().boundingBox(), metricBox=await active.boundingBox()
+    const canvasLocator=page.locator('section canvas').first()
+    await canvasLocator.waitFor({state:'visible'})
+    await active.waitFor({state:'visible'})
+    const canvasBox=await canvasLocator.boundingBox(), metricBox=await active.boundingBox()
     const overlapWidth=Math.min(canvasBox.x+canvasBox.width,metricBox.x+metricBox.width)-Math.max(canvasBox.x,metricBox.x)
     const overlapHeight=Math.min(canvasBox.y+canvasBox.height,metricBox.y+metricBox.height)-Math.max(canvasBox.y,metricBox.y)
     assert.ok(overlapWidth<=1||overlapHeight<=1,'reference canvas must not cover the metric cards in either responsive layout')

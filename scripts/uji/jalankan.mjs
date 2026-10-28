@@ -29,8 +29,7 @@ for (const f of berkas) {
   // Node 24 menjalankan TypeScript secara native. Resolver yang dipreload hanya
   // menutup perbedaan resolusi source repo (`./x` -> `./x.ts`, `.js` -> `.ts`)
   // dan dibatasi pada file relatif di dalam repository. Tidak ada npx/download.
-  const r = spawnSync(process.execPath, [
-    '--experimental-transform-types',
+  const r = spawnSync(process.execPath, [...(Number(process.versions.node.split(".")[0]) < 25 ? ['--experimental-transform-types'] : []),
     `--import=${resolver}`,
     join(di, f),
   ], {
