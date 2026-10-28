@@ -23,7 +23,7 @@ test('Care Episode return links resolve to the canonical VisitOS, not a missing 
 test('the redirect shares the canonical patient store and does not duplicate VisitOS', () => {
   assert.match(router, /<StoreProvider\b/, 'shared patient store must remain above routes')
   assert.match(visitEntry, /from ['"]\.\/clinical\/VisitOS['"]/, 'canonical VisitOS re-export must remain')
-  assert.equal((router.match(/<Route\s+path="\/visit"\b/g) ?? []).length, 1,
+  assert.equal((router.match(/<Route\s+path="\/visit"/g) ?? []).length, 1,
     'only one /visit compatibility alias is allowed')
 })
 
