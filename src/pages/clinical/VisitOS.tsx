@@ -73,7 +73,7 @@ export function VisitOS() {
               <h2 id="visit-next-action-title" className="mt-1 text-lg font-bold">Next step in this visit</h2>
               <p id="visit-next-action-reason" className="mt-1 text-sm leading-relaxed text-white/80">{outcomeJob.nextAction.reason}</p>
             </div>
-            <Link to={outcomeJob.nextAction.href} aria-describedby="visit-next-action-reason" className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-xl bg-emerald-400 px-4 py-2 text-sm font-bold text-slate-950 transition hover:bg-emerald-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">
+            <Link to={outcomeJob.nextAction.href} aria-describedby="visit-next-action-reason" state={{ fromVisitOS: true }} className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-xl bg-emerald-400 px-4 py-2 text-sm font-bold text-slate-950 transition hover:bg-emerald-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">
               {outcomeJob.nextAction.title}<span aria-hidden="true" className="ml-2">→</span>
             </Link>
           </div>
