@@ -30,6 +30,7 @@ Evidence snapshot `106fe679`, 2026-10-25 (all H0, H1, H2 engineering criteria 32
 
 | ID | Task | Criterion | Lane | Status |
 |---|---|---|---|---|
+| T-F1-VISIT-RETURN | Restore Care Episode's missing `/visit` return destination via the canonical VisitOS route; preserve shared patient context | — | codex | IN_REVIEW | #2880, exact-head CI and review pending; dedicated route and negative-control tests |
 | T-F2-01 | Fix measurable contrast failures, page by page (one page per PR) | ENG-F2-01 | claude | DONE | measured 0 failures; baseline ratcheted to 0 in #2706; PASS on main f6dd7185 (ux-audit run 39946759961). 1499 unmeasurable elements remain a tracked gap |
 | T-F2-02 | Triage 8 axe incomplete results into AXE_BASELINE with reasons | ENG-F2-02 | claude | DONE | obsolete: incompleteTotal is 0 (the 8 counts came from 2 elements fixed earlier); PASS on main f6dd7185 |
 | T-F1-01 | Assert F1 critical page inventory = resilience coverage list | ENG-F1-03 | claude | DONE (#2711 merged): inventory equals journey coverage and every route resolves to a real page; dead `#/all-features` fixed. run 39979532110 at 74eba9d8 covers 9/9 pages; ENG-F1-03 stays NOT_RUN: named error-boundary negative control missing (T-F1-04) |
