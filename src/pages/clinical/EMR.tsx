@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { StatusSinkronKlinis } from '../../components/StatusSinkronKlinis'
 import { Prosa } from '../../components/Prosa'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { useStore } from '../../lib/store'
 import { Card, SectionTitle, Badge, Button } from '../../components/ui'
 import { lazy, Suspense } from 'react'
@@ -139,6 +139,26 @@ const ANAMNESIS_FIELDS: { key: keyof Anamnesis; label: string }[] = [
   { key: 'riwayatSosialEkonomi', label: 'Socioeconomic & Environmental History' },
 ]
 
+/** Navigation context only: never changes patient state, authorization, or clinical evidence. */
+function VisitOsReturn({ blocked = false }: { blocked?: boolean }) {
+  const location = useLocation()
+  if (location.state?.fromVisitOS !== true) return null
+  if (blocked) {
+    return (
+      <p role="status" className="print:hidden text-sm font-semibold text-amber-700 dark:text-amber-300">
+        Save your draft changes before returning to Visit OS.
+      </p>
+    )
+  }
+  return (
+    <nav aria-label="Return to Visit OS" className="print:hidden">
+      <Link to="/visit-os" className="inline-flex min-h-11 items-center rounded-lg px-3 text-sm font-semibold text-brand-dark underline underline-offset-4 transition hover:opacity-80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand">
+        <span aria-hidden="true" className="mr-2">←</span>Return to Visit OS
+      </Link>
+    </nav>
+  )
+}
+
 function StrGate({ str }: { str?: string }) {
   return (
     <div className="mx-auto max-w-lg">
@@ -204,8 +224,8 @@ export function EMR() {
 
   // STR gate — AI-EMR is restricted to clinicians with a verified STR/SIP.
   // Hooks stay above this return so changing auth state never changes hook order.
-  if (strBlocked) return <StrGate str={acc?.str} />
-  if (!draft) return <EmptyEMR />
+  if (strBlocked) return <div className="space-y-4"><VisitOsReturn /><StrGate str={acc?.str} /></div>
+  if (!draft) return <div className="space-y-4"><VisitOsReturn /><EmptyEMR /></div>
 
   const historicalReadOnly = Boolean(record && draft.id !== record.id)
   const systemFindings = buildFindings(draft.physicalExam)
@@ -256,6 +276,7 @@ export function EMR() {
   return (
     <div className="space-y-6">
       <StatusSinkronKlinis />
+      <VisitOsReturn blocked={dirty} />
       {/* Header */}
       <Card>
         <div className="flex flex-wrap items-center justify-between gap-3">
