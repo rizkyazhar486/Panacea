@@ -17,6 +17,7 @@ import { spawnSync } from 'node:child_process'
 import { dirname, join } from 'node:path'
 import process from 'node:process'
 import { fileURLToPath, pathToFileURL } from 'node:url'
+import { typeScriptRunnerArgs } from './node-runtime-flags.mjs'
 
 const di = dirname(fileURLToPath(import.meta.url))
 const akar = join(di, '..', '..')
@@ -30,7 +31,7 @@ for (const f of berkas) {
   // menutup perbedaan resolusi source repo (`./x` -> `./x.ts`, `.js` -> `.ts`)
   // dan dibatasi pada file relatif di dalam repository. Tidak ada npx/download.
   const r = spawnSync(process.execPath, [
-    '--experimental-transform-types',
+    ...typeScriptRunnerArgs(process.versions.node),
     `--import=${resolver}`,
     join(di, f),
   ], {
