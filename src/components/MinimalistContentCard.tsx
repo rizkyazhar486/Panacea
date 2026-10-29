@@ -1,44 +1,43 @@
 import React, { useState } from 'react'
 
 export interface MinimalistCardProps {
-  singleWordTitle: string; // Satu kata utama yang mewakili
+  singleWordTitle: string;
   subtitle: string;
   symbol: string;
-  detailedParagraph: string; // Penjelasan lengkap di balik logo (i)
+  detailedParagraph: string;
 }
 
 export function MinimalistContentCard({ singleWordTitle, subtitle, symbol, detailedParagraph }: MinimalistCardProps) {
   const [showDetails, setShowDetails] = useState(false);
 
   return (
-    <div className="group relative rounded-3xl border border-white/10 bg-slate-900/50 p-6 backdrop-blur-xl transition-all duration-300 hover:border-cyan-500/40 hover:bg-slate-900/80">
-      <div className="flex items-start justify-between">
+    <article className="group relative rounded-2xl border border-cyan-500/25 bg-slate-950/90 p-5 font-mono text-slate-100 shadow-2xl backdrop-blur-2xl transition-all hover:border-cyan-400">
+      <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-cyan-500/20 to-blue-600/20 text-2xl border border-white/10 text-cyan-300 shadow-inner">
+          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-cyan-950 border border-cyan-500/40 text-xl text-cyan-400">
             {symbol}
           </div>
           <div>
-            <span className="text-xs font-medium text-slate-400">{subtitle}</span>
-            <h3 className="text-2xl font-bold tracking-tight text-white">{singleWordTitle}</h3>
+            <span className="text-[10px] uppercase tracking-widest text-slate-500">{subtitle}</span>
+            <h2 className="text-xl font-bold tracking-tight text-white">{singleWordTitle}</h2>
           </div>
         </div>
 
-        {/* Tombol Logo (i) Minimalis & Ramah Motorik */}
+        {/* Minimalist Deterministic Toggle (i) */}
         <button
           onClick={() => setShowDetails(!showDetails)}
-          aria-label="Informasi selengkapnya"
-          className="flex h-10 w-10 items-center justify-center rounded-full border border-white/15 bg-white/5 text-cyan-300 font-semibold transition-all hover:bg-cyan-500 hover:text-slate-950 hover:scale-110 active:scale-95"
+          aria-label="Toggle details"
+          className="flex h-9 w-9 items-center justify-center rounded-lg border border-cyan-500/30 bg-cyan-950/50 text-cyan-400 text-sm font-bold transition hover:bg-cyan-400 hover:text-slate-950"
         >
           i
         </button>
       </div>
 
-      {/* Paragraf Tersembunyi di balik logo (i) */}
       {showDetails && (
-        <div className="mt-5 rounded-2xl border border-cyan-500/20 bg-slate-950/80 p-5 text-slate-300 text-sm leading-relaxed animate-fadeIn">
+        <div className="mt-4 border-t border-cyan-500/20 pt-3 text-xs leading-relaxed text-slate-300">
           <p>{detailedParagraph}</p>
         </div>
       )}
-    </div>
+    </article>
   )
 }
