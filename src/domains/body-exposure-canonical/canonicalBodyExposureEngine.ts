@@ -33,6 +33,7 @@ export type VerificationVerdict =
   | 'VERIFIED_EMPIRICAL_ASSET'
   | 'UNVERIFIED_MISSING_SOURCE_ASSET'
   | 'REJECTED_NONEXISTENT_STRUCTURE'
+  | 'REJECTED_AMBIGUOUS_STRUCTURE'
   | 'REJECTED_CORRUPTED_GLB'
   | 'REJECTED_HASH_MISMATCH'
   | 'REJECTED_INVALID_INDICES'
@@ -391,10 +392,10 @@ function loadBodyMatrixCatalog(repoRoot: string): {
                 ? rec.source
                 : typeof rec.provenance === 'string'
                 ? rec.provenance
-                : 'PanaceaMed Canonical Body Matrix Atlas';
+                : null;
 
             const license =
-              typeof rec.license === 'string' ? rec.license : 'CC-BY-4.0 / Canonical Atlas License';
+              typeof rec.license === 'string' ? rec.license : null;
 
             const latRaw = String(rec.laterality ?? 'UNSPECIFIED').toUpperCase();
             const laterality: ResolvedMatrixStructure['laterality'] =
@@ -577,7 +578,7 @@ export function renderCanonicalAnatomySlice(request: CanonicalAnatomyRequest): C
   }
 
   const catalog = loadBodyMatrixCatalog(repoRoot);
-  let resolvedEntry =
+  const resolvedEntry =
     catalog.entries.get(rawStructureId) ?? catalog.entries.get(rawStructureId.toUpperCase());
 
   // Attempt to locate candidate GLB file on disk
@@ -586,9 +587,12 @@ export function renderCanonicalAnatomySlice(request: CanonicalAnatomyRequest): C
     candidateGlbPaths.push(resolvedEntry.glbRelativePath.replace(/^\//, ''));
     candidateGlbPaths.push(path.join('public', resolvedEntry.glbRelativePath.replace(/^\//, '')));
   }
-  for (const discovered of catalog.defaultGlbPaths) {
-    if (!candidateGlbPaths.includes(discovered)) {
-      candidateGlbPaths.push(discovered);
+  // Aset terdaftar yang hilang tidak boleh digantikan berkas hasil penemuan.
+  if (!resolvedEntry?.glbRelativePath) {
+    for (const discovered of catalog.defaultGlbPaths) {
+      if (!candidateGlbPaths.includes(discovered)) {
+        candidateGlbPaths.push(discovered);
+      }
     }
   }
 
@@ -646,53 +650,44 @@ export function renderCanonicalAnatomySlice(request: CanonicalAnatomyRequest): C
   const meshes = gltf.meshes ?? [];
   const accessors = gltf.accessors ?? [];
 
-  // Resolve structure from glTF node/mesh names or extras.panacea_structure_id if not in matrix
-  let matchedNode = nodes.find((n) => {
+  // Alias hanya sah melalui ID eksplisit di katalog; nama parsial bukan identitas.
+  const targetId = resolvedEntry?.panaceaStructureId ?? rawStructureId;
+  const matchingNodes = nodes.filter((n) => {
     const extraId =
       n.extras && typeof n.extras.panacea_structure_id === 'string'
         ? n.extras.panacea_structure_id
         : null;
-    return (
-      extraId === rawStructureId ||
-      (n.name && n.name.toUpperCase() === rawStructureId.toUpperCase())
-    );
+    return extraId !== null
+      ? extraId === targetId
+      : typeof n.name === 'string' && n.name.toUpperCase() === targetId.toUpperCase();
   });
 
-  // Also allow canonical alias prefix CANONICAL-MALE-* to map to a verified node/mesh when matrix or glTF nodes exist
-  if (!matchedNode && !resolvedEntry) {
-    if (rawStructureId.startsWith('CANONICAL-MALE-') && (nodes.length > 0 || meshes.length > 0)) {
-      const token = rawStructureId.replace(/^CANONICAL-MALE-/, '').replace(/-ROOT$/, '').toUpperCase();
-      matchedNode =
-        nodes.find((n) => n.name && n.name.toUpperCase().includes(token)) ?? nodes[0];
-      const extraSource =
-        (gltf.extras && typeof gltf.extras.sourceAttribution === 'string'
-          ? gltf.extras.sourceAttribution
-          : null) ?? 'PanaceaMed Canonical Adult Male Atlas (GLB Embedded Provenance)';
-      resolvedEntry = {
-        structureId: rawStructureId,
-        panaceaStructureId:
-          (matchedNode?.extras && typeof matchedNode.extras.panacea_structure_id === 'string'
-            ? matchedNode.extras.panacea_structure_id
-            : null) ?? rawStructureId,
-        semanticName: matchedNode?.name ?? rawStructureId,
-        laterality: 'MIDLINE',
-        systemCategory: 'CANONICAL_ATLAS',
-        glbRelativePath: path.relative(repoRoot, selectedGlbFullPath),
-        sourceAttribution: extraSource,
-        license: 'CC-BY-4.0',
-        expectedSha256: glbSha256,
-        supportedLods: ['LOD_0_FULL', 'LOD_1_SIMPLIFIED', 'LOD_2_BOUNDING']
-      };
-    } else {
-      return buildFailClosedResponse(request, 'REJECTED_NONEXISTENT_STRUCTURE', [
-        `Structure '${rawStructureId}' not found in body_matrix.json or GLB node/extras hierarchy.`
-      ]);
-    }
+  if (matchingNodes.length !== 1) {
+    return buildFailClosedResponse(request, matchingNodes.length === 0
+      ? 'REJECTED_NONEXISTENT_STRUCTURE' : 'REJECTED_AMBIGUOUS_STRUCTURE', [
+      'Structure identity must resolve to exactly one node in the selected GLB.'
+    ]);
+  }
+  const matchedNode = matchingNodes[0];
+
+  // Katalog yang ada wajib menyatakan sumber dan lisensinya sendiri.
+  const sourceAttribution = resolvedEntry
+    ? resolvedEntry.sourceAttribution
+    : matchedNode.extras?.sourceAttribution ?? gltf.extras?.sourceAttribution;
+  const license = resolvedEntry
+    ? resolvedEntry.license
+    : matchedNode.extras?.license ?? gltf.extras?.license;
+  if (typeof sourceAttribution !== 'string' || !sourceAttribution.trim() ||
+      typeof license !== 'string' || !license.trim()) {
+    return buildFailClosedResponse(request, 'REJECTED_MISSING_PROVENANCE', [
+      'The selected structure requires an explicit source attribution and license declaration.'
+    ]);
   }
 
-  if (resolvedEntry && !resolvedEntry.sourceAttribution) {
-    return buildFailClosedResponse(request, 'REJECTED_MISSING_PROVENANCE', [
-      `Structure '${rawStructureId}' is missing required clinical/anatomical source provenance.`
+  const meshIndex = matchedNode.mesh;
+  if (typeof meshIndex !== 'number' || !Number.isInteger(meshIndex) || meshIndex < 0 || !meshes[meshIndex]) {
+    return buildFailClosedResponse(request, 'REJECTED_INVALID_INDICES', [
+      'The selected structure node does not reference a valid mesh.'
     ]);
   }
 
@@ -702,10 +697,7 @@ export function renderCanonicalAnatomySlice(request: CanonicalAnatomyRequest): C
   let primitiveCount = 0;
   let indicesValid = true;
 
-  const targetMeshes =
-    matchedNode && typeof matchedNode.mesh === 'number' && meshes[matchedNode.mesh]
-      ? [meshes[matchedNode.mesh]]
-      : meshes;
+  const targetMeshes = [meshes[meshIndex]];
 
   for (const mesh of targetMeshes) {
     for (const prim of mesh.primitives ?? []) {
@@ -902,11 +894,10 @@ export function renderCanonicalAnatomySlice(request: CanonicalAnatomyRequest): C
           ? matchedNode.extras.panacea_structure_id
           : rawStructureId),
       semanticName: resolvedEntry?.semanticName ?? matchedNode?.name ?? rawStructureId,
-      laterality: resolvedEntry?.laterality ?? 'MIDLINE',
+      laterality: resolvedEntry?.laterality ?? 'UNSPECIFIED',
       systemCategory: resolvedEntry?.systemCategory ?? 'CANONICAL_ATLAS',
-      sourceAttribution:
-        resolvedEntry?.sourceAttribution ?? 'PanaceaMed Canonical Adult Male Atlas',
-      license: resolvedEntry?.license ?? 'CC-BY-4.0',
+      sourceAttribution,
+      license,
       coordinateSystem: 'RAS_RIGHT_ANTERIOR_SUPERIOR_METERS',
       scaleMetersPerUnit: 1.0,
       transformMatrix: matchedNode?.matrix ?? [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]
