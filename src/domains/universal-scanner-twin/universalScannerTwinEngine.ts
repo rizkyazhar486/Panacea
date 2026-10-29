@@ -1,47 +1,92 @@
-/**
- * PanaceaMed Universal Multi-Modal Scanner Ingestion & 1:1 Digital Twin Engine (Directive 065)
- * Universal ingestion pipeline capable of processing any existing and future scanning modalities
- * (Quantum MRI, Molecular PET, Hyperspectral, Nanoscale, and Real-Time Wearable Telemetry)
- * to synthesize an exact 1:1 digital twin representation of the user.
- */
+import crypto from 'node:crypto';
 
-export type ScannerModalityType = 
-  | 'QUANTUM_MRI_3T_7T' 
-  | 'MOLECULAR_PET_CT' 
-  | 'HYPERSPECTRAL_TISSUE_SCAN' 
-  | 'NANOSCALE_CELLULAR_TOMOGRAPHY' 
+export type ScannerModalityType =
+  | 'QUANTUM_MRI_3T_7T'
+  | 'MOLECULAR_PET_CT'
+  | 'HYPERSPECTRAL_TISSUE_SCAN'
+  | 'NANOSCALE_CELLULAR_TOMOGRAPHY'
   | 'FUTURE_OMNI_QUANTUM_SCANNER';
 
 export interface UniversalScanInput {
   scanId: string;
   modality: ScannerModalityType;
   spatialResolutionMicrons: number;
-  rawSignalTensorData: number[]; // Represents multi-dimensional imaging/telemetry tensors
+  rawSignalTensorData: number[];
   userBiometricCalibrationHash: string;
+  verifiedIndividualImagingSha256?: string;
 }
 
 export interface DigitalTwinSynthesisReport {
   synthesisId: string;
   scanId: string;
   modalityProcessed: ScannerModalityType;
-  digitalTwinFidelityRatio: string; // Target: 1:1 Exact Parity
-  anatomicalMappingStatus: 'SYNTHESIS_SUCCESSFUL_1_TO_1' | 'CALIBRATION_PENDING';
+  digitalTwinFidelityClassification:
+    | 'INDIVIDUAL_IMAGING_BACKED_PARITY'
+    | 'REFERENCE_ATLAS_CALIBRATED_ONLY'
+    | 'UNVERIFIED_MISSING_SIGNAL';
+  anatomicalMappingStatus: 'SYNTHESIS_VERIFIED' | 'CALIBRATION_PENDING';
+  signalStatistics: {
+    sampleCount: number;
+    meanIntensity: number;
+    signalVariance: number;
+  };
   safetyVerificationGate: 'PASSED_NON_DESTRUCTIVE_INVARIANT';
   provenanceHash: string;
-  isClinicallyAuthoritative: false; // Invariant: AI provides 1:1 digital twin synthesis, human clinician decides
+  isClinicallyAuthoritative: false;
 }
 
 export function synthesizeUniversalDigitalTwin(input: UniversalScanInput): DigitalTwinSynthesisReport {
-  const isHighResolution = input.spatialResolutionMicrons <= 100;
-  
+  const samples = Array.isArray(input.rawSignalTensorData)
+    ? input.rawSignalTensorData.filter((n) => Number.isFinite(n))
+    : [];
+  const sampleCount = samples.length;
+  const meanIntensity =
+    sampleCount > 0 ? Number((samples.reduce((a, b) => a + b, 0) / sampleCount).toFixed(4)) : 0;
+  const signalVariance =
+    sampleCount > 1
+      ? Number(
+          (
+            samples.reduce((acc, val) => acc + Math.pow(val - meanIntensity, 2), 0) / sampleCount
+          ).toFixed(4)
+        )
+      : 0;
+
+  const hasVerifiedIndividualScan =
+    typeof input.verifiedIndividualImagingSha256 === 'string' &&
+    /^[a-f0-9]{64}$/i.test(input.verifiedIndividualImagingSha256);
+
+  let fidelity: DigitalTwinSynthesisReport['digitalTwinFidelityClassification'] =
+    'UNVERIFIED_MISSING_SIGNAL';
+  if (sampleCount > 0 && hasVerifiedIndividualScan) {
+    fidelity = 'INDIVIDUAL_IMAGING_BACKED_PARITY';
+  } else if (sampleCount > 0) {
+    // Directive 067 Rule: Never claim 1:1 individual internal anatomy without verified individual imaging!
+    fidelity = 'REFERENCE_ATLAS_CALIBRATED_ONLY';
+  }
+
+  const provenanceHash = crypto
+    .createHash('sha256')
+    .update(
+      JSON.stringify({
+        scanId: input.scanId,
+        modality: input.modality,
+        sampleCount,
+        meanIntensity,
+        signalVariance,
+        fidelity
+      })
+    )
+    .digest('hex');
+
   return {
-    synthesisId: `TWIN-SYNTH-${Date.now()}`,
+    synthesisId: `TWIN-${provenanceHash.slice(0, 12).toUpperCase()}`,
     scanId: input.scanId,
     modalityProcessed: input.modality,
-    digitalTwinFidelityRatio: isHighResolution ? '1:1 Absolute Structural Parity' : 'High-Fidelity Macro Parity',
-    anatomicalMappingStatus: input.rawSignalTensorData.length > 0 ? 'SYNTHESIS_SUCCESSFUL_1_TO_1' : 'CALIBRATION_PENDING',
+    digitalTwinFidelityClassification: fidelity,
+    anatomicalMappingStatus: sampleCount > 0 ? 'SYNTHESIS_VERIFIED' : 'CALIBRATION_PENDING',
+    signalStatistics: { sampleCount, meanIntensity, signalVariance },
     safetyVerificationGate: 'PASSED_NON_DESTRUCTIVE_INVARIANT',
-    provenanceHash: `sha256-universal-twin-${Math.random().toString(36).substring(2)}`,
+    provenanceHash,
     isClinicallyAuthoritative: false
   };
 }

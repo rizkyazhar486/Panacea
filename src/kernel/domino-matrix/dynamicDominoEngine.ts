@@ -1,61 +1,103 @@
-/**
- * PanaceaMed Dynamic Domino Recursive Matrix Engine (Directive 058)
- * Simulates trillion-scale recursive cascading effects across sub-atomic,
- * biochemical, and macroscopic clinical layers using dynamic domino propagation.
- */
+import crypto from 'node:crypto';
 
 export interface DominoNodeInput {
   nodeId: string;
   layerLevel: 'SUB_ATOMIC' | 'MOLECULAR' | 'CELLULAR' | 'ORGAN_SYSTEMIC';
   initialPerturbationValue: number;
-  cascadeDepth: number; // Controls the exponential expansion factor
+  cascadeDepth: number;
+  atpReserveMmol?: number;
+  bufferCapacityMmolPerL?: number;
 }
 
 export interface DominoPropagationResult {
   simulationId: string;
   originNodeId: string;
-  totalCascadingStatesSimulated: number; // Represents trillion-scale virtual permutations
+  totalCascadingStatesSimulated: number;
   dominoStabilityIndex: number;
-  cascadeTrajectory: { depth: number; impactedLayer: string; propagatedEnergy: number }[];
+  cascadeTrajectory: {
+    depth: number;
+    impactedLayer: 'SUB_ATOMIC' | 'MOLECULAR' | 'CELLULAR' | 'ORGAN_SYSTEMIC';
+    propagatedEnergy: number;
+    homeostaticDampingApplied: number;
+    consequentialOrganTargets: string[];
+  }[];
   systemicOutcome: 'HOMEOSTASIS_PRESERVED' | 'CASCADING_COLLAPSE_PREVENTED' | 'QUANTUM_DOMINO_SURGE';
   provenanceHash: string;
   isClinicallyAuthoritative: false;
 }
 
+const LAYER_ORDER: DominoNodeInput['layerLevel'][] = [
+  'SUB_ATOMIC',
+  'MOLECULAR',
+  'CELLULAR',
+  'ORGAN_SYSTEMIC'
+];
+
+const LAYER_ORGAN_TARGETS: Record<DominoNodeInput['layerLevel'], string[]> = {
+  SUB_ATOMIC: ['ELECTRON_TRANSPORT_COMPLEX_I', 'RADICAL_OXYGEN_SPECIES_POOL'],
+  MOLECULAR: ['CYTOCHROME_C_OXIDASE', 'HEMOGLOBIN_ALLOSTERIC_CORE', 'CARBONIC_ANHYDRASE'],
+  CELLULAR: ['CARDIOMYOCYTE_SARCOLEMMA', 'ALVEOLAR_TYPE_II_EPITHELIUM', 'NEURONAL_AXON_HILLOCK'],
+  ORGAN_SYSTEMIC: ['CARDIOVASCULAR_MYOCARDIUM', 'PULMONARY_GAS_EXCHANGE', 'RENAL_GLOMERULAR_FILTRATION', 'CEREBRAL_PERFUSION']
+};
+
 export function evaluateDynamicDominoCascade(input: DominoNodeInput): DominoPropagationResult {
-  const trajectory: { depth: number; impactedLayer: string; propagatedEnergy: number }[] = [];
-  let currentEnergy = input.initialPerturbationValue;
-  let virtualPermutationsCount = 1;
+  if (!input.nodeId || !Number.isFinite(input.initialPerturbationValue) || input.cascadeDepth <= 0) {
+    throw new Error('Invalid DominoNodeInput: nodeId, finite initialPerturbationValue, and positive cascadeDepth required.');
+  }
 
-  const layers: DominoNodeInput['layerLevel'][] = ['SUB_ATOMIC', 'MOLECULAR', 'CELLULAR', 'ORGAN_SYSTEMIC'];
+  const startIdx = Math.max(0, LAYER_ORDER.indexOf(input.layerLevel));
+  const boundedDepth = Math.min(Math.max(1, Math.floor(input.cascadeDepth)), 16);
+  const atpReserve = input.atpReserveMmol ?? 5.0;
+  const bufferCap = input.bufferCapacityMmolPerL ?? 24.0;
 
-  for (let d = 1; d <= Math.min(input.cascadeDepth, 12); d++) {
-    currentEnergy = Number((currentEnergy * 1.414).toFixed(4)); // Non-linear domino amplification factor
-    virtualPermutationsCount *= 10; // Exponential combinatorial explosion modeling trillion-scale depth
+  const trajectory: DominoPropagationResult['cascadeTrajectory'] = [];
+  let currentEnergy = Math.abs(input.initialPerturbationValue);
+  let evaluatedBranchStates = 1;
 
-    const layerIndex = (d - 1) % layers.length;
+  for (let d = 1; d <= boundedDepth; d++) {
+    const layer = LAYER_ORDER[(startIdx + d - 1) % LAYER_ORDER.length];
+    const damping = Number(((atpReserve * 0.35 + bufferCap * 0.12) / (1 + d * 0.25)).toFixed(4));
+    const rawCoupledEnergy = currentEnergy * (1 + 0.38 / Math.sqrt(d));
+    currentEnergy = Number(Math.max(0, rawCoupledEnergy - damping).toFixed(4));
+
+    const targets = LAYER_ORGAN_TARGETS[layer];
+    evaluatedBranchStates *= targets.length;
+
     trajectory.push({
       depth: d,
-      impactedLayer: layers[layerIndex],
-      propagatedEnergy: currentEnergy
+      impactedLayer: layer,
+      propagatedEnergy: currentEnergy,
+      homeostaticDampingApplied: damping,
+      consequentialOrganTargets: targets
     });
   }
 
   let outcome: DominoPropagationResult['systemicOutcome'] = 'HOMEOSTASIS_PRESERVED';
   if (currentEnergy > 500) {
-    outcome = 'CASCADING_COLLAPSE_PREVENTED';
-  } else if (currentEnergy > 1000) {
     outcome = 'QUANTUM_DOMINO_SURGE';
+  } else if (currentEnergy > 120) {
+    outcome = 'CASCADING_COLLAPSE_PREVENTED';
   }
 
-  return {
-    simulationId: `DOMINO-SIM-${Date.now()}`,
+  const stabilityIndex = Number((1 / (1 + currentEnergy * 0.008)).toFixed(4));
+  const canonicalPayload = JSON.stringify({
     originNodeId: input.nodeId,
-    totalCascadingStatesSimulated: virtualPermutationsCount * 100000000, // Scaling towards trillion-permutation virtual matrix
-    dominoStabilityIndex: Number((1 / (1 + currentEnergy * 0.001)).toFixed(4)),
+    layerLevel: input.layerLevel,
+    initialPerturbationValue: input.initialPerturbationValue,
+    boundedDepth,
+    trajectory,
+    outcome
+  });
+  const provenanceHash = crypto.createHash('sha256').update(canonicalPayload).digest('hex');
+
+  return {
+    simulationId: `DOMINO-${provenanceHash.slice(0, 12).toUpperCase()}`,
+    originNodeId: input.nodeId,
+    totalCascadingStatesSimulated: evaluatedBranchStates,
+    dominoStabilityIndex: stabilityIndex,
     cascadeTrajectory: trajectory,
     systemicOutcome: outcome,
-    provenanceHash: `sha256-domino-matrix-${Math.random().toString(36).substring(2)}`,
+    provenanceHash,
     isClinicallyAuthoritative: false
   };
 }
