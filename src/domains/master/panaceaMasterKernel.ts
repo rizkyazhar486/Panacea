@@ -1,20 +1,46 @@
 /**
- * PanaceaMed Master Universal Integration Kernel (Directive 023)
- * Unifies Clinical OS, Education Hub, Economic Valuation, and 10/10 Integrity Standards.
+ * PanaceaMed Master Evidence-Driven Governance Kernel (Directive 024)
+ * Replaces self-declared scores with verifiable build, test, and dependency evidence.
  */
 
-export interface MasterSystemStatus {
-  branchName: string;
-  totalModulesIntegrated: number;
-  systemIntegrityScore: number;
-  productionReady: boolean;
+export interface EvidenceRecord {
+  dependencyResolutionValid: boolean;
+  ciStatusPassing: boolean;
+  productionBuildSuccessful: boolean;
+  clinicalSafetyContractVerified: boolean;
+  securityControlsAudited: boolean;
+  accessibilityWCAGPassed: boolean;
 }
 
-export function evaluateMasterSystem(): MasterSystemStatus {
+export interface TruthfulReadinessAssessment {
+  readinessStatus: 'VERIFIED_READY' | 'PENDING_EVIDENCE' | 'NOT_READY';
+  evidenceScore: number; // 0 to 10 based on actual passing checks
+  missingEvidenceItems: string[];
+}
+
+export function evaluateTruthfulReadiness(evidence: EvidenceRecord): TruthfulReadinessAssessment {
+  const items: string[] = [];
+  let passedCount = 0;
+
+  if (evidence.dependencyResolutionValid) passedCount++; else items.push('Dependency Resolution Pending');
+  if (evidence.ciStatusPassing) passedCount++; else items.push('CI Status Unverified');
+  if (evidence.productionBuildSuccessful) passedCount++; else items.push('Production Build Unconfirmed');
+  if (evidence.clinicalSafetyContractVerified) passedCount++; else items.push('Clinical Safety Unverified');
+  if (evidence.securityControlsAudited) passedCount++; else items.push('Security Audit Pending');
+  if (evidence.accessibilityWCAGPassed) passedCount++; else items.push('WCAG Accessibility Unverified');
+
+  const score = Number(((passedCount / 6) * 10).toFixed(1));
+  let status: 'VERIFIED_READY' | 'PENDING_EVIDENCE' | 'NOT_READY' = 'NOT_READY';
+
+  if (score >= 10.0) {
+    status = 'VERIFIED_READY';
+  } else if (score >= 5.0) {
+    status = 'PENDING_EVIDENCE';
+  }
+
   return {
-    branchName: 'feat/research-omnicausalis-cascade',
-    totalModulesIntegrated: 23,
-    systemIntegrityScore: 10.0,
-    productionReady: true
+    readinessStatus: status,
+    evidenceScore: score,
+    missingEvidenceItems: items
   };
 }
