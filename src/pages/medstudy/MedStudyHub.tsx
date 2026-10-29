@@ -1,3 +1,4 @@
+import { PrometheusCardioBridge } from "./PrometheusCardioBridge"
 import { useSearchParams } from 'react-router-dom'
 import { MedicalLibraryWorkbench } from '../../components/MedicalLibraryWorkbench'
 import { StudyCommandCenter } from '../../components/StudyCommandCenter'
@@ -16,6 +17,7 @@ export function MedStudyHub() {
 
   return (
     <div className="space-y-5 pb-8">
+      <div className="mb-6"><PrometheusCardioBridge /></div>
       <MedicalLibraryWorkbench onRun={runEvidenceQuery} />
       {/* Hasil pencarian bukti tampil di bagian ini; ia terbuka sendiri bila ada `bagian`. */}
       <Fold label="Topics" defaultOpen={params.has('bagian')}>

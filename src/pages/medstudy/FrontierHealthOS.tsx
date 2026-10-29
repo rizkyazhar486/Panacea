@@ -1,10 +1,12 @@
 import { lazy, Suspense, useMemo, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { DiscoveryWorkbench } from '../../components/frontier/DiscoveryWorkbench'
 import { PanaceaCausalTimeMachine } from '../../components/frontier/PanaceaCausalTimeMachine'
 import { PanaceaFrontierSeven } from '../../components/frontier/PanaceaFrontierSeven'
 import { PanaceaHopeStack } from '../../components/frontier/PanaceaHopeStack'
 import { PanaceaRealityEngine } from '../../components/frontier/PanaceaRealityEngine'
 const AGILongevitySystemsLab = lazy(() => import('../bodyhub/AGILongevitySystemsLab'))
+const OmnicausalisWorkbench = lazy(() => import('../../domains/scientific-research').then(m => ({ default: m.OmnicausalisWorkbench })))
 import {
   FRONTIER_CATEGORIES,
   FRONTIER_FEATURES,
@@ -59,6 +61,13 @@ function FeatureCard({ feature, active, onClick }: { feature: FrontierFeature; a
 }
 
 export function FrontierHealthOS() {
+  const [params] = useSearchParams()
+  return params.get('workspace') === 'omnicausalis'
+    ? <Suspense fallback={<p role="status">Loading research workspace…</p>}><OmnicausalisWorkbench /></Suspense>
+    : <FrontierHealthHome />
+}
+
+function FrontierHealthHome() {
   const [category, setCategory] = useState<FrontierCategory>('clinical-intelligence')
   const features = useMemo(() => frontierByCategory(category), [category])
   const [selectedId, setSelectedId] = useState(FRONTIER_FEATURES[0].id)
