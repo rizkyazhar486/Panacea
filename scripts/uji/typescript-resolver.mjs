@@ -1,4 +1,5 @@
-import { existsSync, realpathSync, statSync } from 'node:fs'
+import ts from "typescript"
+import { existsSync, readFileSync, realpathSync, statSync } from 'node:fs'
 import { registerHooks } from 'node:module'
 import { dirname, extname, relative, resolve as resolvePath } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
@@ -73,5 +74,35 @@ registerHooks({
       }
       throw error
     }
+  },
+  load(url, context, nextLoad) {
+    if (url.startsWith("file:") && (url.endsWith(".ts") || url.endsWith(".tsx") || url.endsWith(".mts") || url.endsWith(".cts"))) {
+      const sourcePath = fileURLToPath(url)
+      const rawSource = readFileSync(sourcePath, "utf8")
+      const needsTransform =
+        url.endsWith(".tsx") ||
+        (rawSource.includes("constructor(") &&
+          (rawSource.includes("private ") ||
+            rawSource.includes("public ") ||
+            rawSource.includes("protected ") ||
+            rawSource.includes("readonly ")))
+      if (needsTransform) {
+        const transpiled = ts.transpileModule(rawSource, {
+          fileName: sourcePath,
+          compilerOptions: {
+            module: ts.ModuleKind.ESNext,
+            target: ts.ScriptTarget.ESNext,
+            jsx: ts.JsxEmit.ReactJSX,
+            isolatedModules: true,
+          },
+        })
+        return {
+          format: "module",
+          shortCircuit: true,
+          source: transpiled.outputText,
+        }
+      }
+    }
+    return nextLoad(url, context)
   },
 })
