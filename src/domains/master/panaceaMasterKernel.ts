@@ -1,46 +1,63 @@
 /**
- * PanaceaMed Master Evidence-Driven Governance Kernel (Directive 024)
- * Replaces self-declared scores with verifiable build, test, and dependency evidence.
+ * PanaceaMed Master Evidence-Driven Governance Kernel (Directive 024 Closure)
+ * Replaces self-reported readiness with inspectable, cryptographically signed or CI-verified evidence records.
  */
 
 export interface EvidenceRecord {
-  dependencyResolutionValid: boolean;
-  ciStatusPassing: boolean;
-  productionBuildSuccessful: boolean;
-  clinicalSafetyContractVerified: boolean;
-  securityControlsAudited: boolean;
-  accessibilityWCAGPassed: boolean;
+  source: string;
+  commitSha: string;
+  checkId: string;
+  status: 'PASS' | 'FAIL' | 'UNKNOWN';
+  timestamp: string;
+  freshnessSeconds: number;
+  provenanceValid: boolean;
+  applicableCriteria: string;
 }
 
-export interface TruthfulReadinessAssessment {
-  readinessStatus: 'VERIFIED_READY' | 'PENDING_EVIDENCE' | 'NOT_READY';
-  evidenceScore: number; // 0 to 10 based on actual passing checks
-  missingEvidenceItems: string[];
+export interface InspectionResult {
+  readinessStatus: 'VERIFIED_READY' | 'PENDING_EVIDENCE' | 'REJECTED';
+  verifiedEvidenceCount: number;
+  failures: string[];
 }
 
-export function evaluateTruthfulReadiness(evidence: EvidenceRecord): TruthfulReadinessAssessment {
-  const items: string[] = [];
-  let passedCount = 0;
+export function auditProductionReadiness(records: EvidenceRecord[], expectedCommitSha: string): InspectionResult {
+  let passed = 0;
+  const failures: string[] = [];
 
-  if (evidence.dependencyResolutionValid) passedCount++; else items.push('Dependency Resolution Pending');
-  if (evidence.ciStatusPassing) passedCount++; else items.push('CI Status Unverified');
-  if (evidence.productionBuildSuccessful) passedCount++; else items.push('Production Build Unconfirmed');
-  if (evidence.clinicalSafetyContractVerified) passedCount++; else items.push('Clinical Safety Unverified');
-  if (evidence.securityControlsAudited) passedCount++; else items.push('Security Audit Pending');
-  if (evidence.accessibilityWCAGPassed) passedCount++; else items.push('WCAG Accessibility Unverified');
+  if (!records || records.length === 0) {
+    return { readinessStatus: 'REJECTED', verifiedEvidenceCount: 0, failures: ['No evidence records provided. Failing closed.'] };
+  }
 
-  const score = Number(((passedCount / 6) * 10).toFixed(1));
-  let status: 'VERIFIED_READY' | 'PENDING_EVIDENCE' | 'NOT_READY' = 'NOT_READY';
+  for (const rec of records) {
+    if (rec.commitSha !== expectedCommitSha) {
+      failures.push(`Commit SHA mismatch for check ${rec.checkId}: expected ${expectedCommitSha}, got ${rec.commitSha}`);
+      continue;
+    }
+    if (!rec.provenanceValid) {
+      failures.push(`Invalid evidence provenance for check ${rec.checkId}`);
+      continue;
+    }
+    if (rec.freshnessSeconds > 86400) {
+      failures.push(`Stale evidence for check ${rec.checkId} (age: ${rec.freshnessSeconds}s)`);
+      continue;
+    }
+    if (rec.status === 'PASS') {
+      passed++;
+    } else {
+      failures.push(`Evidence check ${rec.checkId} failed or unknown status: ${rec.status}`);
+    }
+  }
 
-  if (score >= 10.0) {
+  let status: 'VERIFIED_READY' | 'PENDING_EVIDENCE' | 'REJECTED' = 'REJECTED';
+  if (failures.length === 0 && passed >= 6) {
     status = 'VERIFIED_READY';
-  } else if (score >= 5.0) {
+  } else if (passed > 0) {
     status = 'PENDING_EVIDENCE';
   }
 
   return {
     readinessStatus: status,
-    evidenceScore: score,
-    missingEvidenceItems: items
+    verifiedEvidenceCount: passed,
+    failures
   };
 }
