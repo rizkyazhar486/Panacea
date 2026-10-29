@@ -11,10 +11,10 @@ test('Prometheus Educational Contract validates evidence persistence and learnin
     anatomyContext: {
       region: 'Left Anterior Descending Artery',
       vesselSegment: 'Proximal LAD',
-      perfusionStatus: 'ISCHEMIC_RISK' as const
+      perfusionStatus: 'ISCHEMIC_RISK'
     },
     simulationReference: {
-      modelType: 'ILLUSTRATIVE_CARDIAC_FLOW' as const,
+      modelType: 'ILLUSTRATIVE_CARDIAC_FLOW',
       reproducibleSeed: 4242,
       oxygenDeliveryIndex: 0.78
     },
