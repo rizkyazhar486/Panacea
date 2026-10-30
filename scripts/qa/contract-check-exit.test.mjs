@@ -66,7 +66,7 @@ test('the real Assistive Touch contract rejects a missing accessible name', asyn
     await writeFile(join(root, path), await readFile(new URL(`../../${path}`, import.meta.url)))
   }
   const execute = () => spawnSync(process.execPath, [
-    '--experimental-transform-types', join(root, files[0]),
+    join(root, files[0]),
   ], { encoding: 'utf8' })
   const passing = execute()
   assert.equal(passing.error, undefined)

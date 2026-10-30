@@ -3,10 +3,13 @@ import { readFile } from 'node:fs/promises'
 
 const runner = await readFile(new URL('./jalankan.mjs', import.meta.url), 'utf8')
 const resolver = await readFile(new URL('./typescript-resolver.mjs', import.meta.url), 'utf8')
+const compatibility = await readFile(new URL('./node-runtime-flags.mjs', import.meta.url), 'utf8')
 const pkg = JSON.parse(await readFile(new URL('../../package.json', import.meta.url), 'utf8'))
 
 assert.match(runner, /spawnSync\(process\.execPath/)
-assert.match(runner, /--experimental-transform-types/)
+assert.match(runner, /typeScriptRunnerArgs\(process\.versions\.node\)/)
+assert.match(compatibility, /--experimental-transform-types/)
+assert.match(compatibility, /major < 26/)
 assert.match(runner, /typescript-resolver\.mjs/)
 assert.doesNotMatch(runner, /spawnSync\(['"]npx['"]/)
 assert.doesNotMatch(runner, /--import=tsx/)
@@ -21,4 +24,4 @@ assert.match(resolver, /MAX_FALLBACKS = 12/)
 assert.match(resolver, /isInsideRepo/)
 assert.doesNotMatch(resolver, /https?:\/\//)
 
-console.log('Deterministic test runner uses Node 24 plus a bounded repo-local resolver, with no runtime package download.')
+console.log('Deterministic test runner supports Node 24/26 with a bounded repo-local resolver and no runtime package download.')
