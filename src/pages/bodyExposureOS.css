@@ -69,12 +69,12 @@
    surfaces. Scope the visual normalization here so no other Panacea page is
    affected and no feature logic needs to be duplicated or removed. */
 .body-exposure-os__core [class~="bg-neutral-100"] {
-  background-color: rgba(255, 255, 255, 0.038) !important;
+  background-color: rgba(255, 255, 255, 0.065) !important;
 }
 
 .body-exposure-os__core [class~="border-neutral-200"],
 .body-exposure-os__core [class~="border-neutral-100"] {
-  border-color: rgba(255, 255, 255, 0.09) !important;
+  border-color: rgba(255, 255, 255, 0.16) !important;
 }
 
 .body-exposure-os__core [class~="text-neutral-600"],
@@ -130,4 +130,35 @@
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
   }
+}
+
+
+/* UI/UX Accessibility, Spacing & Specialty Depth Enhancements */
+.body-exposure-os {
+  line-height: 1.65;
+  letter-spacing: 0.01em;
+}
+
+.body-exposure-os__dock {
+  scroll-padding-inline: 1rem;
+}
+
+.body-exposure-os__specialty-card {
+  background: linear-gradient(145deg, rgba(15, 23, 42, 0.78), rgba(8, 15, 30, 0.88));
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  box-shadow: 0 16px 40px -12px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(16px);
+}
+
+.body-exposure-os__pill-btn {
+  min-height: 44px;
+  padding: 0.625rem 1rem;
+  font-size: 0.875rem;
+  line-height: 1.35;
+  transition: all 160ms ease;
+}
+
+.body-exposure-os__pill-btn:focus-visible {
+  outline: 2px solid #38bdf8;
+  outline-offset: 2px;
 }

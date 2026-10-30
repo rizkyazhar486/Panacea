@@ -428,6 +428,7 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/sexual-health" element={<SexualHealth />} />
               <Route path="/shape-forming" element={<Navigate to="/latihan?t=bentuk" replace />} />
               <Route path="/consult" element={<Consult />} />
+              <Route path="/visit" element={<Navigate to="/visit-os" replace />} />
               <Route path="/visit-os" element={<VisitOS />} />
               <Route path="/poli" element={<VisitOS />} />
               <Route path="/hospitals" element={<Hospitals />} />

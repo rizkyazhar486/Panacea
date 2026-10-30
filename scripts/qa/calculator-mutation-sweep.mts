@@ -47,7 +47,7 @@ export function numericLiterals(src: string): Literal[] {
 export const mutate = (text: string) => String(Number(text) + 1)
 
 const runSuite = (file: string): Promise<{ code: number | null; stderr: string }> => new Promise((resolve) => {
-  const child = spawn(process.execPath, ['--experimental-transform-types', `--import=${new URL('typescript-resolver.mjs', UJI_DIR).href}`, new URL(file, UJI_DIR).pathname], { cwd: ROOT.pathname, stdio: ['ignore', 'ignore', 'pipe'] })
+  const child = spawn(process.execPath, [...(Number(process.versions.node.split(".")[0]) < 25 ? ['--experimental-transform-types'] : []), `--import=${new URL('typescript-resolver.mjs', UJI_DIR).href}`, new URL(file, UJI_DIR).pathname], { cwd: ROOT.pathname, stdio: ['ignore', 'ignore', 'pipe'] })
   let stderr = ''
   child.stderr.on('data', (b: Buffer) => { stderr += b.toString() })
   const timer = setTimeout(() => child.kill('SIGKILL'), 60_000)

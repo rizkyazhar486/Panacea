@@ -177,11 +177,11 @@ export function BodyExposureOS() {
 
       <nav
         ref={modeRailRef}
-        className="body-exposure-os__dock relative z-[3] mt-3 overflow-x-auto rounded-[22px] border border-white/[.08] bg-black/55 p-1.5 backdrop-blur-2xl"
+        className="body-exposure-os__dock relative z-[3] mt-5 overflow-x-auto rounded-[24px] border border-white/15 bg-black/70 p-2.5 backdrop-blur-2xl shadow-lg"
         aria-label="Body Exposure modes"
         data-body-exposure-mode-rail="v1"
       >
-        <div className="flex min-w-max gap-1.5">
+        <div className="flex min-w-max gap-2.5">
           {MODES.map((mode) => {
             const active = mode.key === activeMode
             return (
@@ -191,10 +191,10 @@ export function BodyExposureOS() {
                 aria-pressed={active}
                 data-body-exposure-mode-active={String(active)}
                 onClick={() => openPanel(mode)}
-                className={`min-h-[42px] rounded-[16px] border px-4 text-xs font-black transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/60 ${
+                className={`min-h-[48px] rounded-[16px] border px-5 py-2.5 text-sm font-bold tracking-wide transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300 ${
                   active
-                    ? 'border-white bg-white text-black shadow-sm'
-                    : 'border-transparent bg-transparent text-white/45 hover:border-white/[.08] hover:bg-white/[.04] hover:text-white/80'
+                    ? 'border-cyan-200 bg-white text-slate-950 shadow-md'
+                    : 'border-white/10 bg-white/[.04] text-white/80 hover:border-white/25 hover:bg-white/[.10] hover:text-white'
                 }`}
               >
                 {mode.label}
@@ -204,12 +204,12 @@ export function BodyExposureOS() {
         </div>
       </nav>
 
-      <div className="relative z-[2] mt-2 flex items-center justify-between gap-3 px-1 text-[10px] font-bold text-white/40" aria-live="polite">
-        <span><span className="text-cyan-200/80">{current.label}</span> · {current.description}</span>
+      <div className="relative z-[2] mt-3 flex items-center justify-between gap-3 px-1 text-xs font-semibold text-white/75" aria-live="polite">
+        <span><span className="text-cyan-200">{current.label}</span> · {current.description}</span>
         <span className="hidden shrink-0 sm:inline">Educational atlas · not a patient-specific diagnosis</span>
       </div>
 
-      <div ref={systemsRef} className="relative z-[2] mt-3 scroll-mt-4">
+      <div ref={systemsRef} className="relative z-[2] mt-6 scroll-mt-6 space-y-5">
         <BodyExposurePatientOverlay selectedSystemId={selectedBodySystemId} onClinicalView={() => setActiveMode('clinical')} onShowStructure={(s) => { setSelectedBodySystemId(s.systemId); setStrukturDiminta((k) => ({ name: s.name, nonce: (k?.nonce ?? 0) + 1 })) }} />
         <SinyalPribadiDiTubuh selectedSystemId={selectedBodySystemId} onSelectSystem={setSelectedBodySystemId} />
         <Suspense fallback={<div className="grid min-h-56 place-items-center rounded-[28px] border border-white/[.08] bg-black/35 text-xs font-bold text-white/35">Loading unified human simulation projector…</div>}>
@@ -223,7 +223,7 @@ export function BodyExposureOS() {
         </Suspense>
       </div>
 
-      <Fold label="Multiscale" className="relative z-[2] mt-3">
+      <Fold label="Multiscale" className="relative z-[2] mt-6">
         <Suspense fallback={null}>
           <PanelKoplingMultiSkala />
         </Suspense>
@@ -234,14 +234,14 @@ export function BodyExposureOS() {
         </div>
       </Fold>
 
-      <details className="body-exposure-os__labs relative z-[1] mt-3 overflow-hidden rounded-[28px] border border-white/[.08] bg-black/35">
-        <summary className="flex min-h-[54px] cursor-pointer list-none items-center justify-between gap-3 px-4 text-xs font-black text-white/65 transition hover:text-white">
+      <details className="body-exposure-os__labs relative z-[1] mt-6 overflow-hidden rounded-[28px] border border-white/15 bg-black/50 shadow-xl">
+        <summary className="flex min-h-[56px] cursor-pointer list-none items-center justify-between gap-4 px-6 py-3 text-sm sm:text-base font-bold text-white/90 transition hover:bg-white/[.04] hover:text-white">
           <span>Deep reference labs</span>
-          <span className="text-[9px] font-bold uppercase tracking-[.14em] text-white/30">all existing tools preserved · open on demand</span>
+          <span className="text-xs font-semibold uppercase tracking-wider text-cyan-200/80">Eksplorasi Mendalam Per Spesialisasi · Klik untuk Buka/Tutup</span>
         </summary>
         <div
           id="body-exposure-core"
-          className="body-exposure-os__core border-t border-white/[.08] p-2 sm:p-3"
+          className="body-exposure-os__core border-t border-white/15 p-4 sm:p-6"
         >
           <BodyExplorer />
         </div>
