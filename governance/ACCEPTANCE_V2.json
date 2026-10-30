@@ -608,7 +608,7 @@
       ],
       "status": "FAIL",
       "statusSha": "37d12268a9597610eb79e86834860eaf49f15cc7",
-      "statusNote": "Reopened 2026-10-30. The previous PASS (2026-10-25, PR #2769, Option A forefoot-only RUN) cited an owner decision that the owner did not make: asked directly on 2026-10-30, the owner confirmed Option B (re-rig the foot with an MTP joint), the same answer given on 2026-10-24; the cited docs/governance/ENG_D7_02_GAIT_DECISION_ANALYSIS.md was never committed. Measured facts stay valid (bodyexposure/qa_reports/gait_contact_probe.json): RUN has no heel strike (calcaneus min 32.3/34.8 mm male, 16.9/20.2 mm female) and male RUN lands on the distal toe phalanges because the rigid foot has no MTP joint. Next: T-D7-05 MTP re-rig, regenerate gait reports, re-earn PASS with exact-SHA evidence."
+      "statusNote": "Reopened 2026-10-30. The previous PASS (2026-10-25, PR #2769, Option A forefoot-only RUN) rests on DOCS/governance/ENG_D7_02_GAIT_DECISION_ANALYSIS.md section 4, which records \"Product Owner Formal Decision (2026-10-25): Option A\". Asked directly on 2026-10-30, the owner chose Option B (re-rig the foot with an MTP joint), the same answer given on 2026-10-24; the latest owner statement governs. Measured facts stay valid (bodyexposure/qa_reports/gait_contact_probe.json): RUN has no heel strike (calcaneus min 32.3/34.8 mm male, 16.9/20.2 mm female) and male RUN lands on the distal toe phalanges because the rigid foot has no MTP joint. Next: T-D7-05 MTP re-rig, regenerate gait reports, re-earn PASS with exact-SHA evidence."
     },
     {
       "id": "ENG-D7-03",
