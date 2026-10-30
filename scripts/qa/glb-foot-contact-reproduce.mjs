@@ -68,7 +68,7 @@ for (const side of ['L', 'R']) {
   const verts = (meshes) => { const p = []; for (const mesh of meshes) for (let i = 0; i < mesh.geometry.attributes.position.count; i++) { world(mesh, i, v); p.push({ mesh, i, y: v.y, z: v.z }) } return p }
   const calc = verts(bone(new RegExp(`SKELETALCALCANEUS${side}$`)))
   const mt1 = verts(bone(new RegExp(`SKELETALFIRST_METATARSAL_BONE${side}$`)))
-  const comb = verts(bone(new RegExp(`METATARSALS_AND_PHALANGES_COMBINED${side}$`)))
+  const comb = verts(bone(new RegExp(`METATARSALS_AND_PHALANGES_COMBINED(_PHALANGEAL_PART)?${side}$`)))
   const forefoot = mt1.length ? mt1 : comb
 
   // ENG-D7-03: rig yang diekspor membawa node landmark bernama (scripts/qa/glb-add-foot-landmarks.mjs). Metrik MEMAKAI node itu; simpul mesh

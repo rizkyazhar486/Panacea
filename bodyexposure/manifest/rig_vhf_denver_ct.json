@@ -42,6 +42,26 @@
    -0.1102,
    0.0044
   ],
+  "MTP.L": [
+   0.0202,
+   -0.0844,
+   0.0292
+  ],
+  "TOE_TIP.L": [
+   0.0219,
+   -0.1233,
+   0.0098
+  ],
+  "MTP.R": [
+   -0.0613,
+   -0.0684,
+   0.0197
+  ],
+  "TOE_TIP.R": [
+   -0.055,
+   -0.1102,
+   0.0044
+  ],
   "PELVIS_CENTRE": [
    0.0008,
    -0.023,
@@ -104,6 +124,44 @@
   "TOE_END.R": {
    "method": "most anterior vertex of the forefoot mesh"
   },
+  "MTP.L": {
+   "method": "step in forefoot cross-section area (derived heuristic, not a labelled landmark): largest drop of the 6 mm mean slab area along the ankle->toe axis within 55-85% of the mesh span; centre = centroid of the 3 mm slab at that plane; flexion axis = mediolateral principal axis of that slab",
+   "truth_class": "derived",
+   "plane_from_ankle_mm": 140.0,
+   "fraction_of_ankle_to_toe_tip": 0.772,
+   "area_drop_mm2_per_mm": 39.0,
+   "mesh_span_from_ankle_mm": [
+    40,
+    184
+   ],
+   "search_window_mm": [
+    118,
+    160
+   ],
+   "uncertainty_note": "order of several mm; no per-bone landmarks in the combined mesh"
+  },
+  "TOE_TIP.L": {
+   "method": "most anterior vertex of the forefoot mesh"
+  },
+  "MTP.R": {
+   "method": "step in forefoot cross-section area (derived heuristic, not a labelled landmark): largest drop of the 6 mm mean slab area along the ankle->toe axis within 55-85% of the mesh span; centre = centroid of the 3 mm slab at that plane; flexion axis = mediolateral principal axis of that slab",
+   "truth_class": "derived",
+   "plane_from_ankle_mm": 142.0,
+   "fraction_of_ankle_to_toe_tip": 0.776,
+   "area_drop_mm2_per_mm": 49.0,
+   "mesh_span_from_ankle_mm": [
+    40,
+    184
+   ],
+   "search_window_mm": [
+    118,
+    160
+   ],
+   "uncertainty_note": "order of several mm; no per-bone landmarks in the combined mesh"
+  },
+  "TOE_TIP.R": {
+   "method": "most anterior vertex of the forefoot mesh"
+  },
   "PELVIS_CENTRE": {
    "method": "midpoint of hip joint centres"
   },
@@ -115,10 +173,12 @@
   "PELVIS": 138.2,
   "THIGH.L": 375.5,
   "SHIN.L": 368.7,
-  "FOOT.L": 181.3,
+  "FOOT.L": 136.6,
+  "TOE.L": 43.5,
   "THIGH.R": 375.9,
   "SHIN.R": 371.7,
-  "FOOT.R": 183.0
+  "FOOT.R": 137.9,
+  "TOE.R": 45.0
  },
  "rom_limits_deg_local": {
   "THIGH.L": {
@@ -214,6 +274,20 @@
     0.0
    ],
    "positive_X": "extension"
+  },
+  "TOE.L": {
+   "X": null,
+   "Y": null,
+   "Z": null,
+   "positive_X": "flexion",
+   "note": "no ROM limit (no verified source); sign only"
+  },
+  "TOE.R": {
+   "X": null,
+   "Y": null,
+   "Z": null,
+   "positive_X": "extension",
+   "note": "no ROM limit (no verified source); sign only"
   }
  },
  "rest_offsets_deg": {
@@ -267,8 +341,10 @@
  "flexion_axis_change_deg": {
   "SHIN.L": 9.3,
   "FOOT.L": 60.8,
+  "TOE.L": 18.1,
   "SHIN.R": 0.5,
-  "FOOT.R": 77.3
+  "FOOT.R": 77.3,
+  "TOE.R": 5.1
  },
  "hinge_refinement": {
   "ANKLE.L": {
@@ -302,6 +378,16 @@
    -0.55824,
    0.78375,
    -0.27223
+  ],
+  "MTP.L": [
+   0.97158,
+   0.10516,
+   -0.21205
+  ],
+  "MTP.R": [
+   -0.95843,
+   0.19537,
+   -0.20793
   ]
  },
  "binding": {
@@ -311,13 +397,16 @@
   "SHIN.L": 5,
   "SHIN.R": 5,
   "FOOT.L": 9,
-  "FOOT.R": 9
+  "FOOT.R": 9,
+  "TOE.L": 1,
+  "TOE.R": 1
  },
  "qa": {
   "left_right_length_difference_mm": {
    "THIGH": 0.4,
    "SHIN": 3.02,
-   "FOOT": 1.62
+   "FOOT": 1.34,
+   "TOE": 1.44
   },
   "joint_centre_to_articulating_bone_surface_mm": {
    "HIP.L": {
@@ -345,8 +434,8 @@
     "TALUS": 10.4
    }
   },
-  "bound_meshes": 44,
-  "meshes_considered": 108,
+  "bound_meshes": 46,
+  "meshes_considered": 116,
   "not_rigged": [
    "VHF_DENVER_CT.ADULT.FEMALE.JOINT.ANTERIOR_CRUCIATE_LIGAMENT.L",
    "VHF_DENVER_CT.ADULT.FEMALE.JOINT.ANTERIOR_CRUCIATE_LIGAMENT.R",
@@ -358,8 +447,12 @@
    "VHF_DENVER_CT.ADULT.FEMALE.JOINT.POSTERIOR_CRUCIATE_LIGAMENT.R",
    "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.CLAVICLE.L",
    "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.CLAVICLE.R",
+   "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.HAND_BONES.L",
+   "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.HAND_BONES.R",
    "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.HUMERUS.L",
    "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.HUMERUS.R",
+   "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.RADIUS.L",
+   "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.RADIUS.R",
    "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.RIB_1.L",
    "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.RIB_1.R",
    "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.RIB_10.L",
@@ -388,6 +481,8 @@
    "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.SCAPULA.R",
    "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.SKULL_CRANIUM_AND_MANDIBLE_ONE_MESH",
    "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.STERNUM",
+   "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.ULNA.L",
+   "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.ULNA.R",
    "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.VERTEBRA_C1",
    "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.VERTEBRA_C2",
    "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.VERTEBRA_C3",
@@ -413,6 +508,24 @@
    "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.VERTEBRA_T8",
    "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.VERTEBRA_T9"
   ],
+  "forefoot_split_at_mtp": {
+   "L": {
+    "posterior_faces": 27493,
+    "anterior_faces": 8370,
+    "cap_faces_posterior": 307,
+    "cap_faces_anterior": 307,
+    "cut_edges": 313,
+    "plane_from_ankle_mm": 140.0
+   },
+   "R": {
+    "posterior_faces": 28934,
+    "anterior_faces": 8221,
+    "cap_faces_posterior": 315,
+    "cap_faces_anterior": 315,
+    "cut_edges": 323,
+    "plane_from_ankle_mm": 142.0
+   }
+  },
   "not_rigged_reason": "knee ligaments span the joint and need soft skinning; muscles are not rigged; CT-derived upper-body bones (if present) are outside this lower-limb rig"
  }
 }

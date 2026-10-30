@@ -73,7 +73,7 @@ export async function computeLandmarks(buf) {
     const pick = (ps, better) => ps.reduce((a, b) => (better(b.v, a.v) ? b : a))
     const calc = verts(new RegExp(`SKELETALCALCANEUS${side}$`))
     const mt1 = verts(new RegExp(`SKELETALFIRST_METATARSAL_BONE${side}$`))
-    const comb = verts(new RegExp(`METATARSALS_AND_PHALANGES_COMBINED${side}$`))
+    const comb = verts(new RegExp(`METATARSALS_AND_PHALANGES_COMBINED(_PHALANGEAL_PART)?${side}$`))
 
     const isFemale = comb.length > 0
 

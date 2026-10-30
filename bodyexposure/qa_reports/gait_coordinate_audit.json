@@ -1289,9 +1289,9 @@
     },
     {
       "source": "public/bodyexposure/vhf_denver_ct_adult_female.rig_rom.glb",
-      "source_sha256": "7ec5ae004e6dca96f93cbb85b297e32d6a1d128980cdaa4af42a1d51eb574e32",
+      "source_sha256": "ebcb2053c3a83669416d0b1f7b2d8aa70f62bb0bf10a325070fcc41b39af9349",
       "decoded_name": "vhf_denver_ct_adult_female.decoded.glb",
-      "decoded_sha256": "f6285ac7fc1d76c2d61af2f9a790a6f5e22df6804d937305e23b7e049058b8ac",
+      "decoded_sha256": "9082c847bc9a8fa5944be6a050e8e8d2aad55aff6eb93b07c06a5e7e1fe51e75",
       "gltf_asset": {
         "version": "2.0",
         "generator": "gltfpack 1.3"
@@ -1330,6 +1330,14 @@
         {
           "object": "THIGH.R",
           "action": "ROM"
+        },
+        {
+          "object": "TOE.L",
+          "action": "ROM"
+        },
+        {
+          "object": "TOE.R",
+          "action": "ROM"
         }
       ],
       "rig_nodes": [
@@ -1338,28 +1346,28 @@
           "type": "EMPTY",
           "parent": "SHIN.L",
           "local_scale": [
+            0.9999998807907104,
             1.0,
-            1.0,
-            1.0
+            0.9999998807907104
           ],
           "world_matrix": [
             [
               0.7821741700172424,
               0.3074941039085388,
-              0.54189532995224,
-              0.10611448436975479
+              0.5418952703475952,
+              0.1061144769191742
             ],
             [
-              0.5672194957733154,
+              0.5672194361686707,
               0.00845157541334629,
-              -0.8235231637954712,
-              -0.028597431257367134
+              -0.8235231041908264,
+              -0.028597459197044373
             ],
             [
-              -0.25780823826789856,
+              -0.25780820846557617,
               0.9515119791030884,
-              -0.1678059846162796,
-              0.020224153995513916
+              -0.1678059697151184,
+              0.020841598510742188
             ],
             [
               0.0,
@@ -1374,28 +1382,28 @@
           "type": "EMPTY",
           "parent": "SHIN.R",
           "local_scale": [
+            0.9999999403953552,
             1.0,
-            1.0,
-            0.9999999403953552
+            1.0
           ],
           "world_matrix": [
             [
-              -0.5751237273216248,
+              -0.57512366771698,
               0.3958292603492737,
-              -0.7159269452095032,
-              -0.09426954388618469
+              -0.715927004814148,
+              -0.09426955133676529
             ],
             [
-              0.7731383442878723,
+              0.7731382846832275,
               -0.023033903911709785,
-              -0.6338183283805847,
-              -0.018150854855775833
+              -0.6338183879852295,
+              -0.018150879070162773
             ],
             [
-              -0.2673744261264801,
+              -0.2673743963241577,
               -0.9180347323417664,
-              -0.29278331995010376,
-              0.016445249319076538
+              -0.29278334975242615,
+              0.017062783241271973
             ],
             [
               0.0,
@@ -1431,7 +1439,7 @@
               -0.13611295819282532,
               -0.4768519997596741,
               0.8683808445930481,
-              0.7641640901565552
+              0.7647815346717834
             ],
             [
               0.0,
@@ -1467,7 +1475,7 @@
               0.0,
               0.0,
               1.0,
-              -0.11096379160881042
+              -0.11034629493951797
             ],
             [
               0.0,
@@ -1486,9 +1494,11 @@
             649.0
           ],
           "slots": [
+            "OBTOE.L",
             "OBFOOT.L",
             "OBSHIN.L",
             "OBTHIGH.L",
+            "OBTOE.R",
             "OBFOOT.R",
             "OBSHIN.R",
             "OBTHIGH.R"
@@ -1501,9 +1511,11 @@
             18.0
           ],
           "slots": [
+            "OBTOE.L",
             "OBFOOT.L",
             "OBSHIN.L",
             "OBTHIGH.L",
+            "OBTOE.R",
             "OBFOOT.R",
             "OBSHIN.R",
             "OBTHIGH.R",
@@ -1517,9 +1529,11 @@
             26.0
           ],
           "slots": [
+            "OBTOE.L",
             "OBFOOT.L",
             "OBSHIN.L",
             "OBTHIGH.L",
+            "OBTOE.R",
             "OBFOOT.R",
             "OBSHIN.R",
             "OBTHIGH.R",
@@ -1533,61 +1547,66 @@
           "meshes": [
             {
               "name": "Mesh_0",
+              "parent": "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.METATARSALS_AND_PHALANGES_COMBINED_PHALANGEAL_PART.L",
+              "vertices": 105
+            },
+            {
+              "name": "Mesh_1",
               "parent": "VHF_DENVER_CT.ADULT.FEMALE.JOINT.TALAR_ARTICULAR_CARTILAGE.L",
               "vertices": 13
             },
             {
-              "name": "Mesh_1",
+              "name": "Mesh_2",
               "parent": "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.CALCANEUS.L",
-              "vertices": 206
+              "vertices": 205
             },
             {
-              "name": "Mesh_2",
+              "name": "Mesh_3",
               "parent": "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.CUBOID.L",
               "vertices": 62
             },
             {
-              "name": "Mesh_3",
+              "name": "Mesh_4",
               "parent": "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.INTERMEDIATE_CUNEIFORM.L",
               "vertices": 32
             },
             {
-              "name": "Mesh_4",
+              "name": "Mesh_5",
               "parent": "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.LATERAL_CUNEIFORM.L",
               "vertices": 36
             },
             {
-              "name": "Mesh_5",
+              "name": "Mesh_6",
               "parent": "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.MEDIAL_CUNEIFORM.L",
               "vertices": 52
             },
             {
-              "name": "Mesh_6",
+              "name": "Mesh_7",
               "parent": "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.METATARSALS_AND_PHALANGES_COMBINED.L",
-              "vertices": 397
+              "vertices": 318
             },
             {
-              "name": "Mesh_7",
+              "name": "Mesh_8",
               "parent": "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.NAVICULAR.L",
               "vertices": 58
             },
             {
-              "name": "Mesh_8",
+              "name": "Mesh_9",
               "parent": "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.TALUS.L",
               "vertices": 132
             }
           ],
-          "vertices": 988,
+          "vertices": 1013,
           "bounds": {
             "min": [
-              0.07696143537759781,
-              -0.20741006731987,
-              -0.046389106661081314
+              0.07696140557527542,
+              -0.20741000771522522,
+              -0.045771680772304535
             ],
             "max": [
-              0.18567609786987305,
-              0.018918082118034363,
-              0.04035241901874542
+              0.18613548576831818,
+              0.018918070942163467,
+              0.04096990451216698
             ]
           }
         },
@@ -1595,62 +1614,67 @@
           "anchor": "FOOT.R",
           "meshes": [
             {
-              "name": "Mesh_19",
+              "name": "Mesh_20",
+              "parent": "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.METATARSALS_AND_PHALANGES_COMBINED_PHALANGEAL_PART.R",
+              "vertices": 108
+            },
+            {
+              "name": "Mesh_21",
               "parent": "VHF_DENVER_CT.ADULT.FEMALE.JOINT.TALAR_ARTICULAR_CARTILAGE.R",
               "vertices": 34
             },
             {
-              "name": "Mesh_20",
+              "name": "Mesh_22",
               "parent": "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.CALCANEUS.R",
-              "vertices": 207
+              "vertices": 206
             },
             {
-              "name": "Mesh_21",
+              "name": "Mesh_23",
               "parent": "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.CUBOID.R",
               "vertices": 63
             },
             {
-              "name": "Mesh_22",
+              "name": "Mesh_24",
               "parent": "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.INTERMEDIATE_CUNEIFORM.R",
               "vertices": 32
             },
             {
-              "name": "Mesh_23",
+              "name": "Mesh_25",
               "parent": "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.LATERAL_CUNEIFORM.R",
               "vertices": 38
             },
             {
-              "name": "Mesh_24",
-              "parent": "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.MEDIAL_CUNEIFORM.R",
-              "vertices": 54
-            },
-            {
-              "name": "Mesh_25",
-              "parent": "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.METATARSALS_AND_PHALANGES_COMBINED.R",
-              "vertices": 410
-            },
-            {
               "name": "Mesh_26",
-              "parent": "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.NAVICULAR.R",
-              "vertices": 57
+              "parent": "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.MEDIAL_CUNEIFORM.R",
+              "vertices": 53
             },
             {
               "name": "Mesh_27",
+              "parent": "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.METATARSALS_AND_PHALANGES_COMBINED.R",
+              "vertices": 329
+            },
+            {
+              "name": "Mesh_28",
+              "parent": "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.NAVICULAR.R",
+              "vertices": 56
+            },
+            {
+              "name": "Mesh_29",
               "parent": "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.TALUS.R",
               "vertices": 128
             }
           ],
-          "vertices": 1023,
+          "vertices": 1047,
           "bounds": {
             "min": [
-              -0.2007768303155899,
-              -0.17990794777870178,
-              -0.04999937862157822
+              -0.20077744126319885,
+              -0.17990778386592865,
+              -0.04938187822699547
             ],
             "max": [
-              -0.0617559514939785,
-              0.02737313322722912,
-              0.03263264149427414
+              -0.06175599619746208,
+              0.02737322822213173,
+              0.03325015679001808
             ]
           }
         }
@@ -1670,6 +1694,10 @@
             "path": "rotation"
           },
           {
+            "node": "TOE.L",
+            "path": "rotation"
+          },
+          {
             "node": "THIGH.R",
             "path": "rotation"
           },
@@ -1679,6 +1707,10 @@
           },
           {
             "node": "FOOT.R",
+            "path": "rotation"
+          },
+          {
+            "node": "TOE.R",
             "path": "rotation"
           }
         ],
@@ -1696,6 +1728,10 @@
             "path": "rotation"
           },
           {
+            "node": "TOE.L",
+            "path": "rotation"
+          },
+          {
             "node": "THIGH.R",
             "path": "rotation"
           },
@@ -1705,6 +1741,10 @@
           },
           {
             "node": "FOOT.R",
+            "path": "rotation"
+          },
+          {
+            "node": "TOE.R",
             "path": "rotation"
           },
           {
@@ -1726,6 +1766,10 @@
             "path": "rotation"
           },
           {
+            "node": "TOE.L",
+            "path": "rotation"
+          },
+          {
             "node": "THIGH.R",
             "path": "rotation"
           },
@@ -1738,6 +1782,10 @@
             "path": "rotation"
           },
           {
+            "node": "TOE.R",
+            "path": "rotation"
+          },
+          {
             "node": "RIG.VHF_LOWER_LIMB",
             "path": "translation"
           }
@@ -1745,14 +1793,14 @@
       },
       "world_bounds": {
         "min": [
-          -0.2060871124267578,
-          -0.21423308551311493,
-          -0.09694519639015198
+          -0.20608842372894287,
+          -0.2130635380744934,
+          -0.0932362824678421
         ],
         "max": [
           0.2005203664302826,
-          0.09382598102092743,
-          0.9124288558959961
+          0.09382592141628265,
+          0.9130463004112244
         ]
       },
       "nonfinite_or_exactly_singular_transforms": []

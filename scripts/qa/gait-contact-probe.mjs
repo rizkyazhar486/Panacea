@@ -13,7 +13,7 @@ import { MeshoptDecoder } from '../../node_modules/three/examples/jsm/libs/mesho
 
 const BODIES = ['adult_male', 'vhf_denver_ct_adult_female']
 const FPS = 24, WINDOW = 0.015
-const GROUPS = { calcaneus: /SKELETAL\.CALCANEUS\./, forefoot: /SKELETAL\.(FIRST_METATARSAL_BONE|METATARSALS_AND_PHALANGES_COMBINED)\./ }
+const GROUPS = { calcaneus: /SKELETAL\.CALCANEUS\./, forefoot: /SKELETAL\.(FIRST_METATARSAL_BONE|METATARSALS_AND_PHALANGES_COMBINED(_PHALANGEAL_PART)?)\./ }
 const LANDMARK = { calcaneus: 'HEEL', forefoot: 'BALL' }
 const mm = (x) => Math.round(x * 1e4) / 10
 const sid = (m) => { for (let o = m; o; o = o.parent) { const id = o.userData?.panacea_structure_id; if (id) return id } return '' }

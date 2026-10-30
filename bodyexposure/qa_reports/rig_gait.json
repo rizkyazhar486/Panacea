@@ -13,7 +13,8 @@
    "frames_24fps": 27,
    "keys_start_at_s": 0.0,
    "loop_seam_max_deg": 0.0,
-   "loop_drift_corrected_max_deg": 15.11,
+   "loop_drift_corrected_max_deg": 4.58,
+   "toe_mtp_loop_drift_corrected_max_deg": 15.11,
    "joint_angle_range_deg": {
     "hip_flex": [
      -32.5,
@@ -318,6 +319,7 @@
    "keys_start_at_s": 0.0,
    "loop_seam_max_deg": 0.0,
    "loop_drift_corrected_max_deg": 12.39,
+   "toe_mtp_loop_drift_corrected_max_deg": 2.41,
    "joint_angle_range_deg": {
     "hip_flex": [
      -34.4,

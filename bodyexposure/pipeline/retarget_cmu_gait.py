@@ -299,11 +299,13 @@ for name, subj, trial in CLIPS:
     sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
     contact = rig_contact_qa.sweep(sc, list(range(0, len(idx), 2)), lambda at: name.lower())
     loop_err = max(abs(sample(f"{key}.{s}", idx[0]) - sample(f"{key}.{s}", idx[-1])) for key in CLAMP for s in "LR")
-    drift_max = max(abs(v) for v in drift.values())
+    drift_max = max(abs(v) for k, v in drift.items() if not k.startswith("mtp_ext"))  # metrik lama: hanya sendi dari CMU yang sudah ada sebelum MTP
+    mtp_drift_max = max(abs(drift[f"mtp_ext.{sd}"]) for sd in "LR") if mtp_seen else None
     report["clips"][name] = {
         "subject": subj, "trial": trial, "source_fps": 120, "cycle_start_frame": start, "cycle_frames_120fps": period,
         "cycle_s": round(period / 120, 3), "frames_24fps": len(idx), "keys_start_at_s": 0.0, "loop_seam_max_deg": round(loop_err, 2),
         "loop_drift_corrected_max_deg": round(drift_max, 2),
+        "toe_mtp_loop_drift_corrected_max_deg": (round(mtp_drift_max, 2) if mtp_drift_max is not None else None),
         "joint_angle_range_deg": rngs, "clamped_samples": clamped,
         "rest_offsets_deg": ({sd: {k: round(v, 1) for k, v in REST[sd].items()} for sd in "LR"} if BODY else None), "coverage": COVERAGE or None,
         "leg_length_m": {"rig": round(leg_rig, 3), "source": round(leg_src, 3)},
