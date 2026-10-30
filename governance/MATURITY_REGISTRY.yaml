@@ -146,23 +146,3 @@ workflows:
     known_gaps: [limited_domain_coupling_coverage, no_curated_parameter_declarations_for_personalization, no_qualified_clinical_validation, limited_projection_wiring]
     next_action: integrate_next_source_backed_couplings_through_shared_runtime_then_project_without_patient_truth_writeback
     last_audited_commit: adfaf2d5040a4e96bb305173060df14bddb75583
-
-
-  - workflow_id: research.omnicausalis
-    name: Reference mechanisms separated from illustrative numerical scenarios
-    strategic_priority: bounded_owner_requested_research_lane
-    maturity_level: CONNECTED
-    clinical_validation: none
-    dimensions:
-      functional_completeness: unknown
-      integration: medium
-      reliability: unknown
-      usability: unknown
-      clinical_quality: unknown
-      safety_security: medium
-      observability_testing: unknown
-    acceptance_evidence:
-      - "Source and equations documented in DOCS/research/OMNICAUSALIS.md; no clinical acceptance promoted."
-    known_gaps: [exact_head_browser_acceptance, biological_calibration, independent_external_validation]
-    next_action: verify_route_and_ci_then_request_independent_scientific_challenge
-    last_audited_commit: null

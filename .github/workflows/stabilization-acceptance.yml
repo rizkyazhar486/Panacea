@@ -543,20 +543,6 @@ jobs:
           path: artifacts/privacy-disclosure
           if-no-files-found: ignore
 
-      - name: Omnicausalis actual research route (mobile, desktop and negative controls)
-        timeout-minutes: 4
-        env:
-          PLAYWRIGHT_MODULE: ${{ runner.temp }}/panacea-playwright/node_modules/playwright/index.mjs
-        run: node qa/research/omnicausalis.mjs
-
-      - name: Upload Omnicausalis browser evidence
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: omnicausalis-research
-          path: artifacts/omnicausalis
-          if-no-files-found: ignore
-
       - name: A6 clinician care-plan approval (real HTTP, mobile and desktop)
         timeout-minutes: 6
         env:
