@@ -210,3 +210,5 @@ export function SkeletonRows({ rows = 3 }: { rows?: number }) {
 
 export const inputClass =
   'w-full min-h-[44px] rounded-[14px] border border-black/[.10] bg-white/95 px-3.5 py-2 text-sm text-ink shadow-[inset_0_1px_rgba(255,255,255,.7),0_4px_14px_rgba(20,40,50,.03)] outline-none backdrop-blur-lg transition duration-200 placeholder:text-neutral-500 hover:border-black/[.16] focus:border-brand/55 focus:ring-4 focus:ring-brand/10 dark:border-white/12 dark:bg-[#101214]/96 dark:text-white dark:placeholder:text-neutral-500'
+
+export * from './SearchableSelect'

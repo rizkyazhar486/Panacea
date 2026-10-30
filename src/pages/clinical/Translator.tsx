@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Card, SectionTitle } from '../../components/ui'
+import { Card, SectionTitle, SearchableSelect } from '../../components/ui'
 import { api, type TranslateLanguage, type TranslateResult } from '../../lib/api'
 
 // Penerjemah kedokteran. Lihat server/src/translate.ts untuk perisai
@@ -71,16 +71,17 @@ export function Translator() {
 
       <Card>
         <div className="flex items-end gap-2">
-          <label className="min-w-0 flex-1">
+          <div className="min-w-0 flex-1">
             <span className="t-mikro font-bold uppercase tracking-wide text-neutral-500">From</span>
-            <select
+            <SearchableSelect
               value={from}
-              onChange={(e) => setFrom(e.target.value)}
-              className="mt-0.5 h-11 w-full rounded-xl border border-neutral-200 bg-white px-2 text-sm text-ink dark:border-white/10 dark:bg-white/5 dark:text-white"
-            >
-              {daftar.map((l) => <option key={l.kode} value={l.kode}>{l.asli}</option>)}
-            </select>
-          </label>
+              onChange={setFrom}
+              options={daftar.map((l) => ({ value: l.kode, label: l.asli, hint: l.nama !== l.asli ? l.nama : undefined }))}
+              placeholder="Pilih bahasa..."
+              searchPlaceholder="Cari bahasa..."
+              className="mt-0.5"
+            />
+          </div>
           <button
             onClick={tukar}
             aria-label="Swap languages"
@@ -88,16 +89,17 @@ export function Translator() {
           >
             ⇄
           </button>
-          <label className="min-w-0 flex-1">
+          <div className="min-w-0 flex-1">
             <span className="t-mikro font-bold uppercase tracking-wide text-neutral-500">To</span>
-            <select
+            <SearchableSelect
               value={to}
-              onChange={(e) => setTo(e.target.value)}
-              className="mt-0.5 h-11 w-full rounded-xl border border-neutral-200 bg-white px-2 text-sm text-ink dark:border-white/10 dark:bg-white/5 dark:text-white"
-            >
-              {daftar.map((l) => <option key={l.kode} value={l.kode}>{l.asli}</option>)}
-            </select>
-          </label>
+              onChange={setTo}
+              options={daftar.map((l) => ({ value: l.kode, label: l.asli, hint: l.nama !== l.asli ? l.nama : undefined }))}
+              placeholder="Pilih bahasa..."
+              searchPlaceholder="Cari bahasa..."
+              className="mt-0.5"
+            />
+          </div>
         </div>
 
         <div className="mt-3">

@@ -124,78 +124,82 @@ export function ScienceOdysseySection() {
 
           {/* Ancient eras — Interactive Split Stepper */}
           {(scienceTab === 'eras' || scienceTab === 'all') && (
-            <div className="mt-10 grid grid-cols-1 gap-6 lg:grid-cols-12 items-start">
+            <div className="mt-10 grid grid-cols-1 gap-6 lg:grid-cols-12 lg:items-stretch">
               {/* Left: Era Stepper Navigation (5 cols) */}
-              <div className="space-y-2.5 lg:col-span-5">
-                <div className="mb-2 text-[11px] font-extrabold uppercase tracking-widest text-emerald-700 dark:text-emerald-400">
+              <div className="flex flex-col lg:col-span-5">
+                <div className="mb-2 shrink-0 text-[11px] font-extrabold uppercase tracking-widest text-emerald-700 dark:text-emerald-400">
                   Pilih Era Sejarah (1–{HISTORY_ERAS.length})
                 </div>
-                {HISTORY_ERAS.map((e, i) => (
-                  <button
-                    key={e.era}
-                    onClick={() => setActiveEra(i)}
-                    className={`w-full flex items-center justify-between rounded-2xl p-4 text-left transition-all ${
-                      activeEra === i
-                        ? 'border-2 border-emerald-500 bg-white shadow-md shadow-emerald-500/10 dark:bg-neutral-900'
-                        : 'border border-black/5 bg-white/70 hover:bg-white hover:border-emerald-300/60 dark:border-white/10 dark:bg-neutral-900/60'
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <span
-                        className={`grid h-10 w-10 shrink-0 place-items-center rounded-xl text-xl ${
-                          activeEra === i
-                            ? 'bg-emerald-500 text-white'
-                            : 'bg-brand-50 text-brand-dark dark:bg-emerald-950 dark:text-emerald-300'
-                        }`}
-                      >
-                        {renderEraGlyph(e.era, e.emoji)}
-                      </span>
-                      <div>
-                        <div className="text-sm font-extrabold text-ink">{e.era}</div>
-                        <div className="text-xs text-neutral-500 dark:text-neutral-400">{e.title}</div>
+                <div className="flex flex-1 flex-col justify-between gap-2.5">
+                  {HISTORY_ERAS.map((e, i) => (
+                    <button
+                      key={e.era}
+                      onClick={() => setActiveEra(i)}
+                      className={`w-full flex flex-1 items-center justify-between rounded-2xl px-4 py-3 text-left transition-all ${
+                        activeEra === i
+                          ? 'border-2 border-emerald-500 bg-white shadow-md shadow-emerald-500/10 dark:bg-neutral-900'
+                          : 'border border-black/5 bg-white/70 hover:bg-white hover:border-emerald-300/60 dark:border-white/10 dark:bg-neutral-900/60'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <span
+                          className={`grid h-10 w-10 shrink-0 place-items-center rounded-xl text-xl ${
+                            activeEra === i
+                              ? 'bg-emerald-500 text-white'
+                              : 'bg-brand-50 text-brand-dark dark:bg-emerald-950 dark:text-emerald-300'
+                          }`}
+                        >
+                          {renderEraGlyph(e.era, e.emoji)}
+                        </span>
+                        <div>
+                          <div className="text-sm font-extrabold text-ink">{e.era}</div>
+                          <div className="text-xs text-neutral-500 dark:text-neutral-400">{e.title}</div>
+                        </div>
                       </div>
-                    </div>
-                    <span className="shrink-0 rounded-full bg-emerald-50 px-2.5 py-0.5 text-[10px] font-bold text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300">
-                      {e.when}
-                    </span>
-                  </button>
-                ))}
+                      <span className="shrink-0 rounded-full bg-emerald-50 px-2.5 py-0.5 text-[10px] font-bold text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300">
+                        {e.when}
+                      </span>
+                    </button>
+                  ))}
+                </div>
               </div>
 
               {/* Right: Active Era Viewport Showcase (7 cols) */}
-              <div className="lg:col-span-7">
-                <div className="sticky top-24 rounded-3xl border border-black/5 bg-white p-6 shadow-xl shadow-black/5 dark:border-white/10 dark:bg-neutral-900">
-                  <div className="flex items-center justify-between gap-3 border-b border-black/5 pb-4 dark:border-white/10">
-                    <div className="flex items-center gap-3">
-                      <span className="grid h-10 w-10 place-items-center rounded-xl bg-brand-50 text-2xl dark:bg-emerald-950">
-                        {renderEraGlyph(HISTORY_ERAS[activeEra].era, HISTORY_ERAS[activeEra].emoji)}
-                      </span>
-                      <div>
-                        <h3 className="text-base font-extrabold text-ink sm:text-lg">{HISTORY_ERAS[activeEra].title}</h3>
-                        <div className="text-xs font-bold text-brand-dark dark:text-emerald-400">
-                          {HISTORY_ERAS[activeEra].era} ·{' '}
-                          <span className="text-neutral-500 font-medium">{HISTORY_ERAS[activeEra].when}</span>
+              <div className="flex flex-col lg:col-span-7">
+                <div className="flex h-full flex-col justify-between rounded-3xl border border-black/5 bg-white p-6 shadow-xl shadow-black/5 dark:border-white/10 dark:bg-neutral-900">
+                  <div>
+                    <div className="flex items-center justify-between gap-3 border-b border-black/5 pb-4 dark:border-white/10">
+                      <div className="flex items-center gap-3">
+                        <span className="grid h-10 w-10 place-items-center rounded-xl bg-brand-50 text-2xl dark:bg-emerald-950">
+                          {renderEraGlyph(HISTORY_ERAS[activeEra].era, HISTORY_ERAS[activeEra].emoji)}
+                        </span>
+                        <div>
+                          <h3 className="text-base font-extrabold text-ink sm:text-lg">{HISTORY_ERAS[activeEra].title}</h3>
+                          <div className="text-xs font-bold text-brand-dark dark:text-emerald-400">
+                            {HISTORY_ERAS[activeEra].era} ·{' '}
+                            <span className="text-neutral-500 font-medium">{HISTORY_ERAS[activeEra].when}</span>
+                          </div>
                         </div>
                       </div>
+                      <span className="rounded-full bg-neutral-100 px-3 py-1 font-mono text-xs font-black text-neutral-600 dark:bg-neutral-800 dark:text-neutral-300">
+                        {activeEra + 1} / {HISTORY_ERAS.length}
+                      </span>
                     </div>
-                    <span className="rounded-full bg-neutral-100 px-3 py-1 font-mono text-xs font-black text-neutral-600 dark:bg-neutral-800 dark:text-neutral-300">
-                      {activeEra + 1} / {HISTORY_ERAS.length}
-                    </span>
-                  </div>
 
-                  <div className="mt-4">
-                    {HISTORY_ERAS[activeEra].video && (
-                      <VideoSaatTerlihat
-                        key={HISTORY_ERAS[activeEra].video}
-                        src={HISTORY_ERAS[activeEra].video}
-                        judul={HISTORY_ERAS[activeEra].era}
-                      />
-                    )}
-                  </div>
+                    <div className="mt-4">
+                      {HISTORY_ERAS[activeEra].video && (
+                        <VideoSaatTerlihat
+                          key={HISTORY_ERAS[activeEra].video}
+                          src={HISTORY_ERAS[activeEra].video}
+                          judul={HISTORY_ERAS[activeEra].era}
+                        />
+                      )}
+                    </div>
 
-                  <p className="mt-4 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">
-                    {HISTORY_ERAS[activeEra].body}
-                  </p>
+                    <p className="mt-4 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">
+                      {HISTORY_ERAS[activeEra].body}
+                    </p>
+                  </div>
 
                   {/* Stepper Navigation Buttons */}
                   <div className="mt-5 flex items-center justify-between border-t border-black/5 pt-4 dark:border-white/10">

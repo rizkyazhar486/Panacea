@@ -227,24 +227,31 @@
 
 .panacea-command-result-main {
   min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
 .panacea-command-result-title {
+  display: inline-block;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: 14px;
+  font-size: 13.5px;
   font-weight: 800;
 }
 
 .panacea-command-result-meta {
-  margin-top: 2px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  color: rgba(255,255,255,.34);
-  font-size: 10px;
-  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 7px;
+  border-radius: 999px;
+  font-size: 9.5px;
+  font-weight: 750;
+  letter-spacing: 0.02em;
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.65);
 }
 
 .panacea-command-result-arrow {
@@ -529,7 +536,78 @@ html:not(.dark) .panacea-command-result {
 }
 
 html:not(.dark) .panacea-command-result-meta {
-  color: #64748b;
+  background: #f1f5f9;
+  color: #475569;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.panacea-command-result-meta[data-domain='Your Body'] {
+  color: #10b981;
+}
+html:not(.dark) .panacea-command-result-meta[data-domain='Your Body'] {
+  background: #ecfdf5;
+  color: #047857;
+  border-color: rgba(16, 185, 129, 0.25);
+}
+
+.panacea-command-result-meta[data-domain='Clinical'] {
+  color: #38bdf8;
+}
+html:not(.dark) .panacea-command-result-meta[data-domain='Clinical'] {
+  background: #eff6ff;
+  color: #1d4ed8;
+  border-color: rgba(59, 130, 246, 0.25);
+}
+
+.panacea-command-result-meta[data-domain='For You'] {
+  color: #c084fc;
+}
+html:not(.dark) .panacea-command-result-meta[data-domain='For You'] {
+  background: #faf5ff;
+  color: #6d28d9;
+  border-color: rgba(139, 92, 246, 0.25);
+}
+
+.panacea-bento-icon {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  font-size: 17px;
+  flex-shrink: 0;
+}
+html:not(.dark) .panacea-bento-icon {
+  background: #f8fafc;
+  border: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.panacea-bento-preview {
+  display: block;
+  margin-top: 3px;
+  font-size: 11px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.40);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 340px;
+}
+html:not(.dark) .panacea-bento-preview {
+  color: #94a3b8;
+}
+
+.panacea-bento-chevron {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.40);
+  transition: transform 160ms ease;
+}
+html:not(.dark) .panacea-bento-chevron {
+  color: #94a3b8;
+}
+.panacea-bento-tile[data-open='true'] .panacea-bento-chevron {
+  transform: rotate(180deg);
 }
 
 html:not(.dark) .panacea-bento-tile {

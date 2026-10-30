@@ -1,6 +1,6 @@
 import { FRICTION_KEYS, parseFriction, type FrictionKey } from './frictionInputs'
 import { useMemo, useState } from 'react'
-import { Card, inputClass } from '../ui'
+import { Card, inputClass, SearchableSelect } from '../ui'
 import {
   DEFAULT_GAP_SIGNALS,
   GAP_NAVIGATOR_TRUTH_RULES,

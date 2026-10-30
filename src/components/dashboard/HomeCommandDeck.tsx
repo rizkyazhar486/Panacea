@@ -12,6 +12,24 @@ import { BatasKlaimKesehatan } from '../BatasKlaimKesehatan'
 
 type Domain = 'Your Body' | 'Clinical' | 'For You'
 
+const GROUP_ICONS: Record<string, string> = {
+  'Longevity': '🧬',
+  'Calculators & Labs': '🧪',
+  'Fitness': '🏃',
+  'Your Body': '🫀',
+  'Account': '👤',
+  'Learn & Look Up': '📚',
+  'Content': '📰',
+  'Services': '🏥',
+  'Health': '🩺',
+  'Home': '🏠',
+  'Move': '⚡',
+  'Clinical & AI': '🔬',
+  'Money': '💳',
+  'Manage': '⚙️',
+  'Most used': '⭐',
+}
+
 function textOf(feature: EntriKatalog) {
   return `${feature.label} ${feature.apa} ${feature.kw} ${feature.group}`
 }
@@ -140,23 +158,43 @@ export function HomeCommandDeck() {
                   aria-expanded={open}
                   onClick={() => setOpenGroup((value) => (value === group.name ? null : group.name))}
                 >
-                  <span className="panacea-bento-name">{group.name}</span>
-                  <span className="panacea-bento-count" aria-hidden>{group.items.length}</span>
+                  <div className="flex min-w-0 items-center gap-3">
+                    <span className="panacea-bento-icon" aria-hidden>
+                      {GROUP_ICONS[group.name] ?? '📁'}
+                    </span>
+                    <div className="min-w-0">
+                      <span className="panacea-bento-name">{group.name}</span>
+                      {!open && group.items.length > 0 && (
+                        <span className="panacea-bento-preview">
+                          {group.items.slice(0, 3).map((f) => f.label).join(' · ')}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex shrink-0 items-center gap-2">
+                    <span className="panacea-bento-count" aria-hidden>{group.items.length}</span>
+                    <span className="panacea-bento-chevron" aria-hidden>{open ? '▲' : '▼'}</span>
+                  </div>
                 </button>
 
                 {open ? (
                   <ul className="panacea-bento-items" role="list">
-                    {group.items.map((feature) => (
-                      <li key={`${feature.label}-${canonical(feature.to)}`}>
-                        <Link to={canonical(feature.to)} className="panacea-command-result">
-                          <span className="panacea-command-result-main">
-                            <span className="panacea-command-result-title">{feature.label}</span>
-                            <span className="panacea-command-result-meta">{domainOf(feature)}</span>
-                          </span>
-                          <span className="panacea-command-result-arrow" aria-hidden>→</span>
-                        </Link>
-                      </li>
-                    ))}
+                    {group.items.map((feature) => {
+                      const domain = domainOf(feature)
+                      return (
+                        <li key={`${feature.label}-${canonical(feature.to)}`}>
+                          <Link to={canonical(feature.to)} className="panacea-command-result">
+                            <span className="panacea-command-result-main">
+                              <span className="panacea-command-result-title">{feature.label}</span>
+                              <span className="panacea-command-result-meta" data-domain={domain}>
+                                {domain}
+                              </span>
+                            </span>
+                            <span className="panacea-command-result-arrow" aria-hidden>→</span>
+                          </Link>
+                        </li>
+                      )
+                    })}
                   </ul>
                 ) : null}
               </section>

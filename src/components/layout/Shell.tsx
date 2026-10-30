@@ -46,7 +46,7 @@ import {
 import { useStore } from '../../lib/store'
 import { getTheme, toggleTheme, type Theme } from '../../lib/theme'
 import { ageFromDob } from '../../lib/anthro'
-import { Badge } from '../ui'
+import { Badge, SearchableSelect } from '../ui'
 import { Login } from '../../pages/Login'
 import { Landing } from '../../pages/Landing'
 import { ContactService } from '../ContactService'
@@ -708,26 +708,28 @@ export function Shell({ children }: { children: ReactNode }) {
             )}
             {showPatient && (
               <div
-                className="flex items-center gap-2 rounded-xl border border-neutral-200 bg-white px-2 py-1"
+                className="flex items-center gap-1.5"
                 title="Active patient"
               >
-                <span
-                  className="grid h-8 w-8 place-items-center rounded-lg text-xs font-bold text-white"
-                  style={{ background: activePatient.avatarColor }}
-                >
-                  {activePatient.name.replace(/^[^ ]+ /, '').slice(0, 2).toUpperCase()}
-                </span>
-                <select
+                <SearchableSelect
                   value={state.activePatientId}
-                  onChange={(e) => setActivePatient(e.target.value)}
-                  className="max-w-[160px] cursor-pointer bg-transparent text-sm font-semibold outline-none"
-                >
-                  {state.patients.map((p) => (
-                    <option key={p.id} value={p.id}>
-                      {p.name} · {ageFromDob(p.dob)}y
-                    </option>
-                  ))}
-                </select>
+                  onChange={setActivePatient}
+                  options={state.patients.map((p) => ({
+                    value: p.id,
+                    label: `${p.name} · ${ageFromDob(p.dob)}y`,
+                    icon: (
+                      <span
+                        className="grid h-5 w-5 place-items-center rounded-full text-[9px] font-bold text-white"
+                        style={{ background: p.avatarColor }}
+                      >
+                        {p.name.replace(/^[^ ]+ /, '').slice(0, 2).toUpperCase()}
+                      </span>
+                    ),
+                  }))}
+                  searchPlaceholder="Cari pasien..."
+                  className="min-w-[170px]"
+                  triggerClassName="!min-h-[36px] !py-1 !text-xs !bg-white dark:!bg-neutral-800"
+                />
               </div>
             )}
             {showPatient && (

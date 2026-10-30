@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useStore, uid } from '../../lib/store'
-import { Card, SectionTitle, Button, Badge, Field, inputClass } from '../../components/ui'
+import { Card, SectionTitle, Button, Badge, Field, inputClass, SearchableSelect } from '../../components/ui'
 import { IconPill, IconUpload, IconCheck, IconShield, IconSearch, IconPlus } from '../../components/icons'
 import { Carousel, ButtonGroup } from '../../components/Carousel'
 import { Portal } from '../../components/Portal'
@@ -202,7 +202,15 @@ function AddProductForm({ onAdd }: { onAdd: (p: Product) => void }) {
   return (
     <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
       <Field label="Medicine name"><input className={inputClass} value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} placeholder="e.g. Paracetamol" /></Field>
-      <Field label="Category"><select className={inputClass} value={f.category} onChange={(e) => setF({ ...f, category: e.target.value as Cat })}>{CAT_LIST.map((c) => <option key={c} value={c}>{CAT_LABELS[c] ?? c}</option>)}</select></Field>
+      <Field label="Category">
+        <SearchableSelect<Cat>
+          value={f.category}
+          onChange={(val) => setF({ ...f, category: val })}
+          options={CAT_LIST.map((c) => ({ value: c, label: CAT_LABELS[c] ?? c }))}
+          searchPlaceholder="Cari kategori obat..."
+          placeholder="Pilih kategori"
+        />
+      </Field>
       <Field label="Price (Rp)"><input className={inputClass} type="number" value={f.priceIdr} onChange={(e) => setF({ ...f, priceIdr: e.target.value })} /></Field>
       <Field label="Product photo"><input className={inputClass} type="file" accept="image/*" onChange={(e) => pickImg(e.target.files?.[0])} /></Field>
       <Field label="Description"><input className={inputClass} value={f.desc} onChange={(e) => setF({ ...f, desc: e.target.value })} placeholder="packaging / usage" /></Field>
