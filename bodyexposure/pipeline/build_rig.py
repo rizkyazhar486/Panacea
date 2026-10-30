@@ -109,6 +109,12 @@ for s in SIDES:
     meta[f"ULNAR_HEAD.{s}"] = {"method": "centroid of the distal 15 mm of the ulna (ulnar head)"}
     jc[f"HAND_END.{s}"] = extreme(f"{P}THIRD_METACARPAL_BONE.{s}", 2, "min"); meta[f"HAND_END.{s}"] = {"method": "distal end of third metacarpal"}
     jc[f"TOE_END.{s}"] = extreme(f"{P}SECOND_METATARSAL_BONE.{s}", 1, "min"); meta[f"TOE_END.{s}"] = {"method": "distal (anterior) end of second metatarsal"}
+    # T-D7-05: sendi metatarsofalangeal (MTP). Pusat = rerata ujung distal (anterior) metatarsal I-V; ujung jari = titik paling
+    # anterior falang distal jari II. Sumbu fleksi MTP = garis kepala MT I -> MT V (mediolateral), seperti garis maleolus untuk pergelangan.
+    mt_heads = [extreme(f"{P}{n}_METATARSAL_BONE.{s}", 1, "min") for n in ("FIRST", "SECOND", "THIRD", "FOURTH", "FIFTH")]
+    jc[f"MTP.{s}"] = np.mean(mt_heads, axis=0); meta[f"MTP.{s}"] = {"method": "mean of the distal (anterior) ends of metatarsals I-V"}
+    AXIS[f"MTP.{s}"] = (mt_heads[4] - mt_heads[0]) / np.linalg.norm(mt_heads[4] - mt_heads[0])
+    jc[f"TOE_TIP.{s}"] = extreme(f"{P}DISTAL_PHALANX_OF_SECOND_FINGER_OF_FOOT.{s}", 1, "min"); meta[f"TOE_TIP.{s}"] = {"method": "most anterior vertex of the distal phalanx of the second toe"}
     jc[f"STERNOCLAVICULAR.{s}"] = centroid(f"{J}ARTICULAR_DISC_OF_STERNOCLAVICULAR_JOINT.{s}"); meta[f"STERNOCLAVICULAR.{s}"] = {"method": "centroid of sternoclavicular articular disc"}
 
 LEVELS = ["L5_S1", "L4_L5", "L3_L4", "L2_L3", "L1_L2", "T12_L1"] + [f"T{i}_T{i+1}" for i in range(11, 0, -1)] + ["C7_T1"] + [f"C{i}_C{i+1}" for i in range(6, 1, -1)]
@@ -163,10 +169,11 @@ for s in SIDES:
     bone(f"HAND.{s}", jc[f"WRIST.{s}"], jc[f"HAND_END.{s}"], f"FOREARM_ROT.{s}")
     bone(f"THIGH.{s}", jc[f"HIP.{s}"], jc[f"KNEE.{s}"], "PELVIS")
     bone(f"SHIN.{s}", jc[f"KNEE.{s}"], jc[f"ANKLE.{s}"], f"THIGH.{s}", connect=True)
-    bone(f"FOOT.{s}", jc[f"ANKLE.{s}"], jc[f"TOE_END.{s}"], f"SHIN.{s}", connect=True)
+    bone(f"FOOT.{s}", jc[f"ANKLE.{s}"], jc[f"MTP.{s}"], f"SHIN.{s}", connect=True)
+    bone(f"TOE.{s}", jc[f"MTP.{s}"], jc[f"TOE_TIP.{s}"], f"FOOT.{s}", connect=True)  # T-D7-05: sendi MTP
 # sumbu fleksi lutut, siku, pergelangan kaki = garis epikondilus / maleolus (ISB, Wu dkk. 2002/2005), bukan sekadar
 # tegak lurus tulang ke anterior: X lokal tulang distal diarahkan ke sumbu itu (diproyeksikan ⟂ tulang).
-AXIS_BONE = {"SHIN": "KNEE", "FOREARM": "ELBOW", "FOOT": "ANKLE", "HAND": "WRIST"}
+AXIS_BONE = {"SHIN": "KNEE", "FOREARM": "ELBOW", "FOOT": "ANKLE", "HAND": "WRIST", "TOE": "MTP"}
 axis_dev = {}
 for s in SIDES:
     for bn, key in AXIS_BONE.items():
@@ -186,6 +193,7 @@ RULES = [
     (r"(FRONTAL|PARIETAL|OCCIPITAL|TEMPORAL|SPHENOID|ETHMOID|NASAL|LACRIMAL|ZYGOMATIC|PALATINE|VOMER|MAXILLA|MANDIBLE|HYOID|NASAL_CONCHA|AUDITORY_OSSICLE|MALLEUS|INCUS|STAPES|TOOTH|INCISOR|CANINE|MOLAR|PREMOLAR|TEMPOROMANDIBULAR|SKULL|CRANI)", "HEAD"),
     (r"\.(FEMUR|PATELLA)\.|HIP_JOINT|HEAD_OF_FEMUR|ILIOFEMORAL|PUBOFEMORAL|ISCHIOFEMORAL|ZONA_ORBICULARIS", "THIGH"),
     (r"\.(TIBIA|FIBULA)\.|KNEE|MENISC|CRUCIATE|TIBIAL_COLLATERAL|FIBULAR_COLLATERAL|PATELLAR_LIGAMENT|TIBIOFIBULAR|INTEROSSEOUS_MEMBRANE_OF_LEG|POPLITEAL", "SHIN"),
+    (r"PHALANX_OF_\w+_FINGER_OF_FOOT|INTERPHALANGEAL_JOINTS_OF_FOOT|INTERPHALANGEAL_JOINT_OF_GREAT_TOE|INTERPHALANGEAL_LIGAMENTS_OF_FOOT|PLANTAR_INTERPHALANGEAL", "TOE"),
     (r"TALUS|CALCANEUS|NAVICULAR|CUBOID|CUNEIFORM|METATARS|OF_FOOT|TOE|SESAMOID_BONES_OF_FOOT|PLANTAR|TALO|CALCANEO|DELTOID_LIGAMENT|ANKLE|TARS", "FOOT"),
     (r"\.HUMERUS\.|GLENOHUMERAL|CORACOHUMERAL|GLENOID_LABRUM", "UPPER_ARM"),
     (r"\.RADIUS\.|RADIO_ULNAR|DISTAL_RADIO", "FOREARM_ROT"),  # radius & sendi radioulnar distal ikut berputar (pronasi)
@@ -295,6 +303,13 @@ for s in SIDES:
             setattr(c, f"min_{ax.lower()}", math.radians(lo)); setattr(c, f"max_{ax.lower()}", math.radians(hi))
         pb.rotation_mode = 'XYZ'
         limits_report[pb.name] = {ax: lim[ax] for ax in "XYZ"} | {"positive_X": "flexion" if flex_pos else "extension"}
+
+# T-D7-05: TOE tidak diberi LIMIT_ROTATION (belum ada sumber terverifikasi untuk batas MTP); hanya konvensi tanda sumbu X
+# yang dihitung numerik: ekstensi MTP (dorsofleksi jari) = ujung jari bergerak ke superior (+Z).
+for s in SIDES:
+    pb = arm.pose.bones[f"TOE.{s}"]; pb.rotation_mode = 'XYZ'
+    d = moved(pb, 'X', 10, Vector((0, pb.length, 0))) - np.array(pb.bone.tail_local[:])
+    limits_report[pb.name] = {"X": None, "Y": None, "Z": None, "positive_X": "extension" if d[2] > 0 else "flexion", "note": "no ROM limit (no verified source); sign only"}
 
 # ── QA rig ────────────────────────────────────────────────────────────────────
 def length(n): return arm_d.bones[n].length

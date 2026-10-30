@@ -193,7 +193,7 @@
     "TIBIA.L",
     "TALUS.L"
    ],
-   "max_penetration_mm": 0.8,
+   "max_penetration_mm": 1.07,
    "at_frame": 685,
    "movement": "ankle plantarflexion"
   },
@@ -202,7 +202,7 @@
     "FIBULA.L",
     "TALUS.L"
    ],
-   "max_penetration_mm": 0.61,
+   "max_penetration_mm": 0.74,
    "at_frame": 757,
    "movement": "ankle dorsiflexion"
   },
@@ -310,7 +310,7 @@
     "TIBIA.R",
     "TALUS.R"
    ],
-   "max_penetration_mm": 0.8,
+   "max_penetration_mm": 1.07,
    "at_frame": 685,
    "movement": "ankle plantarflexion"
   },
@@ -319,7 +319,7 @@
     "FIBULA.R",
     "TALUS.R"
    ],
-   "max_penetration_mm": 0.61,
+   "max_penetration_mm": 0.74,
    "at_frame": 757,
    "movement": "ankle dorsiflexion"
   },

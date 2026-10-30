@@ -52,6 +52,16 @@
    -0.0852,
    0.0215
   ],
+  "MTP.L": [
+   0.103,
+   -0.0766,
+   0.0208
+  ],
+  "TOE_TIP.L": [
+   0.1028,
+   -0.1373,
+   0.0116
+  ],
   "STERNOCLAVICULAR.L": [
    0.0167,
    -0.0395,
@@ -106,6 +116,16 @@
    -0.0947,
    -0.0852,
    0.0215
+  ],
+  "MTP.R": [
+   -0.103,
+   -0.0766,
+   0.0208
+  ],
+  "TOE_TIP.R": [
+   -0.1028,
+   -0.1373,
+   0.0116
   ],
   "STERNOCLAVICULAR.R": [
    -0.0167,
@@ -301,6 +321,12 @@
   "TOE_END.L": {
    "method": "distal (anterior) end of second metatarsal"
   },
+  "MTP.L": {
+   "method": "mean of the distal (anterior) ends of metatarsals I-V"
+  },
+  "TOE_TIP.L": {
+   "method": "most anterior vertex of the distal phalanx of the second toe"
+  },
   "STERNOCLAVICULAR.L": {
    "method": "centroid of sternoclavicular articular disc"
   },
@@ -360,6 +386,12 @@
   },
   "TOE_END.R": {
    "method": "distal (anterior) end of second metatarsal"
+  },
+  "MTP.R": {
+   "method": "mean of the distal (anterior) ends of metatarsals I-V"
+  },
+  "TOE_TIP.R": {
+   "method": "most anterior vertex of the distal phalanx of the second toe"
   },
   "STERNOCLAVICULAR.R": {
    "method": "centroid of sternoclavicular articular disc"
@@ -481,10 +513,12 @@
   "HAND.R": 85.0,
   "THIGH.L": 405.9,
   "SHIN.L": 387.7,
-  "FOOT.L": 135.7,
+  "FOOT.L": 129.6,
+  "TOE.L": 61.4,
   "THIGH.R": 405.9,
   "SHIN.R": 387.7,
-  "FOOT.R": 135.7
+  "FOOT.R": 129.6,
+  "TOE.R": 61.4
  },
  "rom_limits_deg_local": {
   "THIGH.L": {
@@ -696,6 +730,20 @@
     20
    ],
    "positive_X": "extension"
+  },
+  "TOE.L": {
+   "X": null,
+   "Y": null,
+   "Z": null,
+   "positive_X": "flexion",
+   "note": "no ROM limit (no verified source); sign only"
+  },
+  "TOE.R": {
+   "X": null,
+   "Y": null,
+   "Z": null,
+   "positive_X": "extension",
+   "note": "no ROM limit (no verified source); sign only"
   }
  },
  "rom_source": "AAOS normal values (Greene & Heckman 1994)",
@@ -703,12 +751,14 @@
  "flexion_axis_change_deg": {
   "SHIN.L": 3.7,
   "FOREARM.L": 8.2,
-  "FOOT.L": 43.3,
+  "FOOT.L": 50.2,
   "HAND.L": 7.2,
+  "TOE.L": 10.5,
   "SHIN.R": 3.7,
   "FOREARM.R": 8.2,
-  "FOOT.R": 43.2,
-  "HAND.R": 7.2
+  "FOOT.R": 50.1,
+  "HAND.R": 7.2,
+  "TOE.R": 10.5
  },
  "flexion_axes": {
   "KNEE.L": [
@@ -731,6 +781,11 @@
    0.13868,
    -0.01743
   ],
+  "MTP.L": [
+   0.91496,
+   0.3793,
+   -0.13774
+  ],
   "KNEE.R": [
    -0.99369,
    -0.06552,
@@ -750,6 +805,11 @@
    0.99018,
    0.13868,
    -0.01743
+  ],
+  "MTP.R": [
+   -0.91496,
+   0.3793,
+   -0.13774
   ]
  },
  "hinge_refinement": {
@@ -794,12 +854,14 @@
   "SHIN.R": 28,
   "SPINE.T9": 11,
   "SPINE.T4": 18,
-  "FOOT.L": 70,
-  "FOOT.R": 70,
+  "FOOT.L": 51,
+  "FOOT.R": 51,
   "UPPER_ARM.L": 8,
   "UPPER_ARM.R": 8,
   "THIGH.L": 10,
   "THIGH.R": 10,
+  "TOE.L": 19,
+  "TOE.R": 19,
   "HAND.L": 69,
   "HAND.R": 69,
   "HEAD": 48,
@@ -951,11 +1013,11 @@
    ],
    [
     "ADULT.MALE.JOINT.INTERSESAMOID_LIGAMENT.L",
-    "FOOT.L via nearest segment (21 mm)"
+    "FOOT.L via nearest segment (27 mm)"
    ],
    [
     "ADULT.MALE.JOINT.INTERSESAMOID_LIGAMENT.R",
-    "FOOT.R via nearest segment (21 mm)"
+    "FOOT.R via nearest segment (27 mm)"
    ],
    [
     "ADULT.MALE.JOINT.MEDIAN_CRICOTHYROID_LIGAMENT",
