@@ -33,6 +33,8 @@ export type VerificationVerdict =
   | 'VERIFIED_EMPIRICAL_ASSET'
   | 'UNVERIFIED_MISSING_SOURCE_ASSET'
   | 'REJECTED_NONEXISTENT_STRUCTURE'
+  | 'REJECTED_AMBIGUOUS_STRUCTURE'
+  | 'REJECTED_CATALOG_UNAVAILABLE'
   | 'REJECTED_CORRUPTED_GLB'
   | 'REJECTED_HASH_MISMATCH'
   | 'REJECTED_INVALID_INDICES'
@@ -343,6 +345,7 @@ interface ResolvedMatrixStructure {
 
 function loadBodyMatrixCatalog(repoRoot: string): {
   loaded: boolean;
+  loadError: 'CATALOG_UNAVAILABLE' | 'AMBIGUOUS_CATALOG' | null;
   matrixSha256: string | null;
   entries: Map<string, ResolvedMatrixStructure>;
   defaultGlbPaths: string[];
@@ -352,12 +355,24 @@ function loadBodyMatrixCatalog(repoRoot: string): {
   const matrixPath = path.join(repoRoot, 'public', 'bodyexposure', 'body_matrix.json');
 
   let matrixSha256: string | null = null;
-  if (fs.existsSync(matrixPath)) {
+  let loadError: 'CATALOG_UNAVAILABLE' | 'AMBIGUOUS_CATALOG' | null = null;
+  let loaded = false;
+  try {
+    fs.lstatSync(matrixPath);
+    loaded = true;
+  } catch (error) {
+    if (!error || typeof error !== 'object' || !('code' in error) || error.code !== 'ENOENT') {
+      loadError = 'CATALOG_UNAVAILABLE';
+    }
+  }
+  if (loaded) {
     try {
       const rawBytes = fs.readFileSync(matrixPath);
+      if (rawBytes.byteLength === 0) throw new Error('EMPTY_CATALOG');
       if (rawBytes.byteLength > 0) {
         matrixSha256 = computeRealBufferSha256(rawBytes);
         const parsed = JSON.parse(rawBytes.toString('utf8')) as Record<string, unknown>;
+        if (parsed === null || typeof parsed !== 'object') throw new Error('INVALID_CATALOG');
 
         const collectFromArray = (items: unknown[], defaultSystem = 'ANATOMICAL_SYSTEM') => {
           for (const item of items) {
@@ -391,10 +406,10 @@ function loadBodyMatrixCatalog(repoRoot: string): {
                 ? rec.source
                 : typeof rec.provenance === 'string'
                 ? rec.provenance
-                : 'PanaceaMed Canonical Body Matrix Atlas';
+                : null;
 
             const license =
-              typeof rec.license === 'string' ? rec.license : 'CC-BY-4.0 / Canonical Atlas License';
+              typeof rec.license === 'string' ? rec.license : null;
 
             const latRaw = String(rec.laterality ?? 'UNSPECIFIED').toUpperCase();
             const laterality: ResolvedMatrixStructure['laterality'] =
@@ -402,9 +417,16 @@ function loadBodyMatrixCatalog(repoRoot: string): {
                 ? latRaw
                 : 'UNSPECIFIED';
 
+            if (rec.sha256 !== undefined && rec.sha256 !== null &&
+                (typeof rec.sha256 !== 'string' || !/^[a-f0-9]{64}$/i.test(rec.sha256))) {
+              throw new Error('INVALID_MANIFEST_HASH');
+            }
+
             const entry: ResolvedMatrixStructure = {
               structureId: id,
-              panaceaStructureId: typeof rec.panacea_structure_id === 'string' ? rec.panacea_structure_id : id,
+              panaceaStructureId: Object.prototype.hasOwnProperty.call(rec, 'panacea_structure_id')
+                ? typeof rec.panacea_structure_id === 'string' ? rec.panacea_structure_id : null
+                : id,
               semanticName: String(rec.semanticName ?? rec.name ?? rec.label ?? id),
               laterality,
               systemCategory: String(rec.system ?? rec.category ?? defaultSystem),
@@ -416,6 +438,10 @@ function loadBodyMatrixCatalog(repoRoot: string): {
                 ? rec.supportedLods.map(String)
                 : ['LOD_0_FULL', 'LOD_1_SIMPLIFIED', 'LOD_2_BOUNDING']
             };
+            if (entries.has(id.toUpperCase())) {
+              loadError = 'AMBIGUOUS_CATALOG';
+              throw new Error('AMBIGUOUS_CATALOG');
+            }
             entries.set(id, entry);
             entries.set(id.toUpperCase(), entry);
           }
@@ -438,8 +464,15 @@ function loadBodyMatrixCatalog(repoRoot: string): {
         }
       }
     } catch {
-      // Fall through to filesystem discovery
+      loadError ??= 'CATALOG_UNAVAILABLE';
     }
+  }
+
+  if (loaded && entries.size === 0) loadError ??= 'CATALOG_UNAVAILABLE';
+  // Katalog yang rusak tidak boleh mengalihkan pemeriksaan ke aset hasil penemuan.
+  if (loadError) {
+    entries.clear();
+    return { loaded, loadError, matrixSha256, entries, defaultGlbPaths };
   }
 
   // Discover real .glb files committed in public/bodyexposure or public/models
@@ -467,7 +500,8 @@ function loadBodyMatrixCatalog(repoRoot: string): {
   }
 
   return {
-    loaded: fs.existsSync(matrixPath),
+    loaded,
+    loadError,
     matrixSha256,
     entries,
     defaultGlbPaths
@@ -577,8 +611,26 @@ export function renderCanonicalAnatomySlice(request: CanonicalAnatomyRequest): C
   }
 
   const catalog = loadBodyMatrixCatalog(repoRoot);
-  let resolvedEntry =
+  if (catalog.loadError) {
+    return buildFailClosedResponse(request, catalog.loadError === 'AMBIGUOUS_CATALOG'
+      ? 'REJECTED_AMBIGUOUS_STRUCTURE' : 'REJECTED_CATALOG_UNAVAILABLE', [
+      'The canonical structure catalog is unavailable, invalid or ambiguous.'
+    ]);
+  }
+  const resolvedEntry =
     catalog.entries.get(rawStructureId) ?? catalog.entries.get(rawStructureId.toUpperCase());
+
+  if (catalog.loaded && !resolvedEntry) {
+    return buildFailClosedResponse(request, 'REJECTED_NONEXISTENT_STRUCTURE', [
+      'The structure identity is not registered in the loaded catalog.'
+    ]);
+  }
+
+  if (resolvedEntry && !resolvedEntry.glbRelativePath && !resolvedEntry.expectedSha256) {
+    return buildFailClosedResponse(request, 'UNVERIFIED_MISSING_SOURCE_ASSET', [
+      'The registered structure has neither an asset path nor a manifest hash binding.'
+    ]);
+  }
 
   // Attempt to locate candidate GLB file on disk
   const candidateGlbPaths: string[] = [];
@@ -586,9 +638,12 @@ export function renderCanonicalAnatomySlice(request: CanonicalAnatomyRequest): C
     candidateGlbPaths.push(resolvedEntry.glbRelativePath.replace(/^\//, ''));
     candidateGlbPaths.push(path.join('public', resolvedEntry.glbRelativePath.replace(/^\//, '')));
   }
-  for (const discovered of catalog.defaultGlbPaths) {
-    if (!candidateGlbPaths.includes(discovered)) {
-      candidateGlbPaths.push(discovered);
+  // Aset terdaftar yang hilang tidak boleh digantikan berkas hasil penemuan.
+  if (!resolvedEntry?.glbRelativePath) {
+    for (const discovered of catalog.defaultGlbPaths) {
+      if (!candidateGlbPaths.includes(discovered)) {
+        candidateGlbPaths.push(discovered);
+      }
     }
   }
 
@@ -626,10 +681,14 @@ export function renderCanonicalAnatomySlice(request: CanonicalAnatomyRequest): C
   }
 
   // Verify against expected manifest SHA-256 if provided
-  const expectedSha = request.expectedManifestSha256 ?? resolvedEntry?.expectedSha256 ?? null;
-  if (expectedSha && expectedSha.toLowerCase() !== glbSha256.toLowerCase()) {
+  const expectedSha = resolvedEntry?.expectedSha256 ?? request.expectedManifestSha256 ?? null;
+  const expectedHashes = [resolvedEntry?.expectedSha256, request.expectedManifestSha256]
+    .filter((value) => value !== undefined && value !== null);
+  // Klaim pemanggil menambah batas; tidak menggantikan hash manifest terdaftar.
+  if (expectedHashes.some((value) => typeof value !== 'string' ||
+      !/^[a-f0-9]{64}$/i.test(value) || value.toLowerCase() !== glbSha256.toLowerCase())) {
     return buildFailClosedResponse(request, 'REJECTED_HASH_MISMATCH', [
-      `GLB SHA-256 mismatch: actual=${glbSha256}, expected=${expectedSha}`
+      'The GLB bytes do not match every declared manifest hash.'
     ]);
   }
 
@@ -646,53 +705,47 @@ export function renderCanonicalAnatomySlice(request: CanonicalAnatomyRequest): C
   const meshes = gltf.meshes ?? [];
   const accessors = gltf.accessors ?? [];
 
-  // Resolve structure from glTF node/mesh names or extras.panacea_structure_id if not in matrix
-  let matchedNode = nodes.find((n) => {
-    const extraId =
-      n.extras && typeof n.extras.panacea_structure_id === 'string'
-        ? n.extras.panacea_structure_id
-        : null;
-    return (
-      extraId === rawStructureId ||
-      (n.name && n.name.toUpperCase() === rawStructureId.toUpperCase())
-    );
+  // Alias hanya sah melalui ID eksplisit di katalog; nama parsial bukan identitas.
+  const targetId = resolvedEntry ? resolvedEntry.panaceaStructureId : rawStructureId;
+  if (typeof targetId !== 'string' || !targetId.trim()) {
+    return buildFailClosedResponse(request, 'REJECTED_NONEXISTENT_STRUCTURE', [
+      'The registered structure has no valid stable identifier.'
+    ]);
+  }
+  const matchingNodes = nodes.filter((n) => {
+    if (n.extras && Object.prototype.hasOwnProperty.call(n.extras, 'panacea_structure_id')) {
+      const extraId = n.extras.panacea_structure_id;
+      return typeof extraId === 'string' && extraId.trim().length > 0 && extraId === targetId;
+    }
+    return typeof n.name === 'string' && n.name.toUpperCase() === targetId.toUpperCase();
   });
 
-  // Also allow canonical alias prefix CANONICAL-MALE-* to map to a verified node/mesh when matrix or glTF nodes exist
-  if (!matchedNode && !resolvedEntry) {
-    if (rawStructureId.startsWith('CANONICAL-MALE-') && (nodes.length > 0 || meshes.length > 0)) {
-      const token = rawStructureId.replace(/^CANONICAL-MALE-/, '').replace(/-ROOT$/, '').toUpperCase();
-      matchedNode =
-        nodes.find((n) => n.name && n.name.toUpperCase().includes(token)) ?? nodes[0];
-      const extraSource =
-        (gltf.extras && typeof gltf.extras.sourceAttribution === 'string'
-          ? gltf.extras.sourceAttribution
-          : null) ?? 'PanaceaMed Canonical Adult Male Atlas (GLB Embedded Provenance)';
-      resolvedEntry = {
-        structureId: rawStructureId,
-        panaceaStructureId:
-          (matchedNode?.extras && typeof matchedNode.extras.panacea_structure_id === 'string'
-            ? matchedNode.extras.panacea_structure_id
-            : null) ?? rawStructureId,
-        semanticName: matchedNode?.name ?? rawStructureId,
-        laterality: 'MIDLINE',
-        systemCategory: 'CANONICAL_ATLAS',
-        glbRelativePath: path.relative(repoRoot, selectedGlbFullPath),
-        sourceAttribution: extraSource,
-        license: 'CC-BY-4.0',
-        expectedSha256: glbSha256,
-        supportedLods: ['LOD_0_FULL', 'LOD_1_SIMPLIFIED', 'LOD_2_BOUNDING']
-      };
-    } else {
-      return buildFailClosedResponse(request, 'REJECTED_NONEXISTENT_STRUCTURE', [
-        `Structure '${rawStructureId}' not found in body_matrix.json or GLB node/extras hierarchy.`
-      ]);
-    }
+  if (matchingNodes.length !== 1) {
+    return buildFailClosedResponse(request, matchingNodes.length === 0
+      ? 'REJECTED_NONEXISTENT_STRUCTURE' : 'REJECTED_AMBIGUOUS_STRUCTURE', [
+      'Structure identity must resolve to exactly one node in the selected GLB.'
+    ]);
+  }
+  const matchedNode = matchingNodes[0];
+
+  // Katalog yang ada wajib menyatakan sumber dan lisensinya sendiri.
+  const sourceAttribution = resolvedEntry
+    ? resolvedEntry.sourceAttribution
+    : matchedNode.extras?.sourceAttribution ?? gltf.extras?.sourceAttribution;
+  const license = resolvedEntry
+    ? resolvedEntry.license
+    : matchedNode.extras?.license ?? gltf.extras?.license;
+  if (typeof sourceAttribution !== 'string' || !sourceAttribution.trim() ||
+      typeof license !== 'string' || !license.trim()) {
+    return buildFailClosedResponse(request, 'REJECTED_MISSING_PROVENANCE', [
+      'The selected structure requires an explicit source attribution and license declaration.'
+    ]);
   }
 
-  if (resolvedEntry && !resolvedEntry.sourceAttribution) {
-    return buildFailClosedResponse(request, 'REJECTED_MISSING_PROVENANCE', [
-      `Structure '${rawStructureId}' is missing required clinical/anatomical source provenance.`
+  const meshIndex = matchedNode.mesh;
+  if (typeof meshIndex !== 'number' || !Number.isInteger(meshIndex) || meshIndex < 0 || !meshes[meshIndex]) {
+    return buildFailClosedResponse(request, 'REJECTED_INVALID_INDICES', [
+      'The selected structure node does not reference a valid mesh.'
     ]);
   }
 
@@ -702,10 +755,7 @@ export function renderCanonicalAnatomySlice(request: CanonicalAnatomyRequest): C
   let primitiveCount = 0;
   let indicesValid = true;
 
-  const targetMeshes =
-    matchedNode && typeof matchedNode.mesh === 'number' && meshes[matchedNode.mesh]
-      ? [meshes[matchedNode.mesh]]
-      : meshes;
+  const targetMeshes = [meshes[meshIndex]];
 
   for (const mesh of targetMeshes) {
     for (const prim of mesh.primitives ?? []) {
@@ -902,11 +952,10 @@ export function renderCanonicalAnatomySlice(request: CanonicalAnatomyRequest): C
           ? matchedNode.extras.panacea_structure_id
           : rawStructureId),
       semanticName: resolvedEntry?.semanticName ?? matchedNode?.name ?? rawStructureId,
-      laterality: resolvedEntry?.laterality ?? 'MIDLINE',
+      laterality: resolvedEntry?.laterality ?? 'UNSPECIFIED',
       systemCategory: resolvedEntry?.systemCategory ?? 'CANONICAL_ATLAS',
-      sourceAttribution:
-        resolvedEntry?.sourceAttribution ?? 'PanaceaMed Canonical Adult Male Atlas',
-      license: resolvedEntry?.license ?? 'CC-BY-4.0',
+      sourceAttribution,
+      license,
       coordinateSystem: 'RAS_RIGHT_ANTERIOR_SUPERIOR_METERS',
       scaleMetersPerUnit: 1.0,
       transformMatrix: matchedNode?.matrix ?? [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]

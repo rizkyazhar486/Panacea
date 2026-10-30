@@ -6,6 +6,31 @@ rules:
   - "Link mitigations to code/tests/evidence where possible."
 
 risks:
+  - risk_id: risk.body_canonical_identity_provenance
+    category: scientific_data_integrity
+    severity: high
+    state: open
+    description: >-
+      The Directive 067-R asset inspector accepted unmatched canonical IDs by
+      selecting the first node, substituted unrelated geometry for missing mesh
+      references, and invented source and licence declarations. A registered
+      file could also fall back to another discovered asset. An unusable catalog,
+      malformed stored hash or caller-supplied hash could bypass manifest binding.
+    mitigation: >-
+      The candidate requires one exact stable identity, an explicit alias mapping,
+      a valid mesh reference and declared source/licence metadata. Missing registered
+      files and unusable/ambiguous catalogs fail closed. A loaded catalog requires
+      an explicit registration; caller hashes cannot replace stored constraints.
+      Sixty-five focused synthetic tests pass on Node 20.19, 24.15 and 26.12;
+      six isolated source sabotages fail by name. Exact-head CI, final independent
+      review and main integration remain pending. Declared metadata is not proof of licence rights
+      or anatomical accuracy. This Node inspector is not connected to the browser
+      viewer; binary payload validation and rendering claims need separate evidence.
+    evidence:
+      - src/domains/body-exposure-canonical/canonicalBodyExposureEngine.ts
+      - scripts/qa/canonical-body-identity.test.mjs
+      - scripts/qa/directive067-canonical-vertical-slice.test.mjs
+
   - risk_id: risk.result_closure_inferred_evidence_and_deadlines
     category: clinical_data_integrity
     severity: high
