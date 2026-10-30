@@ -1,0 +1,635 @@
+{
+  "rangeEvaluated": "3e3f9471..59f9a87f",
+  "totalCommits": 68,
+  "timestampUtc": "2026-10-30T04:49:42.082Z",
+  "commits": [
+    {
+      "sha": "59f9a87f0220e716bcd308415c2eaf62d30eabda",
+      "subject": "Merge pull request #2908 from rizkyazhar486/fix/argon-complete-audit-remediation-058-067",
+      "filesTouchedCount": 0,
+      "linesAdded": 532,
+      "hasTests": false,
+      "claimHits": [],
+      "classification": "reject-noise"
+    },
+    {
+      "sha": "8383f71d252eeaceea8c14d6e7f0e1518bef0031",
+      "subject": "fix(argon-audit): remediate Directives 058-067 in-place with deterministic SHA-256, binary GLB inspection, biophysical equations, and consequential causal graphs",
+      "filesTouchedCount": 7,
+      "linesAdded": 532,
+      "hasTests": true,
+      "claimHits": [],
+      "classification": "legit-candidate"
+    },
+    {
+      "sha": "0d88ec81b09b5ce91976ee160112da88d8f3acf6",
+      "subject": "Merge pull request #2907 from rizkyazhar486/fix/directive-067r-real-canonical-recovery",
+      "filesTouchedCount": 0,
+      "linesAdded": 1290,
+      "hasTests": false,
+      "claimHits": [],
+      "classification": "needs-rework"
+    },
+    {
+      "sha": "6315f9f1cc24f24bab49b60cb4f5adaeed6cf882",
+      "subject": "fix(body-exposure): implement Directive 067-R real binary GLB/PNG inspection, SHA-256 verification, and 9 negative controls fixing PR #2906",
+      "filesTouchedCount": 3,
+      "linesAdded": 1290,
+      "hasTests": true,
+      "claimHits": [],
+      "classification": "needs-rework"
+    },
+    {
+      "sha": "66a29dbe1a6b17b766beb0c721f9cd2eabc1596f",
+      "subject": "Merge pull request #2906 from rizkyazhar486/feat/directive-067-canonical-vertical-slice",
+      "filesTouchedCount": 0,
+      "linesAdded": 89,
+      "hasTests": false,
+      "claimHits": [],
+      "classification": "reject-noise"
+    },
+    {
+      "sha": "f61ec3d0e7df0cc4fc01bf4e7fe6753927e5b221",
+      "subject": "feat(canonical-slice): implement Directive 067 canonical adult male body exposure vertical slice with empirical evidence and clinical governance",
+      "filesTouchedCount": 2,
+      "linesAdded": 89,
+      "hasTests": true,
+      "claimHits": [],
+      "classification": "legit-candidate"
+    },
+    {
+      "sha": "4812ecbc7926d8aa88b7c7024199e93d3f76a778",
+      "subject": "Merge pull request #2905 from rizkyazhar486/feat/directive-066-longitudinal-causal-engine",
+      "filesTouchedCount": 0,
+      "linesAdded": 55,
+      "hasTests": false,
+      "claimHits": [],
+      "classification": "reject-noise"
+    },
+    {
+      "sha": "f02d563a4e31314b20535a3bbef56255f5948267",
+      "subject": "feat(longitudinal): implement Directive 066 longitudinal space-time causal body exposure and cinematic POV synthesis engine",
+      "filesTouchedCount": 2,
+      "linesAdded": 55,
+      "hasTests": true,
+      "claimHits": [],
+      "classification": "legit-candidate"
+    },
+    {
+      "sha": "700c9d9e8c1c0b53bb51dfb5682a14544e048cdf",
+      "subject": "Merge pull request #2904 from rizkyazhar486/feat/directive-065-universal-scanner-twin",
+      "filesTouchedCount": 0,
+      "linesAdded": 79,
+      "hasTests": false,
+      "claimHits": [],
+      "classification": "reject-noise"
+    },
+    {
+      "sha": "d8449e454fce12e25f93c921a6e6eb60df5e68cf",
+      "subject": "feat(universal-scanner): implement Directive 065 universal multi-modal scanner ingestion and 1:1 digital twin synthesis engine",
+      "filesTouchedCount": 2,
+      "linesAdded": 79,
+      "hasTests": true,
+      "claimHits": [],
+      "classification": "legit-candidate"
+    },
+    {
+      "sha": "5ebfcc17eca7f0c86419a03c08c064d241fa3803",
+      "subject": "Merge pull request #2903 from rizkyazhar486/feat/directive-064-aaa-emr-interactive",
+      "filesTouchedCount": 0,
+      "linesAdded": 67,
+      "hasTests": false,
+      "claimHits": [],
+      "classification": "reject-noise"
+    },
+    {
+      "sha": "e6774a16d8bbd4f1b011cb879ec21f2e4181d6b6",
+      "subject": "feat(aaa-emr): implement Directive 064 AAA cinematic WebGPU interactive body exposure and human-in-the-loop EMR engine",
+      "filesTouchedCount": 2,
+      "linesAdded": 67,
+      "hasTests": true,
+      "claimHits": [],
+      "classification": "legit-candidate"
+    },
+    {
+      "sha": "dfe62444fa9f4a44a96b0b0e7d816a1bf39cbcbd",
+      "subject": "Merge pull request #2902 from rizkyazhar486/feat/directive-063-evidence-gate-verification",
+      "filesTouchedCount": 0,
+      "linesAdded": 81,
+      "hasTests": false,
+      "claimHits": [],
+      "classification": "reject-noise"
+    },
+    {
+      "sha": "0d69c6cf37c83d3449dcc11c4d6173688a389d9a",
+      "subject": "feat(evidence-gate): implement Directive 063 empirical evidence gates replacing unverified graphics claims with SHA-256 and mesh validation",
+      "filesTouchedCount": 2,
+      "linesAdded": 81,
+      "hasTests": true,
+      "claimHits": [],
+      "classification": "legit-candidate"
+    },
+    {
+      "sha": "8a3dc7d76382bdc4d1c531904aa3e8b126cd1f82",
+      "subject": "Merge pull request #2900 from rizkyazhar486/feat/directive-061-body-exposure-cinematic-ocr",
+      "filesTouchedCount": 0,
+      "linesAdded": 75,
+      "hasTests": false,
+      "claimHits": [],
+      "classification": "reject-noise"
+    },
+    {
+      "sha": "2251a894900b4202add7de489afaf11c44a9a4cf",
+      "subject": "feat(body-exposure): implement Directive 061 advanced cinematic POV and OCR text telemetry extraction engine",
+      "filesTouchedCount": 2,
+      "linesAdded": 75,
+      "hasTests": true,
+      "claimHits": [],
+      "classification": "legit-candidate"
+    },
+    {
+      "sha": "35d1ad61799a46ed11795f2d2fb5d7b30e9e55a1",
+      "subject": "Merge pull request #2899 from rizkyazhar486/feat/directive-060-body-exposure-enterprise",
+      "filesTouchedCount": 0,
+      "linesAdded": 75,
+      "hasTests": false,
+      "claimHits": [],
+      "classification": "reject-noise"
+    },
+    {
+      "sha": "00a474c1a53c5428f504f60f0da5529834a91344",
+      "subject": "feat(body-exposure): implement Directive 060 enterprise body exposure next-gen 8K PBR graphics synchronization engine",
+      "filesTouchedCount": 2,
+      "linesAdded": 75,
+      "hasTests": true,
+      "claimHits": [],
+      "classification": "legit-candidate"
+    },
+    {
+      "sha": "7c0d74c1e71c4c340cd696806f8d7dbb1a786cfe",
+      "subject": "Merge pull request #2898 from rizkyazhar486/feat/directive-058-dynamic-domino-matrix",
+      "filesTouchedCount": 0,
+      "linesAdded": 91,
+      "hasTests": false,
+      "claimHits": [],
+      "classification": "reject-noise"
+    },
+    {
+      "sha": "412e31b3640e3181a2dc45c31f0868a7c55243d0",
+      "subject": "feat(domino-matrix): implement Directive 058 dynamic recursive domino matrix engine simulating trillion-scale multi-layer cascading physiological permutations",
+      "filesTouchedCount": 2,
+      "linesAdded": 91,
+      "hasTests": true,
+      "claimHits": [],
+      "classification": "legit-candidate"
+    },
+    {
+      "sha": "a8d08658d28b7713640b1285210b02323e825aa3",
+      "subject": "Merge pull request #2897 from rizkyazhar486/feat/directive-057-thousand-functional-modules",
+      "filesTouchedCount": 0,
+      "linesAdded": 33094,
+      "hasTests": false,
+      "claimHits": [],
+      "classification": "needs-rework"
+    },
+    {
+      "sha": "8c416960713c0776caa22d4fac5b3beea7510db6",
+      "subject": "feat(scale-1000): implement Directive 057 generating 1000 functional end-to-end clinical and biophysical modules across 35 medical domains",
+      "filesTouchedCount": 1002,
+      "linesAdded": 33094,
+      "hasTests": true,
+      "claimHits": [],
+      "classification": "needs-rework"
+    },
+    {
+      "sha": "ce5c99a427ebc5b5b149bce8ea1c893227875edf",
+      "subject": "Merge pull request #2896 from rizkyazhar486/feat/directive-054-master-dispatch-kernel",
+      "filesTouchedCount": 0,
+      "linesAdded": 88,
+      "hasTests": false,
+      "claimHits": [],
+      "classification": "reject-noise"
+    },
+    {
+      "sha": "b023a9d5cc7b6af40ef3c07c115bbe9ff0b4cf1b",
+      "subject": "feat(kernel): implement Directive 054 master unified clinical dispatcher and multi-specialty validation kernel",
+      "filesTouchedCount": 2,
+      "linesAdded": 88,
+      "hasTests": true,
+      "claimHits": [],
+      "classification": "legit-candidate"
+    },
+    {
+      "sha": "b3c50ad2d985287d1e3697fe0f70a93d62cfa271",
+      "subject": "Merge pull request #2895 from rizkyazhar486/feat/directive-massive-scale-generator",
+      "filesTouchedCount": 0,
+      "linesAdded": 28406,
+      "hasTests": false,
+      "claimHits": [],
+      "classification": "needs-rework"
+    },
+    {
+      "sha": "3ad5e436bfcd1c892cfb98b072b595111d62d195",
+      "subject": "feat(scale): implement automated enterprise scale module generator producing hundreds of canonical medical engines",
+      "filesTouchedCount": 1051,
+      "linesAdded": 28406,
+      "hasTests": false,
+      "claimHits": [],
+      "classification": "needs-rework"
+    },
+    {
+      "sha": "c8abed7f7f0b380b8db37595d54cddc67967440a",
+      "subject": "Merge pull request #2893 from rizkyazhar486/feat/directive-034-knowledge-graph",
+      "filesTouchedCount": 0,
+      "linesAdded": 71,
+      "hasTests": false,
+      "claimHits": [],
+      "classification": "reject-noise"
+    },
+    {
+      "sha": "7cb940037b9570a461e9c5adb93511ce0fac046c",
+      "subject": "feat(knowledge-graph): implement Directive 034 biomedical knowledge graph and semantic interoperability normalization engine",
+      "filesTouchedCount": 2,
+      "linesAdded": 71,
+      "hasTests": true,
+      "claimHits": [],
+      "classification": "legit-candidate"
+    },
+    {
+      "sha": "21dfd11849ce316400406a35a9449080fb9c6ca8",
+      "subject": "Merge pull request #2890 from rizkyazhar486/feat/directive-031-pharmacovigilance-surveillance",
+      "filesTouchedCount": 0,
+      "linesAdded": 95,
+      "hasTests": false,
+      "claimHits": [],
+      "classification": "reject-noise"
+    },
+    {
+      "sha": "4dfa9f905ba2b156d5a43c610dcb7c271d168573",
+      "subject": "feat(pharmacovigilance): implement Directive 031 autonomous adverse drug event surveillance and FHIR adverse event mapping engine",
+      "filesTouchedCount": 2,
+      "linesAdded": 95,
+      "hasTests": true,
+      "claimHits": [],
+      "classification": "legit-candidate"
+    },
+    {
+      "sha": "91d8ae03924c34fa13f585a5fb286ba203bce8b0",
+      "subject": "Merge pull request #2887 from rizkyazhar486/feat/directive-026-global-integration",
+      "filesTouchedCount": 0,
+      "linesAdded": 212,
+      "hasTests": false,
+      "claimHits": [],
+      "classification": "reject-noise"
+    },
+    {
+      "sha": "1e0a9df4b3b4d78e83b620c55aa7ce681265da12",
+      "subject": "feat(global-ai): implement Directive 026 Global Technology Intelligence Registry, multi-country tech tracking, and PaddleOCR document intelligence pilot with UU PDP privacy filters",
+      "filesTouchedCount": 3,
+      "linesAdded": 212,
+      "hasTests": true,
+      "claimHits": [],
+      "classification": "legit-candidate"
+    },
+    {
+      "sha": "78e8b81245613bd88df747561b6748a7fa6f02b8",
+      "subject": "Merge pull request #2885 from rizkyazhar486/feat/directive-024-evidence-governance",
+      "filesTouchedCount": 0,
+      "linesAdded": 646,
+      "hasTests": false,
+      "claimHits": [],
+      "classification": "reject-noise"
+    },
+    {
+      "sha": "aaeba6e7d8975f057117940968d9d3fbd5a16af1",
+      "subject": "feat(ai-gateway): implement Directive 025 China Frontier AI Gateway, OCR CER/WER evaluator, MiniCPM-V edu prototype, BGE-M3 retrieval provenance, and UU PDP security controls",
+      "filesTouchedCount": 2,
+      "linesAdded": 340,
+      "hasTests": true,
+      "claimHits": [],
+      "classification": "legit-candidate"
+    },
+    {
+      "sha": "05ccf88e8ac944d5519eb2eea5dfd97518cf1688",
+      "subject": "feat(insurance): add single canonical TypeScript module for BPJS, PNS, TNI/POLRI, and Kemenimipas correctional care",
+      "filesTouchedCount": 2,
+      "linesAdded": 153,
+      "hasTests": true,
+      "claimHits": [],
+      "classification": "legit-candidate"
+    },
+    {
+      "sha": "6bf5612b57a8715e82f3b04ccab61a9323d815cb",
+      "subject": "feat(governance): replace self-reported readiness with inspectable evidence verification and recover argon/genesis modules (Directive 024 Closure)",
+      "filesTouchedCount": 4,
+      "linesAdded": 121,
+      "hasTests": true,
+      "claimHits": [],
+      "classification": "legit-candidate"
+    },
+    {
+      "sha": "083cca4d60603029cb3cd454c38f602581e54ff8",
+      "subject": "feat(governance): replace hardcoded metrics with evidence-driven readiness contract and add negative controls (Directive 024)",
+      "filesTouchedCount": 2,
+      "linesAdded": 59,
+      "hasTests": true,
+      "claimHits": [],
+      "classification": "legit-candidate"
+    },
+    {
+      "sha": "aecfbfc5abc39217c7d44c1f9d62e5614b25b819",
+      "subject": "feat(core): integrate remaining argon neural and genesis control components cleanly into main",
+      "filesTouchedCount": 4,
+      "linesAdded": 198,
+      "hasTests": true,
+      "claimHits": [],
+      "classification": "legit-candidate"
+    },
+    {
+      "sha": "0b3dd13cfbdbdd03d376187ac6cf33fa94703b3c",
+      "subject": "merge: integrate all architectural masterpieces and universal master kernels into main (Panaceamed.id)",
+      "filesTouchedCount": 0,
+      "linesAdded": 3632,
+      "hasTests": false,
+      "claimHits": [],
+      "classification": "needs-rework"
+    },
+    {
+      "sha": "0eb4b9272e71b7eba586d11d799df773ee811c08",
+      "subject": "feat(master): implement Directive 023 Master Universal Integration Kernel and production readiness dashboard",
+      "filesTouchedCount": 3,
+      "linesAdded": 81,
+      "hasTests": true,
+      "claimHits": [],
+      "classification": "legit-candidate"
+    },
+    {
+      "sha": "e52c5af6793ddb655b037250ff6cf9d01561aff2",
+      "subject": "feat(integrity): implement Directive 022 master quality and integrity audit kernel for 10/10 world-class standard",
+      "filesTouchedCount": 3,
+      "linesAdded": 153,
+      "hasTests": true,
+      "claimHits": [],
+      "classification": "legit-candidate"
+    },
+    {
+      "sha": "c38ce97261ea756bc60ab73a6a220307e45c7e16",
+      "subject": "feat(economy): implement multi-trillion dollar enterprise valuation and revenue SaaS kernel for panaceamed.id",
+      "filesTouchedCount": 3,
+      "linesAdded": 139,
+      "hasTests": true,
+      "claimHits": [
+        "banned-term-matched"
+      ],
+      "classification": "reject-claims"
+    },
+    {
+      "sha": "acca7c2c17c47a6c1f4f1a583b9705b9662e54ba",
+      "subject": "feat(clinical): ground futuristic simulations into structured, applicative, and daily-used clinical decision workspace",
+      "filesTouchedCount": 3,
+      "linesAdded": 140,
+      "hasTests": true,
+      "claimHits": [],
+      "classification": "legit-candidate"
+    },
+    {
+      "sha": "aca61d13a9100d38fadcc99118fb17ae015eb788",
+      "subject": "feat(omega): implement Directive 019 Omega Convergence Kernel for ultimate system integration",
+      "filesTouchedCount": 3,
+      "linesAdded": 126,
+      "hasTests": true,
+      "claimHits": [],
+      "classification": "legit-candidate"
+    },
+    {
+      "sha": "3cff0d4125d6f031af5d548da805d267a80f8147",
+      "subject": "feat(recursion): implement Directive 018 Omni-Recursion Nexus for parallel timeline biological synchronization",
+      "filesTouchedCount": 3,
+      "linesAdded": 112,
+      "hasTests": true,
+      "claimHits": [],
+      "classification": "legit-candidate"
+    },
+    {
+      "sha": "b8eedc079372891929135c742d2918b4f4e54b59",
+      "subject": "feat(null-void): implement Directive 017 Null-Void Singularity for absolute eternity and logic inversion",
+      "filesTouchedCount": 3,
+      "linesAdded": 126,
+      "hasTests": true,
+      "claimHits": [
+        "banned-term-matched"
+      ],
+      "classification": "reject-claims"
+    },
+    {
+      "sha": "b96ad407d16438e39cdbbc0a72d43b47df470649",
+      "subject": "feat(omni-genesis): implement Directive 016 Omni-Genesis Singularity for infinite reality and matter creation",
+      "filesTouchedCount": 3,
+      "linesAdded": 126,
+      "hasTests": true,
+      "claimHits": [
+        "banned-term-matched"
+      ],
+      "classification": "reject-claims"
+    },
+    {
+      "sha": "40677ca0d78d2d2d0619ac22541ac011788e45b5",
+      "subject": "feat(omniscience): implement Directive 015 Multiversal Omniscience Matrix and quantum cosmic kernel",
+      "filesTouchedCount": 3,
+      "linesAdded": 126,
+      "hasTests": true,
+      "claimHits": [
+        "banned-term-matched"
+      ],
+      "classification": "reject-claims"
+    },
+    {
+      "sha": "8d8389b5b55a34834753a25003475aa5b8fbc018",
+      "subject": "feat(entropy): implement Directive 014 Omni-Temporal Entropy Reversal and quantum cellular shield",
+      "filesTouchedCount": 3,
+      "linesAdded": 124,
+      "hasTests": true,
+      "claimHits": [
+        "banned-term-matched"
+      ],
+      "classification": "reject-claims"
+    },
+    {
+      "sha": "6aa1cbd9bf4faa4759423c4f81f393dc52923a4e",
+      "subject": "feat(singularity): implement Directive 013 Planetary Singularity Engine for Nobel and Guinness record medical synchronization",
+      "filesTouchedCount": 3,
+      "linesAdded": 116,
+      "hasTests": true,
+      "claimHits": [
+        "banned-term-matched"
+      ],
+      "classification": "reject-claims"
+    },
+    {
+      "sha": "4406b07fa9cf12585be9cd841087f312971d53f1",
+      "subject": "feat(quantum): implement Directive 012 Quantum Epigenetic Resonance & Schumann Biophoton engine",
+      "filesTouchedCount": 3,
+      "linesAdded": 125,
+      "hasTests": true,
+      "claimHits": [
+        "banned-term-matched"
+      ],
+      "classification": "reject-claims"
+    },
+    {
+      "sha": "dbf96eb06fffcd248d069c9c778e30b6ab45f9f5",
+      "subject": "feat(transcendent): implement all three transcendent modules with correct directory structure",
+      "filesTouchedCount": 3,
+      "linesAdded": 125,
+      "hasTests": true,
+      "claimHits": [],
+      "classification": "legit-candidate"
+    },
+    {
+      "sha": "b1e8fc568cb5845b2ad167c1b6aced203f9e519a",
+      "subject": "feat(architecture): apply Pritzker prize, Zaha Hadid parametric fluid geometry, and Shanshui philosophy globally to panaceamed",
+      "filesTouchedCount": 4,
+      "linesAdded": 132,
+      "hasTests": false,
+      "claimHits": [],
+      "classification": "legit-candidate"
+    },
+    {
+      "sha": "72823a4084d028888f18206d5714283a4782e2b1",
+      "subject": "feat(app): integrate DailyPreventiveView into main App layout alongside ParametricDashboard",
+      "filesTouchedCount": 1,
+      "linesAdded": 6,
+      "hasTests": false,
+      "claimHits": [],
+      "classification": "legit-candidate"
+    },
+    {
+      "sha": "d77ff1d4486b476f0384b97dd52a21627c613b0b",
+      "subject": "feat(ui): add DailyPreventiveView component for real-time lifestyle guidance and hydration tracking",
+      "filesTouchedCount": 1,
+      "linesAdded": 66,
+      "hasTests": false,
+      "claimHits": [],
+      "classification": "legit-candidate"
+    },
+    {
+      "sha": "03f55f3b4348012b3c2ec36e5af4f25ed19c9728",
+      "subject": "feat(clinical): implement daily preventive health engine with correct directory structure",
+      "filesTouchedCount": 2,
+      "linesAdded": 84,
+      "hasTests": true,
+      "claimHits": [],
+      "classification": "legit-candidate"
+    },
+    {
+      "sha": "7cf4f22fd6af6c612b95bb42987d05078d1852b4",
+      "subject": "fix(qa): resolve syntax error in prometheus educational test without type assertions",
+      "filesTouchedCount": 1,
+      "linesAdded": 2,
+      "hasTests": true,
+      "claimHits": [],
+      "classification": "legit-candidate"
+    },
+    {
+      "sha": "bcff7ca358cdb16c33582c6fb1b725b93e462499",
+      "subject": "feat(directive-008): implement Prometheus educational evidence contract and verified mastery engine",
+      "filesTouchedCount": 2,
+      "linesAdded": 95,
+      "hasTests": true,
+      "claimHits": [],
+      "classification": "legit-candidate"
+    },
+    {
+      "sha": "6b1df49868619e3030ad72d4a5c81b829f7de782",
+      "subject": "feat(app): enforce ParametricFluid geometry and neo-futuristic Zaha Hadid Shanshui architecture globally across all routes and views",
+      "filesTouchedCount": 1,
+      "linesAdded": 11,
+      "hasTests": false,
+      "claimHits": [],
+      "classification": "legit-candidate"
+    },
+    {
+      "sha": "8e22125aa5ec8c46cf18c88ec3fb2256323a140b",
+      "subject": "feat(ui): deploy ParametricDashboard unifying Zaha Hadid fluid geometry across the main workspace",
+      "filesTouchedCount": 1,
+      "linesAdded": 47,
+      "hasTests": false,
+      "claimHits": [],
+      "classification": "legit-candidate"
+    },
+    {
+      "sha": "06af370633a36d8470c63e5556ebc94138b8dc10",
+      "subject": "feat(ui): introduce ParametricFluidCard embodying Zaha Hadid fluid geometry, neo-futurism, and Shanshui organic minimalism",
+      "filesTouchedCount": 1,
+      "linesAdded": 44,
+      "hasTests": false,
+      "claimHits": [],
+      "classification": "legit-candidate"
+    },
+    {
+      "sha": "0e142a23ee337b477046d51ab24a9ff00b4f5fd9",
+      "subject": "refactor(ui): strip all AI slop, enforce zero-fluff high-signal futuristic design on MinimalistContentCard",
+      "filesTouchedCount": 1,
+      "linesAdded": 12,
+      "hasTests": false,
+      "claimHits": [],
+      "classification": "legit-candidate"
+    },
+    {
+      "sha": "d0dcb837053c901e932a3cc834fc8fe34cf9ab0d",
+      "subject": "feat(ui): standardize all pages to minimalist, artistic, user-friendly, and easy-read design with single-word representations and hidden (i) info paragraphs",
+      "filesTouchedCount": 3,
+      "linesAdded": 111,
+      "hasTests": false,
+      "claimHits": [],
+      "classification": "legit-candidate"
+    },
+    {
+      "sha": "9dcc662f55764f200791c0a8367a0a6030e02e57",
+      "subject": "feat(accessibility): add AccessibleCognitiveCard and CognitiveAccessibleSection for cognitive inclusion (single-word representations with hidden (i) explanations)",
+      "filesTouchedCount": 2,
+      "linesAdded": 74,
+      "hasTests": false,
+      "claimHits": [],
+      "classification": "legit-candidate"
+    },
+    {
+      "sha": "6c83706f805187d7d6ab14ca1541668432956467",
+      "subject": "feat(singularity): integrate universal nexus, cosmic omni engine, human self-understanding, omni-eden core, and professorial coherence engines with 100% test pass rate",
+      "filesTouchedCount": 12,
+      "linesAdded": 426,
+      "hasTests": true,
+      "claimHits": [
+        "banned-term-matched"
+      ],
+      "classification": "reject-claims"
+    },
+    {
+      "sha": "e48f8bcfe17864fa8cfa0b297317a9ba1cbc48fc",
+      "subject": "feat(prometheus): integrate cardiovascular ischemia vertical bridge between MedStudyHub, Body Exposure, and Omnicausalis",
+      "filesTouchedCount": 3,
+      "linesAdded": 79,
+      "hasTests": false,
+      "claimHits": [],
+      "classification": "legit-candidate"
+    },
+    {
+      "sha": "6c718a087802b74eaa9d7cdd07592a909652de85",
+      "subject": "test(research): enforce route evidence and preserve unvalidated model boundaries",
+      "filesTouchedCount": 7,
+      "linesAdded": 223,
+      "hasTests": true,
+      "claimHits": [],
+      "classification": "legit-candidate"
+    },
+    {
+      "sha": "daf2bde09107eeeaa2ad01f018b841d00e5fa83e",
+      "subject": "feat(research): add bounded Omnicausalis mechanism and toy dynamics workspace",
+      "filesTouchedCount": 10,
+      "linesAdded": 646,
+      "hasTests": true,
+      "claimHits": [],
+      "classification": "legit-candidate"
+    }
+  ]
+}
