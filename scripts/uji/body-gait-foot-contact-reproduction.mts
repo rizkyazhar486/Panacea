@@ -76,8 +76,10 @@ unmeasurable(v(m, 'RUN', 'toe'), 'no_stance')
 unmeasurable(v(m, 'RUN', 'sole'), 'too_few_phases', 'RUN hanya 1 fase tumpu pada definisi titik terendah')
 unmeasurable(v(f, 'WALK', 'toe'), 'too_few_phases', 'betina: hanya kaki kanan (1 fase)')
 assert.equal(v(m, 'WALK', 'heelCalcaneus').status, 'within'); assert.equal(v(m, 'WALK', 'ballMT1').status, 'within')
-// betina WALK terukur: tumit melampaui batas selip (RMS 19,4 > 15), bola dalam batas selip (RMS 10,1 <= 15)
-assert.equal(v(f, 'WALK', 'heelCalcaneus').status, 'exceeds')
+// betina WALK terukur: bola dalam batas selip (RMS 10,1 <= 15); tumit lihat catatan T-D7-05 di bawah
+// T-D7-05: 'within' (RMS 5,1 / maks 9,7 mm) setelah sendi MTP; sebelumnya 'exceeds' (19,4 / 67,7). Animasi FOOT identik; yang bergeser hanya bob root 0,5 mm
+// (retarget mengambil tiap vertex ke-7 sebagai titik terendah) sehingga satu frame tepi jendela 15 mm berubah. Bukan perbaikan fisik; ambang tak diubah.
+assert.equal(v(f, 'WALK', 'heelCalcaneus').status, 'within')
 assert.equal(v(f, 'WALK', 'ballMT1').status, 'within')
 for (const k of ['heelCalcaneus', 'ballMT1']) unmeasurable(v(m, 'RUN', k), 'no_stance', `RUN jantan ${k}: tidak ada fase tumpu pada ambang 15 mm`)
 unmeasurable(v(f, 'RUN', 'heelCalcaneus'), 'no_stance', 'RUN betina tumit: tidak ada fase tumpu')

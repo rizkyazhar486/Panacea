@@ -1,7 +1,7 @@
 {
  "schema": "panacea-foot-contact/v2",
  "source_sha256": "b2c7cb609a7cc52064de4b5526ddfd2d9e15b6b261dcf44652aa5e1e3c887dc9",
- "reproducer_sha256": "4879357e6754734c9bb2174e3437ebeff91f66db45b480ab7ca8865dc50981aa",
+ "reproducer_sha256": "ac8084fc33bef5b828967931cd9fd68fde0470a621d59d9820bcf8638bb4a4d6",
  "math_sha256": "5114a01e1c0ac99b96d12b7a511d34f8354e462893a3fbfea5cc26c968a32d7c",
  "coordinate_contract": {
   "gltf_length_unit": "metre",
