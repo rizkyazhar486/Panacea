@@ -41,7 +41,7 @@ test('endpoint_priority_uses_first_nonempty_setting_and_one_health_request', () 
     const env = Object.fromEntries(settings.slice(first).map((key, i) => [key, `https://wake-${first + i}.invalid/`]))
     const r = run('once', env)
     assert.equal(r.status, 0, r.stderr)
-    assert.deepEqual(r.calls, [`-s -o /dev/null -w %{http_code} --max-time 90 https://wake-${first}.invalid/api/health`])
+    assert.deepEqual(r.calls, [`-s -o /dev/null -w %{http_code} %header{x-render-routing} --max-time 90 https://wake-${first}.invalid/api/health`])
     assert.equal(r.stdout.trim(), 'HTTP 200')
   }
 })
@@ -87,3 +87,26 @@ test('unknown_mode_is_rejected_before_network', () => {
   assert.equal(r.status, 2, r.stderr)
   assert.deepEqual(r.calls, [])
 })
+
+test('suspended_render_service_names_the_cause_and_stops_keepalive_without_sleeping', () => {
+  const r = run('keepalive', { SERVER_URL: 'https://wake.invalid', WAKE_HTTP: '503 suspend-by-user', WAKE_HOUR: '21' })
+  assert.equal(r.status, 0, r.stderr)
+  assert.match(r.stdout, /^HTTP 503\n::warning::Render: layanan DISUSPEND oleh pemiliknya \(x-render-routing: suspend-by-user\)/)
+  assert.match(r.stdout, /resume/)
+  assert.deepEqual(r.calls.filter((x) => x.startsWith('sleep')), [], 'no sleep after a suspended answer')
+  assert.equal(r.calls.filter((x) => x.startsWith('-s ')).length, 1)
+  assert.doesNotMatch(r.stdout, /wake\.invalid/)
+})
+
+test('other_routing_values_keep_the_existing_best_effort_loop', () => {
+  // pasangan: hanya nilai header yang berbeda; 503 biasa (mis. cold start) tetap mencoba lagi seperti sebelumnya
+  for (const http of ['503 dynamic', '503', '200 ']) {
+    const r = run('keepalive', { SERVER_URL: 'https://wake.invalid', WAKE_HTTP: http, WAKE_HOUR: '21' })
+    assert.equal(r.status, 0, `${http}: ${r.stderr}`)
+    assert.equal(r.calls.filter((x) => x.startsWith('-s ')).length, 2, http)
+    assert.ok(r.calls.includes('sleep 540'), http)
+    assert.doesNotMatch(r.stdout, /DISUSPEND/, http)
+    assert.match(r.stdout, new RegExp(`^HTTP ${http.split(' ')[0]}\n`), http)
+  }
+})
+

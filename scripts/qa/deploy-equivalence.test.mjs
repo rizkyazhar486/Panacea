@@ -1,6 +1,6 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { klasifikasiDeploy, STATUS_LULUS, JALUR_BACKEND, JALUR_FRONTEND } from './deploy-equivalence.mjs'
+import { klasifikasiDeploy, galatHttp, STATUS_LULUS, JALUR_BACKEND, JALUR_FRONTEND } from './deploy-equivalence.mjs'
 
 const M = 'a'.repeat(40), D = 'b'.repeat(40)
 const k = (o) => klasifikasiDeploy({ deployedSha: D, mainSha: M, adalahLeluhur: true, jalurBerubah: [], ...o })
@@ -24,3 +24,19 @@ test('sha_sama_mengalahkan_data_leluhur_yang_keliru', () => { assert.equal(k({ d
 test('jalur_server_dan_render_ada_di_backend_dan_src_di_frontend', () => {
   assert.ok(JALUR_BACKEND.includes('server') && JALUR_BACKEND.includes('render.yaml')); assert.ok(JALUR_FRONTEND.includes('src') && JALUR_FRONTEND.includes('public'))
 })
+
+test('galat_http_menyebut_layanan_disuspend_pemilik_secara_eksplisit', () => {
+  const m = galatHttp(503, 'suspend-by-user')
+  assert.match(m, /^HTTP 503; Render: service suspended by its owner \(x-render-routing: suspend-by-user\)/)
+  assert.match(m, /resume the service on Render/)
+})
+test('galat_http_tanpa_header_tetap_generik_dan_header_lain_dikutip_tanpa_klaim_suspend', () => {
+  assert.equal(galatHttp(503, null), 'HTTP 503')
+  assert.equal(galatHttp(404, ''), 'HTTP 404')
+  assert.equal(galatHttp(503, 'dynamic'), 'HTTP 503 (x-render-routing: dynamic)')
+  assert.doesNotMatch(galatHttp(503, 'dynamic'), /suspended/)
+})
+test('galat_http_tidak_mengutip_nilai_header_yang_bukan_token', () => {
+  for (const v of ['suspend-by-user\n::error::injected', 'x'.repeat(41), 'Suspend-By-User', 'a b']) assert.equal(galatHttp(503, v), 'HTTP 503', JSON.stringify(v))
+})
+
