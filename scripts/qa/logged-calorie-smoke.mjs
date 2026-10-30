@@ -6,6 +6,27 @@ const browser = await chromium.launch({ headless: true, ...(process.env.CHROME_P
 try {
   const context = await browser.newContext({ viewport: { width: 390, height: 844 }, timezoneId: 'Asia/Jakarta', reducedMotion: 'reduce' })
   const page = await context.newPage(); const errors = []; page.on('pageerror', e => errors.push(e.message))
+  const consoleErrors = []; page.on('console', m => { if (m.type() === 'error') consoleErrors.push(m.text().slice(0, 200)) })
+  const output = process.env.LOGGED_CALORIE_QA_OUTPUT || 'artifacts/logged-calories'
+  // Intermittent CI timeout on the first Widgets fold wait (never reproduced locally in 48 throttled/parallel/software-GL/fake-clock runs).
+  // The wait and its 30 s limit are unchanged and still fail the job; on failure we now keep evidence so the next occurrence is diagnosable.
+  const keepFailureEvidence = async (error) => {
+    try {
+      await mkdir(output, { recursive: true })
+      const snap = await page.evaluate(() => {
+        const nav = performance.getEntriesByType('navigation')[0]
+        return {
+          url: location.href, readyState: document.readyState, folds: document.querySelectorAll('details.fold').length,
+          hasWidgetsText: /Widgets/.test(document.body?.innerText ?? ''), bodyTextHead: (document.body?.innerText ?? '').replace(/\s+/g, ' ').slice(0, 300),
+          storageKeys: Object.keys(localStorage).sort().map(k => [k, (localStorage.getItem(k) ?? '').length]),
+          navigation: nav ? { domContentLoadedMs: Math.round(nav.domContentLoadedEventEnd), loadMs: Math.round(nav.loadEventEnd) } : null,
+          hardwareConcurrency: navigator.hardwareConcurrency,
+        }
+      }).catch(e => ({ evaluateFailed: String(e.message).slice(0, 200) }))
+      await page.screenshot({ path: `${output}/failure-fold.png` }).catch(() => {})
+      await writeFile(`${output}/failure-diagnostics.json`, JSON.stringify({ at: new Date().toISOString(), error: String(error.message).split('\n')[0], snap, pageErrors: errors.slice(0, 10), consoleErrors: consoleErrors.slice(0, 10), syntheticData: true }, null, 2))
+    } catch { /* evidence is best effort; the original error is still thrown */ }
+  }
   await page.goto(origin, { waitUntil: 'domcontentloaded' })
   const open = async (foodValues, workoutValues) => {
     await page.evaluate(({ foodValues, workoutValues }) => {
@@ -21,7 +42,8 @@ try {
     }, { foodValues, workoutValues })
     await page.goto(`${origin}/#/`, { waitUntil: 'domcontentloaded' }); await page.reload({ waitUntil: 'domcontentloaded' })
     const fold = page.locator('details.fold', { has: page.getByText('Widgets', { exact: true }) }).first()
-    await fold.waitFor(); if (await fold.getAttribute('open') === null) await fold.locator('summary').click()
+    try { await fold.waitFor({ timeout: Number(process.env.LOGGED_CALORIE_QA_FOLD_TIMEOUT_MS) || 30000 }) } catch (error) { await keepFailureEvidence(error); throw error }
+    if (await fold.getAttribute('open') === null) await fold.locator('summary').click()
   }
   const food = page.locator('[data-logged-calories="Food logged"]')
   const training = page.locator('[data-logged-calories="Training calories"]')
@@ -40,5 +62,5 @@ try {
   assert.deepEqual(errors, [])
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - innerWidth); assert.ok(overflow <= 1)
   const evidence = { ok: true, synthetic: true, explicitZero: true, missingNotZero: true, partialSubtotalsLabelled: true, localCalendar: 'Asia/Jakarta', horizontalOverflowPx: overflow, clinicallyReviewed: false }
-  const output = process.env.LOGGED_CALORIE_QA_OUTPUT || 'artifacts/logged-calories'; await mkdir(output,{recursive:true}); await writeFile(`${output}/evidence.json`,JSON.stringify(evidence,null,2)); console.log(JSON.stringify(evidence))
+  await mkdir(output,{recursive:true}); await writeFile(`${output}/evidence.json`,JSON.stringify(evidence,null,2)); console.log(JSON.stringify(evidence))
 } finally { await browser.close() }
