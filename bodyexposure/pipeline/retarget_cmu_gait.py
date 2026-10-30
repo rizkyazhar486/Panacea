@@ -113,6 +113,8 @@ def angles(bones, hier, frames):
     = arah hadap root per frame (horizontal), kiri dari panggul R→L. Lutut, pergelangan kaki & siku: sudut antar-segmen."""
     zeroP, _ = fk(bones, hier, {})
     a0 = {s: ang(zeroP[f"{s}tibia"] - zeroP[f"{s}femur"], zeroP[f"{s}foot"] - zeroP[f"{s}tibia"]) for s in "lr"}
+    def sag(a, b, left):  # sudut bertanda dari a ke b di bidang sagital (normal = sumbu kiri); positif = b berputar ke atas
+        return math.degrees(math.atan2(float(np.dot(np.cross(a, b), left)), float(np.dot(a, b))))
     up = np.array([0, 1.0, 0])  # ASF/CMU: Y ke atas
     out, roots = [], []
     for fr in frames:
@@ -128,6 +130,10 @@ def angles(bones, hier, frames):
             r[f"hip_abd.{side}"] = math.degrees(math.atan2(thigh.dot(out_dir), -thigh.dot(up)))
             r[f"knee_flex.{side}"] = ang(thigh, shank)
             r[f"ankle_dorsi.{side}"] = ang(shank, foot) - a0[s]
+            # T-D7-05: ekstensi MTP (dorsofleksi jari) dari segmen CMU foot -> toes, relatif terhadap pose nol CMU; tanpa jepit
+            toe = P[f"{s}toes"] - P[f"{s}foot"]
+            z_foot, z_toe = zeroP[f"{s}foot"] - zeroP[f"{s}tibia"], zeroP[f"{s}toes"] - zeroP[f"{s}foot"]
+            r[f"mtp_ext.{side}"] = -(sag(foot, toe, left) - sag(z_foot, z_toe, left))
             upper = P[f"{s}humerus"] - P[f"{s}clavicle"]; fore = P[f"{s}radius"] - P[f"{s}humerus"]
             r[f"shoulder_flex.{side}"] = math.degrees(math.atan2(upper.dot(fwd), -upper.dot(up)))
             r[f"elbow_flex.{side}"] = ang(upper, fore)
@@ -194,13 +200,13 @@ for name, subj, trial in CLIPS:
         i0 = int(math.floor(t)); f = t - i0; i1 = min(i0 + 1, len(A) - 1)
         return A[i0][key] * (1 - f) + A[i1][key] * f
     # koreksi drift loop: selisih akhir−awal siklus disebar linear sepanjang siklus → sambungan loop persis 0
-    drift = {f"{key}.{s}": raw(f"{key}.{s}", idx[-1]) - raw(f"{key}.{s}", idx[0]) for key in CLAMP for s in "LR"}
+    drift = {f"{key}.{s}": raw(f"{key}.{s}", idx[-1]) - raw(f"{key}.{s}", idx[0]) for key in list(CLAMP) + ["mtp_ext"] for s in "LR"}
     def sample(key, t):
         return raw(key, t) - drift[key] * (t - idx[0]) / (idx[-1] - idx[0])
     act = bpy.data.actions.new(name); arm.animation_data_create(); arm.animation_data.action = act
     for pb in P:
         pb.rotation_mode = 'XYZ'
-    clamped = {}
+    clamped = {}; mtp_seen = {}
     base_z = arm.location.z; bobs = []
     for j, t in enumerate(idx):
         fr = j  # frame 0 → waktu glTF 0; kunci terakhir = pose awal pada t = siklus (loop tanpa jeda)
@@ -217,13 +223,16 @@ for name, subj, trial in CLIPS:
             setb(f"THIGH.{side}", sg(f"THIGH.{side}", "flexion") * vals["hip_flex"], zsign(f"THIGH.{side}") * vals["hip_abd"])
             setb(f"SHIN.{side}", sg(f"SHIN.{side}", "flexion") * vals["knee_flex"])
             setb(f"FOOT.{side}", sg(f"FOOT.{side}", "extension") * vals["ankle_dorsi"])  # FOOT: ekstensi = dorsofleksi
+            if f"TOE.{side}" in P.keys():  # T-D7-05: sudut MTP langsung dari mocap (tanpa batas ROM karang); min/max dicatat di laporan
+                mtp = sample(f"mtp_ext.{side}", t); mtp_seen.setdefault(side, []).append(mtp)
+                setb(f"TOE.{side}", sg(f"TOE.{side}", "extension") * mtp)
             if HAS_ARMS:
                 setb(f"UPPER_ARM.{side}", sg(f"UPPER_ARM.{side}", "flexion") * vals["shoulder_flex"])
                 setb(f"FOREARM.{side}", sg(f"FOREARM.{side}", "flexion") * vals["elbow_flex"])
         bobs.append(float(np.interp(t, np.arange(len(bob)), bob)) * unit_m * (leg_rig / leg_src))
     # kontak lantai: tinggi kaki terendah per frame pada pelvis dasar
     sc = bpy.context.scene; sc.frame_start, sc.frame_end = 0, len(idx) - 1; sc.render.fps = FPS_OUT
-    feet = [o for o in bpy.data.objects if o.type == 'MESH' and o.parent_bone and o.parent_bone.startswith("FOOT.")]
+    feet = [o for o in bpy.data.objects if o.type == 'MESH' and o.parent_bone and o.parent_bone.startswith(("FOOT.", "TOE."))]
     def lowest_now():
         dg = bpy.context.evaluated_depsgraph_get(); low = math.inf
         for o in feet:
@@ -259,6 +268,8 @@ for name, subj, trial in CLIPS:
         "rest_offsets_deg": ({sd: {k: round(v, 1) for k, v in REST[sd].items()} for sd in "LR"} if BODY else None), "coverage": COVERAGE or None,
         "leg_length_m": {"rig": round(leg_rig, 3), "source": round(leg_src, 3)},
         "lowest_foot_point_m": {"min": round(min(lowest), 4), "max": round(max(lowest), 4)},
+        # T-D7-05: sudut MTP dari mocap (positif = ekstensi/dorsofleksi jari), tanpa jepit; null bila rig tidak punya TOE
+        "toe_mtp_extension_deg": ({sd: {"min": round(min(v), 1), "max": round(max(v), 1)} for sd, v in mtp_seen.items()} or None),
         "max_bone_penetration_mm": max(c["max_penetration_mm"] for c in contact), "bone_contact": contact}
     # rentang frame manual (bukan dari handle Bezier) & interpolasi linear: sampel 24 fps rapat, tanpa overshoot
     act.use_frame_range = True; act.frame_start, act.frame_end = 0, len(idx) - 1
