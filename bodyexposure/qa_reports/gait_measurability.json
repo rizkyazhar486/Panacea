@@ -9,49 +9,45 @@
   {
    "body": "adult_male",
    "clip": "WALK",
-   "source_sha256": "305535b44af0667b3dded8abfa99b4a4a77b3d078036888af8210d827ffb5ce8",
+   "source_sha256": "b2c7cb609a7cc52064de4b5526ddfd2d9e15b6b261dcf44652aa5e1e3c887dc9",
    "frames": 26,
    "sole_min_height_mm": {
-    "L": 0.3,
-    "R": 0
+    "L": 0,
+    "R": 0.4
    },
    "landmarks": {
     "heelCalcaneus": {
      "per_side": {
       "L": {
-       "min_height_mm": 0.5,
-       "frames_within_window": 11,
+       "min_height_mm": 0.9,
+       "frames_within_window": 9,
        "stance_phases": 1
       },
       "R": {
-       "min_height_mm": 0,
-       "frames_within_window": 7,
-       "stance_phases": 1
-      }
-     },
-     "verdict": "exceeds",
-     "failed": [
-      "rms",
-      "peak"
-     ],
-     "slide_rms_mm": 21.2,
-     "slide_max_mm": 73.6
-    },
-    "ballMT1": {
-     "per_side": {
-      "L": {
-       "min_height_mm": 5.8,
-       "frames_within_window": 11,
-       "stance_phases": 1
-      },
-      "R": {
-       "min_height_mm": 6.2,
-       "frames_within_window": 12,
+       "min_height_mm": 0.4,
+       "frames_within_window": 5,
        "stance_phases": 1
       }
      },
      "verdict": "within",
-     "slide_rms_mm": 6.5,
+     "slide_rms_mm": 7.7,
+     "slide_max_mm": 16.6
+    },
+    "ballMT1": {
+     "per_side": {
+      "L": {
+       "min_height_mm": 5.9,
+       "frames_within_window": 11,
+       "stance_phases": 1
+      },
+      "R": {
+       "min_height_mm": 9,
+       "frames_within_window": 6,
+       "stance_phases": 1
+      }
+     },
+     "verdict": "within",
+     "slide_rms_mm": 6.9,
      "slide_max_mm": 16.1
     }
    },
@@ -60,7 +56,7 @@
   {
    "body": "adult_male",
    "clip": "RUN",
-   "source_sha256": "305535b44af0667b3dded8abfa99b4a4a77b3d078036888af8210d827ffb5ce8",
+   "source_sha256": "b2c7cb609a7cc52064de4b5526ddfd2d9e15b6b261dcf44652aa5e1e3c887dc9",
    "frames": 18,
    "sole_min_height_mm": {
     "L": 2.8,

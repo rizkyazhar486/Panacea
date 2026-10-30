@@ -137,7 +137,7 @@ export function withLandmarks(glb, landmarks) {
   for (const [key, lm] of Object.entries(landmarks).sort(([a], [b]) => a.localeCompare(b))) {
     const side = key.slice(-1), foot = json.nodes.findIndex((n) => n.name === `FOOT.${side}`)
     if (foot < 0) throw new Error(`FOOT.${side} node missing`)
-    json.nodes.push({ name: `${LANDMARK_PREFIX}${key}`, translation: lm.translation, extras: { panacea_landmark: key.split('_')[0].toLowerCase(), derived_from: lm.source, note: 'Derived from source bone mesh at rest pose; no toe joint exists, the ball is the forefoot pivot. Not a clinical measurement.' } })
+    json.nodes.push({ name: `${LANDMARK_PREFIX}${key}`, translation: lm.translation, extras: { panacea_landmark: key.split('_')[0].toLowerCase(), derived_from: lm.source, note: json.nodes.some((n) => n.name === `TOE.${side}`) ? 'Derived from source bone mesh at rest pose; an MTP toe joint (TOE bone) exists, the ball is the first metatarsal head at that joint. Not a clinical measurement.' : 'Derived from source bone mesh at rest pose; no toe joint exists, the ball is the forefoot pivot. Not a clinical measurement.' } })
     ;(json.nodes[foot].children ??= []).push(json.nodes.length - 1)
   }
   return { ...glb, json }

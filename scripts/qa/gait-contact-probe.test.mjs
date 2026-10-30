@@ -30,13 +30,14 @@ test('finding 1: female heel landmark matches the closest-vertex definition and 
   }
 })
 
-test('finding 2: RUN has no heel contact on either body, and male RUN lands on distal toe phalanges', () => {
+test('finding 2: RUN has no heel contact on either body, and male RUN lands on the forefoot (MTP region or toes) after the T-D7-05 MTP re-rig', () => {
   for (const body of ['adult_male', 'vhf_denver_ct_adult_female']) for (const s of ['L', 'R']) {
     const c = B[body].clips.RUN.sides[s].groups.calcaneus.closest_vertex
     assert.ok(c.min_height_mm >= 15 && c.stance_phases === 0, `${body} RUN ${s}: no calcaneus vertex within the window`)
   }
   for (const s of ['L', 'R']) {
     const owners = Object.keys(B.adult_male.clips.RUN.sides[s].lowest_structure_at_contact)
-    assert.ok(owners.length > 0 && owners.every((o) => /DISTAL_PHALANX|INTERPHALANGEAL/.test(o)), `male RUN ${s} contact owners: ${owners}`)
+    // sebelum T-D7-05 kaki kaku mendarat di ujung falang distal; dengan sendi MTP + kendala kontak jari (derived) kontak berada di region MTP/jari
+    assert.ok(owners.length > 0 && owners.every((o) => /METATARSOPHALANGEAL|PHALANX|INTERPHALANGEAL/.test(o)), `male RUN ${s} contact owners: ${owners}`)
   }
 })
