@@ -28,6 +28,16 @@ jobs:
       - run: npm ci
       - name: Unsupported claim guard (WP-1)
         run: node scripts/qa/claim-guard.mjs
+      - name: Giant-drop PR shape guard (WP-2)
+        if: github.event_name == 'pull_request'
+        env:
+          PR_BODY: ${{ github.event.pull_request.body }}
+          BASE_REF: ${{ github.base_ref }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        # checkout@v4 dangkal (depth 1): ambil base dan head PR secara eksplisit agar merge-base ada
+        run: |
+          git fetch --no-tags --depth=500 origin "+refs/heads/${BASE_REF}:refs/remotes/origin/${BASE_REF}" "+refs/pull/${PR_NUMBER}/head:refs/remotes/origin/pr-head"
+          node scripts/qa/pr-shape-guard.mjs "origin/${BASE_REF}...origin/pr-head"
       - name: Architecture boundaries (new violations only)
         run: npm run lint:arsitektur
       - name: Architecture ratchet (flat lib freeze + lib purity)
