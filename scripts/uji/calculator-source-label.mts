@@ -171,12 +171,22 @@ assert.deepEqual(sourceMissingByEngine, [], 'every page that renders an engine r
 // teks sumber: kutipan tampil apa adanya, tautan hanya dari identifier yang tersimpan dan sah, sumber tak bernama tidak diberi kutipan
 {
   const pub = describeSource('x', { kind: 'published', citation: 'Contoh 1999', anchor: 'Contoh 1999', basis: 'b', pmid: '12345', doi: '10.1000/abc' }, { formula: 'A + B', units: 'mg/dL' })
-  assert.deepEqual(pub, { id: 'x', kind: 'published', label: 'Published source', text: 'Contoh 1999', formula: 'A + B', units: 'mg/dL', pubmedUrl: 'https://pubmed.ncbi.nlm.nih.gov/12345/', doiUrl: 'https://doi.org/10.1000/abc' })
+  assert.deepEqual(pub, { id: 'x', kind: 'published', label: 'Published source', text: 'Contoh 1999', formula: 'A + B', units: 'mg/dL', pubmedUrl: 'https://pubmed.ncbi.nlm.nih.gov/12345/', doiUrl: 'https://doi.org/10.1000/abc', publisherUrl: null })
   assert.equal(describeSource('x', { kind: 'published', citation: 'Contoh 1999', anchor: 'a', basis: 'b' }).pubmedUrl, null, 'tanpa PMID tersimpan tidak ada tautan')
   assert.equal(describeSource('x', { kind: 'published', citation: 'C', anchor: 'a', basis: 'b', pmid: 'PMC1', doi: 'doi:1' }).pubmedUrl, null, 'PMID tak sah tidak jadi tautan')
   assert.equal(describeSource('x', { kind: 'published', citation: 'C', anchor: 'a', basis: 'b', pmid: '1', doi: 'javascript:alert(1)' }).doiUrl, null, 'DOI tak sah tidak jadi tautan')
   const un = describeSource('x', { kind: 'unattributed', citation: null, anchor: null, basis: 'Standard equation; no publication named.', pmid: '999' })
   assert.deepEqual([un.label, un.text, un.formula, un.units, un.pubmedUrl], ['No source recorded', 'Standard equation; no publication named.', null, null, null], 'sumber tak bernama tidak membawa tautan walau ada PMID nyasar')
+  // terbitan tak terindeks: tautan penerbit hanya untuk published tanpa PMID dan hanya https
+  const base = { kind: 'published' as const, citation: 'RCP 2017', anchor: 'RCP 2017', basis: 'b', pmid: null, doi: null }
+  const unx = (url: string | null) => ({ reason: 'tidak ada di PubMed', url, checkedOn: '2026-10-24' })
+  assert.equal(describeSource('x', { ...base, unindexed: unx('https://www.rcp.ac.uk/news2/') }).publisherUrl, 'https://www.rcp.ac.uk/news2/', 'unindexed https menjadi tautan penerbit')
+  assert.equal(describeSource('x', { ...base, unindexed: unx(null) }).publisherUrl, null, 'tanpa URL tidak ada tautan')
+  assert.equal(describeSource('x', { ...base, unindexed: unx('http://rcp.ac.uk/x') }).publisherUrl, null, 'http ditolak')
+  assert.equal(describeSource('x', { ...base, unindexed: unx('javascript:alert(1)') }).publisherUrl, null, 'skema berbahaya ditolak')
+  assert.equal(describeSource('x', { ...base, unindexed: unx('https://a.b/c d') }).publisherUrl, null, 'URL berspasi ditolak')
+  assert.equal(describeSource('x', { ...base, pmid: '12345', unindexed: unx('https://www.rcp.ac.uk/news2/') }).publisherUrl, null, 'PMID tersimpan: tautan PubMed saja, tanpa tautan penerbit')
+  assert.equal(describeSource('x', { ...base, kind: 'unattributed', unindexed: unx('https://www.rcp.ac.uk/news2/') }).publisherUrl, null, 'sumber tak bernama tidak membawa tautan penerbit')
   assert.equal(describeSource('x', undefined).kind, 'unknown')
   assert.equal(describeSource('x', { kind: 'verified' as never, citation: 'C', anchor: 'a', basis: 'b' }).kind, 'unknown', 'kind tak dikenal gagal tertutup')
   assert.equal(describeSource('x', null).text, 'No source record was found for this calculator.')

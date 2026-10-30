@@ -23,6 +23,7 @@ export function SumberKalkulator({ ids, className = 'mt-2 text-[11px] leading-sn
             <span className="font-medium">{l.label}.</span> {l.text}
             {l.pubmedUrl && <> <a className="underline" href={l.pubmedUrl} target="_blank" rel="noopener noreferrer">PubMed</a></>}
             {l.doiUrl && <> <a className="underline" href={l.doiUrl} target="_blank" rel="noopener noreferrer">DOI</a></>}
+            {l.publisherUrl && <> <a className="underline" href={l.publisherUrl} target="_blank" rel="noopener noreferrer">Publisher</a></>}
             {l.formula && (
               <div className="mt-0.5 text-neutral-600 dark:text-neutral-400">
                 <span className="font-medium">Formula:</span> <code className="font-mono text-[10px]">{l.formula}</code>

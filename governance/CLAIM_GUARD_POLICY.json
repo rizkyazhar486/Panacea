@@ -1,0 +1,46 @@
+{
+  "terms": [
+    "biophoton",
+    "schumann resonance",
+    "quantum healing",
+    "null-void singularity",
+    "omniscience",
+    "entropy reversal",
+    "1:1 digital twin",
+    "guinness",
+    "multi-trillion valuation"
+  ],
+  "include": [
+    "src",
+    "server/src",
+    "public"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "build",
+    ".git",
+    "coverage",
+    "output",
+    "test-results"
+  ],
+  "allowedBoundaryPaths": [
+    "src/simulations/",
+    "src/fiction/",
+    "src/sandbox/"
+  ],
+  "baseline": [
+    {
+      "file": "src/components/frontier/FrontierBiomedicalResearchPanel.tsx",
+      "term": "quantum healing"
+    },
+    {
+      "file": "src/lib/discovery/frontierResearchRegistry.ts",
+      "term": "quantum healing"
+    },
+    {
+      "file": "src/lib/discovery/immersiveLifeScienceSandboxEngine.ts",
+      "term": "quantum healing"
+    }
+  ]
+}

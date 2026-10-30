@@ -13,6 +13,8 @@ export interface SourceLine {
   units: string | null
   pubmedUrl: string | null
   doiUrl: string | null
+  /** Halaman penerbit untuk terbitan tak terindeks PubMed; hanya published tanpa PMID dan hanya https. */
+  publisherUrl: string | null
 }
 
 const LABELS: Record<SourceKind, string> = {
@@ -31,7 +33,7 @@ export function describeSource(
   const formula = meta?.formula && typeof meta.formula === 'string' && meta.formula.trim().length > 0 ? meta.formula.trim() : null
   const units = meta?.units && typeof meta.units === 'string' && meta.units.trim().length > 0 ? meta.units.trim() : null
   if (!source || !SOURCE_KINDS.includes(source.kind)) {
-    return { id, kind: 'unknown', label: 'Source unknown', text: 'No source record was found for this calculator.', formula, units, pubmedUrl: null, doiUrl: null }
+    return { id, kind: 'unknown', label: 'Source unknown', text: 'No source record was found for this calculator.', formula, units, pubmedUrl: null, doiUrl: null, publisherUrl: null }
   }
   const published = source.kind === 'published'
   const text = published && source.citation ? source.citation : source.basis
@@ -45,5 +47,6 @@ export function describeSource(
     // Tautan hanya bila identifier tersimpan DAN bentuknya sah; tidak pernah dirakit dari kutipan.
     pubmedUrl: published && source.pmid && /^\d{1,9}$/.test(source.pmid) ? `https://pubmed.ncbi.nlm.nih.gov/${source.pmid}/` : null,
     doiUrl: published && source.doi && /^10\.\d{4,9}\/\S+$/.test(source.doi) ? `https://doi.org/${source.doi}` : null,
+    publisherUrl: published && !source.pmid && typeof source.unindexed?.url === 'string' && /^https:\/\/\S+$/.test(source.unindexed.url) ? source.unindexed.url : null,
   }
 }

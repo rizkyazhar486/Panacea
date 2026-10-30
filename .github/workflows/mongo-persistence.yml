@@ -16,7 +16,10 @@ jobs:
     timeout-minutes: 10
     services:
       mongo:
-        image: mongo@sha256:d0d926f94df099bff534b7ee5b5986458131a22489dfff8664509af0c1e2ca9c
+        # mongo 8.0.32 (digest d0d926f9…) menolak start di kernel runner 6.19–7.0.13: "MongoDB cannot start: Linux kernel versions 6.19 and newer
+        # has a known incompatibility" (SERVER-121912; perbaikan SERVER-125742 hanya membuka kernel ≥ 7.0.14). Jalur 7.0 tidak terdampak
+        # (tiket menyebut 8.0+). Dipin ke 7.0.43 (rilis 2026-10-02) per digest; kembalikan ke 8.x setelah kernel runner ≥ 7.0.14.
+        image: mongo@sha256:1f995ad6fdb93244a1addab1b58f934a0bc2f5643c38e02f5e9d7f0c7d227a7b
         ports:
           - 27017:27017
         options: >-
