@@ -6,13 +6,13 @@ test('Civilizational Sync Core successfully validates and synthesizes multi-doma
   const sampleNodes = [
     {
       conceptId: 'PAR-QUANTUM-01',
-      domain: 'PHYSICS' as const,
+      domain: 'PHYSICS',
       epistemicProvenance: ['PMID:30129481', 'DOI:10.1038/s41587-021'],
       structuralIntegrityScore: 0.96
     },
     {
       conceptId: 'PAR-PHYSIO-02',
-      domain: 'PHYSIOLOGY' as const,
+      domain: 'PHYSIOLOGY',
       epistemicProvenance: ['PMID:28491022'],
       structuralIntegrityScore: 0.91
     }
