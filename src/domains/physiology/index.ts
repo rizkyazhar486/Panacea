@@ -2,6 +2,8 @@
 // Sengaja tidak mengekspor deklarasi parameter apa pun: deklarasi adalah data kurasi dengan sumber, bukan bagian gerbang.
 export { evaluatePersonalization } from './engine/personalizationGate'
 export { ALVEOLAR_GAS_DEFAULTS, ALVEOLAR_GAS_CONTROLS, ALVEOLAR_GAS_MODELS, ALVEOLAR_GAS_BOUNDARY, evaluateAlveolarGasBudget, alveolarFrequencySweep } from './engine/alveolarGasBudget'
+export { deadSpaceFraction, shuntFraction } from './engine/gasExchangeIdentities'
+export type { IdentityResult } from './engine/gasExchangeIdentities'
 export type { AlveolarGasScenario, AlveolarGasBudget } from './engine/alveolarGasBudget'
 export type {
   ParameterDeclaration, PersonalizationObservation, PersonalizationProposal, PersonalizationBlocker,
