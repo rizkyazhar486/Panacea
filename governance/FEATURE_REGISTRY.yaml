@@ -239,36 +239,3 @@ features:
     known_gaps: [limited_domain_coupling_coverage, no_curated_parameter_declarations_for_personalization, no_qualified_clinical_validation, limited_projection_wiring]
     next_actions: [route_additional_domain_couplings_through_runtime, connect_model_derived_state_to_existing_projections_without_writeback, validate_models_against_external_reference_data]
     last_audited_commit: adfaf2d5040a4e96bb305173060df14bddb75583
-
-
-  - feature_id: research.omnicausalis
-    name: Omnicausalis reference mechanism and toy dynamics workbench
-    domain: Scientific Research
-    capability: Evidence inspection and isolated illustrative scenario comparison
-    workflow: Discovery -> mechanism conditions -> toy comparison -> explicit gaps
-    user_types: [researcher, learner]
-    primary_problem: Scientific diagrams and illustrative equations can be mistaken for calibrated patient predictions
-    use_case: Inspect source-specific mechanisms separately from reproducible dimensionless toy dynamics
-    inputs: [curated_reference_graph, explicit_toy_parameters]
-    outputs: [reference_relationships, illustrative_indices, imposed_sensitivity_range, reproducible_run_artifact]
-    reads_from: [curated_bibliographic_metadata]
-    writes_to: []
-    dependencies: [discovery_workbench, react_router]
-    dependents: []
-    patient_state_fields: []
-    knowledge_graph_entities: [ischemia_reperfusion_reference_mechanisms]
-    shared_services: [discovery_workbench_identity_contract]
-    backend_surfaces: []
-    frontend_surfaces: [src/domains/scientific-research/ui/OmnicausalisWorkbench.tsx]
-    persistence_surfaces: []
-    external_integrations: []
-    maturity_level: CONNECTED
-    clinical_validation: not_started
-    technical_risk: medium
-    clinical_risk: medium
-    provenance_required: true
-    tests: [scripts/qa/omnicausalis.test.mjs, qa/research/omnicausalis.mjs]
-    observability: [model_version, explicit_run_parameters, no_patient_writeback]
-    known_gaps: [no_biological_calibration, no_quantum_solver, no_patient_observation_mapping, no_external_validation]
-    next_actions: [independent_scientific_review, verify_actual_route_and_exact_head_ci]
-    last_audited_commit: null

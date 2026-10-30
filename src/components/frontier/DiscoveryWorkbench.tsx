@@ -1,5 +1,4 @@
 import { Suspense, lazy, useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
 import {
   DISCOVERY_CHALLENGES,
   challengeById,
@@ -86,8 +85,6 @@ export function DiscoveryWorkbench() {
         </div>
         <span className="rounded-full border border-amber-300 bg-amber-50 px-3 py-1 text-[10px] font-black text-amber-800 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-200">Research only · fail closed</span>
       </div>
-
-      <Link to="/frontier-health?workspace=omnicausalis" className="inline-flex min-h-11 items-center rounded-xl border border-brand/40 px-4 py-2 text-sm font-bold text-ink hover:bg-brand/10 dark:text-white">Open Omnicausalis · mechanism and simulation workspace</Link>
 
       <div className="grid gap-2 sm:grid-cols-3" role="tablist" aria-label="Research program mode">
         {(Object.keys(MODE_COPY) as DiscoveryMode[]).map((item) => (
