@@ -1,0 +1,321 @@
+{
+  "timestampUtc": "2026-10-30T05:50:03.878Z",
+  "totalOpenPrs": 35,
+  "rows": [
+    {
+      "number": 2918,
+      "branch": "feat/d7-05-mtp-rerig-male",
+      "author": "rizkyazhar486",
+      "ciState": "GREEN",
+      "conflict": false,
+      "claimHits": 0,
+      "recommendation": "ready"
+    },
+    {
+      "number": 2916,
+      "branch": "argon/wp5-20261030",
+      "author": "rizkyazhar486",
+      "ciState": "GREEN",
+      "conflict": false,
+      "claimHits": 0,
+      "recommendation": "ready"
+    },
+    {
+      "number": 2915,
+      "branch": "argon/wp3-20261030",
+      "author": "rizkyazhar486",
+      "ciState": "GREEN",
+      "conflict": false,
+      "claimHits": 0,
+      "recommendation": "ready"
+    },
+    {
+      "number": 2914,
+      "branch": "argon/wp2-20261030",
+      "author": "rizkyazhar486",
+      "ciState": "GREEN",
+      "conflict": false,
+      "claimHits": 0,
+      "recommendation": "ready"
+    },
+    {
+      "number": 2913,
+      "branch": "argon/wp1-20261030",
+      "author": "rizkyazhar486",
+      "ciState": "GREEN",
+      "conflict": false,
+      "claimHits": 0,
+      "recommendation": "ready"
+    },
+    {
+      "number": 2909,
+      "branch": "fix/bodyexposure-canonical-guards-20261029",
+      "author": "rizkyazhar486",
+      "ciState": "GREEN",
+      "conflict": false,
+      "claimHits": 0,
+      "recommendation": "ready"
+    },
+    {
+      "number": 2901,
+      "branch": "docs/bodyexposure-github-first-graphics-memory-20261029",
+      "author": "rizkyazhar486",
+      "ciState": "GREEN",
+      "conflict": false,
+      "claimHits": 0,
+      "recommendation": "ready"
+    },
+    {
+      "number": 2894,
+      "branch": "feat/directive-035-outbreak-surveillance",
+      "author": "rizkyazhar486",
+      "ciState": "GREEN",
+      "conflict": false,
+      "claimHits": 0,
+      "recommendation": "ready"
+    },
+    {
+      "number": 2892,
+      "branch": "feat/directive-033-canonical-insurance",
+      "author": "rizkyazhar486",
+      "ciState": "GREEN",
+      "conflict": false,
+      "claimHits": 0,
+      "recommendation": "ready"
+    },
+    {
+      "number": 2891,
+      "branch": "feat/directive-032-hospital-operations",
+      "author": "rizkyazhar486",
+      "ciState": "GREEN",
+      "conflict": false,
+      "claimHits": 0,
+      "recommendation": "ready"
+    },
+    {
+      "number": 2889,
+      "branch": "feat/directive-030-digital-twin-trajectory",
+      "author": "rizkyazhar486",
+      "ciState": "GREEN",
+      "conflict": false,
+      "claimHits": 0,
+      "recommendation": "ready"
+    },
+    {
+      "number": 2888,
+      "branch": "feat/directive-029-clinical-decision-support",
+      "author": "rizkyazhar486",
+      "ciState": "GREEN",
+      "conflict": false,
+      "claimHits": 0,
+      "recommendation": "ready"
+    },
+    {
+      "number": 2886,
+      "branch": "feat/directive-026-paddleocr-pilot",
+      "author": "rizkyazhar486",
+      "ciState": "GREEN",
+      "conflict": false,
+      "claimHits": 0,
+      "recommendation": "ready"
+    },
+    {
+      "number": 2884,
+      "branch": "fix/omnicausalis-ci-and-claim-boundary-20261029",
+      "author": "rizkyazhar486",
+      "ciState": "GREEN",
+      "conflict": false,
+      "claimHits": 0,
+      "recommendation": "ready"
+    },
+    {
+      "number": 2882,
+      "branch": "fix/node26-typescript-uji-runner-20261028",
+      "author": "rizkyazhar486",
+      "ciState": "GREEN",
+      "conflict": false,
+      "claimHits": 0,
+      "recommendation": "ready"
+    },
+    {
+      "number": 2881,
+      "branch": "plan/hospital-one-os-acceptance-20261028",
+      "author": "rizkyazhar486",
+      "ciState": "GREEN",
+      "conflict": false,
+      "claimHits": 0,
+      "recommendation": "ready"
+    },
+    {
+      "number": 2880,
+      "branch": "fix/visit-os-care-episode-return-route-20261028",
+      "author": "rizkyazhar486",
+      "ciState": "GREEN",
+      "conflict": false,
+      "claimHits": 0,
+      "recommendation": "ready"
+    },
+    {
+      "number": 2877,
+      "branch": "ux/visit-os-next-action-accessibility-20261028",
+      "author": "rizkyazhar486",
+      "ciState": "GREEN",
+      "conflict": false,
+      "claimHits": 0,
+      "recommendation": "ready"
+    },
+    {
+      "number": 2874,
+      "branch": "feat/clean-clinical-one-os-journey",
+      "author": "rizkyazhar486",
+      "ciState": "GREEN",
+      "conflict": false,
+      "claimHits": 0,
+      "recommendation": "ready"
+    },
+    {
+      "number": 2873,
+      "branch": "feat/directive-001-single-golden-journey",
+      "author": "rizkyazhar486",
+      "ciState": "GREEN",
+      "conflict": false,
+      "claimHits": 0,
+      "recommendation": "ready"
+    },
+    {
+      "number": 2872,
+      "branch": "feat/t-clin-humanitarian-5-pillars-batch",
+      "author": "rizkyazhar486",
+      "ciState": "GREEN",
+      "conflict": false,
+      "claimHits": 0,
+      "recommendation": "ready"
+    },
+    {
+      "number": 2871,
+      "branch": "feat/t-clin-bci-neural-engine",
+      "author": "rizkyazhar486",
+      "ciState": "GREEN",
+      "conflict": false,
+      "claimHits": 0,
+      "recommendation": "ready"
+    },
+    {
+      "number": 2870,
+      "branch": "feat/t-clin-spatiotemporal-aging-engine",
+      "author": "rizkyazhar486",
+      "ciState": "GREEN",
+      "conflict": false,
+      "claimHits": 0,
+      "recommendation": "ready"
+    },
+    {
+      "number": 2869,
+      "branch": "feat/t-clin-epigenetic-omics-engine",
+      "author": "rizkyazhar486",
+      "ciState": "GREEN",
+      "conflict": false,
+      "claimHits": 0,
+      "recommendation": "ready"
+    },
+    {
+      "number": 2868,
+      "branch": "feat/t-clin-222-1000-infinity-batch",
+      "author": "rizkyazhar486",
+      "ciState": "GREEN",
+      "conflict": false,
+      "claimHits": 0,
+      "recommendation": "ready"
+    },
+    {
+      "number": 2867,
+      "branch": "feat/t-clin-191-221-mass-batch",
+      "author": "rizkyazhar486",
+      "ciState": "GREEN",
+      "conflict": false,
+      "claimHits": 0,
+      "recommendation": "ready"
+    },
+    {
+      "number": 2866,
+      "branch": "feat/t-clin-181-190-batch",
+      "author": "rizkyazhar486",
+      "ciState": "GREEN",
+      "conflict": false,
+      "claimHits": 0,
+      "recommendation": "ready"
+    },
+    {
+      "number": 2865,
+      "branch": "feat/t-clin-171-180-batch",
+      "author": "rizkyazhar486",
+      "ciState": "GREEN",
+      "conflict": false,
+      "claimHits": 0,
+      "recommendation": "ready"
+    },
+    {
+      "number": 2864,
+      "branch": "feat/t-clin-161-170-batch",
+      "author": "rizkyazhar486",
+      "ciState": "GREEN",
+      "conflict": false,
+      "claimHits": 0,
+      "recommendation": "ready"
+    },
+    {
+      "number": 2863,
+      "branch": "feat/t-clin-151-160-batch",
+      "author": "rizkyazhar486",
+      "ciState": "GREEN",
+      "conflict": false,
+      "claimHits": 0,
+      "recommendation": "ready"
+    },
+    {
+      "number": 2862,
+      "branch": "feat/t-clin-141-150-batch",
+      "author": "rizkyazhar486",
+      "ciState": "GREEN",
+      "conflict": false,
+      "claimHits": 0,
+      "recommendation": "ready"
+    },
+    {
+      "number": 2861,
+      "branch": "feat/t-clin-131-140-batch",
+      "author": "rizkyazhar486",
+      "ciState": "GREEN",
+      "conflict": false,
+      "claimHits": 0,
+      "recommendation": "ready"
+    },
+    {
+      "number": 2860,
+      "branch": "feat/t-clin-121-130-batch",
+      "author": "rizkyazhar486",
+      "ciState": "GREEN",
+      "conflict": false,
+      "claimHits": 0,
+      "recommendation": "ready"
+    },
+    {
+      "number": 2858,
+      "branch": "governance/t-clin-six-pillar-impact-gate-20261027",
+      "author": "rizkyazhar486",
+      "ciState": "GREEN",
+      "conflict": false,
+      "claimHits": 0,
+      "recommendation": "ready"
+    },
+    {
+      "number": 2835,
+      "branch": "docs/tclin-simulation-agent-guidance-main-sync",
+      "author": "rizkyazhar486",
+      "ciState": "GREEN",
+      "conflict": false,
+      "claimHits": 0,
+      "recommendation": "ready"
+    }
+  ]
+}
