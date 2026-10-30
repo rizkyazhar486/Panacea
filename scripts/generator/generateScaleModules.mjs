@@ -15,7 +15,10 @@ console.log('🚀 Generating scalable clinical modules...');
 let createdCount = 0;
 for (let i = 1; i <= 35; i++) {
   for (const specialty of specialties) {
-    const modName = `${specialty}Module${i}`;
+    // Hyphen is not legal in a TS identifier: derive the identifier separately from the file name.
+    const identBase = specialty.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
+    const modName = `${identBase}Module${i}`;
+    const fileName = `${specialty}Module${i}`;
     const dir = path.join('src', 'domains', 'generated-scale', specialty);
     fs.mkdirSync(dir, { recursive: true });
 
@@ -48,7 +51,7 @@ export function evaluate${modName}(input: ${modName}Input) {
 }
 `;
 
-    fs.writeFileSync(path.join(dir, `${modName}.ts`), codeContent);
+    fs.writeFileSync(path.join(dir, `${fileName}.ts`), codeContent);
     createdCount++;
   }
 }
