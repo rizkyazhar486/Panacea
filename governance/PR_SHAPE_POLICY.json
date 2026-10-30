@@ -1,0 +1,15 @@
+{
+  "maxChangedLines": 1500,
+  "maxChangedFiles": 60,
+  "taskBoardIdPattern": "\\b(?:WP-\\d+|ENG-[A-Z0-9-]+|TASK-\\d+|D-100)\\b",
+  "generatedPaths": [
+    {
+      "pathPrefix": "governance/RELAND_TRIAGE.json",
+      "generatorScript": "scripts/qa/reland-triage.mjs"
+    },
+    {
+      "pathPrefix": "governance/OPEN_PR_TRIAGE.json",
+      "generatorScript": "scripts/qa/open-pr-triage.mjs"
+    }
+  ]
+}
