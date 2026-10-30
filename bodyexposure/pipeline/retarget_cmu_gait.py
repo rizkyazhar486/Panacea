@@ -230,6 +230,44 @@ for name, subj, trial in CLIPS:
                 setb(f"UPPER_ARM.{side}", sg(f"UPPER_ARM.{side}", "flexion") * vals["shoulder_flex"])
                 setb(f"FOREARM.{side}", sg(f"FOREARM.{side}", "flexion") * vals["elbow_flex"])
         bobs.append(float(np.interp(t, np.arange(len(bob)), bob)) * unit_m * (leg_rig / leg_src))
+    # T-D7-05 kendala kontak jari (keputusan owner 2026-10-30): semua sendi tetap dari CMU; HANYA sudut MTP pada frame tumpu diselesaikan
+    # agar segmen jari mendatar (jari rebah di lantai). Data jari CMU sendiri menunjuk ke bawah saat kontak, jadi tanpa ini kepala MT
+    # tidak pernah menapak. Kelas kebenaran: derived (contact-constrained); tiap koreksi dicatat per frame.
+    toe_fix = {}
+    if all(f"TOE.{sd}" in P.keys() for sd in ("L", "R")):
+        sc0 = bpy.context.scene; sc0.frame_start, sc0.frame_end = 0, len(idx) - 1
+        side_meshes = {sd: [o for o in bpy.data.objects if o.type == 'MESH' and o.parent_bone in (f"FOOT.{sd}", f"TOE.{sd}")] for sd in ("L", "R")}
+        def side_low(sd):
+            dg = bpy.context.evaluated_depsgraph_get(); low = math.inf
+            for o in side_meshes[sd]:
+                vs = o.evaluated_get(dg).data.vertices; M = o.matrix_world
+                for i in range(0, len(vs), 7): low = min(low, (M @ vs[i].co).z)
+            return low
+        lows = {sd: [] for sd in ("L", "R")}
+        for fr in range(len(idx)):
+            sc0.frame_set(fr)
+            for sd in ("L", "R"): lows[sd].append(side_low(sd))
+        for sd in ("L", "R"):
+            if name == "WALK":  # pelvis kelak diturunkan per frame sampai kaki terendah menapak: tumpu = dalam 15 mm dari kaki terendah frame itu
+                stance = [fr for fr in range(len(idx)) if lows[sd][fr] - min(lows["L"][fr], lows["R"][fr]) < 0.015]
+            else:  # lari: naik-turun pelvis dari mocap; tumpu = tinggi kaki + bob dalam 15 mm dari minimum sisi itu
+                zz = [lows[sd][fr] + bobs[fr] for fr in range(len(idx))]; m = min(zz)
+                stance = [fr for fr, z in enumerate(zz) if z - m < 0.015]
+            pb = P[f"TOE.{sd}"]; fixes = []
+            for fr in stance:
+                sc0.frame_set(fr); before = math.degrees(pb.rotation_euler.x)
+                for _ in range(3):  # pitch segmen jari dunia -> 0 dengan memutar X lokal TOE (beberapa iterasi kecil, arah ditentukan numerik)
+                    bpy.context.view_layer.update()
+                    d = (arm.matrix_world @ pb.tail) - (arm.matrix_world @ pb.head)
+                    pitch = math.degrees(math.atan2(d.z, math.hypot(d.x, d.y)))
+                    if abs(pitch) < 0.2: break
+                    x0 = pb.rotation_euler.x; pb.rotation_euler.x = x0 + math.radians(1.0); bpy.context.view_layer.update()
+                    d1 = (arm.matrix_world @ pb.tail) - (arm.matrix_world @ pb.head)
+                    dp = math.degrees(math.atan2(d1.z, math.hypot(d1.x, d1.y))) - pitch  # perubahan pitch per +1 derajat
+                    pb.rotation_euler.x = x0 - math.radians(pitch / dp) if abs(dp) > 1e-6 else x0
+                pb.keyframe_insert("rotation_euler", frame=fr)
+                fixes.append({"frame": fr, "mtp_local_x_before_deg": round(before, 1), "mtp_local_x_after_deg": round(math.degrees(pb.rotation_euler.x), 1)})
+            toe_fix[sd] = fixes
     # kontak lantai: tinggi kaki terendah per frame pada pelvis dasar
     sc = bpy.context.scene; sc.frame_start, sc.frame_end = 0, len(idx) - 1; sc.render.fps = FPS_OUT
     feet = [o for o in bpy.data.objects if o.type == 'MESH' and o.parent_bone and o.parent_bone.startswith(("FOOT.", "TOE."))]
@@ -270,6 +308,7 @@ for name, subj, trial in CLIPS:
         "lowest_foot_point_m": {"min": round(min(lowest), 4), "max": round(max(lowest), 4)},
         # T-D7-05: sudut MTP dari mocap (positif = ekstensi/dorsofleksi jari), tanpa jepit; null bila rig tidak punya TOE
         "toe_mtp_extension_deg": ({sd: {"min": round(min(v), 1), "max": round(max(v), 1)} for sd, v in mtp_seen.items()} or None),
+        "toe_contact_constraint": ({"truth_class": "derived (contact-constrained): MTP angle solved on stance frames so the toe segment lies flat; all other joints are CMU", "per_side": toe_fix} if toe_fix else None),
         "max_bone_penetration_mm": max(c["max_penetration_mm"] for c in contact), "bone_contact": contact}
     # rentang frame manual (bukan dari handle Bezier) & interpolasi linear: sampel 24 fps rapat, tanpa overshoot
     act.use_frame_range = True; act.frame_start, act.frame_end = 0, len(idx) - 1
