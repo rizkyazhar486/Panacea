@@ -26,6 +26,8 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
+      - name: Unsupported claim guard (WP-1)
+        run: node scripts/qa/claim-guard.mjs
       - name: Giant-drop PR shape guard (WP-2)
         if: github.event_name == 'pull_request'
         env:
