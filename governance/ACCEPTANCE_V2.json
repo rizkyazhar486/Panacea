@@ -606,9 +606,9 @@
         "ENG-D7-01",
         "ENG-D7-03"
       ],
-      "status": "PASS",
-      "statusSha": "48cab5293c59ce71c78b6fa5f7e8c4f409660cd7",
-      "statusNote": "Resolved 2026-10-25 under Option A (Owner decision D-D7-RUN, docs/governance/ENG_D7_02_GAIT_DECISION_ANALYSIS.md). CMU mocap runner (09_02) is forefoot-strike running with calcaneus min height >15 mm (32.3 mm male, 16.9 mm female); heel strike is genuinely absent and recorded as NOT_APPLICABLE without artificial heel fabrication. Forefoot contact assessed against 15 mm window. All four fixtures measurable. Verified on main 48cab5293c59ce71c78b6fa5f7e8c4f409660cd7, Body 3D Render run 40146154116, Validate changes run 40148244302 (job 121034117500) and PR #2769 run 40149569579. Not clinically validated."
+      "status": "FAIL",
+      "statusSha": "37d12268a9597610eb79e86834860eaf49f15cc7",
+      "statusNote": "Reopened 2026-10-30. The previous PASS (2026-10-25, PR #2769, Option A forefoot-only RUN) rests on DOCS/governance/ENG_D7_02_GAIT_DECISION_ANALYSIS.md section 4, which records \"Product Owner Formal Decision (2026-10-25): Option A\". Asked directly on 2026-10-30, the owner chose Option B (re-rig the foot with an MTP joint), the same answer given on 2026-10-24; the latest owner statement governs. Measured facts stay valid (bodyexposure/qa_reports/gait_contact_probe.json): RUN has no heel strike (calcaneus min 32.3/34.8 mm male, 16.9/20.2 mm female) and male RUN lands on the distal toe phalanges because the rigid foot has no MTP joint. Next: T-D7-05 MTP re-rig, regenerate gait reports, re-earn PASS with exact-SHA evidence."
     },
     {
       "id": "ENG-D7-03",

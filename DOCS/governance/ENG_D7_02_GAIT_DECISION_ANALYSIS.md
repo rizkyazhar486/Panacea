@@ -90,4 +90,6 @@ The Product Owner explicitly selected **Option A — Forefoot/Toe-Based RUN Asse
      `"capability": "WALK and RUN for male and female rigs all measurable (>= 1 verified stance phase per foot, >= 2 stance phases total across both feet; forefoot-strike RUN assessed on forefoot landmark with heel documented as NOT_APPLICABLE)."`
    - This eliminates ambiguity, prevents any silent contract downgrade, and aligns the acceptance contract with the exact physical reality of 1-stride looping mocap clips.
 
+## 5. Owner correction (2026-10-30)
 
+Asked directly on 2026-10-30, the owner selected **Option B — Articulated MTP (toe joint) re-rigging**, the same answer given on 2026-10-24. This supersedes the 2026-10-25 entry in section 4. `ENG-D7-02` is reopened (FAIL) until the MTP re-rig (TASK_BOARD T-D7-05) produces new gait evidence. The measured facts in sections 1–3 are unchanged.
