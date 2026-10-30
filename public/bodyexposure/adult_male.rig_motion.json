@@ -128,7 +128,7 @@
     "max_bone_penetration_mm": 1.32,
     "lowest_foot_point_m": {
      "min": 0.0,
-     "max": 0.0952
+     "max": 0.0795
     },
     "loop_drift_corrected_max_deg": 12.39
    }

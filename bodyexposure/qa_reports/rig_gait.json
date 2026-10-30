@@ -67,6 +67,180 @@
      "max": 20.2
     }
    },
+   "toe_contact_constraint": {
+    "truth_class": "derived (contact-constrained): MTP angle solved on stance frames so the toe segment lies flat; all other joints are CMU",
+    "per_side": {
+     "L": [
+      {
+       "frame": 0,
+       "mtp_local_x_before_deg": -8.0,
+       "mtp_local_x_after_deg": -8.4
+      },
+      {
+       "frame": 1,
+       "mtp_local_x_before_deg": -7.5,
+       "mtp_local_x_after_deg": -9.8
+      },
+      {
+       "frame": 2,
+       "mtp_local_x_before_deg": -6.5,
+       "mtp_local_x_after_deg": -10.2
+      },
+      {
+       "frame": 3,
+       "mtp_local_x_before_deg": -6.1,
+       "mtp_local_x_after_deg": -11.3
+      },
+      {
+       "frame": 4,
+       "mtp_local_x_before_deg": -5.9,
+       "mtp_local_x_after_deg": -11.9
+      },
+      {
+       "frame": 5,
+       "mtp_local_x_before_deg": -8.4,
+       "mtp_local_x_after_deg": -14.4
+      },
+      {
+       "frame": 6,
+       "mtp_local_x_before_deg": -12.9,
+       "mtp_local_x_after_deg": -18.6
+      },
+      {
+       "frame": 7,
+       "mtp_local_x_before_deg": -11.3,
+       "mtp_local_x_after_deg": -25.4
+      },
+      {
+       "frame": 9,
+       "mtp_local_x_before_deg": -23.5,
+       "mtp_local_x_after_deg": -54.8
+      },
+      {
+       "frame": 22,
+       "mtp_local_x_before_deg": -10.6,
+       "mtp_local_x_after_deg": -7.4
+      },
+      {
+       "frame": 23,
+       "mtp_local_x_before_deg": -9.2,
+       "mtp_local_x_after_deg": -8.1
+      },
+      {
+       "frame": 24,
+       "mtp_local_x_before_deg": -11.3,
+       "mtp_local_x_after_deg": -8.1
+      },
+      {
+       "frame": 25,
+       "mtp_local_x_before_deg": -7.4,
+       "mtp_local_x_after_deg": -8.2
+      },
+      {
+       "frame": 26,
+       "mtp_local_x_before_deg": -8.0,
+       "mtp_local_x_after_deg": -8.4
+      }
+     ],
+     "R": [
+      {
+       "frame": 4,
+       "mtp_local_x_before_deg": 7.0,
+       "mtp_local_x_after_deg": -2.2
+      },
+      {
+       "frame": 5,
+       "mtp_local_x_before_deg": 15.1,
+       "mtp_local_x_after_deg": -16.3
+      },
+      {
+       "frame": 6,
+       "mtp_local_x_before_deg": 20.2,
+       "mtp_local_x_after_deg": -19.5
+      },
+      {
+       "frame": 7,
+       "mtp_local_x_before_deg": 18.0,
+       "mtp_local_x_after_deg": -11.3
+      },
+      {
+       "frame": 8,
+       "mtp_local_x_before_deg": 16.6,
+       "mtp_local_x_after_deg": 3.7
+      },
+      {
+       "frame": 9,
+       "mtp_local_x_before_deg": 9.4,
+       "mtp_local_x_after_deg": 10.7
+      },
+      {
+       "frame": 10,
+       "mtp_local_x_before_deg": 5.5,
+       "mtp_local_x_after_deg": 12.3
+      },
+      {
+       "frame": 11,
+       "mtp_local_x_before_deg": 3.6,
+       "mtp_local_x_after_deg": 12.9
+      },
+      {
+       "frame": 12,
+       "mtp_local_x_before_deg": 1.6,
+       "mtp_local_x_after_deg": 13.8
+      },
+      {
+       "frame": 13,
+       "mtp_local_x_before_deg": 1.3,
+       "mtp_local_x_after_deg": 15.3
+      },
+      {
+       "frame": 14,
+       "mtp_local_x_before_deg": 4.6,
+       "mtp_local_x_after_deg": 16.1
+      },
+      {
+       "frame": 15,
+       "mtp_local_x_before_deg": 0.8,
+       "mtp_local_x_after_deg": 18.3
+      },
+      {
+       "frame": 16,
+       "mtp_local_x_before_deg": 1.9,
+       "mtp_local_x_after_deg": 20.9
+      },
+      {
+       "frame": 17,
+       "mtp_local_x_before_deg": 3.6,
+       "mtp_local_x_after_deg": 23.6
+      },
+      {
+       "frame": 18,
+       "mtp_local_x_before_deg": 0.4,
+       "mtp_local_x_after_deg": 28.0
+      },
+      {
+       "frame": 19,
+       "mtp_local_x_before_deg": 1.5,
+       "mtp_local_x_after_deg": 34.4
+      },
+      {
+       "frame": 20,
+       "mtp_local_x_before_deg": 2.5,
+       "mtp_local_x_after_deg": 43.3
+      },
+      {
+       "frame": 21,
+       "mtp_local_x_before_deg": 4.4,
+       "mtp_local_x_after_deg": 52.9
+      },
+      {
+       "frame": 22,
+       "mtp_local_x_before_deg": 5.4,
+       "mtp_local_x_after_deg": 74.1
+      }
+     ]
+    }
+   },
    "max_bone_penetration_mm": 0.74,
    "bone_contact": [
     {
@@ -356,7 +530,7 @@
    },
    "lowest_foot_point_m": {
     "min": 0.0,
-    "max": 0.0952
+    "max": 0.0795
    },
    "toe_mtp_extension_deg": {
     "L": {
@@ -366,6 +540,40 @@
     "R": {
      "min": -17.7,
      "max": 22.2
+    }
+   },
+   "toe_contact_constraint": {
+    "truth_class": "derived (contact-constrained): MTP angle solved on stance frames so the toe segment lies flat; all other joints are CMU",
+    "per_side": {
+     "L": [
+      {
+       "frame": 0,
+       "mtp_local_x_before_deg": -18.2,
+       "mtp_local_x_after_deg": -24.6
+      },
+      {
+       "frame": 17,
+       "mtp_local_x_before_deg": -9.6,
+       "mtp_local_x_after_deg": -16.1
+      },
+      {
+       "frame": 18,
+       "mtp_local_x_before_deg": -18.2,
+       "mtp_local_x_after_deg": -24.6
+      }
+     ],
+     "R": [
+      {
+       "frame": 7,
+       "mtp_local_x_before_deg": -7.7,
+       "mtp_local_x_after_deg": 15.7
+      },
+      {
+       "frame": 8,
+       "mtp_local_x_before_deg": -7.2,
+       "mtp_local_x_after_deg": 18.8
+      }
+     ]
     }
    },
    "max_bone_penetration_mm": 1.32,
