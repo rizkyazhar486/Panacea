@@ -225,6 +225,8 @@ for name, subj, trial in CLIPS:
             setb(f"FOOT.{side}", sg(f"FOOT.{side}", "extension") * vals["ankle_dorsi"])  # FOOT: ekstensi = dorsofleksi
             if f"TOE.{side}" in P.keys():  # T-D7-05: sudut MTP langsung dari mocap (tanpa batas ROM karang); min/max dicatat di laporan
                 mtp = sample(f"mtp_ext.{side}", t); mtp_seen.setdefault(side, []).append(mtp)
+                if name == "WALK":  # WALK: MTP ditahan pada pose istirahat (geometri = kaki kaku lama); kanal jari CMU menunjuk ~30° ke bawah saat
+                    mtp = 0.0       # kontak dan memakainya membuat jari menopang tubuh sehingga tumit tergelincir (diukur: RMS 7,8 -> 21,2 mm)
                 setb(f"TOE.{side}", sg(f"TOE.{side}", "extension") * mtp)
             if HAS_ARMS:
                 setb(f"UPPER_ARM.{side}", sg(f"UPPER_ARM.{side}", "flexion") * vals["shoulder_flex"])
@@ -234,7 +236,7 @@ for name, subj, trial in CLIPS:
     # agar segmen jari mendatar (jari rebah di lantai). Data jari CMU sendiri menunjuk ke bawah saat kontak, jadi tanpa ini kepala MT
     # tidak pernah menapak. Kelas kebenaran: derived (contact-constrained); tiap koreksi dicatat per frame.
     toe_fix = {}
-    if all(f"TOE.{sd}" in P.keys() for sd in ("L", "R")):
+    if name != "WALK" and all(f"TOE.{sd}" in P.keys() for sd in ("L", "R")):
         sc0 = bpy.context.scene; sc0.frame_start, sc0.frame_end = 0, len(idx) - 1
         side_meshes = {sd: [o for o in bpy.data.objects if o.type == 'MESH' and o.parent_bone in (f"FOOT.{sd}", f"TOE.{sd}")] for sd in ("L", "R")}
         def side_low(sd):
@@ -308,6 +310,7 @@ for name, subj, trial in CLIPS:
         "lowest_foot_point_m": {"min": round(min(lowest), 4), "max": round(max(lowest), 4)},
         # T-D7-05: sudut MTP dari mocap (positif = ekstensi/dorsofleksi jari), tanpa jepit; null bila rig tidak punya TOE
         "toe_mtp_extension_deg": ({sd: {"min": round(min(v), 1), "max": round(max(v), 1)} for sd, v in mtp_seen.items()} or None),
+        "toe_mtp_applied": ("held at rest pose (CMU toe channel points ~30 deg down at contact in WALK; applying it degraded heel contact)" if name == "WALK" else "CMU toe angle, contact-constrained on stance frames"),
         "toe_contact_constraint": ({"truth_class": "derived (contact-constrained): MTP angle solved on stance frames so the toe segment lies flat; all other joints are CMU", "per_side": toe_fix} if toe_fix else None),
         "max_bone_penetration_mm": max(c["max_penetration_mm"] for c in contact), "bone_contact": contact}
     # rentang frame manual (bukan dari handle Bezier) & interpolasi linear: sampel 24 fps rapat, tanpa overshoot
