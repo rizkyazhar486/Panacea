@@ -48,8 +48,12 @@ export function evaluatePrShape({
   const hasTaskBoardId = taskIdRegex.test(prBody || '')
   const unmarkedDirectiveCommits = directiveCommits.length > 0 && !hasTaskBoardId ? directiveCommits.length : 0
 
+  // PR yang murni menghapus (mis. revert ke tree hijau) tidak bisa menyelundupkan kode baru,
+  // jadi batas ukuran tidak berlaku; aturan komit directive tetap berlaku.
+  const pureDeletion = numstatEntries.length > 0 && numstatEntries.every((e) => e && (e.added ?? 0) === 0)
+
   const violations = []
-  if (nonGeneratedLines > linesLimit) {
+  if (!pureDeletion && nonGeneratedLines > linesLimit) {
     violations.push({
       rule: 'non-generated-lines',
       value: nonGeneratedLines,
@@ -57,7 +61,7 @@ export function evaluatePrShape({
       message: `pr-shape-guard: non-generated-lines ${nonGeneratedLines}/${linesLimit} (FAIL)`
     })
   }
-  if (nonGeneratedFiles > filesLimit) {
+  if (!pureDeletion && nonGeneratedFiles > filesLimit) {
     violations.push({
       rule: 'changed-files',
       value: nonGeneratedFiles,
@@ -80,6 +84,7 @@ export function evaluatePrShape({
     nonGeneratedFiles,
     filesLimit,
     unmarkedDirectiveCommits,
+    pureDeletion,
     violations
   }
 }
@@ -87,7 +92,8 @@ export function evaluatePrShape({
 export function collectGitRangeData(rangeSpec, repoRoot = '.') {
   const numstatOut = execFileSync('git', ['diff', '--numstat', rangeSpec], {
     cwd: repoRoot,
-    encoding: 'utf8'
+    encoding: 'utf8',
+    stdio: ['ignore', 'pipe', 'pipe']
   })
   const numstatEntries = []
   for (const line of numstatOut.split('\n')) {
@@ -102,7 +108,8 @@ export function collectGitRangeData(rangeSpec, repoRoot = '.') {
 
   const logOut = execFileSync('git', ['log', '--format=%s', rangeSpec], {
     cwd: repoRoot,
-    encoding: 'utf8'
+    encoding: 'utf8',
+    stdio: ['ignore', 'pipe', 'pipe']
   })
   const commitMessages = logOut
     .split('\n')
@@ -116,7 +123,15 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const rangeArg = process.argv[2] || process.env.PR_SHAPE_RANGE || 'origin/main...HEAD'
   const prBody = process.env.PR_BODY || ''
   const policy = loadShapePolicy()
-  const { numstatEntries, commitMessages } = collectGitRangeData(rangeArg)
+  let data
+  try {
+    data = collectGitRangeData(rangeArg)
+  } catch (err) {
+    // fail-closed: range tidak bisa dibaca berarti bentuk PR tidak terbukti
+    console.error(`pr-shape-guard: cannot read git range ${rangeArg} (FAIL): ${String(err.stderr || err.message).trim()}`)
+    process.exit(2)
+  }
+  const { numstatEntries, commitMessages } = data
   const report = evaluatePrShape({ numstatEntries, commitMessages, prBody, policy })
 
   console.log(`pr-shape-guard: non-generated-lines ${report.nonGeneratedLines}/${report.linesLimit}`)

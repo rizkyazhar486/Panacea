@@ -115,3 +115,32 @@ test('6. Directive-style commit message with a valid TASK_BOARD row id in PR bod
   })
   assert.equal(res.violations.length, 0)
 })
+
+test('7. Pure-deletion diff (revert to a green tree) is exempt from size limits', () => {
+  const res = evaluatePrShape({
+    numstatEntries: Array.from({ length: 80 }, (_, i) => ({ file: `src/old_${i}.ts`, added: 0, deleted: 900 })),
+    commitMessages: ['revert: restore main to the last fully green tree'],
+    prBody: 'Owner decision',
+    policy: basePolicy
+  })
+  assert.equal(res.pureDeletion, true)
+  assert.equal(res.violations.length, 0)
+})
+
+test('8. One added line removes the pure-deletion exemption (paired with test 7)', () => {
+  const entries = Array.from({ length: 80 }, (_, i) => ({ file: `src/old_${i}.ts`, added: 0, deleted: 900 }))
+  entries[0] = { file: 'src/old_0.ts', added: 1, deleted: 900 }
+  const res = evaluatePrShape({ numstatEntries: entries, commitMessages: ['revert: x'], prBody: '', policy: basePolicy })
+  assert.equal(res.pureDeletion, false)
+  assert.deepEqual(res.violations.map((v) => v.rule), ['non-generated-lines', 'changed-files'])
+})
+
+test('9. Pure deletion still fails on untracked directive commits', () => {
+  const res = evaluatePrShape({
+    numstatEntries: [{ file: 'src/a.ts', added: 0, deleted: 10 }],
+    commitMessages: ['chore: Directive 070 cleanup'],
+    prBody: 'no id',
+    policy: basePolicy
+  })
+  assert.deepEqual(res.violations.map((v) => v.rule), ['untracked-directive-commits'])
+})
