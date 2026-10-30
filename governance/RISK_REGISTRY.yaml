@@ -14,13 +14,16 @@ risks:
       The Directive 067-R asset inspector accepted unmatched canonical IDs by
       selecting the first node, substituted unrelated geometry for missing mesh
       references, and invented source and licence declarations. A registered
-      file could also fall back to another discovered asset.
+      file could also fall back to another discovered asset. An unusable catalog,
+      malformed stored hash or caller-supplied hash could bypass manifest binding.
     mitigation: >-
       The candidate requires one exact stable identity, an explicit alias mapping,
       a valid mesh reference and declared source/licence metadata. Missing registered
-      files fail closed. Synthetic positive and negative controls plus two isolated
-      sabotages exercise the boundary. Exact-head CI, independent review and main
-      integration remain pending. Declared metadata is not proof of licence rights
+      files and unusable/ambiguous catalogs fail closed. A loaded catalog requires
+      an explicit registration; caller hashes cannot replace stored constraints.
+      Sixty-five focused synthetic tests pass on Node 20.19, 24.15 and 26.12;
+      six isolated source sabotages fail by name. Exact-head CI, final independent
+      review and main integration remain pending. Declared metadata is not proof of licence rights
       or anatomical accuracy. This Node inspector is not connected to the browser
       viewer; binary payload validation and rendering claims need separate evidence.
     evidence:

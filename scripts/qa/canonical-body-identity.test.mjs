@@ -1,17 +1,24 @@
 import assert from 'node:assert/strict'
 import { createHash } from 'node:crypto'
-import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from 'node:fs'
+import { mkdtempSync, mkdirSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import path from 'node:path'
 import test from 'node:test'
-import { renderCanonicalAnatomySlice } from '../../src/domains/body-exposure-canonical/canonicalBodyExposureEngine.ts'
+import { loadTypeScriptSubject } from './load-typescript-subject.mjs'
+
+const { renderCanonicalAnatomySlice } = await loadTypeScriptSubject(
+  'src/domains/body-exposure-canonical/canonicalBodyExposureEngine.ts'
+)
 
 const id = 'CANONICAL-MALE-HEART-ROOT'
 const source = 'Synthetic geometry fixture; no anatomical or clinical validation'
 const license = 'LicenseRef-Synthetic-Test-Only'
 
 // Segitiga sintetis berisi posisi dan indeks nyata; bukan geometri anatomi.
-function fixture(t, { matrix = true, nodes, entry = {}, extras = { sourceAttribution: source, license } } = {}) {
+function fixture(t, {
+  matrix = true, matrixContents, matrixEntries, nodes, entry = {},
+  extras = { sourceAttribution: source, license },
+} = {}) {
   const root = mkdtempSync(path.join(tmpdir(), 'panacea-body-identity-'))
   t.after(() => rmSync(root, { recursive: true, force: true }))
   const dir = path.join(root, 'public', 'bodyexposure')
@@ -38,11 +45,21 @@ function fixture(t, { matrix = true, nodes, entry = {}, extras = { sourceAttribu
   glb.writeUInt32LE(bin.length, 20 + jsonChunk.length); glb.writeUInt32LE(0x004e4942, 24 + jsonChunk.length)
   bin.copy(glb, 28 + jsonChunk.length)
   writeFileSync(path.join(dir, 'synthetic.glb'), glb)
-  if (matrix) writeFileSync(path.join(dir, 'body_matrix.json'), JSON.stringify({ structures: [{
+  const realSha256 = createHash('sha256').update(glb).digest('hex')
+  const registeredEntry = {
     structureId: id, panacea_structure_id: id, glbPath: 'bodyexposure/synthetic.glb',
-    sourceAttribution: source, license, sha256: createHash('sha256').update(glb).digest('hex'), ...entry,
-  }] }))
-  return structureId => renderCanonicalAnatomySlice({ structureId, requestedLodLevel: 'LOD_0_FULL', allowPersonalizationContract: false, repositoryRootPath: root })
+    sourceAttribution: source, license, sha256: realSha256, ...entry,
+  }
+  const matrixPath = path.join(dir, 'body_matrix.json')
+  if (matrix === 'directory') mkdirSync(matrixPath)
+  else if (matrix === 'dangling-symlink') symlinkSync(path.join(dir, 'missing-catalog.json'), matrixPath)
+  else if (matrix) writeFileSync(matrixPath, matrixContents ?? JSON.stringify({
+    structures: matrixEntries ? matrixEntries(registeredEntry) : [registeredEntry],
+  }))
+  const inspect = (structureId, request = {}) => renderCanonicalAnatomySlice({ structureId, requestedLodLevel: 'LOD_0_FULL', allowPersonalizationContract: false, repositoryRootPath: root, ...request })
+  inspect.root = root
+  inspect.realSha256 = realSha256
+  return inspect
 }
 
 function rejected(result, verdict) {
@@ -80,6 +97,54 @@ test('a missing registered file cannot borrow another discovered GLB', t => {
   rejected(fixture(t, { entry: { glbPath: 'bodyexposure/missing-source.glb' } })(id), 'UNVERIFIED_MISSING_SOURCE_ASSET')
 })
 
+test('a registered identity without a path or hash cannot borrow a discovered GLB', t => {
+  rejected(fixture(t, { entry: { glbPath: null, sha256: null } })(id), 'UNVERIFIED_MISSING_SOURCE_ASSET')
+})
+
+test('a registered hash can bind the discovered asset without a path', t => {
+  const result = fixture(t, { entry: { glbPath: null } })(id)
+  assert.equal(result.verificationVerdict, 'VERIFIED_EMPIRICAL_ASSET')
+  assert.equal(result.materialEvidence.manifestHashMatched, true)
+  assert.equal(result.geometryMeasured.vertexCount, 3)
+  assert.equal(result.structureMetadata.panaceaStructureId, id)
+})
+
+test('a caller hash cannot override a conflicting registered manifest hash', t => {
+  const inspect = fixture(t, { entry: { sha256: '0'.repeat(64) } })
+  rejected(inspect(id, { expectedManifestSha256: inspect.realSha256 }), 'REJECTED_HASH_MISMATCH')
+})
+
+test('matching caller and registered hashes retain their binding', t => {
+  const inspect = fixture(t)
+  const result = inspect(id, { expectedManifestSha256: inspect.realSha256 })
+  assert.equal(result.verificationVerdict, 'VERIFIED_EMPIRICAL_ASSET')
+  assert.equal(result.materialEvidence.manifestHashMatched, true)
+})
+
+test('uppercase registered hashes retain the same byte binding', t => {
+  const result = fixture(t, { matrixEntries: entry => [{ ...entry, sha256: entry.sha256.toUpperCase() }] })(id)
+  assert.equal(result.verificationVerdict, 'VERIFIED_EMPIRICAL_ASSET')
+  assert.equal(result.materialEvidence.manifestHashMatched, true)
+})
+
+for (const [label, sha256] of [
+  ['empty', ''], ['short', 'bad'], ['nonhex', 'g'.repeat(64)], ['number', 42],
+  ['boolean', true], ['object', {}], ['array', []],
+]) test(`an explicit ${label} registered hash cannot disappear as unknown`, t => {
+  rejected(fixture(t, { entry: { sha256 } })(id), 'REJECTED_CATALOG_UNAVAILABLE')
+})
+
+test('an existing catalog cannot be bypassed with an unregistered embedded identity', t => {
+  rejected(fixture(t, { entry: { structureId: 'other-registration', panacea_structure_id: 'other-stable-id' } })(id), 'REJECTED_NONEXISTENT_STRUCTURE')
+})
+
+test('a conflicting or malformed caller hash is rejected even with a valid registered hash', t => {
+  const inspect = fixture(t)
+  for (const digest of ['0'.repeat(64), '', 'invalid-digest', 42, true, {}]) {
+    rejected(inspect(id, { expectedManifestSha256: digest }), 'REJECTED_HASH_MISMATCH')
+  }
+})
+
 test('a display name cannot override a conflicting stable identifier', t => {
   rejected(fixture(t, { nodes: [{ name: id, mesh: 0, extras: { panacea_structure_id: 'different-stable-id' } }] })(id), 'REJECTED_NONEXISTENT_STRUCTURE')
 })
@@ -101,6 +166,50 @@ test('duplicate stable identifiers are ambiguous rather than first-match wins', 
   rejected(fixture(t, { nodes: [{ mesh: 0, extras: { panacea_structure_id: id } }, { mesh: 0, extras: { panacea_structure_id: id } }] })(id), 'REJECTED_AMBIGUOUS_STRUCTURE')
 })
 
+test('duplicate catalog identities cannot silently replace the first declaration', t => {
+  rejected(fixture(t, { matrixEntries: entry => [entry, { ...entry, sourceAttribution: 'Conflicting synthetic source' }] })(id), 'REJECTED_AMBIGUOUS_STRUCTURE')
+})
+
+test('case-colliding catalog aliases cannot silently replace the first declaration', t => {
+  const inspect = fixture(t, { matrixEntries: entry => [
+    { ...entry, structureId: 'explicit-heart-alias' },
+    { ...entry, structureId: 'EXPLICIT-HEART-ALIAS', sourceAttribution: 'Conflicting synthetic source' },
+  ] })
+  for (const alias of ['explicit-heart-alias', 'EXPLICIT-HEART-ALIAS', 'Explicit-Heart-Alias']) {
+    rejected(inspect(alias), 'REJECTED_AMBIGUOUS_STRUCTURE')
+  }
+})
+
+const malformedStableIds = [
+  ['empty', ''], ['whitespace', '  '], ['null', null], ['number', 17],
+  ['boolean', false], ['object', {}], ['array', []],
+]
+
+for (const [label, value] of malformedStableIds) {
+  test(`an explicit ${label} catalog stable ID cannot become an identity`, t => {
+    rejected(fixture(t, {
+      entry: { panacea_structure_id: value },
+      nodes: [{ name: id, mesh: 0, extras: { panacea_structure_id: value } }],
+    })(id), 'REJECTED_NONEXISTENT_STRUCTURE')
+  })
+
+  test(`an explicit ${label} node stable ID cannot fall back to its display name`, t => {
+    rejected(fixture(t, {
+      nodes: [{ name: id, mesh: 0, extras: { panacea_structure_id: value } }],
+    })(id), 'REJECTED_NONEXISTENT_STRUCTURE')
+  })
+}
+
+test('a missing catalog and node stable ID can retain an exact legacy display-name match', t => {
+  const result = fixture(t, {
+    entry: { panacea_structure_id: undefined },
+    nodes: [{ name: id, mesh: 0 }],
+  })(id)
+  assert.equal(result.verificationVerdict, 'VERIFIED_EMPIRICAL_ASSET')
+  assert.equal(result.structureMetadata.panaceaStructureId, id)
+  assert.equal(result.geometryMeasured.vertexCount, 3)
+})
+
 test('an exact embedded identity can retain explicit provenance without a matrix', t => {
   const result = fixture(t, { matrix: false })(id)
   assert.equal(result.verificationVerdict, 'VERIFIED_EMPIRICAL_ASSET')
@@ -109,6 +218,35 @@ test('an exact embedded identity can retain explicit provenance without a matrix
   assert.equal(result.structureMetadata.laterality, 'UNSPECIFIED')
   assert.equal(result.materialEvidence.manifestHashMatched, null)
 })
+
+test('an unknown embedded identity cannot borrow the first node when no catalog exists', t => {
+  rejected(fixture(t, { matrix: false })('CANONICAL-MALE-LIVER-ROOT'), 'REJECTED_NONEXISTENT_STRUCTURE')
+})
+
+for (const [label, options] of [
+  ['empty', { matrixContents: '' }],
+  ['whitespace', { matrixContents: ' \n\t ' }],
+  ['malformed', { matrixContents: '{"privateCatalogProbe":' }],
+  ['numeric scalar', { matrixContents: '42' }],
+  ['boolean scalar', { matrixContents: 'false' }],
+  ['string scalar', { matrixContents: '"privateCatalogProbe"' }],
+  ['null', { matrixContents: 'null' }],
+  ['directory', { matrix: 'directory' }],
+  ['dangling reference', { matrix: 'dangling-symlink' }],
+  ['empty object', { matrixContents: '{}' }],
+  ['empty array', { matrixContents: '[]' }],
+  ['invalid record container', { matrixContents: '{"structures":"unparseable-records"}' }],
+  ['unusable records', { matrixContents: '{"structures":[null,42,{}]}' }],
+]) {
+  test(`an existing ${label} catalog fails closed without disclosing read details`, t => {
+    const inspect = fixture(t, options)
+    const result = inspect(id)
+    rejected(result, 'REJECTED_CATALOG_UNAVAILABLE')
+    const publicReasons = result.failureReasons.join(' ')
+    assert.equal(publicReasons.includes(inspect.root), false)
+    assert.doesNotMatch(publicReasons, /EISDIR|EACCES|EPERM|ENOENT|JSON\.parse|Unexpected token|privateCatalogProbe/)
+  })
+}
 
 test('missing or blank source and license are never manufactured from defaults', t => {
   for (const field of ['sourceAttribution', 'license']) for (const missing of [undefined, '', '  ']) {

@@ -34,6 +34,7 @@ export type VerificationVerdict =
   | 'UNVERIFIED_MISSING_SOURCE_ASSET'
   | 'REJECTED_NONEXISTENT_STRUCTURE'
   | 'REJECTED_AMBIGUOUS_STRUCTURE'
+  | 'REJECTED_CATALOG_UNAVAILABLE'
   | 'REJECTED_CORRUPTED_GLB'
   | 'REJECTED_HASH_MISMATCH'
   | 'REJECTED_INVALID_INDICES'
@@ -344,6 +345,7 @@ interface ResolvedMatrixStructure {
 
 function loadBodyMatrixCatalog(repoRoot: string): {
   loaded: boolean;
+  loadError: 'CATALOG_UNAVAILABLE' | 'AMBIGUOUS_CATALOG' | null;
   matrixSha256: string | null;
   entries: Map<string, ResolvedMatrixStructure>;
   defaultGlbPaths: string[];
@@ -353,12 +355,24 @@ function loadBodyMatrixCatalog(repoRoot: string): {
   const matrixPath = path.join(repoRoot, 'public', 'bodyexposure', 'body_matrix.json');
 
   let matrixSha256: string | null = null;
-  if (fs.existsSync(matrixPath)) {
+  let loadError: 'CATALOG_UNAVAILABLE' | 'AMBIGUOUS_CATALOG' | null = null;
+  let loaded = false;
+  try {
+    fs.lstatSync(matrixPath);
+    loaded = true;
+  } catch (error) {
+    if (!error || typeof error !== 'object' || !('code' in error) || error.code !== 'ENOENT') {
+      loadError = 'CATALOG_UNAVAILABLE';
+    }
+  }
+  if (loaded) {
     try {
       const rawBytes = fs.readFileSync(matrixPath);
+      if (rawBytes.byteLength === 0) throw new Error('EMPTY_CATALOG');
       if (rawBytes.byteLength > 0) {
         matrixSha256 = computeRealBufferSha256(rawBytes);
         const parsed = JSON.parse(rawBytes.toString('utf8')) as Record<string, unknown>;
+        if (parsed === null || typeof parsed !== 'object') throw new Error('INVALID_CATALOG');
 
         const collectFromArray = (items: unknown[], defaultSystem = 'ANATOMICAL_SYSTEM') => {
           for (const item of items) {
@@ -403,9 +417,16 @@ function loadBodyMatrixCatalog(repoRoot: string): {
                 ? latRaw
                 : 'UNSPECIFIED';
 
+            if (rec.sha256 !== undefined && rec.sha256 !== null &&
+                (typeof rec.sha256 !== 'string' || !/^[a-f0-9]{64}$/i.test(rec.sha256))) {
+              throw new Error('INVALID_MANIFEST_HASH');
+            }
+
             const entry: ResolvedMatrixStructure = {
               structureId: id,
-              panaceaStructureId: typeof rec.panacea_structure_id === 'string' ? rec.panacea_structure_id : id,
+              panaceaStructureId: Object.prototype.hasOwnProperty.call(rec, 'panacea_structure_id')
+                ? typeof rec.panacea_structure_id === 'string' ? rec.panacea_structure_id : null
+                : id,
               semanticName: String(rec.semanticName ?? rec.name ?? rec.label ?? id),
               laterality,
               systemCategory: String(rec.system ?? rec.category ?? defaultSystem),
@@ -417,6 +438,10 @@ function loadBodyMatrixCatalog(repoRoot: string): {
                 ? rec.supportedLods.map(String)
                 : ['LOD_0_FULL', 'LOD_1_SIMPLIFIED', 'LOD_2_BOUNDING']
             };
+            if (entries.has(id.toUpperCase())) {
+              loadError = 'AMBIGUOUS_CATALOG';
+              throw new Error('AMBIGUOUS_CATALOG');
+            }
             entries.set(id, entry);
             entries.set(id.toUpperCase(), entry);
           }
@@ -439,8 +464,15 @@ function loadBodyMatrixCatalog(repoRoot: string): {
         }
       }
     } catch {
-      // Fall through to filesystem discovery
+      loadError ??= 'CATALOG_UNAVAILABLE';
     }
+  }
+
+  if (loaded && entries.size === 0) loadError ??= 'CATALOG_UNAVAILABLE';
+  // Katalog yang rusak tidak boleh mengalihkan pemeriksaan ke aset hasil penemuan.
+  if (loadError) {
+    entries.clear();
+    return { loaded, loadError, matrixSha256, entries, defaultGlbPaths };
   }
 
   // Discover real .glb files committed in public/bodyexposure or public/models
@@ -468,7 +500,8 @@ function loadBodyMatrixCatalog(repoRoot: string): {
   }
 
   return {
-    loaded: fs.existsSync(matrixPath),
+    loaded,
+    loadError,
     matrixSha256,
     entries,
     defaultGlbPaths
@@ -578,8 +611,26 @@ export function renderCanonicalAnatomySlice(request: CanonicalAnatomyRequest): C
   }
 
   const catalog = loadBodyMatrixCatalog(repoRoot);
+  if (catalog.loadError) {
+    return buildFailClosedResponse(request, catalog.loadError === 'AMBIGUOUS_CATALOG'
+      ? 'REJECTED_AMBIGUOUS_STRUCTURE' : 'REJECTED_CATALOG_UNAVAILABLE', [
+      'The canonical structure catalog is unavailable, invalid or ambiguous.'
+    ]);
+  }
   const resolvedEntry =
     catalog.entries.get(rawStructureId) ?? catalog.entries.get(rawStructureId.toUpperCase());
+
+  if (catalog.loaded && !resolvedEntry) {
+    return buildFailClosedResponse(request, 'REJECTED_NONEXISTENT_STRUCTURE', [
+      'The structure identity is not registered in the loaded catalog.'
+    ]);
+  }
+
+  if (resolvedEntry && !resolvedEntry.glbRelativePath && !resolvedEntry.expectedSha256) {
+    return buildFailClosedResponse(request, 'UNVERIFIED_MISSING_SOURCE_ASSET', [
+      'The registered structure has neither an asset path nor a manifest hash binding.'
+    ]);
+  }
 
   // Attempt to locate candidate GLB file on disk
   const candidateGlbPaths: string[] = [];
@@ -630,10 +681,14 @@ export function renderCanonicalAnatomySlice(request: CanonicalAnatomyRequest): C
   }
 
   // Verify against expected manifest SHA-256 if provided
-  const expectedSha = request.expectedManifestSha256 ?? resolvedEntry?.expectedSha256 ?? null;
-  if (expectedSha && expectedSha.toLowerCase() !== glbSha256.toLowerCase()) {
+  const expectedSha = resolvedEntry?.expectedSha256 ?? request.expectedManifestSha256 ?? null;
+  const expectedHashes = [resolvedEntry?.expectedSha256, request.expectedManifestSha256]
+    .filter((value) => value !== undefined && value !== null);
+  // Klaim pemanggil menambah batas; tidak menggantikan hash manifest terdaftar.
+  if (expectedHashes.some((value) => typeof value !== 'string' ||
+      !/^[a-f0-9]{64}$/i.test(value) || value.toLowerCase() !== glbSha256.toLowerCase())) {
     return buildFailClosedResponse(request, 'REJECTED_HASH_MISMATCH', [
-      `GLB SHA-256 mismatch: actual=${glbSha256}, expected=${expectedSha}`
+      'The GLB bytes do not match every declared manifest hash.'
     ]);
   }
 
@@ -651,15 +706,18 @@ export function renderCanonicalAnatomySlice(request: CanonicalAnatomyRequest): C
   const accessors = gltf.accessors ?? [];
 
   // Alias hanya sah melalui ID eksplisit di katalog; nama parsial bukan identitas.
-  const targetId = resolvedEntry?.panaceaStructureId ?? rawStructureId;
+  const targetId = resolvedEntry ? resolvedEntry.panaceaStructureId : rawStructureId;
+  if (typeof targetId !== 'string' || !targetId.trim()) {
+    return buildFailClosedResponse(request, 'REJECTED_NONEXISTENT_STRUCTURE', [
+      'The registered structure has no valid stable identifier.'
+    ]);
+  }
   const matchingNodes = nodes.filter((n) => {
-    const extraId =
-      n.extras && typeof n.extras.panacea_structure_id === 'string'
-        ? n.extras.panacea_structure_id
-        : null;
-    return extraId !== null
-      ? extraId === targetId
-      : typeof n.name === 'string' && n.name.toUpperCase() === targetId.toUpperCase();
+    if (n.extras && Object.prototype.hasOwnProperty.call(n.extras, 'panacea_structure_id')) {
+      const extraId = n.extras.panacea_structure_id;
+      return typeof extraId === 'string' && extraId.trim().length > 0 && extraId === targetId;
+    }
+    return typeof n.name === 'string' && n.name.toUpperCase() === targetId.toUpperCase();
   });
 
   if (matchingNodes.length !== 1) {

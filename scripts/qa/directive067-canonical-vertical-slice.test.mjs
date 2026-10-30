@@ -4,11 +4,12 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
-import {
+import { loadTypeScriptSubject } from './load-typescript-subject.mjs';
+const {
   computeRealBufferSha256,
   renderCanonicalAnatomySlice
-} from '../../src/domains/body-exposure-canonical/canonicalBodyExposureEngine.ts';
-import { evaluateBodyExposureEvidence } from '../../src/domains/body-exposure-evidence/bodyExposureEvidenceEngine.ts';
+} = await loadTypeScriptSubject('src/domains/body-exposure-canonical/canonicalBodyExposureEngine.ts');
+const { evaluateBodyExposureEvidence } = await loadTypeScriptSubject('src/domains/body-exposure-evidence/bodyExposureEvidenceEngine.ts');
 
 /**
  * Builds a minimal valid binary PNG buffer with exact width and height in the IHDR chunk.
