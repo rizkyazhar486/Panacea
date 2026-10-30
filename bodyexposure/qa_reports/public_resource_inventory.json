@@ -1102,8 +1102,8 @@
     },
     {
       "path": "adult_male.rig_motion.json",
-      "bytes": 3779,
-      "sha256": "8f07ca48b3be4ba85ad2eacabe48bc9bebe479560af7bde996d00527b78ebc07",
+      "bytes": 3780,
+      "sha256": "732a02495d7a6d0529b757f659cc24bde490315f363561af2822ab1865cc2cf7",
       "evidencePath": "adult_male.rig_motion.json",
       "sources": [
         "AAOS normal range of motion (Greene & Heckman 1994)",
@@ -1117,8 +1117,8 @@
     },
     {
       "path": "adult_male.rig_rom.glb",
-      "bytes": 1385024,
-      "sha256": "03aa529c35d347d00f23c6bd2fb8dd6ac5050818e2ed818f1e11bff6bcbbd177",
+      "bytes": 1387220,
+      "sha256": "b2c7cb609a7cc52064de4b5526ddfd2d9e15b6b261dcf44652aa5e1e3c887dc9",
       "evidencePath": "adult_male.rig_rom.glb",
       "sources": [
         "Z-Anatomy (derived from BodyParts3D, DBCLS) via Panaceamed public/anatomy/skeletal.glb",

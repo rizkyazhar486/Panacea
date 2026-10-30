@@ -19,9 +19,9 @@
   "assets": [
     {
       "source": "public/bodyexposure/adult_male.rig_rom.glb",
-      "source_sha256": "03aa529c35d347d00f23c6bd2fb8dd6ac5050818e2ed818f1e11bff6bcbbd177",
+      "source_sha256": "b2c7cb609a7cc52064de4b5526ddfd2d9e15b6b261dcf44652aa5e1e3c887dc9",
       "decoded_name": "adult_male.decoded.glb",
-      "decoded_sha256": "6e75a235caab2f2a986b92722bdebca8a1930879548e2069e1e3d41f8c1ea28c",
+      "decoded_sha256": "cde1409e4328a620d7d95dceaf21e7dedf68ab0d65a1e41e10692fd36cb7893a",
       "gltf_asset": {
         "version": "2.0",
         "generator": "gltfpack 1.3"
@@ -86,6 +86,14 @@
           "action": "ROM"
         },
         {
+          "object": "TOE.L",
+          "action": "ROM"
+        },
+        {
+          "object": "TOE.R",
+          "action": "ROM"
+        },
+        {
           "object": "UPPER_ARM.L",
           "action": "ROM"
         },
@@ -100,28 +108,28 @@
           "type": "EMPTY",
           "parent": "SHIN.L",
           "local_scale": [
-            1.0,
-            1.0,
+            0.9999999403953552,
+            1.0000001192092896,
             1.0
           ],
           "world_matrix": [
             [
-              0.9241432547569275,
-              0.35020968317985535,
-              0.15268811583518982,
+              0.9095649123191833,
+              0.35031259059906006,
+              0.22354865074157715,
               0.07399166375398636
             ],
             [
-              0.2565542459487915,
-              -0.27272915840148926,
-              -0.9272529482841492,
+              0.32759058475494385,
+              -0.27344420552253723,
+              -0.904384970664978,
               0.04069322347640991
             ],
             [
-              -0.28309035301208496,
-              0.8960869908332825,
-              -0.341888427734375,
-              0.025227397680282593
+              -0.25568917393684387,
+              0.8958290815353394,
+              -0.36347419023513794,
+              0.01630517840385437
             ],
             [
               0.0,
@@ -136,28 +144,28 @@
           "type": "EMPTY",
           "parent": "SHIN.R",
           "local_scale": [
-            0.9999998807907104,
+            1.0,
             0.9999999403953552,
-            1.0
+            0.9999998807907104
           ],
           "world_matrix": [
             [
-              -0.9242051243782043,
-              0.35003092885017395,
-              -0.15271960198879242,
-              -0.07399137318134308
+              -0.9096277356147766,
+              0.3501238226890564,
+              -0.22358658909797668,
+              -0.07399136573076248
             ],
             [
-              0.25652840733528137,
-              0.2727625072002411,
-              -0.9272525310516357,
-              0.040694646537303925
+              0.3275527358055115,
+              0.273443341255188,
+              -0.9044010639190674,
+              0.040694642812013626
             ],
             [
-              -0.2829103469848633,
-              -0.8961469531059265,
-              -0.3418811559677124,
-              0.02522742748260498
+              -0.25551366806030273,
+              -0.8959032297134399,
+              -0.36341530084609985,
+              0.016305238008499146
             ],
             [
               0.0,
@@ -193,7 +201,7 @@
               8.213401656576025e-07,
               -0.12112760543823242,
               0.9926369190216064,
-              0.8177013993263245
+              0.8087791800498962
             ],
             [
               0.0,
@@ -229,7 +237,7 @@
               0.0,
               0.0,
               1.0,
-              -0.04267270863056183
+              -0.05159491300582886
             ],
             [
               0.0,
@@ -256,9 +264,11 @@
             "OBFOREARM_ROT.R",
             "OBFOREARM.R",
             "OBUPPER_ARM.R",
+            "OBTOE.L",
             "OBFOOT.L",
             "OBSHIN.L",
             "OBTHIGH.L",
+            "OBTOE.R",
             "OBFOOT.R",
             "OBSHIN.R",
             "OBTHIGH.R"
@@ -279,9 +289,11 @@
             "OBFOREARM_ROT.R",
             "OBFOREARM.R",
             "OBUPPER_ARM.R",
+            "OBTOE.L",
             "OBFOOT.L",
             "OBSHIN.L",
             "OBTHIGH.L",
+            "OBTOE.R",
             "OBFOOT.R",
             "OBSHIN.R",
             "OBTHIGH.R",
@@ -303,9 +315,11 @@
             "OBFOREARM_ROT.R",
             "OBFOREARM.R",
             "OBUPPER_ARM.R",
+            "OBTOE.L",
             "OBFOOT.L",
             "OBSHIN.L",
             "OBTHIGH.L",
+            "OBTOE.R",
             "OBFOOT.R",
             "OBSHIN.R",
             "OBTHIGH.R",
@@ -319,333 +333,333 @@
           "meshes": [
             {
               "name": "Mesh_398",
-              "parent": "ADULT.MALE.JOINT.ANTERIOR_TALOCALCANEAL_LIGAMENT.L",
-              "vertices": 8
-            },
-            {
-              "name": "Mesh_399",
-              "parent": "ADULT.MALE.JOINT.ANTERIOR_TALOFIBULAR_LIGAMENT.L",
-              "vertices": 7
-            },
-            {
-              "name": "Mesh_400",
               "parent": "ADULT.MALE.JOINT.ARTICULAR_CAPSULE_OF_INTERPHALANGEAL_JOINT_OF_GREAT_TOE.L",
               "vertices": 14
             },
             {
-              "name": "Mesh_401",
+              "name": "Mesh_399",
               "parent": "ADULT.MALE.JOINT.ARTICULAR_CAPSULES_OF_DISTAL_INTERPHALANGEAL_JOINTS_OF_FOOT.L",
               "vertices": 21
             },
             {
-              "name": "Mesh_402",
-              "parent": "ADULT.MALE.JOINT.ARTICULAR_CAPSULES_OF_METATARSOPHALANGEAL_JOINTS.L",
-              "vertices": 56
-            },
-            {
-              "name": "Mesh_403",
+              "name": "Mesh_400",
               "parent": "ADULT.MALE.JOINT.ARTICULAR_CAPSULES_OF_PROXIMAL_INTERPHALANGEAL_JOINTS_OF_FOOT.L",
               "vertices": 22
             },
             {
-              "name": "Mesh_404",
-              "parent": "ADULT.MALE.JOINT.CALCANEOCUBOID_LIGAMENT.L",
-              "vertices": 6
-            },
-            {
-              "name": "Mesh_405",
-              "parent": "ADULT.MALE.JOINT.CALCANEOFIBULAR_LIGAMENT.L",
-              "vertices": 7
-            },
-            {
-              "name": "Mesh_406",
-              "parent": "ADULT.MALE.JOINT.CALCANEONAVICULAR_LIGAMENT.L",
-              "vertices": 7
-            },
-            {
-              "name": "Mesh_407",
+              "name": "Mesh_401",
               "parent": "ADULT.MALE.JOINT.COLLATERAL_INTERPHALANGEAL_LIGAMENTS_OF_FOOT.L",
               "vertices": 54
             },
             {
-              "name": "Mesh_408",
-              "parent": "ADULT.MALE.JOINT.COLLATERAL_METATARSOPHALANGEAL_LIGAMENTS.L",
-              "vertices": 37
-            },
-            {
-              "name": "Mesh_409",
-              "parent": "ADULT.MALE.JOINT.CUNEOCUBOID_INTEROSSEOUS_LIGAMENT.L",
-              "vertices": 6
-            },
-            {
-              "name": "Mesh_410",
-              "parent": "ADULT.MALE.JOINT.CUNEOMETATARSAL_INTEROSSEOUS_LIGAMENTS.L",
-              "vertices": 10
-            },
-            {
-              "name": "Mesh_411",
-              "parent": "ADULT.MALE.JOINT.DEEP_TRANSVERSE_METATARSAL_LIGAMENT.L",
-              "vertices": 16
-            },
-            {
-              "name": "Mesh_412",
-              "parent": "ADULT.MALE.JOINT.DORSAL_CALCANEOCUBOID_LIGAMENT.L",
-              "vertices": 6
-            },
-            {
-              "name": "Mesh_413",
-              "parent": "ADULT.MALE.JOINT.DORSAL_CUBOIDEONAVICULAR_LIGAMENT.L",
-              "vertices": 6
-            },
-            {
-              "name": "Mesh_414",
-              "parent": "ADULT.MALE.JOINT.DORSAL_CUNEOCUBOID_LIGAMENT.L",
-              "vertices": 7
-            },
-            {
-              "name": "Mesh_415",
-              "parent": "ADULT.MALE.JOINT.DORSAL_CUNEONAVICULAR_LIGAMENTS.L",
-              "vertices": 12
-            },
-            {
-              "name": "Mesh_416",
-              "parent": "ADULT.MALE.JOINT.DORSAL_INTERCUNEIFORM_LIGAMENTS.L",
-              "vertices": 9
-            },
-            {
-              "name": "Mesh_417",
-              "parent": "ADULT.MALE.JOINT.DORSAL_METATARSAL_LIGAMENTS.L",
-              "vertices": 13
-            },
-            {
-              "name": "Mesh_418",
-              "parent": "ADULT.MALE.JOINT.DORSAL_TARSOMETATARSAL_LIGAMENTS.L",
-              "vertices": 24
-            },
-            {
-              "name": "Mesh_419",
-              "parent": "ADULT.MALE.JOINT.INTERCUNEIFORM_INTEROSSEOUS_LIGAMENTS.L",
-              "vertices": 9
-            },
-            {
-              "name": "Mesh_420",
-              "parent": "ADULT.MALE.JOINT.INTERSESAMOID_LIGAMENT.L",
-              "vertices": 6
-            },
-            {
-              "name": "Mesh_421",
-              "parent": "ADULT.MALE.JOINT.LATERAL_TALOCALCANEAL_LIGAMENT.L",
-              "vertices": 7
-            },
-            {
-              "name": "Mesh_422",
-              "parent": "ADULT.MALE.JOINT.LONG_PLANTAR_LIGAMENT.L",
-              "vertices": 38
-            },
-            {
-              "name": "Mesh_423",
-              "parent": "ADULT.MALE.JOINT.MEDIAL_TALOCALCANEAL_LIGAMENT.L",
-              "vertices": 7
-            },
-            {
-              "name": "Mesh_424",
-              "parent": "ADULT.MALE.JOINT.METATARSAL_INTEROSSEOUS_LIGAMENTS.L",
-              "vertices": 13
-            },
-            {
-              "name": "Mesh_425",
-              "parent": "ADULT.MALE.JOINT.PLANTAR_CALCANEOCUBOID_LIGAMENT.L",
-              "vertices": 7
-            },
-            {
-              "name": "Mesh_426",
-              "parent": "ADULT.MALE.JOINT.PLANTAR_CALCANEONAVICULAR_LIGAMENT.L",
-              "vertices": 7
-            },
-            {
-              "name": "Mesh_427",
-              "parent": "ADULT.MALE.JOINT.PLANTAR_CUBOIDEONAVICULAR_LIGAMENT.L",
-              "vertices": 6
-            },
-            {
-              "name": "Mesh_428",
-              "parent": "ADULT.MALE.JOINT.PLANTAR_CUNEOCUBOID_LIGAMENT.L",
-              "vertices": 6
-            },
-            {
-              "name": "Mesh_429",
-              "parent": "ADULT.MALE.JOINT.PLANTAR_CUNEONAVICULAR_LIGAMENTS.L",
-              "vertices": 11
-            },
-            {
-              "name": "Mesh_430",
-              "parent": "ADULT.MALE.JOINT.PLANTAR_INTERCUNEIFORM_LIGAMENTS.L",
-              "vertices": 8
-            },
-            {
-              "name": "Mesh_431",
+              "name": "Mesh_402",
               "parent": "ADULT.MALE.JOINT.PLANTAR_INTERPHALANGEAL_LIGAMENTS.L",
               "vertices": 29
             },
             {
-              "name": "Mesh_432",
-              "parent": "ADULT.MALE.JOINT.PLANTAR_METATARSAL_LIGAMENTS.L",
-              "vertices": 14
-            },
-            {
-              "name": "Mesh_433",
-              "parent": "ADULT.MALE.JOINT.PLANTAR_METATARSOPHALANGEAL_LIGAMENTS.L",
-              "vertices": 24
-            },
-            {
-              "name": "Mesh_434",
-              "parent": "ADULT.MALE.JOINT.PLANTAR_TARSOMETATARSAL_LIGAMENTS.L",
-              "vertices": 16
-            },
-            {
-              "name": "Mesh_435",
-              "parent": "ADULT.MALE.JOINT.POSTERIOR_TALOCALCANEAL_LIGAMENT.L",
-              "vertices": 7
-            },
-            {
-              "name": "Mesh_436",
-              "parent": "ADULT.MALE.JOINT.POSTERIOR_TALOFIBULAR_LIGAMENT.L",
-              "vertices": 7
-            },
-            {
-              "name": "Mesh_437",
-              "parent": "ADULT.MALE.JOINT.TALOCALCANEAL_INTEROSSEOUS_LIGAMENT.L",
-              "vertices": 10
-            },
-            {
-              "name": "Mesh_438",
-              "parent": "ADULT.MALE.JOINT.TALONAVICULAR_LIGAMENT.L",
-              "vertices": 8
-            },
-            {
-              "name": "Mesh_439",
-              "parent": "ADULT.MALE.JOINT.TIBIOCALCANEAL_LIGAMENT.L",
-              "vertices": 9
-            },
-            {
-              "name": "Mesh_440",
-              "parent": "ADULT.MALE.JOINT.TIBIONAVICULAR_LIGAMENT.L",
-              "vertices": 12
-            },
-            {
-              "name": "Mesh_441",
-              "parent": "ADULT.MALE.SKELETAL.CALCANEUS.L",
-              "vertices": 91
-            },
-            {
-              "name": "Mesh_442",
-              "parent": "ADULT.MALE.SKELETAL.CUBOID_BONE.L",
-              "vertices": 42
-            },
-            {
-              "name": "Mesh_443",
+              "name": "Mesh_403",
               "parent": "ADULT.MALE.SKELETAL.DISTAL_PHALANX_OF_FIFTH_FINGER_OF_FOOT.L",
               "vertices": 10
             },
             {
-              "name": "Mesh_444",
+              "name": "Mesh_404",
               "parent": "ADULT.MALE.SKELETAL.DISTAL_PHALANX_OF_FIRST_FINGER_OF_FOOT.L",
               "vertices": 18
             },
             {
-              "name": "Mesh_445",
+              "name": "Mesh_405",
               "parent": "ADULT.MALE.SKELETAL.DISTAL_PHALANX_OF_FOURTH_FINGER_OF_FOOT.L",
               "vertices": 11
             },
             {
-              "name": "Mesh_446",
+              "name": "Mesh_406",
               "parent": "ADULT.MALE.SKELETAL.DISTAL_PHALANX_OF_SECOND_FINGER_OF_FOOT.L",
               "vertices": 10
             },
             {
-              "name": "Mesh_447",
+              "name": "Mesh_407",
               "parent": "ADULT.MALE.SKELETAL.DISTAL_PHALANX_OF_THIRD_FINGER_OF_FOOT.L",
               "vertices": 11
             },
             {
-              "name": "Mesh_448",
-              "parent": "ADULT.MALE.SKELETAL.FIFTH_METATARSAL_BONE.L",
-              "vertices": 40
-            },
-            {
-              "name": "Mesh_449",
-              "parent": "ADULT.MALE.SKELETAL.FIRST_METATARSAL_BONE.L",
-              "vertices": 54
-            },
-            {
-              "name": "Mesh_450",
-              "parent": "ADULT.MALE.SKELETAL.FOURTH_METATARSAL_BONE.L",
-              "vertices": 30
-            },
-            {
-              "name": "Mesh_451",
-              "parent": "ADULT.MALE.SKELETAL.INTERMEDIATE_CUNEIFORM_BONE.L",
-              "vertices": 23
-            },
-            {
-              "name": "Mesh_452",
-              "parent": "ADULT.MALE.SKELETAL.LATERAL_CUNEIFORM_BONE.L",
-              "vertices": 29
-            },
-            {
-              "name": "Mesh_453",
-              "parent": "ADULT.MALE.SKELETAL.MEDIAL_CUNEIFORM_BONE.L",
-              "vertices": 36
-            },
-            {
-              "name": "Mesh_454",
+              "name": "Mesh_408",
               "parent": "ADULT.MALE.SKELETAL.MIDDLE_PHALANX_OF_FIFTH_FINGER_OF_FOOT.L",
               "vertices": 14
             },
             {
-              "name": "Mesh_455",
+              "name": "Mesh_409",
               "parent": "ADULT.MALE.SKELETAL.MIDDLE_PHALANX_OF_FOURTH_FINGER_OF_FOOT.L",
               "vertices": 15
             },
             {
-              "name": "Mesh_456",
+              "name": "Mesh_410",
               "parent": "ADULT.MALE.SKELETAL.MIDDLE_PHALANX_OF_SECOND_FINGER_OF_FOOT.L",
               "vertices": 15
             },
             {
-              "name": "Mesh_457",
+              "name": "Mesh_411",
               "parent": "ADULT.MALE.SKELETAL.MIDDLE_PHALANX_OF_THIRD_FINGER_OF_FOOT.L",
               "vertices": 12
             },
             {
-              "name": "Mesh_458",
-              "parent": "ADULT.MALE.SKELETAL.NAVICULAR_BONE.L",
-              "vertices": 38
-            },
-            {
-              "name": "Mesh_459",
+              "name": "Mesh_412",
               "parent": "ADULT.MALE.SKELETAL.PROXIMAL_PHALANX_OF_FIFTH_FINGER_OF_FOOT.L",
               "vertices": 18
             },
             {
-              "name": "Mesh_460",
+              "name": "Mesh_413",
               "parent": "ADULT.MALE.SKELETAL.PROXIMAL_PHALANX_OF_FIRST_FINGER_OF_FOOT.L",
               "vertices": 29
             },
             {
-              "name": "Mesh_461",
+              "name": "Mesh_414",
               "parent": "ADULT.MALE.SKELETAL.PROXIMAL_PHALANX_OF_FOURTH_FINGER_OF_FOOT.L",
               "vertices": 18
             },
             {
-              "name": "Mesh_462",
+              "name": "Mesh_415",
               "parent": "ADULT.MALE.SKELETAL.PROXIMAL_PHALANX_OF_SECOND_FINGER_OF_FOOT.L",
               "vertices": 18
             },
             {
-              "name": "Mesh_463",
+              "name": "Mesh_416",
               "parent": "ADULT.MALE.SKELETAL.PROXIMAL_PHALANX_OF_THIRD_FINGER_OF_FOOT.L",
               "vertices": 19
+            },
+            {
+              "name": "Mesh_417",
+              "parent": "ADULT.MALE.JOINT.ANTERIOR_TALOCALCANEAL_LIGAMENT.L",
+              "vertices": 8
+            },
+            {
+              "name": "Mesh_418",
+              "parent": "ADULT.MALE.JOINT.ANTERIOR_TALOFIBULAR_LIGAMENT.L",
+              "vertices": 7
+            },
+            {
+              "name": "Mesh_419",
+              "parent": "ADULT.MALE.JOINT.ARTICULAR_CAPSULES_OF_METATARSOPHALANGEAL_JOINTS.L",
+              "vertices": 56
+            },
+            {
+              "name": "Mesh_420",
+              "parent": "ADULT.MALE.JOINT.CALCANEOCUBOID_LIGAMENT.L",
+              "vertices": 6
+            },
+            {
+              "name": "Mesh_421",
+              "parent": "ADULT.MALE.JOINT.CALCANEOFIBULAR_LIGAMENT.L",
+              "vertices": 7
+            },
+            {
+              "name": "Mesh_422",
+              "parent": "ADULT.MALE.JOINT.CALCANEONAVICULAR_LIGAMENT.L",
+              "vertices": 7
+            },
+            {
+              "name": "Mesh_423",
+              "parent": "ADULT.MALE.JOINT.COLLATERAL_METATARSOPHALANGEAL_LIGAMENTS.L",
+              "vertices": 37
+            },
+            {
+              "name": "Mesh_424",
+              "parent": "ADULT.MALE.JOINT.CUNEOCUBOID_INTEROSSEOUS_LIGAMENT.L",
+              "vertices": 6
+            },
+            {
+              "name": "Mesh_425",
+              "parent": "ADULT.MALE.JOINT.CUNEOMETATARSAL_INTEROSSEOUS_LIGAMENTS.L",
+              "vertices": 10
+            },
+            {
+              "name": "Mesh_426",
+              "parent": "ADULT.MALE.JOINT.DEEP_TRANSVERSE_METATARSAL_LIGAMENT.L",
+              "vertices": 16
+            },
+            {
+              "name": "Mesh_427",
+              "parent": "ADULT.MALE.JOINT.DORSAL_CALCANEOCUBOID_LIGAMENT.L",
+              "vertices": 6
+            },
+            {
+              "name": "Mesh_428",
+              "parent": "ADULT.MALE.JOINT.DORSAL_CUBOIDEONAVICULAR_LIGAMENT.L",
+              "vertices": 6
+            },
+            {
+              "name": "Mesh_429",
+              "parent": "ADULT.MALE.JOINT.DORSAL_CUNEOCUBOID_LIGAMENT.L",
+              "vertices": 7
+            },
+            {
+              "name": "Mesh_430",
+              "parent": "ADULT.MALE.JOINT.DORSAL_CUNEONAVICULAR_LIGAMENTS.L",
+              "vertices": 12
+            },
+            {
+              "name": "Mesh_431",
+              "parent": "ADULT.MALE.JOINT.DORSAL_INTERCUNEIFORM_LIGAMENTS.L",
+              "vertices": 9
+            },
+            {
+              "name": "Mesh_432",
+              "parent": "ADULT.MALE.JOINT.DORSAL_METATARSAL_LIGAMENTS.L",
+              "vertices": 13
+            },
+            {
+              "name": "Mesh_433",
+              "parent": "ADULT.MALE.JOINT.DORSAL_TARSOMETATARSAL_LIGAMENTS.L",
+              "vertices": 24
+            },
+            {
+              "name": "Mesh_434",
+              "parent": "ADULT.MALE.JOINT.INTERCUNEIFORM_INTEROSSEOUS_LIGAMENTS.L",
+              "vertices": 9
+            },
+            {
+              "name": "Mesh_435",
+              "parent": "ADULT.MALE.JOINT.INTERSESAMOID_LIGAMENT.L",
+              "vertices": 6
+            },
+            {
+              "name": "Mesh_436",
+              "parent": "ADULT.MALE.JOINT.LATERAL_TALOCALCANEAL_LIGAMENT.L",
+              "vertices": 7
+            },
+            {
+              "name": "Mesh_437",
+              "parent": "ADULT.MALE.JOINT.LONG_PLANTAR_LIGAMENT.L",
+              "vertices": 38
+            },
+            {
+              "name": "Mesh_438",
+              "parent": "ADULT.MALE.JOINT.MEDIAL_TALOCALCANEAL_LIGAMENT.L",
+              "vertices": 7
+            },
+            {
+              "name": "Mesh_439",
+              "parent": "ADULT.MALE.JOINT.METATARSAL_INTEROSSEOUS_LIGAMENTS.L",
+              "vertices": 13
+            },
+            {
+              "name": "Mesh_440",
+              "parent": "ADULT.MALE.JOINT.PLANTAR_CALCANEOCUBOID_LIGAMENT.L",
+              "vertices": 7
+            },
+            {
+              "name": "Mesh_441",
+              "parent": "ADULT.MALE.JOINT.PLANTAR_CALCANEONAVICULAR_LIGAMENT.L",
+              "vertices": 7
+            },
+            {
+              "name": "Mesh_442",
+              "parent": "ADULT.MALE.JOINT.PLANTAR_CUBOIDEONAVICULAR_LIGAMENT.L",
+              "vertices": 6
+            },
+            {
+              "name": "Mesh_443",
+              "parent": "ADULT.MALE.JOINT.PLANTAR_CUNEOCUBOID_LIGAMENT.L",
+              "vertices": 6
+            },
+            {
+              "name": "Mesh_444",
+              "parent": "ADULT.MALE.JOINT.PLANTAR_CUNEONAVICULAR_LIGAMENTS.L",
+              "vertices": 11
+            },
+            {
+              "name": "Mesh_445",
+              "parent": "ADULT.MALE.JOINT.PLANTAR_INTERCUNEIFORM_LIGAMENTS.L",
+              "vertices": 8
+            },
+            {
+              "name": "Mesh_446",
+              "parent": "ADULT.MALE.JOINT.PLANTAR_METATARSAL_LIGAMENTS.L",
+              "vertices": 14
+            },
+            {
+              "name": "Mesh_447",
+              "parent": "ADULT.MALE.JOINT.PLANTAR_METATARSOPHALANGEAL_LIGAMENTS.L",
+              "vertices": 24
+            },
+            {
+              "name": "Mesh_448",
+              "parent": "ADULT.MALE.JOINT.PLANTAR_TARSOMETATARSAL_LIGAMENTS.L",
+              "vertices": 16
+            },
+            {
+              "name": "Mesh_449",
+              "parent": "ADULT.MALE.JOINT.POSTERIOR_TALOCALCANEAL_LIGAMENT.L",
+              "vertices": 7
+            },
+            {
+              "name": "Mesh_450",
+              "parent": "ADULT.MALE.JOINT.POSTERIOR_TALOFIBULAR_LIGAMENT.L",
+              "vertices": 7
+            },
+            {
+              "name": "Mesh_451",
+              "parent": "ADULT.MALE.JOINT.TALOCALCANEAL_INTEROSSEOUS_LIGAMENT.L",
+              "vertices": 10
+            },
+            {
+              "name": "Mesh_452",
+              "parent": "ADULT.MALE.JOINT.TALONAVICULAR_LIGAMENT.L",
+              "vertices": 8
+            },
+            {
+              "name": "Mesh_453",
+              "parent": "ADULT.MALE.JOINT.TIBIOCALCANEAL_LIGAMENT.L",
+              "vertices": 9
+            },
+            {
+              "name": "Mesh_454",
+              "parent": "ADULT.MALE.JOINT.TIBIONAVICULAR_LIGAMENT.L",
+              "vertices": 12
+            },
+            {
+              "name": "Mesh_455",
+              "parent": "ADULT.MALE.SKELETAL.CALCANEUS.L",
+              "vertices": 91
+            },
+            {
+              "name": "Mesh_456",
+              "parent": "ADULT.MALE.SKELETAL.CUBOID_BONE.L",
+              "vertices": 42
+            },
+            {
+              "name": "Mesh_457",
+              "parent": "ADULT.MALE.SKELETAL.FIFTH_METATARSAL_BONE.L",
+              "vertices": 40
+            },
+            {
+              "name": "Mesh_458",
+              "parent": "ADULT.MALE.SKELETAL.FIRST_METATARSAL_BONE.L",
+              "vertices": 54
+            },
+            {
+              "name": "Mesh_459",
+              "parent": "ADULT.MALE.SKELETAL.FOURTH_METATARSAL_BONE.L",
+              "vertices": 30
+            },
+            {
+              "name": "Mesh_460",
+              "parent": "ADULT.MALE.SKELETAL.INTERMEDIATE_CUNEIFORM_BONE.L",
+              "vertices": 23
+            },
+            {
+              "name": "Mesh_461",
+              "parent": "ADULT.MALE.SKELETAL.LATERAL_CUNEIFORM_BONE.L",
+              "vertices": 29
+            },
+            {
+              "name": "Mesh_462",
+              "parent": "ADULT.MALE.SKELETAL.MEDIAL_CUNEIFORM_BONE.L",
+              "vertices": 36
+            },
+            {
+              "name": "Mesh_463",
+              "parent": "ADULT.MALE.SKELETAL.NAVICULAR_BONE.L",
+              "vertices": 38
             },
             {
               "name": "Mesh_464",
@@ -671,14 +685,14 @@
           "vertices": 1380,
           "bounds": {
             "min": [
-              0.05059972032904625,
-              -0.1370701938867569,
-              -0.033952925354242325
+              0.05060035362839699,
+              -0.13706852495670319,
+              -0.042880576103925705
             ],
             "max": [
-              0.14631418883800507,
-              0.09152738749980927,
-              0.04312284290790558
+              0.1463126242160797,
+              0.09152817726135254,
+              0.034200966358184814
             ]
           }
         },
@@ -687,333 +701,333 @@
           "meshes": [
             {
               "name": "Mesh_506",
-              "parent": "ADULT.MALE.JOINT.ANTERIOR_TALOCALCANEAL_LIGAMENT.R",
-              "vertices": 8
-            },
-            {
-              "name": "Mesh_507",
-              "parent": "ADULT.MALE.JOINT.ANTERIOR_TALOFIBULAR_LIGAMENT.R",
-              "vertices": 7
-            },
-            {
-              "name": "Mesh_508",
               "parent": "ADULT.MALE.JOINT.ARTICULAR_CAPSULE_OF_INTERPHALANGEAL_JOINT_OF_GREAT_TOE.R",
               "vertices": 15
             },
             {
-              "name": "Mesh_509",
+              "name": "Mesh_507",
               "parent": "ADULT.MALE.JOINT.ARTICULAR_CAPSULES_OF_DISTAL_INTERPHALANGEAL_JOINTS_OF_FOOT.R",
               "vertices": 21
             },
             {
-              "name": "Mesh_510",
-              "parent": "ADULT.MALE.JOINT.ARTICULAR_CAPSULES_OF_METATARSOPHALANGEAL_JOINTS.R",
-              "vertices": 56
-            },
-            {
-              "name": "Mesh_511",
+              "name": "Mesh_508",
               "parent": "ADULT.MALE.JOINT.ARTICULAR_CAPSULES_OF_PROXIMAL_INTERPHALANGEAL_JOINTS_OF_FOOT.R",
               "vertices": 22
             },
             {
-              "name": "Mesh_512",
-              "parent": "ADULT.MALE.JOINT.CALCANEOCUBOID_LIGAMENT.R",
-              "vertices": 6
-            },
-            {
-              "name": "Mesh_513",
-              "parent": "ADULT.MALE.JOINT.CALCANEOFIBULAR_LIGAMENT.R",
-              "vertices": 7
-            },
-            {
-              "name": "Mesh_514",
-              "parent": "ADULT.MALE.JOINT.CALCANEONAVICULAR_LIGAMENT.R",
-              "vertices": 7
-            },
-            {
-              "name": "Mesh_515",
+              "name": "Mesh_509",
               "parent": "ADULT.MALE.JOINT.COLLATERAL_INTERPHALANGEAL_LIGAMENTS_OF_FOOT.R",
               "vertices": 54
             },
             {
-              "name": "Mesh_516",
-              "parent": "ADULT.MALE.JOINT.COLLATERAL_METATARSOPHALANGEAL_LIGAMENTS.R",
-              "vertices": 37
-            },
-            {
-              "name": "Mesh_517",
-              "parent": "ADULT.MALE.JOINT.CUNEOCUBOID_INTEROSSEOUS_LIGAMENT.R",
-              "vertices": 6
-            },
-            {
-              "name": "Mesh_518",
-              "parent": "ADULT.MALE.JOINT.CUNEOMETATARSAL_INTEROSSEOUS_LIGAMENTS.R",
-              "vertices": 10
-            },
-            {
-              "name": "Mesh_519",
-              "parent": "ADULT.MALE.JOINT.DEEP_TRANSVERSE_METATARSAL_LIGAMENT.R",
-              "vertices": 16
-            },
-            {
-              "name": "Mesh_520",
-              "parent": "ADULT.MALE.JOINT.DORSAL_CALCANEOCUBOID_LIGAMENT.R",
-              "vertices": 6
-            },
-            {
-              "name": "Mesh_521",
-              "parent": "ADULT.MALE.JOINT.DORSAL_CUBOIDEONAVICULAR_LIGAMENT.R",
-              "vertices": 6
-            },
-            {
-              "name": "Mesh_522",
-              "parent": "ADULT.MALE.JOINT.DORSAL_CUNEOCUBOID_LIGAMENT.R",
-              "vertices": 7
-            },
-            {
-              "name": "Mesh_523",
-              "parent": "ADULT.MALE.JOINT.DORSAL_CUNEONAVICULAR_LIGAMENTS.R",
-              "vertices": 12
-            },
-            {
-              "name": "Mesh_524",
-              "parent": "ADULT.MALE.JOINT.DORSAL_INTERCUNEIFORM_LIGAMENTS.R",
-              "vertices": 9
-            },
-            {
-              "name": "Mesh_525",
-              "parent": "ADULT.MALE.JOINT.DORSAL_METATARSAL_LIGAMENTS.R",
-              "vertices": 13
-            },
-            {
-              "name": "Mesh_526",
-              "parent": "ADULT.MALE.JOINT.DORSAL_TARSOMETATARSAL_LIGAMENTS.R",
-              "vertices": 24
-            },
-            {
-              "name": "Mesh_527",
-              "parent": "ADULT.MALE.JOINT.INTERCUNEIFORM_INTEROSSEOUS_LIGAMENTS.R",
-              "vertices": 9
-            },
-            {
-              "name": "Mesh_528",
-              "parent": "ADULT.MALE.JOINT.INTERSESAMOID_LIGAMENT.R",
-              "vertices": 6
-            },
-            {
-              "name": "Mesh_529",
-              "parent": "ADULT.MALE.JOINT.LATERAL_TALOCALCANEAL_LIGAMENT.R",
-              "vertices": 7
-            },
-            {
-              "name": "Mesh_530",
-              "parent": "ADULT.MALE.JOINT.LONG_PLANTAR_LIGAMENT.R",
-              "vertices": 38
-            },
-            {
-              "name": "Mesh_531",
-              "parent": "ADULT.MALE.JOINT.MEDIAL_TALOCALCANEAL_LIGAMENT.R",
-              "vertices": 7
-            },
-            {
-              "name": "Mesh_532",
-              "parent": "ADULT.MALE.JOINT.METATARSAL_INTEROSSEOUS_LIGAMENTS.R",
-              "vertices": 13
-            },
-            {
-              "name": "Mesh_533",
-              "parent": "ADULT.MALE.JOINT.PLANTAR_CALCANEOCUBOID_LIGAMENT.R",
-              "vertices": 7
-            },
-            {
-              "name": "Mesh_534",
-              "parent": "ADULT.MALE.JOINT.PLANTAR_CALCANEONAVICULAR_LIGAMENT.R",
-              "vertices": 7
-            },
-            {
-              "name": "Mesh_535",
-              "parent": "ADULT.MALE.JOINT.PLANTAR_CUBOIDEONAVICULAR_LIGAMENT.R",
-              "vertices": 6
-            },
-            {
-              "name": "Mesh_536",
-              "parent": "ADULT.MALE.JOINT.PLANTAR_CUNEOCUBOID_LIGAMENT.R",
-              "vertices": 6
-            },
-            {
-              "name": "Mesh_537",
-              "parent": "ADULT.MALE.JOINT.PLANTAR_CUNEONAVICULAR_LIGAMENTS.R",
-              "vertices": 11
-            },
-            {
-              "name": "Mesh_538",
-              "parent": "ADULT.MALE.JOINT.PLANTAR_INTERCUNEIFORM_LIGAMENTS.R",
-              "vertices": 8
-            },
-            {
-              "name": "Mesh_539",
+              "name": "Mesh_510",
               "parent": "ADULT.MALE.JOINT.PLANTAR_INTERPHALANGEAL_LIGAMENTS.R",
               "vertices": 29
             },
             {
-              "name": "Mesh_540",
-              "parent": "ADULT.MALE.JOINT.PLANTAR_METATARSAL_LIGAMENTS.R",
-              "vertices": 14
-            },
-            {
-              "name": "Mesh_541",
-              "parent": "ADULT.MALE.JOINT.PLANTAR_METATARSOPHALANGEAL_LIGAMENTS.R",
-              "vertices": 24
-            },
-            {
-              "name": "Mesh_542",
-              "parent": "ADULT.MALE.JOINT.PLANTAR_TARSOMETATARSAL_LIGAMENTS.R",
-              "vertices": 16
-            },
-            {
-              "name": "Mesh_543",
-              "parent": "ADULT.MALE.JOINT.POSTERIOR_TALOCALCANEAL_LIGAMENT.R",
-              "vertices": 7
-            },
-            {
-              "name": "Mesh_544",
-              "parent": "ADULT.MALE.JOINT.POSTERIOR_TALOFIBULAR_LIGAMENT.R",
-              "vertices": 7
-            },
-            {
-              "name": "Mesh_545",
-              "parent": "ADULT.MALE.JOINT.TALOCALCANEAL_INTEROSSEOUS_LIGAMENT.R",
-              "vertices": 10
-            },
-            {
-              "name": "Mesh_546",
-              "parent": "ADULT.MALE.JOINT.TALONAVICULAR_LIGAMENT.R",
-              "vertices": 8
-            },
-            {
-              "name": "Mesh_547",
-              "parent": "ADULT.MALE.JOINT.TIBIOCALCANEAL_LIGAMENT.R",
-              "vertices": 9
-            },
-            {
-              "name": "Mesh_548",
-              "parent": "ADULT.MALE.JOINT.TIBIONAVICULAR_LIGAMENT.R",
-              "vertices": 12
-            },
-            {
-              "name": "Mesh_549",
-              "parent": "ADULT.MALE.SKELETAL.CALCANEUS.R",
-              "vertices": 91
-            },
-            {
-              "name": "Mesh_550",
-              "parent": "ADULT.MALE.SKELETAL.CUBOID_BONE.R",
-              "vertices": 42
-            },
-            {
-              "name": "Mesh_551",
+              "name": "Mesh_511",
               "parent": "ADULT.MALE.SKELETAL.DISTAL_PHALANX_OF_FIFTH_FINGER_OF_FOOT.R",
               "vertices": 10
             },
             {
-              "name": "Mesh_552",
+              "name": "Mesh_512",
               "parent": "ADULT.MALE.SKELETAL.DISTAL_PHALANX_OF_FIRST_FINGER_OF_FOOT.R",
               "vertices": 18
             },
             {
-              "name": "Mesh_553",
+              "name": "Mesh_513",
               "parent": "ADULT.MALE.SKELETAL.DISTAL_PHALANX_OF_FOURTH_FINGER_OF_FOOT.R",
               "vertices": 11
             },
             {
-              "name": "Mesh_554",
+              "name": "Mesh_514",
               "parent": "ADULT.MALE.SKELETAL.DISTAL_PHALANX_OF_SECOND_FINGER_OF_FOOT.R",
               "vertices": 10
             },
             {
-              "name": "Mesh_555",
+              "name": "Mesh_515",
               "parent": "ADULT.MALE.SKELETAL.DISTAL_PHALANX_OF_THIRD_FINGER_OF_FOOT.R",
               "vertices": 11
             },
             {
-              "name": "Mesh_556",
-              "parent": "ADULT.MALE.SKELETAL.FIFTH_METATARSAL_BONE.R",
-              "vertices": 40
-            },
-            {
-              "name": "Mesh_557",
-              "parent": "ADULT.MALE.SKELETAL.FIRST_METATARSAL_BONE.R",
-              "vertices": 54
-            },
-            {
-              "name": "Mesh_558",
-              "parent": "ADULT.MALE.SKELETAL.FOURTH_METATARSAL_BONE.R",
-              "vertices": 30
-            },
-            {
-              "name": "Mesh_559",
-              "parent": "ADULT.MALE.SKELETAL.INTERMEDIATE_CUNEIFORM_BONE.R",
-              "vertices": 23
-            },
-            {
-              "name": "Mesh_560",
-              "parent": "ADULT.MALE.SKELETAL.LATERAL_CUNEIFORM_BONE.R",
-              "vertices": 29
-            },
-            {
-              "name": "Mesh_561",
-              "parent": "ADULT.MALE.SKELETAL.MEDIAL_CUNEIFORM_BONE.R",
-              "vertices": 36
-            },
-            {
-              "name": "Mesh_562",
+              "name": "Mesh_516",
               "parent": "ADULT.MALE.SKELETAL.MIDDLE_PHALANX_OF_FIFTH_FINGER_OF_FOOT.R",
               "vertices": 14
             },
             {
-              "name": "Mesh_563",
+              "name": "Mesh_517",
               "parent": "ADULT.MALE.SKELETAL.MIDDLE_PHALANX_OF_FOURTH_FINGER_OF_FOOT.R",
               "vertices": 14
             },
             {
-              "name": "Mesh_564",
+              "name": "Mesh_518",
               "parent": "ADULT.MALE.SKELETAL.MIDDLE_PHALANX_OF_SECOND_FINGER_OF_FOOT.R",
               "vertices": 15
             },
             {
-              "name": "Mesh_565",
+              "name": "Mesh_519",
               "parent": "ADULT.MALE.SKELETAL.MIDDLE_PHALANX_OF_THIRD_FINGER_OF_FOOT.R",
               "vertices": 12
             },
             {
-              "name": "Mesh_566",
-              "parent": "ADULT.MALE.SKELETAL.NAVICULAR_BONE.R",
-              "vertices": 38
-            },
-            {
-              "name": "Mesh_567",
+              "name": "Mesh_520",
               "parent": "ADULT.MALE.SKELETAL.PROXIMAL_PHALANX_OF_FIFTH_FINGER_OF_FOOT.R",
               "vertices": 18
             },
             {
-              "name": "Mesh_568",
+              "name": "Mesh_521",
               "parent": "ADULT.MALE.SKELETAL.PROXIMAL_PHALANX_OF_FIRST_FINGER_OF_FOOT.R",
               "vertices": 29
             },
             {
-              "name": "Mesh_569",
+              "name": "Mesh_522",
               "parent": "ADULT.MALE.SKELETAL.PROXIMAL_PHALANX_OF_FOURTH_FINGER_OF_FOOT.R",
               "vertices": 18
             },
             {
-              "name": "Mesh_570",
+              "name": "Mesh_523",
               "parent": "ADULT.MALE.SKELETAL.PROXIMAL_PHALANX_OF_SECOND_FINGER_OF_FOOT.R",
               "vertices": 18
             },
             {
-              "name": "Mesh_571",
+              "name": "Mesh_524",
               "parent": "ADULT.MALE.SKELETAL.PROXIMAL_PHALANX_OF_THIRD_FINGER_OF_FOOT.R",
               "vertices": 19
+            },
+            {
+              "name": "Mesh_525",
+              "parent": "ADULT.MALE.JOINT.ANTERIOR_TALOCALCANEAL_LIGAMENT.R",
+              "vertices": 8
+            },
+            {
+              "name": "Mesh_526",
+              "parent": "ADULT.MALE.JOINT.ANTERIOR_TALOFIBULAR_LIGAMENT.R",
+              "vertices": 7
+            },
+            {
+              "name": "Mesh_527",
+              "parent": "ADULT.MALE.JOINT.ARTICULAR_CAPSULES_OF_METATARSOPHALANGEAL_JOINTS.R",
+              "vertices": 56
+            },
+            {
+              "name": "Mesh_528",
+              "parent": "ADULT.MALE.JOINT.CALCANEOCUBOID_LIGAMENT.R",
+              "vertices": 6
+            },
+            {
+              "name": "Mesh_529",
+              "parent": "ADULT.MALE.JOINT.CALCANEOFIBULAR_LIGAMENT.R",
+              "vertices": 7
+            },
+            {
+              "name": "Mesh_530",
+              "parent": "ADULT.MALE.JOINT.CALCANEONAVICULAR_LIGAMENT.R",
+              "vertices": 7
+            },
+            {
+              "name": "Mesh_531",
+              "parent": "ADULT.MALE.JOINT.COLLATERAL_METATARSOPHALANGEAL_LIGAMENTS.R",
+              "vertices": 37
+            },
+            {
+              "name": "Mesh_532",
+              "parent": "ADULT.MALE.JOINT.CUNEOCUBOID_INTEROSSEOUS_LIGAMENT.R",
+              "vertices": 6
+            },
+            {
+              "name": "Mesh_533",
+              "parent": "ADULT.MALE.JOINT.CUNEOMETATARSAL_INTEROSSEOUS_LIGAMENTS.R",
+              "vertices": 10
+            },
+            {
+              "name": "Mesh_534",
+              "parent": "ADULT.MALE.JOINT.DEEP_TRANSVERSE_METATARSAL_LIGAMENT.R",
+              "vertices": 16
+            },
+            {
+              "name": "Mesh_535",
+              "parent": "ADULT.MALE.JOINT.DORSAL_CALCANEOCUBOID_LIGAMENT.R",
+              "vertices": 6
+            },
+            {
+              "name": "Mesh_536",
+              "parent": "ADULT.MALE.JOINT.DORSAL_CUBOIDEONAVICULAR_LIGAMENT.R",
+              "vertices": 6
+            },
+            {
+              "name": "Mesh_537",
+              "parent": "ADULT.MALE.JOINT.DORSAL_CUNEOCUBOID_LIGAMENT.R",
+              "vertices": 7
+            },
+            {
+              "name": "Mesh_538",
+              "parent": "ADULT.MALE.JOINT.DORSAL_CUNEONAVICULAR_LIGAMENTS.R",
+              "vertices": 12
+            },
+            {
+              "name": "Mesh_539",
+              "parent": "ADULT.MALE.JOINT.DORSAL_INTERCUNEIFORM_LIGAMENTS.R",
+              "vertices": 9
+            },
+            {
+              "name": "Mesh_540",
+              "parent": "ADULT.MALE.JOINT.DORSAL_METATARSAL_LIGAMENTS.R",
+              "vertices": 13
+            },
+            {
+              "name": "Mesh_541",
+              "parent": "ADULT.MALE.JOINT.DORSAL_TARSOMETATARSAL_LIGAMENTS.R",
+              "vertices": 24
+            },
+            {
+              "name": "Mesh_542",
+              "parent": "ADULT.MALE.JOINT.INTERCUNEIFORM_INTEROSSEOUS_LIGAMENTS.R",
+              "vertices": 9
+            },
+            {
+              "name": "Mesh_543",
+              "parent": "ADULT.MALE.JOINT.INTERSESAMOID_LIGAMENT.R",
+              "vertices": 6
+            },
+            {
+              "name": "Mesh_544",
+              "parent": "ADULT.MALE.JOINT.LATERAL_TALOCALCANEAL_LIGAMENT.R",
+              "vertices": 7
+            },
+            {
+              "name": "Mesh_545",
+              "parent": "ADULT.MALE.JOINT.LONG_PLANTAR_LIGAMENT.R",
+              "vertices": 38
+            },
+            {
+              "name": "Mesh_546",
+              "parent": "ADULT.MALE.JOINT.MEDIAL_TALOCALCANEAL_LIGAMENT.R",
+              "vertices": 7
+            },
+            {
+              "name": "Mesh_547",
+              "parent": "ADULT.MALE.JOINT.METATARSAL_INTEROSSEOUS_LIGAMENTS.R",
+              "vertices": 13
+            },
+            {
+              "name": "Mesh_548",
+              "parent": "ADULT.MALE.JOINT.PLANTAR_CALCANEOCUBOID_LIGAMENT.R",
+              "vertices": 7
+            },
+            {
+              "name": "Mesh_549",
+              "parent": "ADULT.MALE.JOINT.PLANTAR_CALCANEONAVICULAR_LIGAMENT.R",
+              "vertices": 7
+            },
+            {
+              "name": "Mesh_550",
+              "parent": "ADULT.MALE.JOINT.PLANTAR_CUBOIDEONAVICULAR_LIGAMENT.R",
+              "vertices": 6
+            },
+            {
+              "name": "Mesh_551",
+              "parent": "ADULT.MALE.JOINT.PLANTAR_CUNEOCUBOID_LIGAMENT.R",
+              "vertices": 6
+            },
+            {
+              "name": "Mesh_552",
+              "parent": "ADULT.MALE.JOINT.PLANTAR_CUNEONAVICULAR_LIGAMENTS.R",
+              "vertices": 11
+            },
+            {
+              "name": "Mesh_553",
+              "parent": "ADULT.MALE.JOINT.PLANTAR_INTERCUNEIFORM_LIGAMENTS.R",
+              "vertices": 8
+            },
+            {
+              "name": "Mesh_554",
+              "parent": "ADULT.MALE.JOINT.PLANTAR_METATARSAL_LIGAMENTS.R",
+              "vertices": 14
+            },
+            {
+              "name": "Mesh_555",
+              "parent": "ADULT.MALE.JOINT.PLANTAR_METATARSOPHALANGEAL_LIGAMENTS.R",
+              "vertices": 24
+            },
+            {
+              "name": "Mesh_556",
+              "parent": "ADULT.MALE.JOINT.PLANTAR_TARSOMETATARSAL_LIGAMENTS.R",
+              "vertices": 16
+            },
+            {
+              "name": "Mesh_557",
+              "parent": "ADULT.MALE.JOINT.POSTERIOR_TALOCALCANEAL_LIGAMENT.R",
+              "vertices": 7
+            },
+            {
+              "name": "Mesh_558",
+              "parent": "ADULT.MALE.JOINT.POSTERIOR_TALOFIBULAR_LIGAMENT.R",
+              "vertices": 7
+            },
+            {
+              "name": "Mesh_559",
+              "parent": "ADULT.MALE.JOINT.TALOCALCANEAL_INTEROSSEOUS_LIGAMENT.R",
+              "vertices": 10
+            },
+            {
+              "name": "Mesh_560",
+              "parent": "ADULT.MALE.JOINT.TALONAVICULAR_LIGAMENT.R",
+              "vertices": 8
+            },
+            {
+              "name": "Mesh_561",
+              "parent": "ADULT.MALE.JOINT.TIBIOCALCANEAL_LIGAMENT.R",
+              "vertices": 9
+            },
+            {
+              "name": "Mesh_562",
+              "parent": "ADULT.MALE.JOINT.TIBIONAVICULAR_LIGAMENT.R",
+              "vertices": 12
+            },
+            {
+              "name": "Mesh_563",
+              "parent": "ADULT.MALE.SKELETAL.CALCANEUS.R",
+              "vertices": 91
+            },
+            {
+              "name": "Mesh_564",
+              "parent": "ADULT.MALE.SKELETAL.CUBOID_BONE.R",
+              "vertices": 42
+            },
+            {
+              "name": "Mesh_565",
+              "parent": "ADULT.MALE.SKELETAL.FIFTH_METATARSAL_BONE.R",
+              "vertices": 40
+            },
+            {
+              "name": "Mesh_566",
+              "parent": "ADULT.MALE.SKELETAL.FIRST_METATARSAL_BONE.R",
+              "vertices": 54
+            },
+            {
+              "name": "Mesh_567",
+              "parent": "ADULT.MALE.SKELETAL.FOURTH_METATARSAL_BONE.R",
+              "vertices": 30
+            },
+            {
+              "name": "Mesh_568",
+              "parent": "ADULT.MALE.SKELETAL.INTERMEDIATE_CUNEIFORM_BONE.R",
+              "vertices": 23
+            },
+            {
+              "name": "Mesh_569",
+              "parent": "ADULT.MALE.SKELETAL.LATERAL_CUNEIFORM_BONE.R",
+              "vertices": 29
+            },
+            {
+              "name": "Mesh_570",
+              "parent": "ADULT.MALE.SKELETAL.MEDIAL_CUNEIFORM_BONE.R",
+              "vertices": 36
+            },
+            {
+              "name": "Mesh_571",
+              "parent": "ADULT.MALE.SKELETAL.NAVICULAR_BONE.R",
+              "vertices": 38
             },
             {
               "name": "Mesh_572",
@@ -1039,14 +1053,14 @@
           "vertices": 1380,
           "bounds": {
             "min": [
-              -0.14650648832321167,
-              -0.1370682269334793,
-              -0.034021273255348206
+              -0.1465054601430893,
+              -0.13706925511360168,
+              -0.04294287785887718
             ],
             "max": [
-              -0.050601281225681305,
-              0.09152892231941223,
-              0.04312294349074364
+              -0.05060175061225891,
+              0.0915282592177391,
+              0.03420138731598854
             ]
           }
         }
@@ -1098,6 +1112,10 @@
             "path": "rotation"
           },
           {
+            "node": "TOE.L",
+            "path": "rotation"
+          },
+          {
             "node": "THIGH.R",
             "path": "rotation"
           },
@@ -1107,6 +1125,10 @@
           },
           {
             "node": "FOOT.R",
+            "path": "rotation"
+          },
+          {
+            "node": "TOE.R",
             "path": "rotation"
           }
         ],
@@ -1156,6 +1178,10 @@
             "path": "rotation"
           },
           {
+            "node": "TOE.L",
+            "path": "rotation"
+          },
+          {
             "node": "THIGH.R",
             "path": "rotation"
           },
@@ -1165,6 +1191,10 @@
           },
           {
             "node": "FOOT.R",
+            "path": "rotation"
+          },
+          {
+            "node": "TOE.R",
             "path": "rotation"
           },
           {
@@ -1218,6 +1248,10 @@
             "path": "rotation"
           },
           {
+            "node": "TOE.L",
+            "path": "rotation"
+          },
+          {
             "node": "THIGH.R",
             "path": "rotation"
           },
@@ -1230,6 +1264,10 @@
             "path": "rotation"
           },
           {
+            "node": "TOE.R",
+            "path": "rotation"
+          },
+          {
             "node": "RIG.ADULT_MALE",
             "path": "translation"
           }
@@ -1238,13 +1276,13 @@
       "world_bounds": {
         "min": [
           -0.3343604505062103,
-          -0.13707050681114197,
-          -0.03402283787727356
+          -0.13706935942173004,
+          -0.04294376075267792
         ],
         "max": [
-          0.334351509809494,
-          0.11314914375543594,
-          1.662872552871704
+          0.3343515694141388,
+          0.11314909905195236,
+          1.6539499759674072
         ]
       },
       "nonfinite_or_exactly_singular_transforms": []
