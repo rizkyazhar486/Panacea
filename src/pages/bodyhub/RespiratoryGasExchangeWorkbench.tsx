@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { AlveolarGasBudgetLab } from '../../domains/physiology/ui'
+import { AlveolarGasBudgetLab, GasExchangeIdentitiesLab } from '../../domains/physiology/ui'
 import {
   RESPIRATORY_GAS_EXCHANGE_BOUNDARY,
   RESPIRATORY_GAS_EXCHANGE_DEFAULTS,
@@ -36,6 +36,7 @@ export default function RespiratoryGasExchangeWorkbench() {
     <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-4"><Signal label="Airway resistance" value={outputs.airwayResistanceSignal}/><Signal label="Alveolar ventilation" value={outputs.alveolarVentilationSignal}/><Signal label="O₂ transfer" value={outputs.oxygenTransferSignal}/><Signal label="Gas-exchange reserve" value={outputs.gasExchangeReserveSignal}/></div>
     <div className="mt-4 rounded-2xl border border-white/[.07] p-3"><div className="text-[9px] font-black uppercase text-white/50">Formula ledger</div>{RESPIRATORY_TEACHING_EQUATIONS.map((item) => <div key={item.expression} className="mt-2 grid gap-1 sm:grid-cols-[150px_1fr]"><code className="text-[10px] text-cyan-100/75">{item.expression}</code><span className="text-[9px] leading-relaxed text-white/40">{item.meaning}</span></div>)}</div>
     <AlveolarGasBudgetLab />
+    <GasExchangeIdentitiesLab />
     <details className="mt-3 rounded-2xl border border-white/[.07] p-3"><summary className="cursor-pointer text-[9px] font-black uppercase text-white/50">Evidence & boundary</summary><p className="mt-2 text-[9px] leading-relaxed text-white/40">{RESPIRATORY_GAS_EXCHANGE_BOUNDARY}</p>{RESPIRATORY_GAS_EXCHANGE_PROVENANCE.map((source) => <p key={source.pmid} className="mt-2 text-[9px] leading-relaxed text-white/35">PMID {source.pmid} · {source.citation} · {source.supports} {source.reviewState}</p>)}</details>
   </section>
 }

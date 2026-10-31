@@ -105,5 +105,5 @@ assert.ok(!/\b(?:1\.34|0\.003|0\.0034|142\b)/.test(sumber), 'tidak ada konstanta
 assert.ok(!/(?:meaningSourceIds|identifiableFrom)\s*:\s*\[/.test(sumber), 'tidak ada literal deklarasi parameter di model/engine')
 assert.ok(!/\bDECLARATIONS?\b/.test(sumber), 'tidak ada registry deklarasi di gerbang')
 const berkas = readdirSync(new URL('../../src/domains/physiology', import.meta.url), { recursive: true }) as string[]
-assert.deepEqual(berkas.filter((f) => f.endsWith('.ts')).sort(), ['engine/alveolarGasBudget.ts', 'engine/gasExchangeIdentities.ts', 'engine/personalizationGate.ts', 'index.ts', 'model/personalization.ts', 'ui/index.ts'])
+assert.deepEqual(berkas.filter((f) => f.endsWith('.ts')).sort(), ['engine/alveolarGasBudget.ts', 'engine/gasExchangeIdentities.ts', 'engine/gasIdentityPanel.ts', 'engine/personalizationGate.ts', 'index.ts', 'model/personalization.ts', 'ui/index.ts'])
 console.log('personalization-gate: eligibility needs meaning, identifiability, enough distinct observations, uncertainty, provenance, bounded step, rollback and held-out validation; blocked values never leak')
