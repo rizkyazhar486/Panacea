@@ -3,14 +3,16 @@ import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import vm from 'node:vm'
 import ts from 'typescript'
-import { dokumenInti, simpanIrisan, muatIrisan, VERSI_IRISAN } from '../../server/src/irisanPenyimpanan.ts'
+import { createHash } from 'node:crypto'
+import { dokumenInti, simpanIrisan, muatIrisan, VERSI_IRISAN, buatJejakTulis } from '../../server/src/irisanPenyimpanan.ts'
 
 // Execute the production scheduling functions, replacing only disk, clock and
 // Mongo I/O boundaries. No application module or real patient database is loaded.
 function harness({ mongo = true } = {}) {
   const source = ts.createSourceFile('store.ts', readFileSync(new URL('../../server/src/store.ts', import.meta.url), 'utf8'), ts.ScriptTarget.Latest, true)
   const names = new Set(['save', 'flushSimpan', 'simpanSekarang', 'simpanMongo', 'flushStore', 'antrikanSimpanMongo'])
-  const variables = new Set(['saveTimer', 'simpanTertunda', 'mongoSaveTail', 'irisanAktif'])
+  // jejakTulisMongo/sidikIntiTertulis/statistikInti: tulis inkremental (hanya dokumen yang berubah) ikut diuji di jalur produksi
+  const variables = new Set(['saveTimer', 'simpanTertunda', 'mongoSaveTail', 'irisanAktif', 'jejakTulisMongo', 'sidikIntiTertulis', 'statistikInti'])
   const code = source.statements.filter(node => ts.isFunctionDeclaration(node) ? names.has(node.name?.text)
     : ts.isVariableStatement(node) && node.declarationList.declarations.some(d => variables.has(d.name.getText(source))))
     .map(node => node.getText(source)).join('\n')
@@ -20,21 +22,24 @@ function harness({ mongo = true } = {}) {
     setTimeout: fn => { const id = ++serial; timers.set(id, fn); return id }, queueMicrotask,
     db: { clinical: { hasilLab: {}, rujukanKlinis: {} } }, DB_PATH: 'synthetic', statistikSimpan: { serialisasi: 0 },
     isiConnect: () => ({}), tulisAtomik: () => {}, catatBerhasil: () => {}, catatGagal: () => {},
-    BATAS_DOKUMEN_MONGO: 16 * 1024 * 1024, dokumenInti, VERSI_IRISAN,
+    BATAS_DOKUMEN_MONGO: 16 * 1024 * 1024, dokumenInti, VERSI_IRISAN, buatJejakTulis, createHash,
     mongoCol: mongo ? { async updateOne() {} } : null,
     mongoDb: { collection(name) {
       if (!columns.has(name)) columns.set(name, new Map())
       const rows = columns.get(name)
       return { async bulkWrite(ops) { for (const op of ops) rows.set(op.updateOne.filter._id, structuredClone(op.updateOne.update.$set)) },
-        async deleteMany(filter) { for (const key of rows.keys()) if (!filter._id.$nin.includes(key)) rows.delete(key) },
+        async deleteMany(filter) {
+          if (filter._id.$nin) for (const key of rows.keys()) if (!filter._id.$nin.includes(key)) rows.delete(key)
+          if (filter._id.$in) for (const key of filter._id.$in) rows.delete(key)
+        },
         find() { return { async toArray() { return [...rows].map(([id, row]) => ({ _id: id, ...structuredClone(row) })) } } } }
     } },
-    async simpanIrisan(database, state) {
+    async simpanIrisan(database, state, kini, jejak) {
       writes++; active++; maximum = Math.max(maximum, active)
       const snapshot = structuredClone(state)
       const wait = hold; hold = undefined
       started?.(); started = undefined
-      try { if (wait) await wait; await simpanIrisan(database, snapshot) } finally { active-- }
+      try { if (wait) await wait; await simpanIrisan(database, snapshot, kini, jejak) } finally { active-- }
     },
   })
   vm.runInContext(ts.transpileModule(code, { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 } }).outputText, context)

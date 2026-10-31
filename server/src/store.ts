@@ -5,10 +5,10 @@ import { readFileSync, existsSync, appendFileSync, mkdirSync } from 'node:fs'
 import { isiConnect, muatConnect, pasangPenyimpan } from './connect.js'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
-import { randomBytes } from 'node:crypto'
+import { randomBytes, createHash } from 'node:crypto'
 import { KATALOG } from './domains/push/healthMetrics.js'
 import { tulisAtomik, amankanBerkasRusak, catatBerhasil, catatGagal, BATAS_DOKUMEN_MONGO } from './simpanAman.js'
-import { dokumenInti, muatIrisan, pasangIrisan, pastikanIndeksIrisan, simpanIrisan, VERSI_IRISAN } from './irisanPenyimpanan.js'
+import { dokumenInti, muatIrisan, pasangIrisan, pastikanIndeksIrisan, simpanIrisan, VERSI_IRISAN, buatJejakTulis } from './irisanPenyimpanan.js'
 import { ambilEncounter, daftarEncounter, daftarRiwayatEncounter, simpanEncounter } from './domains/clinical-records/rekamEncounter.js'
 import { tambahkanLangganan, type LanggananPush } from './domains/push/pushSubscription.js'
 
@@ -446,20 +446,37 @@ function antrikanSimpanMongo(): Promise<void> {
   return mongoSaveTail
 }
 
+// Hanya dokumen yang berubah yang dikirim ke MongoDB; alasannya di irisanPenyimpanan.ts (JejakTulis).
+const jejakTulisMongo = buatJejakTulis()
+let sidikIntiTertulis: string | null = null
+const statistikInti = { ditulis: 0, dilewati: 0, byteDitulis: 0 }
+/** Statistik tulis MongoDB proses ini (jumlah dokumen dan byte terkirim), untuk log trafik keluar. Tanpa isi data. */
+export function statistikTulisMongo() {
+  return { irisan: { ...jejakTulisMongo.statistik }, inti: { ...statistikInti } }
+}
+
 async function simpanMongo(): Promise<void> {
   // Batas 16 MB diukur pada dokumen inti saja. Irisan lab/cek harian sudah
   // keluar ke koleksi sendiri; memasukkan mereka ke ukuran ini akan menolak
   // simpan justru ketika pemisahan itu sedang bekerja.
   const inti = dokumenInti(db as unknown as Record<string, unknown>)
-  const ukuran = Buffer.byteLength(JSON.stringify(inti))
+  const teksInti = JSON.stringify(inti)
+  const ukuran = Buffer.byteLength(teksInti)
   if (ukuran >= BATAS_DOKUMEN_MONGO) {
     catatGagal(new Error(`state ${ukuran} bytes exceeds the MongoDB 16 MB document limit`))
     console.error('[store] NOT SAVED to MongoDB: state exceeds 16 MB document limit')
     return
   }
   try {
-    if (mongoDb) await simpanIrisan(mongoDb, db as unknown as Record<string, unknown>)
-    await mongoCol.updateOne({ _id: 'state' }, { $set: { data: inti, at: new Date(), irisan: VERSI_IRISAN } }, { upsert: true })
+    if (mongoDb) await simpanIrisan(mongoDb, db as unknown as Record<string, unknown>, new Date(), jejakTulisMongo)
+    // Dokumen inti dikirim hanya bila isinya berubah sejak tulisan terakhir yang berhasil di proses ini.
+    const sidikInti = createHash('sha256').update(teksInti).digest('base64')
+    if (sidikInti !== sidikIntiTertulis) {
+      await mongoCol.updateOne({ _id: 'state' }, { $set: { data: inti, at: new Date(), irisan: VERSI_IRISAN } }, { upsert: true })
+      sidikIntiTertulis = sidikInti
+      statistikInti.ditulis++
+      statistikInti.byteDitulis += ukuran
+    } else statistikInti.dilewati++
     irisanAktif = true
     catatBerhasil(ukuran)
   } catch (e) {

@@ -749,6 +749,64 @@ export function pasangIrisan(keadaan: Record<string, unknown>, irisan: IrisanDat
   if (irisan.audit) keadaan.audit = irisan.audit
 }
 
+/**
+ * Sidik setiap dokumen yang terakhir BERHASIL ditulis, per koleksi, ditambah statistik tulis.
+ *
+ * Tanpa jejak ini setiap save() mengirim ulang SELURUH isi semua koleksi ke MongoDB, termasuk
+ * dokumen yang tidak berubah. Trafik itu dimulai server sendiri (keluar dari host), jadi ikut
+ * dihitung kuota bandwidth penyedia. Dengan jejak, hanya dokumen yang isinya berubah yang ditulis
+ * dan hanya id yang hilang yang dihapus. Tulisan pertama tiap koleksi dalam satu proses tetap
+ * penuh, termasuk pembersihan `$nin`, agar dokumen liar dari versi/proses lama tetap dibersihkan.
+ * Sidik diperbarui hanya SETELAH tulis berhasil, sehingga kegagalan selalu diulang pada simpan
+ * berikutnya. Asumsi: hanya proses ini yang menulis koleksi-koleksi ini (satu instans).
+ */
+export interface StatistikTulis { simpan: number; ditulis: number; dilewati: number; dihapus: number; byteDitulis: number }
+export interface JejakTulis { koleksi: Map<string, Map<string, string>>; statistik: StatistikTulis }
+
+export function buatJejakTulis(): JejakTulis {
+  return { koleksi: new Map(), statistik: { simpan: 0, ditulis: 0, dilewati: 0, dihapus: 0, byteDitulis: 0 } }
+}
+
+const sidikTeks = (teks: string) => createHash('sha256').update(teks).digest('base64')
+const opTulis = (d: DokumenIrisan) => {
+  const { _id, ...bidang } = d
+  return { updateOne: { filter: { _id }, update: { $set: bidang }, upsert: true } }
+}
+
+async function tulisBerubah(col: KoleksiIrisan, nama: string, dokumen: DokumenIrisan[], jejak: JejakTulis, tambahSaja: boolean): Promise<void> {
+  const st = jejak.statistik
+  const tercatat = jejak.koleksi.get(nama)
+  const sidik = new Map<string, string>()
+  const berubah: DokumenIrisan[] = []
+  let byte = 0
+  for (const d of dokumen) {
+    const { _id, ...bidang } = d
+    const teks = JSON.stringify(bidang)
+    const s = sidikTeks(teks)
+    sidik.set(String(_id), s)
+    if (tercatat?.get(String(_id)) === s) { st.dilewati++; continue }
+    berubah.push(d)
+    byte += Buffer.byteLength(teks)
+  }
+  if (berubah.length) await col.bulkWrite(berubah.map(opTulis))
+  st.ditulis += berubah.length
+  st.byteDitulis += byte
+
+  if (!tercatat) {
+    // Tulisan pertama koleksi ini dalam proses: perilaku lama (bersihkan semua id yang tidak ada di memori).
+    if (!tambahSaja) await col.deleteMany({ _id: { $nin: dokumen.map((d) => d._id) } })
+    jejak.koleksi.set(nama, sidik)
+    return
+  }
+  for (const d of berubah) tercatat.set(String(d._id), sidik.get(String(d._id))!)
+  if (tambahSaja) return
+  const hilang = [...tercatat.keys()].filter((id) => !sidik.has(id))
+  if (!hilang.length) return
+  await col.deleteMany({ _id: { $in: hilang } })
+  for (const id of hilang) tercatat.delete(id)
+  st.dihapus += hilang.length
+}
+
 async function tulisTambah(col: KoleksiIrisan, dokumen: DokumenIrisan[]): Promise<void> {
   if (!dokumen.length) return
   await col.bulkWrite(dokumen.map((d) => {
@@ -768,15 +826,19 @@ async function tulisKoleksi(col: KoleksiIrisan, dokumen: DokumenIrisan[]): Promi
   await col.deleteMany({ _id: { $nin: ids } })
 }
 
-/** Tulis koleksi dulu, penanda versi paling akhir. */
-export async function simpanIrisan(db: DbIrisan, keadaan: Record<string, unknown>, kini = new Date()): Promise<void> {
+/** Tulis koleksi dulu, penanda versi paling akhir. Dengan `jejak`, hanya dokumen yang berubah yang dikirim. */
+export async function simpanIrisan(db: DbIrisan, keadaan: Record<string, unknown>, kini = new Date(), jejak?: JejakTulis): Promise<void> {
   const dokumen = susunDokumen(keadaan)
+  if (jejak) jejak.statistik.simpan++
   for (const [nama, isi] of Object.entries(dokumen)) {
     if (nama === KOLEKSI_IRISAN.validasiLedger) {
-      if (Array.isArray(keadaan.validasiLedger)) await tulisTambah(db.collection(nama), isi)
+      if (!Array.isArray(keadaan.validasiLedger)) continue
+      if (jejak) await tulisBerubah(db.collection(nama), nama, isi, jejak, true)
+      else await tulisTambah(db.collection(nama), isi)
       continue
     }
-    await tulisKoleksi(db.collection(nama), isi)
+    if (jejak) await tulisBerubah(db.collection(nama), nama, isi, jejak, false)
+    else await tulisKoleksi(db.collection(nama), isi)
   }
   await tulisKoleksi(db.collection(KOLEKSI_IRISAN.meta), [{ _id: 'lab-care', urutan: 0, versi: VERSI_IRISAN, at: kini.toISOString() }])
 }

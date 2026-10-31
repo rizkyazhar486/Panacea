@@ -195,8 +195,18 @@ import { mountVisitRoutes } from './modules/visits/visits.js'
 import { validasiPengingatBaru, validasiTambalPengingat } from './domains/medication-reminders/pengingatObat.js'
 import { postUntukPemirsa } from './domains/social-feed/postPrivacy.js'
 import { validasiLanggananPush, type LanggananPush } from './domains/push/pushSubscription.js'
-import { MAKS_AKTIVITAS_POS, MAKS_CAPTION_POS } from './store.js'
+import { MAKS_AKTIVITAS_POS, MAKS_CAPTION_POS, statistikTulisMongo } from './store.js'
 import { penandaLog } from './domains/observability/logIdentity.js'
+import { buatMeter, bungkusFetch, ringkasanTrafik } from './domains/observability/trafikKeluar.js'
+
+// Ukur trafik yang dimulai server (fetch keluar) per host, tanpa mengubah perilakunya.
+// Alasan dan batasnya ada di domains/observability/trafikKeluar.ts.
+const meterTrafikKeluar = buatMeter()
+globalThis.fetch = bungkusFetch(globalThis.fetch.bind(globalThis), meterTrafikKeluar) as typeof fetch
+setInterval(() => {
+  // Kumulatif sejak proses hidup. fetch: per host; mongo: dokumen/byte yang benar-benar dikirim driver (perkiraan JSON, bukan BSON di kabel).
+  console.log(JSON.stringify({ jenis: 'trafik_keluar_per_jam', fetch: ringkasanTrafik(meterTrafikKeluar, 10), mongo: statistikTulisMongo() }))
+}, 3600_000).unref()
 
 const app = express()
 // Security headers (CSP disabled here — the SPA is served from GitHub Pages,
