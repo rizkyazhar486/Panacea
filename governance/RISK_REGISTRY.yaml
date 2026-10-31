@@ -48,6 +48,7 @@ risks:
       - server/src/store.ts
       - server/src/domains/observability/egressKeluar.ts
       - server/uji/egressTerukur.uji.ts
+      - server/uji/mongoSemaiBoot.uji.ts
       - scripts/qa/mongo-save-drain.test.mjs
       - server/uji/mongoRestart.uji.ts
       - .github/workflows/mongo-persistence.yml
@@ -712,7 +713,7 @@ risks:
       state and is NOT a measured reduction of the billed Render bandwidth. Not yet verified:
       whether Mongo traffic is the dominant source (candidates not excluded: web-push and
       email delivery, the 90 s sports poll, outbound AI and medical-reference calls; the 75 MB build-time
-      dataset download is inbound to the service, and whether Render counts it is unverified), the first save after each boot still rewrites everything once, and
+      dataset download is inbound to the service, and whether Render counts it is unverified), the first save after a boot now skips every document proven identical to what was read at boot (documents that differ, are missing or are orphaned are still written or deleted; the claim rests on offline fake-DB tests, not on a real restart against Mongo), and
       provider metrics after the service resumes. Measurement now exists in-process: /api/health
       reports response bytes per route template (uncompressed upper bound) and server-initiated
       fetch calls and request-body bytes per vendor host, since process start (host and route

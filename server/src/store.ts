@@ -8,7 +8,7 @@ import { dirname, join } from 'node:path'
 import { createHash, randomBytes } from 'node:crypto'
 import { KATALOG } from './domains/push/healthMetrics.js'
 import { tulisAtomik, amankanBerkasRusak, catatBerhasil, catatGagal, BATAS_DOKUMEN_MONGO } from './simpanAman.js'
-import { dokumenInti, muatIrisan, pasangIrisan, pastikanIndeksIrisan, simpanIrisan, VERSI_IRISAN, statistikTulisIrisan } from './irisanPenyimpanan.js'
+import { dokumenInti, muatIrisan, pasangIrisan, pastikanIndeksIrisan, simpanIrisan, VERSI_IRISAN, statistikTulisIrisan, semaiSidikTulis, semaiSidikInti, kanonLengkap } from './irisanPenyimpanan.js'
 import { ambilEncounter, daftarEncounter, daftarRiwayatEncounter, simpanEncounter } from './domains/clinical-records/rekamEncounter.js'
 import { tambahkanLangganan, type LanggananPush } from './domains/push/pushSubscription.js'
 
@@ -527,10 +527,17 @@ export async function initStore() {
     mongoCol = mongoDb.collection('app')
     await pastikanIndeksIrisan(mongoDb)
     const doc = await mongoCol.findOne({ _id: 'state' })
+    // Jejak dokumen inti SEBELUM dipasang: `db` memakai objek yang sama sehingga pasangIrisan akan mengubahnya.
+    const jejakIntiTersimpan = doc?.data && doc.irisan === VERSI_IRISAN ? kanonLengkap(doc.data) : null
     if (doc?.data) { db = doc.data as DB; muatConnect(db.connect) }
     const irisan = await muatIrisan(mongoDb)
     if (irisan) {
       pasangIrisan(db as unknown as Record<string, unknown>, irisan.data)
+      // Restart tidak perlu mengirim ulang isi Mongo yang terbukti sudah sama: semai sidik dari bacaan ini (lihat semaiSidikTulis).
+      const semai = semaiSidikTulis(mongoDb, db as unknown as Record<string, unknown>, irisan.lengkap)
+      const intiMuat = dokumenInti(db as unknown as Record<string, unknown>)
+      sidikIntiTertulis = semaiSidikInti(jejakIntiTersimpan, intiMuat, irisan.lengkap)
+      if (semai.dokumen) console.log(`[store] write fingerprints seeded from boot read: ${semai.dokumen} documents in ${semai.koleksi} collections`)
       // Connect memegang garam sidik. Muat modulnya SETELAH pasang, kalau
       // tidak garam acak yang lahir bersama proses menimpa garam tersimpan
       // pada simpan berikutnya.
