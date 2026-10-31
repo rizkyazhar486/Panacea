@@ -201,6 +201,15 @@ try {
   await refusedUnchanged(clinicalProbe, 'gzip', 401, 'unauthorized', { path: '/api/clinical/patient' })
   await refusedUnchanged(clinicalProbe, 'gzip', 403, 'patients can only create their own record', { path: '/api/clinical/patient', token: alice.token })
   assert.equal((await call('GET', '/api/health')).status, 200, 'parser refusals leave the server responsive')
+  // Blok egress.mongo di endpoint publik: hanya hitungan dan byte tulis, tanpa isi data atau penanda pasien.
+  const kesehatan = await call('GET', '/api/health')
+  const egressMongo = (kesehatan.body as { egress?: { mongo?: Record<string, Record<string, unknown>> } }).egress?.mongo
+  assert.deepEqual(Object.keys(egressMongo ?? {}).sort(), ['inti', 'irisan'], 'egress.mongo carries the slice and core write counters')
+  for (const [bagian, isi] of Object.entries(egressMongo ?? {})) {
+    assert.ok(Object.keys(isi).length > 0, `egress.mongo.${bagian} is not empty`)
+    for (const [k, v] of Object.entries(isi)) assert.ok(typeof v === 'number' && Number.isFinite(v) && v >= 0, `egress.mongo.${bagian}.${k} must be a non-negative number`)
+  }
+  assert.equal(/marker/i.test(JSON.stringify(kesehatan.body)), false, 'health must not echo any request marker')
   assert.equal((logs().match(/\[incident\]/g) ?? []).length, 0, 'parser refusals must not produce uncaught incidents')
   console.log('bodyParserBounds: identity/gzip/deflate exact 12 MiB accepted; +1 and high-ratio expansion refused 413; malformed 400, unsupported 415, auth 401/403, no writes; passed')
   await new Promise(resolve => setTimeout(resolve, 1500))

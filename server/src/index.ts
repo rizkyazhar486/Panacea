@@ -196,7 +196,7 @@ import { mountVisitRoutes } from './modules/visits/visits.js'
 import { validasiPengingatBaru, validasiTambalPengingat } from './domains/medication-reminders/pengingatObat.js'
 import { postUntukPemirsa } from './domains/social-feed/postPrivacy.js'
 import { validasiLanggananPush, type LanggananPush } from './domains/push/pushSubscription.js'
-import { MAKS_AKTIVITAS_POS, MAKS_CAPTION_POS } from './store.js'
+import { MAKS_AKTIVITAS_POS, MAKS_CAPTION_POS, statistikTulisMongo } from './store.js'
 import { penandaLog } from './domains/observability/logIdentity.js'
 
 const app = express()
@@ -291,7 +291,7 @@ app.get('/api/health', (_req, res) => {
     // Ringkasan HTTP dalam proses (tanpa isi permintaan): jumlah per kelas status dan latensi p50/p95.
     http: ringkasanObservabilitas(),
     // Byte keluar sejak proses mulai: respons per templat rute (batas atas) dan panggilan server ke vendor per host.
-    egress: { rute: egressPerRute(), vendor: ringkasanEgressKeluar() },
+    egress: { rute: egressPerRute(), vendor: ringkasanEgressKeluar(), mongo: statistikTulisMongo() },
     galatKlien: ringkasanGalatKlien(),
     simpan: { terakhirBerhasil: statusSimpan.terakhirBerhasil, gagalBeruntun: statusSimpan.gagalBeruntun, mendekatiBatas: statusSimpan.mendekatiBatas },
     features: { google: features.googleLive, payments: features.paymentsLive, ai: features.aiLive, push: features.pushLive, email: features.emailLive, payout: features.payoutLive, otpEmail: emailOtpLive },

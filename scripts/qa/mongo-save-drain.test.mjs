@@ -11,7 +11,7 @@ import { dokumenInti, simpanIrisan, muatIrisan, VERSI_IRISAN } from '../../serve
 function harness({ mongo = true } = {}) {
   const source = ts.createSourceFile('store.ts', readFileSync(new URL('../../server/src/store.ts', import.meta.url), 'utf8'), ts.ScriptTarget.Latest, true)
   const names = new Set(['save', 'flushSimpan', 'simpanSekarang', 'simpanMongo', 'flushStore', 'antrikanSimpanMongo'])
-  const variables = new Set(['saveTimer', 'simpanTertunda', 'mongoSaveTail', 'irisanAktif', 'sidikIntiTertulis'])
+  const variables = new Set(['saveTimer', 'simpanTertunda', 'mongoSaveTail', 'irisanAktif', 'sidikIntiTertulis', 'statistikTulisInti'])
   const code = source.statements.filter(node => ts.isFunctionDeclaration(node) ? names.has(node.name?.text)
     : ts.isVariableStatement(node) && node.declarationList.declarations.some(d => variables.has(d.name.getText(source))))
     .map(node => node.getText(source)).join('\n')
@@ -107,6 +107,19 @@ test('rapid requests coalesce and simultaneous drain callers await the same acti
   assert.equal(h.maximum, 1)
   assert.equal(completed, 2)
   assert.equal(h.writes, 1, 'rapid requests retain the existing debounce coalescing')
+})
+
+test('an unchanged core document is skipped and counted; a changed one is sent and counted', async () => {
+  const h = harness()
+  const statistik = () => vm.runInContext('({ ...statistikTulisInti })', h.context)
+  h.save(); await h.flush()
+  h.save(); await h.flush()
+  assert.deepEqual({ ditulis: statistik().ditulis, dilewati: statistik().dilewati }, { ditulis: 1, dilewati: 1 }, 'identical core document must not be resent')
+  const byteAwal = statistik().byteDitulis
+  h.context.db.kunciIntiSintetis = { nilai: 'synthetic-core-change' }
+  h.save(); await h.flush()
+  assert.deepEqual({ ditulis: statistik().ditulis, dilewati: statistik().dilewati }, { ditulis: 2, dilewati: 1 }, 'a changed core document must be sent')
+  assert.ok(statistik().byteDitulis > byteAwal, 'bytes of the resent core document are counted')
 })
 
 test('save failure remains observable and does not prevent a later queued recovery', async () => {

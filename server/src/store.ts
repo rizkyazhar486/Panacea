@@ -8,7 +8,7 @@ import { dirname, join } from 'node:path'
 import { createHash, randomBytes } from 'node:crypto'
 import { KATALOG } from './domains/push/healthMetrics.js'
 import { tulisAtomik, amankanBerkasRusak, catatBerhasil, catatGagal, BATAS_DOKUMEN_MONGO } from './simpanAman.js'
-import { dokumenInti, muatIrisan, pasangIrisan, pastikanIndeksIrisan, simpanIrisan, VERSI_IRISAN } from './irisanPenyimpanan.js'
+import { dokumenInti, muatIrisan, pasangIrisan, pastikanIndeksIrisan, simpanIrisan, VERSI_IRISAN, statistikTulisIrisan } from './irisanPenyimpanan.js'
 import { ambilEncounter, daftarEncounter, daftarRiwayatEncounter, simpanEncounter } from './domains/clinical-records/rekamEncounter.js'
 import { tambahkanLangganan, type LanggananPush } from './domains/push/pushSubscription.js'
 
@@ -356,6 +356,13 @@ let saveTimer: ReturnType<typeof setTimeout> | null = null
 let mongoSaveTail: Promise<void> = Promise.resolve()
 let irisanAktif = false
 let sidikIntiTertulis: string | null = null
+// Hitungan tulis dokumen inti (dikirim vs dilewati karena sama). Bersama statistikTulisIrisan, inilah satu-satunya
+// angka trafik ke MongoDB: driver Mongo tidak lewat fetch sehingga tidak tercatat di egress vendor.
+const statistikTulisInti = { ditulis: 0, dilewati: 0, byteDitulis: 0 }
+/** Statistik tulis MongoDB proses ini untuk blok egress /api/health: hanya hitungan dan byte (perkiraan JSON), tanpa isi. */
+export function statistikTulisMongo() {
+  return { irisan: { ...statistikTulisIrisan }, inti: { ...statistikTulisInti } }
+}
 
 function loadFile() {
   if (existsSync(DB_PATH)) {
@@ -468,6 +475,10 @@ async function simpanMongo(): Promise<void> {
       sidikIntiTertulis = null
       await mongoCol.updateOne({ _id: 'state' }, { $set: { data: inti, at: new Date(), irisan: VERSI_IRISAN } }, { upsert: true })
       sidikIntiTertulis = sidikInti
+      statistikTulisInti.ditulis++
+      statistikTulisInti.byteDitulis += ukuran
+    } else {
+      statistikTulisInti.dilewati++
     }
     irisanAktif = true
     catatBerhasil(ukuran)
