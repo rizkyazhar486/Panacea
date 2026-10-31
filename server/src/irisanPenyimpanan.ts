@@ -753,7 +753,7 @@ export function pasangIrisan(keadaan: Record<string, unknown>, irisan: IrisanDat
  * Sidik KELENGKAPAN dokumen untuk mendeteksi perubahan. Berbeda dari kanon(): _id dan urutan IKUT dihitung
  * di semua kedalaman, karena melewatkan perubahan berarti data tidak pernah sampai ke Mongo.
  */
-function kanonLengkap(nilai: unknown): string {
+export function kanonLengkap(nilai: unknown): string {
   if (Array.isArray(nilai)) return `[${nilai.map(kanonLengkap).join(',')}]`
   if (nilai && typeof nilai === 'object') {
     const objek = nilai as Record<string, unknown>
@@ -793,6 +793,8 @@ function lupakanPeta(db: object, nama: string): void {
 
 type SidikDokumen = (d: DokumenIrisan) => string
 const sidikBiasa: SidikDokumen = (d) => sidik(kanonLengkap(d))
+/** Cap waktu `at` tidak ikut sidik: tanpa itu penanda versi akan ditulis ulang pada setiap simpan. */
+const sidikMeta: SidikDokumen = (d) => sidik(kanonLengkap({ ...d, at: undefined }))
 
 /** Mengirim HANYA dokumen yang berubah sejak penulisan sukses terakhir; yatim dihapus hanya bila himpunan id berubah. */
 async function tulisKoleksi(db: DbIrisan, nama: string, dokumen: DokumenIrisan[], opsi: { hapusYatim: boolean; sidikDokumen?: SidikDokumen } = { hapusYatim: true }): Promise<void> {
@@ -845,11 +847,71 @@ export async function simpanIrisan(db: DbIrisan, keadaan: Record<string, unknown
     await tulisKoleksi(db, nama, isi)
   }
   // Cap waktu `at` tidak ikut sidik: tanpa itu penanda versi akan ditulis ulang pada setiap simpan.
-  await tulisKoleksi(db, KOLEKSI_IRISAN.meta, [{ _id: 'lab-care', urutan: 0, versi: VERSI_IRISAN, at: kini.toISOString() }], { hapusYatim: true, sidikDokumen: (d) => sidik(kanonLengkap({ ...d, at: undefined })) })
+  await tulisKoleksi(db, KOLEKSI_IRISAN.meta, [{ _id: 'lab-care', urutan: 0, versi: VERSI_IRISAN, at: kini.toISOString() }], { hapusYatim: true, sidikDokumen: sidikMeta })
 }
 
+/** Dokumen mentah yang dibaca saat muat, ditahan sebentar agar sidik tulis dapat disemai dari bukti, bukan dugaan. */
+const DIBACA = new WeakMap<object, Map<string, Record<string, unknown>[]>>()
+
 async function bacaKoleksi(db: DbIrisan, nama: string): Promise<Record<string, unknown>[]> {
-  return db.collection(nama).find({}).toArray()
+  const hasil = await db.collection(nama).find({}).toArray()
+  let m = DIBACA.get(db)
+  if (!m) { m = new Map(); DIBACA.set(db, m) }
+  m.set(nama, hasil)
+  return hasil
+}
+
+/** Dua nilai sama persis (kunci terurut; kunci tambahan/hilang = beda). Dipakai store untuk dokumen inti. */
+export function samaKanon(a: unknown, b: unknown): boolean {
+  return kanonLengkap(a) === kanonLengkap(b)
+}
+
+/**
+ * Sidik dokumen inti untuk disemai, atau null. Hanya bila irisan lengkap, dokumen tersimpan bertanda versi yang sama,
+ * dan isinya (jejak kanonik, diambil SEBELUM dipasang) identik dengan inti yang akan ditulis dari keadaan termuat.
+ * Sidik dihitung dari JSON.stringify(inti) persis seperti simpanMongo, supaya perbandingan di sana setara.
+ */
+export function semaiSidikInti(jejakTersimpan: string | null, intiMuat: unknown, lengkap: boolean): string | null {
+  if (!lengkap || jejakTersimpan === null || kanonLengkap(intiMuat) !== jejakTersimpan) return null
+  return createHash('sha256').update(JSON.stringify(intiMuat)).digest('hex')
+}
+
+const SIDIK_YATIM = '\u0000yatim'
+
+/**
+ * Semai sidik tulis dari dokumen yang BARU DIBACA, supaya restart (Render menidurkan layanan gratis) tidak mengirim
+ * ulang seluruh Mongo. Sebuah dokumen disemai HANYA bila identik persis (termasuk tidak ada kunci tambahan) dengan
+ * dokumen yang akan ditulis dari keadaan termuat; yang berbeda atau tak ada tidak disemai sehingga dikirim.
+ * Id yang ada di Mongo tetapi tidak di keadaan ditandai yatim agar penyimpanan pertama menghapusnya.
+ * Koleksi yang tidak dibaca tidak disemai. Dipanggil sekali, sinkron, SEBELUM simpan apa pun; selalu melepas bacaan.
+ */
+export function semaiSidikTulis(db: object, keadaan: Record<string, unknown>, boleh: boolean): { koleksi: number; dokumen: number } {
+  const dibaca = DIBACA.get(db)
+  DIBACA.delete(db)
+  const hasil = { koleksi: 0, dokumen: 0 }
+  if (!boleh || !dibaca) return hasil
+  for (const [nama, isi] of Object.entries(susunDokumen(keadaan))) {
+    const mentah = dibaca.get(nama)
+    if (!mentah) continue
+    const calon = new Map(isi.map((d) => [String(d._id), d]))
+    const peta = new Map<string, string>()
+    for (const r of mentah) {
+      const id = String(r._id)
+      const d = calon.get(id)
+      if (!d) { peta.set(id, SIDIK_YATIM); continue }
+      if (samaKanon(r, d)) { peta.set(id, sidikBiasa(d)); hasil.dokumen++ }
+    }
+    simpanPeta(db, nama, peta)
+    hasil.koleksi++
+  }
+  // Penanda versi: disemai hanya bila persis penanda versi saat ini (selain cap waktu).
+  const meta = dibaca.get(KOLEKSI_IRISAN.meta)
+  const sah = { _id: 'lab-care', urutan: 0, versi: VERSI_IRISAN }
+  if (meta?.length === 1 && samaKanon({ ...meta[0], at: undefined }, { ...sah, at: undefined })) {
+    simpanPeta(db, KOLEKSI_IRISAN.meta, new Map([['lab-care', sidikMeta(meta[0] as DokumenIrisan)]]))
+    hasil.koleksi++; hasil.dokumen++
+  }
+  return hasil
 }
 
 export async function muatIrisan(db: DbIrisan): Promise<HasilMuatIrisan | null> {
