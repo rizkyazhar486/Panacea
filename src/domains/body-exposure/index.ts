@@ -143,12 +143,21 @@ export { parseFetalMriContext, type FetalMriContext, type FetalMriRegion, type F
 
 export {
   AHA17_LIMITATIONS,
+  AHA17_RINGS,
   AHA17_SEGMENT_COUNT,
-  AHA17_SOURCE,
+  AHA17_SEGMENT_NAMES,
+  AHA17_SOURCES,
+  DOMINANCE_PREVALENCE,
+  branchForSegment,
   territoryForArtery,
-  trunkForSegment,
-  type CoronaryTrunk,
+  type CoronaryArtery,
+  type CoronaryBranch,
   type Dominance,
+  type EvidenceKind,
+  type SegmentEvidence,
+  type SegmentInfo,
   type SegmentResult,
   type TerritoryResult,
 } from './engine/vascularTerritoryEngine'
+
+export { CoronaryTerritoryPanel } from './ui/CoronaryTerritoryPanel'
