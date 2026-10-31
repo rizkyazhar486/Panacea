@@ -2,6 +2,7 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import vm from 'node:vm'
+import { createHash } from 'node:crypto'
 import ts from 'typescript'
 import { dokumenInti, simpanIrisan, muatIrisan, VERSI_IRISAN } from '../../server/src/irisanPenyimpanan.ts'
 
@@ -10,13 +11,13 @@ import { dokumenInti, simpanIrisan, muatIrisan, VERSI_IRISAN } from '../../serve
 function harness({ mongo = true } = {}) {
   const source = ts.createSourceFile('store.ts', readFileSync(new URL('../../server/src/store.ts', import.meta.url), 'utf8'), ts.ScriptTarget.Latest, true)
   const names = new Set(['save', 'flushSimpan', 'simpanSekarang', 'simpanMongo', 'flushStore', 'antrikanSimpanMongo'])
-  const variables = new Set(['saveTimer', 'simpanTertunda', 'mongoSaveTail', 'irisanAktif'])
+  const variables = new Set(['saveTimer', 'simpanTertunda', 'mongoSaveTail', 'irisanAktif', 'sidikIntiTertulis'])
   const code = source.statements.filter(node => ts.isFunctionDeclaration(node) ? names.has(node.name?.text)
     : ts.isVariableStatement(node) && node.declarationList.declarations.some(d => variables.has(d.name.getText(source))))
     .map(node => node.getText(source)).join('\n')
   const timers = new Map(), columns = new Map()
   let serial = 0, hold, started, active = 0, maximum = 0, writes = 0
-  const context = vm.createContext({ exports: {}, Promise, Buffer, console, clearTimeout: id => timers.delete(id),
+  const context = vm.createContext({ exports: {}, Promise, Buffer, console, createHash, clearTimeout: id => timers.delete(id),
     setTimeout: fn => { const id = ++serial; timers.set(id, fn); return id }, queueMicrotask,
     db: { clinical: { hasilLab: {}, rujukanKlinis: {} } }, DB_PATH: 'synthetic', statistikSimpan: { serialisasi: 0 },
     isiConnect: () => ({}), tulisAtomik: () => {}, catatBerhasil: () => {}, catatGagal: () => {},
@@ -124,4 +125,25 @@ test('save failure remains observable and does not prevent a later queued recove
   h.save(); await h.flush()
   assert.equal(failures, 1)
   assert.equal((await h.reload()).data.clinical.hasilLab.recovered.id, 'recovered')
+})
+
+test('unchanged core document is not re-sent, a changed or previously failed one is', async () => {
+  const h = harness()
+  let sent = 0, failNext = false
+  h.context.mongoCol = { async updateOne() { if (failNext) { failNext = false; throw new Error('synthetic unavailable Mongo') } sent++ } }
+  h.context.console = { error() {} }
+  h.context.db.sintetisInti = { n: 1 }
+  h.save(); await h.flush()
+  assert.equal(sent, 1, 'first save writes the core document')
+  h.save(); await h.flush()
+  assert.equal(sent, 1, 'identical core document is not sent again')
+  h.context.db.sintetisInti = { n: 2 }
+  h.save(); await h.flush()
+  assert.equal(sent, 2, 'a changed core document is sent')
+  h.context.db.sintetisInti = { n: 3 }
+  failNext = true
+  h.save(); await h.flush()
+  assert.equal(sent, 2, 'failed write is not counted as sent')
+  h.save(); await h.flush()
+  assert.equal(sent, 3, 'after a failed write the same document is sent again')
 })
