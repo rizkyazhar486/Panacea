@@ -141,3 +141,24 @@ export { assessMeasurement, parseFetalTables, normalCdf, GA_MIN_WEEKS, GA_MAX_WE
 export { FETAL_PARCEL_COLORS, parseFetalParcelDataset, visibleParcelTriangles, wholeLungOverlap, type FetalParcelDataset, type FetalParcelRegion } from './engine/fetalParcelInspection'
 export { parseFetalMriContext, type FetalMriContext, type FetalMriRegion, type FetalMriImage } from './engine/fetalMriContext'
 export { correlateImagingPlane, type ImagingPlane, type AtlasBox, type PlaneResult } from './engine/imagingPlaneEngine'
+
+export {
+  AHA17_LIMITATIONS,
+  AHA17_RINGS,
+  AHA17_SEGMENT_COUNT,
+  AHA17_SEGMENT_NAMES,
+  AHA17_SOURCES,
+  DOMINANCE_PREVALENCE,
+  branchForSegment,
+  territoryForArtery,
+  type CoronaryArtery,
+  type CoronaryBranch,
+  type Dominance,
+  type EvidenceKind,
+  type SegmentEvidence,
+  type SegmentInfo,
+  type SegmentResult,
+  type TerritoryResult,
+} from './engine/vascularTerritoryEngine'
+
+export { CoronaryTerritoryPanel } from './ui/CoronaryTerritoryPanel'

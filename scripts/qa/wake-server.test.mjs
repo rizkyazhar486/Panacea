@@ -22,7 +22,7 @@ function run(mode = 'once', extra = {}) {
       writeFileSync(join(dir, name), `#!/bin/bash\n${body}`, { mode: 0o755 })
     }
     const result = spawnSync('bash', [script, mode], {
-      encoding: 'utf8', timeout: 2000,
+      encoding: 'utf8', timeout: 20_000, // hanya pagar anti-gantung untuk bash+shim; 2 dtk gagal di mesin dengan load average ≈10 (status null)
       env: { ...process.env, PATH: `${dir}:${process.env.PATH}`, SERVER_URL: '', SERVER_URL_SECRET: '', VITE_API_URL: '', VITE_API_URL_SECRET: '', WAKE_CAPTURE: capture, ...extra },
     })
     return { ...result, calls: existsSync(capture) ? readFileSync(capture, 'utf8').trim().split('\n') : [] }
