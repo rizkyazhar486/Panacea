@@ -6,15 +6,18 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { verifyRenderDeployment } from './verify-render-revision.mjs'
 const workflow = readFileSync(new URL('../../.github/workflows/render-live-smoke.yml', import.meta.url), 'utf8')
+// Badan skrip dipindah dari YAML ke scripts/ops/render-live-smoke.sh (diuji di render-live-smoke.test.mjs); asersinya tetap sama.
+const smoke = readFileSync(new URL('../ops/render-live-smoke.sh', import.meta.url), 'utf8')
 
 test('live smoke verifies the checked-out canonical server source and keeps capability and auth checks', () => {
   assert.match(workflow, /uses: actions\/checkout@v4[\s\S]*fetch-depth:\s*0/)
-  assert.match(workflow, /expected_sha="\$\(git rev-parse HEAD\)"/)
-  assert.match(workflow, /if \[ -z "\$expected_sha" \]; then[\s\S]*exit 1[\s\S]*fi/)
-  assert.match(workflow, /\[ "\$code" = '200' \] && \[ "\$health_code" = '200' \]/)
-  assert.match(workflow, /node scripts\/qa\/verify-render-revision\.mjs \/tmp\/capabilities\.json \/tmp\/health\.json "\$expected_sha"/)
-  assert.match(workflow, /test "\$unauth_code" = '401'/)
-  assert.match(workflow, /grep -q '\"unauthorized\"'/)
+  assert.match(workflow, /run: bash scripts\/ops\/render-live-smoke\.sh/)
+  assert.match(smoke, /expected_sha="\$\(git rev-parse HEAD\)"/)
+  assert.match(smoke, /if \[ -z "\$expected_sha" \]; then[\s\S]*exit 1[\s\S]*fi/)
+  assert.match(smoke, /\[ "\$code" = '200' \] && \[ "\$health_code" = '200' \]/)
+  assert.match(smoke, /node scripts\/qa\/verify-render-revision\.mjs \/tmp\/capabilities\.json \/tmp\/health\.json "\$expected_sha"/)
+  assert.match(smoke, /test "\$unauth_code" = '401'/)
+  assert.match(smoke, /grep -q '\"unauthorized\"'/)
 })
 
 test('merged server revisions and later frontend commits verify by approved ancestry and identical server tree', () => {

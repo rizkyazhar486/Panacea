@@ -6,6 +6,7 @@ on:
     paths:
       - 'server/**'
       - '.github/workflows/render-live-smoke.yml'
+      - 'scripts/ops/render-live-smoke.sh'
   workflow_dispatch:
 
 permissions:
@@ -30,48 +31,5 @@ jobs:
           SERVER_URL_SECRET: ${{ secrets.SERVER_URL }}
           VITE_API_URL: ${{ vars.VITE_API_URL }}
           VITE_API_URL_SECRET: ${{ secrets.VITE_API_URL }}
-        run: |
-          set -euo pipefail
-          expected_sha="$(git rev-parse HEAD)"
-          if [ -z "$expected_sha" ]; then
-            echo 'No canonical checkout revision could be resolved.' >&2
-            exit 1
-          fi
-          echo "Canonical checkout revision: $expected_sha"
-          base="${SERVER_URL:-${SERVER_URL_SECRET:-${VITE_API_URL:-$VITE_API_URL_SECRET}}}"
-          if [ -z "$base" ]; then
-            echo 'VITE_API_URL/SERVER_URL is not configured.' >&2
-            exit 1
-          fi
-          endpoint="${base%/}/api/genomics/compute/capabilities"
-          health_endpoint="${base%/}/api/health"
-          echo "Waiting for live Render endpoint: $endpoint"
-
-          ok=''
-          for attempt in $(seq 1 45); do
-            code=$(curl -sS --max-time 90 -o /tmp/capabilities.json -w '%{http_code}' "$endpoint" || true)
-            health_code=$(curl -sS --max-time 90 -o /tmp/health.json -w '%{http_code}' "$health_endpoint" || true)
-            if [ "$code" = '200' ] && [ "$health_code" = '200' ]; then
-              if node scripts/qa/verify-render-revision.mjs /tmp/capabilities.json /tmp/health.json "$expected_sha"
-              then
-                ok='yes'
-                break
-              fi
-            fi
-            echo "Attempt $attempt: capability HTTP ${code:-000}, health HTTP ${health_code:-000}; Render may still be deploying."
-            sleep 10
-          done
-
-          if [ "$ok" != 'yes' ]; then
-            echo 'Live Render genomics capability check did not converge.' >&2
-            cat /tmp/capabilities.json 2>/dev/null || true
-            exit 1
-          fi
-
-          unauth_code=$(curl -sS --max-time 30 -o /tmp/unauth.json -w '%{http_code}' \
-            -H 'Content-Type: application/json' \
-            -d '{"kind":"ont-basecalling","input":{"uri":"https://example.test/input.pod5"}}' \
-            "${base%/}/api/genomics/compute/jobs")
-          test "$unauth_code" = '401'
-          grep -q '"unauthorized"' /tmp/unauth.json
-          echo 'Live Render genomics control plane passed capability + auth-boundary smoke tests.'
+        # Skrip dipindah ke scripts/ops agar dapat diuji (scripts/qa/render-live-smoke.test.mjs); layanan disuspend gagal segera dengan alasannya.
+        run: bash scripts/ops/render-live-smoke.sh

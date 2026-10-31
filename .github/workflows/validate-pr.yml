@@ -52,6 +52,10 @@ jobs:
         run: |
           node --test scripts/qa/compare-blender-gait-contact.test.mjs scripts/qa/glb-add-foot-landmarks.test.mjs scripts/qa/licence-primary-sources.test.mjs scripts/qa/gait-contact-probe.test.mjs
           node scripts/qa/glb-provenance-audit.mjs
+      # Tes skrip ops Render ada di repo tetapi sebelumnya tidak dijalankan alur kerja mana pun (gerbang yang tidak pernah dijalankan
+      # tidak menjaga apa pun, lihat scripts/uji/gerbang-qa-terdaftar.mts). Hanya shim curl/sleep: tanpa jaringan.
+      - name: Render ops scripts (wake, live smoke, deployment provenance)
+        run: node --test scripts/qa/wake-server.test.mjs scripts/qa/render-live-smoke.test.mjs scripts/qa/render-live-provenance.test.mjs
 
   server-validate:
     runs-on: ubuntu-24.04
