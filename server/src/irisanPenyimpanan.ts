@@ -749,23 +749,89 @@ export function pasangIrisan(keadaan: Record<string, unknown>, irisan: IrisanDat
   if (irisan.audit) keadaan.audit = irisan.audit
 }
 
-async function tulisTambah(col: KoleksiIrisan, dokumen: DokumenIrisan[]): Promise<void> {
-  if (!dokumen.length) return
-  await col.bulkWrite(dokumen.map((d) => {
-    const { _id, ...bidang } = d
-    return { updateOne: { filter: { _id }, update: { $set: bidang }, upsert: true } }
-  }))
+/**
+ * Sidik KELENGKAPAN dokumen untuk mendeteksi perubahan. Berbeda dari kanon(): _id dan urutan IKUT dihitung
+ * di semua kedalaman, karena melewatkan perubahan berarti data tidak pernah sampai ke Mongo.
+ */
+function kanonLengkap(nilai: unknown): string {
+  if (Array.isArray(nilai)) return `[${nilai.map(kanonLengkap).join(',')}]`
+  if (nilai && typeof nilai === 'object') {
+    const objek = nilai as Record<string, unknown>
+    return `{${Object.keys(objek).sort().map((k) => `${JSON.stringify(k)}:${kanonLengkap(objek[k])}`).join(',')}}`
+  }
+  return JSON.stringify(nilai) ?? 'null'
 }
 
-async function tulisKoleksi(col: KoleksiIrisan, dokumen: DokumenIrisan[]): Promise<void> {
-  const ids = dokumen.map((d) => d._id)
-  if (dokumen.length) {
-    await col.bulkWrite(dokumen.map((d) => {
-      const { _id, ...bidang } = d
-      return { updateOne: { filter: { _id }, update: { $set: bidang }, upsert: true } }
-    }))
+/** Hitungan tulis sejak proses mulai (atau sejak setel ulang): bukti apakah simpan masih mengirim ulang data yang tidak berubah. */
+export const statistikTulisIrisan = { dokumenDitulis: 0, dokumenDilewati: 0, byteDitulis: 0, panggilanBulk: 0, panggilanHapus: 0 }
+export function setelUlangStatistikTulisIrisan(): void {
+  statistikTulisIrisan.dokumenDitulis = 0
+  statistikTulisIrisan.dokumenDilewati = 0
+  statistikTulisIrisan.byteDitulis = 0
+  statistikTulisIrisan.panggilanBulk = 0
+  statistikTulisIrisan.panggilanHapus = 0
+}
+
+/**
+ * Sidik dokumen yang SUDAH berhasil ditulis, per objek DB lalu per koleksi. Terikat ke objek DB agar koneksi baru
+ * (reconnect, klien lain, uji) mulai dari kosong dan menulis ulang semuanya sekali — tidak pernah mengira Mongo
+ * sudah berisi sesuatu yang tidak dibuktikan oleh penulisan sukses dari proses ini.
+ */
+const TERTULIS = new WeakMap<object, Map<string, Map<string, string>>>()
+
+function petaTertulis(db: object, nama: string): Map<string, string> | undefined {
+  return TERTULIS.get(db)?.get(nama)
+}
+function simpanPeta(db: object, nama: string, isi: Map<string, string>): void {
+  let semua = TERTULIS.get(db)
+  if (!semua) { semua = new Map(); TERTULIS.set(db, semua) }
+  semua.set(nama, isi)
+}
+function lupakanPeta(db: object, nama: string): void {
+  TERTULIS.get(db)?.delete(nama)
+}
+
+type SidikDokumen = (d: DokumenIrisan) => string
+const sidikBiasa: SidikDokumen = (d) => sidik(kanonLengkap(d))
+
+/** Mengirim HANYA dokumen yang berubah sejak penulisan sukses terakhir; yatim dihapus hanya bila himpunan id berubah. */
+async function tulisKoleksi(db: DbIrisan, nama: string, dokumen: DokumenIrisan[], opsi: { hapusYatim: boolean; sidikDokumen?: SidikDokumen } = { hapusYatim: true }): Promise<void> {
+  const col = db.collection(nama)
+  const sidikDokumen = opsi.sidikDokumen ?? sidikBiasa
+  const sebelum = petaTertulis(db, nama)
+  const sekarang = new Map<string, string>()
+  const berubah: DokumenIrisan[] = []
+  for (const d of dokumen) {
+    const id = String(d._id)
+    const sd = sidikDokumen(d)
+    sekarang.set(id, sd)
+    if (sebelum?.get(id) !== sd) berubah.push(d)
   }
-  await col.deleteMany({ _id: { $nin: ids } })
+  statistikTulisIrisan.dokumenDilewati += dokumen.length - berubah.length
+  try {
+    if (berubah.length) {
+      await col.bulkWrite(berubah.map((d) => {
+        const { _id, ...bidang } = d
+        return { updateOne: { filter: { _id }, update: { $set: bidang }, upsert: true } }
+      }))
+      statistikTulisIrisan.panggilanBulk += 1
+      statistikTulisIrisan.dokumenDitulis += berubah.length
+      statistikTulisIrisan.byteDitulis += Buffer.byteLength(JSON.stringify(berubah))
+    }
+    if (opsi.hapusYatim) {
+      const adaYatim = !sebelum || [...sebelum.keys()].some((id) => !sekarang.has(id))
+      if (adaYatim) {
+        await col.deleteMany({ _id: { $nin: dokumen.map((d) => d._id) } })
+        statistikTulisIrisan.panggilanHapus += 1
+      }
+    }
+  } catch (e) {
+    // Hasil sebagian tidak diketahui: lupakan semuanya supaya percobaan berikutnya mengirim ulang seluruh koleksi.
+    lupakanPeta(db, nama)
+    throw e
+  }
+  // Tanpa hapusYatim (hanya-tambah), id lama tetap ada di Mongo sehingga pengetahuan kita tentangnya dipertahankan.
+  simpanPeta(db, nama, opsi.hapusYatim ? sekarang : new Map([...(sebelum ?? []), ...sekarang]))
 }
 
 /** Tulis koleksi dulu, penanda versi paling akhir. */
@@ -773,12 +839,13 @@ export async function simpanIrisan(db: DbIrisan, keadaan: Record<string, unknown
   const dokumen = susunDokumen(keadaan)
   for (const [nama, isi] of Object.entries(dokumen)) {
     if (nama === KOLEKSI_IRISAN.validasiLedger) {
-      if (Array.isArray(keadaan.validasiLedger)) await tulisTambah(db.collection(nama), isi)
+      if (Array.isArray(keadaan.validasiLedger)) await tulisKoleksi(db, nama, isi, { hapusYatim: false })
       continue
     }
-    await tulisKoleksi(db.collection(nama), isi)
+    await tulisKoleksi(db, nama, isi)
   }
-  await tulisKoleksi(db.collection(KOLEKSI_IRISAN.meta), [{ _id: 'lab-care', urutan: 0, versi: VERSI_IRISAN, at: kini.toISOString() }])
+  // Cap waktu `at` tidak ikut sidik: tanpa itu penanda versi akan ditulis ulang pada setiap simpan.
+  await tulisKoleksi(db, KOLEKSI_IRISAN.meta, [{ _id: 'lab-care', urutan: 0, versi: VERSI_IRISAN, at: kini.toISOString() }], { hapusYatim: true, sidikDokumen: (d) => sidik(kanonLengkap({ ...d, at: undefined })) })
 }
 
 async function bacaKoleksi(db: DbIrisan, nama: string): Promise<Record<string, unknown>[]> {

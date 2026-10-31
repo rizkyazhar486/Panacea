@@ -686,3 +686,35 @@ risks:
       - server/src/domains/observability/logIdentity.ts
       - server/uji/logPrivacyHttp.uji.ts
       - docs/alpha/OMEGA_EXECUTION_CHECKPOINT.md
+
+  - risk_id: risk.render_outbound_bandwidth_quota
+    category: production_reliability
+    severity: high
+    state: mitigated_in_part
+    description: >-
+      The Render Hobby workspace exceeded its 5 GB monthly outbound allocation in October
+      2026 (owner-reported: about 5.59 GB used, about 5.41 GB service-initiated, about
+      187 MB HTTP responses; suspended 2026-10-29). These figures come from the owner, not
+      from this repository, and Render metrics were NOT reachable from the engineering
+      sandbox. The dominant source is UNVERIFIED. Source inspection found one verified
+      write amplification: every debounced store save upserted every document of every
+      Mongo collection (including each heart-rate sample document) and the core state
+      document, whether or not it changed.
+    mitigation: >-
+      The Mongo save path now sends only documents whose fingerprint changed since the last
+      successful write on the same DB object, deletes orphans only when the id set shrinks,
+      skips an unchanged core document, and forgets its cache after any failed write so the
+      next attempt resends the whole collection. On a synthetic workload (50 users x 200
+      heart-rate samples, 300 posts, 100 saves each adding one sample) the request payload fell
+      from about 192 MB to about 1.9 MB; that is a synthetic upper bound for mostly-unchanged
+      state and is NOT a measured reduction of the billed Render bandwidth. Not yet verified:
+      whether Mongo traffic is the dominant source (candidates not excluded: web-push and
+      email delivery, the 90 s sports poll, outbound AI and medical-reference calls; the 75 MB build-time
+      dataset download is inbound to the service, and whether Render counts it is unverified), the first save after each boot still rewrites everything once, and
+      provider metrics after the service resumes. No egress budget controller or per-integration
+      byte accounting exists yet; the application cannot cap Render-billed traffic.
+    evidence:
+      - server/src/irisanPenyimpanan.ts
+      - server/src/store.ts
+      - server/uji/mongoTulisHemat.uji.ts
+      - render.yaml

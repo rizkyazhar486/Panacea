@@ -5,7 +5,7 @@ import { readFileSync, existsSync, appendFileSync, mkdirSync } from 'node:fs'
 import { isiConnect, muatConnect, pasangPenyimpan } from './connect.js'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
-import { randomBytes } from 'node:crypto'
+import { createHash, randomBytes } from 'node:crypto'
 import { KATALOG } from './domains/push/healthMetrics.js'
 import { tulisAtomik, amankanBerkasRusak, catatBerhasil, catatGagal, BATAS_DOKUMEN_MONGO } from './simpanAman.js'
 import { dokumenInti, muatIrisan, pasangIrisan, pastikanIndeksIrisan, simpanIrisan, VERSI_IRISAN } from './irisanPenyimpanan.js'
@@ -355,6 +355,7 @@ let mongoCol: any = null
 let saveTimer: ReturnType<typeof setTimeout> | null = null
 let mongoSaveTail: Promise<void> = Promise.resolve()
 let irisanAktif = false
+let sidikIntiTertulis: string | null = null
 
 function loadFile() {
   if (existsSync(DB_PATH)) {
@@ -451,7 +452,8 @@ async function simpanMongo(): Promise<void> {
   // keluar ke koleksi sendiri; memasukkan mereka ke ukuran ini akan menolak
   // simpan justru ketika pemisahan itu sedang bekerja.
   const inti = dokumenInti(db as unknown as Record<string, unknown>)
-  const ukuran = Buffer.byteLength(JSON.stringify(inti))
+  const teksInti = JSON.stringify(inti)
+  const ukuran = Buffer.byteLength(teksInti)
   if (ukuran >= BATAS_DOKUMEN_MONGO) {
     catatGagal(new Error(`state ${ukuran} bytes exceeds the MongoDB 16 MB document limit`))
     console.error('[store] NOT SAVED to MongoDB: state exceeds 16 MB document limit')
@@ -459,7 +461,14 @@ async function simpanMongo(): Promise<void> {
   }
   try {
     if (mongoDb) await simpanIrisan(mongoDb, db as unknown as Record<string, unknown>)
-    await mongoCol.updateOne({ _id: 'state' }, { $set: { data: inti, at: new Date(), irisan: VERSI_IRISAN } }, { upsert: true })
+    // Dokumen inti yang sama persis dengan yang terakhir BERHASIL ditulis tidak dikirim ulang. Setiap simpan sebelumnya
+    // mengirim seluruhnya; sidik direset saat gagal sehingga percobaan berikutnya selalu menulis.
+    const sidikInti = createHash('sha256').update(teksInti).digest('hex')
+    if (sidikInti !== sidikIntiTertulis) {
+      sidikIntiTertulis = null
+      await mongoCol.updateOne({ _id: 'state' }, { $set: { data: inti, at: new Date(), irisan: VERSI_IRISAN } }, { upsert: true })
+      sidikIntiTertulis = sidikInti
+    }
     irisanAktif = true
     catatBerhasil(ukuran)
   } catch (e) {
