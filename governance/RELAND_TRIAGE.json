@@ -9,7 +9,7 @@
       "linesAdded": 532,
       "linesDeleted": 74,
       "hasTests": false,
-      "testStatus": "not-applicable",
+      "testStatus": "no-tests-in-commit",
       "claimHits": [],
       "classification": "reject-noise"
     },
@@ -20,7 +20,7 @@
       "linesAdded": 532,
       "linesDeleted": 74,
       "hasTests": true,
-      "testStatus": "not-applicable",
+      "testStatus": "not-run",
       "claimHits": [],
       "classification": "legit-candidate"
     },
@@ -31,7 +31,7 @@
       "linesAdded": 1290,
       "linesDeleted": 53,
       "hasTests": false,
-      "testStatus": "not-applicable",
+      "testStatus": "no-tests-in-commit",
       "claimHits": [],
       "classification": "reject-noise"
     },
@@ -42,7 +42,7 @@
       "linesAdded": 1290,
       "linesDeleted": 53,
       "hasTests": true,
-      "testStatus": "not-applicable",
+      "testStatus": "not-run",
       "claimHits": [],
       "classification": "needs-rework"
     },
@@ -53,7 +53,7 @@
       "linesAdded": 89,
       "linesDeleted": 0,
       "hasTests": false,
-      "testStatus": "not-applicable",
+      "testStatus": "no-tests-in-commit",
       "claimHits": [],
       "classification": "reject-noise"
     },
@@ -64,7 +64,7 @@
       "linesAdded": 89,
       "linesDeleted": 0,
       "hasTests": true,
-      "testStatus": "not-applicable",
+      "testStatus": "not-run",
       "claimHits": [],
       "classification": "legit-candidate"
     },
@@ -75,7 +75,7 @@
       "linesAdded": 55,
       "linesDeleted": 0,
       "hasTests": false,
-      "testStatus": "not-applicable",
+      "testStatus": "no-tests-in-commit",
       "claimHits": [],
       "classification": "reject-noise"
     },
@@ -86,7 +86,7 @@
       "linesAdded": 55,
       "linesDeleted": 0,
       "hasTests": true,
-      "testStatus": "not-applicable",
+      "testStatus": "not-run",
       "claimHits": [],
       "classification": "legit-candidate"
     },
@@ -97,7 +97,7 @@
       "linesAdded": 79,
       "linesDeleted": 0,
       "hasTests": false,
-      "testStatus": "not-applicable",
+      "testStatus": "no-tests-in-commit",
       "claimHits": [],
       "classification": "reject-noise"
     },
@@ -108,7 +108,7 @@
       "linesAdded": 79,
       "linesDeleted": 0,
       "hasTests": true,
-      "testStatus": "not-applicable",
+      "testStatus": "not-run",
       "claimHits": [
         "scripts/qa/directive065-universal-scanner.test.mjs:1:1 digital twin",
         "src/domains/universal-scanner-twin/universalScannerTwinEngine.ts:1:1 digital twin"
@@ -122,7 +122,7 @@
       "linesAdded": 67,
       "linesDeleted": 0,
       "hasTests": false,
-      "testStatus": "not-applicable",
+      "testStatus": "no-tests-in-commit",
       "claimHits": [],
       "classification": "reject-noise"
     },
@@ -133,7 +133,7 @@
       "linesAdded": 67,
       "linesDeleted": 0,
       "hasTests": true,
-      "testStatus": "not-applicable",
+      "testStatus": "not-run",
       "claimHits": [],
       "classification": "legit-candidate"
     },
@@ -144,7 +144,7 @@
       "linesAdded": 81,
       "linesDeleted": 0,
       "hasTests": false,
-      "testStatus": "not-applicable",
+      "testStatus": "no-tests-in-commit",
       "claimHits": [],
       "classification": "reject-noise"
     },
@@ -155,7 +155,7 @@
       "linesAdded": 81,
       "linesDeleted": 0,
       "hasTests": true,
-      "testStatus": "not-applicable",
+      "testStatus": "not-run",
       "claimHits": [],
       "classification": "legit-candidate"
     },
@@ -166,7 +166,7 @@
       "linesAdded": 75,
       "linesDeleted": 0,
       "hasTests": false,
-      "testStatus": "not-applicable",
+      "testStatus": "no-tests-in-commit",
       "claimHits": [],
       "classification": "reject-noise"
     },
@@ -177,7 +177,7 @@
       "linesAdded": 75,
       "linesDeleted": 0,
       "hasTests": true,
-      "testStatus": "not-applicable",
+      "testStatus": "not-run",
       "claimHits": [],
       "classification": "legit-candidate"
     },
@@ -188,7 +188,7 @@
       "linesAdded": 75,
       "linesDeleted": 0,
       "hasTests": false,
-      "testStatus": "not-applicable",
+      "testStatus": "no-tests-in-commit",
       "claimHits": [],
       "classification": "reject-noise"
     },
@@ -199,7 +199,7 @@
       "linesAdded": 75,
       "linesDeleted": 0,
       "hasTests": true,
-      "testStatus": "not-applicable",
+      "testStatus": "not-run",
       "claimHits": [],
       "classification": "legit-candidate"
     },
@@ -210,7 +210,7 @@
       "linesAdded": 91,
       "linesDeleted": 0,
       "hasTests": false,
-      "testStatus": "not-applicable",
+      "testStatus": "no-tests-in-commit",
       "claimHits": [],
       "classification": "reject-noise"
     },
@@ -221,7 +221,7 @@
       "linesAdded": 91,
       "linesDeleted": 0,
       "hasTests": true,
-      "testStatus": "not-applicable",
+      "testStatus": "not-run",
       "claimHits": [],
       "classification": "legit-candidate"
     },
@@ -232,7 +232,7 @@
       "linesAdded": 33094,
       "linesDeleted": 0,
       "hasTests": false,
-      "testStatus": "not-applicable",
+      "testStatus": "no-tests-in-commit",
       "claimHits": [],
       "classification": "reject-noise"
     },
@@ -243,7 +243,7 @@
       "linesAdded": 33094,
       "linesDeleted": 0,
       "hasTests": true,
-      "testStatus": "not-applicable",
+      "testStatus": "not-run",
       "claimHits": [],
       "classification": "needs-rework"
     },
@@ -254,7 +254,7 @@
       "linesAdded": 88,
       "linesDeleted": 0,
       "hasTests": false,
-      "testStatus": "not-applicable",
+      "testStatus": "no-tests-in-commit",
       "claimHits": [],
       "classification": "reject-noise"
     },
@@ -265,7 +265,7 @@
       "linesAdded": 88,
       "linesDeleted": 0,
       "hasTests": true,
-      "testStatus": "not-applicable",
+      "testStatus": "not-run",
       "claimHits": [],
       "classification": "legit-candidate"
     },
@@ -276,7 +276,7 @@
       "linesAdded": 28406,
       "linesDeleted": 0,
       "hasTests": false,
-      "testStatus": "not-applicable",
+      "testStatus": "no-tests-in-commit",
       "claimHits": [],
       "classification": "reject-noise"
     },
@@ -287,7 +287,7 @@
       "linesAdded": 28406,
       "linesDeleted": 0,
       "hasTests": false,
-      "testStatus": "not-applicable",
+      "testStatus": "no-tests-in-commit",
       "claimHits": [],
       "classification": "needs-rework"
     },
@@ -298,7 +298,7 @@
       "linesAdded": 71,
       "linesDeleted": 0,
       "hasTests": false,
-      "testStatus": "not-applicable",
+      "testStatus": "no-tests-in-commit",
       "claimHits": [],
       "classification": "reject-noise"
     },
@@ -309,7 +309,7 @@
       "linesAdded": 71,
       "linesDeleted": 0,
       "hasTests": true,
-      "testStatus": "not-applicable",
+      "testStatus": "not-run",
       "claimHits": [],
       "classification": "legit-candidate"
     },
@@ -320,7 +320,7 @@
       "linesAdded": 95,
       "linesDeleted": 0,
       "hasTests": false,
-      "testStatus": "not-applicable",
+      "testStatus": "no-tests-in-commit",
       "claimHits": [],
       "classification": "reject-noise"
     },
@@ -331,7 +331,7 @@
       "linesAdded": 95,
       "linesDeleted": 0,
       "hasTests": true,
-      "testStatus": "not-applicable",
+      "testStatus": "not-run",
       "claimHits": [],
       "classification": "legit-candidate"
     },
@@ -342,7 +342,7 @@
       "linesAdded": 212,
       "linesDeleted": 0,
       "hasTests": false,
-      "testStatus": "not-applicable",
+      "testStatus": "no-tests-in-commit",
       "claimHits": [],
       "classification": "reject-noise"
     },
@@ -353,7 +353,7 @@
       "linesAdded": 212,
       "linesDeleted": 0,
       "hasTests": true,
-      "testStatus": "not-applicable",
+      "testStatus": "not-run",
       "claimHits": [],
       "classification": "legit-candidate"
     },
@@ -364,7 +364,7 @@
       "linesAdded": 646,
       "linesDeleted": 12,
       "hasTests": false,
-      "testStatus": "not-applicable",
+      "testStatus": "no-tests-in-commit",
       "claimHits": [],
       "classification": "reject-noise"
     },
@@ -375,7 +375,7 @@
       "linesAdded": 340,
       "linesDeleted": 0,
       "hasTests": true,
-      "testStatus": "not-applicable",
+      "testStatus": "not-run",
       "claimHits": [],
       "classification": "legit-candidate"
     },
@@ -386,7 +386,7 @@
       "linesAdded": 153,
       "linesDeleted": 0,
       "hasTests": true,
-      "testStatus": "not-applicable",
+      "testStatus": "not-run",
       "claimHits": [],
       "classification": "legit-candidate"
     },
@@ -397,7 +397,7 @@
       "linesAdded": 121,
       "linesDeleted": 27,
       "hasTests": true,
-      "testStatus": "not-applicable",
+      "testStatus": "not-run",
       "claimHits": [],
       "classification": "legit-candidate"
     },
@@ -408,7 +408,7 @@
       "linesAdded": 59,
       "linesDeleted": 12,
       "hasTests": true,
-      "testStatus": "not-applicable",
+      "testStatus": "not-run",
       "claimHits": [],
       "classification": "legit-candidate"
     },
@@ -419,7 +419,7 @@
       "linesAdded": 198,
       "linesDeleted": 0,
       "hasTests": true,
-      "testStatus": "not-applicable",
+      "testStatus": "not-run",
       "claimHits": [],
       "classification": "legit-candidate"
     },
@@ -430,7 +430,7 @@
       "linesAdded": 3632,
       "linesDeleted": 0,
       "hasTests": false,
-      "testStatus": "not-applicable",
+      "testStatus": "no-tests-in-commit",
       "claimHits": [],
       "classification": "reject-noise"
     },
@@ -441,7 +441,7 @@
       "linesAdded": 81,
       "linesDeleted": 0,
       "hasTests": true,
-      "testStatus": "not-applicable",
+      "testStatus": "not-run",
       "claimHits": [],
       "classification": "legit-candidate"
     },
@@ -452,7 +452,7 @@
       "linesAdded": 153,
       "linesDeleted": 0,
       "hasTests": true,
-      "testStatus": "not-applicable",
+      "testStatus": "not-run",
       "claimHits": [],
       "classification": "legit-candidate"
     },
@@ -463,7 +463,7 @@
       "linesAdded": 139,
       "linesDeleted": 0,
       "hasTests": true,
-      "testStatus": "not-applicable",
+      "testStatus": "not-run",
       "claimHits": [
         "src/domains/economy/panaceaValuationKernel.ts:multi-trillion valuation"
       ],
@@ -476,7 +476,7 @@
       "linesAdded": 140,
       "linesDeleted": 0,
       "hasTests": true,
-      "testStatus": "not-applicable",
+      "testStatus": "not-run",
       "claimHits": [],
       "classification": "legit-candidate"
     },
@@ -487,7 +487,7 @@
       "linesAdded": 126,
       "linesDeleted": 0,
       "hasTests": true,
-      "testStatus": "not-applicable",
+      "testStatus": "not-run",
       "claimHits": [],
       "classification": "legit-candidate"
     },
@@ -498,7 +498,7 @@
       "linesAdded": 112,
       "linesDeleted": 0,
       "hasTests": true,
-      "testStatus": "not-applicable",
+      "testStatus": "not-run",
       "claimHits": [],
       "classification": "legit-candidate"
     },
@@ -509,7 +509,7 @@
       "linesAdded": 126,
       "linesDeleted": 0,
       "hasTests": true,
-      "testStatus": "not-applicable",
+      "testStatus": "not-run",
       "claimHits": [
         "scripts/qa/null-void.test.mjs:null-void singularity",
         "src/components/NullVoidCommandCenter.tsx:null-void singularity"
@@ -523,7 +523,7 @@
       "linesAdded": 126,
       "linesDeleted": 0,
       "hasTests": true,
-      "testStatus": "not-applicable",
+      "testStatus": "not-run",
       "claimHits": [],
       "classification": "legit-candidate"
     },
@@ -534,7 +534,7 @@
       "linesAdded": 126,
       "linesDeleted": 0,
       "hasTests": true,
-      "testStatus": "not-applicable",
+      "testStatus": "not-run",
       "claimHits": [
         "scripts/qa/omniscience-engine.test.mjs:omniscience",
         "src/components/OmniscienceCommandCenter.tsx:omniscience",
@@ -549,7 +549,7 @@
       "linesAdded": 124,
       "linesDeleted": 0,
       "hasTests": true,
-      "testStatus": "not-applicable",
+      "testStatus": "not-run",
       "claimHits": [
         "src/components/EntropyReversalDashboard.tsx:entropy reversal",
         "src/domains/argon/panaceaEntropyEngine.ts:entropy reversal"
@@ -563,7 +563,7 @@
       "linesAdded": 116,
       "linesDeleted": 0,
       "hasTests": true,
-      "testStatus": "not-applicable",
+      "testStatus": "not-run",
       "claimHits": [
         "src/components/SingularityCommandCenter.tsx:guinness",
         "src/domains/argon/panaceaSingularityEngine.ts:guinness"
@@ -577,7 +577,7 @@
       "linesAdded": 125,
       "linesDeleted": 0,
       "hasTests": true,
-      "testStatus": "not-applicable",
+      "testStatus": "not-run",
       "claimHits": [
         "src/components/QuantumResonanceDashboard.tsx:biophoton",
         "src/domains/argon/panaceaQuantumResonanceEngine.ts:biophoton",
@@ -592,7 +592,7 @@
       "linesAdded": 125,
       "linesDeleted": 0,
       "hasTests": true,
-      "testStatus": "not-applicable",
+      "testStatus": "not-run",
       "claimHits": [],
       "classification": "legit-candidate"
     },
@@ -603,7 +603,7 @@
       "linesAdded": 132,
       "linesDeleted": 7,
       "hasTests": false,
-      "testStatus": "not-applicable",
+      "testStatus": "no-tests-in-commit",
       "claimHits": [],
       "classification": "legit-candidate"
     },
@@ -614,7 +614,7 @@
       "linesAdded": 6,
       "linesDeleted": 2,
       "hasTests": false,
-      "testStatus": "not-applicable",
+      "testStatus": "no-tests-in-commit",
       "claimHits": [],
       "classification": "legit-candidate"
     },
@@ -625,7 +625,7 @@
       "linesAdded": 66,
       "linesDeleted": 0,
       "hasTests": false,
-      "testStatus": "not-applicable",
+      "testStatus": "no-tests-in-commit",
       "claimHits": [],
       "classification": "legit-candidate"
     },
@@ -636,7 +636,7 @@
       "linesAdded": 84,
       "linesDeleted": 0,
       "hasTests": true,
-      "testStatus": "not-applicable",
+      "testStatus": "not-run",
       "claimHits": [],
       "classification": "legit-candidate"
     },
@@ -647,7 +647,7 @@
       "linesAdded": 2,
       "linesDeleted": 2,
       "hasTests": true,
-      "testStatus": "not-applicable",
+      "testStatus": "not-run",
       "claimHits": [],
       "classification": "legit-candidate"
     },
@@ -658,7 +658,7 @@
       "linesAdded": 95,
       "linesDeleted": 0,
       "hasTests": true,
-      "testStatus": "not-applicable",
+      "testStatus": "not-run",
       "claimHits": [],
       "classification": "legit-candidate"
     },
@@ -669,7 +669,7 @@
       "linesAdded": 11,
       "linesDeleted": 0,
       "hasTests": false,
-      "testStatus": "not-applicable",
+      "testStatus": "no-tests-in-commit",
       "claimHits": [],
       "classification": "legit-candidate"
     },
@@ -680,7 +680,7 @@
       "linesAdded": 47,
       "linesDeleted": 0,
       "hasTests": false,
-      "testStatus": "not-applicable",
+      "testStatus": "no-tests-in-commit",
       "claimHits": [],
       "classification": "legit-candidate"
     },
@@ -691,7 +691,7 @@
       "linesAdded": 44,
       "linesDeleted": 0,
       "hasTests": false,
-      "testStatus": "not-applicable",
+      "testStatus": "no-tests-in-commit",
       "claimHits": [],
       "classification": "legit-candidate"
     },
@@ -702,7 +702,7 @@
       "linesAdded": 12,
       "linesDeleted": 13,
       "hasTests": false,
-      "testStatus": "not-applicable",
+      "testStatus": "no-tests-in-commit",
       "claimHits": [],
       "classification": "legit-candidate"
     },
@@ -713,7 +713,7 @@
       "linesAdded": 111,
       "linesDeleted": 0,
       "hasTests": false,
-      "testStatus": "not-applicable",
+      "testStatus": "no-tests-in-commit",
       "claimHits": [],
       "classification": "legit-candidate"
     },
@@ -724,7 +724,7 @@
       "linesAdded": 74,
       "linesDeleted": 0,
       "hasTests": false,
-      "testStatus": "not-applicable",
+      "testStatus": "no-tests-in-commit",
       "claimHits": [],
       "classification": "legit-candidate"
     },
@@ -735,7 +735,7 @@
       "linesAdded": 426,
       "linesDeleted": 0,
       "hasTests": true,
-      "testStatus": "not-applicable",
+      "testStatus": "not-run",
       "claimHits": [],
       "classification": "legit-candidate"
     },
@@ -746,7 +746,7 @@
       "linesAdded": 79,
       "linesDeleted": 0,
       "hasTests": false,
-      "testStatus": "not-applicable",
+      "testStatus": "no-tests-in-commit",
       "claimHits": [],
       "classification": "legit-candidate"
     },
@@ -757,7 +757,7 @@
       "linesAdded": 223,
       "linesDeleted": 21,
       "hasTests": true,
-      "testStatus": "not-applicable",
+      "testStatus": "not-run",
       "claimHits": [],
       "classification": "legit-candidate"
     },
@@ -768,7 +768,7 @@
       "linesAdded": 646,
       "linesDeleted": 0,
       "hasTests": true,
-      "testStatus": "not-applicable",
+      "testStatus": "not-run",
       "claimHits": [],
       "classification": "legit-candidate"
     }

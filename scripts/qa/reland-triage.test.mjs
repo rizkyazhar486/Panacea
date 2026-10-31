@@ -24,13 +24,13 @@ test('2. Every reject-claims entry has real file:term claim hits (never placehol
   }
 })
 
-test('3. Every legit-candidate entry has zero claim hits and valid testStatus', () => {
+test('3. Every legit-candidate entry has zero claim hits and an honest testStatus (tests are never executed here)', () => {
   const content = JSON.parse(readFileSync('governance/RELAND_TRIAGE.json', 'utf8'))
   const legit = content.commits.filter((c) => c.classification === 'legit-candidate')
   assert.ok(legit.length > 0)
   for (const c of legit) {
     assert.deepEqual(c.claimHits, [])
-    assert.ok(['pass', 'not-applicable'].includes(c.testStatus))
+    assert.ok(['not-run', 'no-tests-in-commit'].includes(c.testStatus))
   }
 })
 
@@ -69,3 +69,10 @@ test('6. Negative control (fail-closed by name): invalid git range or malformed 
     /reland-triage: invalid diff input/
   )
 })
+
+test('7. Negative control: no entry may claim its tests passed or failed, because this script never runs them', () => {
+  const content = JSON.parse(readFileSync('governance/RELAND_TRIAGE.json', 'utf8'))
+  for (const c of content.commits) assert.ok(['not-run', 'no-tests-in-commit'].includes(c.testStatus), `${c.sha}: ${c.testStatus}`)
+  assert.equal(content.commits.some((c) => c.testStatus === 'pass' || c.testStatus === 'fail' || c.testStatus === 'not-applicable'), false)
+})
+

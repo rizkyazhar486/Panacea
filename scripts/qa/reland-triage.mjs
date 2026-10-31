@@ -1,6 +1,6 @@
 // Skrip triase deterministik untuk 68 komit yang direvert berdasarkan isi diff dan claim-guard nyata (WP-3 D-101/D-102).
-import { execFileSync, spawnSync } from 'node:child_process'
-import { existsSync, writeFileSync } from 'node:fs'
+import { execFileSync } from 'node:child_process'
+import { writeFileSync } from 'node:fs'
 import { pathToFileURL } from 'node:url'
 import { loadPolicy, scanText } from './claim-guard.mjs'
 
@@ -59,18 +59,17 @@ export function classifyCommitDiff({ statText, filesTouched, linesAdded, patchTe
     classification = 'reject-claims'
   } else if (onlyBuildOrDist || filesTouched.length === 0) {
     classification = 'reject-noise'
-  } else if (filesTouched.length > 25 || linesAdded > 800 || testStatus === 'fail') {
+  } else if (filesTouched.length > 25 || linesAdded > 800) {
     classification = 'needs-rework'
   }
 
   return { claimHits, classification }
 }
 
-function runCommitTests(testFiles) {
-  const existing = testFiles.filter((f) => existsSync(f) && (f.endsWith('.test.mjs') || f.endsWith('.test.js')))
-  if (existing.length === 0) return 'not-applicable'
-  const res = spawnSync(process.execPath, ['--test', ...existing], { encoding: 'utf8', timeout: 30000 })
-  return res.status === 0 ? 'pass' : 'fail'
+// Tes milik komit TIDAK dijalankan di sini: berkas tes komit yang direvert tidak ada di tree saat ini, sehingga menjalankannya akan menguji
+// berkas lain atau tidak menguji apa pun. Status jujur: 'not-run' bila komit menyentuh tes, 'no-tests-in-commit' bila tidak.
+function testStatusOf(testFiles) {
+  return testFiles.length > 0 ? 'not-run' : 'no-tests-in-commit'
 }
 
 export function evaluateRange(range = DEFAULT_RANGE, policy = loadPolicy()) {
@@ -108,7 +107,7 @@ export function evaluateRange(range = DEFAULT_RANGE, policy = loadPolicy()) {
     })
 
     const testFiles = filesTouched.filter((f) => f.includes('.test.') || f.includes('.spec.'))
-    const testStatus = runCommitTests(testFiles)
+    const testStatus = testStatusOf(testFiles)
 
     const { claimHits, classification } = classifyCommitDiff(
       { statText, filesTouched, linesAdded, patchText, testStatus },
