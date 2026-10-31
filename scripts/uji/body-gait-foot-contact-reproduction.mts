@@ -77,13 +77,15 @@ unmeasurable(v(m, 'RUN', 'sole'), 'too_few_phases', 'RUN hanya 1 fase tumpu pada
 unmeasurable(v(f, 'WALK', 'toe'), 'too_few_phases', 'betina: hanya kaki kanan (1 fase)')
 assert.equal(v(m, 'WALK', 'heelCalcaneus').status, 'within'); assert.equal(v(m, 'WALK', 'ballMT1').status, 'within')
 // betina WALK terukur: bola dalam batas selip (RMS 10,1 <= 15); tumit lihat catatan T-D7-05 di bawah
-// T-D7-05: 'within' (RMS 5,1 / maks 9,7 mm) setelah sendi MTP; sebelumnya 'exceeds' (19,4 / 67,7). Animasi FOOT identik; yang bergeser hanya bob root 0,5 mm
-// (retarget mengambil tiap vertex ke-7 sebagai titik terendah) sehingga satu frame tepi jendela 15 mm berubah. Bukan perbaikan fisik; ambang tak diubah.
+// T-D7-05: 'within' setelah sendi MTP; sebelumnya 'exceeds' (19,4 / 67,7). Koreksi hasil tinjauan independen #2918: tinggi tumit pada frame yang berubah SAMA di kedua GLB
+// (14,03 mm); yang bergeser adalah lantai klip (floor_m -0,6 -> -1,2 mm, akibat bob root 0,5 mm dan pengambilan tiap vertex ke-7 sebagai titik terendah di retarget_cmu_gait.py)
+// sehingga satu frame keluar dari jendela 15 mm. Artefak sampling, bukan perbaikan fisik; ambang tak diubah. Jangan baca 'within' ini sebagai bukti kinematik.
+// Landmark bola betina kini dari bagian metatarsal (ikut FOOT), bukan bagian jari; itu menggeser angka bola di bawah dan tetap diukur, tidak ditebak.
 assert.equal(v(f, 'WALK', 'heelCalcaneus').status, 'within')
 assert.equal(v(f, 'WALK', 'ballMT1').status, 'within')
 for (const k of ['heelCalcaneus', 'ballMT1']) unmeasurable(v(m, 'RUN', k), 'no_stance', `RUN jantan ${k}: tidak ada fase tumpu pada ambang 15 mm`)
 unmeasurable(v(f, 'RUN', 'heelCalcaneus'), 'no_stance', 'RUN betina tumit: tidak ada fase tumpu')
-unmeasurable(v(f, 'RUN', 'ballMT1'), 'too_few_phases', 'RUN betina bola: hanya 1 fase di kaki kanan')
+unmeasurable(v(f, 'RUN', 'ballMT1'), 'no_stance', 'RUN betina bola: tidak ada fase tumpu (landmark di bagian metatarsal, ikut FOOT)')
 // pasangan: hanya satu angka yang berbeda dari kasus yang melampaui -> dalam kriteria
 assert.equal(evaluateFootSlide({ ...m.clips.WALK.toe, slide_max_mm: 30 }, C).status, 'within')
 // definisi sol memakai simpul terendah yang berpindah-pindah antara tumit dan jari: selipnya tidak boleh dibaca sebagai selip nyata

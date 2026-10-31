@@ -28,12 +28,12 @@ test('public rigs carry exactly the named landmark empties, parented to FOOT.L/R
       assert.match(n.extras.note, hasToe ? /MTP toe joint \(TOE bone\) exists/ : /no toe joint/, `${n.name} note matches the rig`)
     }
   }
-  // betina: metatarsal I tidak dipisah di sumber -> bola diturunkan dari kombinasi metatarsal+falang dan dilabeli jelas (T-D7-04)
+  // betina: metatarsal I tidak dipisah di sumber -> bola diturunkan HANYA dari bagian metatarsal (ikut FOOT), bukan bagian jari (ikut TOE), dan dilabeli jelas (T-D7-04)
   const fNodes = splitGlb(fs.readFileSync(file('vhf_denver_ct_adult_female'))).json.nodes
   for (const s of ['L', 'R']) {
     const ball = fNodes.find((n) => n.name === `${LANDMARK_PREFIX}BALL_${s}`)
     assert.ok(ball, `female BALL_${s} node must exist`)
-    assert.match(ball.extras.derived_from, /METATARSALS_AND_PHALANGES_COMBINED.*forefoot \(combined\), not MT1/)
+    assert.match(ball.extras.derived_from, /METATARSALS_AND_PHALANGES_COMBINED.*posterior metatarsal part of the forefoot.*not MT1 and not the toe part/)
   }
 })
 

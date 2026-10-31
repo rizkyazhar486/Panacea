@@ -53,4 +53,4 @@ const mw = fx('adult_male', 'WALK').landmarks
 for (const k of ['heelCalcaneus', 'ballMT1']) for (const s of ['L', 'R']) assert.ok(mw[k].per_side[s].stance_phases >= 1 && mw[k].per_side[s].min_height_mm < 15)
 assert.equal(mw.heelCalcaneus.verdict, 'within'); assert.equal(mw.ballMT1.verdict, 'within')
 assert.match(committed.note, /not clinically validated/)
-console.log('body-gait-measurability: 4/4 fixture terukur; WALK jantan & betina within; RUN forefoot within & heel not_applicable')
+console.log('body-gait-measurability: 4/4 fixture terukur; WALK jantan & betina within; RUN forefoot within only via the whole-foot sole substitute (Option A, not the toe joint) & heel not_applicable')

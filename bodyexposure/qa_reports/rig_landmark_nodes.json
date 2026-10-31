@@ -49,7 +49,7 @@
       "before_sha256": "d14528a5747733a01300242670e6e72934ec22f7f82293ed4c55e4436d51c560",
       "before_json_canonical_sha256": "2a35d239dba7e2393fb69b66268b2a0cc4206cb681c370975ea461b90d4a582a",
       "bin_sha256": "bafac5421187a2294b518ba0993289081dee6a1bb18a5456c271eab6ab880d4a",
-      "after_sha256": "ebcb2053c3a83669416d0b1f7b2d8aa70f62bb0bf10a325070fcc41b39af9349",
+      "after_sha256": "246118cbcceb42e38a9e1783bb6edd037819697ae18f5416850bf7a0f24136af",
       "landmarks": {
         "HEEL_L": {
           "translation": [
@@ -61,11 +61,11 @@
         },
         "BALL_L": {
           "translation": [
-            -0.0584349,
-            0.1706799,
-            0.0217519
+            -0.0541126,
+            0.1234003,
+            0.0389162
           ],
-          "source": "SKELETAL.METATARSALS_AND_PHALANGES_COMBINED.L (forefoot (combined), not MT1)"
+          "source": "SKELETAL.METATARSALS_AND_PHALANGES_COMBINED.L (posterior metatarsal part of the forefoot, proximal to the derived MTP plane; not MT1 and not the toe part)"
         },
         "HEEL_R": {
           "translation": [
@@ -77,13 +77,14 @@
         },
         "BALL_R": {
           "translation": [
-            -0.0685174,
-            0.1480912,
-            -0.0258897
+            -0.0594343,
+            0.1291701,
+            -0.0338258
           ],
-          "source": "SKELETAL.METATARSALS_AND_PHALANGES_COMBINED.R (forefoot (combined), not MT1)"
+          "source": "SKELETAL.METATARSALS_AND_PHALANGES_COMBINED.R (posterior metatarsal part of the forefoot, proximal to the derived MTP plane; not MT1 and not the toe part)"
         }
-      }
+      },
+      "note": "Correction (review of #2918): the female BALL landmark was sourced from the combined forefoot including the TOE-bound phalangeal part, so it sat on a segment that moves with TOE while parented to FOOT. It is now sourced only from the FOOT-bound posterior metatarsal part (proximal to the derived MTP plane). before_sha256 is the landmark-free file reconstructed by stripping the landmark nodes; the strip is verified by before_json_canonical_sha256 and bin_sha256."
     }
   }
 }

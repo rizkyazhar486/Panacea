@@ -516,8 +516,8 @@
     },
     {
       "source": "public/bodyexposure/vhf_denver_ct_adult_female.rig_rom.glb",
-      "source_sha256": "ebcb2053c3a83669416d0b1f7b2d8aa70f62bb0bf10a325070fcc41b39af9349",
-      "decoded_sha256": "9082c847bc9a8fa5944be6a050e8e8d2aad55aff6eb93b07c06a5e7e1fe51e75",
+      "source_sha256": "246118cbcceb42e38a9e1783bb6edd037819697ae18f5416850bf7a0f24136af",
+      "decoded_sha256": "914b27c3e6df90be97a55cd48734f5bb97344847ed4bc028213d9c576e2f7c39",
       "rest_markers": {
         "L": {
           "heel": {

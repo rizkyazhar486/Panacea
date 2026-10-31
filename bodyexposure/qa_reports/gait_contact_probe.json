@@ -167,7 +167,7 @@
    }
   },
   "vhf_denver_ct_adult_female": {
-   "sha256": "ebcb2053c3a83669416d0b1f7b2d8aa70f62bb0bf10a325070fcc41b39af9349",
+   "sha256": "246118cbcceb42e38a9e1783bb6edd037819697ae18f5416850bf7a0f24136af",
    "clips": {
     "RUN": {
      "frames": 18,
@@ -200,9 +200,9 @@
          },
          "current_landmark": {
           "node": "FOOT_LANDMARK_BALL_L",
-          "min_height_mm": 15.5,
-          "frames_within_window": 0,
-          "stance_phases": 0
+          "min_height_mm": 12.6,
+          "frames_within_window": 1,
+          "stance_phases": 1
          }
         }
        }
@@ -235,8 +235,8 @@
          },
          "current_landmark": {
           "node": "FOOT_LANDMARK_BALL_R",
-          "min_height_mm": 0.2,
-          "frames_within_window": 3,
+          "min_height_mm": 0,
+          "frames_within_window": 2,
           "stance_phases": 1
          }
         }
@@ -276,7 +276,7 @@
          },
          "current_landmark": {
           "node": "FOOT_LANDMARK_BALL_L",
-          "min_height_mm": 0.8,
+          "min_height_mm": 1.8,
           "frames_within_window": 5,
           "stance_phases": 1
          }
@@ -312,8 +312,8 @@
          },
          "current_landmark": {
           "node": "FOOT_LANDMARK_BALL_R",
-          "min_height_mm": 0,
-          "frames_within_window": 13,
+          "min_height_mm": 0.9,
+          "frames_within_window": 11,
           "stance_phases": 1
          }
         }

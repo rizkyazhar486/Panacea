@@ -12,7 +12,7 @@ const expected = {
     run: { heelPlantar: { L: [], R: [] }, toePlantar: { L: [], R: ['7-9'] } },
   },
   vhf_denver_ct_adult_female: {
-    source: 'ebcb2053c3a83669416d0b1f7b2d8aa70f62bb0bf10a325070fcc41b39af9349',
+    source: '246118cbcceb42e38a9e1783bb6edd037819697ae18f5416850bf7a0f24136af',
     walk: { heelPlantar: { L: [], R: [] }, toePlantar: { L: [], R: [] } },
     run: { heelPlantar: { L: [], R: [] }, toePlantar: { L: [], R: [] } },  // betina: landmark plantar tidak menapak; kontak lewat 'sole' dan landmark bola (lihat gait_measurability)
   },
@@ -68,7 +68,7 @@ test('WALK/RUN coverage and phase boundaries reproduce source-bound D7 evidence 
 
 test('native numeric cross-check stays within measured Blender/Three evaluation difference', () => {
   const male = native.assets[0].clips.WALK
-  // Source-bound T-D7-05 MTP re-rig (male b2c7cb60, female ebcb2053); 0.02 mm exceeds the observed 0.01094 mm
+  // Source-bound T-D7-05 MTP re-rig (male b2c7cb60, female 246118cb); 0.02 mm exceeds the observed 0.01094 mm
   // maximum comparison discrepancy, but is far below the research 15/30 mm limits.
   for (const [kind, rms, peak] of [
     ['heelPlantar', 7.731030802941662, 16.57895021713697],
