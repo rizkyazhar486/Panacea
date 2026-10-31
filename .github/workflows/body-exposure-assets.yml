@@ -6,6 +6,11 @@ on:
       - 'public/bodyexposure/**'
       - 'bodyexposure/pipeline/check_web_budget.py'
       - 'bodyexposure/pipeline/test_web_budget.py'
+      - 'bodyexposure/pipeline/mtp_plane.py'
+      - 'bodyexposure/pipeline/test_mtp_plane.py'
+      - 'bodyexposure/pipeline/build_rig_lower_limb.py'
+      - 'bodyexposure/qa_reports/forefoot_area_profile.vhf_denver_ct_adult_female.json'
+      - 'bodyexposure/manifest/rig_vhf_denver_ct.json'
       - 'src/pages/bodyhub/CanonicalBody.tsx'
       - '.github/workflows/body-exposure-assets.yml'
   push:
@@ -14,6 +19,11 @@ on:
       - 'public/bodyexposure/**'
       - 'bodyexposure/pipeline/check_web_budget.py'
       - 'bodyexposure/pipeline/test_web_budget.py'
+      - 'bodyexposure/pipeline/mtp_plane.py'
+      - 'bodyexposure/pipeline/test_mtp_plane.py'
+      - 'bodyexposure/pipeline/build_rig_lower_limb.py'
+      - 'bodyexposure/qa_reports/forefoot_area_profile.vhf_denver_ct_adult_female.json'
+      - 'bodyexposure/manifest/rig_vhf_denver_ct.json'
       - 'src/pages/bodyhub/CanonicalBody.tsx'
       - '.github/workflows/body-exposure-assets.yml'
 
@@ -30,5 +40,9 @@ jobs:
           python-version: '3.12'
       - name: Verify budget checker regressions
         run: python3 -m unittest discover -s bodyexposure/pipeline -p test_web_budget.py
+      # T-D7-05: heuristik bidang MTP betina (modul murni, tanpa numpy) terhadap profil luas nyata dan manifest rig yang dicommit,
+      # termasuk sensitivitas yang dipin. Mengubah bangun rig tanpa memperbarui manifest/profil akan gagal di sini.
+      - name: Verify the derived female MTP plane heuristic and its pinned sensitivity
+        run: python3 -m unittest discover -s bodyexposure/pipeline -p test_mtp_plane.py
       - name: Verify viewer assets and initial triangle budgets
         run: python3 bodyexposure/pipeline/check_web_budget.py --out /tmp/body-exposure-web-budget.json

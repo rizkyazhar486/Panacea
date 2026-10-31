@@ -17,10 +17,13 @@ import bpy, json, math, os, re, sys
 import numpy as np
 from mathutils import Vector, Matrix
 from mathutils.bvhtree import BVHTree
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from mtp_plane import pilih_bidang_mtp  # pemilihan bidang MTP murni, diuji tanpa Blender (test_mtp_plane.py)
 
 argv = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
 OUT = argv[argv.index("--out") + 1]
 REPORT = argv[argv.index("--report") + 1]
+AREAS_OUT = argv[argv.index("--areas-out") + 1] if "--areas-out" in argv else None  # profil luas kaki depan per sisi (fixture uji sensitivitas)
 BODY = argv[argv.index("--body") + 1] if "--body" in argv else "VHF_LOWER_LIMB.ADULT.FEMALE"  # tubuh gabungan Denver+CT: --body VHF_DENVER_CT.ADULT.FEMALE
 B = BODY + "."
 S = B + "SKELETAL."
@@ -103,7 +106,7 @@ if "--hinges" in argv:
 # per irisan 2 mm turun tajam tepat di sana (kepala metatarsal menggembung, falang lebih ramping). Posisi = irisan dengan selisih
 # rerata luas (6 mm sebelum - 6 mm sesudah) terbesar di jendela 55-85% rentang mesh. Ini HEURISTIK TURUNAN (derived), bukan landmark
 # berlabel; ketidakpastian diperkirakan beberapa mm dan dilaporkan. Kelas kebenaran: derived.
-SLAB = 0.002; MTP_SPLIT = {}
+SLAB = 0.002; MTP_SPLIT = {}; PROFIL_MTP = {}
 
 
 def forefoot_name(s): return f"{S}METATARSALS_AND_PHALANGES_COMBINED.{s}"
@@ -124,16 +127,11 @@ for s in SIDES:
     P_ = verts(forefoot_name(s)); tip = jc[f"TOE_END.{s}"]
     ax_f = unit(tip - jc[f"ANKLE.{s}"]); t_all = (P_ - jc[f"ANKLE.{s}"]) @ ax_f
     areas = slab_cross_section_area(forefoot_name(s), jc[f"ANKLE.{s}"], ax_f)
-    ks = sorted(areas); k0, k1 = ks[0], ks[-1]; span = (k1 - k0 + 1) * SLAB
-    win = range(int(k0 + 0.55 * (k1 - k0)), int(k0 + 0.85 * (k1 - k0)) + 1); win_scores = {}
-    for k in win:
-        before = np.mean([areas.get(j, 0.0) for j in range(k - 3, k)]); after = np.mean([areas.get(j, 0.0) for j in range(k, k + 3)])
-        win_scores[k] = before - after
-    # titik awal = puncak lokal PERTAMA (dari posterior) yang skornya >= 70% skor tertinggi: penurunan luas kedua, lebih ke anterior,
-    # adalah runcingnya ujung falang distal, bukan sendi MTP
-    top = max(win_scores.values()); ks_w = sorted(win_scores)
-    peaks = [k for i, k in enumerate(ks_w) if win_scores[k] >= 0.7 * top and (i == 0 or win_scores[k] >= win_scores[ks_w[i - 1]]) and (i == len(ks_w) - 1 or win_scores[k] >= win_scores[ks_w[i + 1]])]
-    kbest = peaks[0]; t_mtp = kbest * SLAB
+    # Pemilihan bidang di modul murni mtp_plane.py: jendela 55-85% rentang mesh, penurunan luas rata-rata 3 irisan, puncak lokal PERTAMA
+    # (dari posterior) yang skornya >= 70% tertinggi; aritmetika identik dengan versi sebaris sebelumnya (laporan rig tidak berubah).
+    pilihan = pilih_bidang_mtp(areas); PROFIL_MTP[s] = areas
+    k0, k1 = pilihan["k0"], pilihan["k1"]; win = range(pilihan["jendela"][0], pilihan["jendela"][1] + 1); win_scores = pilihan["skor"]
+    kbest = pilihan["k"]; t_mtp = kbest * SLAB
     slab = P_[np.abs(t_all - t_mtp) < 0.0015]
     c = slab.mean(0); Q = slab - c; Q = Q - np.outer(Q @ ax_f, ax_f)
     a = np.linalg.eigh(np.cov(Q.T))[1][:, -1]; a = a - ax_f * float(a @ ax_f); a = unit(a)
@@ -146,6 +144,11 @@ for s in SIDES:
                         "area_drop_mm2_per_mm": round(float(win_scores[kbest]) * 1e6 / (SLAB * 1000), 1), "mesh_span_from_ankle_mm": [round(k0 * SLAB * 1000), round((k1 + 1) * SLAB * 1000)], "search_window_mm": [round(min(win) * SLAB * 1000), round(max(win) * SLAB * 1000)], "uncertainty_note": "order of several mm; no per-bone landmarks in the combined mesh"}
     MTP_SPLIT[s] = (ax_f, jc[f"ANKLE.{s}"] + ax_f * t_mtp)
     jc[f"TOE_TIP.{s}"] = jc[f"TOE_END.{s}"]; meta[f"TOE_TIP.{s}"] = {"method": "most anterior vertex of the forefoot mesh"}
+if AREAS_OUT:
+    json.dump({"body": BODY, "slab_m": SLAB, "axis": "ankle joint centre -> most anterior forefoot vertex (TOE_END)", "truth_class": "derived",
+               "note": "surface area of the combined metatarsal+phalanx mesh per slab, binned by triangle centroid; input of mtp_plane.pilih_bidang_mtp",
+               "sides": {sd: {"k": sorted(PROFIL_MTP[sd]), "area_m2": [PROFIL_MTP[sd][k] for k in sorted(PROFIL_MTP[sd])]} for sd in SIDES}},
+              open(AREAS_OUT, "w"), indent=1)
 jc["PELVIS_CENTRE"] = (jc["HIP.L"] + jc["HIP.R"]) / 2; meta["PELVIS_CENTRE"] = {"method": "midpoint of hip joint centres"}
 sac = verts(f"{S}SACRUM"); jc["SACRUM_TOP"] = sac[sac[:, 2].argmax()]; meta["SACRUM_TOP"] = {"method": "highest sacral vertex (pelvis bone tail)"}
 
