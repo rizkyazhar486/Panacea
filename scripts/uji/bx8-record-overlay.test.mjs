@@ -6,7 +6,7 @@ import {
   aggregateLongitudinalOrganOverlay,
   computeCanonicalRecordOverlays,
   resolveAnatomicalOverlayBinding,
-} from '../../src/domains/body-exposure/index.ts'
+} from '../../src/domains/body-exposure/engine/recordOverlayEngine.ts'
 
 test('BX-8 1. Golden case: valid canonical record resolves multiscale anatomical identity (L1..L7) and reference status', () => {
   const records = [
