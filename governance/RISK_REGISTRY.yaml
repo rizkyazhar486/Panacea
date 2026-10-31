@@ -46,6 +46,8 @@ risks:
       not cross-process transaction isolation or recovery of previously lost data.
     evidence:
       - server/src/store.ts
+      - server/src/domains/observability/egressKeluar.ts
+      - server/uji/egressTerukur.uji.ts
       - scripts/qa/mongo-save-drain.test.mjs
       - server/uji/mongoRestart.uji.ts
       - .github/workflows/mongo-persistence.yml
@@ -711,8 +713,13 @@ risks:
       whether Mongo traffic is the dominant source (candidates not excluded: web-push and
       email delivery, the 90 s sports poll, outbound AI and medical-reference calls; the 75 MB build-time
       dataset download is inbound to the service, and whether Render counts it is unverified), the first save after each boot still rewrites everything once, and
-      provider metrics after the service resumes. No egress budget controller or per-integration
-      byte accounting exists yet; the application cannot cap Render-billed traffic.
+      provider metrics after the service resumes. Measurement now exists in-process: /api/health
+      reports response bytes per route template (uncompressed upper bound) and server-initiated
+      fetch calls and request-body bytes per vendor host, since process start (host and route
+      only; no path, query, header or body). Non-fetch traffic (the Mongo driver, web-push,
+      SMTP) is NOT counted, streamed request bodies are counted as unknown rather than zero,
+      and the counters reset on restart. No egress budget controller exists yet; the
+      application cannot cap Render-billed traffic.
     evidence:
       - server/src/irisanPenyimpanan.ts
       - server/src/store.ts
