@@ -20,6 +20,9 @@ const matchName = (m, re) => {
   return false
 }
 
+// Bagian jari dan bagian metatarsal berbagi panacea_structure_id yang sama; hanya nama simpul (…_PHALANGEAL_PART) yang membedakan.
+const underToePart = (m) => { for (let o = m; o; o = o.parent) if (/PHALANGEAL_PART/.test(o.name)) return true; return false }
+
 export function splitGlb(buf) {
   if (buf.readUInt32LE(0) !== 0x46546c67) throw new Error('not a GLB')
   const jsonLength = buf.readUInt32LE(12)
@@ -73,7 +76,9 @@ export async function computeLandmarks(buf) {
     const pick = (ps, better) => ps.reduce((a, b) => (better(b.v, a.v) ? b : a))
     const calc = verts(new RegExp(`SKELETALCALCANEUS${side}$`))
     const mt1 = verts(new RegExp(`SKELETALFIRST_METATARSAL_BONE${side}$`))
-    const comb = verts(new RegExp(`METATARSALS_AND_PHALANGES_COMBINED${side}$`))
+    const comb = verts(new RegExp(`METATARSALS_AND_PHALANGES_COMBINED(_PHALANGEAL_PART)?${side}$`))
+    // Landmark ditempel ke FOOT, jadi hanya bagian posterior (metatarsal) yang ikut FOOT yang boleh jadi sumber; bagian jari ikut TOE dan akan membuat titik hantu saat jari menekuk.
+    const combFoot = verts(new RegExp(`METATARSALS_AND_PHALANGES_COMBINED${side}$`))
 
     const isFemale = comb.length > 0
 
@@ -101,22 +106,22 @@ export async function computeLandmarks(buf) {
       if (!(z1 > z0)) throw new Error(`invalid first metatarsal length: ${side}`)
       const pt = pick(mt1.filter((p) => p.v.z >= z1 - PLANTAR_FRACTION * (z1 - z0)), (b, a) => b.y < a.y || (b.y === a.y && b.z > a.z))
       out[`BALL_${side}`] = { translation: local(pt.v), source: `SKELETAL.FIRST_METATARSAL_BONE.${side} (lowest vertex in anterior quarter)` }
-    } else if (comb.length) {
+    } else if (combFoot.length) {
       if (walkTrack[side]) {
         let best = null
         for (const item of Object.values(walkTrack[side])) {
-          if (!matchName(item.m, new RegExp(`METATARSALS_AND_PHALANGES_COMBINED.*${side}`))) continue
+          if (!matchName(item.m, new RegExp(`METATARSALS_AND_PHALANGES_COMBINED.*${side}`)) || underToePart(item.m)) continue
           const minY = Math.min(...item.ys)
           if (!best || minY < best.y) best = { y: minY, item }
         }
         if (best) {
           const { m, i } = best.item
           const p = new THREE.Vector3().fromBufferAttribute(m.geometry.attributes.position, i).applyMatrix4(m.matrixWorld)
-          out[`BALL_${side}`] = { translation: local(p), source: `SKELETAL.METATARSALS_AND_PHALANGES_COMBINED.${side} (forefoot (combined), not MT1)` }
+          out[`BALL_${side}`] = { translation: local(p), source: `SKELETAL.METATARSALS_AND_PHALANGES_COMBINED.${side} (posterior metatarsal part of the forefoot, proximal to the derived MTP plane; not MT1 and not the toe part)` }
         }
       } else {
-        const pt = pick(comb, (b, a) => b.y < a.y || (b.y === a.y && b.z > a.z))
-        out[`BALL_${side}`] = { translation: local(pt.v), source: `SKELETAL.METATARSALS_AND_PHALANGES_COMBINED.${side} (forefoot (combined), not MT1)` }
+        const pt = pick(combFoot, (b, a) => b.y < a.y || (b.y === a.y && b.z > a.z))
+        out[`BALL_${side}`] = { translation: local(pt.v), source: `SKELETAL.METATARSALS_AND_PHALANGES_COMBINED.${side} (posterior metatarsal part of the forefoot, proximal to the derived MTP plane; not MT1 and not the toe part)` }
       }
     }
   }
@@ -137,7 +142,7 @@ export function withLandmarks(glb, landmarks) {
   for (const [key, lm] of Object.entries(landmarks).sort(([a], [b]) => a.localeCompare(b))) {
     const side = key.slice(-1), foot = json.nodes.findIndex((n) => n.name === `FOOT.${side}`)
     if (foot < 0) throw new Error(`FOOT.${side} node missing`)
-    json.nodes.push({ name: `${LANDMARK_PREFIX}${key}`, translation: lm.translation, extras: { panacea_landmark: key.split('_')[0].toLowerCase(), derived_from: lm.source, note: 'Derived from source bone mesh at rest pose; no toe joint exists, the ball is the forefoot pivot. Not a clinical measurement.' } })
+    json.nodes.push({ name: `${LANDMARK_PREFIX}${key}`, translation: lm.translation, extras: { panacea_landmark: key.split('_')[0].toLowerCase(), derived_from: lm.source, note: json.nodes.some((n) => n.name === `TOE.${side}`) ? (!(key.startsWith('BALL') && !lm.source.includes('FIRST_METATARSAL')) ? 'Derived from source bone mesh at rest pose; an MTP toe joint (TOE bone) exists, the ball is the first metatarsal head at that joint. Not a clinical measurement.' : 'Derived from source bone mesh at rest pose; an MTP toe joint (TOE bone) exists; the source has no separate first metatarsal, so the ball is the lowest point of the posterior (metatarsal) forefoot part, which moves with FOOT, proximal to the MTP joint. Not a clinical measurement.') : 'Derived from source bone mesh at rest pose; no toe joint exists, the ball is the forefoot pivot. Not a clinical measurement.' } })
     ;(json.nodes[foot].children ??= []).push(json.nodes.length - 1)
   }
   return { ...glb, json }

@@ -14,6 +14,7 @@
    "keys_start_at_s": 0.0,
    "loop_seam_max_deg": 0.0,
    "loop_drift_corrected_max_deg": 4.58,
+   "toe_mtp_loop_drift_corrected_max_deg": 15.11,
    "joint_angle_range_deg": {
     "hip_flex": [
      -32.5,
@@ -70,6 +71,18 @@
     "min": -0.0,
     "max": 0.0
    },
+   "toe_mtp_extension_deg": {
+    "L": {
+     "min": 5.9,
+     "max": 24.1
+    },
+    "R": {
+     "min": -4.2,
+     "max": 20.2
+    }
+   },
+   "toe_mtp_applied": "held at rest pose (CMU toe channel points ~30 deg down at contact in WALK; applying it degraded heel contact)",
+   "toe_contact_constraint": null,
    "max_bone_penetration_mm": 0.0,
    "bone_contact": [
     {
@@ -193,6 +206,7 @@
    "keys_start_at_s": 0.0,
    "loop_seam_max_deg": 0.0,
    "loop_drift_corrected_max_deg": 12.39,
+   "toe_mtp_loop_drift_corrected_max_deg": 2.41,
    "joint_angle_range_deg": {
     "hip_flex": [
      -34.4,
@@ -246,7 +260,62 @@
    },
    "lowest_foot_point_m": {
     "min": 0.0,
-    "max": 0.0737
+    "max": 0.0743
+   },
+   "toe_mtp_extension_deg": {
+    "L": {
+     "min": -3.8,
+     "max": 29.3
+    },
+    "R": {
+     "min": -17.7,
+     "max": 22.2
+    }
+   },
+   "toe_mtp_applied": "CMU toe angle, contact-constrained on stance frames",
+   "toe_contact_constraint": {
+    "truth_class": "derived (contact-constrained): MTP angle solved on stance frames so the toe segment lies flat; all other joints are CMU",
+    "per_side": {
+     "L": [
+      {
+       "frame": 0,
+       "mtp_local_x_before_deg": -18.2,
+       "mtp_local_x_after_deg": -0.2
+      },
+      {
+       "frame": 1,
+       "mtp_local_x_before_deg": -29.3,
+       "mtp_local_x_after_deg": -9.5
+      },
+      {
+       "frame": 16,
+       "mtp_local_x_before_deg": -4.8,
+       "mtp_local_x_after_deg": 12.4
+      },
+      {
+       "frame": 17,
+       "mtp_local_x_before_deg": -9.6,
+       "mtp_local_x_after_deg": 8.8
+      },
+      {
+       "frame": 18,
+       "mtp_local_x_before_deg": -18.2,
+       "mtp_local_x_after_deg": -0.2
+      }
+     ],
+     "R": [
+      {
+       "frame": 8,
+       "mtp_local_x_before_deg": -7.2,
+       "mtp_local_x_after_deg": 9.8
+      },
+      {
+       "frame": 9,
+       "mtp_local_x_before_deg": 15.2,
+       "mtp_local_x_after_deg": 16.6
+      }
+     ]
+    }
    },
    "max_bone_penetration_mm": 0.07,
    "bone_contact": [

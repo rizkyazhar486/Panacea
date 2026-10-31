@@ -6,12 +6,15 @@ const native = JSON.parse(fs.readFileSync('bodyexposure/qa_reports/gait_contact_
 const coordinates = JSON.parse(fs.readFileSync('bodyexposure/qa_reports/gait_coordinate_audit.json', 'utf8'))
 const expected = {
   adult_male: {
-    source: '03aa529c35d347d00f23c6bd2fb8dd6ac5050818e2ed818f1e11bff6bcbbd177',
-    walk: { heelPlantar: { L: ['22-25+0-4'], R: ['7-10'] }, toePlantar: { L: ['22-25+0-8'], R: ['8-18'] } },
+    source: 'b2c7cb609a7cc52064de4b5526ddfd2d9e15b6b261dcf44652aa5e1e3c887dc9',
+    walk: { heelPlantar: { L: ['22-25+0-4'], R: ['7-10'] }, toePlantar: { L: ['22-25+0-8'], R: ['8-17'] } },
+    // T-D7-05: RUN forefoot contact comes from the labelled (derived) toe constraint
+    run: { heelPlantar: { L: [], R: [] }, toePlantar: { L: [], R: ['7-9'] } },
   },
   vhf_denver_ct_adult_female: {
-    source: '7ec5ae004e6dca96f93cbb85b297e32d6a1d128980cdaa4af42a1d51eb574e32',
+    source: '246118cbcceb42e38a9e1783bb6edd037819697ae18f5416850bf7a0f24136af',
     walk: { heelPlantar: { L: [], R: [] }, toePlantar: { L: [], R: [] } },
+    run: { heelPlantar: { L: [], R: [] }, toePlantar: { L: [], R: [] } },  // betina: landmark plantar tidak menapak; kontak lewat 'sole' dan landmark bola (lihat gait_measurability)
   },
 }
 
@@ -46,8 +49,9 @@ test('WALK/RUN coverage and phase boundaries reproduce source-bound D7 evidence 
     assert.equal(run.loop_closed_duplicate_end_frame_dropped, true)
     for (const kind of ['heelPlantar', 'toePlantar']) {
       assert.deepEqual(walk[kind].phases_by_side, expected[name].walk[kind])
-      assert.equal(run[kind].stance_phases, 0)
-      assert.deepEqual(run[kind].phases_by_side, { L: [], R: [] })
+      const runPhases = expected[name].run[kind]
+      assert.equal(run[kind].stance_phases, runPhases.L.length + runPhases.R.length)
+      assert.deepEqual(run[kind].phases_by_side, runPhases)
     }
     for (const clip of [walk, run]) for (const kind of ['heel', 'toe', 'heelPlantar', 'toePlantar', 'sole']) {
       const result = clip[kind]
@@ -64,14 +68,14 @@ test('WALK/RUN coverage and phase boundaries reproduce source-bound D7 evidence 
 
 test('native numeric cross-check stays within measured Blender/Three evaluation difference', () => {
   const male = native.assets[0].clips.WALK
-  // Source-bound PR #2554 head 44ecb92d; 0.02 mm exceeds the observed 0.01094 mm
+  // Source-bound T-D7-05 MTP re-rig (male b2c7cb60, female 246118cb); 0.02 mm exceeds the observed 0.01094 mm
   // maximum comparison discrepancy, but is far below the research 15/30 mm limits.
   for (const [kind, rms, peak] of [
-    ['heelPlantar', 7.763764946696831, 16.643469604190706],
-    ['toePlantar', 8.68758191375185, 16.57656235993915],
+    ['heelPlantar', 7.731030802941662, 16.57895021713697],
+    ['toePlantar', 8.809465808548133, 16.380974939110725],
   ]) {
     assert.ok(Math.abs(male[kind].slide_rms_mm - rms) < 0.02)
     assert.ok(Math.abs(male[kind].slide_max_mm - peak) < 0.02)
   }
-  assert.ok(Math.abs(native.assets[1].clips.RUN.sole.slide_max_mm - 10.60818031175357) < 0.02)
+  assert.ok(Math.abs(native.assets[1].clips.RUN.sole.slide_max_mm - 7.346117248137794) < 0.02)
 })

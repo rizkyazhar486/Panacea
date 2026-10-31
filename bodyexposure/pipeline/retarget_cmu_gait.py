@@ -113,6 +113,8 @@ def angles(bones, hier, frames):
     = arah hadap root per frame (horizontal), kiri dari panggul R→L. Lutut, pergelangan kaki & siku: sudut antar-segmen."""
     zeroP, _ = fk(bones, hier, {})
     a0 = {s: ang(zeroP[f"{s}tibia"] - zeroP[f"{s}femur"], zeroP[f"{s}foot"] - zeroP[f"{s}tibia"]) for s in "lr"}
+    def sag(a, b, left):  # sudut bertanda dari a ke b di bidang sagital (normal = sumbu kiri); positif = b berputar ke atas
+        return math.degrees(math.atan2(float(np.dot(np.cross(a, b), left)), float(np.dot(a, b))))
     up = np.array([0, 1.0, 0])  # ASF/CMU: Y ke atas
     out, roots = [], []
     for fr in frames:
@@ -128,6 +130,10 @@ def angles(bones, hier, frames):
             r[f"hip_abd.{side}"] = math.degrees(math.atan2(thigh.dot(out_dir), -thigh.dot(up)))
             r[f"knee_flex.{side}"] = ang(thigh, shank)
             r[f"ankle_dorsi.{side}"] = ang(shank, foot) - a0[s]
+            # T-D7-05: ekstensi MTP (dorsofleksi jari) dari segmen CMU foot -> toes, relatif terhadap pose nol CMU; tanpa jepit
+            toe = P[f"{s}toes"] - P[f"{s}foot"]
+            z_foot, z_toe = zeroP[f"{s}foot"] - zeroP[f"{s}tibia"], zeroP[f"{s}toes"] - zeroP[f"{s}foot"]
+            r[f"mtp_ext.{side}"] = -(sag(foot, toe, left) - sag(z_foot, z_toe, left))
             upper = P[f"{s}humerus"] - P[f"{s}clavicle"]; fore = P[f"{s}radius"] - P[f"{s}humerus"]
             r[f"shoulder_flex.{side}"] = math.degrees(math.atan2(upper.dot(fwd), -upper.dot(up)))
             r[f"elbow_flex.{side}"] = ang(upper, fore)
@@ -194,13 +200,13 @@ for name, subj, trial in CLIPS:
         i0 = int(math.floor(t)); f = t - i0; i1 = min(i0 + 1, len(A) - 1)
         return A[i0][key] * (1 - f) + A[i1][key] * f
     # koreksi drift loop: selisih akhir−awal siklus disebar linear sepanjang siklus → sambungan loop persis 0
-    drift = {f"{key}.{s}": raw(f"{key}.{s}", idx[-1]) - raw(f"{key}.{s}", idx[0]) for key in CLAMP for s in "LR"}
+    drift = {f"{key}.{s}": raw(f"{key}.{s}", idx[-1]) - raw(f"{key}.{s}", idx[0]) for key in list(CLAMP) + ["mtp_ext"] for s in "LR"}
     def sample(key, t):
         return raw(key, t) - drift[key] * (t - idx[0]) / (idx[-1] - idx[0])
     act = bpy.data.actions.new(name); arm.animation_data_create(); arm.animation_data.action = act
     for pb in P:
         pb.rotation_mode = 'XYZ'
-    clamped = {}
+    clamped = {}; mtp_seen = {}
     base_z = arm.location.z; bobs = []
     for j, t in enumerate(idx):
         fr = j  # frame 0 → waktu glTF 0; kunci terakhir = pose awal pada t = siklus (loop tanpa jeda)
@@ -217,13 +223,56 @@ for name, subj, trial in CLIPS:
             setb(f"THIGH.{side}", sg(f"THIGH.{side}", "flexion") * vals["hip_flex"], zsign(f"THIGH.{side}") * vals["hip_abd"])
             setb(f"SHIN.{side}", sg(f"SHIN.{side}", "flexion") * vals["knee_flex"])
             setb(f"FOOT.{side}", sg(f"FOOT.{side}", "extension") * vals["ankle_dorsi"])  # FOOT: ekstensi = dorsofleksi
+            if f"TOE.{side}" in P.keys():  # T-D7-05: sudut MTP langsung dari mocap (tanpa batas ROM karang); min/max dicatat di laporan
+                mtp = sample(f"mtp_ext.{side}", t); mtp_seen.setdefault(side, []).append(mtp)
+                if name == "WALK":  # WALK: MTP ditahan pada pose istirahat (geometri = kaki kaku lama); kanal jari CMU menunjuk ~30° ke bawah saat
+                    mtp = 0.0       # kontak dan memakainya membuat jari menopang tubuh sehingga tumit tergelincir (diukur: RMS 7,8 -> 21,2 mm)
+                setb(f"TOE.{side}", sg(f"TOE.{side}", "extension") * mtp)
             if HAS_ARMS:
                 setb(f"UPPER_ARM.{side}", sg(f"UPPER_ARM.{side}", "flexion") * vals["shoulder_flex"])
                 setb(f"FOREARM.{side}", sg(f"FOREARM.{side}", "flexion") * vals["elbow_flex"])
         bobs.append(float(np.interp(t, np.arange(len(bob)), bob)) * unit_m * (leg_rig / leg_src))
+    # T-D7-05 kendala kontak jari (keputusan owner 2026-10-30): semua sendi tetap dari CMU; HANYA sudut MTP pada frame tumpu diselesaikan
+    # agar segmen jari mendatar (jari rebah di lantai). Data jari CMU sendiri menunjuk ke bawah saat kontak, jadi tanpa ini kepala MT
+    # tidak pernah menapak. Kelas kebenaran: derived (contact-constrained); tiap koreksi dicatat per frame.
+    toe_fix = {}
+    if name != "WALK" and all(f"TOE.{sd}" in P.keys() for sd in ("L", "R")):
+        sc0 = bpy.context.scene; sc0.frame_start, sc0.frame_end = 0, len(idx) - 1
+        side_meshes = {sd: [o for o in bpy.data.objects if o.type == 'MESH' and o.parent_bone in (f"FOOT.{sd}", f"TOE.{sd}")] for sd in ("L", "R")}
+        def side_low(sd):
+            dg = bpy.context.evaluated_depsgraph_get(); low = math.inf
+            for o in side_meshes[sd]:
+                vs = o.evaluated_get(dg).data.vertices; M = o.matrix_world
+                for i in range(0, len(vs), 7): low = min(low, (M @ vs[i].co).z)
+            return low
+        lows = {sd: [] for sd in ("L", "R")}
+        for fr in range(len(idx)):
+            sc0.frame_set(fr)
+            for sd in ("L", "R"): lows[sd].append(side_low(sd))
+        for sd in ("L", "R"):
+            if name == "WALK":  # pelvis kelak diturunkan per frame sampai kaki terendah menapak: tumpu = dalam 15 mm dari kaki terendah frame itu
+                stance = [fr for fr in range(len(idx)) if lows[sd][fr] - min(lows["L"][fr], lows["R"][fr]) < 0.015]
+            else:  # lari: naik-turun pelvis dari mocap; tumpu = tinggi kaki + bob dalam 15 mm dari minimum sisi itu
+                zz = [lows[sd][fr] + bobs[fr] for fr in range(len(idx))]; m = min(zz)
+                stance = [fr for fr, z in enumerate(zz) if z - m < 0.015]
+            pb = P[f"TOE.{sd}"]; fixes = []
+            for fr in stance:
+                sc0.frame_set(fr); before = math.degrees(pb.rotation_euler.x)
+                for _ in range(3):  # pitch segmen jari dunia -> 0 dengan memutar X lokal TOE (beberapa iterasi kecil, arah ditentukan numerik)
+                    bpy.context.view_layer.update()
+                    d = (arm.matrix_world @ pb.tail) - (arm.matrix_world @ pb.head)
+                    pitch = math.degrees(math.atan2(d.z, math.hypot(d.x, d.y)))
+                    if abs(pitch) < 0.2: break
+                    x0 = pb.rotation_euler.x; pb.rotation_euler.x = x0 + math.radians(1.0); bpy.context.view_layer.update()
+                    d1 = (arm.matrix_world @ pb.tail) - (arm.matrix_world @ pb.head)
+                    dp = math.degrees(math.atan2(d1.z, math.hypot(d1.x, d1.y))) - pitch  # perubahan pitch per +1 derajat
+                    pb.rotation_euler.x = x0 - math.radians(pitch / dp) if abs(dp) > 1e-6 else x0
+                pb.keyframe_insert("rotation_euler", frame=fr)
+                fixes.append({"frame": fr, "mtp_local_x_before_deg": round(before, 1), "mtp_local_x_after_deg": round(math.degrees(pb.rotation_euler.x), 1)})
+            toe_fix[sd] = fixes
     # kontak lantai: tinggi kaki terendah per frame pada pelvis dasar
     sc = bpy.context.scene; sc.frame_start, sc.frame_end = 0, len(idx) - 1; sc.render.fps = FPS_OUT
-    feet = [o for o in bpy.data.objects if o.type == 'MESH' and o.parent_bone and o.parent_bone.startswith("FOOT.")]
+    feet = [o for o in bpy.data.objects if o.type == 'MESH' and o.parent_bone and o.parent_bone.startswith(("FOOT.", "TOE."))]
     def lowest_now():
         dg = bpy.context.evaluated_depsgraph_get(); low = math.inf
         for o in feet:
@@ -250,15 +299,21 @@ for name, subj, trial in CLIPS:
     sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
     contact = rig_contact_qa.sweep(sc, list(range(0, len(idx), 2)), lambda at: name.lower())
     loop_err = max(abs(sample(f"{key}.{s}", idx[0]) - sample(f"{key}.{s}", idx[-1])) for key in CLAMP for s in "LR")
-    drift_max = max(abs(v) for v in drift.values())
+    drift_max = max(abs(v) for k, v in drift.items() if not k.startswith("mtp_ext"))  # metrik lama: hanya sendi dari CMU yang sudah ada sebelum MTP
+    mtp_drift_max = max(abs(drift[f"mtp_ext.{sd}"]) for sd in "LR") if mtp_seen else None
     report["clips"][name] = {
         "subject": subj, "trial": trial, "source_fps": 120, "cycle_start_frame": start, "cycle_frames_120fps": period,
         "cycle_s": round(period / 120, 3), "frames_24fps": len(idx), "keys_start_at_s": 0.0, "loop_seam_max_deg": round(loop_err, 2),
         "loop_drift_corrected_max_deg": round(drift_max, 2),
+        "toe_mtp_loop_drift_corrected_max_deg": (round(mtp_drift_max, 2) if mtp_drift_max is not None else None),
         "joint_angle_range_deg": rngs, "clamped_samples": clamped,
         "rest_offsets_deg": ({sd: {k: round(v, 1) for k, v in REST[sd].items()} for sd in "LR"} if BODY else None), "coverage": COVERAGE or None,
         "leg_length_m": {"rig": round(leg_rig, 3), "source": round(leg_src, 3)},
         "lowest_foot_point_m": {"min": round(min(lowest), 4), "max": round(max(lowest), 4)},
+        # T-D7-05: sudut MTP dari mocap (positif = ekstensi/dorsofleksi jari), tanpa jepit; null bila rig tidak punya TOE
+        "toe_mtp_extension_deg": ({sd: {"min": round(min(v), 1), "max": round(max(v), 1)} for sd, v in mtp_seen.items()} or None),
+        "toe_mtp_applied": ("held at rest pose (CMU toe channel points ~30 deg down at contact in WALK; applying it degraded heel contact)" if name == "WALK" else "CMU toe angle, contact-constrained on stance frames"),
+        "toe_contact_constraint": ({"truth_class": "derived (contact-constrained): MTP angle solved on stance frames so the toe segment lies flat; all other joints are CMU", "per_side": toe_fix} if toe_fix else None),
         "max_bone_penetration_mm": max(c["max_penetration_mm"] for c in contact), "bone_contact": contact}
     # rentang frame manual (bukan dari handle Bezier) & interpolasi linear: sampel 24 fps rapat, tanpa overshoot
     act.use_frame_range = True; act.frame_start, act.frame_end = 0, len(idx) - 1

@@ -1,6 +1,6 @@
 """Uji kontinuitas loop WALK/RUN langsung dari GLB terbit (bukan dari sumber Blender).
 
-  npx gltfpack -i public/bodyexposure/adult_male.rig_rom.glb -o /tmp/gait_decoded.glb -noq   # buka kompresi meshopt
+  npx gltfpack -i public/bodyexposure/adult_male.rig_rom.glb -o /tmp/gait_decoded.glb -noq -af 0   # buka kompresi meshopt; -af 0 wajib (tanpa itu gltfpack me-resample ke 30 Hz dan metrik sambungan salah)
   python3 bodyexposure/pipeline/check_gait_loop.py /tmp/gait_decoded.glb --out bodyexposure/qa_reports/gait_loop_continuity.json
 
 Metrik per klip (kuaternion lokal tiap tulang, translasi akar):
@@ -71,7 +71,11 @@ for anim in J["animations"]:
     start_pose[anim["name"]] = {name_of[nd]: qn(q[0]) for nd, (t, q) in rot.items()}
     if anim["name"] == "ROM": continue  # ROM hanya dipakai sebagai pose awal (istirahat) untuk matriks transisi
     seams, jumps, interior = {}, {}, {}
-    animated = {nd: tq for nd, tq in rot.items() if len(tq[0]) >= 3}  # kanal 1 kunci = tulang diam (konstan)
+    # kanal 1 kunci = tulang diam; kanal banyak kunci yang nilainya identik (mis. TOE ditahan di WALK) juga diam -> dicatat terpisah,
+    # sama seperti loader three.js yang membuang trek konstan (selaras dengan scripts/uji/body-gait-loop-reproduction.mts)
+    varies = lambda q: max(abs(float(np.dot(qn(q[0]), qn(x)))) for x in q) - min(abs(float(np.dot(qn(q[0]), qn(x)))) for x in q) > 1e-9
+    static_multi = sorted(name_of[nd] for nd, tq in rot.items() if len(tq[0]) >= 3 and not varies(tq[1]))
+    animated = {nd: tq for nd, tq in rot.items() if len(tq[0]) >= 3 and varies(tq[1])}
     for nd, (t, q) in animated.items():
         q = np.array([qn(x) for x in q]); d = abs(float(np.dot(q[0], q[-1])))
         seams[name_of[nd]] = math.degrees(2 * math.acos(min(1.0, d)))
@@ -88,9 +92,12 @@ for anim in J["animations"]:
            "max_seam_deg": round(max(seams.values()), 4), "worst_seam_bone": max(seams, key=seams.get),
            "max_omega_jump_deg_s": round(max(jumps.values()), 1), "worst_omega_jump_bone": max(jumps, key=jumps.get),
            "median_omega_jump_deg_s": round(float(np.median(list(jumps.values()))), 1),
-           "seam_jump_over_interior_p95": {k: round(jumps[k] / interior[k][0], 2) for k in jumps},
-           "seam_jump_over_interior_max": {k: round(jumps[k] / interior[k][1], 2) for k in jumps}}
-    res["bones_seam_jump_above_interior_max"] = [k for k in jumps if jumps[k] > interior[k][1]]
+           "omega_jump_deg_s_by_bone": {k: round(v, 1) for k, v in sorted(jumps.items())},
+           # tulang yang beranimasi tetapi diam (mis. TOE di WALK, ditahan pada pose istirahat) punya interior 0: rasio tidak terdefinisi -> null
+           "seam_jump_over_interior_p95": {k: (round(jumps[k] / interior[k][0], 2) if interior[k][0] > 0 else None) for k in jumps},
+           "seam_jump_over_interior_max": {k: (round(jumps[k] / interior[k][1], 2) if interior[k][1] > 0 else None) for k in jumps}}
+    res["bones_seam_jump_above_interior_max"] = [k for k in jumps if interior[k][1] > 0 and jumps[k] > interior[k][1]]
+    res["static_keyed_bones"] = static_multi
     # typical angular speed for scale: median over bones of the mean |ω| inside the clip
     sp = []
     for nd, (t, q) in animated.items():

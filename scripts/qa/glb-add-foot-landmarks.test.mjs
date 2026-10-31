@@ -23,15 +23,17 @@ test('public rigs carry exactly the named landmark empties, parented to FOOT.L/R
       assert.equal(json.nodes[parent].name, `FOOT.${side}`, `${n.name} is a child of FOOT.${side}`)
       assert.equal(n.mesh, undefined, 'landmark is an empty, not geometry')
       assert.ok(n.translation.every(Number.isFinite) && n.translation.length === 3)
-      assert.match(n.extras.note, /no toe joint/)
+      // T-D7-05: rig dengan tulang TOE.<sisi> (sendi MTP) wajib menyebutnya; rig tanpa TOE tetap menyatakan tidak ada sendi jari
+      const hasToe = json.nodes.some((p) => p.name === `TOE.${side}`)
+      assert.match(n.extras.note, hasToe ? /MTP toe joint \(TOE bone\) exists/ : /no toe joint/, `${n.name} note matches the rig`)
     }
   }
-  // betina: metatarsal I tidak dipisah di sumber -> bola diturunkan dari kombinasi metatarsal+falang dan dilabeli jelas (T-D7-04)
+  // betina: metatarsal I tidak dipisah di sumber -> bola diturunkan HANYA dari bagian metatarsal (ikut FOOT), bukan bagian jari (ikut TOE), dan dilabeli jelas (T-D7-04)
   const fNodes = splitGlb(fs.readFileSync(file('vhf_denver_ct_adult_female'))).json.nodes
   for (const s of ['L', 'R']) {
     const ball = fNodes.find((n) => n.name === `${LANDMARK_PREFIX}BALL_${s}`)
     assert.ok(ball, `female BALL_${s} node must exist`)
-    assert.match(ball.extras.derived_from, /METATARSALS_AND_PHALANGES_COMBINED.*forefoot \(combined\), not MT1/)
+    assert.match(ball.extras.derived_from, /METATARSALS_AND_PHALANGES_COMBINED.*posterior metatarsal part of the forefoot.*not MT1 and not the toe part/)
   }
 })
 

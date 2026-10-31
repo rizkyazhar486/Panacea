@@ -1,16 +1,30 @@
 {
- "source": "/Users/rizkyazhar/.claude/jobs/76008e85/tmp/gait_fixed_decoded.glb",
+ "source": "/var/folders/ks/34gmdyz12ng1q80z69vpvt040000gn/T/tmp.ncsjfMBF1i/g.glb",
  "clips": {
   "RUN": {
    "duration_s": 0.75,
    "keys": 19,
-   "rotation_channels": 14,
-   "animated_rotation_channels": 10,
+   "rotation_channels": 16,
+   "animated_rotation_channels": 12,
    "max_seam_deg": 0.0,
-   "worst_seam_bone": "UPPER_ARM.R",
-   "max_omega_jump_deg_s": 250.7,
-   "worst_omega_jump_bone": "SHIN.R",
-   "median_omega_jump_deg_s": 85.1,
+   "worst_seam_bone": "TOE.L",
+   "max_omega_jump_deg_s": 417.5,
+   "worst_omega_jump_bone": "TOE.R",
+   "median_omega_jump_deg_s": 86.9,
+   "omega_jump_deg_s_by_bone": {
+    "FOOT.L": 88.6,
+    "FOOT.R": 31.8,
+    "FOREARM.L": 85.0,
+    "FOREARM.R": 27.9,
+    "SHIN.L": 158.2,
+    "SHIN.R": 250.7,
+    "THIGH.L": 64.1,
+    "THIGH.R": 137.4,
+    "TOE.L": 89.1,
+    "TOE.R": 417.5,
+    "UPPER_ARM.L": 85.1,
+    "UPPER_ARM.R": 12.6
+   },
    "seam_jump_over_interior_p95": {
     "UPPER_ARM.L": 0.85,
     "FOREARM.L": 0.87,
@@ -19,9 +33,11 @@
     "THIGH.L": 0.28,
     "SHIN.L": 0.37,
     "FOOT.L": 0.22,
+    "TOE.L": 0.15,
     "THIGH.R": 0.65,
     "SHIN.R": 0.52,
-    "FOOT.R": 0.09
+    "FOOT.R": 0.09,
+    "TOE.R": 0.69
    },
    "seam_jump_over_interior_max": {
     "UPPER_ARM.L": 0.83,
@@ -31,12 +47,15 @@
     "THIGH.L": 0.23,
     "SHIN.L": 0.33,
     "FOOT.L": 0.17,
+    "TOE.L": 0.14,
     "THIGH.R": 0.49,
     "SHIN.R": 0.37,
-    "FOOT.R": 0.05
+    "FOOT.R": 0.05,
+    "TOE.R": 0.64
    },
    "bones_seam_jump_above_interior_max": [],
-   "median_mean_angular_speed_deg_s": 153.7,
+   "static_keyed_bones": [],
+   "median_mean_angular_speed_deg_s": 164.1,
    "translation": {
     "RIG.ADULT_MALE": {
      "drift_m": 0.0,
@@ -62,13 +81,25 @@
   "WALK": {
    "duration_s": 1.0833,
    "keys": 27,
-   "rotation_channels": 14,
+   "rotation_channels": 16,
    "animated_rotation_channels": 10,
    "max_seam_deg": 0.0,
    "worst_seam_bone": "THIGH.L",
    "max_omega_jump_deg_s": 132.1,
    "worst_omega_jump_bone": "SHIN.L",
-   "median_omega_jump_deg_s": 24.2,
+   "median_omega_jump_deg_s": 24.3,
+   "omega_jump_deg_s_by_bone": {
+    "FOOT.L": 26.7,
+    "FOOT.R": 21.0,
+    "FOREARM.L": 3.6,
+    "FOREARM.R": 48.9,
+    "SHIN.L": 132.1,
+    "SHIN.R": 70.5,
+    "THIGH.L": 81.9,
+    "THIGH.R": 21.8,
+    "UPPER_ARM.L": 19.2,
+    "UPPER_ARM.R": 9.4
+   },
    "seam_jump_over_interior_p95": {
     "UPPER_ARM.L": 0.43,
     "FOREARM.L": 0.06,
@@ -79,7 +110,7 @@
     "FOOT.L": 0.13,
     "THIGH.R": 0.21,
     "SHIN.R": 0.35,
-    "FOOT.R": 0.09
+    "FOOT.R": 0.1
    },
    "seam_jump_over_interior_max": {
     "UPPER_ARM.L": 0.27,
@@ -94,11 +125,12 @@
     "FOOT.R": 0.08
    },
    "bones_seam_jump_above_interior_max": [],
+   "static_keyed_bones": [],
    "median_mean_angular_speed_deg_s": 95.0,
    "translation": {
     "RIG.ADULT_MALE": {
      "drift_m": 0.0,
-     "vel_jump_m_s": 0.1211,
+     "vel_jump_m_s": 0.117,
      "range_m": [
       0.0,
       0.0507,

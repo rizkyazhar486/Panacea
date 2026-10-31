@@ -14,6 +14,7 @@
    "keys_start_at_s": 0.0,
    "loop_seam_max_deg": 0.0,
    "loop_drift_corrected_max_deg": 4.58,
+   "toe_mtp_loop_drift_corrected_max_deg": 15.11,
    "joint_angle_range_deg": {
     "hip_flex": [
      -32.5,
@@ -47,6 +48,8 @@
     "knee_flex.R": 3,
     "hip_flex.R": 1
    },
+   "rest_offsets_deg": null,
+   "coverage": null,
    "leg_length_m": {
     "rig": 0.794,
     "source": 0.809
@@ -55,7 +58,19 @@
     "min": -0.0,
     "max": 0.0
    },
-   "max_bone_penetration_mm": 0.61,
+   "toe_mtp_extension_deg": {
+    "L": {
+     "min": 5.9,
+     "max": 24.1
+    },
+    "R": {
+     "min": -4.2,
+     "max": 20.2
+    }
+   },
+   "toe_mtp_applied": "held at rest pose (CMU toe channel points ~30 deg down at contact in WALK; applying it degraded heel contact)",
+   "toe_contact_constraint": null,
+   "max_bone_penetration_mm": 0.74,
    "bone_contact": [
     {
      "pair": [
@@ -125,8 +140,8 @@
       "TIBIA.L",
       "TALUS.L"
      ],
-     "max_penetration_mm": 0.03,
-     "at_frame": 2,
+     "max_penetration_mm": 0.13,
+     "at_frame": 14,
      "movement": "walk"
     },
     {
@@ -134,7 +149,7 @@
       "FIBULA.L",
       "TALUS.L"
      ],
-     "max_penetration_mm": 0.55,
+     "max_penetration_mm": 0.65,
      "at_frame": 2,
      "movement": "walk"
     },
@@ -242,7 +257,7 @@
       "TIBIA.R",
       "TALUS.R"
      ],
-     "max_penetration_mm": 0.11,
+     "max_penetration_mm": 0.14,
      "at_frame": 6,
      "movement": "walk"
     },
@@ -251,7 +266,7 @@
       "FIBULA.R",
       "TALUS.R"
      ],
-     "max_penetration_mm": 0.61,
+     "max_penetration_mm": 0.74,
      "at_frame": 6,
      "movement": "walk"
     },
@@ -304,6 +319,7 @@
    "keys_start_at_s": 0.0,
    "loop_seam_max_deg": 0.0,
    "loop_drift_corrected_max_deg": 12.39,
+   "toe_mtp_loop_drift_corrected_max_deg": 2.41,
    "joint_angle_range_deg": {
     "hip_flex": [
      -34.4,
@@ -336,13 +352,60 @@
     "ankle_dorsi.R": 1,
     "hip_flex.R": 2
    },
+   "rest_offsets_deg": null,
+   "coverage": null,
    "leg_length_m": {
     "rig": 0.794,
     "source": 0.861
    },
    "lowest_foot_point_m": {
     "min": 0.0,
-    "max": 0.0827
+    "max": 0.0795
+   },
+   "toe_mtp_extension_deg": {
+    "L": {
+     "min": -3.8,
+     "max": 29.3
+    },
+    "R": {
+     "min": -17.7,
+     "max": 22.2
+    }
+   },
+   "toe_mtp_applied": "CMU toe angle, contact-constrained on stance frames",
+   "toe_contact_constraint": {
+    "truth_class": "derived (contact-constrained): MTP angle solved on stance frames so the toe segment lies flat; all other joints are CMU",
+    "per_side": {
+     "L": [
+      {
+       "frame": 0,
+       "mtp_local_x_before_deg": -18.2,
+       "mtp_local_x_after_deg": -24.6
+      },
+      {
+       "frame": 17,
+       "mtp_local_x_before_deg": -9.6,
+       "mtp_local_x_after_deg": -16.1
+      },
+      {
+       "frame": 18,
+       "mtp_local_x_before_deg": -18.2,
+       "mtp_local_x_after_deg": -24.6
+      }
+     ],
+     "R": [
+      {
+       "frame": 7,
+       "mtp_local_x_before_deg": -7.7,
+       "mtp_local_x_after_deg": 15.7
+      },
+      {
+       "frame": 8,
+       "mtp_local_x_before_deg": -7.2,
+       "mtp_local_x_after_deg": 18.8
+      }
+     ]
+    }
    },
    "max_bone_penetration_mm": 1.32,
    "bone_contact": [
@@ -414,7 +477,7 @@
       "TIBIA.L",
       "TALUS.L"
      ],
-     "max_penetration_mm": 0.11,
+     "max_penetration_mm": 0.14,
      "at_frame": 0,
      "movement": "run"
     },
@@ -423,7 +486,7 @@
       "FIBULA.L",
       "TALUS.L"
      ],
-     "max_penetration_mm": 0.61,
+     "max_penetration_mm": 0.74,
      "at_frame": 0,
      "movement": "run"
     },
@@ -531,7 +594,7 @@
       "TIBIA.R",
       "TALUS.R"
      ],
-     "max_penetration_mm": 0.09,
+     "max_penetration_mm": 0.12,
      "at_frame": 8,
      "movement": "run"
     },
@@ -540,7 +603,7 @@
       "FIBULA.R",
       "TALUS.R"
      ],
-     "max_penetration_mm": 0.59,
+     "max_penetration_mm": 0.72,
      "at_frame": 8,
      "movement": "run"
     },

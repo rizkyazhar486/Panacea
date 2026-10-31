@@ -6,43 +6,42 @@
  "note": "Read-only diagnostic. closest_vertex is the bone vertex that comes nearest the floor during the clip (pose-independent); current_landmark is the rig node derived at rest pose. Matching values mean the landmark definition is not the cause. Not a clinical measurement.",
  "bodies": {
   "adult_male": {
-   "sha256": "03aa529c35d347d00f23c6bd2fb8dd6ac5050818e2ed818f1e11bff6bcbbd177",
+   "sha256": "b2c7cb609a7cc52064de4b5526ddfd2d9e15b6b261dcf44652aa5e1e3c887dc9",
    "clips": {
     "RUN": {
      "frames": 18,
      "sides": {
       "L": {
-       "sole_min_height_mm": 0.3,
+       "sole_min_height_mm": 2.8,
        "contact_frames": 2,
        "lowest_structure_at_contact": {
-        "ADULT.MALE.SKELETAL.DISTAL_PHALANX_OF_FIRST_FINGER_OF_FOOT.L": 1,
-        "ADULT.MALE.JOINT.PLANTAR_INTERPHALANGEAL_LIGAMENTS.L": 1
+        "ADULT.MALE.JOINT.PLANTAR_METATARSOPHALANGEAL_LIGAMENTS.L": 2
        },
        "groups": {
         "calcaneus": {
          "closest_vertex": {
-          "min_height_mm": 32.3,
+          "min_height_mm": 24.2,
           "frames_within_window": 0,
           "stance_phases": 0
          },
          "current_landmark": {
           "node": "FOOT_LANDMARK_HEEL_L",
-          "min_height_mm": 32.3,
+          "min_height_mm": 24.2,
           "frames_within_window": 0,
           "stance_phases": 0
          }
         },
         "forefoot": {
          "closest_vertex": {
-          "min_height_mm": 17.5,
-          "frames_within_window": 0,
-          "stance_phases": 0
+          "min_height_mm": 8.7,
+          "frames_within_window": 2,
+          "stance_phases": 1
          },
          "current_landmark": {
           "node": "FOOT_LANDMARK_BALL_L",
-          "min_height_mm": 17.5,
-          "frames_within_window": 0,
-          "stance_phases": 0
+          "min_height_mm": 8.7,
+          "frames_within_window": 2,
+          "stance_phases": 1
          }
         }
        }
@@ -51,33 +50,33 @@
        "sole_min_height_mm": 0,
        "contact_frames": 3,
        "lowest_structure_at_contact": {
-        "ADULT.MALE.JOINT.PLANTAR_INTERPHALANGEAL_LIGAMENTS.R": 1,
-        "ADULT.MALE.SKELETAL.DISTAL_PHALANX_OF_SECOND_FINGER_OF_FOOT.R": 2
+        "ADULT.MALE.SKELETAL.PROXIMAL_PHALANX_OF_FIFTH_FINGER_OF_FOOT.R": 2,
+        "ADULT.MALE.JOINT.PLANTAR_INTERPHALANGEAL_LIGAMENTS.R": 1
        },
        "groups": {
         "calcaneus": {
          "closest_vertex": {
-          "min_height_mm": 34.8,
+          "min_height_mm": 26.6,
           "frames_within_window": 0,
           "stance_phases": 0
          },
          "current_landmark": {
           "node": "FOOT_LANDMARK_HEEL_R",
-          "min_height_mm": 34.8,
+          "min_height_mm": 26.6,
           "frames_within_window": 0,
           "stance_phases": 0
          }
         },
         "forefoot": {
          "closest_vertex": {
-          "min_height_mm": 13.9,
-          "frames_within_window": 1,
+          "min_height_mm": 5.2,
+          "frames_within_window": 2,
           "stance_phases": 1
          },
          "current_landmark": {
           "node": "FOOT_LANDMARK_BALL_R",
-          "min_height_mm": 13.9,
-          "frames_within_window": 1,
+          "min_height_mm": 5.2,
+          "frames_within_window": 2,
           "stance_phases": 1
          }
         }
@@ -92,34 +91,34 @@
        "sole_min_height_mm": 0,
        "contact_frames": 14,
        "lowest_structure_at_contact": {
-        "ADULT.MALE.JOINT.PLANTAR_METATARSOPHALANGEAL_LIGAMENTS.L": 2,
-        "ADULT.MALE.JOINT.PLANTAR_INTERPHALANGEAL_LIGAMENTS.L": 7,
+        "ADULT.MALE.JOINT.PLANTAR_METATARSOPHALANGEAL_LIGAMENTS.L": 1,
+        "ADULT.MALE.JOINT.PLANTAR_INTERPHALANGEAL_LIGAMENTS.L": 8,
         "ADULT.MALE.SKELETAL.DISTAL_PHALANX_OF_SECOND_FINGER_OF_FOOT.L": 4,
         "ADULT.MALE.SKELETAL.CALCANEUS.L": 1
        },
        "groups": {
         "calcaneus": {
          "closest_vertex": {
-          "min_height_mm": 0.6,
+          "min_height_mm": 0.9,
           "frames_within_window": 9,
           "stance_phases": 1
          },
          "current_landmark": {
           "node": "FOOT_LANDMARK_HEEL_L",
-          "min_height_mm": 0.6,
+          "min_height_mm": 0.9,
           "frames_within_window": 9,
           "stance_phases": 1
          }
         },
         "forefoot": {
          "closest_vertex": {
-          "min_height_mm": 5.7,
+          "min_height_mm": 5.9,
           "frames_within_window": 11,
           "stance_phases": 1
          },
          "current_landmark": {
           "node": "FOOT_LANDMARK_BALL_L",
-          "min_height_mm": 5.7,
+          "min_height_mm": 5.9,
           "frames_within_window": 11,
           "stance_phases": 1
          }
@@ -127,36 +126,36 @@
        }
       },
       "R": {
-       "sole_min_height_mm": 0.1,
+       "sole_min_height_mm": 0.4,
        "contact_frames": 18,
        "lowest_structure_at_contact": {
         "ADULT.MALE.SKELETAL.CALCANEUS.R": 4,
-        "ADULT.MALE.JOINT.PLANTAR_INTERPHALANGEAL_LIGAMENTS.R": 2,
-        "ADULT.MALE.SKELETAL.DISTAL_PHALANX_OF_SECOND_FINGER_OF_FOOT.R": 12
+        "ADULT.MALE.JOINT.PLANTAR_INTERPHALANGEAL_LIGAMENTS.R": 3,
+        "ADULT.MALE.SKELETAL.DISTAL_PHALANX_OF_SECOND_FINGER_OF_FOOT.R": 11
        },
        "groups": {
         "calcaneus": {
          "closest_vertex": {
-          "min_height_mm": 0.1,
+          "min_height_mm": 0.4,
           "frames_within_window": 5,
           "stance_phases": 2
          },
          "current_landmark": {
           "node": "FOOT_LANDMARK_HEEL_R",
-          "min_height_mm": 0.1,
+          "min_height_mm": 0.4,
           "frames_within_window": 5,
           "stance_phases": 2
          }
         },
         "forefoot": {
          "closest_vertex": {
-          "min_height_mm": 8.9,
+          "min_height_mm": 9,
           "frames_within_window": 6,
           "stance_phases": 1
          },
          "current_landmark": {
           "node": "FOOT_LANDMARK_BALL_R",
-          "min_height_mm": 8.9,
+          "min_height_mm": 9,
           "frames_within_window": 6,
           "stance_phases": 1
          }
@@ -168,13 +167,13 @@
    }
   },
   "vhf_denver_ct_adult_female": {
-   "sha256": "7ec5ae004e6dca96f93cbb85b297e32d6a1d128980cdaa4af42a1d51eb574e32",
+   "sha256": "246118cbcceb42e38a9e1783bb6edd037819697ae18f5416850bf7a0f24136af",
    "clips": {
     "RUN": {
      "frames": 18,
      "sides": {
       "L": {
-       "sole_min_height_mm": 10.5,
+       "sole_min_height_mm": 10.9,
        "contact_frames": 1,
        "lowest_structure_at_contact": {
         "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.METATARSALS_AND_PHALANGES_COMBINED.L": 1
@@ -182,28 +181,28 @@
        "groups": {
         "calcaneus": {
          "closest_vertex": {
-          "min_height_mm": 16.9,
+          "min_height_mm": 17.2,
           "frames_within_window": 0,
           "stance_phases": 0
          },
          "current_landmark": {
           "node": "FOOT_LANDMARK_HEEL_L",
-          "min_height_mm": 17.5,
+          "min_height_mm": 17.8,
           "frames_within_window": 0,
           "stance_phases": 0
          }
         },
         "forefoot": {
          "closest_vertex": {
-          "min_height_mm": 10.5,
+          "min_height_mm": 10.9,
           "frames_within_window": 1,
           "stance_phases": 1
          },
          "current_landmark": {
           "node": "FOOT_LANDMARK_BALL_L",
-          "min_height_mm": 15.2,
-          "frames_within_window": 0,
-          "stance_phases": 0
+          "min_height_mm": 12.6,
+          "frames_within_window": 1,
+          "stance_phases": 1
          }
         }
        }
@@ -217,13 +216,13 @@
        "groups": {
         "calcaneus": {
          "closest_vertex": {
-          "min_height_mm": 20.2,
+          "min_height_mm": 20.5,
           "frames_within_window": 0,
           "stance_phases": 0
          },
          "current_landmark": {
           "node": "FOOT_LANDMARK_HEEL_R",
-          "min_height_mm": 23.6,
+          "min_height_mm": 23.9,
           "frames_within_window": 0,
           "stance_phases": 0
          }
@@ -236,8 +235,8 @@
          },
          "current_landmark": {
           "node": "FOOT_LANDMARK_BALL_R",
-          "min_height_mm": 0.7,
-          "frames_within_window": 3,
+          "min_height_mm": 0,
+          "frames_within_window": 2,
           "stance_phases": 1
          }
         }
@@ -249,7 +248,7 @@
      "frames": 26,
      "sides": {
       "L": {
-       "sole_min_height_mm": 0.2,
+       "sole_min_height_mm": 0.8,
        "contact_frames": 14,
        "lowest_structure_at_contact": {
         "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.CALCANEUS.L": 9,
@@ -258,26 +257,26 @@
        "groups": {
         "calcaneus": {
          "closest_vertex": {
-          "min_height_mm": 0.3,
+          "min_height_mm": 0.9,
           "frames_within_window": 10,
           "stance_phases": 1
          },
          "current_landmark": {
           "node": "FOOT_LANDMARK_HEEL_L",
-          "min_height_mm": 0.3,
+          "min_height_mm": 0.9,
           "frames_within_window": 10,
           "stance_phases": 1
          }
         },
         "forefoot": {
          "closest_vertex": {
-          "min_height_mm": 0.2,
+          "min_height_mm": 0.8,
           "frames_within_window": 5,
           "stance_phases": 1
          },
          "current_landmark": {
           "node": "FOOT_LANDMARK_BALL_L",
-          "min_height_mm": 0.2,
+          "min_height_mm": 1.8,
           "frames_within_window": 5,
           "stance_phases": 1
          }
@@ -286,22 +285,22 @@
       },
       "R": {
        "sole_min_height_mm": 0,
-       "contact_frames": 17,
+       "contact_frames": 16,
        "lowest_structure_at_contact": {
-        "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.CALCANEUS.R": 5,
+        "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.CALCANEUS.R": 4,
         "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.METATARSALS_AND_PHALANGES_COMBINED.R": 12
        },
        "groups": {
         "calcaneus": {
          "closest_vertex": {
-          "min_height_mm": 0.4,
-          "frames_within_window": 8,
+          "min_height_mm": 1,
+          "frames_within_window": 7,
           "stance_phases": 2
          },
          "current_landmark": {
           "node": "FOOT_LANDMARK_HEEL_R",
-          "min_height_mm": 0.4,
-          "frames_within_window": 8,
+          "min_height_mm": 1,
+          "frames_within_window": 7,
           "stance_phases": 2
          }
         },
@@ -313,8 +312,8 @@
          },
          "current_landmark": {
           "node": "FOOT_LANDMARK_BALL_R",
-          "min_height_mm": 0,
-          "frames_within_window": 13,
+          "min_height_mm": 0.9,
+          "frames_within_window": 11,
           "stance_phases": 1
          }
         }
