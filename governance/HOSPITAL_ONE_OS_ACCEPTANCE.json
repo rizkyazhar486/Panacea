@@ -1,0 +1,434 @@
+{
+  "schema_version": 1,
+  "artifact_type": "proposed_hospital_one_os_roadmap_acceptance",
+  "as_of": "2026-10-28",
+  "status": "NOT_ACCEPTED",
+  "evidence_level": "E0_PROPOSED",
+  "implemented_claim": false,
+  "production_ready": false,
+  "clinical_validation_claim": false,
+  "current_wedge": "one outpatient longitudinal clinical encounter with trustworthy clinician sign-off, diagnostic continuity and follow-up",
+  "canonical_truth_source": "existing patient/encounter/event store; never a shadow clinical database",
+  "account_role_union_source": "src/lib/types.ts",
+  "account_roles": [
+    "pasien",
+    "dokter",
+    "kontributor",
+    "verifikator",
+    "perawat",
+    "lab",
+    "admin",
+    "owner"
+  ],
+  "role_mismatch_to_reconcile": "docs/product/PRD_PANACEAMED.md says six roles; src/lib/types.ts defines eight; actual endpoint policy requires an independent audit",
+  "proposed_personas_not_new_roles": [
+    "nurse",
+    "pharmacist",
+    "allied-health",
+    "medical-student",
+    "supervisor",
+    "researcher",
+    "investigator",
+    "facility-operator",
+    "insurer",
+    "agent"
+  ],
+  "explicit_not_assumed": [
+    "researcher_can_access_phi",
+    "student_can_access_patient_chart",
+    "admin_can_sign_care",
+    "nurse_can_sign_as_doctor",
+    "pharmacy_administration_is_complete",
+    "ADT_is_complete",
+    "OR_ICU_integration_is_live"
+  ],
+  "allowed_statuses": [
+    "NOT_AUDITED",
+    "EVIDENCE_IN_PROGRESS",
+    "ENGINEERING_VERIFIED",
+    "DEFERRED_EXTERNAL_GATES",
+    "BLOCKED"
+  ],
+  "acceptance_requirements": [
+    "existing_canonical_state",
+    "correct_actor_and_scope",
+    "clinically_authoritative_only_when_applicable",
+    "source_provenance",
+    "negative_controls",
+    "reproducible_tests",
+    "exact_head_ci",
+    "usable_real_route",
+    "human_or_external_gate_separate"
+  ],
+  "source_references": [
+    "AGENTS.md",
+    "docs/governance/README.md",
+    "governance/doctrine/PANACEA_CURRENT_WEDGE.md",
+    "governance/doctrine/PANACEA_ONE_OS_LONGITUDINAL_CARE_DOCTRINE.md",
+    "docs/product/PRD_PANACEAMED.md"
+  ],
+  "work_items": [
+    {
+      "id": "HOSP-G0-CI",
+      "phase": "G0",
+      "priority": "P0",
+      "scope": "existing-baseline",
+      "title": "Reconcile main and existing PR evidence",
+      "depends_on": [],
+      "actor_personas": [
+        "dokter",
+        "perawat",
+        "lab",
+        "admin"
+      ],
+      "status": "NOT_AUDITED",
+      "evidence_level": "E0",
+      "evidence_refs": [],
+      "required_negative_controls": [
+        "red CI must not count as green",
+        "stale SHA cannot satisfy exact-head"
+      ],
+      "required_evidence": [
+        "latest main/PR SHA and required check matrix",
+        "first assertion of each failing check",
+        "scoped recovery diff or explicit baseline disposition"
+      ]
+    },
+    {
+      "id": "HOSP-G0-ROLE",
+      "phase": "G0",
+      "priority": "P0",
+      "scope": "existing-audit",
+      "title": "Role and facility authorization inventory",
+      "depends_on": [
+        "HOSP-G0-CI"
+      ],
+      "actor_personas": [
+        "pasien",
+        "dokter",
+        "perawat",
+        "lab",
+        "admin",
+        "owner",
+        "kontributor",
+        "verifikator"
+      ],
+      "status": "NOT_AUDITED",
+      "evidence_level": "E0",
+      "evidence_refs": [],
+      "required_negative_controls": [
+        "admin cannot sign clinical decisions",
+        "editorial role cannot export PHI"
+      ],
+      "required_evidence": [
+        "eight-role source and PRD reconciliation",
+        "service-endpoint permission matrix",
+        "positive and negative authorization tests"
+      ]
+    },
+    {
+      "id": "HOSP-G0-EPISODE",
+      "phase": "G0",
+      "priority": "P0",
+      "scope": "active-wedge",
+      "title": "One persisted synthetic longitudinal encounter",
+      "depends_on": [
+        "HOSP-G0-ROLE"
+      ],
+      "actor_personas": [
+        "pasien",
+        "dokter"
+      ],
+      "status": "NOT_AUDITED",
+      "evidence_level": "E0",
+      "evidence_refs": [],
+      "required_negative_controls": [
+        "unreviewed lab prevents verified closure",
+        "wrong patient or version rejected"
+      ],
+      "required_evidence": [
+        "canonical identity and encounter roundtrip",
+        "clinician-signature service evidence and audit",
+        "browser/integration test and exact-head CI"
+      ]
+    },
+    {
+      "id": "HOSP-G1-NURSE",
+      "phase": "G1",
+      "priority": "P1",
+      "scope": "candidate-extension",
+      "title": "Nursing assessment and authenticated handoff",
+      "depends_on": [
+        "HOSP-G0-EPISODE"
+      ],
+      "actor_personas": [
+        "perawat",
+        "dokter"
+      ],
+      "status": "NOT_AUDITED",
+      "evidence_level": "E0",
+      "evidence_refs": [],
+      "required_negative_controls": [
+        "nurse cannot impersonate physician signature",
+        "wrong encounter handoff rejected"
+      ],
+      "required_evidence": [
+        "nurse assessment source and duty scope",
+        "handoff receive/ack/escalate persisted tasks",
+        "role-based browser journey"
+      ]
+    },
+    {
+      "id": "HOSP-G1-LAB",
+      "phase": "G1",
+      "priority": "P1",
+      "scope": "existing-integration-audit",
+      "title": "Real order-to-result custody and review",
+      "depends_on": [
+        "HOSP-G0-EPISODE"
+      ],
+      "actor_personas": [
+        "dokter",
+        "lab"
+      ],
+      "status": "NOT_AUDITED",
+      "evidence_level": "E0",
+      "evidence_refs": [],
+      "required_negative_controls": [
+        "wrong-patient specimen rejected",
+        "unreviewed critical result remains open"
+      ],
+      "required_evidence": [
+        "order-linked specimen and result provenance",
+        "lab role ownership and clinician acknowledgement",
+        "failure/restart/duplicate controls"
+      ]
+    },
+    {
+      "id": "HOSP-G1-MED",
+      "phase": "G1",
+      "priority": "P1",
+      "scope": "proposed",
+      "title": "Pharmacy and nursing medication evidence",
+      "depends_on": [
+        "HOSP-G1-NURSE",
+        "HOSP-G1-LAB"
+      ],
+      "actor_personas": [
+        "dokter",
+        "perawat"
+      ],
+      "status": "NOT_AUDITED",
+      "evidence_level": "E0",
+      "evidence_refs": [],
+      "required_negative_controls": [
+        "prescribed is not administered",
+        "unauthorized dispensing/administration rejected"
+      ],
+      "required_evidence": [
+        "approved medication order linkage",
+        "distinct dispensing and administration provenance",
+        "licensed-role authorization matrix"
+      ]
+    },
+    {
+      "id": "HOSP-G1-OPS",
+      "phase": "G1",
+      "priority": "P1",
+      "scope": "proposed",
+      "title": "Authorized facility task and follow-up coordination",
+      "depends_on": [
+        "HOSP-G1-NURSE",
+        "HOSP-G1-LAB"
+      ],
+      "actor_personas": [
+        "admin",
+        "dokter",
+        "pasien"
+      ],
+      "status": "NOT_AUDITED",
+      "evidence_level": "E0",
+      "evidence_refs": [],
+      "required_negative_controls": [
+        "admin cannot alter signed clinical truth",
+        "pending payer task cannot claim paid"
+      ],
+      "required_evidence": [
+        "assigned task state history and acknowledgement",
+        "patient-friendly plan and follow-up",
+        "reimbursement packet status without invented payer acceptance"
+      ]
+    },
+    {
+      "id": "HOSP-G2-ADT",
+      "phase": "G2",
+      "priority": "P2",
+      "scope": "proposed",
+      "title": "Facility ADT, beds, emergency ward ICU OR continuity",
+      "depends_on": [
+        "HOSP-G1-OPS"
+      ],
+      "actor_personas": [
+        "perawat",
+        "dokter",
+        "admin"
+      ],
+      "status": "NOT_AUDITED",
+      "evidence_level": "E0",
+      "evidence_refs": [],
+      "required_negative_controls": [
+        "transfer cannot create new patient identity",
+        "unavailable bed/ICU capacity is never invented"
+      ],
+      "required_evidence": [
+        "admission-transfer-discharge states with ownership",
+        "facility scope and safe escalation paths",
+        "cross-unit synthetic browser acceptance"
+      ]
+    },
+    {
+      "id": "HOSP-G3-EDU",
+      "phase": "G3",
+      "priority": "P3",
+      "scope": "proposed",
+      "title": "Student supervisor and patient education projections",
+      "depends_on": [
+        "HOSP-G1-OPS"
+      ],
+      "actor_personas": [
+        "dokter",
+        "pasien",
+        "kontributor",
+        "verifikator"
+      ],
+      "status": "NOT_AUDITED",
+      "evidence_level": "E0",
+      "evidence_refs": [],
+      "required_negative_controls": [
+        "student cannot write signed patient care",
+        "unreviewed AI education cannot claim signed plan"
+      ],
+      "required_evidence": [
+        "synthetic/permitted case boundary and supervisor attribution",
+        "competency evaluation and plain-language explanation",
+        "privacy and comprehension tests"
+      ]
+    },
+    {
+      "id": "HOSP-G3-RESEARCH",
+      "phase": "G3",
+      "priority": "P3",
+      "scope": "proposed",
+      "title": "Approved research protocol and minimum-necessary data",
+      "depends_on": [
+        "HOSP-G0-ROLE",
+        "HOSP-G3-EDU"
+      ],
+      "actor_personas": [
+        "kontributor",
+        "verifikator"
+      ],
+      "status": "NOT_AUDITED",
+      "evidence_level": "E0",
+      "evidence_refs": [],
+      "required_negative_controls": [
+        "editorial access cannot grant patient research export",
+        "missing protocol or consent fails closed"
+      ],
+      "required_evidence": [
+        "ethics and purpose-bound research authority",
+        "cohort/data lineage and de-identification assessment",
+        "audited export/retention controls"
+      ]
+    },
+    {
+      "id": "HOSP-G4-AGENT",
+      "phase": "G4",
+      "priority": "P4",
+      "scope": "proposed",
+      "title": "Scoped multi-agent operational orchestration",
+      "depends_on": [
+        "HOSP-G1-OPS",
+        "HOSP-G0-ROLE"
+      ],
+      "actor_personas": [
+        "dokter",
+        "perawat",
+        "lab",
+        "admin"
+      ],
+      "status": "NOT_AUDITED",
+      "evidence_level": "E0",
+      "evidence_refs": [],
+      "required_negative_controls": [
+        "agent cannot forge signatory/clinical order",
+        "tool request cannot exceed patient tenant purpose scope"
+      ],
+      "required_evidence": [
+        "agent task/actor/evidence trace without raw PHI",
+        "human approval/escalation and negative controls",
+        "provider-independent integration tests"
+      ]
+    },
+    {
+      "id": "HOSP-G4-INTEROP",
+      "phase": "G4",
+      "priority": "P4",
+      "scope": "existing-integration-audit",
+      "title": "Tested facility/vendor interoperability adapters",
+      "depends_on": [
+        "HOSP-G1-LAB",
+        "HOSP-G2-ADT"
+      ],
+      "actor_personas": [
+        "lab",
+        "dokter",
+        "admin"
+      ],
+      "status": "NOT_AUDITED",
+      "evidence_level": "E0",
+      "evidence_refs": [],
+      "required_negative_controls": [
+        "unknown code/unit remains unmapped",
+        "unsupported vendor cannot be presented connected"
+      ],
+      "required_evidence": [
+        "validated HL7 FHIR/SATUSEHAT and device fixtures per adapter",
+        "identity/terminology/provenance reconciliation",
+        "security, restart and error-path evidence"
+      ]
+    },
+    {
+      "id": "HOSP-G5-PILOT",
+      "phase": "G5",
+      "priority": "P5",
+      "scope": "future-external-gate",
+      "title": "Ethical real-world multiprofessional pilot and validation",
+      "depends_on": [
+        "HOSP-G2-ADT",
+        "HOSP-G3-RESEARCH",
+        "HOSP-G4-AGENT",
+        "HOSP-G4-INTEROP"
+      ],
+      "actor_personas": [
+        "pasien",
+        "dokter",
+        "perawat",
+        "lab",
+        "admin"
+      ],
+      "status": "NOT_AUDITED",
+      "evidence_level": "E0",
+      "evidence_refs": [],
+      "required_negative_controls": [
+        "technical tests cannot claim clinical effectiveness",
+        "unknown baseline cannot claim time savings"
+      ],
+      "required_evidence": [
+        "approved protocol and consent",
+        "prespecified task outcomes and denominators",
+        "independent safety, usability and real-world evaluation"
+      ]
+    }
+  ]
+}
