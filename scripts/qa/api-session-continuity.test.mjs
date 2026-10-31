@@ -4,7 +4,7 @@ import { registerHooks, stripTypeScriptTypes } from 'node:module'
 import '../uji/typescript-resolver.mjs'
 // Inject only Vite's build-time API origin; execute the actual client and error parser.
 registerHooks({load(url,context,nextLoad){const result=nextLoad(url,context);
-  if(/\/src\/lib\/(api|galatApi)\.ts/.test(url))return {...result,format:'module',source:stripTypeScriptTypes(String(result.source).replace('import.meta.env.VITE_API_URL',JSON.stringify('https://example.invalid')),{mode:'transform'})};
+  if(/\/src\/lib\/(api|galatApi)\.ts/.test(url))return {...result,format:'module',source:stripTypeScriptTypes(String(result.source).replace('import.meta.env.VITE_API_URL',JSON.stringify('https://example.invalid')),{mode:'strip'})};
   return result}})
 const memory=new Map()
 globalThis.localStorage={getItem:k=>memory.get(k)??null,setItem:(k,v)=>memory.set(k,String(v)),removeItem:k=>memory.delete(k)}

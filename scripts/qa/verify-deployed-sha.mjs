@@ -1,12 +1,12 @@
 // E7: bandingkan SHA yang berjalan (frontend build.json, backend /api/health) dengan main. Hanya membaca; keluar 1 bila ada yang gagal.
 // Kriteria ('sama' atau 'setara' = lulus) ada di deploy-equivalence.mjs. Pakai: node scripts/qa/verify-deployed-sha.mjs [shaMain]
 import { execFileSync } from 'node:child_process'
-import { klasifikasiDeploy, STATUS_LULUS, JALUR_FRONTEND, JALUR_BACKEND } from './deploy-equivalence.mjs'
+import { klasifikasiDeploy, galatHttp, STATUS_LULUS, JALUR_FRONTEND, JALUR_BACKEND } from './deploy-equivalence.mjs'
 const FRONT = process.env.FRONT_URL || 'https://www.panaceamed.id'
 const BACK = process.env.BACK_URL || 'https://panaceamed-backend.onrender.com'
 const git = (...a) => execFileSync('git', a, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim()
 const main = (process.argv[2] || git('rev-parse', 'origin/main')).trim()
-const ambil = async (url) => { try { const r = await fetch(url, { signal: AbortSignal.timeout(60000) }); return r.ok ? await r.json() : { galat: `HTTP ${r.status}` } } catch (e) { return { galat: String(e.message || e) } } }
+const ambil = async (url) => { try { const r = await fetch(url, { signal: AbortSignal.timeout(60000) }); return r.ok ? await r.json() : { galat: galatHttp(r.status, r.headers.get('x-render-routing')) } } catch (e) { return { galat: String(e.message || e) } } }
 const leluhur = (sha) => { try { git('merge-base', '--is-ancestor', sha, main); return true } catch { return false } }
 const berubah = (sha, jalur) => { try { return git('diff', '--name-only', `${sha}..${main}`, '--', ...jalur).split('\n').filter(Boolean) } catch { return ['(git diff gagal: SHA terdeploy tidak ada di klon ini)'] } }
 

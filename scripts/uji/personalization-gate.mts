@@ -96,7 +96,7 @@ assert.equal(JSON.stringify([decl, good]), beku)
 // ── Batas arsitektur dan kejujuran: tidak ada deklarasi parameter fisiologis nyata, tidak ada I/O atau waktu ──
 assert.deepEqual(Object.keys(publicApi).sort(), [
   'ALVEOLAR_GAS_BOUNDARY', 'ALVEOLAR_GAS_CONTROLS', 'ALVEOLAR_GAS_DEFAULTS', 'ALVEOLAR_GAS_MODELS',
-  'alveolarFrequencySweep', 'evaluateAlveolarGasBudget', 'evaluatePersonalization',
+  'alveolarFrequencySweep', 'deadSpaceFraction', 'evaluateAlveolarGasBudget', 'evaluatePersonalization', 'shuntFraction',
 ], 'domain exports reviewed teaching gas models and the gate, never personalization parameter declarations or UI')
 const sumber = ['model/personalization.ts', 'engine/personalizationGate.ts'].map((f) => readFileSync(new URL(`../../src/domains/physiology/${f}`, import.meta.url), 'utf8')).join('\n')
 for (const terlarang of ['Date.now(', 'Math.random(', 'fetch(', 'document.', 'window.', 'localStorage']) assert.ok(!sumber.includes(terlarang), `modul murni tidak boleh memuat ${terlarang}`)
@@ -105,5 +105,5 @@ assert.ok(!/\b(?:1\.34|0\.003|0\.0034|142\b)/.test(sumber), 'tidak ada konstanta
 assert.ok(!/(?:meaningSourceIds|identifiableFrom)\s*:\s*\[/.test(sumber), 'tidak ada literal deklarasi parameter di model/engine')
 assert.ok(!/\bDECLARATIONS?\b/.test(sumber), 'tidak ada registry deklarasi di gerbang')
 const berkas = readdirSync(new URL('../../src/domains/physiology', import.meta.url), { recursive: true }) as string[]
-assert.deepEqual(berkas.filter((f) => f.endsWith('.ts')).sort(), ['engine/alveolarGasBudget.ts', 'engine/personalizationGate.ts', 'index.ts', 'model/personalization.ts', 'ui/index.ts'])
+assert.deepEqual(berkas.filter((f) => f.endsWith('.ts')).sort(), ['engine/alveolarGasBudget.ts', 'engine/gasExchangeIdentities.ts', 'engine/personalizationGate.ts', 'index.ts', 'model/personalization.ts', 'ui/index.ts'])
 console.log('personalization-gate: eligibility needs meaning, identifiability, enough distinct observations, uncertainty, provenance, bounded step, rollback and held-out validation; blocked values never leak')

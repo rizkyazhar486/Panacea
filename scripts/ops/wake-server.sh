@@ -17,10 +17,19 @@ fi
 # HTTP saja cukup untuk wake: URL konfigurasi dan isi respons tidak masuk log CI.
 mulai=$(date +%s)
 while :; do
-  if ! kode=$(curl -s -o /dev/null -w '%{http_code}' --max-time 90 "${alamat%/}/api/health"); then
-    kode=000
+  # Satu permintaan: kode HTTP + header x-render-routing (curl >= 7.84; versi lama mencetak teks literal dan tidak pernah cocok di bawah).
+  if ! hasil=$(curl -s -o /dev/null -w '%{http_code} %header{x-render-routing}' --max-time 90 "${alamat%/}/api/health"); then
+    hasil=000
   fi
+  kode=${hasil%% *}
+  routing=${hasil#"$kode"}; routing=${routing# }
   echo "HTTP $kode"
+  # Layanan yang DISUSPEND pemiliknya tidak bisa dibangunkan oleh ping: sebut penyebabnya dan hentikan loop alih-alih mem-ping berjam-jam
+  # sambil tampak "berhasil". Tetap exit 0 (kebijakan tanpa spam galat tiap 10 menit); pemeriksa produksi yang menjadi sinyal gagalnya.
+  if [ "$routing" = 'suspend-by-user' ]; then
+    echo '::warning::Render: layanan DISUSPEND oleh pemiliknya (x-render-routing: suspend-by-user). Ping tidak dapat membangunkannya; lanjutkan (resume) layanan di dashboard Render. Loop dihentikan.'
+    break
+  fi
   if [ "$kode" != '200' ]; then
     echo "::warning::Server belum menjawab 200 (kode $kode). Jalur utama/cadangan akan mencoba lagi."
   fi
