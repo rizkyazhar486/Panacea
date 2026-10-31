@@ -140,3 +140,15 @@ export { PerfusionChainPanel } from './ui/PerfusionChainPanel'
 export { assessMeasurement, parseFetalTables, normalCdf, GA_MIN_WEEKS, GA_MAX_WEEKS, type Assessment, type AssessResult, type FetalTables, type MeasureId, type ReferenceId } from './engine/fetalBiometry'
 export { FETAL_PARCEL_COLORS, parseFetalParcelDataset, visibleParcelTriangles, wholeLungOverlap, type FetalParcelDataset, type FetalParcelRegion } from './engine/fetalParcelInspection'
 export { parseFetalMriContext, type FetalMriContext, type FetalMriRegion, type FetalMriImage } from './engine/fetalMriContext'
+
+export {
+  AHA17_LIMITATIONS,
+  AHA17_SEGMENT_COUNT,
+  AHA17_SOURCE,
+  territoryForArtery,
+  trunkForSegment,
+  type CoronaryTrunk,
+  type Dominance,
+  type SegmentResult,
+  type TerritoryResult,
+} from './engine/vascularTerritoryEngine'
