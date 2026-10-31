@@ -45,3 +45,20 @@ Local browser verification is pending: the sandbox has no Chromium executable
 and the Playwright download returned a corrupt archive. Full exact-head CI and
 Stabilization Acceptance remain required before merge. This increment does not
 deliver 10K source textures or demonstrate superiority to commercial games.
+
+## Dead-space and shunt identities panel
+
+A second collapsed panel in the same respiratory workspace (no new route, no new patient truth store) exposes the two
+algebraic identities in `gasExchangeIdentities.ts`: `VD/VT = (PaCO2 − PeCO2) / PaCO2` (Enghoff modification) and
+`Qs/Qt = (CcO2 − CaO2) / (CcO2 − CvO2)`. The person types their own measured values: nothing is prefilled, a blank field
+is "not entered" (never zero, while a typed `0` is a value), a comma decimal is accepted, and impossible combinations are
+refused with the engine's reason instead of being clamped. The result is truth class `derived`, drawn as two labelled
+shares of 100%, with the formula, the engine's limitations and PubMed links. No value is stored, interpreted or compared
+with a normal range.
+
+Honest limits: sources were read from PubMed abstracts only; the algebraic form of Qs/Qt was not printed in any abstract
+read (`formVerified: false`), and below 100% inspired oxygen the result is venous admixture, not pure shunt. The panel
+cannot detect mixed units between its fields. Not a diagnosis, ventilator target or clinical recommendation.
+
+Validation: `scripts/uji/gas-identity-panel.mts` (unit, with four sabotage mutations) and
+`scripts/qa/gas-exchange-identities-smoke.mjs` (real workspace at 390x844; wired into Stabilization Acceptance).

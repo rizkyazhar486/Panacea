@@ -138,6 +138,9 @@ jobs:
       - name: Respiratory gas budget mobile interaction smoke
         run: node scripts/qa/alveolar-gas-budget-smoke.mjs
 
+      - name: Gas-exchange identities mobile smoke (blank is not zero, impossible inputs refused)
+        run: node scripts/qa/gas-exchange-identities-smoke.mjs
+
       - name: Panacea OS Daily mobile 390x844 smoke
         env:
           PANACEA_OS_QA_URL: http://127.0.0.1:4173/#/harian
