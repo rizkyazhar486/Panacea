@@ -1,0 +1,1803 @@
+{
+ "lods": {
+  "LOD0": {
+   "target_ratio": 0.5,
+   "min_tris": 400
+  },
+  "LOD1": {
+   "target_ratio": 0.25,
+   "min_tris": 200
+  },
+  "LOD2": {
+   "target_ratio": 0.1,
+   "min_tris": 120
+  },
+  "LOD3": {
+   "target_ratio": 0.04,
+   "min_tris": 60
+  },
+  "LOD4": {
+   "system_budget_tris": {
+    "skeletal": 20000,
+    "cardiovascular": 38000,
+    "surface": 6000,
+    "digestive": 6000,
+    "respiratory": 3500,
+    "urinary": 2000,
+    "reproductive": 2000,
+    "muscular": 24000,
+    "nervous": 12000,
+    "joint": 8000,
+    "lymphatic": 3000,
+    "fascia": 3000,
+    "sensory": 3000,
+    "endocrine": 1500,
+    "visceral_unclassified": 1000
+   },
+   "body_overrides": {
+    "HUMAN.ADULT.MALE": {
+     "skeletal": 16000,
+     "surface": 5000,
+     "digestive": 5000,
+     "respiratory": 3000,
+     "urinary": 1800,
+     "reproductive": 1800
+    },
+    "ATLAS.NERVOUS.MNI152": {
+     "nervous": 52000,
+     "cardiovascular": 20000,
+     "tracts": 40000,
+     "peripheral": 40000,
+     "territories": 15000,
+     "fascia": 5000,
+     "spinal": 9000
+    }
+   },
+   "min_tris": 8,
+   "initial_load_systems": [
+    "cardiovascular",
+    "digestive",
+    "reproductive",
+    "respiratory",
+    "skeletal",
+    "surface",
+    "urinary"
+   ],
+   "allocation": "per system: floor + remainder proportional to surface area"
+  }
+ },
+ "files": [
+  {
+   "body": "TSD_S0327.OLDER_ADULT.MALE",
+   "system": "cardiovascular",
+   "lod": "LOD1",
+   "file": "tsd_s0327_older_adult_male.cardiovascular.LOD1.glb",
+   "structures": 18,
+   "tris_master": 256018,
+   "tris_lod": 63992,
+   "bytes_raw": 1198960,
+   "error_mm_largest_structures": [
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.CARDIOVASCULAR.HEART_ALL_CHAMBERS_ONE_MESH",
+     0.04,
+     0.203
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.CARDIOVASCULAR.AORTA",
+     0.026,
+     0.101
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.CARDIOVASCULAR.INFERIOR_VENA_CAVA",
+     0.033,
+     0.127
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.CARDIOVASCULAR.PULMONARY_VEINS_ONE_MESH",
+     0.05,
+     0.212
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.CARDIOVASCULAR.ILIAC_VEIN.L",
+     0.039,
+     0.152
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.CARDIOVASCULAR.ILIAC_VEIN.R",
+     0.04,
+     0.209
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.CARDIOVASCULAR.SUPERIOR_VENA_CAVA",
+     0.034,
+     0.144
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.CARDIOVASCULAR.ILIAC_ARTERY.R",
+     0.053,
+     0.203
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.CARDIOVASCULAR.ILIAC_ARTERY.L",
+     0.057,
+     0.195
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.CARDIOVASCULAR.PORTAL_VEIN_AND_SPLENIC_VEIN",
+     0.06,
+     0.307
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.CARDIOVASCULAR.SUBCLAVIAN_ARTERY.L",
+     0.054,
+     0.21
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.CARDIOVASCULAR.BRACHIOCEPHALIC_VEIN.L",
+     0.042,
+     0.161
+    ]
+   ],
+   "bbox_escape_fixed": []
+  },
+  {
+   "body": "TSD_S0327.OLDER_ADULT.MALE",
+   "system": "digestive",
+   "lod": "LOD1",
+   "file": "tsd_s0327_older_adult_male.digestive.LOD1.glb",
+   "structures": 8,
+   "tris_master": 462202,
+   "tris_lod": 115548,
+   "bytes_raw": 2099644,
+   "error_mm_largest_structures": [
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.DIGESTIVE.SMALL_BOWEL_JEJUNUM_AND_ILEUM",
+     0.033,
+     0.148
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.DIGESTIVE.COLON",
+     0.027,
+     0.127
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.DIGESTIVE.LIVER",
+     0.026,
+     0.11
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.DIGESTIVE.STOMACH",
+     0.028,
+     0.132
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.DIGESTIVE.PANCREAS",
+     0.044,
+     0.152
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.DIGESTIVE.DUODENUM",
+     0.032,
+     0.113
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.DIGESTIVE.ESOPHAGUS",
+     0.038,
+     0.139
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.DIGESTIVE.GALLBLADDER",
+     0.033,
+     0.151
+    ]
+   ],
+   "bbox_escape_fixed": []
+  },
+  {
+   "body": "TSD_S0327.OLDER_ADULT.MALE",
+   "system": "endocrine",
+   "lod": "LOD1",
+   "file": "tsd_s0327_older_adult_male.endocrine.LOD1.glb",
+   "structures": 3,
+   "tris_master": 17266,
+   "tris_lod": 4316,
+   "bytes_raw": 85692,
+   "error_mm_largest_structures": [
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.ENDOCRINE.THYROID_GLAND",
+     0.044,
+     0.174
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.ENDOCRINE.ADRENAL_GLAND.R",
+     0.059,
+     0.236
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.ENDOCRINE.ADRENAL_GLAND.L",
+     0.05,
+     0.195
+    ]
+   ],
+   "bbox_escape_fixed": []
+  },
+  {
+   "body": "TSD_S0327.OLDER_ADULT.MALE",
+   "system": "joint",
+   "lod": "LOD1",
+   "file": "tsd_s0327_older_adult_male.joint.LOD1.glb",
+   "structures": 1,
+   "tris_master": 84712,
+   "tris_lod": 21178,
+   "bytes_raw": 384132,
+   "error_mm_largest_structures": [
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.JOINT.COSTAL_CARTILAGES_ALL_ONE_MESH",
+     0.049,
+     0.19
+    ]
+   ],
+   "bbox_escape_fixed": []
+  },
+  {
+   "body": "TSD_S0327.OLDER_ADULT.MALE",
+   "system": "lymphatic",
+   "lod": "LOD1",
+   "file": "tsd_s0327_older_adult_male.lymphatic.LOD1.glb",
+   "structures": 1,
+   "tris_master": 27844,
+   "tris_lod": 6960,
+   "bytes_raw": 128364,
+   "error_mm_largest_structures": [
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.LYMPHATIC.SPLEEN",
+     0.025,
+     0.124
+    ]
+   ],
+   "bbox_escape_fixed": []
+  },
+  {
+   "body": "TSD_S0327.OLDER_ADULT.MALE",
+   "system": "muscular",
+   "lod": "LOD1",
+   "file": "tsd_s0327_older_adult_male.muscular.LOD1.glb",
+   "structures": 10,
+   "tris_master": 500546,
+   "tris_lod": 125134,
+   "bytes_raw": 2278596,
+   "error_mm_largest_structures": [
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.MUSCULAR.ERECTOR_SPINAE_AUTOCHTHONOUS_BACK_MUSCLES.R",
+     0.026,
+     0.103
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.MUSCULAR.ERECTOR_SPINAE_AUTOCHTHONOUS_BACK_MUSCLES.L",
+     0.023,
+     0.101
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.MUSCULAR.GLUTEUS_MAXIMUS.R",
+     0.019,
+     0.099
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.MUSCULAR.GLUTEUS_MAXIMUS.L",
+     0.022,
+     0.146
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.MUSCULAR.ILIOPSOAS.L",
+     0.026,
+     0.117
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.MUSCULAR.ILIOPSOAS.R",
+     0.024,
+     0.172
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.MUSCULAR.GLUTEUS_MEDIUS.L",
+     0.022,
+     0.085
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.MUSCULAR.GLUTEUS_MEDIUS.R",
+     0.021,
+     0.081
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.MUSCULAR.GLUTEUS_MINIMUS.R",
+     0.024,
+     0.109
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.MUSCULAR.GLUTEUS_MINIMUS.L",
+     0.024,
+     0.125
+    ]
+   ],
+   "bbox_escape_fixed": []
+  },
+  {
+   "body": "TSD_S0327.OLDER_ADULT.MALE",
+   "system": "nervous",
+   "lod": "LOD1",
+   "file": "tsd_s0327_older_adult_male.nervous.LOD1.glb",
+   "structures": 1,
+   "tris_master": 25838,
+   "tris_lod": 6458,
+   "bytes_raw": 119452,
+   "error_mm_largest_structures": [
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.NERVOUS.SPINAL_CORD",
+     0.036,
+     0.153
+    ]
+   ],
+   "bbox_escape_fixed": []
+  },
+  {
+   "body": "TSD_S0327.OLDER_ADULT.MALE",
+   "system": "reproductive",
+   "lod": "LOD1",
+   "file": "tsd_s0327_older_adult_male.reproductive.LOD1.glb",
+   "structures": 1,
+   "tris_master": 5892,
+   "tris_lod": 1472,
+   "bytes_raw": 29600,
+   "error_mm_largest_structures": [
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.REPRODUCTIVE.PROSTATE",
+     0.032,
+     0.128
+    ]
+   ],
+   "bbox_escape_fixed": []
+  },
+  {
+   "body": "TSD_S0327.OLDER_ADULT.MALE",
+   "system": "respiratory",
+   "lod": "LOD1",
+   "file": "tsd_s0327_older_adult_male.respiratory.LOD1.glb",
+   "structures": 6,
+   "tris_master": 352606,
+   "tris_lod": 88146,
+   "bytes_raw": 1601388,
+   "error_mm_largest_structures": [
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.RESPIRATORY.INFERIOR_LOBE_OF_LEFT_LUNG.L",
+     0.024,
+     0.13
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.RESPIRATORY.SUPERIOR_LOBE_OF_LEFT_LUNG.L",
+     0.031,
+     0.125
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.RESPIRATORY.INFERIOR_LOBE_OF_RIGHT_LUNG.R",
+     0.028,
+     0.105
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.RESPIRATORY.MIDDLE_LOBE_OF_RIGHT_LUNG.R",
+     0.03,
+     0.146
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.RESPIRATORY.SUPERIOR_LOBE_OF_RIGHT_LUNG.R",
+     0.037,
+     0.163
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.RESPIRATORY.TRACHEA",
+     0.038,
+     0.226
+    ]
+   ],
+   "bbox_escape_fixed": []
+  },
+  {
+   "body": "TSD_S0327.OLDER_ADULT.MALE",
+   "system": "skeletal",
+   "lod": "LOD1",
+   "file": "tsd_s0327_older_adult_male.skeletal.LOD1.glb",
+   "structures": 56,
+   "tris_master": 954978,
+   "tris_lod": 238706,
+   "bytes_raw": 4425548,
+   "error_mm_largest_structures": [
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.HIP_BONE_OS_COXAE.R",
+     0.026,
+     0.106
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.HIP_BONE_OS_COXAE.L",
+     0.026,
+     0.137
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.SACRUM",
+     0.05,
+     0.221
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.SCAPULA.L",
+     0.032,
+     0.136
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.SCAPULA.R",
+     0.029,
+     0.124
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.FEMUR.L",
+     0.024,
+     0.11
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.FEMUR.R",
+     0.024,
+     0.13
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.VERTEBRA_L3",
+     0.049,
+     0.209
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.VERTEBRA_L4",
+     0.048,
+     0.222
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.VERTEBRA_L5",
+     0.042,
+     0.176
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.VERTEBRA_L2",
+     0.044,
+     0.206
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.VERTEBRA_L1",
+     0.041,
+     0.231
+    ]
+   ],
+   "bbox_escape_fixed": []
+  },
+  {
+   "body": "TSD_S0327.OLDER_ADULT.MALE",
+   "system": "urinary",
+   "lod": "LOD1",
+   "file": "tsd_s0327_older_adult_male.urinary.LOD1.glb",
+   "structures": 3,
+   "tris_master": 47140,
+   "tris_lod": 11784,
+   "bytes_raw": 220072,
+   "error_mm_largest_structures": [
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.URINARY.KIDNEY.R",
+     0.036,
+     0.154
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.URINARY.KIDNEY.L",
+     0.033,
+     0.129
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.URINARY.URINARY_BLADDER",
+     0.027,
+     0.098
+    ]
+   ],
+   "bbox_escape_fixed": []
+  },
+  {
+   "body": "TSD_S0327.OLDER_ADULT.MALE",
+   "system": "cardiovascular",
+   "lod": "LOD2",
+   "file": "tsd_s0327_older_adult_male.cardiovascular.LOD2.glb",
+   "structures": 18,
+   "tris_master": 256018,
+   "tris_lod": 25588,
+   "bytes_raw": 507620,
+   "error_mm_largest_structures": [
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.CARDIOVASCULAR.HEART_ALL_CHAMBERS_ONE_MESH",
+     0.081,
+     0.362
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.CARDIOVASCULAR.AORTA",
+     0.054,
+     0.336
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.CARDIOVASCULAR.INFERIOR_VENA_CAVA",
+     0.068,
+     0.422
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.CARDIOVASCULAR.PULMONARY_VEINS_ONE_MESH",
+     0.107,
+     0.477
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.CARDIOVASCULAR.ILIAC_VEIN.L",
+     0.083,
+     0.391
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.CARDIOVASCULAR.ILIAC_VEIN.R",
+     0.092,
+     0.421
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.CARDIOVASCULAR.SUPERIOR_VENA_CAVA",
+     0.072,
+     0.471
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.CARDIOVASCULAR.ILIAC_ARTERY.R",
+     0.121,
+     0.493
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.CARDIOVASCULAR.ILIAC_ARTERY.L",
+     0.124,
+     0.451
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.CARDIOVASCULAR.PORTAL_VEIN_AND_SPLENIC_VEIN",
+     0.123,
+     0.552
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.CARDIOVASCULAR.SUBCLAVIAN_ARTERY.L",
+     0.118,
+     0.597
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.CARDIOVASCULAR.BRACHIOCEPHALIC_VEIN.L",
+     0.088,
+     0.437
+    ]
+   ],
+   "bbox_escape_fixed": []
+  },
+  {
+   "body": "TSD_S0327.OLDER_ADULT.MALE",
+   "system": "digestive",
+   "lod": "LOD2",
+   "file": "tsd_s0327_older_adult_male.digestive.LOD2.glb",
+   "structures": 8,
+   "tris_master": 462202,
+   "tris_lod": 46212,
+   "bytes_raw": 851548,
+   "error_mm_largest_structures": [
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.DIGESTIVE.SMALL_BOWEL_JEJUNUM_AND_ILEUM",
+     0.072,
+     0.302
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.DIGESTIVE.COLON",
+     0.055,
+     0.252
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.DIGESTIVE.LIVER",
+     0.052,
+     0.229
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.DIGESTIVE.STOMACH",
+     0.058,
+     0.307
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.DIGESTIVE.PANCREAS",
+     0.086,
+     0.389
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.DIGESTIVE.DUODENUM",
+     0.068,
+     0.418
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.DIGESTIVE.ESOPHAGUS",
+     0.077,
+     0.418
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.DIGESTIVE.GALLBLADDER",
+     0.074,
+     0.392
+    ]
+   ],
+   "bbox_escape_fixed": []
+  },
+  {
+   "body": "TSD_S0327.OLDER_ADULT.MALE",
+   "system": "endocrine",
+   "lod": "LOD2",
+   "file": "tsd_s0327_older_adult_male.endocrine.LOD2.glb",
+   "structures": 3,
+   "tris_master": 17266,
+   "tris_lod": 1722,
+   "bytes_raw": 38992,
+   "error_mm_largest_structures": [
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.ENDOCRINE.THYROID_GLAND",
+     0.093,
+     0.497
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.ENDOCRINE.ADRENAL_GLAND.R",
+     0.119,
+     0.554
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.ENDOCRINE.ADRENAL_GLAND.L",
+     0.115,
+     0.529
+    ]
+   ],
+   "bbox_escape_fixed": []
+  },
+  {
+   "body": "TSD_S0327.OLDER_ADULT.MALE",
+   "system": "joint",
+   "lod": "LOD2",
+   "file": "tsd_s0327_older_adult_male.joint.LOD2.glb",
+   "structures": 1,
+   "tris_master": 84712,
+   "tris_lod": 8470,
+   "bytes_raw": 155380,
+   "error_mm_largest_structures": [
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.JOINT.COSTAL_CARTILAGES_ALL_ONE_MESH",
+     0.101,
+     0.517
+    ]
+   ],
+   "bbox_escape_fixed": []
+  },
+  {
+   "body": "TSD_S0327.OLDER_ADULT.MALE",
+   "system": "lymphatic",
+   "lod": "LOD2",
+   "file": "tsd_s0327_older_adult_male.lymphatic.LOD2.glb",
+   "structures": 1,
+   "tris_master": 27844,
+   "tris_lod": 2784,
+   "bytes_raw": 53192,
+   "error_mm_largest_structures": [
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.LYMPHATIC.SPLEEN",
+     0.05,
+     0.257
+    ]
+   ],
+   "bbox_escape_fixed": []
+  },
+  {
+   "body": "TSD_S0327.OLDER_ADULT.MALE",
+   "system": "muscular",
+   "lod": "LOD2",
+   "file": "tsd_s0327_older_adult_male.muscular.LOD2.glb",
+   "structures": 10,
+   "tris_master": 500546,
+   "tris_lod": 50048,
+   "bytes_raw": 927020,
+   "error_mm_largest_structures": [
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.MUSCULAR.ERECTOR_SPINAE_AUTOCHTHONOUS_BACK_MUSCLES.R",
+     0.052,
+     0.248
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.MUSCULAR.ERECTOR_SPINAE_AUTOCHTHONOUS_BACK_MUSCLES.L",
+     0.052,
+     0.258
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.MUSCULAR.GLUTEUS_MAXIMUS.R",
+     0.043,
+     0.281
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.MUSCULAR.GLUTEUS_MAXIMUS.L",
+     0.045,
+     0.229
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.MUSCULAR.ILIOPSOAS.L",
+     0.053,
+     0.379
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.MUSCULAR.ILIOPSOAS.R",
+     0.05,
+     0.211
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.MUSCULAR.GLUTEUS_MEDIUS.L",
+     0.044,
+     0.215
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.MUSCULAR.GLUTEUS_MEDIUS.R",
+     0.045,
+     0.237
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.MUSCULAR.GLUTEUS_MINIMUS.R",
+     0.053,
+     0.268
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.MUSCULAR.GLUTEUS_MINIMUS.L",
+     0.047,
+     0.341
+    ]
+   ],
+   "bbox_escape_fixed": []
+  },
+  {
+   "body": "TSD_S0327.OLDER_ADULT.MALE",
+   "system": "nervous",
+   "lod": "LOD2",
+   "file": "tsd_s0327_older_adult_male.nervous.LOD2.glb",
+   "structures": 1,
+   "tris_master": 25838,
+   "tris_lod": 2582,
+   "bytes_raw": 49684,
+   "error_mm_largest_structures": [
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.NERVOUS.SPINAL_CORD",
+     0.078,
+     0.367
+    ]
+   ],
+   "bbox_escape_fixed": []
+  },
+  {
+   "body": "TSD_S0327.OLDER_ADULT.MALE",
+   "system": "reproductive",
+   "lod": "LOD2",
+   "file": "tsd_s0327_older_adult_male.reproductive.LOD2.glb",
+   "structures": 1,
+   "tris_master": 5892,
+   "tris_lod": 588,
+   "bytes_raw": 13684,
+   "error_mm_largest_structures": [
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.REPRODUCTIVE.PROSTATE",
+     0.062,
+     0.377
+    ]
+   ],
+   "bbox_escape_fixed": []
+  },
+  {
+   "body": "TSD_S0327.OLDER_ADULT.MALE",
+   "system": "respiratory",
+   "lod": "LOD2",
+   "file": "tsd_s0327_older_adult_male.respiratory.LOD2.glb",
+   "structures": 6,
+   "tris_master": 352606,
+   "tris_lod": 35256,
+   "bytes_raw": 649332,
+   "error_mm_largest_structures": [
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.RESPIRATORY.INFERIOR_LOBE_OF_LEFT_LUNG.L",
+     0.057,
+     0.274
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.RESPIRATORY.SUPERIOR_LOBE_OF_LEFT_LUNG.L",
+     0.062,
+     0.292
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.RESPIRATORY.INFERIOR_LOBE_OF_RIGHT_LUNG.R",
+     0.061,
+     0.406
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.RESPIRATORY.MIDDLE_LOBE_OF_RIGHT_LUNG.R",
+     0.058,
+     0.292
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.RESPIRATORY.SUPERIOR_LOBE_OF_RIGHT_LUNG.R",
+     0.084,
+     0.418
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.RESPIRATORY.TRACHEA",
+     0.088,
+     0.488
+    ]
+   ],
+   "bbox_escape_fixed": []
+  },
+  {
+   "body": "TSD_S0327.OLDER_ADULT.MALE",
+   "system": "skeletal",
+   "lod": "LOD2",
+   "file": "tsd_s0327_older_adult_male.skeletal.LOD2.glb",
+   "structures": 56,
+   "tris_master": 954978,
+   "tris_lod": 95448,
+   "bytes_raw": 1846592,
+   "error_mm_largest_structures": [
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.HIP_BONE_OS_COXAE.R",
+     0.06,
+     0.345
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.HIP_BONE_OS_COXAE.L",
+     0.058,
+     0.307
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.SACRUM",
+     0.114,
+     0.667
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.SCAPULA.L",
+     0.063,
+     0.279
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.SCAPULA.R",
+     0.061,
+     0.399
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.FEMUR.L",
+     0.049,
+     0.365
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.FEMUR.R",
+     0.052,
+     0.209
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.VERTEBRA_L3",
+     0.108,
+     0.508
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.VERTEBRA_L4",
+     0.099,
+     0.498
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.VERTEBRA_L5",
+     0.093,
+     0.416
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.VERTEBRA_L2",
+     0.092,
+     0.459
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.VERTEBRA_L1",
+     0.085,
+     0.554
+    ]
+   ],
+   "bbox_escape_fixed": []
+  },
+  {
+   "body": "TSD_S0327.OLDER_ADULT.MALE",
+   "system": "urinary",
+   "lod": "LOD2",
+   "file": "tsd_s0327_older_adult_male.urinary.LOD2.glb",
+   "structures": 3,
+   "tris_master": 47140,
+   "tris_lod": 4710,
+   "bytes_raw": 92720,
+   "error_mm_largest_structures": [
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.URINARY.KIDNEY.R",
+     0.077,
+     0.386
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.URINARY.KIDNEY.L",
+     0.063,
+     0.354
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.URINARY.URINARY_BLADDER",
+     0.055,
+     0.329
+    ]
+   ],
+   "bbox_escape_fixed": []
+  },
+  {
+   "body": "TSD_S0327.OLDER_ADULT.MALE",
+   "system": "cardiovascular",
+   "lod": "LOD3",
+   "file": "tsd_s0327_older_adult_male.cardiovascular.LOD3.glb",
+   "structures": 18,
+   "tris_master": 256018,
+   "tris_lod": 10224,
+   "bytes_raw": 231016,
+   "error_mm_largest_structures": [
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.CARDIOVASCULAR.HEART_ALL_CHAMBERS_ONE_MESH",
+     0.198,
+     1.001
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.CARDIOVASCULAR.AORTA",
+     0.131,
+     0.63
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.CARDIOVASCULAR.INFERIOR_VENA_CAVA",
+     0.153,
+     0.761
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.CARDIOVASCULAR.PULMONARY_VEINS_ONE_MESH",
+     0.242,
+     1.188
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.CARDIOVASCULAR.ILIAC_VEIN.L",
+     0.177,
+     1.161
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.CARDIOVASCULAR.ILIAC_VEIN.R",
+     0.186,
+     0.953
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.CARDIOVASCULAR.SUPERIOR_VENA_CAVA",
+     0.159,
+     0.789
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.CARDIOVASCULAR.ILIAC_ARTERY.R",
+     0.245,
+     0.967
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.CARDIOVASCULAR.ILIAC_ARTERY.L",
+     0.254,
+     1.051
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.CARDIOVASCULAR.PORTAL_VEIN_AND_SPLENIC_VEIN",
+     0.271,
+     1.284
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.CARDIOVASCULAR.SUBCLAVIAN_ARTERY.L",
+     0.243,
+     0.987
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.CARDIOVASCULAR.BRACHIOCEPHALIC_VEIN.L",
+     0.18,
+     0.932
+    ]
+   ],
+   "bbox_escape_fixed": []
+  },
+  {
+   "body": "TSD_S0327.OLDER_ADULT.MALE",
+   "system": "digestive",
+   "lod": "LOD3",
+   "file": "tsd_s0327_older_adult_male.digestive.LOD3.glb",
+   "structures": 8,
+   "tris_master": 462202,
+   "tris_lod": 18476,
+   "bytes_raw": 352288,
+   "error_mm_largest_structures": [
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.DIGESTIVE.SMALL_BOWEL_JEJUNUM_AND_ILEUM",
+     0.138,
+     0.808
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.DIGESTIVE.COLON",
+     0.128,
+     0.719
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.DIGESTIVE.LIVER",
+     0.124,
+     0.584
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.DIGESTIVE.STOMACH",
+     0.132,
+     0.802
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.DIGESTIVE.PANCREAS",
+     0.209,
+     0.928
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.DIGESTIVE.DUODENUM",
+     0.14,
+     0.855
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.DIGESTIVE.ESOPHAGUS",
+     0.168,
+     1.019
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.DIGESTIVE.GALLBLADDER",
+     0.141,
+     0.619
+    ]
+   ],
+   "bbox_escape_fixed": []
+  },
+  {
+   "body": "TSD_S0327.OLDER_ADULT.MALE",
+   "system": "endocrine",
+   "lod": "LOD3",
+   "file": "tsd_s0327_older_adult_male.endocrine.LOD3.glb",
+   "structures": 3,
+   "tris_master": 17266,
+   "tris_lod": 688,
+   "bytes_raw": 20368,
+   "error_mm_largest_structures": [
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.ENDOCRINE.THYROID_GLAND",
+     0.212,
+     0.987
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.ENDOCRINE.ADRENAL_GLAND.R",
+     0.286,
+     1.519
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.ENDOCRINE.ADRENAL_GLAND.L",
+     0.29,
+     1.204
+    ]
+   ],
+   "bbox_escape_fixed": []
+  },
+  {
+   "body": "TSD_S0327.OLDER_ADULT.MALE",
+   "system": "joint",
+   "lod": "LOD3",
+   "file": "tsd_s0327_older_adult_male.joint.LOD3.glb",
+   "structures": 1,
+   "tris_master": 84712,
+   "tris_lod": 3388,
+   "bytes_raw": 63904,
+   "error_mm_largest_structures": [
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.JOINT.COSTAL_CARTILAGES_ALL_ONE_MESH",
+     0.223,
+     1.295
+    ]
+   ],
+   "bbox_escape_fixed": []
+  },
+  {
+   "body": "TSD_S0327.OLDER_ADULT.MALE",
+   "system": "lymphatic",
+   "lod": "LOD3",
+   "file": "tsd_s0327_older_adult_male.lymphatic.LOD3.glb",
+   "structures": 1,
+   "tris_master": 27844,
+   "tris_lod": 1112,
+   "bytes_raw": 23092,
+   "error_mm_largest_structures": [
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.LYMPHATIC.SPLEEN",
+     0.108,
+     0.714
+    ]
+   ],
+   "bbox_escape_fixed": []
+  },
+  {
+   "body": "TSD_S0327.OLDER_ADULT.MALE",
+   "system": "muscular",
+   "lod": "LOD3",
+   "file": "tsd_s0327_older_adult_male.muscular.LOD3.glb",
+   "structures": 10,
+   "tris_master": 500546,
+   "tris_lod": 20010,
+   "bytes_raw": 386308,
+   "error_mm_largest_structures": [
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.MUSCULAR.ERECTOR_SPINAE_AUTOCHTHONOUS_BACK_MUSCLES.R",
+     0.119,
+     0.707
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.MUSCULAR.ERECTOR_SPINAE_AUTOCHTHONOUS_BACK_MUSCLES.L",
+     0.115,
+     0.633
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.MUSCULAR.GLUTEUS_MAXIMUS.R",
+     0.111,
+     0.483
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.MUSCULAR.GLUTEUS_MAXIMUS.L",
+     0.102,
+     0.525
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.MUSCULAR.ILIOPSOAS.L",
+     0.116,
+     0.673
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.MUSCULAR.ILIOPSOAS.R",
+     0.11,
+     0.53
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.MUSCULAR.GLUTEUS_MEDIUS.L",
+     0.103,
+     0.638
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.MUSCULAR.GLUTEUS_MEDIUS.R",
+     0.108,
+     0.581
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.MUSCULAR.GLUTEUS_MINIMUS.R",
+     0.113,
+     0.75
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.MUSCULAR.GLUTEUS_MINIMUS.L",
+     0.116,
+     0.932
+    ]
+   ],
+   "bbox_escape_fixed": []
+  },
+  {
+   "body": "TSD_S0327.OLDER_ADULT.MALE",
+   "system": "nervous",
+   "lod": "LOD3",
+   "file": "tsd_s0327_older_adult_male.nervous.LOD3.glb",
+   "structures": 1,
+   "tris_master": 25838,
+   "tris_lod": 1032,
+   "bytes_raw": 21776,
+   "error_mm_largest_structures": [
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.NERVOUS.SPINAL_CORD",
+     0.177,
+     0.886
+    ]
+   ],
+   "bbox_escape_fixed": []
+  },
+  {
+   "body": "TSD_S0327.OLDER_ADULT.MALE",
+   "system": "reproductive",
+   "lod": "LOD3",
+   "file": "tsd_s0327_older_adult_male.reproductive.LOD3.glb",
+   "structures": 1,
+   "tris_master": 5892,
+   "tris_lod": 234,
+   "bytes_raw": 7312,
+   "error_mm_largest_structures": [
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.REPRODUCTIVE.PROSTATE",
+     0.139,
+     0.726
+    ]
+   ],
+   "bbox_escape_fixed": []
+  },
+  {
+   "body": "TSD_S0327.OLDER_ADULT.MALE",
+   "system": "respiratory",
+   "lod": "LOD3",
+   "file": "tsd_s0327_older_adult_male.respiratory.LOD3.glb",
+   "structures": 6,
+   "tris_master": 352606,
+   "tris_lod": 14098,
+   "bytes_raw": 268484,
+   "error_mm_largest_structures": [
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.RESPIRATORY.INFERIOR_LOBE_OF_LEFT_LUNG.L",
+     0.119,
+     0.622
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.RESPIRATORY.SUPERIOR_LOBE_OF_LEFT_LUNG.L",
+     0.129,
+     0.617
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.RESPIRATORY.INFERIOR_LOBE_OF_RIGHT_LUNG.R",
+     0.131,
+     0.647
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.RESPIRATORY.MIDDLE_LOBE_OF_RIGHT_LUNG.R",
+     0.132,
+     0.572
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.RESPIRATORY.SUPERIOR_LOBE_OF_RIGHT_LUNG.R",
+     0.178,
+     0.958
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.RESPIRATORY.TRACHEA",
+     0.185,
+     1.1
+    ]
+   ],
+   "bbox_escape_fixed": []
+  },
+  {
+   "body": "TSD_S0327.OLDER_ADULT.MALE",
+   "system": "skeletal",
+   "lod": "LOD3",
+   "file": "tsd_s0327_older_adult_male.skeletal.LOD3.glb",
+   "structures": 56,
+   "tris_master": 954978,
+   "tris_lod": 38142,
+   "bytes_raw": 814960,
+   "error_mm_largest_structures": [
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.HIP_BONE_OS_COXAE.R",
+     0.121,
+     0.627
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.HIP_BONE_OS_COXAE.L",
+     0.124,
+     0.486
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.SACRUM",
+     0.34,
+     1.57
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.SCAPULA.L",
+     0.141,
+     0.918
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.SCAPULA.R",
+     0.134,
+     0.725
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.FEMUR.L",
+     0.111,
+     0.555
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.FEMUR.R",
+     0.115,
+     0.547
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.VERTEBRA_L3",
+     0.252,
+     1.455
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.VERTEBRA_L4",
+     0.232,
+     1.264
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.VERTEBRA_L5",
+     0.193,
+     0.916
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.VERTEBRA_L2",
+     0.208,
+     0.929
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.VERTEBRA_L1",
+     0.222,
+     1.116
+    ]
+   ],
+   "bbox_escape_fixed": []
+  },
+  {
+   "body": "TSD_S0327.OLDER_ADULT.MALE",
+   "system": "urinary",
+   "lod": "LOD3",
+   "file": "tsd_s0327_older_adult_male.urinary.LOD3.glb",
+   "structures": 3,
+   "tris_master": 47140,
+   "tris_lod": 1882,
+   "bytes_raw": 41812,
+   "error_mm_largest_structures": [
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.URINARY.KIDNEY.R",
+     0.158,
+     0.829
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.URINARY.KIDNEY.L",
+     0.138,
+     0.764
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.URINARY.URINARY_BLADDER",
+     0.126,
+     0.887
+    ]
+   ],
+   "bbox_escape_fixed": []
+  },
+  {
+   "body": "TSD_S0327.OLDER_ADULT.MALE",
+   "system": "cardiovascular",
+   "lod": "LOD4",
+   "file": "tsd_s0327_older_adult_male.cardiovascular.LOD4.glb",
+   "structures": 18,
+   "tris_master": 256018,
+   "tris_lod": 37982,
+   "bytes_raw": 730732,
+   "error_mm_largest_structures": [
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.CARDIOVASCULAR.HEART_ALL_CHAMBERS_ONE_MESH",
+     0.061,
+     0.316
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.CARDIOVASCULAR.AORTA",
+     0.041,
+     0.182
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.CARDIOVASCULAR.INFERIOR_VENA_CAVA",
+     0.05,
+     0.266
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.CARDIOVASCULAR.PULMONARY_VEINS_ONE_MESH",
+     0.084,
+     0.342
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.CARDIOVASCULAR.ILIAC_VEIN.L",
+     0.064,
+     0.238
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.CARDIOVASCULAR.ILIAC_VEIN.R",
+     0.065,
+     0.25
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.CARDIOVASCULAR.SUPERIOR_VENA_CAVA",
+     0.053,
+     0.203
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.CARDIOVASCULAR.ILIAC_ARTERY.R",
+     0.082,
+     0.386
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.CARDIOVASCULAR.ILIAC_ARTERY.L",
+     0.093,
+     0.365
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.CARDIOVASCULAR.PORTAL_VEIN_AND_SPLENIC_VEIN",
+     0.097,
+     0.48
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.CARDIOVASCULAR.SUBCLAVIAN_ARTERY.L",
+     0.083,
+     0.427
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.CARDIOVASCULAR.BRACHIOCEPHALIC_VEIN.L",
+     0.066,
+     0.264
+    ]
+   ],
+   "bbox_escape_fixed": []
+  },
+  {
+   "body": "TSD_S0327.OLDER_ADULT.MALE",
+   "system": "digestive",
+   "lod": "LOD4",
+   "file": "tsd_s0327_older_adult_male.digestive.LOD4.glb",
+   "structures": 8,
+   "tris_master": 462202,
+   "tris_lod": 5992,
+   "bytes_raw": 127536,
+   "error_mm_largest_structures": [
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.DIGESTIVE.SMALL_BOWEL_JEJUNUM_AND_ILEUM",
+     0.409,
+     1.623
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.DIGESTIVE.COLON",
+     0.332,
+     1.515
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.DIGESTIVE.LIVER",
+     0.302,
+     1.357
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.DIGESTIVE.STOMACH",
+     0.306,
+     1.412
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.DIGESTIVE.PANCREAS",
+     0.531,
+     2.605
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.DIGESTIVE.DUODENUM",
+     0.433,
+     2.221
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.DIGESTIVE.ESOPHAGUS",
+     0.43,
+     2.891
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.DIGESTIVE.GALLBLADDER",
+     0.357,
+     1.923
+    ]
+   ],
+   "bbox_escape_fixed": []
+  },
+  {
+   "body": "TSD_S0327.OLDER_ADULT.MALE",
+   "system": "endocrine",
+   "lod": "LOD4",
+   "file": "tsd_s0327_older_adult_male.endocrine.LOD4.glb",
+   "structures": 3,
+   "tris_master": 17266,
+   "tris_lod": 1498,
+   "bytes_raw": 34960,
+   "error_mm_largest_structures": [
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.ENDOCRINE.THYROID_GLAND",
+     0.101,
+     0.497
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.ENDOCRINE.ADRENAL_GLAND.R",
+     0.136,
+     0.631
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.ENDOCRINE.ADRENAL_GLAND.L",
+     0.131,
+     0.6
+    ]
+   ],
+   "bbox_escape_fixed": []
+  },
+  {
+   "body": "TSD_S0327.OLDER_ADULT.MALE",
+   "system": "joint",
+   "lod": "LOD4",
+   "file": "tsd_s0327_older_adult_male.joint.LOD4.glb",
+   "structures": 1,
+   "tris_master": 84712,
+   "tris_lod": 8000,
+   "bytes_raw": 146920,
+   "error_mm_largest_structures": [
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.JOINT.COSTAL_CARTILAGES_ALL_ONE_MESH",
+     0.107,
+     0.533
+    ]
+   ],
+   "bbox_escape_fixed": []
+  },
+  {
+   "body": "TSD_S0327.OLDER_ADULT.MALE",
+   "system": "lymphatic",
+   "lod": "LOD4",
+   "file": "tsd_s0327_older_adult_male.lymphatic.LOD4.glb",
+   "structures": 1,
+   "tris_master": 27844,
+   "tris_lod": 3000,
+   "bytes_raw": 57080,
+   "error_mm_largest_structures": [
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.LYMPHATIC.SPLEEN",
+     0.048,
+     0.257
+    ]
+   ],
+   "bbox_escape_fixed": []
+  },
+  {
+   "body": "TSD_S0327.OLDER_ADULT.MALE",
+   "system": "muscular",
+   "lod": "LOD4",
+   "file": "tsd_s0327_older_adult_male.muscular.LOD4.glb",
+   "structures": 10,
+   "tris_master": 500546,
+   "tris_lod": 23990,
+   "bytes_raw": 457952,
+   "error_mm_largest_structures": [
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.MUSCULAR.ERECTOR_SPINAE_AUTOCHTHONOUS_BACK_MUSCLES.R",
+     0.1,
+     0.532
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.MUSCULAR.ERECTOR_SPINAE_AUTOCHTHONOUS_BACK_MUSCLES.L",
+     0.098,
+     0.59
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.MUSCULAR.GLUTEUS_MAXIMUS.R",
+     0.085,
+     0.348
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.MUSCULAR.GLUTEUS_MAXIMUS.L",
+     0.087,
+     0.394
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.MUSCULAR.ILIOPSOAS.L",
+     0.106,
+     0.571
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.MUSCULAR.ILIOPSOAS.R",
+     0.102,
+     0.53
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.MUSCULAR.GLUTEUS_MEDIUS.L",
+     0.09,
+     0.411
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.MUSCULAR.GLUTEUS_MEDIUS.R",
+     0.095,
+     0.439
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.MUSCULAR.GLUTEUS_MINIMUS.R",
+     0.101,
+     0.573
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.MUSCULAR.GLUTEUS_MINIMUS.L",
+     0.102,
+     0.573
+    ]
+   ],
+   "bbox_escape_fixed": []
+  },
+  {
+   "body": "TSD_S0327.OLDER_ADULT.MALE",
+   "system": "nervous",
+   "lod": "LOD4",
+   "file": "tsd_s0327_older_adult_male.nervous.LOD4.glb",
+   "structures": 1,
+   "tris_master": 25838,
+   "tris_lod": 12000,
+   "bytes_raw": 219212,
+   "error_mm_largest_structures": [
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.NERVOUS.SPINAL_CORD",
+     0.016,
+     0.07
+    ]
+   ],
+   "bbox_escape_fixed": []
+  },
+  {
+   "body": "TSD_S0327.OLDER_ADULT.MALE",
+   "system": "reproductive",
+   "lod": "LOD4",
+   "file": "tsd_s0327_older_adult_male.reproductive.LOD4.glb",
+   "structures": 1,
+   "tris_master": 5892,
+   "tris_lod": 2000,
+   "bytes_raw": 39112,
+   "error_mm_largest_structures": [
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.REPRODUCTIVE.PROSTATE",
+     0.024,
+     0.125
+    ]
+   ],
+   "bbox_escape_fixed": []
+  },
+  {
+   "body": "TSD_S0327.OLDER_ADULT.MALE",
+   "system": "respiratory",
+   "lod": "LOD4",
+   "file": "tsd_s0327_older_adult_male.respiratory.LOD4.glb",
+   "structures": 6,
+   "tris_master": 352606,
+   "tris_lod": 3492,
+   "bytes_raw": 77532,
+   "error_mm_largest_structures": [
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.RESPIRATORY.INFERIOR_LOBE_OF_LEFT_LUNG.L",
+     0.365,
+     1.81
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.RESPIRATORY.SUPERIOR_LOBE_OF_LEFT_LUNG.L",
+     0.376,
+     2.054
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.RESPIRATORY.INFERIOR_LOBE_OF_RIGHT_LUNG.R",
+     0.378,
+     1.804
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.RESPIRATORY.MIDDLE_LOBE_OF_RIGHT_LUNG.R",
+     0.424,
+     3.056
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.RESPIRATORY.SUPERIOR_LOBE_OF_RIGHT_LUNG.R",
+     0.513,
+     2.261
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.RESPIRATORY.TRACHEA",
+     0.621,
+     2.481
+    ]
+   ],
+   "bbox_escape_fixed": []
+  },
+  {
+   "body": "TSD_S0327.OLDER_ADULT.MALE",
+   "system": "skeletal",
+   "lod": "LOD4",
+   "file": "tsd_s0327_older_adult_male.skeletal.LOD4.glb",
+   "structures": 56,
+   "tris_master": 954978,
+   "tris_lod": 19464,
+   "bytes_raw": 478636,
+   "error_mm_largest_structures": [
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.HIP_BONE_OS_COXAE.R",
+     0.202,
+     1.274
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.HIP_BONE_OS_COXAE.L",
+     0.216,
+     1.277
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.SACRUM",
+     3.409,
+     21.716
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.SCAPULA.L",
+     0.235,
+     1.399
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.SCAPULA.R",
+     0.206,
+     1.235
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.FEMUR.L",
+     0.198,
+     1.151
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.FEMUR.R",
+     0.195,
+     1.146
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.VERTEBRA_L3",
+     0.452,
+     1.72
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.VERTEBRA_L4",
+     0.426,
+     2.644
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.VERTEBRA_L5",
+     0.331,
+     1.541
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.VERTEBRA_L2",
+     0.368,
+     1.608
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.SKELETAL.VERTEBRA_L1",
+     0.369,
+     1.752
+    ]
+   ],
+   "bbox_escape_fixed": []
+  },
+  {
+   "body": "TSD_S0327.OLDER_ADULT.MALE",
+   "system": "urinary",
+   "lod": "LOD4",
+   "file": "tsd_s0327_older_adult_male.urinary.LOD4.glb",
+   "structures": 3,
+   "tris_master": 47140,
+   "tris_lod": 1996,
+   "bytes_raw": 43864,
+   "error_mm_largest_structures": [
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.URINARY.KIDNEY.R",
+     0.151,
+     0.829
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.URINARY.KIDNEY.L",
+     0.132,
+     0.764
+    ],
+    [
+     "TSD_S0327.OLDER_ADULT.MALE.URINARY.URINARY_BLADDER",
+     0.111,
+     0.807
+    ]
+   ],
+   "bbox_escape_fixed": []
+  }
+ ]
+}
