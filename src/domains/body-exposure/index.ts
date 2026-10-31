@@ -142,14 +142,25 @@ export { FETAL_PARCEL_COLORS, parseFetalParcelDataset, visibleParcelTriangles, w
 export { parseFetalMriContext, type FetalMriContext, type FetalMriRegion, type FetalMriImage } from './engine/fetalMriContext'
 
 export {
+  ATLAS_STRUCTURE_DISCLAIMER,
+  CANONICAL_ORGAN_BINDINGS,
   EXPECTED_METRIC_UNITS,
   OVERLAY_LABEL,
+  aggregateLongitudinalOrganOverlay,
   computeCanonicalRecordOverlays,
+  resolveAnatomicalOverlayBinding,
+  type AnatomicalMultiscaleBinding,
   type CanonicalRecordInput,
   type ComputeOverlayOptions,
+  type ConversionProvenance,
   type ExpectedMetricUnit,
+  type LongitudinalMetricSeries,
+  type LongitudinalSeriesResult,
+  type MeasurementDimension,
+  type OverlayRejectionReason,
   type OverlayTruthClass,
   type RecordOverlayRejectionItem,
   type RecordOverlayResultItem,
   type RecordOverlaySuccessItem,
+  type UnitConversionRule,
 } from './engine/recordOverlayEngine'
