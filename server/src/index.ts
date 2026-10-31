@@ -1,5 +1,6 @@
 import { randomUUID } from 'node:crypto'
-import { middlewareObservabilitas, ringkasanObservabilitas, jalurAman } from './domains/observability/observabilitas.js'
+import { middlewareObservabilitas, ringkasanObservabilitas, jalurAman, egressPerRute } from './domains/observability/observabilitas.js'
+import { bungkusFetch, ringkasanEgressKeluar } from './domains/observability/egressKeluar.js'
 import { bersihkanGalatKlien, catatGalatKlien, ringkasanGalatKlien, daftarGalatKlien } from './domains/observability/galatKlien.js'
 import { existsSync as adaBerkas, readFileSync as bacaBerkas } from 'node:fs'
 import { dirname as folderDari, join as gabungJalur } from 'node:path'
@@ -202,6 +203,8 @@ const app = express()
 // Security headers (CSP disabled here — the SPA is served from GitHub Pages,
 // not this API host, so a strict API-side CSP would only add risk of breaking
 // JSON clients without protecting the frontend).
+// Hitung panggilan keluar per host sekali di sini; semua integrasi memakai fetch global.
+globalThis.fetch = bungkusFetch(globalThis.fetch)
 app.use(middlewareObservabilitas())
 app.use(helmet({ contentSecurityPolicy: false, crossOriginResourcePolicy: { policy: 'cross-origin' } }))
 app.set('trust proxy', 1) // behind Render's proxy — needed for correct client IPs in rate limiting
@@ -287,6 +290,8 @@ app.get('/api/health', (_req, res) => {
     penyimpananSehat: penyimpananSehat(),
     // Ringkasan HTTP dalam proses (tanpa isi permintaan): jumlah per kelas status dan latensi p50/p95.
     http: ringkasanObservabilitas(),
+    // Byte keluar sejak proses mulai: respons per templat rute (batas atas) dan panggilan server ke vendor per host.
+    egress: { rute: egressPerRute(), vendor: ringkasanEgressKeluar() },
     galatKlien: ringkasanGalatKlien(),
     simpan: { terakhirBerhasil: statusSimpan.terakhirBerhasil, gagalBeruntun: statusSimpan.gagalBeruntun, mendekatiBatas: statusSimpan.mendekatiBatas },
     features: { google: features.googleLive, payments: features.paymentsLive, ai: features.aiLive, push: features.pushLive, email: features.emailLive, payout: features.payoutLive, otpEmail: emailOtpLive },
