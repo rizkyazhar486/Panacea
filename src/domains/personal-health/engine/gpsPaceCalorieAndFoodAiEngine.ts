@@ -1,3 +1,5 @@
+import { evaluateWorkoutSession as evaluateBaseWorkout } from "./workoutAndEndocrineMasteryEngine.ts";
+
 export interface GpsWaypoint {
   readonly lat: number;
   readonly lng: number;
@@ -115,7 +117,6 @@ export function evaluateGpsWorkoutSession(params: {
   };
 }
 
-// AI Food Photo Calorie & Macronutrient Estimator + Meal Generator
 export interface FoodPhotoAnalysisInput {
   readonly imageId: string;
   readonly detectedDishKeys: readonly string[];
@@ -147,7 +148,6 @@ export const CANONICAL_FOOD_VISION_DB: Record<string, FoodMacroItem> = {
 
 export function analyzeFoodPhotoAndGenerateNutritionPlan(input: FoodPhotoAnalysisInput) {
   const mult = input.portionMultiplier ?? 1.0;
-  if (mult <= 0 || mult > 10) throw new RangeError("Invalid portionMultiplier");
   const items = input.detectedDishKeys.map((key) => {
     const ref = CANONICAL_FOOD_VISION_DB[key] || {
       dishKey: key,
@@ -167,24 +167,19 @@ export function analyzeFoodPhotoAndGenerateNutritionPlan(input: FoodPhotoAnalysi
       fiberGrams: Number((ref.fiberGrams * mult).toFixed(1))
     };
   });
-
   const totalCaloriesKcal = items.reduce((s, i) => s + i.caloriesKcal, 0);
   const totalProteinGrams = Number(items.reduce((s, i) => s + i.proteinGrams, 0).toFixed(1));
   const totalCarbsGrams = Number(items.reduce((s, i) => s + i.carbsGrams, 0).toFixed(1));
   const totalFatGrams = Number(items.reduce((s, i) => s + i.fatGrams, 0).toFixed(1));
   const totalFiberGrams = Number(items.reduce((s, i) => s + i.fiberGrams, 0).toFixed(1));
-
   const burned = input.workoutCaloriesBurnedKcal ?? 0;
   const netCalorieBalanceKcal = totalCaloriesKcal - burned;
-  const goal = input.targetGoal ?? "MAINTENANCE_RECOMP";
-  const aiNextMealRecommendation =
-    totalProteinGrams < 40
-      ? "Add 1 scoop Whey Isolate (+27g protein) or 100g Tempe Bakar (+20g protein) to hit post-workout muscle protein synthesis threshold."
-      : "Protein target met (>40g leucine threshold). Hydrate with 500mL water + electrolytes.";
-
+  const aiNextMealRecommendation = totalProteinGrams < 40
+    ? "Add 1 scoop Whey Protein (+27g protein) or 100g Tempe Bakar to hit muscle recovery threshold."
+    : "Protein target met. Hydrate with 500mL water + electrolytes.";
   return {
     imageId: input.imageId,
-    goal,
+    goal: input.targetGoal ?? "MAINTENANCE_RECOMP",
     items,
     totals: { totalCaloriesKcal, totalProteinGrams, totalCarbsGrams, totalFatGrams, totalFiberGrams },
     netCalorieBalanceKcal,
