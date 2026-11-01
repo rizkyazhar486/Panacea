@@ -208,3 +208,14 @@ export {
   type VascularTerritorySource,
   type VascularTruthClass,
 } from './engine/vascularTerritoryEngine'
+export {
+  GAIT_BIOMECHANICS_SOURCE,
+  GAIT_LIBRARY_DISCLAIMER,
+  classifyPathologicalGaitCycle,
+  type GaitCycleKinematicsInput,
+  type GaitEvaluationFailure,
+  type GaitEvaluationResult,
+  type GaitEvaluationSuccess,
+  type GaitFailureReason,
+  type PathologicalGaitPatternId,
+} from './engine/pathologicalGaitEngine'
