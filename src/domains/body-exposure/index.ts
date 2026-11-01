@@ -292,3 +292,17 @@ export {
   type RecordOverlaySuccessItem,
   type UnitConversionRule,
 } from './engine/recordOverlayEngine'
+export {
+  DRUG_ACTION_DISCLAIMER,
+  DRUG_MULTISCALE_TARGET_TABLE,
+  IUPHAR_DRUG_ACTION_SOURCE,
+  evaluateMultiscaleDrugAction,
+  type CanonicalDrugId,
+  type DrugActionFailure,
+  type DrugActionFailureReason,
+  type DrugActionResult,
+  type DrugActionSource,
+  type DrugActionSuccess,
+  type DrugMultiscaleTargetRow,
+  type HillOccupancyInput,
+} from './engine/drugActionEngine'
