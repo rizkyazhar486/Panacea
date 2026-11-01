@@ -306,3 +306,12 @@ export {
   type DrugMultiscaleTargetRow,
   type HillOccupancyInput,
 } from './engine/drugActionEngine'
+export {
+  evaluateStructureReviewWorkflow,
+  type StructureWorkflowFailure,
+  type StructureWorkflowFailureReason,
+  type StructureWorkflowInput,
+  type StructureWorkflowResult,
+  type StructureWorkflowSuccess,
+  type WorkflowStage,
+} from './engine/structureReviewWorkflowEngine'
