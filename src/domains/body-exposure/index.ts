@@ -243,3 +243,15 @@ export {
   type FetalGrowthVelocitySuccess,
   type HadlockBiometryInput,
 } from './engine/fetalGrowthEngine'
+export {
+  IMAGING_PLANE_DISCLAIMER,
+  correlateImagingPlaneWithStructures,
+  type ImagingPlaneCorrelationFailure,
+  type ImagingPlaneCorrelationResult,
+  type ImagingPlaneCorrelationSuccess,
+  type ImagingPlaneFailureReason,
+  type ImagingSliceDefinition,
+  type LpsAnatomicalBoundingBox3D,
+  type LpsVector3D,
+  type RadiologicalPlaneOrientation,
+} from './engine/imagingPlaneEngine'
