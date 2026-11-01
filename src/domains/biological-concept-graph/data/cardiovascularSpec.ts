@@ -7,6 +7,7 @@ import { CONCEPT_GRAPH_SCHEMA_VERSION, type ConceptEdge, type ConceptGraphSpec, 
 const REFS: ScientificReference[] = [
   { id: 'ref:openstax-ap2e', kind: 'open_textbook', citation: 'OpenStax. Anatomy and Physiology 2e (ch. 10 Muscle Tissue; ch. 19 The Cardiovascular System: The Heart). Rice University.', url: 'https://openstax.org/books/anatomy-and-physiology-2e', license: 'CC BY 4.0', verification: 'cited_not_retrieved' },
   { id: 'ref:bers-2002', kind: 'peer_reviewed', citation: 'Bers DM. Cardiac excitation–contraction coupling. Nature 2002;415:198–205.', doi: '10.1038/415198a', license: 'publisher copyright; cited only, no text reproduced', verification: 'cited_not_retrieved' },
+  { id: 'ref:esc-hf-2021', kind: 'peer_reviewed', citation: 'McDonagh TA et al. 2021 ESC Guidelines for the diagnosis and treatment of acute and chronic heart failure. Eur Heart J 2021;42:3599–3726.', doi: '10.1093/eurheartj/ehab368', license: 'publisher copyright; cited only, no text reproduced', verification: 'cited_not_retrieved' },
   { id: 'ref:hgnc-symbols', kind: 'peer_reviewed', citation: 'HUGO Gene Nomenclature Committee (HGNC). Approved gene symbols RYR2, CACNA1C, ATP2A2.', url: 'https://www.genenames.org', license: 'CC0', verification: 'cited_not_retrieved' },
 ]
 
