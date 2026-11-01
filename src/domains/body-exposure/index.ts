@@ -219,3 +219,14 @@ export {
   type GaitFailureReason,
   type PathologicalGaitPatternId,
 } from './engine/pathologicalGaitEngine'
+export {
+  VQ_EQUATION_SOURCE,
+  VQ_LAB_DISCLAIMER,
+  evaluateVqAndAlveolarGradient,
+  type AlveolarGasInput,
+  type VqFailureReason,
+  type VqMismatchFailure,
+  type VqMismatchResult,
+  type VqMismatchSuccess,
+  type VqPhysiologicalRegime,
+} from './engine/vqMismatchEngine'
