@@ -6,7 +6,7 @@ import {
   ATLAS_REFERENCE_LABEL,
   evaluateAHA17PerfusionBurden,
   mapCoronaryToAHA17,
-} from '../../src/domains/body-exposure/index.ts'
+} from '../../src/domains/body-exposure/engine/vascularTerritoryEngine.ts'
 
 test('BX-2 1. Golden case: right, left, and codominant AHA-17 territories match cited table and partition segments 1..17', () => {
   const rcaRight = mapCoronaryToAHA17('RCA', 'right')
