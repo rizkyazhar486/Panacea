@@ -1,0 +1,36 @@
+{
+  "campaign": "PANACEAMED_INFINITY_GEMINI_OMNICAUSALIS_FINAL_RECONCILED",
+  "activeBranch": "argon/asc1-life-ascent-workout-mastery",
+  "nodeVersionVerified": "v24.15.0",
+  "nativeTypeScriptEsmVerified": true,
+  "totalVerifiedTests": 36,
+  "releaseGates": {
+    "G_pre": 1,
+    "G_release": 1,
+    "clinicalValidationC6": "DEFERRED_PER_GOVERNANCE"
+  },
+  "competitiveAnimeBots": [
+    "DR_SATORU_SENSEI",
+    "DR_MAKIMA_SENPAI",
+    "DR_SENKU_KUN"
+  ],
+  "argonModulesCompleted": [
+    "BX-1",
+    "BX-2",
+    "BX-3",
+    "BX-4",
+    "BX-5",
+    "BX-6",
+    "BX-7",
+    "BX-8",
+    "BX-9",
+    "BX-10",
+    "EDU-1",
+    "EDU-2",
+    "EDU-3",
+    "EDU-4",
+    "EDU-5",
+    "EDU-6"
+  ],
+  "updatedAt": "2026-11-01T15:26:03.540Z"
+}
