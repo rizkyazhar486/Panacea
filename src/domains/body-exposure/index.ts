@@ -162,3 +162,25 @@ export {
 } from './engine/vascularTerritoryEngine'
 
 export { CoronaryTerritoryPanel } from './ui/CoronaryTerritoryPanel'
+
+export {
+  LESION_ATLAS_DISCLAIMER,
+  LESION_LOCALIZER_SOURCE,
+  NEURO_SYNDROME_CATALOG,
+  localizeNeurologicalLesion,
+  type CranialNerveFinding,
+  type CranialNerveId,
+  type Laterality,
+  type LesionCandidateMatch,
+  type LesionFailureReason,
+  type LesionLocalizationFailure,
+  type LesionLocalizationInput,
+  type LesionLocalizationResult,
+  type LesionLocalizationSuccess,
+  type LesionSourceReference,
+  type LimbMotorFinding,
+  type MotorNeuronPattern,
+  type NeuroSyndromeDefinition,
+  type SensoryModality,
+  type SensoryTractFinding,
+} from './engine/lesionLocalizerEngine'
