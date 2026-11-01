@@ -1,11 +1,19 @@
-import { GOLDEN_JOURNEY_STEPS, type GoldenJourneyStepId } from "./cardiovascular-golden-journey";
-import { type AnimeBotId } from "../prometheus/competitive-bots/anime-sparring-arena";
+import { GOLDEN_JOURNEY_STEPS, type GoldenJourneyStepId } from "./cardiovascular-golden-journey.ts";
+import { type AnimeBotId } from "../prometheus/competitive-bots/anime-sparring-arena.ts";
 
 export type SupportedGoldenSystem = "CARDIOVASCULAR" | "RESPIRATORY_BX4" | "NEUROLOGICAL_BX1";
 
-export interfaceNeuroLesionLocalizationResult {
-  readonly tract: "CORTICOSPINAL" | "SPINOTHALAMIC" | "DORSAL_COLUMN_MEDIAL_LEMNISCUS";
-  readonly lesionLevel: "CEREBRAL_CORTEX" | "INTERNAL_CAPSULE" | "MEDULLARY_PYRAMID" | "SPINAL_CORD_CERVICAL" | "SPINAL_CORD_THORACIC";
+export type NeuroTractType = "CORTICOSPINAL" | "SPINOTHALAMIC" | "DORSAL_COLUMN_MEDIAL_LEMNISCUS";
+export type NeuroLesionLevel =
+  | "CEREBRAL_CORTEX"
+  | "INTERNAL_CAPSULE"
+  | "MEDULLARY_PYRAMID"
+  | "SPINAL_CORD_CERVICAL"
+  | "SPINAL_CORD_THORACIC";
+
+export interface NeuroLesionLocalizationResult {
+  readonly tract: NeuroTractType;
+  readonly lesionLevel: NeuroLesionLevel;
   readonly lesionSide: "LEFT" | "RIGHT";
   readonly deficitSide: "IPSILATERAL" | "CONTRALATERAL";
   readonly decussationReference: string;
@@ -13,22 +21,40 @@ export interfaceNeuroLesionLocalizationResult {
 }
 
 export function localizeNeurologicalPathwayLesion(
-  tract: "CORTICOSPINAL" | "SPINOTHALAMIC" | "DORSAL_COLUMN_MEDIAL_LEMNISCUS",
-  lesionLevel: "CEREBRAL_CORTEX" | "INTERNAL_CAPSULE" | "MEDULLARY_PYRAMID" | "SPINAL_CORD_CERVICAL" | "SPINAL_CORD_THORACIC",
+  tract: NeuroTractType,
+  lesionLevel: NeuroLesionLevel,
   lesionSide: "LEFT" | "RIGHT"
-): interfaceNeuroLesionLocalizationResult {
-  const aboveSpinalCord = lesionLevel === "CEREBRAL_CORTEX" || lesionLevel === "INTERNAL_CAPSULE" || lesionLevel === "MEDULLARY_PYRAMID";
-  const deficitSide = aboveSpinalCord ? "CONTRALATERAL" : (tract === "SPINOTHALAMIC" ? "CONTRALATERAL" : "IPSILATERAL");
-  const decussationReference = tract === "CORTICOSPINAL"
-    ? "Pyramidal decussation at caudal medulla (cervicomedullary junction)"
-    : tract === "DORSAL_COLUMN_MEDIAL_LEMNISCUS"
-      ? "Internal arcuate fibers at caudal medulla (nucleus gracilis/cuneatus)"
-      : "Anterior white commissure (1-2 spinal segments rostral to entry)";
-  return { tract, lesionLevel, lesionSide, deficitSide, decussationReference, truthClass: "SIMULATED_EDUCATIONAL" };
+): NeuroLesionLocalizationResult {
+  const aboveSpinalCord =
+    lesionLevel === "CEREBRAL_CORTEX" ||
+    lesionLevel === "INTERNAL_CAPSULE" ||
+    lesionLevel === "MEDULLARY_PYRAMID";
+  const deficitSide = aboveSpinalCord
+    ? "CONTRALATERAL"
+    : tract === "SPINOTHALAMIC"
+      ? "CONTRALATERAL"
+      : "IPSILATERAL";
+  const decussationReference =
+    tract === "CORTICOSPINAL"
+      ? "Pyramidal decussation at caudal medulla (cervicomedullary junction)"
+      : tract === "DORSAL_COLUMN_MEDIAL_LEMNISCUS"
+        ? "Internal arcuate fibers at caudal medulla (nucleus gracilis/cuneatus)"
+        : "Anterior white commissure (1-2 spinal segments rostral to entry)";
+  return {
+    tract,
+    lesionLevel,
+    lesionSide,
+    deficitSide,
+    decussationReference,
+    truthClass: "SIMULATED_EDUCATIONAL"
+  };
 }
 
 export function executeMultisystemGoldenJourney(system: SupportedGoldenSystem, learnerId: string) {
-  const systemConfig: Record<SupportedGoldenSystem, { rootOrganId: string; substructureId: string; cellularId: string; molecularId: string; leadBot: AnimeBotId }> = {
+  const systemConfig: Record<
+    SupportedGoldenSystem,
+    { rootOrganId: string; substructureId: string; cellularId: string; molecularId: string; leadBot: AnimeBotId }
+  > = {
     CARDIOVASCULAR: {
       rootOrganId: "FMA:7088",
       substructureId: "FMA:7101",
