@@ -8,3 +8,4 @@ export * from "./golden-journey/multisystem-golden-journey.ts";
 export * from "./golden-journey/respiratory-neuro-golden-journey.ts";
 export * from "./one-os/panacea-one-os-synchronizer.ts";
 export * from "./governance/post-expansion-maturation-gate.ts";
+export * from "./personal-health/engine/gpsPaceCalorieAndFoodAiEngine.ts";
