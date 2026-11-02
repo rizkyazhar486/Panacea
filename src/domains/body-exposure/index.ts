@@ -315,3 +315,17 @@ export {
   type StructureWorkflowSuccess,
   type WorkflowStage,
 } from './engine/structureReviewWorkflowEngine'
+export {
+  computeSubsurfacePenetrationDepth,
+  computeDirectionalLightVector,
+  classifyHounsfieldLayer,
+  createDefaultKaloLumenState,
+  type KaloLumenLayerId,
+  type MultiPlanarViewMode,
+  type OpticalSubsurfaceScatteringProperties,
+  type KaloLumenDensityLayerConfig,
+  type DirectionalLightSourceState,
+  type MultiPlanarClippingPlane,
+  type KaloLumenEngineState,
+} from './engine/kaloLumenDicomEngine'
+
