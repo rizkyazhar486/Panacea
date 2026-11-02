@@ -184,3 +184,27 @@ export {
   type SensoryModality,
   type SensoryTractFinding,
 } from './engine/lesionLocalizerEngine'
+
+export {
+  AHA17_CORONARY_TERRITORY_SOURCE,
+  AHA17_CORONARY_TERRITORY_TABLE,
+  AHA17_TERRITORY_LIMITATIONS,
+  ATLAS_REFERENCE_LABEL,
+  evaluateAHA17PerfusionBurden,
+  mapCoronaryToAHA17,
+  type CoronaryArteryId,
+  type CoronaryDominanceColumns,
+  type CoronaryDominanceInput,
+  type CoronaryTerritoryTable,
+  type CoronaryTerritoryTableRow,
+  type KnownCoronaryDominance,
+  type MapCoronaryOptions,
+  type PerfusionBurdenInput,
+  type PerfusionBurdenResult,
+  type VascularFailureReason,
+  type VascularMapping,
+  type VascularMappingFailure,
+  type VascularMappingSuccess,
+  type VascularTerritorySource,
+  type VascularTruthClass,
+} from './engine/vascularTerritoryEngine'
