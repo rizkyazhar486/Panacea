@@ -606,9 +606,9 @@
         "ENG-D7-01",
         "ENG-D7-03"
       ],
-      "status": "FAIL",
-      "statusSha": "37d12268a9597610eb79e86834860eaf49f15cc7",
-      "statusNote": "Reopened 2026-10-30. The previous PASS (2026-10-25, PR #2769, Option A forefoot-only RUN) rests on DOCS/governance/ENG_D7_02_GAIT_DECISION_ANALYSIS.md section 4, which records \"Product Owner Formal Decision (2026-10-25): Option A\". Asked directly on 2026-10-30, the owner chose Option B (re-rig the foot with an MTP joint), the same answer given on 2026-10-24; the latest owner statement governs. Measured facts stay valid (bodyexposure/qa_reports/gait_contact_probe.json): RUN has no heel strike (calcaneus min 32.3/34.8 mm male, 16.9/20.2 mm female) and male RUN lands on the distal toe phalanges because the rigid foot has no MTP joint. Next: T-D7-05 MTP re-rig, regenerate gait reports, re-earn PASS with exact-SHA evidence."
+      "status": "PASS",
+      "statusSha": "1d276d215f421e98e882c0da4742a06adc3e99f3",
+      "statusNote": "Resolved under Option B (MTP-capable foot articulation, T-D7-05 PR #2918 merged 9187d8cc; heuristic unit tests and sensitivity pinned in PR #2953 merged 8b760e4b). Male rig carries articulated TOE.L/R joints (GLB b2c7cb60) and female rig carries derived MTP joints (GLB 246118cb) with verified 0-gap loop seams (scripts/qa/glb-gait-seam-reproduce.mjs). All four fixtures measurable in bodyexposure/qa_reports/gait_measurability.json (adult_male WALK/RUN, vhf_denver_ct_adult_female WALK/RUN). Forefoot RUN is assessed on forefoot landmark with heel documented honestly as NOT_APPLICABLE (forefoot_run_no_rearfoot_strike) without artificial heel contact fabrication. Deterministic reproduction confirmed byte-identical by body-gait-measurability.mts and body-gait-foot-contact-reproduction.mts. Verified on main 1d276d215f421e98e882c0da4742a06adc3e99f3. Research/educational engineering thresholds (RMS <= 15 mm, peak <= 30 mm), not clinically validated."
     },
     {
       "id": "ENG-D7-03",
