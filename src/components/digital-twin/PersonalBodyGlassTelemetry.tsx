@@ -210,25 +210,25 @@ export const PersonalBodyGlassTelemetry: React.FC<PersonalBodyGlassTelemetryProp
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '12px', marginTop: '20px', paddingTop: '16px', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
         <div style={tileBase}>
           <div style={{ fontSize: '10px', fontFamily: 'monospace', textTransform: 'uppercase', color: '#9CA3AF' }}>Weight</div>
-          <div style={{ fontSize: '20px', fontWeight: 300, color: '#FFFFFF' }}>{bodyWeightKg} <span style={{ fontSize: '11px', color: '#6B7280' }}>kg</span></div>
+          <div style={{ fontSize: '20px', fontWeight: 300, color: '#FFFFFF' }}>{bodyWeightKg} <span style={{ fontSize: '11px', color: '#9CA3AF' }}>kg</span></div>
           <div style={{ fontSize: '10px', color: '#00BF63', fontFamily: 'monospace' }}>Equilibrium Steady</div>
         </div>
 
         <div style={tileBase}>
           <div style={{ fontSize: '10px', fontFamily: 'monospace', textTransform: 'uppercase', color: '#9CA3AF' }}>Lean Mass</div>
-          <div style={{ fontSize: '20px', fontWeight: 300, color: '#FFFFFF' }}>{leanMassKg} <span style={{ fontSize: '11px', color: '#6B7280' }}>kg</span></div>
+          <div style={{ fontSize: '20px', fontWeight: 300, color: '#FFFFFF' }}>{leanMassKg} <span style={{ fontSize: '11px', color: '#9CA3AF' }}>kg</span></div>
           <div style={{ fontSize: '10px', color: '#0A84FF', fontFamily: 'monospace' }}>Fat Mass: {bodyFatPercent}%</div>
         </div>
 
         <div style={tileBase}>
           <div style={{ fontSize: '10px', fontFamily: 'monospace', textTransform: 'uppercase', color: '#9CA3AF' }}>Biological Age</div>
-          <div style={{ fontSize: '20px', fontWeight: 300, color: '#00BF63' }}>{biologicalAgeDeltaYears} <span style={{ fontSize: '11px', color: '#6B7280' }}>yrs</span></div>
+          <div style={{ fontSize: '20px', fontWeight: 300, color: '#00BF63' }}>{biologicalAgeDeltaYears} <span style={{ fontSize: '11px', color: '#9CA3AF' }}>yrs</span></div>
           <div style={{ fontSize: '10px', color: '#9CA3AF', fontFamily: 'monospace' }}>PhenoAge Lead</div>
         </div>
 
         <div style={tileBase}>
           <div style={{ fontSize: '10px', fontFamily: 'monospace', textTransform: 'uppercase', color: '#9CA3AF' }}>Substrate FatMax</div>
-          <div style={{ fontSize: '20px', fontWeight: 300, color: '#FF9F0A' }}>74% <span style={{ fontSize: '11px', color: '#6B7280' }}>lipid</span></div>
+          <div style={{ fontSize: '20px', fontWeight: 300, color: '#FF9F0A' }}>74% <span style={{ fontSize: '11px', color: '#9CA3AF' }}>lipid</span></div>
           <div style={{ fontSize: '10px', color: '#9CA3AF', fontFamily: 'monospace' }}>Mitochondrial Beta-Ox</div>
         </div>
       </div>
