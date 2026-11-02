@@ -3,6 +3,7 @@ import { MedicalLibraryWorkbench } from '../../components/MedicalLibraryWorkbenc
 import { StudyCommandCenter } from '../../components/StudyCommandCenter'
 import { MedStudyHub as MedStudyHubBase } from './MedStudyHubBase'
 import { Fold } from '../../shared/ui/Fold'
+import { PrometheusArenaDeck } from '../../domains/prometheus-learning/ui/index'
 
 export function MedStudyHub() {
   const [params, setParams] = useSearchParams()
@@ -16,6 +17,11 @@ export function MedStudyHub() {
 
   return (
     <div className="space-y-5 pb-8">
+      {/* Prometheus Arena & Causal Teachable Figures: competitive multi-agent learning deck */}
+      <Fold label="Prometheus Arena & Causal Simulation" defaultOpen={true}>
+        <PrometheusArenaDeck />
+      </Fold>
+
       <MedicalLibraryWorkbench onRun={runEvidenceQuery} />
       {/* Hasil pencarian bukti tampil di bagian ini; ia terbuka sendiri bila ada `bagian`. */}
       <Fold label="Topics" defaultOpen={params.has('bagian')}>
