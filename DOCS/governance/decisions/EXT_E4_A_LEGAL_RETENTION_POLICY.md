@@ -40,4 +40,4 @@
 ## 3. Engineering Implementation Alignment
 
 - References: `docs/alpha/E4_RETENTION_CONSENT_POLICY_DRAFT.md`, `scripts/uji/privacy-*.mts`.
-- Status: **DECIDED**.
+- Status: **PREPARED (DEFERRED_FINAL_STAGE — parameterized retention harness `server/src/modules/retention/domain/retentionPolicy.ts` verified; `governance/RETENTION_POLICY.json` remains `unset` until external legal counsel sign-off)**.

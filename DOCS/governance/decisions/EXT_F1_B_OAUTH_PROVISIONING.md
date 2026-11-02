@@ -26,4 +26,4 @@
 
 3. **Status:**
    - Determination formalized and implemented.
-   - Status: **DECIDED**.
+   - Status: **PREPARED (DEFERRED_FINAL_STAGE — synthetic JWT session & OAuth contract verified in CI; live production OAuth window deferred to final deployment stage)**.

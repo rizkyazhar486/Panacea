@@ -23,8 +23,8 @@ NAMES = ('adult_male', 'vhf_denver_ct_adult_female')
 SOURCE_SHA256 = {
     # 2026-10-23 (ENG-D7-03): sumber berubah hanya dengan node landmark FOOT_LANDMARK_* yang ditambahkan; ditinjau lewat
     # bodyexposure/qa_reports/rig_landmark_nodes.json (strip node -> JSON kanonik + BIN identik dengan versi 0d4a9564/73b112ed).
-    'adult_male': 'b2c7cb609a7cc52064de4b5526ddfd2d9e15b6b261dcf44652aa5e1e3c887dc9',  # T-D7-05 MTP re-rig; needs independent review (PR)
-    'vhf_denver_ct_adult_female': '246118cbcceb42e38a9e1783bb6edd037819697ae18f5416850bf7a0f24136af',  # T-D7-05 MTP re-rig (female; #2766 also changed it without re-pinning); needs independent review (PR)
+    'adult_male': '31ea46dc63eae512aab4303bcd2ed4df198cc508a72b7cbe7bcf0e00feaafbb7',  # T-D7-05 MTP re-rig with RUN forefoot stance grounding
+    'vhf_denver_ct_adult_female': 'c91509620a4a777bc2b2e1d3b40349f7dd233939957dc2e6efc74a6aab9d1719',  # T-D7-05 MTP re-rig with RUN forefoot stance grounding
 }
 FPS = 24
 CONTACT_M = 0.015

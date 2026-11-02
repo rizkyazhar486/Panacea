@@ -10,7 +10,6 @@ import {
   standings,
   updateRating,
   type ArenaMatch,
-  type BotProfile,
   type Standing,
 } from '../engine/arena.ts';
 import {
@@ -41,10 +40,9 @@ export const PrometheusArenaView: React.FC<PrometheusArenaViewProps> = ({
   initialSeed = 42,
   onMatchComplete,
 }) => {
-  const { isMobile, isDesktop } = useAdaptive();
+  const { isDesktop } = useAdaptive();
 
-  // Initial progress state unlocking cardiology topics
-  const [progress, setProgress] = useState<LearningProgress>(() => {
+  const [progress] = useState<LearningProgress>(() => {
     let p = newProgress(userId);
     const r1 = startLesson(p, CARDIOVASCULAR_CATALOG, userId, 'les:cardiac_output');
     if (r1.ok) p = r1.progress;
@@ -85,7 +83,6 @@ export const PrometheusArenaView: React.FC<PrometheusArenaViewProps> = ({
   );
   const [learnerRating, setLearnerRating] = useState(1200);
 
-  // Initialize Match
   const initMatch = useCallback(
     (newSeed: number) => {
       const matchRes = createMatch(
@@ -118,7 +115,6 @@ export const PrometheusArenaView: React.FC<PrometheusArenaViewProps> = ({
     initMatch(seed);
   }, [initMatch, seed]);
 
-  // Round countdown timer
   useEffect(() => {
     if (!match || match.status === 'finished' || isSubmitting) return;
 
@@ -175,7 +171,6 @@ export const PrometheusArenaView: React.FC<PrometheusArenaViewProps> = ({
         setActiveDialogue(getBotDialogue('bot:aria', 'learner_incorrect', seed + activeRoundIndex));
       }
 
-      // Perturb Teachable Causal Figure
       if (currentQ?.conceptId === 'pcg:sarcomere' || currentQ?.conceptId === 'pcg:excitation_contraction_coupling') {
         setCausalSim(
           simulateCausalNetwork(HEMODYNAMIC_CAUSAL_NETWORK, [
@@ -184,7 +179,6 @@ export const PrometheusArenaView: React.FC<PrometheusArenaViewProps> = ({
         );
       }
 
-      // Progress to next round after delay
       setTimeout(() => {
         if (updatedMatch.status === 'finished') {
           const finalSt = standings(updatedMatch);
@@ -216,37 +210,93 @@ export const PrometheusArenaView: React.FC<PrometheusArenaViewProps> = ({
   const currentStandings = match ? standings(match) : [];
 
   return (
-    <div className="w-full max-w-7xl mx-auto p-4 lg:p-6 space-y-6 bg-slate-950 text-slate-100 rounded-2xl border border-slate-800 shadow-2xl">
-      {/* Header & Disclaimer */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+    <div
+      style={{
+        width: '100%',
+        maxWidth: '80rem',
+        margin: '0 auto',
+        padding: isDesktop ? '1.5rem' : '1rem',
+        backgroundColor: '#020617',
+        color: '#f1f5f9',
+        borderRadius: '1rem',
+        border: '1px solid #1e293b',
+      }}
+    >
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: isDesktop ? 'row' : 'column',
+          alignItems: isDesktop ? 'center' : 'flex-start',
+          justifyContent: 'space-between',
+          gap: '1rem',
+          borderBottom: '1px solid #1e293b',
+          paddingBottom: '1rem',
+          marginBottom: '1.25rem',
+        }}
+      >
         <div>
-          <div className="flex items-center gap-2">
-            <span className="px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider bg-teal-900/60 text-teal-300 border border-teal-700/50">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <span
+              style={{
+                padding: '0.125rem 0.625rem',
+                borderRadius: '9999px',
+                fontSize: '0.75rem',
+                fontWeight: 700,
+                textTransform: 'uppercase',
+                backgroundColor: '#134e4a',
+                color: '#5eead4',
+                border: '1px solid #0f766e',
+              }}
+            >
               Prometheus Arena
             </span>
-            <span className="px-2.5 py-0.5 rounded-full text-xs font-bold text-amber-300 bg-amber-950/60 border border-amber-800/50">
+            <span
+              style={{
+                padding: '0.125rem 0.625rem',
+                borderRadius: '9999px',
+                fontSize: '0.75rem',
+                fontWeight: 700,
+                backgroundColor: '#451a03',
+                color: '#fcd34d',
+                border: '1px solid #92400e',
+              }}
+            >
               Rating: {learnerRating} Elo
             </span>
           </div>
-          <h1 className="text-xl lg:text-2xl font-black tracking-tight text-white mt-1">
+          <h1 style={{ fontSize: isDesktop ? '1.5rem' : '1.25rem', fontWeight: 900, color: '#ffffff', marginTop: '0.25rem' }}>
             Multiscale Retrieval Practice with Rival Anime Bots
           </h1>
-          <p className="text-xs text-slate-400 mt-0.5">{ARENA_DISCLAIMER}</p>
+          <p style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '0.125rem' }}>{ARENA_DISCLAIMER}</p>
         </div>
 
-        <div className="flex items-center gap-3">
-          <button
-            type="button"
-            onClick={() => setSeed((s) => s + 1)}
-            className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition"
-          >
-            New Seed ({seed})
-          </button>
-        </div>
+        <button
+          type="button"
+          onClick={() => setSeed((s) => s + 1)}
+          style={{
+            minHeight: '44px',
+            padding: '0.375rem 0.75rem',
+            borderRadius: '0.5rem',
+            fontSize: '0.75rem',
+            fontWeight: 600,
+            backgroundColor: '#1e293b',
+            color: '#e2e8f0',
+            border: '1px solid #334155',
+            cursor: 'pointer',
+          }}
+        >
+          New Seed ({seed})
+        </button>
       </div>
 
-      {/* 3 Rival Bot Showcase Strip */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: isDesktop ? 'repeat(3, minmax(0, 1fr))' : 'repeat(1, minmax(0, 1fr))',
+          gap: '0.75rem',
+          marginBottom: '1.25rem',
+        }}
+      >
         {ARENA_BOTS.map((bot) => {
           const isAria = bot.id === 'bot:aria';
           const isKenji = bot.id === 'bot:kenji';
@@ -255,29 +305,42 @@ export const PrometheusArenaView: React.FC<PrometheusArenaViewProps> = ({
             : isKenji
               ? '/prometheus/arena/kenji.svg'
               : '/prometheus/arena/mira.svg';
-          const borderColor = isAria
-            ? 'border-teal-500/50 bg-teal-950/20'
-            : isKenji
-              ? 'border-indigo-500/50 bg-indigo-950/20'
-              : 'border-purple-500/50 bg-purple-950/20';
+          const accentBorder = isAria ? '#14b8a6' : isKenji ? '#6366f1' : '#a855f7';
 
           return (
             <div
               key={bot.id}
-              className={`flex items-center gap-3.5 p-3 rounded-xl border ${borderColor} transition-all`}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.875rem',
+                padding: '0.75rem',
+                borderRadius: '0.75rem',
+                border: `1px solid ${accentBorder}`,
+                backgroundColor: '#0f172a',
+              }}
             >
               <img
                 src={avatarUrl}
                 alt={bot.name}
-                className="w-14 h-14 rounded-full border-2 border-slate-700 object-cover shadow-md flex-shrink-0"
+                style={{
+                  width: '3.5rem',
+                  height: '3.5rem',
+                  borderRadius: '9999px',
+                  border: '2px solid #334155',
+                  objectFit: 'cover',
+                  flexShrink: 0,
+                }}
               />
-              <div className="min-w-0">
-                <div className="flex items-center gap-1.5">
-                  <span className="font-bold text-sm text-white">{bot.name}</span>
-                  <span className="text-[10px] text-slate-400">({bot.rating} Elo)</span>
+              <div style={{ minWidth: 0 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
+                  <span style={{ fontWeight: 700, fontSize: '0.875rem', color: '#ffffff' }}>{bot.name}</span>
+                  <span style={{ fontSize: '0.6875rem', color: '#94a3b8' }}>({bot.rating} Elo)</span>
                 </div>
-                <p className="text-xs text-slate-300 truncate">{bot.persona}</p>
-                <div className="flex items-center gap-2 mt-1 text-[11px] text-slate-400">
+                <p style={{ fontSize: '0.75rem', color: '#cbd5e1', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {bot.persona}
+                </p>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.25rem', fontSize: '0.6875rem', color: '#94a3b8' }}>
                   <span>Speed: ~{(bot.meanResponseMs / 1000).toFixed(1)}s</span>
                   <span>•</span>
                   <span>Acc: {(bot.accuracy[2] * 100).toFixed(0)}%</span>
@@ -288,182 +351,249 @@ export const PrometheusArenaView: React.FC<PrometheusArenaViewProps> = ({
         })}
       </div>
 
-      {/* Active Anime Dialogue Bubble */}
       {activeDialogue && (
-        <div className="p-3.5 rounded-xl bg-slate-900 border border-slate-800 flex items-start gap-3 shadow-inner">
-          <span className="text-xl">💬</span>
-          <div className="space-y-0.5">
-            <span className="text-xs font-bold text-teal-400">
+        <div
+          style={{
+            padding: '0.875rem',
+            borderRadius: '0.75rem',
+            backgroundColor: '#0f172a',
+            border: '1px solid #1e293b',
+            display: 'flex',
+            alignItems: 'flex-start',
+            gap: '0.75rem',
+            marginBottom: '1.25rem',
+          }}
+        >
+          <span style={{ fontSize: '1.25rem' }}>💬</span>
+          <div>
+            <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#2dd4bf', display: 'block' }}>
               {activeDialogue.speakerName} ({activeDialogue.emotion}):
             </span>
-            <p className="text-sm text-slate-200 italic font-medium">"{activeDialogue.text}"</p>
+            <p style={{ fontSize: '0.875rem', color: '#e2e8f0', fontStyle: 'italic', margin: 0 }}>
+              "{activeDialogue.text}"
+            </p>
           </div>
         </div>
       )}
 
-      {/* Teachable Causal Hemodynamics Telemetry */}
-      <div className="p-3.5 rounded-xl bg-slate-900/80 border border-slate-800 space-y-2">
-        <div className="flex items-center justify-between text-xs text-slate-400">
-          <span className="font-semibold text-slate-300">Teachable Causal Hemodynamics</span>
+      <div
+        style={{
+          padding: '0.875rem',
+          borderRadius: '0.75rem',
+          backgroundColor: '#0f172a',
+          border: '1px solid #1e293b',
+          marginBottom: '1.25rem',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.75rem', color: '#94a3b8', marginBottom: '0.5rem' }}>
+          <span style={{ fontWeight: 600, color: '#cbd5e1' }}>Teachable Causal Hemodynamics</span>
           <span>PV-Loop Coupling State</span>
         </div>
-        <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 text-center text-xs">
-          <div className="p-2 rounded-lg bg-slate-950 border border-slate-800">
-            <span className="text-[10px] text-teal-400 block">Preload (EDV)</span>
-            <span className="font-bold text-sm text-white">
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: isDesktop ? 'repeat(5, minmax(0, 1fr))' : 'repeat(2, minmax(0, 1fr))',
+            gap: '0.5rem',
+            textAlign: 'center',
+            fontSize: '0.75rem',
+          }}
+        >
+          <div style={{ padding: '0.5rem', borderRadius: '0.5rem', backgroundColor: '#020617', border: '1px solid #1e293b' }}>
+            <span style={{ fontSize: '0.6875rem', color: '#2dd4bf', display: 'block' }}>Preload (EDV)</span>
+            <span style={{ fontWeight: 700, fontSize: '0.875rem', color: '#ffffff' }}>
               {causalSim.finalState.values['preload_edv']?.toFixed(1) ?? '120.0'} mL
             </span>
           </div>
-          <div className="p-2 rounded-lg bg-slate-950 border border-slate-800">
-            <span className="text-[10px] text-magenta-400 block text-fuchsia-400">Inotropy</span>
-            <span className="font-bold text-sm text-white">
+          <div style={{ padding: '0.5rem', borderRadius: '0.5rem', backgroundColor: '#020617', border: '1px solid #1e293b' }}>
+            <span style={{ fontSize: '0.6875rem', color: '#e879f9', display: 'block' }}>Inotropy</span>
+            <span style={{ fontWeight: 700, fontSize: '0.875rem', color: '#ffffff' }}>
               {causalSim.finalState.values['contractility']?.toFixed(2) ?? '1.00'}x
             </span>
           </div>
-          <div className="p-2 rounded-lg bg-slate-950 border border-slate-800">
-            <span className="text-[10px] text-blue-400 block">SVR (Afterload)</span>
-            <span className="font-bold text-sm text-white">
+          <div style={{ padding: '0.5rem', borderRadius: '0.5rem', backgroundColor: '#020617', border: '1px solid #1e293b' }}>
+            <span style={{ fontSize: '0.6875rem', color: '#60a5fa', display: 'block' }}>SVR (Afterload)</span>
+            <span style={{ fontWeight: 700, fontSize: '0.875rem', color: '#ffffff' }}>
               {causalSim.finalState.values['afterload_svr']?.toFixed(0) ?? '1200'} dyn
             </span>
           </div>
-          <div className="p-2 rounded-lg bg-slate-950 border border-slate-800">
-            <span className="text-[10px] text-emerald-400 block">Cardiac Output</span>
-            <span className="font-bold text-sm text-white">
+          <div style={{ padding: '0.5rem', borderRadius: '0.5rem', backgroundColor: '#020617', border: '1px solid #1e293b' }}>
+            <span style={{ fontSize: '0.6875rem', color: '#34d399', display: 'block' }}>Cardiac Output</span>
+            <span style={{ fontWeight: 700, fontSize: '0.875rem', color: '#ffffff' }}>
               {causalSim.finalState.values['cardiac_output']?.toFixed(2) ?? '5.00'} L/m
             </span>
           </div>
-          <div className="p-2 rounded-lg bg-slate-950 border border-slate-800 col-span-2 sm:col-span-1">
-            <span className="text-[10px] text-amber-400 block">Mean Arterial P</span>
-            <span className="font-bold text-sm text-white">
+          <div style={{ padding: '0.5rem', borderRadius: '0.5rem', backgroundColor: '#020617', border: '1px solid #1e293b' }}>
+            <span style={{ fontSize: '0.6875rem', color: '#fbbf24', display: 'block' }}>Mean Arterial P</span>
+            <span style={{ fontWeight: 700, fontSize: '0.875rem', color: '#ffffff' }}>
               {causalSim.finalState.values['mean_arterial_pressure']?.toFixed(1) ?? '93.3'} mmHg
             </span>
           </div>
         </div>
       </div>
 
-      {/* Main Arena Gameplay Area (Dual Projection) */}
       {match && match.status !== 'finished' && currentQ ? (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Question & Answer Deck (2 cols desktop) */}
-          <div className="lg:col-span-2 space-y-4">
-            <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-4">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-teal-400">
-                  Question {activeRoundIndex + 1} of {match.questionIds.length}
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: isDesktop ? '2fr 1fr' : '1fr',
+            gap: '1.5rem',
+          }}
+        >
+          <div style={{ padding: '1.25rem', borderRadius: '1rem', backgroundColor: '#0f172a', border: '1px solid #1e293b' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
+              <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#2dd4bf' }}>
+                Question {activeRoundIndex + 1} of {match.questionIds.length}
+              </span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Time:</span>
+                <span
+                  style={{
+                    fontFamily: 'monospace',
+                    fontWeight: 700,
+                    fontSize: '0.875rem',
+                    padding: '0.125rem 0.5rem',
+                    borderRadius: '0.25rem',
+                    backgroundColor: timeRemainingSec <= 5 ? '#450a0a' : '#1e293b',
+                    color: timeRemainingSec <= 5 ? '#f87171' : '#e2e8f0',
+                  }}
+                >
+                  {timeRemainingSec}s
                 </span>
-                <div className="flex items-center gap-2">
-                  <span className="text-xs text-slate-400">Time:</span>
-                  <span
-                    className={`font-mono font-bold text-sm px-2 py-0.5 rounded ${
-                      timeRemainingSec <= 5
-                        ? 'bg-red-950 text-red-400 border border-red-800 animate-pulse'
-                        : 'bg-slate-800 text-slate-200'
-                    }`}
+              </div>
+            </div>
+
+            <h2 style={{ fontSize: isDesktop ? '1.125rem' : '1rem', fontWeight: 700, color: '#ffffff', marginBottom: '1rem' }}>
+              {currentQ.stem}
+            </h2>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.625rem' }}>
+              {currentQ.options.map((opt, idx) => {
+                const letter = String.fromCharCode(65 + idx);
+                const isSelected = selectedOptionId === opt.id;
+
+                return (
+                  <button
+                    key={opt.id}
+                    type="button"
+                    disabled={isSubmitting}
+                    onClick={() => {
+                      setSelectedOptionId(opt.id);
+                      handleOptionSubmit(opt.id);
+                    }}
+                    style={{
+                      width: '100%',
+                      minHeight: '44px',
+                      textAlign: 'left',
+                      padding: '0.875rem',
+                      borderRadius: '0.75rem',
+                      border: isSelected ? '1px solid #2dd4bf' : '1px solid #1e293b',
+                      backgroundColor: isSelected ? '#134e4a' : '#020617',
+                      color: isSelected ? '#ccfbf1' : '#cbd5e1',
+                      display: 'flex',
+                      alignItems: 'flex-start',
+                      gap: '0.75rem',
+                      opacity: isSubmitting ? 0.7 : 1,
+                      cursor: isSubmitting ? 'not-allowed' : 'pointer',
+                    }}
                   >
-                    {timeRemainingSec}s
-                  </span>
-                </div>
-              </div>
-
-              <h2 className="text-base lg:text-lg font-bold text-white leading-snug">
-                {currentQ.stem}
-              </h2>
-
-              {/* Options */}
-              <div className="space-y-2.5 pt-2">
-                {currentQ.options.map((opt, idx) => {
-                  const letter = String.fromCharCode(65 + idx);
-                  const isSelected = selectedOptionId === opt.id;
-
-                  return (
-                    <button
-                      key={opt.id}
-                      type="button"
-                      disabled={isSubmitting}
-                      onClick={() => {
-                        setSelectedOptionId(opt.id);
-                        handleOptionSubmit(opt.id);
+                    <span
+                      style={{
+                        fontWeight: 700,
+                        fontSize: '0.75rem',
+                        padding: '0.125rem 0.5rem',
+                        borderRadius: '0.25rem',
+                        backgroundColor: '#1e293b',
+                        color: '#cbd5e1',
+                        border: '1px solid #334155',
                       }}
-                      className={`w-full min-h-[44px] text-left p-3.5 rounded-xl border transition-all flex items-start gap-3 ${
-                        isSelected
-                          ? 'border-teal-400 bg-teal-950/40 text-teal-100 shadow-md ring-2 ring-teal-500/30'
-                          : 'border-slate-800 bg-slate-950/60 hover:bg-slate-800 text-slate-300'
-                      } ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
                     >
-                      <span className="font-bold text-xs px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">
-                        {letter}
-                      </span>
-                      <span className="text-sm font-medium">{opt.text}</span>
-                    </button>
-                  );
-                })}
-              </div>
+                      {letter}
+                    </span>
+                    <span style={{ fontSize: '0.875rem', fontWeight: 500 }}>{opt.text}</span>
+                  </button>
+                );
+              })}
             </div>
           </div>
 
-          {/* Live Standings Sidebar (1 col desktop) */}
-          <div className="space-y-4">
-            <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-3">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400">
-                Live Standings
-              </h3>
-              <div className="space-y-2">
-                {currentStandings.map((st) => {
-                  const isLearner = st.competitorId === 'learner';
-                  return (
-                    <div
-                      key={st.competitorId}
-                      className={`flex items-center justify-between p-2.5 rounded-lg border text-xs ${
-                        isLearner
-                          ? 'border-amber-500/50 bg-amber-950/20 text-amber-200'
-                          : 'border-slate-800 bg-slate-950 text-slate-300'
-                      }`}
-                    >
-                      <div className="flex items-center gap-2">
-                        <span className="font-bold text-slate-500 w-4">#{st.rank}</span>
-                        <span className="font-semibold">{st.name}</span>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <span className="text-[11px] text-slate-400">
-                          {st.correct}/{activeRoundIndex + 1}
-                        </span>
-                        <span className="font-mono font-bold text-sm">{st.points} pts</span>
-                      </div>
+          <div style={{ padding: '1rem', borderRadius: '1rem', backgroundColor: '#0f172a', border: '1px solid #1e293b' }}>
+            <h3 style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', color: '#94a3b8', marginBottom: '0.75rem' }}>
+              Live Standings
+            </h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              {currentStandings.map((st) => {
+                const isLearner = st.competitorId === 'learner';
+                return (
+                  <div
+                    key={st.competitorId}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      padding: '0.625rem',
+                      borderRadius: '0.5rem',
+                      border: isLearner ? '1px solid #f59e0b' : '1px solid #1e293b',
+                      backgroundColor: isLearner ? '#451a03' : '#020617',
+                      color: isLearner ? '#fde68a' : '#cbd5e1',
+                      fontSize: '0.75rem',
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <span style={{ fontWeight: 700, color: '#64748b' }}>#{st.rank}</span>
+                      <span style={{ fontWeight: 600 }}>{st.name}</span>
                     </div>
-                  );
-                })}
-              </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                      <span style={{ color: '#94a3b8' }}>
+                        {st.correct}/{activeRoundIndex + 1}
+                      </span>
+                      <span style={{ fontFamily: 'monospace', fontWeight: 700, fontSize: '0.875rem' }}>{st.points} pts</span>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>
       ) : match && match.status === 'finished' ? (
-        /* Match Finished Podium */
-        <div className="p-8 rounded-2xl bg-slate-900 border border-slate-800 text-center space-y-6">
-          <div className="space-y-2">
-            <span className="text-4xl">🏆</span>
-            <h2 className="text-2xl font-black text-white">Retrieval Practice Complete!</h2>
-            <p className="text-sm text-slate-400">
-              Your performance has been incorporated into the canonical spaced-retrieval schedule.
-            </p>
-          </div>
+        <div
+          style={{
+            padding: '2rem',
+            borderRadius: '1rem',
+            backgroundColor: '#0f172a',
+            border: '1px solid #1e293b',
+            textAlign: 'center',
+          }}
+        >
+          <span style={{ fontSize: '2.25rem', display: 'block', marginBottom: '0.5rem' }}>🏆</span>
+          <h2 style={{ fontSize: '1.5rem', fontWeight: 900, color: '#ffffff', marginBottom: '0.25rem' }}>
+            Retrieval Practice Complete!
+          </h2>
+          <p style={{ fontSize: '0.875rem', color: '#94a3b8', marginBottom: '1.5rem' }}>
+            Your performance has been incorporated into the canonical spaced-retrieval schedule.
+          </p>
 
-          <div className="max-w-md mx-auto space-y-2">
+          <div style={{ maxWidth: '28rem', margin: '0 auto 1.5rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
             {currentStandings.map((st) => (
               <div
                 key={st.competitorId}
-                className={`flex items-center justify-between p-3 rounded-xl border text-sm ${
-                  st.rank === 1
-                    ? 'border-amber-500 bg-amber-950/40 text-amber-100 font-bold'
-                    : 'border-slate-800 bg-slate-950 text-slate-300'
-                }`}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: '0.75rem',
+                  borderRadius: '0.75rem',
+                  border: st.rank === 1 ? '1px solid #f59e0b' : '1px solid #1e293b',
+                  backgroundColor: st.rank === 1 ? '#451a03' : '#020617',
+                  color: st.rank === 1 ? '#fef3c7' : '#cbd5e1',
+                  fontSize: '0.875rem',
+                  fontWeight: st.rank === 1 ? 700 : 500,
+                }}
               >
-                <div className="flex items-center gap-3">
-                  <span className="text-lg">
-                    {st.rank === 1 ? '🥇' : st.rank === 2 ? '🥈' : st.rank === 3 ? '🥉' : ' '}
-                  </span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                  <span>{st.rank === 1 ? '🥇' : st.rank === 2 ? '🥈' : st.rank === 3 ? '🥉' : ' '}</span>
                   <span>{st.name}</span>
                 </div>
-                <div className="font-mono">{st.points} pts</div>
+                <div style={{ fontFamily: 'monospace' }}>{st.points} pts</div>
               </div>
             ))}
           </div>
@@ -471,7 +601,17 @@ export const PrometheusArenaView: React.FC<PrometheusArenaViewProps> = ({
           <button
             type="button"
             onClick={() => initMatch(seed + 1)}
-            className="px-6 py-2.5 rounded-xl font-bold text-sm bg-teal-500 hover:bg-teal-400 text-slate-950 transition shadow-lg"
+            style={{
+              minHeight: '44px',
+              padding: '0.625rem 1.5rem',
+              borderRadius: '0.75rem',
+              fontWeight: 700,
+              fontSize: '0.875rem',
+              backgroundColor: '#14b8a6',
+              color: '#020617',
+              border: 'none',
+              cursor: 'pointer',
+            }}
           >
             Play Next Match
           </button>

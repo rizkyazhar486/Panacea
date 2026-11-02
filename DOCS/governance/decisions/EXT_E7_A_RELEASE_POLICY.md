@@ -42,4 +42,4 @@
 ## 3. Engineering Implementation Alignment
 
 - References: `CLAUDE.md` §5–§6, `docs/alpha/E7_DEPLOYMENT_EVIDENCE.md`.
-- Status: **DECIDED**.
+- Status: **PREPARED (DEFERRED_FINAL_STAGE — automated deployed SHA equivalence check `scripts/qa/verify-deployed-sha.mjs` enforced; formal release tag sign-off deferred to final stage)**.

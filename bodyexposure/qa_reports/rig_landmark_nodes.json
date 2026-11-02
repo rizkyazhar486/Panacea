@@ -5,10 +5,10 @@
   "statement": "Landmark empties were appended as children of FOOT.L/R. Stripping them must give the pre-landmark JSON (canonical JSON.stringify) and BIN chunk exactly; mesh, skin and animation data are unchanged.",
   "assets": {
     "adult_male": {
-      "before_sha256": "e55b0774ad28e423c33e8a628fa607b6467e50c89348fdd33c46866f2dda2073",
-      "before_json_canonical_sha256": "4293017121720bdcfa1a4a074aa27853ac5d2ae27a8e0e699ddfe41a41632acb",
-      "bin_sha256": "2f7f45cf738cf82411346b18067ab0aafac1e901eb5bb555387477cc853e91f6",
-      "after_sha256": "b2c7cb609a7cc52064de4b5526ddfd2d9e15b6b261dcf44652aa5e1e3c887dc9",
+      "before_sha256": "ed021c12a36a219459dae6567315cbd615481ccc2f177159e5b88abafa9107db",
+      "before_json_canonical_sha256": "8a3cb6686e11a933a5258cd018ce8d32871cdf6423b73bc9ed04a198b59c94fa",
+      "bin_sha256": "e54fcaeead6ae47c1df8ce7c524f193fa5dc3c0b07c8e2b1865c9b848fb74976",
+      "after_sha256": "31ea46dc63eae512aab4303bcd2ed4df198cc508a72b7cbe7bcf0e00feaafbb7",
       "landmarks": {
         "HEEL_L": {
           "translation": [
@@ -29,7 +29,7 @@
         "HEEL_R": {
           "translation": [
             0.0241875,
-            -0.0039396,
+            -0.0039395,
             -0.0577752
           ],
           "source": "SKELETAL.CALCANEUS.R (lowest vertex)"
@@ -46,10 +46,10 @@
       "note": "T-D7-05 (2026-10-30): rig rebuilt with an MTP toe joint (TOE.L/R); before_sha256 is the landmark-free file reconstructed by stripping the landmark nodes."
     },
     "vhf_denver_ct_adult_female": {
-      "before_sha256": "d14528a5747733a01300242670e6e72934ec22f7f82293ed4c55e4436d51c560",
-      "before_json_canonical_sha256": "2a35d239dba7e2393fb69b66268b2a0cc4206cb681c370975ea461b90d4a582a",
-      "bin_sha256": "bafac5421187a2294b518ba0993289081dee6a1bb18a5456c271eab6ab880d4a",
-      "after_sha256": "246118cbcceb42e38a9e1783bb6edd037819697ae18f5416850bf7a0f24136af",
+      "before_sha256": "149f25156887fa73d26d818dec98aebbdfe40b1ec06975a3487d039571f82aaf",
+      "before_json_canonical_sha256": "403cad0a4b98936e8851bca859acb1148eaad979bb783fc2a33527ea6ddfc4aa",
+      "bin_sha256": "93416609856ccbcc09d06ed36d694020f537b0757e68ac31acd171596257621b",
+      "after_sha256": "c91509620a4a777bc2b2e1d3b40349f7dd233939957dc2e6efc74a6aab9d1719",
       "landmarks": {
         "HEEL_L": {
           "translation": [
@@ -61,15 +61,15 @@
         },
         "BALL_L": {
           "translation": [
-            -0.0541126,
+            -0.0541125,
             0.1234003,
-            0.0389162
+            0.0389161
           ],
           "source": "SKELETAL.METATARSALS_AND_PHALANGES_COMBINED.L (posterior metatarsal part of the forefoot, proximal to the derived MTP plane; not MT1 and not the toe part)"
         },
         "HEEL_R": {
           "translation": [
-            0.0281209,
+            0.0281208,
             -0.0136346,
             -0.0665666
           ],

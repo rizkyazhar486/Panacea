@@ -6,13 +6,13 @@ const native = JSON.parse(fs.readFileSync('bodyexposure/qa_reports/gait_contact_
 const coordinates = JSON.parse(fs.readFileSync('bodyexposure/qa_reports/gait_coordinate_audit.json', 'utf8'))
 const expected = {
   adult_male: {
-    source: 'b2c7cb609a7cc52064de4b5526ddfd2d9e15b6b261dcf44652aa5e1e3c887dc9',
+    source: '31ea46dc63eae512aab4303bcd2ed4df198cc508a72b7cbe7bcf0e00feaafbb7',
     walk: { heelPlantar: { L: ['22-25+0-4'], R: ['7-10'] }, toePlantar: { L: ['22-25+0-8'], R: ['8-17'] } },
-    // T-D7-05: RUN forefoot contact comes from the labelled (derived) toe constraint
-    run: { heelPlantar: { L: [], R: [] }, toePlantar: { L: [], R: ['7-9'] } },
+    // T-D7-05: RUN forefoot contact comes from the labelled (derived) toe constraint + forefoot stance grounding
+    run: { heelPlantar: { L: [], R: [] }, toePlantar: { L: ['17-17+0-1'], R: ['7-9'] } },
   },
   vhf_denver_ct_adult_female: {
-    source: '246118cbcceb42e38a9e1783bb6edd037819697ae18f5416850bf7a0f24136af',
+    source: 'c91509620a4a777bc2b2e1d3b40349f7dd233939957dc2e6efc74a6aab9d1719',
     walk: { heelPlantar: { L: [], R: [] }, toePlantar: { L: [], R: [] } },
     run: { heelPlantar: { L: [], R: [] }, toePlantar: { L: [], R: [] } },  // betina: landmark plantar tidak menapak; kontak lewat 'sole' dan landmark bola (lihat gait_measurability)
   },
@@ -77,5 +77,5 @@ test('native numeric cross-check stays within measured Blender/Three evaluation 
     assert.ok(Math.abs(male[kind].slide_rms_mm - rms) < 0.02)
     assert.ok(Math.abs(male[kind].slide_max_mm - peak) < 0.02)
   }
-  assert.ok(Math.abs(native.assets[1].clips.RUN.sole.slide_max_mm - 7.346117248137794) < 0.02)
+  assert.ok(Math.abs(native.assets[1].clips.RUN.sole.slide_max_mm - 7.625142644558748) < 0.02)
 })

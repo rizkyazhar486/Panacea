@@ -359,7 +359,7 @@
     "source": 0.861
    },
    "lowest_foot_point_m": {
-    "min": 0.0,
+    "min": -0.0,
     "max": 0.0795
    },
    "toe_mtp_extension_deg": {
@@ -383,6 +383,11 @@
        "mtp_local_x_after_deg": -24.6
       },
       {
+       "frame": 1,
+       "mtp_local_x_before_deg": -29.3,
+       "mtp_local_x_after_deg": -32.7
+      },
+      {
        "frame": 17,
        "mtp_local_x_before_deg": -9.6,
        "mtp_local_x_after_deg": -16.1
@@ -403,6 +408,11 @@
        "frame": 8,
        "mtp_local_x_before_deg": -7.2,
        "mtp_local_x_after_deg": 18.8
+      },
+      {
+       "frame": 9,
+       "mtp_local_x_before_deg": 15.2,
+       "mtp_local_x_after_deg": 24.1
       }
      ]
     }

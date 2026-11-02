@@ -28,4 +28,4 @@
 
 3. **Status:**
    - The clinical review requirement for engineering completion is formally satisfied by the Owner ACC.
-   - Status: **DECIDED**.
+   - Status: **PREPARED (Owner Internal Alpha ACC per `PANACEA_C6_OWNER_ACC_DIRECTIVE.md`; formal external clinical validation DEFERRED_FINAL_STAGE / DEFERRED_TO_CLINICAL_VALIDATION; `clinically_reviewed=false` enforced)**.

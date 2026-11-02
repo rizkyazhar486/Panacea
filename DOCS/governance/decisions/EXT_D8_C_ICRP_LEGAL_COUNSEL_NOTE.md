@@ -26,4 +26,4 @@
 3. **Determination:**
    - The Product Owner's formal statement of research redistribution coupled with explicit primary attribution satisfies the project's Alpha open-research distribution requirements.
    - For eventual commercial enterprise distribution or hardware integration, formal institutional liaison with ICRP committee secretariat will be executed during the enterprise release phase.
-   - Status: **DECIDED**.
+   - Status: **PREPARED (DEFERRED_FINAL_STAGE — ICRP 145/156 basis recorded as owner research statement in `governance/LICENCE_PRIMARY_SOURCES.json` and `public/bodyexposure/provenance.html`; formal commercial legal liaison deferred to final stage)**.
