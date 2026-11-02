@@ -14,6 +14,11 @@ import {
 import {
   VolumeDicom3D, MODE_RENDER, type ModeRender, type PotongVolume,
 } from '../../components/VolumeDicom3D'
+import {
+  queryDicomWebStudy,
+  validateDicomUid,
+  validatePacsEndpointUrl,
+} from '../../domains/clinical-operations'
 
 type Keadaan =
   | { tahap: 'kosong' }
@@ -74,6 +79,49 @@ export function VolumeDicomBagian() {
   const [pesanResep, setPesanResep] = useState<{ nada: 'ok' | 'peringatan'; teks: string } | null>(null)
   const resepRef = useRef<HTMLInputElement | null>(null)
   const masukanRef = useRef<HTMLInputElement | null>(null)
+
+  const [pacsUrl, setPacsUrl] = useState('')
+  const [studyUid, setStudyUid] = useState('')
+  const [pacsStatus, setPacsStatus] = useState<string | null>(null)
+  const [pacsLoading, setPacsLoading] = useState(false)
+  const [pacsOpen, setPacsOpen] = useState(false)
+
+  const handlePacsQuery = async () => {
+    if (!pacsUrl.trim() || !studyUid.trim()) {
+      setPacsStatus('Enter both PACS endpoint URL and Study UID')
+      return
+    }
+    const uidCheck = validateDicomUid(studyUid.trim())
+    if (!uidCheck.valid) {
+      setPacsStatus(`UID Error: ${uidCheck.error}`)
+      return
+    }
+    const urlCheck = validatePacsEndpointUrl(pacsUrl.trim(), { allowLocalDevServer: true })
+    if (!urlCheck.valid) {
+      setPacsStatus(`URL Error: ${urlCheck.error}`)
+      return
+    }
+
+    setPacsLoading(true)
+    setPacsStatus('Connecting to DICOMweb endpoint…')
+    try {
+      const res = await queryDicomWebStudy({
+        pacsBaseUrl: pacsUrl.trim(),
+        studyInstanceUid: studyUid.trim(),
+        authenticatedPatientId: 'PT-ACTIVE',
+        allowLocalDevServer: true,
+      })
+      if (res.status === 'SUCCESS') {
+        setPacsStatus(`Connected: Found study ${studyUid.slice(0, 16)}… (${res.modality})`)
+      } else {
+        setPacsStatus(`PACS ${res.status}: ${res.error ?? 'Query returned no matching series'}`)
+      }
+    } catch (e: unknown) {
+      setPacsStatus(`PACS Error: ${e instanceof Error ? e.message : String(e)}`)
+    } finally {
+      setPacsLoading(false)
+    }
+  }
 
   const ubahPotong = (sumbu: 0 | 1 | 2, nilai: number) => {
     setPotong((lama) => lama.map((v, i) => i === sumbu ? nilai : v) as PotongVolume)
@@ -146,9 +194,64 @@ export function VolumeDicomBagian() {
       </p>
 
       <input ref={masukanRef} type="file" multiple accept=".dcm,application/dicom" onChange={(e) => void muat(e.target.files)} className="sr-only" aria-label="DICOM slices to render in 3D" />
-      <button type="button" onClick={() => masukanRef.current?.click()} className="mt-2.5 min-h-11 w-full rounded-xl bg-brand px-4 text-sm font-black text-white">
-        Choose DICOM slices
-      </button>
+      <div className="mt-2.5 flex flex-col sm:flex-row gap-2">
+        <button type="button" onClick={() => masukanRef.current?.click()} className="min-h-11 flex-1 rounded-xl bg-brand px-4 text-sm font-black text-white">
+          Choose DICOM slices
+        </button>
+        <button
+          type="button"
+          onClick={() => setPacsOpen((v) => !v)}
+          className="min-h-11 rounded-xl border border-neutral-300 dark:border-white/15 px-4 text-xs font-bold text-neutral-700 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-white/5"
+        >
+          {pacsOpen ? 'Close PACS Query' : 'Query PACS / DICOMweb'}
+        </button>
+      </div>
+
+      {pacsOpen && (
+        <div className="mt-3 rounded-xl border border-neutral-200 dark:border-white/10 bg-neutral-50 dark:bg-white/[0.02] p-3 text-[11px] space-y-2.5">
+          <div className="font-bold uppercase tracking-wider text-[9px] text-neutral-500">DICOMweb QIDO-RS Study Retrieval</div>
+          <div className="grid gap-2 sm:grid-cols-2">
+            <div>
+              <label htmlFor="pacs-endpoint-input" className="block text-[10px] text-neutral-600 dark:text-neutral-400">PACS Endpoint URL (HTTPS or local dev)</label>
+              <input
+                id="pacs-endpoint-input"
+                type="text"
+                placeholder="https://pacs.hospital.org/dicom-web"
+                value={pacsUrl}
+                onChange={(e) => setPacsUrl(e.target.value)}
+                className="mt-1 w-full rounded-lg border border-neutral-300 dark:border-white/15 bg-white dark:bg-black/40 px-2.5 py-1.5 font-mono text-[11px]"
+              />
+            </div>
+            <div>
+              <label htmlFor="pacs-studyuid-input" className="block text-[10px] text-neutral-600 dark:text-neutral-400">Study Instance UID (PS3.5 standard)</label>
+              <input
+                id="pacs-studyuid-input"
+                type="text"
+                placeholder="1.2.840.113619.2.55.3.60468842"
+                value={studyUid}
+                onChange={(e) => setStudyUid(e.target.value)}
+                className="mt-1 w-full rounded-lg border border-neutral-300 dark:border-white/15 bg-white dark:bg-black/40 px-2.5 py-1.5 font-mono text-[11px]"
+              />
+            </div>
+          </div>
+          <div className="flex items-center gap-2 pt-1">
+            <button
+              type="button"
+              disabled={pacsLoading}
+              onClick={() => void handlePacsQuery()}
+              className="min-h-8 rounded-lg bg-emerald-600 px-3 text-[10px] font-bold text-white disabled:opacity-50"
+            >
+              {pacsLoading ? 'Querying…' : 'Execute DICOMweb Query'}
+            </button>
+            <span className="text-[10px] text-neutral-500">Protected by cross-patient boundary isolation & SSRF defense</span>
+          </div>
+          {pacsStatus && (
+            <div className="rounded-lg bg-neutral-200/50 dark:bg-white/5 p-2 font-mono text-[10px] text-neutral-800 dark:text-neutral-200">
+              {pacsStatus}
+            </div>
+          )}
+        </div>
+      )}
 
       {keadaan.tahap === 'membaca' && <p className="mt-2.5 text-[11.5px] text-neutral-600 dark:text-neutral-300">Decoding {keadaan.jumlah} files…</p>}
       {keadaan.tahap === 'gagal' && (
