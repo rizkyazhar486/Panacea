@@ -255,3 +255,17 @@ export {
   type LpsVector3D,
   type RadiologicalPlaneOrientation,
 } from './engine/imagingPlaneEngine'
+export {
+  DERMATOME_CONVERGENCE_SOURCE,
+  REFERRED_PAIN_DISCLAIMER,
+  VISCERAL_REFERRED_PAIN_TABLE,
+  evaluateViscerosomaticConvergence,
+  type EvaluateReferredPainInput,
+  type ReferredPainEvaluation,
+  type ReferredPainFailure,
+  type ReferredPainFailureReason,
+  type ReferredPainSource,
+  type VisceralOrganKey,
+  type VisceralReferredPainRow,
+  type ViscerosomaticConvergenceResult,
+} from './engine/referredPainEngine'
