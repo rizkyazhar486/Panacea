@@ -1,4 +1,4 @@
-import { evaluateWorkoutSession as evaluateBaseWorkout } from "./workoutAndEndocrineMasteryEngine.ts";
+import { evaluateWorkoutSessionAndRecovery as evaluateBaseWorkout } from "./workoutAndEndocrineMasteryEngine.ts";
 
 export interface GpsWaypoint {
   readonly lat: number;

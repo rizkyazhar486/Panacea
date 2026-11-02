@@ -240,3 +240,6 @@ export function evaluateWorkoutSessionAndRecovery(
     source: WORKOUT_SCIENCE_SOURCE,
   });
 }
+
+export { evaluateWorkoutSessionAndRecovery as evaluateWorkoutSession };
+

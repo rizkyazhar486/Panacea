@@ -1,5 +1,7 @@
 export * from "./body-exposure/omnicausalis-multiscale-bridge.ts";
 export * from "./body-exposure/argon-bx-complete-suite.ts";
+export * from "./body-exposure/nextgen-uhd-pbr-viewport-engine.ts";
+export * from "./body-exposure/kalolumen-dicom-3dcg-and-medmlx-engine.ts";
 export * from "./prometheus/competitive-bots/anime-sparring-arena.ts";
 export * from "./prometheus/argon-edu-complete-suite.ts";
 export * from "./prometheus/omnicausalis-route-registry.ts";
@@ -7,5 +9,6 @@ export * from "./golden-journey/cardiovascular-golden-journey.ts";
 export * from "./golden-journey/multisystem-golden-journey.ts";
 export * from "./golden-journey/respiratory-neuro-golden-journey.ts";
 export * from "./one-os/panacea-one-os-synchronizer.ts";
+export * from "./one-os/freedom-mocap-sepsis-talkvid-simready-engine.ts";
 export * from "./governance/post-expansion-maturation-gate.ts";
 export * from "./personal-health/engine/gpsPaceCalorieAndFoodAiEngine.ts";
