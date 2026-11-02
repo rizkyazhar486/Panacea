@@ -1033,12 +1033,12 @@ function CareJourneyExportSection({ episode }: { episode: CareEpisode }) {
               <span className="font-mono text-[10px]">{packet.standard}</span>
             </Badge>
           </div>
-          <p className="mt-0.5 text-[11px] text-neutral-500 dark:text-white/60 font-mono truncate max-w-md">
+          <p className="mt-0.5 text-neutral-500 dark:text-white/60 font-mono truncate" style={{ fontSize: '11px', maxWidth: '28rem' }}>
             Digest: {packet.auditDigest}
           </p>
-          <div className="mt-1 text-[10px] font-mono text-neutral-500 dark:text-neutral-400">
+          <div className="mt-1 font-mono text-neutral-500 dark:text-neutral-400" style={{ fontSize: '10px' }}>
             <span>Identity: {lhidEnvelope.lhid}</span>
-            <span className="block text-[9px] text-neutral-400 dark:text-neutral-500 truncate max-w-sm">
+            <span className="block text-neutral-400 dark:text-neutral-500 truncate" style={{ fontSize: '9px', maxWidth: '24rem' }}>
               SHA-256: {lhidEnvelope.cryptographicSha256}
             </span>
           </div>

@@ -192,11 +192,11 @@ export default function CardiacInteractiveSurface() {
         </div>
       </header>
 
-      <div className="grid xl:grid-cols-[minmax(0,1fr)_280px]">
+      <div className="grid xl:grid-cols-[minmax(0,1fr)_250px]">
         <div className="relative min-w-0 border-b border-white/[.08] xl:border-b-0 xl:border-r">
-          <div className="absolute left-3 top-3 z-[2] rounded-2xl border border-white/[.08] bg-black/65 px-3 py-2 backdrop-blur-xl">
-            <div className="text-[8px] font-black uppercase tracking-[.14em] text-white/35">{meta.eyebrow}</div>
-            <div className="mt-1 max-w-[280px] text-[9px] leading-relaxed text-white/60">{meta.description}</div>
+          <div className="absolute left-3 top-3 z-[2] rounded-2xl border border-white/[.08] bg-black/55 px-3 py-2 backdrop-blur-xl">
+            <div className="text-[8px] font-black uppercase tracking-[.14em] text-white/30">{meta.eyebrow}</div>
+            <div className="mt-1 max-w-[240px] text-[9px] leading-relaxed text-white/60">{meta.description}</div>
           </div>
 
           <div className="min-h-[420px] p-2 pt-[92px] sm:p-3 sm:pt-[88px]">
@@ -204,33 +204,33 @@ export default function CardiacInteractiveSurface() {
               <div className="space-y-4 p-2 sm:p-4">
                 {/* Wiggers Live Hemodynamic & Valvular Telemetry Panel */}
                 <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-                  <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3">
+                  <div className="rounded-xl border border-white/10 bg-white/5 p-3">
                     <div className="text-[8px] font-mono uppercase text-neutral-400">Phase</div>
-                    <div className="mt-1 text-xs font-bold text-rose-300">
+                    <div className="mt-1 text-xs font-bold" style={{ color: '#FDA4AF' }}>
                       {wiggersState.phase.replace(/_/g, ' ')}
                     </div>
                     <div className="text-[8px] text-white/35">{(wiggersState.normalizedPhase * 100).toFixed(0)}% of cycle</div>
                   </div>
 
-                  <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3">
+                  <div className="rounded-xl border border-white/10 bg-white/5 p-3">
                     <div className="text-[8px] font-mono uppercase text-neutral-400">LV Pressure</div>
-                    <div className="mt-1 text-base font-bold text-emerald-400">
+                    <div className="mt-1 text-base font-bold" style={{ color: '#34D399' }}>
                       {wiggersState.lvPressureMmhg.toFixed(0)} <span className="text-[9px] text-neutral-400">mmHg</span>
                     </div>
                     <div className="text-[8px] text-white/35">Aortic: {wiggersState.aorticPressureMmhg.toFixed(0)} mmHg</div>
                   </div>
 
-                  <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3">
+                  <div className="rounded-xl border border-white/10 bg-white/5 p-3">
                     <div className="text-[8px] font-mono uppercase text-neutral-400">Aortic Valve</div>
-                    <div className="mt-1 text-xs font-bold text-sky-300">
+                    <div className="mt-1 text-xs font-bold" style={{ color: '#7DD3FC' }}>
                       {wiggersState.aorticValveOpenFraction > 0.05 ? 'OPEN' : 'SEALED'}
                     </div>
                     <div className="text-[8px] text-white/35">Leaflet: {(wiggersState.aorticValveOpenFraction * 100).toFixed(0)}%</div>
                   </div>
 
-                  <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3">
+                  <div className="rounded-xl border border-white/10 bg-white/5 p-3">
                     <div className="text-[8px] font-mono uppercase text-neutral-400">Mitral Valve</div>
-                    <div className="mt-1 text-xs font-bold text-amber-300">
+                    <div className="mt-1 text-xs font-bold" style={{ color: '#FCD34D' }}>
                       {wiggersState.mitralValveOpenFraction > 0.05 ? 'OPEN' : 'SEALED'}
                     </div>
                     <div className="text-[8px] text-white/35">Leaflet: {(wiggersState.mitralValveOpenFraction * 100).toFixed(0)}%</div>
@@ -238,52 +238,52 @@ export default function CardiacInteractiveSurface() {
                 </div>
 
                 {/* Valve Counter-Phase Kinematic Invariant Badge */}
-                <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/[0.05] p-2.5 text-[9px] text-emerald-200">
+                <div className="rounded-xl border border-white/10 p-2.5" style={{ color: '#A7F3D0', backgroundColor: 'rgba(16,185,129,0.1)', fontSize: '9px' }}>
                   <span className="font-bold">● Valvular Counter-Phase Invariant:</span> Mitral and Aortic valves move in strict counter-phase (never simultaneously open), preventing regurgitation during normal conduction.
                 </div>
 
                 {/* Physiological Explanation Breakdown */}
-                <div className="rounded-xl border border-white/10 bg-white/[0.02] p-3.5 text-[10px] leading-relaxed text-white/70">
-                  <div className="font-bold uppercase tracking-wider text-white/40 text-[9px]">Physiological Mechanism</div>
+                <div className="rounded-xl border border-white/10 bg-white/5 p-3.5 leading-relaxed text-white/70" style={{ fontSize: '10px' }}>
+                  <div className="font-bold uppercase tracking-wider text-white/40" style={{ fontSize: '9px' }}>Physiological Mechanism</div>
                   {wiggersState.phase === 'ISOVOLUMETRIC_CONTRACTION' && (
-                    <p className="mt-1 text-rose-200">
+                    <p className="mt-1" style={{ color: '#FECDD3' }}>
                       <strong>Isovolumetric Contraction:</strong> Ventricular depolarisation triggers rapid myocyte cross-bridge cycling. Intraventricular pressure spikes steep above atrial pressure, snapping the mitral valve shut (S1 heart sound). Volume remains constant at End-Diastolic Volume (EDV).
                     </p>
                   )}
                   {wiggersState.phase === 'SYSTOLIC_EJECTION' && (
-                    <p className="mt-1 text-sky-200">
+                    <p className="mt-1" style={{ color: '#BAE6FD' }}>
                       <strong>Systolic Ejection:</strong> LV pressure exceeds aortic diastolic pressure (80 mmHg), forcing the aortic valve cusps open. Blood accelerates rapidly into the aorta, reducing ventricular volume toward End-Systolic Volume (ESV).
                     </p>
                   )}
                   {wiggersState.phase === 'ISOVOLUMETRIC_RELAXATION' && (
-                    <p className="mt-1 text-amber-200">
+                    <p className="mt-1" style={{ color: '#FDE68A' }}>
                       <strong>Isovolumetric Relaxation:</strong> As repolarisation concludes, myocyte tension collapses. Aortic recoil forces the semilunar leaflets shut (S2 heart sound, creating the dicrotic notch / incisura). LV pressure plummets while volume stays frozen at ESV.
                     </p>
                   )}
                   {wiggersState.phase === 'DIASTOLIC_FILLING' && (
-                    <p className="mt-1 text-emerald-200">
+                    <p className="mt-1" style={{ color: '#A7F3D0' }}>
                       <strong>Ventricular Diastolic Filling:</strong> Ventricular pressure drops below left atrial pressure, opening the bicuspid mitral valve. Blood flows down the pressure gradient to replenish the ventricular chamber.
                     </p>
                   )}
                 </div>
 
                 {/* Prometheus Synthetic Clinical Vignette & Assessment */}
-                <div className="rounded-2xl border border-indigo-500/25 bg-indigo-500/[0.04] p-4 text-[10px]">
+                <div className="rounded-2xl border border-white/10 bg-white/5 p-4" style={{ fontSize: '10px' }}>
                   <div className="flex items-center justify-between gap-2">
-                    <span className="font-mono text-[8px] uppercase tracking-widest text-indigo-300">
+                    <span className="font-mono uppercase tracking-widest" style={{ color: '#FECDD3', fontSize: '8px' }}>
                       Prometheus Learning Journey · EDU-4 / EDU-6
                     </span>
-                    <span className="rounded-full bg-indigo-400/10 px-2 py-0.5 text-[8px] text-indigo-300">
+                    <span className="rounded-full bg-white/10 px-2 py-0.5 text-white/60" style={{ fontSize: '8px' }}>
                       Synthetic Case
                     </span>
                   </div>
 
-                  <p className="mt-2 text-white/80 leading-relaxed font-sans">
+                  <p className="mt-2 text-white/80 leading-relaxed">
                     <strong>Vignette:</strong> A 68-year-old patient presents with exertional angina and syncope. Cardiac auscultation reveals a harsh crescendo-decrescendo systolic murmur at the right upper sternal border radiating to the carotids. Peak LV systolic pressure is elevated to 175 mmHg while aortic pressure is 115 mmHg.
                   </p>
 
                   <div className="mt-3 space-y-2">
-                    <div className="text-[9px] font-bold text-neutral-300">Select the underlying valvular pathophysiology:</div>
+                    <div className="font-bold text-neutral-300" style={{ fontSize: '9px' }}>Select the underlying valvular pathophysiology:</div>
                     {CLINICAL_VIGNETTE_OPTIONS.map((opt) => (
                       <button
                         key={opt.id}
@@ -291,16 +291,18 @@ export default function CardiacInteractiveSurface() {
                         onClick={() => setSelectedVignetteOption(opt.id)}
                         className={`w-full text-left rounded-xl border p-2.5 transition ${
                           selectedVignetteOption === opt.id
-                            ? opt.isCorrect
-                              ? 'border-emerald-400/60 bg-emerald-500/15 text-white'
-                              : 'border-rose-400/60 bg-rose-500/15 text-white'
-                            : 'border-white/10 bg-white/[0.02] text-white/60 hover:bg-white/[0.05]'
+                            ? 'text-white'
+                            : 'border-white/10 bg-white/5 text-white/60 hover:bg-white/10'
                         }`}
+                        style={{
+                          borderColor: selectedVignetteOption === opt.id ? (opt.isCorrect ? '#34D399' : '#FB7185') : undefined,
+                          backgroundColor: selectedVignetteOption === opt.id ? (opt.isCorrect ? 'rgba(16,185,129,0.12)' : 'rgba(244,63,94,0.12)') : undefined,
+                        }}
                       >
                         <div className="font-bold text-xs">{opt.label}</div>
-                        <div className="text-[9px] text-white/50 mt-0.5">{opt.description}</div>
+                        <div className="text-white/50 mt-0.5" style={{ fontSize: '9px' }}>{opt.description}</div>
                         {selectedVignetteOption === opt.id && (
-                          <div className={`mt-2 text-[9px] p-2 rounded-lg ${opt.isCorrect ? 'bg-emerald-950/40 text-emerald-200' : 'bg-rose-950/40 text-rose-200'}`}>
+                          <div className="mt-2 p-2 rounded-lg" style={{ fontSize: '9px', backgroundColor: opt.isCorrect ? 'rgba(16,185,129,0.15)' : 'rgba(244,63,94,0.15)', color: opt.isCorrect ? '#A7F3D0' : '#FECDD3' }}>
                             {opt.explanation} (Bayesian Posterior: {(opt.bayesianPosterior * 100).toFixed(0)}%)
                           </div>
                         )}
@@ -313,7 +315,8 @@ export default function CardiacInteractiveSurface() {
                     <button
                       type="button"
                       onClick={handleSaveProgress}
-                      className="min-h-9 rounded-full bg-indigo-500/20 border border-indigo-400/30 px-3.5 text-[9px] font-black text-indigo-100 hover:bg-indigo-500/30 transition"
+                      className="min-h-9 rounded-full bg-white/10 border border-white/10 px-3.5 font-black text-white hover:bg-white/20 transition"
+                      style={{ fontSize: '9px' }}
                     >
                       {progressSaved ? 'Progress Saved ✓' : 'Save Learning Progress'}
                     </button>
@@ -321,7 +324,8 @@ export default function CardiacInteractiveSurface() {
                     <button
                       type="button"
                       onClick={handleReturnToAnatomy}
-                      className="min-h-9 rounded-full bg-white/10 border border-white/20 px-3.5 text-[9px] font-black text-white hover:bg-white/20 transition"
+                      className="min-h-9 rounded-full bg-white/10 border border-white/10 px-3.5 font-black text-white hover:bg-white/20 transition"
+                      style={{ fontSize: '9px' }}
                     >
                       Return to Anatomical Context →
                     </button>
@@ -398,8 +402,8 @@ export default function CardiacInteractiveSurface() {
           )}
 
           {view === 'wiggers' && (
-            <div className="rounded-2xl border border-rose-300/12 bg-rose-300/[.035] p-3">
-              <div className="text-[8px] font-black uppercase tracking-[.14em] text-rose-100/55">Wiggers Sequence</div>
+            <div className="rounded-2xl border border-white/10 bg-white/5 p-3">
+              <div className="text-[8px] font-black uppercase tracking-[.14em]" style={{ color: '#FDA4AF' }}>Wiggers Sequence</div>
               <ul className="mt-2 space-y-1.5 text-[8px] text-white/60">
                 <li>1. Isovolumetric Contraction (S1)</li>
                 <li>2. Rapid Systolic Ejection</li>

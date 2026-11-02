@@ -201,36 +201,36 @@ export function VolumeDicomBagian() {
         <button
           type="button"
           onClick={() => setPacsOpen((v) => !v)}
-          className="min-h-11 rounded-xl border border-neutral-300 dark:border-white/15 px-4 text-xs font-bold text-neutral-700 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-white/5"
+          className="min-h-11 rounded-xl border border-neutral-300/70 dark:border-white/15 px-4 text-xs font-bold text-neutral-700 dark:text-neutral-200"
         >
           {pacsOpen ? 'Close PACS Query' : 'Query PACS / DICOMweb'}
         </button>
       </div>
 
       {pacsOpen && (
-        <div className="mt-3 rounded-xl border border-neutral-200 dark:border-white/10 bg-neutral-50 dark:bg-white/[0.02] p-3 text-[11px] space-y-2.5">
-          <div className="font-bold uppercase tracking-wider text-[9px] text-neutral-500">DICOMweb QIDO-RS Study Retrieval</div>
+        <div className="mt-3 rounded-xl border border-neutral-200/70 dark:border-white/10 bg-white/5 p-3 text-[11px] space-y-2.5">
+          <div className="font-bold uppercase tracking-wider text-neutral-500" style={{ fontSize: '9px' }}>DICOMweb QIDO-RS Study Retrieval</div>
           <div className="grid gap-2 sm:grid-cols-2">
             <div>
-              <label htmlFor="pacs-endpoint-input" className="block text-[10px] text-neutral-600 dark:text-neutral-400">PACS Endpoint URL (HTTPS or local dev)</label>
+              <label htmlFor="pacs-endpoint-input" className="block text-neutral-500" style={{ fontSize: '10px' }}>PACS Endpoint URL (HTTPS or local dev)</label>
               <input
                 id="pacs-endpoint-input"
                 type="text"
                 placeholder="https://pacs.hospital.org/dicom-web"
                 value={pacsUrl}
                 onChange={(e) => setPacsUrl(e.target.value)}
-                className="mt-1 w-full rounded-lg border border-neutral-300 dark:border-white/15 bg-white dark:bg-black/40 px-2.5 py-1.5 font-mono text-[11px]"
+                className="mt-1 w-full rounded-lg border border-neutral-300/70 dark:border-white/15 bg-transparent px-2.5 py-1.5 font-mono text-[11px]"
               />
             </div>
             <div>
-              <label htmlFor="pacs-studyuid-input" className="block text-[10px] text-neutral-600 dark:text-neutral-400">Study Instance UID (PS3.5 standard)</label>
+              <label htmlFor="pacs-studyuid-input" className="block text-neutral-500" style={{ fontSize: '10px' }}>Study Instance UID (PS3.5 standard)</label>
               <input
                 id="pacs-studyuid-input"
                 type="text"
                 placeholder="1.2.840.113619.2.55.3.60468842"
                 value={studyUid}
                 onChange={(e) => setStudyUid(e.target.value)}
-                className="mt-1 w-full rounded-lg border border-neutral-300 dark:border-white/15 bg-white dark:bg-black/40 px-2.5 py-1.5 font-mono text-[11px]"
+                className="mt-1 w-full rounded-lg border border-neutral-300/70 dark:border-white/15 bg-transparent px-2.5 py-1.5 font-mono text-[11px]"
               />
             </div>
           </div>
@@ -239,14 +239,15 @@ export function VolumeDicomBagian() {
               type="button"
               disabled={pacsLoading}
               onClick={() => void handlePacsQuery()}
-              className="min-h-8 rounded-lg bg-emerald-600 px-3 text-[10px] font-bold text-white disabled:opacity-50"
+              className="min-h-9 rounded-lg bg-brand px-3 font-bold text-white disabled:opacity-50"
+              style={{ fontSize: '10px' }}
             >
               {pacsLoading ? 'Querying…' : 'Execute DICOMweb Query'}
             </button>
-            <span className="text-[10px] text-neutral-500">Protected by cross-patient boundary isolation & SSRF defense</span>
+            <span className="text-neutral-500" style={{ fontSize: '10px' }}>Protected by cross-patient boundary isolation & SSRF defense</span>
           </div>
           {pacsStatus && (
-            <div className="rounded-lg bg-neutral-200/50 dark:bg-white/5 p-2 font-mono text-[10px] text-neutral-800 dark:text-neutral-200">
+            <div className="rounded-lg bg-white/5 p-2 font-mono text-neutral-700 dark:text-neutral-200" style={{ fontSize: '10px' }}>
               {pacsStatus}
             </div>
           )}
