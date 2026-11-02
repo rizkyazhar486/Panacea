@@ -13,3 +13,11 @@ export { parseServingField, sanitizeServings, estimateRecordedFood, MAX_SERVINGS
 export { parseJetLagHours, validDepartureDate, sanitizeJetLagPlan } from './engine/jetLagInputs.ts'
 
 export { rankedWorkoutsFromStored } from './adapters/rankedWorkoutEvidence.ts'
+
+export * from './engine/lifeAscentProtocolEngine.ts'
+export * from './engine/workoutAndEndocrineMasteryEngine.ts'
+export * from './engine/seasonalClimbAndProofEngine.ts'
+export * from './engine/onboardingAndMiniToolsEngine.ts'
+export * from './engine/gpsPaceCalorieAndFoodAiEngine.ts'
+export * from './engine/neuroChronoMetabolicResonanceEngine.ts'
+export * from './ui/PanaceaLifeAscentDashboard.tsx'
