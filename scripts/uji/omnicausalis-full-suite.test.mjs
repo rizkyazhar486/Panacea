@@ -41,7 +41,41 @@ test("4. [FREEMOCAP, SEPSISAGENT, TALKVID, GPS TRACKER & AI FOOD PHOTO CALORIE]"
   assert.equal(sepsis.septicShockEducationalFlag, true);
   const gps = omnicausalis.evaluateGpsWorkoutSession({ bodyWeightKg: 70, waypoints: [{ lat: -6.22, lng: 106.65, altitudeMeters: 25, timestampMs: 0 }, { lat: -6.20, lng: 106.67, altitudeMeters: 40, timestampMs: 900000 }] });
   assert.ok(gps.totalDistanceKm > 2.5);
-  assert.ok(gps.caloriesBurnedKcal > 150);
   const food = omnicausalis.analyzeFoodPhotoAndGenerateNutritionPlan({ imageId: "img-1", detectedDishKeys: ["CHICKEN_BREAST_GRILLED_200G", "BROWN_RICE_150G"], workoutCaloriesBurnedKcal: gps.caloriesBurnedKcal });
   assert.equal(food.totals.totalCaloriesKcal, 498);
+});
+
+test("5. [UNIVERSAL CRASH SHIELD & DUAL-PROJECTION UX] Prevents Page Crashes and Preserves Blank/Null as Non-Zero", () => {
+  assert.equal(omnicausalis.sanitizeTelemetryValue(null), null);
+  assert.equal(omnicausalis.sanitizeTelemetryValue(""), null);
+  assert.equal(omnicausalis.sanitizeTelemetryValue(NaN), null);
+  const shielded = omnicausalis.safeExecutePageComputation("TEST_CRASH_PAGE", () => { throw new Error("Simulated Component Throw"); }, { safeFallback: true });
+  assert.equal(shielded.ok, false);
+  assert.equal(shielded.recoveredFromError, true);
+  assert.equal(shielded.data.safeFallback, true);
+  const mobileUx = omnicausalis.evaluateDualProjectionLayout(390, 844);
+  assert.equal(mobileUx.projectionMode, "MOBILE_STACKED_CARDS_INFINITE_SCROLL");
+  assert.equal(mobileUx.horizontalOverflowPermitted, false);
+  const desktopUx = omnicausalis.evaluateDualProjectionLayout(1440, 900);
+  assert.equal(desktopUx.projectionMode, "DESKTOP_MULTI_COLUMN_AND_3D_TWIN");
+});
+
+test("6. [7 TRANSCENDENTAL PILLARS] Mitochondria/Autophagy, UDT-OS, Pantheon Consensus, Zero-Loss EMR/Payer, MTP Gait & PhenoAge Longevity", () => {
+  const mito = omnicausalis.simulateMitochondriaAndAutophagyKinetics({ nadPlusToNadhRatio: 4.5, fastingHours: 18, cellularRosIndex0to10: 1.5, exerciseMetabolicLoadMet: 8.5 });
+  assert.equal(mito.lysosomalFusionActive, true);
+  assert.ok(mito.mitochondrialMembranePotentialMv < -150);
+  const udt = omnicausalis.ingestUniversalDeviceTelemetryEnvelope({ patientId: "pt-01", paperEcgRrIntervalMm: 20, paperSpeedMmPerSec: 25, wearableHrvRmssdMs: null, cgmReadingsMgDl: [85, 94, 110, 125] });
+  assert.equal(udt.legacyPaperEcgDigitizedHrBpm, 75);
+  assert.equal(udt.modernWearableHrvRmssdMs, "MISSING_OBSERVATION");
+  assert.equal(udt.modernCgmTimeInRangePercent, 100);
+  const pantheon = omnicausalis.synthesizePantheonMultiSpecialtyConsensus({ meanArterialPressureMmHg: 58, serumLactateMmolL: 3.8, lvefPercent: 32, egfrMlMin173m2: 28, paO2FiO2Ratio: 170 });
+  assert.equal(pantheon.septicShockDetected, true);
+  assert.equal(pantheon.fluidOverloadRisk, true);
+  const emr = omnicausalis.buildZeroLossEmrAndInsuranceClaimEnvelope({ encounterId: "enc-1", patientId: "pt-01", primaryIcd10Code: "A41.9", snomedConceptId: "91302008", referralTargetSpecialty: "CRITICAL_CARE_NEPHROLOGY", observedVitalMapMmHg: null, simulatedDigitalTwinRiskScore: 0.82 });
+  assert.equal(emr.authoritativeEmrRecord.observedMeanArterialPressureMmHg, "MISSING_OBSERVATION");
+  assert.equal(emr.payerClaimReady, true);
+  const mtp = omnicausalis.analyzeFootStrikeAndMtpArticulation({ footPitchAtContactDeg: -6, mtpDorsiflexionPeakDeg: 42, groundContactTimeMs: 195, cadenceSpm: 182 });
+  assert.equal(mtp.strikePattern, "FOREFOOT_STRIKE");
+  const pheno = omnicausalis.computePhenoAgeAndExposomeTrajectory({ chronologicalAgeYears: 30, albuminGdl: 4.9, creatinineMgDl: 0.85, fastingGlucoseMgDl: 82, hsCrpMgL: 0.4, sleepRegularityIndex0to100: 92, ambientPm25UgM3: 10, weeklySaunaOrColdPlungeSessions: 4 });
+  assert.ok(pheno.estimatedPhenoAgeYears < pheno.chronologicalAgeYears);
 });

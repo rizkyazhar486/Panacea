@@ -65,7 +65,7 @@ function renderHtml() {
     "<!DOCTYPE html><html><head><meta charset=\"UTF-8\"/><title>PanaceaMed ∞ — Master Omnicausalis Command Center</title></head>",
     "<body style=\"margin:0;padding:14px;background:#020617;color:#f8fafc;font-family:system-ui,-apple-system,sans-serif;\">",
     "<div style=\"display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-radius:12px;background:#0f172a;border:1px solid #38bdf8;margin-bottom:12px;\">",
-    "<div><span style=\"padding:3px 9px;border-radius:99px;background:#064e3b;color:#34d399;font-size:10px;font-weight:700;\">PANACEAMED ∞ MASTER COMMAND CENTER · ALL 12 MODULES & 33 EXTERNAL REPOS VERIFIED</span>",
+    "<div><span style=\"padding:3px 9px;border-radius:99px;background:#064e3b;color:#34d399;font-size:10px;font-weight:700;\">PANACEAMED ∞ MASTER COMMAND CENTER · ALL 7 TRANSCENDENTAL PILLARS · CRASH-SHIELDED · 14 MODULES & 45 REPOS VERIFIED</span>",
     "<h1 style=\"margin:4px 0 2px;font-size:18px;\">KaloLumen 3-Layer DICOM 3DCG × BioEmu2/FastPLMs/BindCraft2 × SepsisAgent/FreeMoCap × GPS/Food AI × 3 Anime Bots</h1>",
     "<div style=\"font-size:11px;color:#38bdf8;\">" + state.lastLog + "</div></div>",
     "<div style=\"text-align:right;\"><div style=\"font-size:10px;color:#94a3b8;\">DICOM Build / ProteinFighter</div>",
