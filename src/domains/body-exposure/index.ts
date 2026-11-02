@@ -230,3 +230,16 @@ export {
   type VqMismatchSuccess,
   type VqPhysiologicalRegime,
 } from './engine/vqMismatchEngine'
+export {
+  FETAL_GROWTH_DISCLAIMER,
+  FETAL_GROWTH_SOURCE,
+  evaluateHadlockFetalGrowth,
+  evaluateSerialFetalGrowthVelocity,
+  type FetalGrowthFailure,
+  type FetalGrowthFailureReason,
+  type FetalGrowthPointSuccess,
+  type FetalGrowthResult,
+  type FetalGrowthVelocityResult,
+  type FetalGrowthVelocitySuccess,
+  type HadlockBiometryInput,
+} from './engine/fetalGrowthEngine'
