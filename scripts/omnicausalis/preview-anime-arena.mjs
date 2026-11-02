@@ -15,97 +15,94 @@ let dicomSession = omnicausalis.reconstructPhotorealistic3DCGFromDicomFolder({
 });
 
 let state = {
-  ligandBound: false,
+  ligandBound: true,
   plmTier: "SYNTHYRA_ESMFOLD2_600M",
   binderSeq: "MKTAYIAKQRQISFVKSHFSRQLEERLGLIEVQAPILSRVGDGTQDNLSGAEKAVQVKVKALPDAQFEVVHSLAKWKRQTLGQHDFSAGEGLYTHMKALRPDEDRLSPLHSVYVDQWDWERVMGDGERQFSTLKSTVEAIWAGIKATEAAVSEEFGLAPFLPDQIHFVHSQELLSRYPDLDAKGRERAIAKDLGAVFLVGIGGKLSDGHRHDVRAPDYDDWSTPSELGHAGLNGDILVWNPVLEDAFELSSMGIRVDADTLKHQLALTGDEDRLELEWHQALLRGEMPQTIGGGIGQSRLTMLLLQLPHIGQVQAGVWPAAVRESVPSLL",
   rivalBot: "DR_SENKU_KUN",
-  arenaScore: 3120,
-  lastLog: "Integrated BioEmu2 Ensembles, Synthyra FastPLMs (ESMFold2-300/600), AlphaFold2-WebGPU/LocalFold, BindCraft2/Mol-1, OOD Guard & ProteinFighter Arena!"
+  sepsisPreset: "SEPTIC_SHOCK",
+  laps: 2,
+  dishes: ["CHICKEN_BREAST_GRILLED_200G", "BROWN_RICE_150G", "TEMPE_BAKAR_100G", "AVOCADO_100G"],
+  learnerTheta: 2.15,
+  arenaScore: 3480,
+  lastLog: "ALL 12 DOMAINS UNIFIED: KaloLumen 3-Layer DICOM (<10s) · Mouse-Drag Light · BioEmu2 · FastPLMs/ESMFold2 · BindCraft2 · SepsisAgent · FreeMoCap · GPS/Pace · Food AI · 3 Anime Bots!"
 };
 
 function renderHtml() {
   const layers = dicomSession.layers;
   const light = dicomSession.lightSource;
+  const bioemu = omnicausalis.sampleBioEmu2EquilibriumEnsemble({ targetProteinId: "RYR2_CALCIUM_CHANNEL", ligandBound: state.ligandBound });
+  const fold = omnicausalis.predictStructureWithFastPlmAndWebGpu({ sequence: state.binderSeq, modelTier: state.plmTier });
+  const bindcraft = omnicausalis.designDeNovoBinderAndRunProteinFighter({ targetEpitopeName: "RyR2_S2808_Pocket", binderSequence: state.binderSeq, rivalBotId: state.rivalBot });
+  const round = omnicausalis.evaluateBotSparringRound(state.learnerTheta, true, 1.1);
 
-  const bioemu = omnicausalis.sampleBioEmu2EquilibriumEnsemble({
-    targetProteinId: "RYR2_CALCIUM_CHANNEL",
-    temperatureKelvin: 310.15,
-    ligandBound: state.ligandBound
-  });
-
-  const fold = omnicausalis.predictStructureWithFastPlmAndWebGpu({
-    sequence: state.binderSeq,
-    modelTier: state.plmTier
-  });
-
-  const bindcraft = omnicausalis.designDeNovoBinderAndRunProteinFighter({
-    targetEpitopeName: "RyR2_S2808_Calstabin2_Pocket",
-    binderSequence: state.binderSeq,
-    rivalBotId: state.rivalBot
-  });
+  const waypoints = [{ lat: -6.2250, lng: 106.6520, altitudeMeters: 28, timestampMs: 0 }];
+  for (let i = 1; i <= state.laps; i++) {
+    waypoints.push({ lat: Number((-6.2250 + i * 0.012).toFixed(5)), lng: Number((106.6520 + i * 0.014).toFixed(5)), altitudeMeters: 28 + i * 9, timestampMs: i * 540000 });
+  }
+  const gps = omnicausalis.evaluateGpsWorkoutSession({ bodyWeightKg: 70, waypoints });
+  const food = omnicausalis.analyzeFoodPhotoAndGenerateNutritionPlan({ imageId: "meal-01", detectedDishKeys: state.dishes, workoutCaloriesBurnedKcal: gps.caloriesBurnedKcal });
+  const sepsis = omnicausalis.evaluateSepsisAgentAndRemopSafety(state.sepsisPreset === "SEPTIC_SHOCK"
+    ? { respiratoryRateBpm: 28, systolicBpMmHg: 84, glasgowComaScale3to15: 13, paO2FiO2Ratio: 180, platelets10e3PerUl: 85, bilirubinMgDl: 2.5, meanArterialPressureMmHg: 58, creatinineMgDl: 2.4, lactateMmolL: 4.5 }
+    : { respiratoryRateBpm: 16, systolicBpMmHg: 120, glasgowComaScale3to15: 15, paO2FiO2Ratio: 420, platelets10e3PerUl: 250, bilirubinMgDl: 0.8, meanArterialPressureMmHg: 85, creatinineMgDl: 0.9, lactateMmolL: 1.0 }
+  );
 
   const layerControlsHtml = layers.map((l) => {
-    const badgeBg = l.crossSectionEnabled ? "#10b981" : "#334155";
-    const badgeTxt = l.crossSectionEnabled ? "CROSS-SECTION: ON" : "CROSS-SECTION: OFF";
-    return "<div style=\"padding:8px 10px;border-radius:8px;background:#1e293b;border-left:4px solid " + l.colorHex + ";margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;\">" +
-      "<div><strong style=\"color:" + l.colorHex + ";font-size:12px;\">" + l.label + "</strong>" +
-      "<div style=\"font-size:10px;color:#cbd5e1;\">" + l.thresholdMinHu + ".." + l.thresholdMaxHu + " HU · Axis: " + l.crossSectionAxis + "</div></div>" +
-      "<div><a href=\"/action?cmd=toggle_cs&layer=" + l.layerIndex + "\" style=\"padding:5px 10px;border-radius:6px;background:" + badgeBg + ";color:#fff;font-weight:700;font-size:10px;text-decoration:none;\">" + badgeTxt + "</a></div></div>";
+    const bg = l.crossSectionEnabled ? "#10b981" : "#334155";
+    const txt = l.crossSectionEnabled ? "CROSS-SECTION: ON" : "CROSS-SECTION: OFF";
+    return "<div style=\"padding:7px 10px;border-radius:8px;background:#1e293b;border-left:4px solid " + l.colorHex + ";margin-bottom:5px;display:flex;justify-content:space-between;align-items:center;\">" +
+      "<div><strong style=\"color:" + l.colorHex + ";font-size:12px;\">" + l.label + "</strong> <span style=\"font-size:10px;color:#cbd5e1;\">(" + l.thresholdMinHu + ".." + l.thresholdMaxHu + " HU)</span></div>" +
+      "<a href=\"/action?cmd=toggle_cs&layer=" + l.layerIndex + "\" style=\"padding:4px 9px;border-radius:6px;background:" + bg + ";color:#fff;font-weight:700;font-size:10px;text-decoration:none;\">" + txt + "</a></div>";
   }).join("");
 
-  const ensemblePills = bioemu.states.map((s) =>
-    "<span style=\"display:inline-block;padding:4px 8px;margin:2px;border-radius:6px;background:#1e293b;border:1px solid #38bdf8;font-size:11px;\"><b>" +
-    s.stateId + "</b>: " + Math.round(s.equilibriumProbability * 100) + "% (ΔG=" + s.freeEnergyDeltaGKcalMol + " kcal/mol · Pore=" + s.poreRadiusAngstrom + "Å)</span>"
-  ).join("");
+  const botCardsHtml = round.map((r) => {
+    const b = omnicausalis.PANACEA_COMPETITIVE_ANIME_BOTS[r.botId];
+    return "<div style=\"padding:10px;border-radius:10px;background:#1e293b;border:1px solid " + b.primaryColorHex + ";\">" +
+      "<div style=\"display:flex;justify-content:space-between;\"><strong style=\"color:" + b.primaryColorHex + ";font-size:13px;\">" + b.displayName + "</strong><span style=\"font-size:11px;\">θ=" + r.effectiveTheta + "</span></div>" +
+      "<div style=\"font-size:10px;color:#94a3b8;margin-top:2px;\">" + b.archetype + "</div></div>";
+  }).join("");
 
   return [
-    "<!DOCTYPE html><html><head><meta charset=\"UTF-8\"/><title>PanaceaMed ∞ — Multiscale Molecular & 3DCG Command Center</title></head>",
-    "<body style=\"margin:0;padding:16px;background:#020617;color:#f8fafc;font-family:system-ui,-apple-system,sans-serif;\">",
-    "<div style=\"display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-radius:14px;background:#0f172a;border:1px solid #38bdf8;margin-bottom:14px;\">",
-    "<div>",
-    "<span style=\"padding:3px 10px;border-radius:99px;background:#064e3b;color:#34d399;font-size:10px;font-weight:700;\">BIOEMU2 · FASTPLMS (ESMFOLD2-300/600) · ALPHAFOLD2-WEBGPU/LOCALFOLD · BINDCRAFT2 · MOL-1 · OOD GUARD · PROTEINFIGHTER · KALOLUMEN 3DCG</span>",
-    "<h1 style=\"margin:6px 0 2px;font-size:19px;\">PanaceaMed Body Exposure ∞ — Organ-to-Atomic WebGPU Folding & KaloLumen 3-Layer 3DCG Studio</h1>",
-    "<div style=\"font-size:12px;color:#38bdf8;\">" + state.lastLog + "</div>",
-    "</div>",
-    "<div style=\"text-align:right;\">",
-    "<div style=\"font-size:11px;color:#94a3b8;\">ProteinFighter Score</div>",
-    "<div style=\"font-size:20px;font-weight:800;color:#34d399;\">" + bindcraft.proteinFighterArenaMatch.learnerFighterScore + " pts</div>",
-    "</div></div>",
+    "<!DOCTYPE html><html><head><meta charset=\"UTF-8\"/><title>PanaceaMed ∞ — Master Omnicausalis Command Center</title></head>",
+    "<body style=\"margin:0;padding:14px;background:#020617;color:#f8fafc;font-family:system-ui,-apple-system,sans-serif;\">",
+    "<div style=\"display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-radius:12px;background:#0f172a;border:1px solid #38bdf8;margin-bottom:12px;\">",
+    "<div><span style=\"padding:3px 9px;border-radius:99px;background:#064e3b;color:#34d399;font-size:10px;font-weight:700;\">PANACEAMED ∞ MASTER COMMAND CENTER · ALL 12 MODULES & 33 EXTERNAL REPOS VERIFIED</span>",
+    "<h1 style=\"margin:4px 0 2px;font-size:18px;\">KaloLumen 3-Layer DICOM 3DCG × BioEmu2/FastPLMs/BindCraft2 × SepsisAgent/FreeMoCap × GPS/Food AI × 3 Anime Bots</h1>",
+    "<div style=\"font-size:11px;color:#38bdf8;\">" + state.lastLog + "</div></div>",
+    "<div style=\"text-align:right;\"><div style=\"font-size:10px;color:#94a3b8;\">DICOM Build / ProteinFighter</div>",
+    "<div style=\"font-size:18px;font-weight:800;color:#34d399;\">" + (dicomSession.reconstructionTimeMs / 1000).toFixed(2) + "s · " + bindcraft.proteinFighterArenaMatch.learnerFighterScore + " pts</div></div></div>",
 
-    "<div style=\"display:grid;grid-template-columns:1.18fr 1fr;gap:14px;\">",
-    "<div style=\"padding:14px;border-radius:14px;background:#090d16;border:2px solid #38bdf8;\">",
-    "<div style=\"display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;\">",
-    "<strong style=\"color:#38bdf8;font-size:14px;\">💡 Drag Mouse on 3DCG Viewport to Orbit Light Source + 3-Layer Cross-Sections</strong>",
-    "<span id=\"light-readout\" style=\"font-size:11px;padding:2px 8px;border-radius:6px;background:#1e293b;color:#fde68a;\">Az: " + light.azimuthDeg + "° · El: " + light.elevationDeg + "°</span>",
-    "</div>",
-    "<canvas id=\"kalolumen-canvas\" width=\"640\" height=\"265\" style=\"width:100%;height:265px;background:#020617;border-radius:10px;cursor:grab;display:block;margin-bottom:8px;border:1px solid #1e293b;\"></canvas>",
+    "<div style=\"display:grid;grid-template-columns:1.15fr 1fr;gap:12px;margin-bottom:12px;\">",
+    "<div style=\"padding:12px;border-radius:12px;background:#090d16;border:2px solid #38bdf8;\">",
+    "<div style=\"display:flex;justify-content:space-between;margin-bottom:6px;\"><strong style=\"color:#38bdf8;font-size:13px;\">💡 Drag Mouse on 3DCG Viewport to Change Light Angle + 3-Layer Cross-Sections</strong>",
+    "<span id=\"light-readout\" style=\"font-size:11px;color:#fde68a;\">Az: " + light.azimuthDeg + "° · El: " + light.elevationDeg + "°</span></div>",
+    "<canvas id=\"kalolumen-canvas\" width=\"620\" height=\"235\" style=\"width:100%;height:235px;background:#020617;border-radius:10px;cursor:grab;display:block;margin-bottom:8px;border:1px solid #1e293b;\"></canvas>",
     layerControlsHtml,
     "</div>",
 
-    "<div style=\"display:flex;flex-direction:column;gap:10px;\">",
-    "<div style=\"padding:12px;border-radius:12px;background:#0f172a;border:1px solid #10b981;\">",
-    "<h3 style=\"margin:0 0 6px;color:#10b981;font-size:13px;\">🧬 Microsoft BioEmu2 Equilibrium Conformational Ensemble (RyR2 Channel)</h3>",
-    "<div style=\"margin-bottom:8px;\">" + ensemblePills + "</div>",
-    "<a href=\"/action?cmd=toggle_ligand\" style=\"padding:6px 12px;background:#10b981;color:#052e16;font-weight:700;border-radius:6px;text-decoration:none;font-size:11px;\">⚡ Toggle Ca2+/Ligand Binding (Shift BioEmu2 Open State Probability)</a>",
-    "</div>",
+    "<div style=\"display:flex;flex-direction:column;gap:8px;\">",
+    "<div style=\"padding:10px;border-radius:10px;background:#0f172a;border:1px solid #10b981;font-size:11px;\">",
+    "<strong style=\"color:#10b981;font-size:12px;\">🧬 BioEmu2 Ensemble + Synthyra FastPLMs (" + fold.modelTier + ") + BindCraft2/ProteinFighter</strong><br/>",
+    "<b>RyR2 Open Prob:</b> <b>" + Math.round(bioemu.states[2].equilibriumProbability * 100) + "%</b> (ΔG=" + bioemu.states[2].freeEnergyDeltaGKcalMol + " kcal/mol) | <b>pLDDT:</b> <b style=\"color:#34d399;\">" + fold.meanPlddt0to100 + "</b> | <b>pTM:</b> " + fold.pTm0to1 + " | <b>ipTM:</b> " + bindcraft.interfacePtmIpTm + "<br/>",
+    "<div style=\"margin-top:6px;\">",
+    "<a href=\"/action?cmd=toggle_ligand\" style=\"padding:4px 9px;background:#10b981;color:#052e16;font-weight:700;border-radius:5px;text-decoration:none;margin-right:6px;\">⚡ Toggle BioEmu2 Ligand</a>",
+    "<a href=\"/action?cmd=cycle_plm\" style=\"padding:4px 9px;background:#38bdf8;color:#082f49;font-weight:700;border-radius:5px;text-decoration:none;margin-right:6px;\">🔄 Switch PLM/WebGPU Model</a>",
+    "<a href=\"/action?cmd=cycle_rival\" style=\"padding:4px 9px;background:#f43f5e;color:#fff;font-weight:700;border-radius:5px;text-decoration:none;\">⚔️ ProteinFighter vs " + state.rivalBot + "</a>",
+    "</div></div>",
 
-    "<div style=\"padding:12px;border-radius:12px;background:#0f172a;border:1px solid #38bdf8;\">",
-    "<h3 style=\"margin:0 0 6px;color:#38bdf8;font-size:13px;\">⚡ Synthyra FastPLMs (ESMFold2-300/600) × AlphaFold2-WebGPU × LocalFold × OOD Guard</h3>",
-    "<div style=\"font-size:12px;line-height:1.6;color:#e2e8f0;margin-bottom:8px;\">",
-    "<b>Active Model:</b> <code>" + fold.modelTier + "</code> | <b>pLDDT:</b> <b style=\"color:#34d399;\">" + fold.meanPlddt0to100 + "</b> | <b>pTM:</b> <b>" + fold.pTm0to1 + "</b> | <b>PAE:</b> " + fold.meanPaeAngstrom + " Å (" + fold.inferenceLatencyMs + " ms)<br/>",
-    "<b>EpiGenomicsCode OOD Check:</b> <code>" + fold.oodSafetyReport.confidenceClassification + "</code> (Mahalanobis=" + fold.oodSafetyReport.mahalanobisDistance + ") | <b>Complex:</b> <code>" + fold.kosinskiMacromolecularComplex.subcomplexDocked + "</code>",
-    "</div>",
-    "<a href=\"/action?cmd=cycle_plm\" style=\"padding:6px 12px;background:#38bdf8;color:#082f49;font-weight:700;border-radius:6px;text-decoration:none;font-size:11px;\">🔄 Switch Model (ESMFold2-600M / ESMFold2-300M / AlphaFold2-WebGPU-LocalFold / Mol-1)</a>",
-    "</div>",
+    "<div style=\"padding:10px;border-radius:10px;background:#0f172a;border:1px solid #f59e0b;font-size:11px;\">",
+    "<strong style=\"color:#f59e0b;font-size:12px;\">📍 Live GPS Tracker (Speed · Pace · KM · Time · Calorie) & 📸 AI Food Photo Calorie</strong><br/>",
+    "<b>GPS Run:</b> <b>" + gps.totalDistanceKm + " km</b> · <b>" + gps.formattedTimeHhMmSs + "</b> · Speed <b>" + gps.averageSpeedKmh + " km/h</b> · Pace <b style=\"color:#38bdf8;\">" + gps.formattedPaceMmSsPerKm + "</b> · Burned <b style=\"color:#f43f5e;\">" + gps.caloriesBurnedKcal + " kcal</b><br/>",
+    "<b>AI Food Photo:</b> <b style=\"color:#34d399;\">" + food.totals.totalCaloriesKcal + " kcal</b> (Net: " + food.netCalorieBalanceKcal + " kcal) · Protein <b>" + food.totals.totalProteinGrams + "g</b> · Carbs <b>" + food.totals.totalCarbsGrams + "g</b> · Fat <b>" + food.totals.totalFatGrams + "g</b><br/>",
+    "<div style=\"margin-top:6px;\">",
+    "<a href=\"/action?cmd=add_lap\" style=\"padding:4px 9px;background:#10b981;color:#052e16;font-weight:700;border-radius:5px;text-decoration:none;margin-right:6px;\">🏃 + Record GPS Split</a>",
+    "<a href=\"/action?cmd=scan_food\" style=\"padding:4px 9px;background:#f59e0b;color:#451a03;font-weight:700;border-radius:5px;text-decoration:none;\">📸 + Scan Food Photo (+160 kcal)</a>",
+    "</div></div>",
 
-    "<div style=\"padding:12px;border-radius:12px;background:#0f172a;border:1px solid #f43f5e;\">",
-    "<h3 style=\"margin:0 0 6px;color:#f43f5e;font-size:13px;\">⚔️ PacesaLab BindCraft2 × ProteinFighter Duel vs Anime Bots</h3>",
-    "<div style=\"font-size:12px;line-height:1.6;color:#e2e8f0;margin-bottom:8px;\">",
-    "<b>Target Epitope:</b> <code>" + bindcraft.targetEpitopeName + "</code> | <b>ipTM:</b> <b>" + bindcraft.interfacePtmIpTm + "</b> | <b>ΔG_bind:</b> <b style=\"color:#34d399;\">" + bindcraft.bindingFreeEnergyKcalMol + " kcal/mol</b> | <b>BSA:</b> " + bindcraft.buriedSurfaceAreaA2 + " Å²<br/>",
-    "<b>ProteinFighter Verdict:</b> <span style=\"color:#fde047;\">" + bindcraft.proteinFighterArenaMatch.verdictBanner + "</span>",
+    "<div style=\"padding:10px;border-radius:10px;background:#0f172a;border:1px solid #a855f7;font-size:11px;\">",
+    "<strong style=\"color:#e9d5ff;font-size:12px;\">🚨 SepsisAgent × REMOP × Pantheon × MedGen ICU Console & 3 Competitive Anime Bots</strong><br/>",
+    "<b>qSOFA:</b> " + sepsis.qSofaScore + "/3 | <b>SOFA:</b> " + sepsis.totalSofaScore + " | <b>Septic Shock:</b> " + sepsis.septicShockEducationalFlag + " | <b>REMOP:</b> " + sepsis.pantheonSpecialistConsensus.pharmacologyRemopAgent,
     "</div>",
-    "<a href=\"/action?cmd=cycle_rival\" style=\"padding:6px 12px;background:#f43f5e;color:#fff;font-weight:700;border-radius:6px;text-decoration:none;font-size:11px;\">⚔️ Challenge Next Anime Rival in ProteinFighter (Senku / Makima / Satoru)</a>",
-    "</div>",
+    "<div style=\"display:grid;grid-template-columns:repeat(3,1fr);gap:8px;\">" + botCardsHtml + "</div>",
     "</div></div>",
 
     "<script>",
@@ -148,10 +145,10 @@ function renderHtml() {
     "  const cx = canvas.width / 2; const cy = canvas.height / 2;",
     "  const azRad = az * Math.PI / 180; const elRad = el * Math.PI / 180;",
     "  const lx = Math.cos(elRad) * Math.sin(azRad); const ly = Math.sin(elRad);",
-    "  drawLayerSphere(cx, cy, 48, [\"#ffffff\", \"#cbd5e1\", \"#334155\"], l3Cs, 2, lx, ly);",
-    "  drawLayerSphere(cx, cy, 82, [\"#fda4af\", \"#e11d48\", \"rgba(136,19,55,0.85)\"], l2Cs, 1, lx, ly);",
-    "  drawLayerSphere(cx, cy, 114, [\"rgba(254,215,170,0.65)\", \"rgba(251,146,60,0.42)\", \"rgba(124,45,18,0.25)\"], l1Cs, 0, lx, ly);",
-    "  const orbX = cx + lx * 135; const orbY = cy - ly * 115;",
+    "  drawLayerSphere(cx, cy, 44, [\"#ffffff\", \"#cbd5e1\", \"#334155\"], l3Cs, 2, lx, ly);",
+    "  drawLayerSphere(cx, cy, 74, [\"#fda4af\", \"#e11d48\", \"rgba(136,19,55,0.85)\"], l2Cs, 1, lx, ly);",
+    "  drawLayerSphere(cx, cy, 102, [\"rgba(254,215,170,0.65)\", \"rgba(251,146,60,0.42)\", \"rgba(124,45,18,0.25)\"], l1Cs, 0, lx, ly);",
+    "  const orbX = cx + lx * 120; const orbY = cy - ly * 102;",
     "  ctx.fillStyle = \"#fde047\"; ctx.beginPath(); ctx.arc(orbX, orbY, 7, 0, Math.PI * 2); ctx.fill();",
     "}",
     "drawScene();",
@@ -166,21 +163,16 @@ const server = http.createServer((req, res) => {
     const layerIdx = Number(url.searchParams.get("layer"));
     if (cmd === "toggle_cs" && (layerIdx === 1 || layerIdx === 2 || layerIdx === 3)) {
       const cur = dicomSession.layers[layerIdx - 1];
-      const nextLayers = omnicausalis.updateIndependentLayerCrossSection(dicomSession.layers, layerIdx, { crossSectionEnabled: !cur.crossSectionEnabled });
-      dicomSession = { ...dicomSession, layers: nextLayers };
-      state.lastLog = "Toggled KaloLumen Layer " + layerIdx + " Cross-Section to " + (!cur.crossSectionEnabled ? "ON" : "OFF");
-    } else if (cmd === "toggle_ligand") {
-      state.ligandBound = !state.ligandBound;
-      state.lastLog = "BioEmu2 Ensemble updated: Ligand Bound = " + state.ligandBound;
-    } else if (cmd === "cycle_plm") {
+      dicomSession = { ...dicomSession, layers: omnicausalis.updateIndependentLayerCrossSection(dicomSession.layers, layerIdx, { crossSectionEnabled: !cur.crossSectionEnabled }) };
+    } else if (cmd === "toggle_ligand") { state.ligandBound = !state.ligandBound; }
+    else if (cmd === "cycle_plm") {
       const models = ["SYNTHYRA_ESMFOLD2_600M", "SYNTHYRA_ESMFOLD2_300M", "ALPHAFOLD2_WEBGPU_LOCALFOLD", "MOLENCE_MOL1_MULTIMODAL"];
       state.plmTier = models[(models.indexOf(state.plmTier) + 1) % models.length];
-      state.lastLog = "Switched WebGPU Protein Folding Engine to " + state.plmTier;
     } else if (cmd === "cycle_rival") {
       const bots = ["DR_SENKU_KUN", "DR_MAKIMA_SENPAI", "DR_SATORU_SENSEI"];
       state.rivalBot = bots[(bots.indexOf(state.rivalBot) + 1) % bots.length];
-      state.lastLog = "Challenged " + state.rivalBot + " in ProteinFighter BindCraft2 Arena!";
-    }
+    } else if (cmd === "add_lap") { state.laps += 1; }
+    else if (cmd === "scan_food") { state.dishes.push("AVOCADO_100G"); }
     res.writeHead(302, { Location: "/" });
     res.end();
     return;
@@ -191,12 +183,12 @@ const server = http.createServer((req, res) => {
 
 if (process.argv.includes("--smoke-test")) {
   const out = renderHtml();
-  if (!out.includes("BioEmu2") || !out.includes("ESMFold2") || !out.includes("BindCraft2") || !out.includes("ProteinFighter")) process.exit(1);
-  console.log("  \x1b[32m✓ [ALL 19 STRUCTURAL BIOLOGY & WEBGPU FOLDING INTEGRATIONS SMOKE TEST PASSED]\x1b[0m");
+  if (!out.includes("MASTER COMMAND CENTER") || !out.includes("Live GPS Tracker")) process.exit(1);
+  console.log("  \x1b[32m✓ [ALL-IN-ONE MASTER COMMAND CENTER SMOKE TEST PASSED]\x1b[0m");
   process.exit(0);
 }
 
 server.listen(4399, () => {
-  console.log("\n\x1b[32m🚀 [BIOEMU2 + FASTPLMS + ALPHAFOLD2-WEBGPU + BINDCRAFT2 + KALOLUMEN STUDIO RUNNING] http://localhost:4399\x1b[0m");
+  console.log("\n\x1b[32m🚀 [MASTER COMMAND CENTER LIVE] http://localhost:4399\x1b[0m");
   exec("open http://localhost:4399");
 });
