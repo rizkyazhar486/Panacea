@@ -14,4 +14,6 @@ export * from "./one-os/freedom-mocap-sepsis-talkvid-simready-engine.ts";
 export * from "./one-os/transcendental-seven-pillars-engine.ts";
 export * from "./governance/post-expansion-maturation-gate.ts";
 export * from "./governance/universal-crash-shield.ts";
+export * from "./governance/astra-auto-healer-and-hippocratic-gate.ts";
 export * from "./personal-health/engine/gpsPaceCalorieAndFoodAiEngine.ts";
+export * from "./personal-health/engine/yourBodyHealthspanAndReclubPassEngine.ts";

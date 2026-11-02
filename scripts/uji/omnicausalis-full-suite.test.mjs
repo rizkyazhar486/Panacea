@@ -79,3 +79,29 @@ test("6. [7 TRANSCENDENTAL PILLARS] Mitochondria/Autophagy, UDT-OS, Pantheon Con
   const pheno = omnicausalis.computePhenoAgeAndExposomeTrajectory({ chronologicalAgeYears: 30, albuminGdl: 4.9, creatinineMgDl: 0.85, fastingGlucoseMgDl: 82, hsCrpMgL: 0.4, sleepRegularityIndex0to100: 92, ambientPm25UgM3: 10, weeklySaunaOrColdPlungeSessions: 4 });
   assert.ok(pheno.estimatedPhenoAgeYears < pheno.chronologicalAgeYears);
 });
+
+test("7. [YOUR BODY HEALTHSPAN ID, ATHLYTIC/WHOOP SPORT SCIENCE, RECLUB/CLASSPASS & ASTRA AUTO-HEALER]", () => {
+  const astra = omnicausalis.runAstraSelfHealingAndHippocraticAudit();
+  assert.equal(astra.astraPipelineHealthy, true);
+  assert.equal(astra.primumNonNocereVerified, true);
+  const body = omnicausalis.computeYourBodyHealthspanPortfolio({
+    citizenId: "kelvin-001",
+    chronologicalAgeYears: 25,
+    vo2MaxMlKgMin: 56,
+    hrvRmssdMs: 88,
+    hrvBaseline60dMs: 76,
+    restingHeartRateBpm: 50,
+    restorativeSleepRatio0to1: 0.48,
+    acuteLoad7dTrimp: 480,
+    chronicLoad28dTrimp: 440,
+    fastingGlucoseMgDl: 81,
+    zone2MinutesWeekly: 210
+  });
+  assert.equal(body.longitudinalHealthId, "PANACEA-LHID-KELVIN-001");
+  assert.ok(body.projectedBiologicalAgeYears < body.chronologicalAgeYears);
+  assert.equal(body.athlyticWhoopMetrics.recoveryTier, "OPTIMAL_GREEN");
+  const matches = omnicausalis.matchReclubAndClassPassSessionsToBiology(body);
+  assert.equal(matches.length, 3);
+  assert.equal(matches[0].venueName, "The Forum Sports Hub Bintaro, Jakarta Selatan");
+  assert.equal(matches[0].matchStatus, "BIOLOGICALLY_OPTIMAL_MATCH");
+});

@@ -15,96 +15,113 @@ let dicomSession = omnicausalis.reconstructPhotorealistic3DCGFromDicomFolder({
 });
 
 let state = {
-  ligandBound: true,
-  plmTier: "SYNTHYRA_ESMFOLD2_600M",
-  binderSeq: "MKTAYIAKQRQISFVKSHFSRQLEERLGLIEVQAPILSRVGDGTQDNLSGAEKAVQVKVKALPDAQFEVVHSLAKWKRQTLGQHDFSAGEGLYTHMKALRPDEDRLSPLHSVYVDQWDWERVMGDGERQFSTLKSTVEAIWAGIKATEAAVSEEFGLAPFLPDQIHFVHSQELLSRYPDLDAKGRERAIAKDLGAVFLVGIGGKLSDGHRHDVRAPDYDDWSTPSELGHAGLNGDILVWNPVLEDAFELSSMGIRVDADTLKHQLALTGDEDRLELEWHQALLRGEMPQTIGGGIGQSRLTMLLLQLPHIGQVQAGVWPAAVRESVPSLL",
-  rivalBot: "DR_SENKU_KUN",
-  sepsisPreset: "SEPTIC_SHOCK",
-  laps: 2,
-  dishes: ["CHICKEN_BREAST_GRILLED_200G", "BROWN_RICE_150G", "TEMPE_BAKAR_100G", "AVOCADO_100G"],
-  learnerTheta: 2.15,
-  arenaScore: 3480,
-  lastLog: "ALL 12 DOMAINS UNIFIED: KaloLumen 3-Layer DICOM (<10s) · Mouse-Drag Light · BioEmu2 · FastPLMs/ESMFold2 · BindCraft2 · SepsisAgent · FreeMoCap · GPS/Pace · Food AI · 3 Anime Bots!"
+  vo2Max: 56,
+  hrvMs: 88,
+  acuteTrimp: 480,
+  joinedSessionId: "CLUB_BINTARO_FOOTBALL_01"
 };
 
+function buildRingSvg(valueText, subLabel, percent, strokeHex) {
+  const dash = Math.round((Math.max(5, Math.min(100, percent)) / 100) * 251);
+  return "<div style=\"text-align:center;padding:22px 16px;border-radius:24px;background:rgba(15,23,42,0.55);backdrop-filter:blur(24px);border:1px solid rgba(255,255,255,0.08);\">" +
+    "<svg width=\"108\" height=\"108\" viewBox=\"0 0 100 100\" style=\"display:block;margin:0 auto 12px;\">" +
+    "<circle cx=\"50\" cy=\"50\" r=\"40\" fill=\"none\" stroke=\"rgba(255,255,255,0.07)\" stroke-width=\"8\"/>" +
+    "<circle cx=\"50\" cy=\"50\" r=\"40\" fill=\"none\" stroke=\"" + strokeHex + "\" stroke-width=\"8\" stroke-linecap=\"round\" stroke-dasharray=\"" + dash + " 251\" transform=\"rotate(-90 50 50)\"/>" +
+    "<text x=\"50\" y=\"55\" text-anchor=\"middle\" fill=\"#f8fafc\" font-size=\"18\" font-weight=\"800\">" + valueText + "</text>" +
+    "</svg>" +
+    "<div style=\"font-size:12px;font-weight:600;color:#94a3b8;letter-spacing:0.05em;\">" + subLabel + "</div></div>";
+}
+
 function renderHtml() {
+  const astra = omnicausalis.runAstraSelfHealingAndHippocraticAudit();
+  const body = omnicausalis.computeYourBodyHealthspanPortfolio({
+    citizenId: "kelvin-001",
+    chronologicalAgeYears: 25,
+    vo2MaxMlKgMin: state.vo2Max,
+    hrvRmssdMs: state.hrvMs,
+    hrvBaseline60dMs: 76,
+    restingHeartRateBpm: 50,
+    restorativeSleepRatio0to1: 0.48,
+    acuteLoad7dTrimp: state.acuteTrimp,
+    chronicLoad28dTrimp: 440,
+    fastingGlucoseMgDl: 81,
+    zone2MinutesWeekly: 210
+  });
+  const matches = omnicausalis.matchReclubAndClassPassSessionsToBiology(body);
   const layers = dicomSession.layers;
   const light = dicomSession.lightSource;
-  const bioemu = omnicausalis.sampleBioEmu2EquilibriumEnsemble({ targetProteinId: "RYR2_CALCIUM_CHANNEL", ligandBound: state.ligandBound });
-  const fold = omnicausalis.predictStructureWithFastPlmAndWebGpu({ sequence: state.binderSeq, modelTier: state.plmTier });
-  const bindcraft = omnicausalis.designDeNovoBinderAndRunProteinFighter({ targetEpitopeName: "RyR2_S2808_Pocket", binderSequence: state.binderSeq, rivalBotId: state.rivalBot });
-  const round = omnicausalis.evaluateBotSparringRound(state.learnerTheta, true, 1.1);
 
-  const waypoints = [{ lat: -6.2250, lng: 106.6520, altitudeMeters: 28, timestampMs: 0 }];
-  for (let i = 1; i <= state.laps; i++) {
-    waypoints.push({ lat: Number((-6.2250 + i * 0.012).toFixed(5)), lng: Number((106.6520 + i * 0.014).toFixed(5)), altitudeMeters: 28 + i * 9, timestampMs: i * 540000 });
-  }
-  const gps = omnicausalis.evaluateGpsWorkoutSession({ bodyWeightKg: 70, waypoints });
-  const food = omnicausalis.analyzeFoodPhotoAndGenerateNutritionPlan({ imageId: "meal-01", detectedDishKeys: state.dishes, workoutCaloriesBurnedKcal: gps.caloriesBurnedKcal });
-  const sepsis = omnicausalis.evaluateSepsisAgentAndRemopSafety(state.sepsisPreset === "SEPTIC_SHOCK"
-    ? { respiratoryRateBpm: 28, systolicBpMmHg: 84, glasgowComaScale3to15: 13, paO2FiO2Ratio: 180, platelets10e3PerUl: 85, bilirubinMgDl: 2.5, meanArterialPressureMmHg: 58, creatinineMgDl: 2.4, lactateMmolL: 4.5 }
-    : { respiratoryRateBpm: 16, systolicBpMmHg: 120, glasgowComaScale3to15: 15, paO2FiO2Ratio: 420, platelets10e3PerUl: 250, bilirubinMgDl: 0.8, meanArterialPressureMmHg: 85, creatinineMgDl: 0.9, lactateMmolL: 1.0 }
-  );
+  const axes = body.fiveVitalityAxes;
+  const axisPills = [
+    { name: "Cardiovascular", val: axes.cardiovascular.score, sub: axes.cardiovascular.headline, col: "#38bdf8" },
+    { name: "Metabolism", val: axes.metabolism.score, sub: axes.metabolism.headline, col: "#10b981" },
+    { name: "Neuroplasticity", val: axes.neuroplasticity.score, sub: axes.neuroplasticity.headline, col: "#a855f7" },
+    { name: "Orthopedic", val: axes.orthopedic.score, sub: axes.orthopedic.headline, col: "#f59e0b" },
+    { name: "Hormonal Vitality", val: axes.hormonalVitality.score, sub: axes.hormonalVitality.headline, col: "#f43f5e" }
+  ].map((a) =>
+    "<div style=\"padding:18px 20px;border-radius:20px;background:rgba(30,41,59,0.45);border:1px solid rgba(255,255,255,0.07);\">" +
+    "<div style=\"display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;\">" +
+    "<span style=\"font-size:13px;font-weight:700;color:" + a.col + ";\">" + a.name + "</span>" +
+    "<span style=\"font-size:16px;font-weight:800;color:#f8fafc;\">" + a.val + "%</span></div>" +
+    "<div style=\"font-size:12px;color:#94a3b8;\">" + a.sub + "</div></div>"
+  ).join("");
 
-  const layerControlsHtml = layers.map((l) => {
-    const bg = l.crossSectionEnabled ? "#10b981" : "#334155";
-    const txt = l.crossSectionEnabled ? "CROSS-SECTION: ON" : "CROSS-SECTION: OFF";
-    return "<div style=\"padding:7px 10px;border-radius:8px;background:#1e293b;border-left:4px solid " + l.colorHex + ";margin-bottom:5px;display:flex;justify-content:space-between;align-items:center;\">" +
-      "<div><strong style=\"color:" + l.colorHex + ";font-size:12px;\">" + l.label + "</strong> <span style=\"font-size:10px;color:#cbd5e1;\">(" + l.thresholdMinHu + ".." + l.thresholdMaxHu + " HU)</span></div>" +
-      "<a href=\"/action?cmd=toggle_cs&layer=" + l.layerIndex + "\" style=\"padding:4px 9px;border-radius:6px;background:" + bg + ";color:#fff;font-weight:700;font-size:10px;text-decoration:none;\">" + txt + "</a></div>";
+  const clubCards = matches.map((m) => {
+    const isJoined = state.joinedSessionId === m.sessionId;
+    const accent = m.matchStatus === "BIOLOGICALLY_OPTIMAL_MATCH" ? "#10b981" : "#f59e0b";
+    return "<div style=\"padding:18px 20px;border-radius:20px;background:rgba(15,23,42,0.65);border:1px solid " + (isJoined ? accent : "rgba(255,255,255,0.08)") + ";display:flex;justify-content:space-between;align-items:center;gap:16px;\">" +
+      "<div><div style=\"font-size:11px;font-weight:700;color:" + accent + ";letter-spacing:0.05em;\">" + m.organizerClub.toUpperCase() + " · STRAIN " + m.estimatedStrain0to21 + "</div>" +
+      "<div style=\"font-size:16px;font-weight:700;color:#f8fafc;margin:4px 0;\">" + m.title + "</div>" +
+      "<div style=\"font-size:12px;color:#94a3b8;\">" + m.venueName + " (" + m.distanceFromHomeKm + " km) · " + m.durationHours + "h · Rp" + m.feeIdr.toLocaleString() + "</div>" +
+      "<div style=\"font-size:12px;color:#cbd5e1;margin-top:6px;\">" + m.conciseMedicalAdvice + "</div></div>" +
+      "<a href=\"/action?cmd=join_club&id=" + m.sessionId + "\" style=\"white-space:nowrap;padding:10px 18px;border-radius:99px;background:" + (isJoined ? "#10b981" : "rgba(56,189,248,0.15)") + ";color:" + (isJoined ? "#052e16" : "#38bdf8") + ";border:1px solid " + (isJoined ? "#10b981" : "#38bdf8") + ";font-weight:700;font-size:12px;text-decoration:none;\">" + (isJoined ? "Joined Pass" : "Instant Join") + "</a></div>";
   }).join("");
 
-  const botCardsHtml = round.map((r) => {
-    const b = omnicausalis.PANACEA_COMPETITIVE_ANIME_BOTS[r.botId];
-    return "<div style=\"padding:10px;border-radius:10px;background:#1e293b;border:1px solid " + b.primaryColorHex + ";\">" +
-      "<div style=\"display:flex;justify-content:space-between;\"><strong style=\"color:" + b.primaryColorHex + ";font-size:13px;\">" + b.displayName + "</strong><span style=\"font-size:11px;\">θ=" + r.effectiveTheta + "</span></div>" +
-      "<div style=\"font-size:10px;color:#94a3b8;margin-top:2px;\">" + b.archetype + "</div></div>";
-  }).join("");
+  const layerPills = layers.map((l) => {
+    const on = l.crossSectionEnabled;
+    return "<a href=\"/action?cmd=toggle_cs&layer=" + l.layerIndex + "\" style=\"padding:8px 14px;border-radius:99px;background:" + (on ? "rgba(16,185,129,0.18)" : "rgba(30,41,59,0.6)") + ";border:1px solid " + (on ? "#10b981" : "rgba(255,255,255,0.1)") + ";color:#f8fafc;font-size:12px;font-weight:600;text-decoration:none;\">L" + l.layerIndex + " Slice: " + (on ? "ON" : "OFF") + "</a>";
+  }).join(" ");
 
   return [
-    "<!DOCTYPE html><html><head><meta charset=\"UTF-8\"/><title>PanaceaMed ∞ — Master Omnicausalis Command Center</title></head>",
-    "<body style=\"margin:0;padding:14px;background:#020617;color:#f8fafc;font-family:system-ui,-apple-system,sans-serif;\">",
-    "<div style=\"display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-radius:12px;background:#0f172a;border:1px solid #38bdf8;margin-bottom:12px;\">",
-    "<div><span style=\"padding:3px 9px;border-radius:99px;background:#064e3b;color:#34d399;font-size:10px;font-weight:700;\">PANACEAMED ∞ MASTER COMMAND CENTER · ALL 7 TRANSCENDENTAL PILLARS · CRASH-SHIELDED · 14 MODULES & 45 REPOS VERIFIED</span>",
-    "<h1 style=\"margin:4px 0 2px;font-size:18px;\">KaloLumen 3-Layer DICOM 3DCG × BioEmu2/FastPLMs/BindCraft2 × SepsisAgent/FreeMoCap × GPS/Food AI × 3 Anime Bots</h1>",
-    "<div style=\"font-size:11px;color:#38bdf8;\">" + state.lastLog + "</div></div>",
-    "<div style=\"text-align:right;\"><div style=\"font-size:10px;color:#94a3b8;\">DICOM Build / ProteinFighter</div>",
-    "<div style=\"font-size:18px;font-weight:800;color:#34d399;\">" + (dicomSession.reconstructionTimeMs / 1000).toFixed(2) + "s · " + bindcraft.proteinFighterArenaMatch.learnerFighterScore + " pts</div></div></div>",
-
-    "<div style=\"display:grid;grid-template-columns:1.15fr 1fr;gap:12px;margin-bottom:12px;\">",
-    "<div style=\"padding:12px;border-radius:12px;background:#090d16;border:2px solid #38bdf8;\">",
-    "<div style=\"display:flex;justify-content:space-between;margin-bottom:6px;\"><strong style=\"color:#38bdf8;font-size:13px;\">💡 Drag Mouse on 3DCG Viewport to Change Light Angle + 3-Layer Cross-Sections</strong>",
-    "<span id=\"light-readout\" style=\"font-size:11px;color:#fde68a;\">Az: " + light.azimuthDeg + "° · El: " + light.elevationDeg + "°</span></div>",
-    "<canvas id=\"kalolumen-canvas\" width=\"620\" height=\"235\" style=\"width:100%;height:235px;background:#020617;border-radius:10px;cursor:grab;display:block;margin-bottom:8px;border:1px solid #1e293b;\"></canvas>",
-    layerControlsHtml,
+    "<!DOCTYPE html><html><head><meta charset=\"UTF-8\"/><title>PanaceaMed ∞ — Your Body & Sagrada-Glass Healthspan OS</title></head>",
+    "<body style=\"margin:0;padding:40px 52px;background:radial-gradient(circle at 50% 0%, #0f172a 0%, #020617 75%);color:#f8fafc;font-family:system-ui,-apple-system,BlinkMacSystemFont,sans-serif;line-height:1.5;\">",
+    "<header style=\"max-width:1320px;margin:0 auto 36px;padding:28px 36px;border-radius:28px;background:rgba(15,23,42,0.55);backdrop-filter:blur(28px);border:1px solid rgba(255,255,255,0.1);display:flex;justify-content:space-between;align-items:center;\">",
+    "<div>",
+    "<div style=\"display:flex;gap:10px;align-items:center;margin-bottom:8px;\">",
+    "<span style=\"padding:4px 12px;border-radius:99px;background:rgba(16,185,129,0.15);color:#34d399;font-size:11px;font-weight:700;letter-spacing:0.06em;\">" + body.longitudinalHealthId + "</span>",
+    "<span style=\"padding:4px 12px;border-radius:99px;background:rgba(56,189,248,0.15);color:#38bdf8;font-size:11px;font-weight:600;\">HIPPOCRATIC OATH VERIFIED · ASTRA HEALED (" + astra.healedFailureCodes.length + "/3) · MASTER COMMAND CENTER</span>",
     "</div>",
-
-    "<div style=\"display:flex;flex-direction:column;gap:8px;\">",
-    "<div style=\"padding:10px;border-radius:10px;background:#0f172a;border:1px solid #10b981;font-size:11px;\">",
-    "<strong style=\"color:#10b981;font-size:12px;\">🧬 BioEmu2 Ensemble + Synthyra FastPLMs (" + fold.modelTier + ") + BindCraft2/ProteinFighter</strong><br/>",
-    "<b>RyR2 Open Prob:</b> <b>" + Math.round(bioemu.states[2].equilibriumProbability * 100) + "%</b> (ΔG=" + bioemu.states[2].freeEnergyDeltaGKcalMol + " kcal/mol) | <b>pLDDT:</b> <b style=\"color:#34d399;\">" + fold.meanPlddt0to100 + "</b> | <b>pTM:</b> " + fold.pTm0to1 + " | <b>ipTM:</b> " + bindcraft.interfacePtmIpTm + "<br/>",
-    "<div style=\"margin-top:6px;\">",
-    "<a href=\"/action?cmd=toggle_ligand\" style=\"padding:4px 9px;background:#10b981;color:#052e16;font-weight:700;border-radius:5px;text-decoration:none;margin-right:6px;\">⚡ Toggle BioEmu2 Ligand</a>",
-    "<a href=\"/action?cmd=cycle_plm\" style=\"padding:4px 9px;background:#38bdf8;color:#082f49;font-weight:700;border-radius:5px;text-decoration:none;margin-right:6px;\">🔄 Switch PLM/WebGPU Model</a>",
-    "<a href=\"/action?cmd=cycle_rival\" style=\"padding:4px 9px;background:#f43f5e;color:#fff;font-weight:700;border-radius:5px;text-decoration:none;\">⚔️ ProteinFighter vs " + state.rivalBot + "</a>",
-    "</div></div>",
-
-    "<div style=\"padding:10px;border-radius:10px;background:#0f172a;border:1px solid #f59e0b;font-size:11px;\">",
-    "<strong style=\"color:#f59e0b;font-size:12px;\">📍 Live GPS Tracker (Speed · Pace · KM · Time · Calorie) & 📸 AI Food Photo Calorie</strong><br/>",
-    "<b>GPS Run:</b> <b>" + gps.totalDistanceKm + " km</b> · <b>" + gps.formattedTimeHhMmSs + "</b> · Speed <b>" + gps.averageSpeedKmh + " km/h</b> · Pace <b style=\"color:#38bdf8;\">" + gps.formattedPaceMmSsPerKm + "</b> · Burned <b style=\"color:#f43f5e;\">" + gps.caloriesBurnedKcal + " kcal</b><br/>",
-    "<b>AI Food Photo:</b> <b style=\"color:#34d399;\">" + food.totals.totalCaloriesKcal + " kcal</b> (Net: " + food.netCalorieBalanceKcal + " kcal) · Protein <b>" + food.totals.totalProteinGrams + "g</b> · Carbs <b>" + food.totals.totalCarbsGrams + "g</b> · Fat <b>" + food.totals.totalFatGrams + "g</b><br/>",
-    "<div style=\"margin-top:6px;\">",
-    "<a href=\"/action?cmd=add_lap\" style=\"padding:4px 9px;background:#10b981;color:#052e16;font-weight:700;border-radius:5px;text-decoration:none;margin-right:6px;\">🏃 + Record GPS Split</a>",
-    "<a href=\"/action?cmd=scan_food\" style=\"padding:4px 9px;background:#f59e0b;color:#451a03;font-weight:700;border-radius:5px;text-decoration:none;\">📸 + Scan Food Photo (+160 kcal)</a>",
-    "</div></div>",
-
-    "<div style=\"padding:10px;border-radius:10px;background:#0f172a;border:1px solid #a855f7;font-size:11px;\">",
-    "<strong style=\"color:#e9d5ff;font-size:12px;\">🚨 SepsisAgent × REMOP × Pantheon × MedGen ICU Console & 3 Competitive Anime Bots</strong><br/>",
-    "<b>qSOFA:</b> " + sepsis.qSofaScore + "/3 | <b>SOFA:</b> " + sepsis.totalSofaScore + " | <b>Septic Shock:</b> " + sepsis.septicShockEducationalFlag + " | <b>REMOP:</b> " + sepsis.pantheonSpecialistConsensus.pharmacologyRemopAgent,
+    "<h1 style=\"margin:0;font-size:28px;font-weight:800;letter-spacing:-0.02em;\">Your Body — Longitudinal Healthspan Portfolio</h1>",
+    "<p style=\"margin:6px 0 0;font-size:14px;color:#94a3b8;\">Precision biology, Athlytic/Whoop recovery telemetry, KaloLumen 3DCG, Live GPS Tracker, and Reclub/ClassPass smart matchmaking.</p>",
     "</div>",
-    "<div style=\"display:grid;grid-template-columns:repeat(3,1fr);gap:8px;\">" + botCardsHtml + "</div>",
+    "<div style=\"text-align:right;\">",
+    "<div style=\"font-size:12px;color:#94a3b8;\">Biological Age vs Chronological (" + body.chronologicalAgeYears + "y)</div>",
+    "<div style=\"font-size:34px;font-weight:800;color:#34d399;\">" + body.projectedBiologicalAgeYears + " yrs <span style=\"font-size:16px;color:#38bdf8;\">(" + body.biologicalAgeDeltaYears + "y)</span></div>",
+    "</div></header>",
+    "<main style=\"max-width:1320px;margin:0 auto;display:flex;flex-direction:column;gap:32px;\">",
+    "<section style=\"display:grid;grid-template-columns:repeat(4,1fr);gap:24px;\">",
+    buildRingSvg(body.athlyticWhoopMetrics.recoveryPercent + "%", "RECOVERY READINESS", body.athlyticWhoopMetrics.recoveryPercent, "#10b981"),
+    buildRingSvg(String(body.athlyticWhoopMetrics.dayStrain0to21), "DAY STRAIN (0-21)", (body.athlyticWhoopMetrics.dayStrain0to21 / 21) * 100, "#38bdf8"),
+    buildRingSvg(body.compositeHealthspanScore + "%", "HEALTHSPAN VITALITY", body.compositeHealthspanScore, "#a855f7"),
+    buildRingSvg(body.athlyticWhoopMetrics.acuteChronicWorkloadRatio + "x", "ORTHOPEDIC ACWR", 78, "#f59e0b"),
+    "</section>",
+    "<section style=\"display:grid;grid-template-columns:repeat(5,1fr);gap:18px;\">" + axisPills + "</section>",
+    "<section style=\"display:grid;grid-template-columns:1.05fr 1fr;gap:28px;\">",
+    "<div style=\"padding:28px;border-radius:28px;background:rgba(15,23,42,0.55);backdrop-filter:blur(28px);border:1px solid rgba(255,255,255,0.09);display:flex;flex-direction:column;justify-content:space-between;\">",
+    "<div><div style=\"display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;\">",
+    "<span style=\"font-size:15px;font-weight:700;color:#38bdf8;\">KaloLumen 3-Layer Digital Twin (<10s DICOM)</span>",
+    "<span id=\"light-readout\" style=\"font-size:12px;color:#fde68a;\">Drag Mouse: Az " + light.azimuthDeg + "° · El " + light.elevationDeg + "°</span></div>",
+    "<canvas id=\"kalolumen-canvas\" width=\"580\" height=\"260\" style=\"width:100%;height:260px;background:#020617;border-radius:20px;cursor:grab;display:block;margin-bottom:18px;border:1px solid rgba(255,255,255,0.06);\"></canvas></div>",
+    "<div style=\"display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;\">",
+    "<div>" + layerPills + "</div>",
+    "<a href=\"/action?cmd=boost_hrv\" style=\"padding:8px 16px;border-radius:99px;background:#10b981;color:#052e16;font-size:12px;font-weight:700;text-decoration:none;\">+ Simulate Vagal HRV Boost</a>",
     "</div></div>",
-
+    "<div style=\"padding:28px;border-radius:28px;background:rgba(15,23,42,0.55);backdrop-filter:blur(28px);border:1px solid rgba(255,255,255,0.09);display:flex;flex-direction:column;gap:16px;\">",
+    "<div style=\"display:flex;justify-content:space-between;align-items:center;\">",
+    "<span style=\"font-size:15px;font-weight:700;color:#10b981;\">Panacea Club & Studio Pass (Reclub × ClassPass × Biology)</span>",
+    "<span style=\"font-size:12px;color:#94a3b8;\">Matched to Recovery " + body.athlyticWhoopMetrics.recoveryPercent + "%</span></div>",
+    clubCards,
+    "</div></section></main>",
     "<script>",
     "const canvas = document.getElementById(\"kalolumen-canvas\");",
     "const ctx = canvas.getContext(\"2d\");",
@@ -114,42 +131,39 @@ function renderHtml() {
     "const l1Cs = " + layers[0].crossSectionEnabled + ";",
     "const l2Cs = " + layers[1].crossSectionEnabled + ";",
     "const l3Cs = " + layers[2].crossSectionEnabled + ";",
-    "canvas.addEventListener(\"mousedown\", (e) => { dragging = true; lastX = e.clientX; lastY = e.clientY; canvas.style.cursor = \"grabbing\"; });",
-    "window.addEventListener(\"mouseup\", () => { dragging = false; canvas.style.cursor = \"grab\"; });",
+    "canvas.addEventListener(\"mousedown\", (e) => { dragging = true; lastX = e.clientX; lastY = e.clientY; });",
+    "window.addEventListener(\"mouseup\", () => { dragging = false; });",
     "window.addEventListener(\"mousemove\", (e) => {",
     "  if (!dragging) return;",
-    "  const dx = e.clientX - lastX; const dy = e.clientY - lastY;",
+    "  az = (az + (e.clientX - lastX) * 0.6 + 360) % 360;",
+    "  el = Math.max(-80, Math.min(80, el - (e.clientY - lastY) * 0.6));",
     "  lastX = e.clientX; lastY = e.clientY;",
-    "  az = (az + dx * 0.6 + 360) % 360;",
-    "  el = Math.max(-80, Math.min(80, el - dy * 0.6));",
-    "  readout.textContent = \"Az: \" + az.toFixed(1) + \"° · El: \" + el.toFixed(1) + \"° (Dragging)\";",
+    "  readout.textContent = \"Drag Mouse: Az \" + az.toFixed(0) + \"° · El \" + el.toFixed(0) + \"°\";",
     "  drawScene();",
     "});",
     "function drawLayerSphere(cx, cy, radius, baseRgb, csEnabled, csMode, lx, ly) {",
     "  ctx.save();",
     "  if (csEnabled) {",
     "    ctx.beginPath();",
-    "    if (csMode === 0) ctx.rect(0, 0, cx + 15, canvas.height);",
-    "    else if (csMode === 1) ctx.rect(0, cy - 8, canvas.width, canvas.height);",
+    "    if (csMode === 0) ctx.rect(0, 0, cx + 16, canvas.height);",
+    "    else if (csMode === 1) ctx.rect(0, cy - 10, canvas.width, canvas.height);",
     "    else ctx.rect(cx - 20, 0, canvas.width, canvas.height);",
     "    ctx.clip();",
     "  }",
     "  const grad = ctx.createRadialGradient(cx + lx * radius * 0.55, cy - ly * radius * 0.55, radius * 0.08, cx, cy, radius);",
     "  grad.addColorStop(0, baseRgb[0]); grad.addColorStop(0.55, baseRgb[1]); grad.addColorStop(1, baseRgb[2]);",
     "  ctx.fillStyle = grad; ctx.beginPath(); ctx.arc(cx, cy, radius, 0, Math.PI * 2); ctx.fill();",
-    "  if (csEnabled) { ctx.strokeStyle = baseRgb[0]; ctx.lineWidth = 2; ctx.stroke(); }",
     "  ctx.restore();",
     "}",
     "function drawScene() {",
     "  ctx.clearRect(0, 0, canvas.width, canvas.height);",
     "  const cx = canvas.width / 2; const cy = canvas.height / 2;",
-    "  const azRad = az * Math.PI / 180; const elRad = el * Math.PI / 180;",
-    "  const lx = Math.cos(elRad) * Math.sin(azRad); const ly = Math.sin(elRad);",
-    "  drawLayerSphere(cx, cy, 44, [\"#ffffff\", \"#cbd5e1\", \"#334155\"], l3Cs, 2, lx, ly);",
-    "  drawLayerSphere(cx, cy, 74, [\"#fda4af\", \"#e11d48\", \"rgba(136,19,55,0.85)\"], l2Cs, 1, lx, ly);",
-    "  drawLayerSphere(cx, cy, 102, [\"rgba(254,215,170,0.65)\", \"rgba(251,146,60,0.42)\", \"rgba(124,45,18,0.25)\"], l1Cs, 0, lx, ly);",
-    "  const orbX = cx + lx * 120; const orbY = cy - ly * 102;",
-    "  ctx.fillStyle = \"#fde047\"; ctx.beginPath(); ctx.arc(orbX, orbY, 7, 0, Math.PI * 2); ctx.fill();",
+    "  const lx = Math.cos(el * Math.PI / 180) * Math.sin(az * Math.PI / 180);",
+    "  const ly = Math.sin(el * Math.PI / 180);",
+    "  drawLayerSphere(cx, cy, 46, [\"#ffffff\", \"#cbd5e1\", \"#334155\"], l3Cs, 2, lx, ly);",
+    "  drawLayerSphere(cx, cy, 78, [\"#fda4af\", \"#e11d48\", \"rgba(136,19,55,0.85)\"], l2Cs, 1, lx, ly);",
+    "  drawLayerSphere(cx, cy, 108, [\"rgba(254,215,170,0.65)\", \"rgba(251,146,60,0.42)\", \"rgba(124,45,18,0.25)\"], l1Cs, 0, lx, ly);",
+    "  ctx.fillStyle = \"#fde047\"; ctx.beginPath(); ctx.arc(cx + lx * 125, cy - ly * 105, 6, 0, Math.PI * 2); ctx.fill();",
     "}",
     "drawScene();",
     "</script></body></html>"
@@ -164,15 +178,11 @@ const server = http.createServer((req, res) => {
     if (cmd === "toggle_cs" && (layerIdx === 1 || layerIdx === 2 || layerIdx === 3)) {
       const cur = dicomSession.layers[layerIdx - 1];
       dicomSession = { ...dicomSession, layers: omnicausalis.updateIndependentLayerCrossSection(dicomSession.layers, layerIdx, { crossSectionEnabled: !cur.crossSectionEnabled }) };
-    } else if (cmd === "toggle_ligand") { state.ligandBound = !state.ligandBound; }
-    else if (cmd === "cycle_plm") {
-      const models = ["SYNTHYRA_ESMFOLD2_600M", "SYNTHYRA_ESMFOLD2_300M", "ALPHAFOLD2_WEBGPU_LOCALFOLD", "MOLENCE_MOL1_MULTIMODAL"];
-      state.plmTier = models[(models.indexOf(state.plmTier) + 1) % models.length];
-    } else if (cmd === "cycle_rival") {
-      const bots = ["DR_SENKU_KUN", "DR_MAKIMA_SENPAI", "DR_SATORU_SENSEI"];
-      state.rivalBot = bots[(bots.indexOf(state.rivalBot) + 1) % bots.length];
-    } else if (cmd === "add_lap") { state.laps += 1; }
-    else if (cmd === "scan_food") { state.dishes.push("AVOCADO_100G"); }
+    } else if (cmd === "join_club") {
+      state.joinedSessionId = url.searchParams.get("id") || state.joinedSessionId;
+    } else if (cmd === "boost_hrv") {
+      state.hrvMs = state.hrvMs >= 104 ? 82 : state.hrvMs + 6;
+    }
     res.writeHead(302, { Location: "/" });
     res.end();
     return;
@@ -183,12 +193,12 @@ const server = http.createServer((req, res) => {
 
 if (process.argv.includes("--smoke-test")) {
   const out = renderHtml();
-  if (!out.includes("MASTER COMMAND CENTER") || !out.includes("Live GPS Tracker")) process.exit(1);
-  console.log("  \x1b[32m✓ [ALL-IN-ONE MASTER COMMAND CENTER SMOKE TEST PASSED]\x1b[0m");
+  if (!out.includes("PANACEA-LHID-KELVIN-001") || !out.includes("The Forum Sports Hub Bintaro")) process.exit(1);
+  console.log("  \x1b[32m✓ [SAGRADA-APPLE GLASSMORPHISM + ATHLYTIC + RECLUB UI SMOKE TEST PASSED]\x1b[0m");
   process.exit(0);
 }
 
 server.listen(4399, () => {
-  console.log("\n\x1b[32m🚀 [MASTER COMMAND CENTER LIVE] http://localhost:4399\x1b[0m");
+  console.log("\n\x1b[32m🚀 [YOUR BODY SAGRADA-GLASS OS LIVE] http://localhost:4399\x1b[0m");
   exec("open http://localhost:4399");
 });
