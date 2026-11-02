@@ -88,3 +88,109 @@ export const MEDICAL_3D_TRUTH_RULES = [
   'Never imply synthetic tumor-cell placement is histopathology or spatial omics.',
   'Measured, documented, modeled and educational layers must remain visually distinguishable.',
 ] as const
+
+export interface CardiacWiggersCycleState {
+  readonly phase: 'ISOVOLUMETRIC_CONTRACTION' | 'SYSTOLIC_EJECTION' | 'ISOVOLUMETRIC_RELAXATION' | 'DIASTOLIC_FILLING'
+  readonly normalizedPhase: number
+  readonly aorticValveOpenFraction: number
+  readonly mitralValveOpenFraction: number
+  readonly ventricularVolumeFraction: number
+  readonly lvPressureMmhg: number
+  readonly aorticPressureMmhg: number
+}
+
+/**
+ * Calculates phase-locked valvular motion and ventricular pressure-volume state
+ * aligned with the classical Carl Wiggers cardiac cycle diagram.
+ */
+export function calculateCardiacWiggersCycle(tSeconds: number, heartRateBpm = 75): CardiacWiggersCycleState {
+  const bpm = Math.max(30, Math.min(220, heartRateBpm))
+  const cycleDuration = 60 / bpm
+  const normalizedPhase = ((tSeconds % cycleDuration) + cycleDuration) % cycleDuration / cycleDuration
+
+  if (normalizedPhase < 0.05) {
+    // Isovolumetric Contraction (all valves closed, LV pressure rises 10 -> 80 mmHg)
+    const subPhase = normalizedPhase / 0.05
+    return {
+      phase: 'ISOVOLUMETRIC_CONTRACTION',
+      normalizedPhase,
+      aorticValveOpenFraction: 0,
+      mitralValveOpenFraction: 0,
+      ventricularVolumeFraction: 1.0,
+      lvPressureMmhg: 10 + 70 * subPhase,
+      aorticPressureMmhg: 80,
+    }
+  } else if (normalizedPhase < 0.35) {
+    // Systolic Ejection (Aortic valve opens, ejection fraction 60%, LV volume 1.0 -> 0.4)
+    const subPhase = (normalizedPhase - 0.05) / 0.30
+    const ejectionCurve = Math.sin(subPhase * Math.PI)
+    return {
+      phase: 'SYSTOLIC_EJECTION',
+      normalizedPhase,
+      aorticValveOpenFraction: Math.min(1.0, Math.sin(subPhase * Math.PI) * 1.25),
+      mitralValveOpenFraction: 0,
+      ventricularVolumeFraction: 1.0 - 0.60 * Math.sin(subPhase * (Math.PI / 2)),
+      lvPressureMmhg: 80 + 40 * ejectionCurve,
+      aorticPressureMmhg: 80 + 40 * ejectionCurve,
+    }
+  } else if (normalizedPhase < 0.40) {
+    // Isovolumetric Relaxation (Aortic valve snaps closed, pressure drops 80 -> 10 mmHg)
+    const subPhase = (normalizedPhase - 0.35) / 0.05
+    return {
+      phase: 'ISOVOLUMETRIC_RELAXATION',
+      normalizedPhase,
+      aorticValveOpenFraction: 0,
+      mitralValveOpenFraction: 0,
+      ventricularVolumeFraction: 0.40,
+      lvPressureMmhg: 80 - 70 * subPhase,
+      aorticPressureMmhg: 85 - 5 * subPhase, // dicrotic notch
+    }
+  } else {
+    // Diastolic Filling (Mitral valve opens, LV volume fills 0.4 -> 1.0)
+    const subPhase = (normalizedPhase - 0.40) / 0.60
+    return {
+      phase: 'DIASTOLIC_FILLING',
+      normalizedPhase,
+      aorticValveOpenFraction: 0,
+      mitralValveOpenFraction: Math.min(1.0, Math.sin(subPhase * Math.PI) * 1.15),
+      ventricularVolumeFraction: 0.40 + 0.60 * Math.sin(subPhase * (Math.PI / 2)),
+      lvPressureMmhg: 8 + 4 * Math.sin(subPhase * Math.PI),
+      aorticPressureMmhg: 80 - 10 * subPhase,
+    }
+  }
+}
+
+/**
+ * Calculates saltatory conduction wave position and Ranvier depolarization along a myelinated axon.
+ */
+export function calculateSaltatoryNerveImpulse(
+  tSeconds: number,
+  conductionVelocityMps = 60,
+  tractLengthMeters = 0.8
+): { readonly wavePositionMeters: number; readonly isRanvierNodeActive: boolean; readonly actionPotentialMv: number } {
+  const v = Math.max(1, conductionVelocityMps)
+  const len = Math.max(0.1, tractLengthMeters)
+  const wavePositionMeters = ((tSeconds * v) % len + len) % len
+  const nodeSpacing = 0.0015 // ~1.5mm distance between nodes of Ranvier
+  const distanceToNearestNode = Math.abs((wavePositionMeters % nodeSpacing) - nodeSpacing / 2)
+  const isRanvierNodeActive = distanceToNearestNode < 0.0002
+  const actionPotentialMv = isRanvierNodeActive ? 30 : -70
+
+  return { wavePositionMeters, isRanvierNodeActive, actionPotentialMv }
+}
+
+/**
+ * Krogh Cylinder Model: Calculates the effective oxygen diffusion radius
+ * from microvessels before tissue hypoxia occurs (pO2 < 10 mmHg).
+ */
+export function calculateKroghOxygenDiffusionRadiusMicrons(
+  arteriolarPo2Mmhg = 95,
+  metabolicConsumptionRate = 1.0
+): { readonly diffusionRadiusMicrons: number; readonly isHypoxicBeyondLimit: boolean } {
+  const po2 = Math.max(10, arteriolarPo2Mmhg)
+  const consumption = Math.max(0.2, metabolicConsumptionRate)
+  // Baseline Krogh radius ~ 140 microns at normal consumption and 95 mmHg
+  const diffusionRadiusMicrons = Math.min(250, Math.max(50, 140 * Math.sqrt(po2 / 95) / Math.sqrt(consumption)))
+  return { diffusionRadiusMicrons, isHypoxicBeyondLimit: true }
+}
+
