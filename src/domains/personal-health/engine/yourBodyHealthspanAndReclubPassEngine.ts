@@ -119,7 +119,7 @@ export function matchReclubAndClassPassSessionsToBiology(
       orthopedicSafe,
       matchStatus,
       conciseMedicalAdvice: !orthopedicSafe
-        ? "ACWR is high (" + acwr + "x). Cap match play at 45 mins to protect ACL/Achilles."
+        ? "ACWR is high (" + acwr + "x). Heuristic workload advisory: 7d/28d load ratio >1.45x; consider moderating session duration."
         : matchStatus === "BIOLOGICALLY_OPTIMAL_MATCH"
           ? "Recovery " + rec + "% matches " + s.estimatedStrain0to21 + " Strain target. Ready to join."
           : "Hydrate +500mL electrolytes; maintain Zone 2-3 heart rate ceiling."
