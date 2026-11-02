@@ -4,6 +4,7 @@ import { simpanTeks } from '../../lib/unduh'
 import { createPortal } from 'react-dom'
 
 const MeetMap = lazy(() => import('../../components/MeetMap'))
+const UniversalClubClassView = lazy(() => import('../../domains/club').then(m => ({ default: m.UniversalClubClassView })))
 import { Card, SectionTitle, inputClass } from '../../components/ui'
 import { IconUsers, IconActivity, IconMapPin } from '../../components/icons'
 import { api, type BackendMeet, type BackendClub } from '../../lib/api'
@@ -70,7 +71,7 @@ function mapsUrl(m: Meet): string {
   return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(`${m.venue}, ${m.address}`)
 }
 
-type Tab = 'myhub' | 'meets' | 'clubs'
+type Tab = 'myhub' | 'meets' | 'clubs' | 'studio-pass'
 type Rsvp = 'none' | 'maybe' | 'joined'
 
 export function ClubHub() {
@@ -152,7 +153,7 @@ export function ClubHub() {
         <SectionTitle icon={<IconUsers size={20} />} title="Club Hub" subtitle="Find your people — clubs and group meet-ups, all of them real" />
         <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Regular group activity is one of the strongest predictors of sticking with exercise. Join a club, show up to meetups, and your training no longer depends on willpower alone. Anyone can start a club or host a meetup — there's no gatekeeper.</Prosa>
         <div className="mt-3 flex flex-wrap gap-2">
-          {([['meets', 'Meets'], ['myhub', 'My Hub'], ['clubs', 'Clubs']] as [Tab, string][]).map(([t, label]) => (
+          {([['meets', 'Meets'], ['myhub', 'My Hub'], ['clubs', 'Clubs'], ['studio-pass', '⚡ Studio Pass']] as [Tab, string][]).map(([t, label]) => (
             <button
               key={t}
               onClick={() => setTab(t)}
@@ -162,7 +163,7 @@ export function ClubHub() {
             </button>
           ))}
         </div>
-        {tab !== 'myhub' && (
+        {tab !== 'myhub' && tab !== 'studio-pass' && (
           <input
             className={`${inputClass} mt-3`}
             placeholder="Search clubs, meets, venues…"
@@ -362,6 +363,12 @@ export function ClubHub() {
             )
           })}
         </>
+      )}
+
+      {tab === 'studio-pass' && (
+        <Suspense fallback={<Card className="!p-8 text-center text-sm text-neutral-400">Loading Studio & Class Pass…</Card>}>
+          <UniversalClubClassView />
+        </Suspense>
       )}
 
       {detail && (() => {

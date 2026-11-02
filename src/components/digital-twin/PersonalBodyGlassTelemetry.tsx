@@ -106,7 +106,7 @@ export const PersonalBodyGlassTelemetry: React.FC<PersonalBodyGlassTelemetryProp
             </span>
           </div>
           <p style={{ margin: 0, fontSize: '12px', lineHeight: 1.6, color: '#D1D5DB' }}>
-            "Like Antoni Gaudí’s Sagrada Família—soaring, cathedral-scaled, yet intimately anchored to nature’s mathematical proportions—PanaceaMed honors the sacred temple of human biology. We reject hollow commodification, opaque black-boxes, and synthetic disease creation. Every signal, pixel, and equation serves to defend human healthspan, foster profound vitality, and uphold the timeless physician’s oath: to cure sometimes, to treat often, to comfort always, and above all, to do no harm."
+            <span>&ldquo;Like Antoni Gaudí’s Sagrada Família—soaring, cathedral-scaled, yet intimately anchored to nature’s mathematical proportions—PanaceaMed honors the sacred temple of human biology. We reject hollow commodification, opaque black-boxes, and synthetic disease creation. Every signal, pixel, and equation serves to defend human healthspan, foster profound vitality, and uphold the timeless physician’s oath: to cure sometimes, to treat often, to comfort always, and above all, to do no harm.&rdquo;</span>
           </p>
         </div>
       )}
