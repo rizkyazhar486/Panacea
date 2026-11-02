@@ -105,3 +105,23 @@ test("7. [YOUR BODY HEALTHSPAN ID, ATHLYTIC/WHOOP SPORT SCIENCE, RECLUB/CLASSPAS
   assert.equal(matches[0].venueName, "The Forum Sports Hub Bintaro, Jakarta Selatan");
   assert.equal(matches[0].matchStatus, "BIOLOGICALLY_OPTIMAL_MATCH");
 });
+
+test("8. [P0 SHA-256 & FHIR R4 & SEPSIS 2026]", () => {
+  const env = omnicausalis.generatePanaceaLhidEnvelope({ patientId: "PATIENT-999", payload: { test: true } });
+  assert.ok(env.pseudonymizedPatientDid.startsWith("did:panacea:piv:"));
+  assert.equal(env.cryptographicSha256.length, 64);
+  const fhirBundle = omnicausalis.buildFhirBundleForSepsisCare({ patientCanonicalId: "PATIENT-999", encounterId: "enc-1", lactateMmolL: 3.5, bloodCultureTakenBeforeAntibiotics: true, broadSpectrumAntibioticsAdministered: true, crystalloidBolusMlPerKg: 30, meanArterialPressureMmHg: 62 });
+  assert.equal(fhirBundle.resourceType, "Bundle");
+  assert.ok(fhirBundle.entry.length >= 3);
+  const sepsis2026 = omnicausalis.evaluateSepsis2026GuidelineCompliance({ suspectedInfection: true, qSofaScore0to3: 2, serumLactateMmolL: 3.5, meanArterialPressureMmHg: 60, bloodCultureObtainedBeforeAntimicrobials: true, antimicrobialsAdministeredWithin60Min: true, crystalloidResuscitation30MlPerKgComplete: true, vasopressorInitiatedIfPersistentHypotension: true });
+  assert.equal(sepsis2026.bundleFullyCompliant, true);
+});
+
+test("9. [P1 ACWR & P2 WIGGERS & KROGH PHYSIOLOGY]", () => {
+  const acwr = omnicausalis.calculateSafeAcuteChronicWorkloadRatio({ acuteTrainingLoadTrimp: 500, chronicTrainingLoadTrimp: 400, athleteId: "ath-1" });
+  assert.equal(acwr.acwr, 1.25);
+  const wiggers = omnicausalis.computeWiggersCardiacCyclePressure(120, 75);
+  assert.ok(wiggers.leftVentricularPressureMmHg > 0);
+  const krogh = omnicausalis.computeKroghCylinderOxygenDiffusion({ capillaryPo2MmHg: 45, tissueRadiusMicrons: 20, KroghDiffusionCoefficientK: 1.5, oxygenConsumptionRateMmolSec: 0.05 });
+  assert.ok(krogh.tissuePo2MmHg >= 0);
+});
