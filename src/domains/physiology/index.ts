@@ -3,6 +3,12 @@
 export { evaluatePersonalization } from './engine/personalizationGate'
 export { ALVEOLAR_GAS_DEFAULTS, ALVEOLAR_GAS_CONTROLS, ALVEOLAR_GAS_MODELS, ALVEOLAR_GAS_BOUNDARY, evaluateAlveolarGasBudget, alveolarFrequencySweep } from './engine/alveolarGasBudget'
 export { deadSpaceFraction, shuntFraction } from './engine/gasExchangeIdentities'
+export {
+  calculateMitochondrialSubstrateFlux,
+  type MitochondrialFluxInput,
+  type MitochondrialFluxOutput,
+  type MetabolicTrainingZone,
+} from './engine/mitochondrialSubstrateFluxSimulator'
 export type { IdentityResult } from './engine/gasExchangeIdentities'
 export type { AlveolarGasScenario, AlveolarGasBudget } from './engine/alveolarGasBudget'
 export type {
