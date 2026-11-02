@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <radialGradient id="bg-aria" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#14b8a6" /><stop offset="100%" stop-color="#0f766e" /></radialGradient>
+    <linearGradient id="hair-aria" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#5eead4" /><stop offset="60%" stop-color="#14b8a6" /><stop offset="100%" stop-color="#0d9488" /></linearGradient>
+    <linearGradient id="skin-aria" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#fff1ee" /><stop offset="100%" stop-color="#fed7aa" /></linearGradient>
+    <linearGradient id="hoodie-aria" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#0284c7" /><stop offset="100%" stop-color="#0369a1" /></linearGradient>
+    <linearGradient id="coat-aria" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#f8fafc" /><stop offset="100%" stop-color="#e2e8f0" /></linearGradient>
+  </defs>
+  <circle cx="256" cy="256" r="248" fill="url(#bg-aria)" stroke="#2dd4bf" stroke-width="8" />
+  <path d="M160 200 C130 260 140 330 180 370 C220 330 290 330 332 370 C372 330 382 260 352 200 Z" fill="#0d9488" />
+  <path d="M110 500 C120 410 180 370 256 370 C332 370 392 410 402 500 Z" fill="url(#hoodie-aria)" />
+  <path d="M100 500 C110 420 160 380 200 400 L210 500 Z" fill="url(#coat-aria)" stroke="#cbd5e1" stroke-width="2" />
+  <path d="M412 500 C402 420 352 380 312 400 L302 500 Z" fill="url(#coat-aria)" stroke="#cbd5e1" stroke-width="2" />
+  <polygon points="230,370 282,370 256,425" fill="#0369a1" />
+  <line x1="240" y1="410" x2="235" y2="470" stroke="#f1f5f9" stroke-width="3" stroke-linecap="round" /><line x1="272" y1="410" x2="277" y2="470" stroke="#f1f5f9" stroke-width="3" stroke-linecap="round" />
+  <path d="M228 320 L228 375 C240 382 272 382 284 375 L284 320 Z" fill="#fbcfe8" opacity="0.4" /><path d="M228 320 L228 370 C240 380 272 380 284 370 L284 320 Z" fill="url(#skin-aria)" />
+  <path d="M180 210 C180 140 214 110 256 110 C298 110 332 140 332 210 C332 270 298 325 256 340 C214 325 180 270 180 210 Z" fill="url(#skin-aria)" />
+  <ellipse cx="205" cy="270" rx="16" ry="8" fill="#f43f5e" opacity="0.25" /><ellipse cx="307" cy="270" rx="16" ry="8" fill="#f43f5e" opacity="0.25" />
+  <path d="M195 210 Q215 195 235 208" stroke="#0f766e" stroke-width="4" stroke-linecap="round" fill="none" /><path d="M317 210 Q297 195 277 208" stroke="#0f766e" stroke-width="4" stroke-linecap="round" fill="none" />
+  <ellipse cx="215" cy="235" rx="18" ry="24" fill="#78350f" /><ellipse cx="215" cy="236" rx="15" ry="20" fill="#f59e0b" /><ellipse cx="215" cy="238" rx="10" ry="14" fill="#fbbf24" /><circle cx="210" cy="226" r="6" fill="#ffffff" /><circle cx="220" cy="246" r="3" fill="#ffffff" /><path d="M194 225 Q215 208 236 222" stroke="#134e4a" stroke-width="4.5" stroke-linecap="round" fill="none" />
+  <ellipse cx="297" cy="235" rx="18" ry="24" fill="#78350f" /><ellipse cx="297" cy="236" rx="15" ry="20" fill="#f59e0b" /><ellipse cx="297" cy="238" rx="10" ry="14" fill="#fbbf24" /><circle cx="292" cy="226" r="6" fill="#ffffff" /><circle cx="302" cy="246" r="3" fill="#ffffff" /><path d="M276 222 Q297 208 318 225" stroke="#134e4a" stroke-width="4.5" stroke-linecap="round" fill="none" />
+  <path d="M256 260 L254 270 L259 272" stroke="#f97316" stroke-width="2" stroke-linecap="round" fill="none" />
+  <path d="M236 295 Q256 318 276 295 Z" fill="#e11d48" /><path d="M242 297 Q256 304 270 297" fill="#ffffff" /><path d="M232 295 Q256 322 280 295" stroke="#9f1239" stroke-width="3" fill="none" stroke-linecap="round" />
+  <path d="M170 200 Q200 130 256 120 Q312 130 342 200 C340 180 320 140 280 150 C310 180 315 210 320 230 C300 180 280 170 256 170 C240 190 240 220 235 235 C230 190 210 170 195 170 C190 190 185 210 180 230 C175 190 170 180 170 200 Z" fill="url(#hair-aria)" />
+  <path d="M235 150 Q245 195 240 225 Q260 190 270 160" fill="url(#hair-aria)" /><path d="M200 165 Q180 220 170 245 C160 210 175 180 185 160" fill="url(#hair-aria)" /><path d="M312 165 Q332 220 342 245 C352 210 337 180 327 160" fill="url(#hair-aria)" />
+  <line x1="188" y1="168" x2="204" y2="184" stroke="#f43f5e" stroke-width="4.5" stroke-linecap="round" /><line x1="204" y1="168" x2="188" y2="184" stroke="#f43f5e" stroke-width="4.5" stroke-linecap="round" />
+  <rect x="180" y="445" width="152" height="34" rx="8" fill="#134e4a" stroke="#2dd4bf" stroke-width="2" />
+  <text x="256" y="468" font-family="system-ui, -apple-system, sans-serif" font-size="16" font-weight="900" fill="#5eead4" text-anchor="middle" letter-spacing="2">⚡ ARIA · SPEED</text>
+</svg>

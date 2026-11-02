@@ -39,4 +39,4 @@
 ## 3. Engineering Implementation Alignment
 
 - Referenced in: `docs/alpha/E7_DEPLOYMENT_EVIDENCE.md` and `governance/ACCEPTANCE_V2.json`.
-- Status: **DECIDED**.
+- Status: **PREPARED (DEFERRED_FINAL_STAGE — exact-head CI and automated verification enforced; formal production release sign-off deferred to final stage)**.

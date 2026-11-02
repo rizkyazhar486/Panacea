@@ -29,4 +29,4 @@
 ## 3. Determination
 
 - All 5 critical core application surfaces pass the manual accessibility and interaction grammar checklist.
-- Status: **DECIDED**.
+- Status: **PREPARED (DEFERRED_FINAL_STAGE — automated WCAG 2.2 AA contrast, axe-core, keyboard/touch-target, and dual-projection Playwright gates enforced; external human usability pass deferred to final stage)**.

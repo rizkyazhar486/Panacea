@@ -37,4 +37,4 @@
 
 - Referenced in: `public/bodyexposure/provenance.html` and `public/media/ASSET_SOURCES.md`.
 - Closes the lacuna noted in `docs/alpha/D8_OWNER_ATTESTATION_REQUESTS.md` for `public/logo-mark.png`.
-- Status: **DECIDED**.
+- Status: **PREPARED (DEFERRED_FINAL_STAGE — cryptographic SHA-256 asset provenance enforced in CI; formal signed legal attestation deferred to final release stage)**.

@@ -27,4 +27,4 @@
 
 3. **Status:**
    - Log retention boundaries verified and documented.
-   - Status: **DECIDED**.
+   - Status: **PREPARED (DEFERRED_FINAL_STAGE — zero-PHI application log redaction enforced across all 74 HTTP routes in `logPrivacyHttp.uji.ts`; external vendor dashboard settings audit deferred to infra owner)**.

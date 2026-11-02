@@ -51,4 +51,4 @@
 ## 3. Engineering Implementation Alignment
 
 - Referenced in: `docs/alpha/F1_NURSE_LAB_RBAC_PROPOSAL.md` and `scripts/qa/user-journeys.test.mjs`.
-- Status: **DECIDED**.
+- Status: **PREPARED (DEFERRED_FINAL_STAGE — automated multi-role user journey tests verified; formal external clinical pilot deferred to final stage)**.

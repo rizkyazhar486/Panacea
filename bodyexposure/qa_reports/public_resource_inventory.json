@@ -1102,8 +1102,8 @@
     },
     {
       "path": "adult_male.rig_motion.json",
-      "bytes": 3779,
-      "sha256": "82656590aa2da311eab6797f6f5cc1692105ed6079f91b42e86c6f9008262417",
+      "bytes": 3780,
+      "sha256": "ac7f64b8d5866934e1d8423df1a1b3acf4d01a489e0edd6a68661f27f64c74b4",
       "evidencePath": "adult_male.rig_motion.json",
       "sources": [
         "AAOS normal range of motion (Greene & Heckman 1994)",
@@ -1117,8 +1117,8 @@
     },
     {
       "path": "adult_male.rig_rom.glb",
-      "bytes": 1387220,
-      "sha256": "b2c7cb609a7cc52064de4b5526ddfd2d9e15b6b261dcf44652aa5e1e3c887dc9",
+      "bytes": 1387204,
+      "sha256": "31ea46dc63eae512aab4303bcd2ed4df198cc508a72b7cbe7bcf0e00feaafbb7",
       "evidencePath": "adult_male.rig_rom.glb",
       "sources": [
         "Z-Anatomy (derived from BodyParts3D, DBCLS) via Panaceamed public/anatomy/skeletal.glb",
@@ -10728,8 +10728,8 @@
     },
     {
       "path": "vhf_denver_ct_adult_female.rig_motion.json",
-      "bytes": 3517,
-      "sha256": "a3930011f3f5833f030a56069f265824b0987fb22b832bd3f66982d12987116c",
+      "bytes": 3518,
+      "sha256": "471e7b3aec766293e100fb448e8da2d8b1ca02bd9a2cb9162e1a3daca91958fd",
       "evidencePath": "vhf_denver_ct_adult_female.rig_motion.json",
       "sources": [
         "AAOS normal range of motion (Greene & Heckman 1994)",
@@ -10743,8 +10743,8 @@
     },
     {
       "path": "vhf_denver_ct_adult_female.rig_rom.glb",
-      "bytes": 221760,
-      "sha256": "246118cbcceb42e38a9e1783bb6edd037819697ae18f5416850bf7a0f24136af",
+      "bytes": 221752,
+      "sha256": "c91509620a4a777bc2b2e1d3b40349f7dd233939957dc2e6efc74a6aab9d1719",
       "evidencePath": "vhf_denver_ct_adult_female.rig_rom.glb",
       "sources": [
         "Andreassen et al., Scientific Data 10:34 (2023), Visible Human Female lower-extremity musculoskeletal geometry; file VHF_Left_Bone_Calcaneous_smooth.stl",

@@ -35,4 +35,4 @@
 ## 3. Engineering Implementation Alignment
 
 - References: `src/domains/body-exposure/engine/gaitFootMetrics.ts`, `docs/alpha/D7_SOURCE_BOUND_MEASUREMENT_EVIDENCE.md`.
-- Status: **DECIDED**.
+- Status: **PREPARED (DEFERRED_FINAL_STAGE — biomechanical literature thresholds enforced in automated gait measurability pipeline; formal external specialist sign-off deferred to Clinical Validation)**.

@@ -42,4 +42,4 @@
 
 - Codebase references: `docs/alpha/F1_NURSE_LAB_RBAC_PROPOSAL.md`.
 - Gating contract: `src/domains/clinical-operations/` and Visit OS episode coordinator enforce assigned-care-team filtering.
-- Status: **DECIDED**.
+- Status: **PREPARED (DEFERRED_FINAL_STAGE — automated technical RBAC enforced; external human/clinical sign-off deferred to final deployment stage)**.

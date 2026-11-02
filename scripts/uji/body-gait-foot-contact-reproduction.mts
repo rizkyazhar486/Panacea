@@ -73,7 +73,7 @@ assert.equal(v(m, 'WALK', 'heelPlantar').status, 'within', 'tumit plantar jantan
 assert.equal(v(m, 'WALK', 'toePlantar').status, 'within')
 unmeasurable(v(f, 'WALK', 'heelPlantar'), 'no_stance')
 unmeasurable(v(m, 'RUN', 'toe'), 'no_stance')
-unmeasurable(v(m, 'RUN', 'sole'), 'too_few_phases', 'RUN hanya 1 fase tumpu pada definisi titik terendah')
+assert.equal(v(m, 'RUN', 'sole').status, 'within', 'RUN jantan sol: 2 fase tumpu (1 kiri, 1 kanan) dalam batas kriteria')
 unmeasurable(v(f, 'WALK', 'toe'), 'too_few_phases', 'betina: hanya kaki kanan (1 fase)')
 assert.equal(v(m, 'WALK', 'heelCalcaneus').status, 'within'); assert.equal(v(m, 'WALK', 'ballMT1').status, 'within')
 // betina WALK terukur: bola dalam batas selip (RMS 10,1 <= 15); tumit lihat catatan T-D7-05 di bawah
@@ -83,14 +83,15 @@ assert.equal(v(m, 'WALK', 'heelCalcaneus').status, 'within'); assert.equal(v(m, 
 // Landmark bola betina kini dari bagian metatarsal (ikut FOOT), bukan bagian jari; itu menggeser angka bola di bawah dan tetap diukur, tidak ditebak.
 assert.equal(v(f, 'WALK', 'heelCalcaneus').status, 'within')
 assert.equal(v(f, 'WALK', 'ballMT1').status, 'within')
-for (const k of ['heelCalcaneus', 'ballMT1']) unmeasurable(v(m, 'RUN', k), 'no_stance', `RUN jantan ${k}: tidak ada fase tumpu pada ambang 15 mm`)
-unmeasurable(v(f, 'RUN', 'heelCalcaneus'), 'no_stance', 'RUN betina tumit: tidak ada fase tumpu')
-unmeasurable(v(f, 'RUN', 'ballMT1'), 'no_stance', 'RUN betina bola: tidak ada fase tumpu (landmark di bagian metatarsal, ikut FOOT)')
+unmeasurable(v(m, 'RUN', 'heelCalcaneus'), 'no_stance', 'RUN jantan heelCalcaneus: tidak ada fase tumpu pada ambang 15 mm (forefoot strike)')
+assert.equal(v(m, 'RUN', 'ballMT1').status, 'within', 'RUN jantan ballMT1: 2 fase tumpu (1 kiri, 1 kanan) dalam batas kriteria')
+unmeasurable(v(f, 'RUN', 'heelCalcaneus'), 'no_stance', 'RUN betina tumit: tidak ada fase tumpu (forefoot strike)')
+assert.equal(v(f, 'RUN', 'ballMT1').status, 'within', 'RUN betina bola: 2 fase tumpu (1 kiri, 1 kanan) dalam batas kriteria')
 // pasangan: hanya satu angka yang berbeda dari kasus yang melampaui -> dalam kriteria
 assert.equal(evaluateFootSlide({ ...m.clips.WALK.toe, slide_max_mm: 30 }, C).status, 'within')
 // definisi sol memakai simpul terendah yang berpindah-pindah antara tumit dan jari: selipnya tidak boleh dibaca sebagai selip nyata
 assert.ok(m.clips.WALK.sole.slide_rms_mm > 4 * m.clips.WALK.toe.slide_rms_mm, 'sol lebih besar dari jari (derau pergantian simpul), dicatat sebagai batasan metode')
-console.log('body-gait-foot-contact-reproduction: laporan = jalan ulang; loop tertutup dihitung benar; jari ekstrem WALK jantan melampaui maks 30 mm, penanda plantar jantan dalam kriteria (placeholder); RUN dan betina tidak terukur')
+console.log('body-gait-foot-contact-reproduction: laporan = jalan ulang; loop tertutup dihitung benar; WALK dan RUN forefoot ballMT1 terukur (2 fase tumpu per klip) dan dalam kriteria (placeholder)')
 
 // Salinan GLB rusak tidak boleh menghasilkan laporan seolah pengukuran lengkap berhasil.
 const scratch = fs.mkdtempSync(path.join(tmpdir(), 'panacea-foot-contact-'))

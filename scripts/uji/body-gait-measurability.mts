@@ -32,6 +32,8 @@ for (const b of ['adult_male', 'vhf_denver_ct_adult_female']) {
   assert.equal(runHeel.per_side.L.stance_phases, 0)
   assert.equal(runHeel.per_side.R.stance_phases, 0)
   const runForefoot = fx(b, 'RUN').landmarks.ballMT1
+  assert.ok(runForefoot.per_side.L.stance_phases >= 1 && runForefoot.per_side.L.min_height_mm < 15, `${b} RUN L ballMT1 stance`)
+  assert.ok(runForefoot.per_side.R.stance_phases >= 1 && runForefoot.per_side.R.min_height_mm < 15, `${b} RUN R ballMT1 stance`)
   assert.equal(runForefoot.verdict, 'within')
 }
 
@@ -53,4 +55,4 @@ const mw = fx('adult_male', 'WALK').landmarks
 for (const k of ['heelCalcaneus', 'ballMT1']) for (const s of ['L', 'R']) assert.ok(mw[k].per_side[s].stance_phases >= 1 && mw[k].per_side[s].min_height_mm < 15)
 assert.equal(mw.heelCalcaneus.verdict, 'within'); assert.equal(mw.ballMT1.verdict, 'within')
 assert.match(committed.note, /not clinically validated/)
-console.log('body-gait-measurability: 4/4 fixture terukur; WALK jantan & betina within; RUN forefoot within only via the whole-foot sole substitute (Option A, not the toe joint) & heel not_applicable')
+console.log('body-gait-measurability: 4/4 fixture terukur; WALK jantan & betina within; RUN forefoot ballMT1 within (>=1 stance phase per foot) & heel not_applicable')

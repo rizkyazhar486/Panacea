@@ -38,4 +38,4 @@
 
 - Closes the lacuna noted in `docs/alpha/D8_OWNER_ATTESTATION_REQUESTS.md`.
 - Recorded in `public/media/ASSET_SOURCES.md`.
-- Status: **DECIDED**.
+- Status: **PREPARED (DEFERRED_FINAL_STAGE — cryptographic SHA-256 asset provenance enforced in CI; formal signed media rights attestation deferred to final release stage)**.

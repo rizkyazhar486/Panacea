@@ -27,4 +27,4 @@
 
 3. **Status:**
    - Staging environment topology and automated smoke validation configured.
-   - Status: **DECIDED**.
+   - Status: **PREPARED (DEFERRED_FINAL_STAGE — staging gate workflow `.github/workflows/staging-gate.yml` and fail-closed credential verifier `scripts/qa/staging-credentials.mjs` enforced; live staging secret provisioning deferred to infra owner)**.
