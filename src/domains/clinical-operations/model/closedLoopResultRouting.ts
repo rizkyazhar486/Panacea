@@ -2,6 +2,7 @@
 // PanaceaMed T-CLIN-80: Closed-Loop Diagnostic Result Closure & High-Consequence Alert Routing Protocol (PAN-EXP-2026-01)
 
 import { isValidIsoTimestamp } from '../../../shared/kernel/isoTimestamp.ts'
+import { sha256Hex } from './downstreamHilirisasiFhirPacsBridge.ts'
 
 export type DiagnosticResultSeverity = 'CRITICAL_EMERGENCY' | 'ABNORMAL_PRIORITY' | 'ROUTINE_INFORMATIONAL'
 
@@ -134,7 +135,7 @@ export function evaluateClosedLoopResultRouting(
       elapsedMinutesSinceResult: elapsedMinutes,
       maxAllowedAcknowledgementWindowMinutes: maxWindow,
       acknowledgementOverdue: isOverdue,
-      auditDigest: `sha256:closed:${order.orderId}:${order.closedById}:${order.closedAt}`,
+      auditDigest: `sha256:closed:${sha256Hex(`${order.orderId}:${order.closedById}:${order.closedAt}`)}`,
       safetyActionRequired: 'Result loop fully closed with documented physician action',
       isClosed: true,
     }
@@ -151,7 +152,7 @@ export function evaluateClosedLoopResultRouting(
       maxAllowedAcknowledgementWindowMinutes: maxWindow,
       acknowledgementOverdue: isOverdue,
       escalationTarget: 'PRIMARY_CLINICIAN',
-      auditDigest: `sha256:ack:${order.orderId}:${order.acknowledgedById}:${order.acknowledgedAt}`,
+      auditDigest: `sha256:ack:${sha256Hex(`${order.orderId}:${order.acknowledgedById}:${order.acknowledgedAt}`)}`,
       safetyActionRequired: 'Physician must enter mandated clinical plan to close loop',
       isClosed: false,
     }
@@ -197,7 +198,7 @@ export function evaluateClosedLoopResultRouting(
     maxAllowedAcknowledgementWindowMinutes: maxWindow,
     acknowledgementOverdue: isOverdue,
     escalationTarget: target,
-    auditDigest: `sha256:pending:${order.orderId}:${status}:${elapsedMinutes}m`,
+    auditDigest: `sha256:pending:${sha256Hex(`${order.orderId}:${status}:${elapsedMinutes}m`)}`,
     safetyActionRequired: actionRequired,
     isClosed: false,
   }
