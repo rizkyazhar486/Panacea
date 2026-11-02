@@ -9,6 +9,7 @@ import {
   medical3DFrontierSpec,
   relativeFlowIndex,
   relativePoiseuilleResistance,
+  calculateCardiacWiggersCycle,
   type Medical3DFrontierId,
 } from '../../lib/medical3DFrontier'
 import { BatasKlaimKesehatan } from '../BatasKlaimKesehatan'
@@ -60,20 +61,44 @@ function addFlowParticles(scene: THREE.Scene, curve: THREE.Curve<THREE.Vector3>,
   return group
 }
 
+function addValveLeaflet(scene: THREE.Scene, position: THREE.Vector3, isAortic: boolean) {
+  const group = new THREE.Group()
+  group.position.copy(position)
+  group.userData[isAortic ? 'isAorticValve' : 'isMitralValve'] = true
+  const leafletGeo = new THREE.ConeGeometry(0.08, 0.16, 10, 1, true)
+  leafletGeo.rotateX(Math.PI)
+  const leafletMat = material(isAortic ? 0xfef08a : 0xfbcfe8, 0.88, isAortic ? 0xfef08a : 0xfbcfe8)
+  const cuspLeft = new THREE.Mesh(leafletGeo, leafletMat)
+  cuspLeft.scale.set(0.65, 1, 0.25)
+  cuspLeft.position.x = -0.05
+  const cuspRight = cuspLeft.clone()
+  cuspRight.position.x = 0.05
+  group.add(cuspLeft, cuspRight)
+  scene.add(group)
+  return group
+}
+
 function buildHemodynamics(scene: THREE.Scene) {
   const chamberMat = material(0x7f1d1d, 0.56)
   const left = new THREE.Mesh(new THREE.SphereGeometry(0.78, 40, 40), chamberMat.clone())
   left.scale.set(0.85, 1.15, 0.78)
   left.position.set(-0.55, -0.25, 0)
+  left.userData.isLeftVentricle = true
   const right = left.clone()
   right.material = material(0x1e3a8a, 0.5)
   right.position.set(0.55, -0.22, 0.05)
+  right.userData.isRightVentricle = true
   scene.add(left, right)
+
+  // Anatomical Valves with Phase-Locked Motion
+  addValveLeaflet(scene, new THREE.Vector3(-0.6, 0.35, 0), true) // Aortic Semilunar Valve
+  addValveLeaflet(scene, new THREE.Vector3(-0.55, 0.05, 0.25), false) // Mitral Bicuspid Valve
 
   const systemic = addTube(scene, [new THREE.Vector3(-0.6, 0.35, 0), new THREE.Vector3(-0.8, 1.15, 0), new THREE.Vector3(0, 1.8, -0.1), new THREE.Vector3(1.45, 1.25, -0.2)], 0.11, 0xef4444, 0.84)
   const pulmonary = addTube(scene, [new THREE.Vector3(0.55, 0.28, 0), new THREE.Vector3(0.72, 0.95, 0.15), new THREE.Vector3(1.45, 0.7, 0.45)], 0.1, 0x3b82f6, 0.84)
   const shunt = addTube(scene, [new THREE.Vector3(0.16, -0.15, 0.15), new THREE.Vector3(0, 0.02, 0.22), new THREE.Vector3(-0.18, -0.08, 0.18)], 0.055, 0xf59e0b, 0.94)
-  addFlowParticles(scene, systemic, 0xfca5a5, 12)
+  const systemicGroup = addFlowParticles(scene, systemic, 0xfca5a5, 12)
+  systemicGroup.userData.isSystemicAorta = true
   addFlowParticles(scene, pulmonary, 0x93c5fd, 9)
   addFlowParticles(scene, shunt, 0xfbbf24, 6)
 }
@@ -223,15 +248,40 @@ export function Medical3DFrontierLab() {
     const clock = new THREE.Clock()
     const animate = () => {
       const t = clock.getElapsedTime()
+      const cardiac = calculateCardiacWiggersCycle(t, 75)
+
       scene.traverse((obj) => {
         const group = obj as THREE.Group
         const curve = group.userData.flowCurve as THREE.Curve<THREE.Vector3> | undefined
         if (curve) {
           group.children.forEach((child) => {
             const phase = (child.userData.phase as number | undefined) ?? 0
-            const p = curve.getPoint((phase + t * 0.13) % 1)
+            const speed = (group.userData.isSystemicAorta && cardiac.phase === 'SYSTOLIC_EJECTION') ? 0.26 : 0.13
+            const p = curve.getPoint((phase + t * speed) % 1)
             child.position.copy(p)
           })
+        }
+        if (obj.userData.isLeftVentricle) {
+          const s = 0.88 + 0.12 * cardiac.ventricularVolumeFraction
+          obj.scale.set(0.85 * s, 1.15 * s, 0.78 * s)
+        }
+        if (obj.userData.isRightVentricle) {
+          const s = 0.90 + 0.10 * cardiac.ventricularVolumeFraction
+          obj.scale.set(0.85 * s, 1.15 * s, 0.78 * s)
+        }
+        if (obj.userData.isAorticValve) {
+          const openAngle = cardiac.aorticValveOpenFraction * 0.42
+          const c0 = obj.children[0]
+          const c1 = obj.children[1]
+          if (c0) c0.rotation.z = openAngle
+          if (c1) c1.rotation.z = -openAngle
+        }
+        if (obj.userData.isMitralValve) {
+          const openAngle = cardiac.mitralValveOpenFraction * 0.42
+          const c0 = obj.children[0]
+          const c1 = obj.children[1]
+          if (c0) c0.rotation.z = openAngle
+          if (c1) c1.rotation.z = -openAngle
         }
         const stage = obj.userData.embryoStage as number | undefined
         if (stage !== undefined) {
@@ -282,6 +332,12 @@ export function Medical3DFrontierLab() {
           <div className="text-xs font-black text-white">{spec.label}</div>
           <div className="mt-1 text-[10px] leading-snug text-white/65">Drag to orbit · pinch/scroll to zoom · educational schematic</div>
         </div>
+        {mode === 'hemodynamics-4d' ? (
+          <div className="pointer-events-none absolute right-3 top-3 rounded-xl border border-emerald-500/30 bg-black/55 px-2.5 py-1.5 backdrop-blur text-right">
+            <div className="text-[10px] font-bold text-emerald-400">● Wiggers Phase-Locked</div>
+            <div className="text-[9px] font-mono text-white/60">Mitral &amp; Aortic Leaflets</div>
+          </div>
+        ) : null}
       </div>
 
       <div className="grid gap-4 p-5 lg:grid-cols-[1.15fr_.85fr]">
