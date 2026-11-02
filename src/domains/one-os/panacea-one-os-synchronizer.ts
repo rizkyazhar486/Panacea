@@ -1,0 +1,4 @@
+export const CLINICAL_ONE_OS_WORKFLOW_STAGES = ["BEFORE_VISIT", "CLINICIAN_REVIEW", "ENCOUNTER", "DOCUMENTATION", "RESULTS", "FOLLOW_UP"] as const;
+export function buildBoundedHumanDigitalTwinSnapshot(params: { patientId: string; workflowStage: string; observedHeartRateBpm: number | null; modeledStrokeVolumeMl: number; }) {
+  return { patientId: params.patientId, workflowStage: params.workflowStage, measuredClinicalState: { heartRateBpm: params.observedHeartRateBpm === null ? ("MISSING_OBSERVATION" as const) : params.observedHeartRateBpm, truthClass: "OBSERVED_CLINICAL" as const }, educationalDigitalTwinProjection: { modeledStrokeVolumeMl: params.modeledStrokeVolumeMl, truthClass: "SIMULATED_EDUCATIONAL" as const, anatomicalReconstructionClaimed: false as const }, clinicalAuthorityPreserved: true as const };
+}
