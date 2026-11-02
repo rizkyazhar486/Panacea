@@ -1,0 +1,96 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <radialGradient id="bg-kenji" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#4f46e5" />
+      <stop offset="100%" stop-color="#312e81" />
+    </radialGradient>
+    <linearGradient id="hair-kenji" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#334155" />
+      <stop offset="50%" stop-color="#1e293b" />
+      <stop offset="100%" stop-color="#0f172a" />
+    </linearGradient>
+    <linearGradient id="skin-kenji" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#fffbeb" />
+      <stop offset="100%" stop-color="#fde68a" />
+    </linearGradient>
+    <linearGradient id="cardigan-kenji" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e1b4b" />
+      <stop offset="100%" stop-color="#0f172a" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background Circle -->
+  <circle cx="256" cy="256" r="248" fill="url(#bg-kenji)" stroke="#818cf8" stroke-width="8" />
+
+  <!-- Back Hair -->
+  <path d="M165 200 C140 260 150 330 185 365 C220 330 290 330 327 365 C362 330 372 260 347 200 Z" fill="#0f172a" />
+
+  <!-- Shoulders & Cardigan -->
+  <path d="M110 500 C120 410 180 370 256 370 C332 370 392 410 402 500 Z" fill="url(#cardigan-kenji)" />
+  <!-- White collared shirt -->
+  <polygon points="230,370 282,370 268,430 256,440 244,430" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5" />
+  <polygon points="215,370 236,400 232,370" fill="#f1f5f9" />
+  <polygon points="297,370 276,400 280,370" fill="#f1f5f9" />
+  <!-- Cardigan V opening -->
+  <path d="M210 370 L256 460 L302 370" stroke="#312e81" stroke-width="6" fill="none" />
+
+  <!-- Stethoscope around neck -->
+  <path d="M200 400 C185 440 205 480 225 500" stroke="#64748b" stroke-width="6" fill="none" stroke-linecap="round" />
+  <path d="M312 400 C327 440 307 480 287 500" stroke="#64748b" stroke-width="6" fill="none" stroke-linecap="round" />
+  <!-- Stethoscope chest piece (bell) -->
+  <circle cx="280" cy="495" r="14" fill="#94a3b8" stroke="#475569" stroke-width="3" />
+  <circle cx="280" cy="495" r="7" fill="#cbd5e1" />
+
+  <!-- Neck -->
+  <path d="M230 315 L230 375 C242 382 270 382 282 375 L282 315 Z" fill="url(#skin-kenji)" />
+
+  <!-- Head Base -->
+  <path d="M185 210 C185 140 216 110 256 110 C296 110 327 140 327 210 C327 270 296 325 256 340 C216 325 185 270 185 210 Z" fill="url(#skin-kenji)" />
+
+  <!-- Eyebrows (Calm & intellectual) -->
+  <path d="M200 205 Q220 196 238 202" stroke="#1e293b" stroke-width="3.5" stroke-linecap="round" fill="none" />
+  <path d="M312 205 Q292 196 274 202" stroke="#1e293b" stroke-width="3.5" stroke-linecap="round" fill="none" />
+
+  <!-- Eyes (Deep Indigo, gentle and attentive) -->
+  <!-- Left Eye -->
+  <ellipse cx="218" cy="232" rx="16" ry="21" fill="#0f172a" />
+  <ellipse cx="218" cy="233" rx="13" ry="17" fill="#312e81" />
+  <ellipse cx="218" cy="235" rx="8" ry="12" fill="#6366f1" />
+  <circle cx="213" cy="225" r="5" fill="#ffffff" />
+  <path d="M198 223 Q218 212 238 221" stroke="#0f172a" stroke-width="4" stroke-linecap="round" fill="none" />
+
+  <!-- Right Eye -->
+  <ellipse cx="294" cy="232" rx="16" ry="21" fill="#0f172a" />
+  <ellipse cx="294" cy="233" rx="13" ry="17" fill="#312e81" />
+  <ellipse cx="294" cy="235" rx="8" ry="12" fill="#6366f1" />
+  <circle cx="289" cy="225" r="5" fill="#ffffff" />
+  <path d="M274 221 Q294 212 314 223" stroke="#0f172a" stroke-width="4" stroke-linecap="round" fill="none" />
+
+  <!-- Rectangular Spectacles / Glasses -->
+  <rect x="194" y="215" width="48" height="34" rx="6" fill="#e0e7ff" fill-opacity="0.25" stroke="#38bdf8" stroke-width="3" />
+  <rect x="270" y="215" width="48" height="34" rx="6" fill="#e0e7ff" fill-opacity="0.25" stroke="#38bdf8" stroke-width="3" />
+  <!-- Bridge -->
+  <line x1="242" y1="228" x2="270" y2="228" stroke="#38bdf8" stroke-width="3" />
+  <!-- Frame hinges -->
+  <line x1="185" y1="225" x2="194" y2="225" stroke="#38bdf8" stroke-width="2.5" />
+  <line x1="318" y1="225" x2="327" y2="225" stroke="#38bdf8" stroke-width="2.5" />
+  <!-- Glass glint -->
+  <line x1="198" y1="220" x2="208" y2="230" stroke="#ffffff" stroke-width="2" stroke-linecap="round" opacity="0.8" />
+  <line x1="274" y1="220" x2="284" y2="230" stroke="#ffffff" stroke-width="2" stroke-linecap="round" opacity="0.8" />
+
+  <!-- Nose -->
+  <path d="M256 258 L254 268 L259 270" stroke="#d97706" stroke-width="1.8" stroke-linecap="round" fill="none" />
+
+  <!-- Gentle Focused Smile -->
+  <path d="M242 296 Q256 304 270 296" stroke="#475569" stroke-width="3" fill="none" stroke-linecap="round" />
+
+  <!-- Neat Anime Hair (Side-parted, orderly) -->
+  <path d="M180 190 Q200 120 256 115 Q312 120 332 190 C325 155 295 130 256 130 C220 130 195 150 180 190 Z" fill="url(#hair-kenji)" />
+  <path d="M230 125 Q245 180 235 210 Q265 170 275 145" fill="url(#hair-kenji)" />
+  <path d="M205 140 Q190 190 185 220 C180 180 190 155 205 140 Z" fill="url(#hair-kenji)" />
+  <path d="M295 135 Q315 180 325 215 C330 180 315 155 295 135 Z" fill="url(#hair-kenji)" />
+
+  <!-- Badge Name Tag -->
+  <rect x="175" y="445" width="162" height="34" rx="8" fill="#1e1b4b" stroke="#818cf8" stroke-width="2" />
+  <text x="256" y="468" font-family="system-ui, -apple-system, sans-serif" font-size="16" font-weight="900" fill="#c7d2fe" text-anchor="middle" letter-spacing="2">🧠 KENJI · STEADY</text>
+</svg>

@@ -1,0 +1,93 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <radialGradient id="bg-mira" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#c084fc" />
+      <stop offset="100%" stop-color="#581c87" />
+    </radialGradient>
+    <linearGradient id="hair-mira" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#e9d5ff" />
+      <stop offset="40%" stop-color="#d8b4fe" />
+      <stop offset="100%" stop-color="#a855f7" />
+    </linearGradient>
+    <linearGradient id="skin-mira" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="100%" stop-color="#fce7f3" />
+    </linearGradient>
+    <linearGradient id="coat-mira" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#fdf4ff" />
+      <stop offset="100%" stop-color="#f5d0fe" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background Circle -->
+  <circle cx="256" cy="256" r="248" fill="url(#bg-mira)" stroke="#e879f9" stroke-width="8" />
+
+  <!-- Back Flowing Hair (Low Ponytail) -->
+  <path d="M150 200 C120 280 120 380 160 460 C200 480 312 480 352 460 C392 380 392 280 362 200 Z" fill="#9333ea" />
+  <path d="M220 400 C210 450 225 500 230 512 L282 512 C287 500 302 450 292 400 Z" fill="#7e22ce" />
+  <!-- Ribbon on Ponytail -->
+  <ellipse cx="256" cy="405" rx="18" ry="9" fill="#f43f5e" />
+
+  <!-- Shoulders & Doctor Lab Coat -->
+  <path d="M110 500 C120 410 180 370 256 370 C332 370 392 410 402 500 Z" fill="url(#coat-mira)" stroke="#e2e8f0" stroke-width="2" />
+  <!-- Inner Violet Silk Blouse -->
+  <polygon points="234,370 278,370 266,425 256,432 246,425" fill="#c084fc" />
+  <polygon points="220,370 240,400 236,370" fill="#ffffff" />
+  <polygon points="292,370 272,400 276,370" fill="#ffffff" />
+  <!-- Coat Lapels -->
+  <path d="M205 370 L256 465 L307 370" stroke="#f1f5f9" stroke-width="5" fill="none" />
+
+  <!-- Heart-Shaped Golden Clinical Pin on Lapel -->
+  <path d="M220 415 C215 408 206 408 201 413 C196 418 196 426 201 431 L210 440 L219 431 C224 426 224 418 219 413 C214 408 225 408 220 415 Z" fill="#fbbf24" stroke="#d97706" stroke-width="1.5" />
+
+  <!-- Neck -->
+  <path d="M232 315 L232 375 C244 382 268 382 280 375 L280 315 Z" fill="url(#skin-mira)" />
+
+  <!-- Head Base -->
+  <path d="M185 210 C185 140 216 110 256 110 C296 110 327 140 327 210 C327 270 296 325 256 340 C216 325 185 270 185 210 Z" fill="url(#skin-mira)" />
+
+  <!-- Soft Rosy Blush -->
+  <ellipse cx="202" cy="272" rx="14" ry="7" fill="#f472b6" opacity="0.35" />
+  <ellipse cx="310" cy="272" rx="14" ry="7" fill="#f472b6" opacity="0.35" />
+
+  <!-- Eyebrows (Graceful & Serene) -->
+  <path d="M202 206 Q220 198 238 205" stroke="#7e22ce" stroke-width="3" stroke-linecap="round" fill="none" />
+  <path d="M310 206 Q292 198 274 205" stroke="#7e22ce" stroke-width="3" stroke-linecap="round" fill="none" />
+
+  <!-- Eyes (Luminous Violet/Amethyst, deep & brilliant) -->
+  <!-- Left Eye -->
+  <ellipse cx="218" cy="233" rx="17" ry="23" fill="#3b0764" />
+  <ellipse cx="218" cy="234" rx="14" ry="19" fill="#7e22ce" />
+  <ellipse cx="218" cy="236" rx="9" ry="13" fill="#c084fc" />
+  <circle cx="213" cy="225" r="5.5" fill="#ffffff" />
+  <circle cx="223" cy="244" r="2.5" fill="#ffffff" />
+  <path d="M196 222 Q218 209 240 220" stroke="#3b0764" stroke-width="4.5" stroke-linecap="round" fill="none" />
+
+  <!-- Right Eye -->
+  <ellipse cx="294" cy="233" rx="17" ry="23" fill="#3b0764" />
+  <ellipse cx="294" cy="234" rx="14" ry="19" fill="#7e22ce" />
+  <ellipse cx="294" cy="236" rx="9" ry="13" fill="#c084fc" />
+  <circle cx="289" cy="225" r="5.5" fill="#ffffff" />
+  <circle cx="299" cy="244" r="2.5" fill="#ffffff" />
+  <path d="M272 220 Q294 209 316 222" stroke="#3b0764" stroke-width="4.5" stroke-linecap="round" fill="none" />
+
+  <!-- Dainty Nose -->
+  <path d="M256 260 L255 268 L258 270" stroke="#f472b6" stroke-width="1.8" stroke-linecap="round" fill="none" />
+
+  <!-- Composed Intelligent Slight Smile -->
+  <path d="M242 296 Q256 305 270 296" stroke="#db2777" stroke-width="2.8" fill="none" stroke-linecap="round" />
+
+  <!-- Elegant Silver-Lavender Front Hair & Bangs -->
+  <path d="M175 190 Q200 115 256 112 Q312 115 337 190 C332 150 298 128 256 128 C214 128 180 150 175 190 Z" fill="url(#hair-mira)" />
+  <!-- Center soft parted bangs -->
+  <path d="M235 128 Q248 185 240 215 Q262 175 272 135" fill="url(#hair-mira)" />
+  <path d="M210 135 Q195 190 190 230 C185 185 195 150 210 135 Z" fill="url(#hair-mira)" />
+  <path d="M290 135 Q310 190 315 230 C320 185 310 150 290 135 Z" fill="url(#hair-mira)" />
+  <!-- Side strands framing cheeks -->
+  <path d="M172 205 Q165 270 175 320 C182 270 180 220 172 205 Z" fill="url(#hair-mira)" />
+  <path d="M340 205 Q347 270 337 320 C330 270 332 220 340 205 Z" fill="url(#hair-mira)" />
+
+  <!-- Badge Name Tag -->
+  <rect x="175" y="445" width="162" height="34" rx="8" fill="#581c87" stroke="#e879f9" stroke-width="2" />
+  <text x="256" y="468" font-family="system-ui, -apple-system, sans-serif" font-size="16" font-weight="900" fill="#f5d0fe" text-anchor="middle" letter-spacing="2">✨ MIRA · SCHOLAR</text>
+</svg>
