@@ -16,6 +16,8 @@ import { organFactIndex, firstSentence } from '../engine/structureAtlas'
 import { CardiopulmonaryCouplingDeck } from './CardiopulmonaryCouplingDeck'
 import { SoftTissueBiomechanicsDeck } from './SoftTissueBiomechanicsDeck'
 import { NeuroFascicularReflexDeck } from './NeuroFascicularReflexDeck'
+import { CoronaryTerritoryPanel } from './CoronaryTerritoryPanel'
+import { ReferredPainDermatomeStudio } from './ReferredPainDermatomeStudio'
 
 import {
   ATLAS_LAYERS,
@@ -43,6 +45,9 @@ export function BodyExposureAtlasHome() {
   const [selectedStructure, setSelectedStructure] = useState<SelectedStructureInfo | null>(null)
   const [loadingLayers, setLoadingLayers] = useState<Record<string, boolean>>({})
   const [layerError, setLayerError] = useState<string | null>(null)
+  const [isSidePanelOpen, setIsSidePanelOpen] = useState<boolean>(true)
+  const [physiologySystem, setPhysiologySystem] = useState<'cardiopulmonary' | 'soft_tissue' | 'neuro'>('cardiopulmonary')
+  const [clinicalTool, setClinicalTool] = useState<'vascular' | 'referred_pain' | 'neuro_localizer'>('vascular')
 
   // Three.js instances preserved in refs
   const sceneRef = useRef<THREE.Scene | null>(null)
@@ -94,6 +99,39 @@ export function BodyExposureAtlasHome() {
     controlsRef.current.update()
   }, [])
 
+  // Auto-route physiology deck and clinical tool based on selected structure
+  const handleSelectStructure = useCallback((info: SelectedStructureInfo | null) => {
+    setSelectedStructure(info)
+    if (!info) return
+
+    setIsSidePanelOpen(true)
+    const lower = (info.cleanName + ' ' + info.meshName).toLowerCase()
+    if (
+      info.layerId === 'cardiovascular' ||
+      lower.includes('heart') ||
+      lower.includes('aorta') ||
+      lower.includes('coronar') ||
+      lower.includes('arter') ||
+      lower.includes('vein')
+    ) {
+      setPhysiologySystem('cardiopulmonary')
+      setClinicalTool('vascular')
+    } else if (
+      info.layerId === 'nervous' ||
+      lower.includes('brain') ||
+      lower.includes('nerve') ||
+      lower.includes('cord') ||
+      lower.includes('pons') ||
+      lower.includes('medulla')
+    ) {
+      setPhysiologySystem('neuro')
+      setClinicalTool('neuro_localizer')
+    } else {
+      setPhysiologySystem('soft_tissue')
+      setClinicalTool('referred_pain')
+    }
+  }, [])
+
   // Raycasting for organ/mesh picking
   const handleCanvasClick = useCallback(
     (event: React.MouseEvent<HTMLDivElement>) => {
@@ -134,7 +172,7 @@ export function BodyExposureAtlasHome() {
         const cleanName = resolvedName.replace(/[._][lrLR]$/, '').replace(/_/g, ' ')
         const summary = `Normal human reference geometry from ${matchedLayer}.glb.`
 
-        setSelectedStructure({
+        handleSelectStructure({
           meshName: resolvedName,
           layerId: matchedLayer,
           cleanName: cleanName.charAt(0).toUpperCase() + cleanName.slice(1),
@@ -143,7 +181,7 @@ export function BodyExposureAtlasHome() {
         })
       }
     },
-    [],
+    [handleSelectStructure],
   )
 
   // Initialize Three.js WebGL Scene Shell
@@ -318,37 +356,67 @@ export function BodyExposureAtlasHome() {
           <span style={{ fontSize: '0.7rem', color: '#94a3b8' }}>· 7 Shipped Z-Anatomy Layers</span>
         </div>
 
-        {/* 3-Stage Workflow Switcher */}
-        <div style={{ display: 'flex', background: 'rgba(0, 0, 0, 0.35)', padding: '0.2rem', borderRadius: '0.5rem', border: '1px solid rgba(255,255,255,0.08)' }}>
-          {(['anatomy', 'physiology', 'clinical'] as const).map((s) => {
-            const isActive = stage === s
-            const labels = { anatomy: '1. Anatomy', physiology: '2. Living Physiology', clinical: '3. Clinical Relevance' }
-            return (
-              <button
-                key={s}
-                type="button"
-                onClick={() => setStage(s)}
-                style={{
-                  background: isActive ? '#00BF63' : 'transparent',
-                  color: isActive ? '#ffffff' : '#94a3b8',
-                  border: 'none',
-                  padding: '0.35rem 0.75rem',
-                  borderRadius: '0.375rem',
-                  fontSize: '0.75rem',
-                  fontWeight: 800,
-                  cursor: 'pointer',
-                  transition: 'all 0.15s ease',
-                }}
-              >
-                {labels[s]}
-              </button>
-            )
-          })}
+        {/* Right Action Cluster: 3-Stage Workflow & Side Panel Toggle */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+          {/* 3-Stage Workflow Switcher */}
+          <div style={{ display: 'flex', background: 'rgba(0, 0, 0, 0.35)', padding: '0.2rem', borderRadius: '0.5rem', border: '1px solid rgba(255,255,255,0.08)' }}>
+            {(['anatomy', 'physiology', 'clinical'] as const).map((s) => {
+              const isActive = stage === s
+              const labels = { anatomy: '1. Anatomy', physiology: '2. Living Physiology', clinical: '3. Clinical Relevance' }
+              return (
+                <button
+                  key={s}
+                  type="button"
+                  onClick={() => setStage(s)}
+                  style={{
+                    background: isActive ? '#00BF63' : 'transparent',
+                    color: isActive ? '#ffffff' : '#94a3b8',
+                    border: 'none',
+                    padding: '0.35rem 0.75rem',
+                    borderRadius: '0.375rem',
+                    fontSize: '0.75rem',
+                    fontWeight: 800,
+                    cursor: 'pointer',
+                    transition: 'all 0.15s ease',
+                  }}
+                >
+                  {labels[s]}
+                </button>
+              )
+            })}
+          </div>
+
+          {/* Side Panel Toggle */}
+          <button
+            type="button"
+            onClick={() => setIsSidePanelOpen((v) => !v)}
+            aria-label={isSidePanelOpen ? 'Collapse side panel' : 'Open side panel'}
+            style={{
+              background: isSidePanelOpen ? 'rgba(56, 189, 248, 0.15)' : 'rgba(255, 255, 255, 0.06)',
+              border: isSidePanelOpen ? '1px solid rgba(56, 189, 248, 0.4)' : '1px solid rgba(255, 255, 255, 0.12)',
+              color: isSidePanelOpen ? '#38bdf8' : '#94a3b8',
+              padding: '0.35rem 0.65rem',
+              borderRadius: '0.375rem',
+              fontSize: '0.72rem',
+              fontWeight: 800,
+              cursor: 'pointer',
+            }}
+          >
+            {isSidePanelOpen ? 'Deck ⇥' : 'Deck ⇤'}
+          </button>
         </div>
       </div>
 
       {/* Main Workspace: 3D Viewport with Floating Controls & Side Panel */}
-      <div style={{ display: 'grid', gridTemplateColumns: selectedStructure ? 'minmax(0, 1fr) 360px' : '1fr', flex: 1, minHeight: '620px', position: 'relative' }}>
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: isSidePanelOpen ? 'minmax(0, 1fr) clamp(380px, 35vw, 540px)' : '1fr',
+          flex: 1,
+          minHeight: '640px',
+          position: 'relative',
+        }}
+      >
         {/* 3D Viewport Host */}
         <div
           ref={mountRef}
@@ -367,7 +435,7 @@ export function BodyExposureAtlasHome() {
               position: 'absolute',
               bottom: '1rem',
               left: '1rem',
-              right: selectedStructure ? '1rem' : 'auto',
+              right: isSidePanelOpen ? '1rem' : 'auto',
               maxWidth: '520px',
               padding: '0.75rem 1rem',
               borderRadius: '0.75rem',
@@ -446,7 +514,7 @@ export function BodyExposureAtlasHome() {
                   <div
                     key={idx}
                     onClick={() => {
-                      setSelectedStructure({
+                      handleSelectStructure({
                         meshName: item.name,
                         layerId: item.layer,
                         cleanName: item.name.replace(/_/g, ' '),
@@ -465,11 +533,11 @@ export function BodyExposureAtlasHome() {
           </div>
         </div>
 
-        {/* Side Panel: Progressive Disclosure per Stage */}
-        {selectedStructure && (
+        {/* Side Panel: Progressive Disclosure per Stage (Whole Body & Focused Structure) */}
+        {isSidePanelOpen && (
           <div
             style={{
-              background: 'rgba(10, 15, 29, 0.95)',
+              background: 'rgba(10, 15, 29, 0.96)',
               borderLeft: '1px solid rgba(255, 255, 255, 0.08)',
               padding: '1.25rem',
               display: 'flex',
@@ -478,98 +546,235 @@ export function BodyExposureAtlasHome() {
               maxHeight: '100%',
               gap: '1rem',
             }}
+            data-testid="atlas-side-panel"
           >
-            {/* Header with Close */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-              <div>
-                <span style={{ fontSize: '0.65rem', textTransform: 'uppercase', fontWeight: 800, color: '#00BF63', letterSpacing: '0.1em' }}>
-                  {selectedStructure.layerId} layer
-                </span>
-                <h4 style={{ margin: '0.2rem 0 0 0', fontSize: '1.15rem', fontWeight: 900, color: '#ffffff' }}>
-                  {selectedStructure.cleanName}
-                </h4>
-                <span style={{ fontSize: '0.65rem', color: '#94a3b8', fontFamily: 'monospace' }}>
-                  Source: {selectedStructure.meshName}
-                </span>
-              </div>
-              <button
-                type="button"
-                onClick={() => setSelectedStructure(null)}
-                style={{ background: 'transparent', border: 'none', color: '#94a3b8', fontSize: '1.1rem', cursor: 'pointer' }}
-              >
-                ✕
-              </button>
-            </div>
-
-            {/* STAGE 1: ANATOMY SUMMARY */}
-            {stage === 'anatomy' && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                <div style={{ padding: '0.75rem', borderRadius: '0.5rem', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
-                  <span style={{ fontSize: '0.65rem', fontWeight: 800, textTransform: 'uppercase', color: '#38bdf8' }}>
-                    Succinct Functional Role
+            {/* Header: Focused Structure vs Whole-Body Exploration */}
+            {selectedStructure ? (
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '1px solid rgba(255,255,255,0.08)', paddingBottom: '0.75rem' }}>
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                    <span style={{ fontSize: '0.65rem', textTransform: 'uppercase', fontWeight: 800, color: '#00BF63', letterSpacing: '0.1em' }}>
+                      {selectedStructure.layerId} layer
+                    </span>
+                    <span style={{ fontSize: '0.65rem', color: '#64748b' }}>· Inspected Structure</span>
+                  </div>
+                  <h4 style={{ margin: '0.2rem 0 0 0', fontSize: '1.15rem', fontWeight: 900, color: '#ffffff' }}>
+                    {selectedStructure.cleanName}
+                  </h4>
+                  <span style={{ fontSize: '0.65rem', color: '#94a3b8', fontFamily: 'monospace' }}>
+                    Mesh: {selectedStructure.meshName}
                   </span>
-                  <p style={{ margin: '0.3rem 0 0 0', fontSize: '0.8rem', lineHeight: 1.5, color: '#e2e8f0' }}>
-                    {selectedStructure.functionalRole}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => handleSelectStructure(null)}
+                  title="Clear selection (Return to Whole-Body exploration)"
+                  aria-label="Clear structure selection"
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.06)',
+                    border: '1px solid rgba(255, 255, 255, 0.12)',
+                    color: '#cbd5e1',
+                    fontSize: '0.7rem',
+                    padding: '0.3rem 0.5rem',
+                    borderRadius: '0.375rem',
+                    cursor: 'pointer',
+                    fontWeight: 700,
+                  }}
+                >
+                  ✕ Whole Body
+                </button>
+              </div>
+            ) : (
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '1px solid rgba(255,255,255,0.08)', paddingBottom: '0.75rem' }}>
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                    <span style={{ fontSize: '0.65rem', textTransform: 'uppercase', fontWeight: 800, color: '#38bdf8', letterSpacing: '0.1em' }}>
+                      Whole-Body Exploration
+                    </span>
+                    <span style={{ fontSize: '0.65rem', color: '#64748b' }}>· Stage {stage === 'anatomy' ? '1' : stage === 'physiology' ? '2' : '3'}</span>
+                  </div>
+                  <h4 style={{ margin: '0.2rem 0 0 0', fontSize: '1.15rem', fontWeight: 900, color: '#ffffff' }}>
+                    {stage === 'anatomy' ? 'Anatomical Architecture' : stage === 'physiology' ? 'Living Human Physiology' : 'Clinical & Diagnostic Suite'}
+                  </h4>
+                  <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.72rem', color: '#94a3b8', lineHeight: 1.4 }}>
+                    {stage === 'anatomy'
+                      ? 'Inspect 7 normative Z-Anatomy layers. Click any organ in the 3D scene or search to inspect.'
+                      : stage === 'physiology'
+                      ? 'Continuous multiphysics simulation: hemodynamics, soft-tissue viscoelasticity, and cranial reflexes.'
+                      : 'Vascular territories (AHA 17), viscerosomatic referred pain dermatomes (C1–S5), and syndromic deficit localizers.'}
                   </p>
-                </div>
-
-                <div style={{ padding: '0.6rem', borderRadius: '0.5rem', background: 'rgba(0,191,99,0.08)', border: '1px solid rgba(0,191,99,0.2)', fontSize: '0.7rem', color: '#86efac' }}>
-                  <b>Truth Class:</b> ATLAS_REFERENCE_LABEL (Normative Population Geometry, Z-Anatomy CC-BY-SA).
-                </div>
-
-                {/* Primary Stage Transition CTAs */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', marginTop: '0.5rem' }}>
-                  <button
-                    type="button"
-                    onClick={() => setStage('physiology')}
-                    style={{
-                      background: '#0284c7',
-                      color: '#ffffff',
-                      border: 'none',
-                      padding: '0.5rem',
-                      borderRadius: '0.5rem',
-                      fontSize: '0.75rem',
-                      fontWeight: 800,
-                      cursor: 'pointer',
-                    }}
-                  >
-                    See Living Physiology →
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setStage('clinical')}
-                    style={{
-                      background: 'rgba(255,255,255,0.06)',
-                      color: '#ffffff',
-                      border: '1px solid rgba(255,255,255,0.12)',
-                      padding: '0.5rem',
-                      borderRadius: '0.5rem',
-                      fontSize: '0.75rem',
-                      fontWeight: 800,
-                      cursor: 'pointer',
-                    }}
-                  >
-                    Clinical Relevance →
-                  </button>
                 </div>
               </div>
             )}
 
-            {/* STAGE 2: LIVING PHYSIOLOGY (Same Scene Shell) */}
+            {/* STAGE 1: ANATOMY */}
+            {stage === 'anatomy' && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                {selectedStructure ? (
+                  <>
+                    <div style={{ padding: '0.75rem', borderRadius: '0.5rem', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                      <span style={{ fontSize: '0.65rem', fontWeight: 800, textTransform: 'uppercase', color: '#38bdf8' }}>
+                        Succinct Functional Role
+                      </span>
+                      <p style={{ margin: '0.3rem 0 0 0', fontSize: '0.8rem', lineHeight: 1.5, color: '#e2e8f0' }}>
+                        {selectedStructure.functionalRole}
+                      </p>
+                    </div>
+
+                    <div style={{ padding: '0.6rem', borderRadius: '0.5rem', background: 'rgba(0,191,99,0.08)', border: '1px solid rgba(0,191,99,0.2)', fontSize: '0.7rem', color: '#86efac' }}>
+                      <b>Truth Class:</b> ATLAS_REFERENCE_LABEL (Normative Population Geometry, Z-Anatomy CC-BY-SA 4.0).
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', marginTop: '0.25rem' }}>
+                      <button
+                        type="button"
+                        onClick={() => setStage('physiology')}
+                        style={{
+                          background: '#0284c7',
+                          color: '#ffffff',
+                          border: 'none',
+                          padding: '0.5rem',
+                          borderRadius: '0.5rem',
+                          fontSize: '0.75rem',
+                          fontWeight: 800,
+                          cursor: 'pointer',
+                        }}
+                      >
+                        See Living Physiology →
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setStage('clinical')}
+                        style={{
+                          background: 'rgba(255,255,255,0.06)',
+                          color: '#ffffff',
+                          border: '1px solid rgba(255,255,255,0.12)',
+                          padding: '0.5rem',
+                          borderRadius: '0.5rem',
+                          fontSize: '0.75rem',
+                          fontWeight: 800,
+                          cursor: 'pointer',
+                        }}
+                      >
+                        Clinical Relevance →
+                      </button>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    {/* Layer Architecture Deck */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                      <span style={{ fontSize: '0.65rem', fontWeight: 800, textTransform: 'uppercase', color: '#94a3b8', letterSpacing: '0.08em' }}>
+                        7 Layer Depth Progression
+                      </span>
+                      {ATLAS_LAYERS.map((layer) => {
+                        const isVisible = activeLayers[layer.id] ?? true
+                        const isPeeled = layer.peelRank < peelLevel
+                        return (
+                          <div
+                            key={layer.id}
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              padding: '0.4rem 0.6rem',
+                              borderRadius: '0.375rem',
+                              background: isPeeled ? 'rgba(255,255,255,0.01)' : 'rgba(255,255,255,0.04)',
+                              border: isPeeled ? '1px dashed rgba(255,255,255,0.05)' : '1px solid rgba(255,255,255,0.08)',
+                              opacity: isPeeled ? 0.45 : 1,
+                            }}
+                          >
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                              <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: layer.color }} />
+                              <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#f1f5f9' }}>
+                                {layer.label}
+                              </span>
+                              <span style={{ fontSize: '0.65rem', color: '#64748b' }}>
+                                (Rank {layer.peelRank})
+                              </span>
+                            </div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                              <button
+                                type="button"
+                                onClick={() => setPeelLevel(layer.peelRank)}
+                                title={`Peel down to ${layer.label}`}
+                                style={{
+                                  background: 'transparent',
+                                  border: '1px solid rgba(255,255,255,0.1)',
+                                  color: '#38bdf8',
+                                  fontSize: '0.6rem',
+                                  padding: '0.15rem 0.35rem',
+                                  borderRadius: '0.25rem',
+                                  cursor: 'pointer',
+                                }}
+                              >
+                                Peel
+                              </button>
+                              <input
+                                type="checkbox"
+                                checked={isVisible}
+                                onChange={() => setActiveLayers((prev) => ({ ...prev, [layer.id]: !prev[layer.id] }))}
+                                aria-label={`Toggle visibility for ${layer.label}`}
+                                style={{ accentColor: '#00BF63', cursor: 'pointer' }}
+                              />
+                            </div>
+                          </div>
+                        )
+                      })}
+                    </div>
+
+                    <div style={{ padding: '0.6rem', borderRadius: '0.5rem', background: 'rgba(56, 189, 248, 0.08)', border: '1px solid rgba(56, 189, 248, 0.2)', fontSize: '0.7rem', color: '#bae6fd' }}>
+                      <b>Interactive Tip:</b> Click any 3D mesh directly in the viewport to peel, isolate, and inspect its living physiology and clinical correlates.
+                    </div>
+                  </>
+                )}
+              </div>
+            )}
+
+            {/* STAGE 2: LIVING PHYSIOLOGY */}
             {stage === 'physiology' && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                <div style={{ fontSize: '0.75rem', fontWeight: 800, color: '#38bdf8', textTransform: 'uppercase' }}>
-                  Stage 2: Mechanistic Physiology Simulation
+                {/* Physiological System Selector Tabs */}
+                <div style={{ display: 'flex', gap: '0.3rem', background: 'rgba(0,0,0,0.3)', padding: '0.25rem', borderRadius: '0.5rem' }}>
+                  {[
+                    { id: 'cardiopulmonary', label: 'Cardiopulmonary PV' },
+                    { id: 'soft_tissue', label: 'Soft Tissue' },
+                    { id: 'neuro', label: 'Neuro Reflexes' },
+                  ].map((tab) => {
+                    const isTabActive = physiologySystem === tab.id
+                    return (
+                      <button
+                        key={tab.id}
+                        type="button"
+                        onClick={() => setPhysiologySystem(tab.id as 'cardiopulmonary' | 'soft_tissue' | 'neuro')}
+                        style={{
+                          flex: 1,
+                          padding: '0.35rem 0.4rem',
+                          borderRadius: '0.375rem',
+                          border: 'none',
+                          background: isTabActive ? '#0284c7' : 'transparent',
+                          color: isTabActive ? '#ffffff' : '#94a3b8',
+                          fontSize: '0.68rem',
+                          fontWeight: 700,
+                          cursor: 'pointer',
+                          transition: 'all 0.15s ease',
+                          textAlign: 'center',
+                        }}
+                      >
+                        {tab.label}
+                      </button>
+                    )
+                  })}
                 </div>
 
-                {/* Mount appropriate deck depending on organ system */}
-                {selectedStructure.layerId === 'cardiovascular' || selectedStructure.cleanName.toLowerCase().includes('heart') ? (
-                  <CardiopulmonaryCouplingDeck />
-                ) : selectedStructure.layerId === 'nervous' || selectedStructure.cleanName.toLowerCase().includes('brain') ? (
-                  <NeuroFascicularReflexDeck />
-                ) : (
-                  <SoftTissueBiomechanicsDeck />
-                )}
+                {/* Simulation Deck Host */}
+                {physiologySystem === 'cardiopulmonary' && <CardiopulmonaryCouplingDeck />}
+                {physiologySystem === 'soft_tissue' && <SoftTissueBiomechanicsDeck />}
+                {physiologySystem === 'neuro' && <NeuroFascicularReflexDeck initialTab="reflexes" />}
+
+                <div style={{ padding: '0.5rem', borderRadius: '0.375rem', background: 'rgba(0,191,99,0.06)', border: '1px solid rgba(0,191,99,0.15)', fontSize: '0.68rem', color: '#86efac' }}>
+                  <b>Simulation Truth Class:</b> mechanistic_simulation_proxy · Deterministic ordinary differential equations with zero synthetic biomarkers.
+                </div>
 
                 <button
                   type="button"
@@ -583,51 +788,108 @@ export function BodyExposureAtlasHome() {
                     fontSize: '0.75rem',
                     fontWeight: 800,
                     cursor: 'pointer',
-                    marginTop: '0.5rem',
+                    marginTop: '0.25rem',
                   }}
                 >
-                  Advance to Clinical Relevance →
+                  Advance to Stage 3: Clinical Relevance →
                 </button>
               </div>
             )}
 
-            {/* STAGE 3: CLINICAL RELEVANCE */}
+            {/* STAGE 3: CLINICAL RELEVANCE (Interactive Suite) */}
             {stage === 'clinical' && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                <div style={{ fontSize: '0.75rem', fontWeight: 800, color: '#f59e0b', textTransform: 'uppercase' }}>
-                  Stage 3: Clinical & Diagnostic Correlation
+                {/* Clinical Tool Selector Tabs */}
+                <div style={{ display: 'flex', gap: '0.3rem', background: 'rgba(0,0,0,0.3)', padding: '0.25rem', borderRadius: '0.5rem' }}>
+                  {[
+                    { id: 'vascular', label: 'Vascular Perfusion' },
+                    { id: 'referred_pain', label: 'Referred Pain' },
+                    { id: 'neuro_localizer', label: 'Syndromic Localizer' },
+                  ].map((tool) => {
+                    const isToolActive = clinicalTool === tool.id
+                    return (
+                      <button
+                        key={tool.id}
+                        type="button"
+                        onClick={() => setClinicalTool(tool.id as 'vascular' | 'referred_pain' | 'neuro_localizer')}
+                        style={{
+                          flex: 1,
+                          padding: '0.35rem 0.4rem',
+                          borderRadius: '0.375rem',
+                          border: 'none',
+                          background: isToolActive ? '#00BF63' : 'transparent',
+                          color: isToolActive ? '#ffffff' : '#94a3b8',
+                          fontSize: '0.68rem',
+                          fontWeight: 700,
+                          cursor: 'pointer',
+                          transition: 'all 0.15s ease',
+                          textAlign: 'center',
+                        }}
+                      >
+                        {tool.label}
+                      </button>
+                    )
+                  })}
                 </div>
 
-                <div style={{ padding: '0.75rem', borderRadius: '0.5rem', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
-                  <div style={{ fontSize: '0.65rem', fontWeight: 800, textTransform: 'uppercase', color: '#94a3b8' }}>
-                    Vascular Territory & Referred Pain
+                {/* Active Interactive Clinical Tool */}
+                {clinicalTool === 'vascular' && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                    <CoronaryTerritoryPanel defaultOpen={true} />
                   </div>
-                  <p style={{ margin: '0.3rem 0 0 0', fontSize: '0.75rem', lineHeight: 1.5, color: '#cbd5e1' }}>
-                    Segmental perfusion and viscerosomatic referred pain dermatomes (C1–S5) correlate directly with this structure.
-                  </p>
-                </div>
+                )}
+
+                {clinicalTool === 'referred_pain' && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                    <ReferredPainDermatomeStudio />
+                  </div>
+                )}
+
+                {clinicalTool === 'neuro_localizer' && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                    <NeuroFascicularReflexDeck initialTab="syndromes" />
+                  </div>
+                )}
 
                 {/* Fail-closed Boundary Notice */}
                 <div style={{ padding: '0.6rem', borderRadius: '0.5rem', background: 'rgba(239, 68, 68, 0.08)', border: '1px solid rgba(239, 68, 68, 0.2)', fontSize: '0.7rem', color: '#fca5a5' }}>
-                  <b>Clinical Gate:</b> Reference correlation for educational study. Does not constitute autonomous patient diagnosis or signed radiological report.
+                  <b>Clinical Gate:</b> Reference correlation for educational and mechanistic study. Does not constitute autonomous patient diagnosis or signed radiological report.
                 </div>
 
-                <button
-                  type="button"
-                  onClick={() => setStage('anatomy')}
-                  style={{
-                    background: 'rgba(255,255,255,0.06)',
-                    color: '#ffffff',
-                    border: '1px solid rgba(255,255,255,0.12)',
-                    padding: '0.5rem',
-                    borderRadius: '0.5rem',
-                    fontSize: '0.75rem',
-                    fontWeight: 800,
-                    cursor: 'pointer',
-                  }}
-                >
-                  ← Return to Anatomy View
-                </button>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', marginTop: '0.25rem' }}>
+                  <button
+                    type="button"
+                    onClick={() => setStage('anatomy')}
+                    style={{
+                      background: 'rgba(255,255,255,0.06)',
+                      color: '#ffffff',
+                      border: '1px solid rgba(255,255,255,0.12)',
+                      padding: '0.5rem',
+                      borderRadius: '0.5rem',
+                      fontSize: '0.75rem',
+                      fontWeight: 800,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    ← Anatomy View
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setStage('physiology')}
+                    style={{
+                      background: 'rgba(56, 189, 248, 0.12)',
+                      color: '#38bdf8',
+                      border: '1px solid rgba(56, 189, 248, 0.3)',
+                      padding: '0.5rem',
+                      borderRadius: '0.5rem',
+                      fontSize: '0.75rem',
+                      fontWeight: 800,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    ← Living Physiology
+                  </button>
+                </div>
               </div>
             )}
           </div>

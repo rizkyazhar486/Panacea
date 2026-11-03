@@ -55,3 +55,33 @@ test('AtlasHome: Anatomical regions cover whole body and major somatic compartme
     assert.ok(reg.distance > 0, `Region ${reg.id} camera distance must be positive`)
   }
 })
+
+test('AtlasHome: Stage 3 Clinical Suite & Progressive Disclosure Integration', () => {
+  const homePath = path.join(process.cwd(), 'src', 'domains', 'body-exposure', 'ui', 'BodyExposureAtlasHome.tsx')
+  assert.ok(fs.existsSync(homePath), 'BodyExposureAtlasHome.tsx must exist')
+  const content = fs.readFileSync(homePath, 'utf8')
+
+  // Check 3-Stage workflow presence
+  assert.ok(content.includes('1. Anatomy'), 'Must include Stage 1 label')
+  assert.ok(content.includes('2. Living Physiology'), 'Must include Stage 2 label')
+  assert.ok(content.includes('3. Clinical Relevance'), 'Must include Stage 3 label')
+
+  // Check 3 interactive clinical suite components integrated into Stage 3
+  assert.ok(content.includes('<CoronaryTerritoryPanel'), 'Must embed CoronaryTerritoryPanel in Stage 3')
+  assert.ok(content.includes('<ReferredPainDermatomeStudio'), 'Must embed ReferredPainDermatomeStudio in Stage 3')
+  assert.ok(content.includes('<NeuroFascicularReflexDeck initialTab="syndromes"'), 'Must embed NeuroFascicularReflexDeck with syndromes in Stage 3')
+
+  // Check 3 living physiology simulation decks integrated into Stage 2
+  assert.ok(content.includes('<CardiopulmonaryCouplingDeck'), 'Must embed CardiopulmonaryCouplingDeck in Stage 2')
+  assert.ok(content.includes('<SoftTissueBiomechanicsDeck'), 'Must embed SoftTissueBiomechanicsDeck in Stage 2')
+  assert.ok(content.includes('<NeuroFascicularReflexDeck initialTab="reflexes"'), 'Must embed NeuroFascicularReflexDeck with reflexes in Stage 2')
+
+  // Check Truth Classes & Clinical Boundaries
+  assert.ok(content.includes('ATLAS_REFERENCE_LABEL'), 'Must display ATLAS_REFERENCE_LABEL truth class')
+  assert.ok(content.includes('mechanistic_simulation_proxy'), 'Must display mechanistic_simulation_proxy truth class')
+  assert.ok(content.includes('Clinical Gate:'), 'Must display fail-closed clinical gate disclaimer')
+
+  // Check Side Panel collapsible and dual-mode support (whole-body vs focused structure)
+  assert.ok(content.includes('isSidePanelOpen'), 'Must support side panel toggle')
+  assert.ok(content.includes('Whole-Body Exploration'), 'Must support whole-body mode exploration')
+})
