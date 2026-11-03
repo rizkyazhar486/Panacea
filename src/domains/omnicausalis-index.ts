@@ -42,3 +42,6 @@ export * from "./clinical-operations/model/sepsisOneHourBundleCds.ts";
 export * from "./clinical-operations/model/clinicalOneOsAndDicomWebOrchestrator.ts";
 export * from "./clinical-operations/model/longitudinalPersistenceInvariantsEngine.ts";
 export * from "./body-exposure/data/zAnatomyClearIndonesianAtlas.ts";
+
+export * from "./body-exposure/index.ts";
+export * from "../locales/bodyExposureLocales.ts";

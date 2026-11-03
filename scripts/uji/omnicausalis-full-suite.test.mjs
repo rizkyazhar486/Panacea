@@ -496,3 +496,83 @@ test("27. [Z-ANATOMY CLEAR INDONESIAN ATLAS: COMPLETE FUNCTION, PHYSIOLOGY, ORIG
   const ear = omnicausalis.findClearStructureCard("Ear");
   assert.ok(ear.clinicalAndDailyRelevance.includes("THT-KL"));
 });
+
+test("28. [PHASES 1-3 BODY EXPOSURE ATLAS CONSOLIDATION: LAYER PEEL, BVH PICKING, SEARCH, 3-STAGE PRESERVATION, ALIAS PARITY, HRA GATE & WEBGPU PHASE-0]", () => {
+  // 1. Alias Parity Check (Descriptive English === Legacy Indonesian)
+  assert.strictEqual(omnicausalis.atlasEnvelope, omnicausalis.selubungAtlas);
+  assert.strictEqual(omnicausalis.organFactIndex, omnicausalis.faktaMilikOrgan);
+  assert.strictEqual(omnicausalis.firstSentence, omnicausalis.kalimatPertama);
+  assert.strictEqual(omnicausalis.structureKindFromName, omnicausalis.jenisDariNamaStruktur);
+  assert.strictEqual(omnicausalis.atlasRegionNames, omnicausalis.namaBagianAtlas);
+  assert.strictEqual(omnicausalis.diagnosticImagingEngine, omnicausalis.kaloLumenDicomEngine);
+
+  // 2. Layer Toggle Positive & Fail-Closed Negative Test
+  const env0 = omnicausalis.atlasEnvelope();
+  const env1 = omnicausalis.toggleOrPeelAtlasLayer(env0, "surface", { visible: false, opacity0to1: 0.1 });
+  assert.equal(env1.surface.visible, false);
+  assert.equal(env1.surface.glbPath, "/anatomy/surface.glb");
+  assert.throws(() => omnicausalis.toggleOrPeelAtlasLayer(env0, "invented_layer_xyz", { visible: true }));
+
+  // 3. BVH Picking by sourceMeshName (Positive & Click-Outside Null Boundary)
+  let homeState = omnicausalis.createInitialAtlasHomeState("en");
+  assert.ok(omnicausalis.PRIMARY_VIEWPORT_CONTROLS.length <= 6);
+  homeState = omnicausalis.pickStructureInCanonicalScene(homeState, "External_abdominal_oblique_left.g");
+  assert.equal(homeState.selectedStructure.fmaId, "FMA:13335");
+  const outsideState = omnicausalis.pickStructureInCanonicalScene(homeState, null);
+  assert.equal(outsideState.selectedStructure, null);
+
+  // 4. Search Positive & Garbage/Empty Query Boundary
+  const foundHeart = omnicausalis.searchStructures("Heart", "en");
+  assert.ok(foundHeart.matches.length >= 1);
+  assert.equal(foundHeart.emptyStateMessage, null);
+  const garbageSearch = omnicausalis.searchStructures("zzzz_nonexistent_999", "en");
+  assert.equal(garbageSearch.matches.length, 0);
+  assert.ok(garbageSearch.emptyStateMessage && garbageSearch.emptyStateMessage.length > 5);
+
+  // 5. Stage Transition State Preservation & Negative Disabled Guard
+  const pickedHeartState = omnicausalis.pickStructureInCanonicalScene(homeState, "Heart_Myocardium.g");
+  const toStage2 = omnicausalis.transitionAtlasStage(pickedHeartState, "STAGE_2_LIVING_PHYSIOLOGY");
+  assert.equal(toStage2.transitionPermitted, true);
+  assert.equal(toStage2.nextState.selectedStructure.sourceMeshName, "Heart_Myocardium.g");
+  const blockedStage3OnNull = omnicausalis.transitionAtlasStage(outsideState, "STAGE_3_CLINICAL");
+  assert.equal(blockedStage3OnNull.transitionPermitted, false);
+
+  // 6. Auto-Quality Preset Degradation & GPU Lifecycle Unmount Disposal
+  assert.equal(omnicausalis.nextAutoPreset("ULTRA_DESKTOP", 24.5), "BALANCED_DEFAULT");
+  assert.equal(omnicausalis.nextAutoPreset("BALANCED_DEFAULT", 11.2), "BALANCED_DEFAULT");
+  const gpuLifecycle = omnicausalis.createSceneShellLifecycleManager();
+  gpuLifecycle.disposeAll();
+  assert.equal(gpuLifecycle.disposedCount, 1);
+
+  // 7. Legacy Route Redirect Without 404
+  const redir = omnicausalis.resolveLegacyStudioRouteRedirect("KaloLumenVolumetricStudio");
+  assert.equal(redir.canonicalRoute, "/body-exposure");
+  assert.equal(redir.openedDepthPanel, "DiagnosticImagingStudio");
+
+  // 8. Phase 3 HRA Female Gate, Coordinate Separation & Honest Gap Badge
+  const hraGated = omnicausalis.evaluateHraFemaleV15AdmissionGate({
+    sha256VerifiedAgainstMetadataJson: true,
+    blenderMeshAuditNonManifoldZero: true,
+    metricBoundsInMetersVerified: true,
+    externalGenitalSurfaceNodesVerified: false,
+    ccBy4AttributionPresentInCredits: true
+  });
+  assert.equal(hraGated.admissibleForWholeBodyDefault, false);
+  assert.equal(hraGated.currentModeStatus, "GATED_REGIONAL_OBGIN_ONLY");
+  assert.throws(() => omnicausalis.evaluateHraFemaleV15AdmissionGate({
+    sha256VerifiedAgainstMetadataJson: true,
+    blenderMeshAuditNonManifoldZero: true,
+    metricBoundsInMetersVerified: true,
+    externalGenitalSurfaceNodesVerified: true,
+    ccBy4AttributionPresentInCredits: true,
+    attemptedMergeIntoMaleCoordinateSpace: true
+  }));
+  const fasciaGap = omnicausalis.getHonestGapBadgeForContext("fascia");
+  assert.ok(fasciaGap !== null);
+  assert.equal(fasciaGap.rendersPlaceholderGeometry, false);
+
+  // 9. Phase 3C WebGPU Phase-0 Probe & Zero 'DLSS' Mislabeling
+  const probeFallback = omnicausalis.probeWebGpuPhaseZeroCapability({ hasNavigatorGpu: false, adapterAvailable: false, viewportWidthPx: 390 });
+  assert.equal(probeFallback.activeBackend, "WEBGL2_DETERMINISTIC_FALLBACK");
+  assert.equal(probeFallback.proprietaryUpscalerClaimed, false);
+});
