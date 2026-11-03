@@ -118,6 +118,7 @@ export { createPresentationLighting } from './adapters/studioLighting'
 export { AnatomicalLightingControls } from './ui/AnatomicalLightingControls'
 export { KaloLumenVolumetricStudio } from './ui/KaloLumenVolumetricStudio'
 export { ReferredPainDermatomeStudio } from './ui/ReferredPainDermatomeStudio'
+export { OrganBiometricOverlayCard } from './ui/OrganBiometricOverlayCard'
 export { type PresentationLighting } from './engine/presentationLighting'
 
 export {
