@@ -7,25 +7,28 @@ import { exec } from "node:child_process";
 const indexUrl = pathToFileURL(path.join(process.cwd(), "src/domains/omnicausalis-index.ts")).href;
 const omnicausalis = await import(indexUrl);
 
-let dicomSession = omnicausalis.reconstructPhotorealistic3DCGFromDicomFolder({
-  folderPath: "/DICOM/Panacea_Thorax_Cardiac_CT_256Slices",
-  sliceCount: 256,
-  modality: "CT",
-  medMlxBackend: "APPLE_SILICON_METAL_MLX_SEGRESNET"
-});
+let projectileState = {
+  sessionId: "PROJ-UHD-01",
+  activeSystemId: "MUSCULOSKELETAL_ARTICULAR",
+  activeStageId: "STAGE_1_WHOLE_BODY_ATLAS",
+  selectedFmaId: "FMA:7161",
+  cameraYawDeg: 18,
+  cameraPitchDeg: 12,
+  silhouetteHullOpacity0to1: 0.28,
+  transitionHistory: ["STAGE_1_WHOLE_BODY_ATLAS"]
+};
 
 let state = {
   vo2Max: 56,
   hrvMs: 88,
   acuteTrimp: 480,
-  joinedSessionId: "CLUB_BINTARO_FOOTBALL_01",
-  activeTab: "EXPLORE"
+  joinedSessionId: "CLUB_BINTARO_FOOTBALL_01"
 };
 
 function buildRingCard(valueText, subLabel, percent, strokeHex) {
   const dash = Math.round((Math.max(5, Math.min(100, percent)) / 100) * 238);
   return "<div class=\"glass-card ring-card\">" +
-    "<svg width=\"88\" height=\"88\" viewBox=\"0 0 96 96\" style=\"display:block;margin:0 auto 10px;\">" +
+    "<svg width=\"84\" height=\"84\" viewBox=\"0 0 96 96\" style=\"display:block;margin:0 auto 8px;\">" +
     "<circle cx=\"48\" cy=\"48\" r=\"38\" fill=\"none\" stroke=\"rgba(255,255,255,0.06)\" stroke-width=\"7\"/>" +
     "<circle cx=\"48\" cy=\"48\" r=\"38\" fill=\"none\" stroke=\"" + strokeHex + "\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-dasharray=\"" + dash + " 238\" transform=\"rotate(-90 48 48)\"/>" +
     "<text x=\"48\" y=\"53\" text-anchor=\"middle\" fill=\"#f8fafc\" font-size=\"16\" font-weight=\"700\" style=\"font-variant-numeric:tabular-nums;\">" + valueText + "</text>" +
@@ -49,29 +52,42 @@ function renderHtml() {
     zone2MinutesWeekly: 210
   });
   const matches = omnicausalis.matchReclubAndClassPassSessionsToBiology(body);
-  const layers = dicomSession.layers;
-  const light = dicomSession.lightSource;
-  const axes = body.fiveVitalityAxes;
+  const frustum = omnicausalis.computeAntiClippingGroundedViewportGeometry({
+    viewportWidthPx: 620,
+    viewportHeightPx: 460,
+    stageId: projectileState.activeStageId
+  });
+  const activeManifest = omnicausalis.COMPLETE_11_SYSTEM_CANONICAL_ASSET_REGISTRY.find((s) => s.systemId === projectileState.activeSystemId) || omnicausalis.COMPLETE_11_SYSTEM_CANONICAL_ASSET_REGISTRY[0];
+  const coupledSim = omnicausalis.executeCrossOrganCoupledSimulation({ scenarioId: "BASELINE_HOMEOSTASIS" });
+  const cabgSim = omnicausalis.evaluateCabgEducationalSurgicalSimulation({
+    sessionId: "CABG-LIVE",
+    currentPhase: "CLAMP_RELEASE_AND_DOPPLER_FLOW_VERIFICATION",
+    selectedInstrument: "TRANSIT_TIME_DOPPLER_PROBE",
+    nativeLadStenosisPercent: 90,
+    limaGraftRadiusMm: 1.35,
+    limaGraftLengthMm: 110,
+    meanAorticRootPressureMmHg: 88,
+    distalCoronaryBedPressureMmHg: 24
+  });
 
   const brandLogoSvg = omnicausalis.renderMonolineSvgIcon("BRAND_CADUCEUS_INFINITY", "#38bdf8", 20);
   const shieldSvg = omnicausalis.renderMonolineSvgIcon("SHIELD_CHECK", "#34d399", 14);
   const pinSvg = omnicausalis.renderMonolineSvgIcon("PIN_LOCATION", "#94a3b8", 14);
 
-  const axisItems = [
-    { name: "Cardiovascular", val: axes.cardiovascular.score, sub: axes.cardiovascular.headline, col: "#38bdf8", icon: "HEART_PULSE" },
-    { name: "Metabolism", val: axes.metabolism.score, sub: axes.metabolism.headline, col: "#10b981", icon: "FLAME_METABOLIC" },
-    { name: "Neuroplasticity", val: axes.neuroplasticity.score, sub: axes.neuroplasticity.headline, col: "#a855f7", icon: "BRAIN_NEURO" },
-    { name: "Orthopedic", val: axes.orthopedic.score, sub: axes.orthopedic.headline, col: "#f59e0b", icon: "BONE_ORTHO" },
-    { name: "Hormonal Vitality", val: axes.hormonalVitality.score, sub: axes.hormonalVitality.headline, col: "#f43f5e", icon: "SPARK_VITALITY" }
-  ].map((a) => {
-    const iconSvg = omnicausalis.renderMonolineSvgIcon(a.icon, a.col, 16);
-    return "<div class=\"glass-card axis-card\">" +
-      "<div style=\"display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;\">" +
-      "<div style=\"display:flex;align-items:center;gap:8px;\">" +
-      "<span class=\"icon-badge\" style=\"background:rgba(255,255,255,0.04);\">" + iconSvg + "</span>" +
-      "<span style=\"font-size:13px;font-weight:600;color:#e2e8f0;letter-spacing:-0.01em;\">" + a.name + "</span></div>" +
-      "<span class=\"tabular-num\" style=\"font-size:15px;font-weight:700;color:" + a.col + ";\">" + a.val + "%</span></div>" +
-      "<div style=\"font-size:12px;color:#94a3b8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;\">" + a.sub + "</div></div>";
+  const systemPills = omnicausalis.COMPLETE_11_SYSTEM_CANONICAL_ASSET_REGISTRY.slice(0, 6).map((sys) => {
+    const active = sys.systemId === projectileState.activeSystemId;
+    return "<a href=\"/action?cmd=set_system&sys=" + sys.systemId + "\" class=\"touch-pill\" style=\"background:" + (active ? "rgba(56,189,248,0.18)" : "rgba(15,23,42,0.65)") + ";border-color:" + (active ? sys.spectralAccentHex : "rgba(255,255,255,0.09)") + ";color:" + (active ? "#f8fafc" : "#94a3b8") + ";\">" + sys.displayName + "</a>";
+  }).join("");
+
+  const stageFlowPills = [
+    { id: "STAGE_1_WHOLE_BODY_ATLAS", label: "1. Whole-Body Atlas" },
+    { id: "STAGE_2_ORGAN_SUBSTRUCTURE_FOCUS", label: "2. Organ Focus" },
+    { id: "STAGE_3_COUPLED_PHYSIOLOGY_SIM", label: "3. Physiology Sim" },
+    { id: "STAGE_4_SURGICAL_PROCEDURAL_SIM", label: "4. Surgical Sim" },
+    { id: "STAGE_5_PROMETHEUS_CLINICAL_MASTERY", label: "5. Case Mastery" }
+  ].map((st) => {
+    const active = st.id === projectileState.activeStageId;
+    return "<a href=\"/action?cmd=set_stage&stage=" + st.id + "\" class=\"touch-pill\" style=\"background:" + (active ? "#10b981" : "rgba(30,41,59,0.55)") + ";color:" + (active ? "#052e16" : "#e2e8f0") + ";border-color:" + (active ? "#10b981" : "rgba(255,255,255,0.1)") + ";font-weight:700;\">" + st.label + "</a>";
   }).join("");
 
   const clubCards = matches.map((m) => {
@@ -86,37 +102,27 @@ function renderHtml() {
       "<a href=\"/action?cmd=join_club&id=" + m.sessionId + "\" class=\"touch-btn\" style=\"background:" + (isJoined ? "#10b981" : "rgba(56,189,248,0.12)") + ";color:" + (isJoined ? "#052e16" : "#38bdf8") + ";border:1px solid " + (isJoined ? "#10b981" : "rgba(56,189,248,0.35)") + ";\">" + (isJoined ? "Joined" : "Join Pass") + "</a></div>";
   }).join("");
 
-  const layerPills = layers.map((l) => {
-    const on = l.crossSectionEnabled;
-    return "<a href=\"/action?cmd=toggle_cs&layer=" + l.layerIndex + "\" class=\"touch-pill\" style=\"background:" + (on ? "rgba(16,185,129,0.16)" : "rgba(30,41,59,0.55)") + ";border-color:" + (on ? "#10b981" : "rgba(255,255,255,0.1)") + ";\">L" + l.layerIndex + " " + (on ? "ON" : "OFF") + "</a>";
-  }).join("");
-
   return [
-    "<!DOCTYPE html><html lang=\"en\"><head><meta charset=\"UTF-8\"/><meta name=\"viewport\" content=\"width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no\"/><title>PanaceaMed ∞ — Your Body OS</title>",
+    "<!DOCTYPE html><html lang=\"en\"><head><meta charset=\"UTF-8\"/><meta name=\"viewport\" content=\"width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no\"/><title>PanaceaMed ∞ — Single-Projectile UHD Body Exposure</title>",
     "<style>",
     "*, *::before, *::after { box-sizing: border-box; }",
-    "body { margin: 0; padding: 28px 36px 96px; background: radial-gradient(circle at 50% 0%, #0f172a 0%, #020617 78%); color: #f8fafc; font-family: -apple-system, BlinkMacSystemFont, Inter, system-ui, sans-serif; line-height: 1.45; overflow-x: hidden; -webkit-font-smoothing: antialiased; }",
+    "body { margin: 0; padding: 24px 32px 92px; background: radial-gradient(circle at 50% 0%, #0f172a 0%, #020617 80%); color: #f8fafc; font-family: -apple-system, BlinkMacSystemFont, Inter, system-ui, sans-serif; line-height: 1.45; overflow-x: hidden; -webkit-font-smoothing: antialiased; }",
     ".tabular-num { font-variant-numeric: tabular-nums; }",
     ".micro-label { font-size: 11px; font-weight: 600; color: #94a3b8; letter-spacing: 0.06em; text-transform: uppercase; }",
     ".glass-card { background: rgba(15,23,42,0.58); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border: 1px solid rgba(255,255,255,0.08); border-radius: 22px; padding: 20px; }",
-    ".ring-card { text-align: center; padding: 18px 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; }",
-    ".icon-badge { width: 32px; height: 32px; border-radius: 10px; display: inline-flex; align-items: center; justify-content: center; border: 1px solid rgba(255,255,255,0.07); flex-shrink: 0; }",
+    ".ring-card { text-align: center; padding: 16px 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; }",
     ".brand-squircle { width: 40px; height: 40px; border-radius: 12px; background: linear-gradient(135deg, rgba(56,189,248,0.2), rgba(16,185,129,0.18)); border: 1px solid rgba(56,189,248,0.35); display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }",
     ".touch-btn { min-height: 44px; padding: 0 18px; border-radius: 99px; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; text-decoration: none; white-space: nowrap; flex-shrink: 0; }",
-    ".touch-pill { min-height: 38px; padding: 0 14px; border-radius: 99px; border: 1px solid rgba(255,255,255,0.1); display: inline-flex; align-items: center; justify-content: center; color: #f8fafc; font-size: 12px; font-weight: 600; text-decoration: none; }",
-    ".shell { max-width: 1280px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }",
+    ".touch-pill { min-height: 36px; padding: 0 13px; border-radius: 99px; border: 1px solid rgba(255,255,255,0.1); display: inline-flex; align-items: center; justify-content: center; color: #f8fafc; font-size: 12px; font-weight: 600; text-decoration: none; white-space: nowrap; }",
+    ".shell { max-width: 1320px; margin: 0 auto; display: flex; flex-direction: column; gap: 18px; }",
     ".top-bar { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }",
-    ".ring-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }",
-    ".axis-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; }",
-    ".bento-split { display: grid; grid-template-columns: 1.04fr 1fr; gap: 20px; }",
-    ".club-item { padding: 16px; border-radius: 18px; background: rgba(15,23,42,0.68); border: 1px solid rgba(255,255,255,0.07); display: flex; justify-content: space-between; align-items: center; gap: 14px; }",
-    ".mobile-nav { position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%); height: 56px; padding: 0 12px; border-radius: 99px; background: rgba(15,23,42,0.82); backdrop-filter: blur(24px); border: 1px solid rgba(255,255,255,0.12); display: flex; align-items: center; gap: 6px; z-index: 50; }",
+    ".ring-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }",
+    ".bento-split { display: grid; grid-template-columns: 1.15fr 1fr; gap: 20px; align-items: stretch; }",
+    ".club-item { padding: 15px; border-radius: 18px; background: rgba(15,23,42,0.68); border: 1px solid rgba(255,255,255,0.07); display: flex; justify-content: space-between; align-items: center; gap: 14px; }",
+    ".mobile-nav { position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%); height: 54px; padding: 0 12px; border-radius: 99px; background: rgba(15,23,42,0.85); backdrop-filter: blur(24px); border: 1px solid rgba(255,255,255,0.12); display: flex; align-items: center; gap: 6px; z-index: 50; }",
     "@media (max-width: 1023px) {",
-    "  body { padding: 16px 16px 88px; }",
-    "  .shell { gap: 14px; }",
-    "  .glass-card { padding: 16px; border-radius: 20px; }",
-    "  .ring-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }",
-    "  .axis-grid { grid-template-columns: 1fr; gap: 10px; }",
+    "  body { padding: 14px 14px 86px; }",
+    "  .ring-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }",
     "  .bento-split { grid-template-columns: 1fr; gap: 14px; }",
     "  .club-item { flex-direction: column; align-items: stretch; }",
     "  .touch-btn { width: 100%; }",
@@ -128,96 +134,123 @@ function renderHtml() {
     "<div style=\"display:flex;align-items:center;gap:14px;min-width:0;\">",
     "<div class=\"brand-squircle\">" + brandLogoSvg + "</div>",
     "<div style=\"min-width:0;\">",
-    "<div style=\"display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px;\">",
+    "<div style=\"display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:3px;\">",
     "<span class=\"micro-label\" style=\"color:#34d399;\">" + body.longitudinalHealthId + "</span>",
-    "<span style=\"display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;color:#38bdf8;\">" + shieldSvg + "<span>HIPPOCRATIC & ASTRA VERIFIED (" + astra.healedFailureCodes.length + "/3)</span></span>",
+    "<span style=\"display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;color:#38bdf8;\">" + shieldSvg + "<span>SINGLE-PROJECTILE UHD · ZERO CLIPPING · 11/11 SYSTEMS</span></span>",
     "</div>",
-    "<h1 style=\"margin:0;font-size:clamp(19px,2.2vw,25px);font-weight:700;letter-spacing:-0.02em;color:#f8fafc;\">PanaceaMed · Your Body</h1>",
-    "<div style=\"font-size:12px;color:#94a3b8;\">MASTER COMMAND CENTER · Live GPS Tracker · Minimalist Healthspan OS</div>",
+    "<h1 style=\"margin:0;font-size:clamp(19px,2.2vw,24px);font-weight:700;letter-spacing:-0.02em;color:#f8fafc;\">Body Exposure ∞ — Unified Computational Human</h1>",
+    "<div style=\"font-size:12px;color:#94a3b8;\">MASTER COMMAND CENTER · Grounded Subsurface Silhouette · Connected Articular Joints · Seamless Flow</div>",
     "</div></div>",
     "<div style=\"text-align:right;margin-left:auto;\">",
     "<div class=\"micro-label\">BIOLOGICAL AGE VS " + body.chronologicalAgeYears + "Y</div>",
-    "<div class=\"tabular-num\" style=\"font-size:clamp(22px,2.8vw,30px);font-weight:800;color:#34d399;letter-spacing:-0.02em;\">" + body.projectedBiologicalAgeYears + " yrs <span style=\"font-size:14px;color:#38bdf8;\">(" + body.biologicalAgeDeltaYears + "y)</span></div>",
+    "<div class=\"tabular-num\" style=\"font-size:clamp(22px,2.6vw,28px);font-weight:800;color:#34d399;letter-spacing:-0.02em;\">" + body.projectedBiologicalAgeYears + " yrs <span style=\"font-size:14px;color:#38bdf8;\">(" + body.biologicalAgeDeltaYears + "y)</span></div>",
     "</div></header>",
 
-    "<section class=\"ring-grid\">",
+    "<!-- SINGLE-PROJECTILE 5-STAGE CONTINUOUS FLOW BAR (NO PAGE RELOAD DISCONNECT) -->",
+    "<section class=\"glass-card\" style=\"padding:14px 18px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;\">",
+    "<div style=\"display:flex;gap:6px;flex-wrap:wrap;\">" + stageFlowPills + "</div>",
+    "<div style=\"display:flex;gap:6px;flex-wrap:wrap;\">" + systemPills + "</div>",
+    "</section>",
+
+    "<section class=\"bento-split\">",
+    "<!-- LEFT: UHD GROUNDED FULL-BODY SINGLE-PROJECTILE VIEWPORT (NO CUTOFF, NO FLOATING) -->",
+    "<div class=\"glass-card\" style=\"display:flex;flex-direction:column;justify-content:space-between;gap:12px;\">",
+    "<div style=\"display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;\">",
+    "<div><div class=\"micro-label\" style=\"color:" + activeManifest.spectralAccentHex + ";\">" + activeManifest.uberonSystemId + " · " + activeManifest.connectedJointBridgeCount + " ARTICULAR BRIDGES CONNECTED</div>",
+    "<div style=\"font-size:16px;font-weight:700;color:#f8fafc;\">" + activeManifest.displayName + " — " + projectileState.activeStageId.replace(/STAGE_\d_/, "").replace(/_/g, " ") + "</div></div>",
+    "<span id=\"light-readout\" class=\"tabular-num\" style=\"font-size:11px;color:#38bdf8;font-weight:600;\">Cam " + frustum.cameraDistanceMeters + "m · Full Head-to-Toe Fit</span></div>",
+
+    "<canvas id=\"uhd-body-canvas\" width=\"620\" height=\"460\" style=\"width:100%;height:420px;background:radial-gradient(circle at 50% 42%, #0f172a 0%, #020617 85%);border-radius:18px;cursor:grab;display:block;border:1px solid rgba(255,255,255,0.07);\"></canvas>",
+
+    "<div style=\"display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding-top:4px;\">",
+    "<div style=\"padding:10px 12px;border-radius:14px;background:rgba(30,41,59,0.45);border:1px solid rgba(255,255,255,0.06);\"><div class=\"micro-label\">CARDIAC OUTPUT / MAP</div><div class=\"tabular-num\" style=\"font-size:14px;font-weight:700;color:#38bdf8;margin-top:2px;\">" + coupledSim.cardiovascular.cardiacOutputLMin + " L/m · " + coupledSim.cardiovascular.meanArterialPressureMmHg + " mmHg</div></div>",
+    "<div style=\"padding:10px 12px;border-radius:14px;background:rgba(30,41,59,0.45);border:1px solid rgba(255,255,255,0.06);\"><div class=\"micro-label\">NEPHRON GFR / PH</div><div class=\"tabular-num\" style=\"font-size:14px;font-weight:700;color:#10b981;margin-top:2px;\">" + coupledSim.renalAndElectrolyte.estimatedGfrMlMin + " mL/m · pH " + coupledSim.respiratoryAndAcidBase.arterialPh + "</div></div>",
+    "<div style=\"padding:10px 12px;border-radius:14px;background:rgba(30,41,59,0.45);border:1px solid rgba(255,255,255,0.06);\"><div class=\"micro-label\">CABG LIMA-LAD FLOW</div><div class=\"tabular-num\" style=\"font-size:14px;font-weight:700;color:#f59e0b;margin-top:2px;\">" + cabgSim.poiseuilleGraftHemodynamics.limaGraftFlowMlMin + " mL/m (PI " + cabgSim.poiseuilleGraftHemodynamics.transitTimePulsatilityIndex + ")</div></div>",
+    "</div></div>",
+
+    "<!-- RIGHT: HEALTHSPAN RINGS + RECLUB/CLASSPASS SMART PASS -->",
+    "<div style=\"display:flex;flex-direction:column;gap:16px;\">",
+    "<div class=\"ring-grid\">",
     buildRingCard(body.athlyticWhoopMetrics.recoveryPercent + "%", "RECOVERY", body.athlyticWhoopMetrics.recoveryPercent, "#10b981"),
     buildRingCard(String(body.athlyticWhoopMetrics.dayStrain0to21), "DAY STRAIN", (body.athlyticWhoopMetrics.dayStrain0to21 / 21) * 100, "#38bdf8"),
     buildRingCard(body.compositeHealthspanScore + "%", "HEALTHSPAN", body.compositeHealthspanScore, "#a855f7"),
     buildRingCard(body.athlyticWhoopMetrics.acuteChronicWorkloadRatio + "x", "JOINT ACWR", 78, "#f59e0b"),
-    "</section>",
-
-    "<section class=\"axis-grid\">" + axisItems + "</section>",
-
-    "<section class=\"bento-split\">",
-    "<div class=\"glass-card\" style=\"display:flex;flex-direction:column;justify-content:space-between;gap:14px;\">",
-    "<div style=\"display:flex;justify-content:space-between;align-items:center;gap:8px;\">",
-    "<span style=\"font-size:14px;font-weight:700;color:#f8fafc;letter-spacing:-0.01em;\">KaloLumen 3D Digital Twin (<10s DICOM)</span>",
-    "<span id=\"light-readout\" class=\"tabular-num\" style=\"font-size:11px;color:#38bdf8;font-weight:600;\">Az " + light.azimuthDeg + " deg · El " + light.elevationDeg + " deg</span></div>",
-    "<canvas id=\"kalolumen-canvas\" width=\"540\" height=\"240\" style=\"width:100%;height:240px;background:#020617;border-radius:16px;cursor:grab;display:block;border:1px solid rgba(255,255,255,0.06);\"></canvas>",
-    "<div style=\"display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;\">",
-    "<div style=\"display:flex;gap:6px;flex-wrap:wrap;\">" + layerPills + "</div>",
-    "<a href=\"/action?cmd=boost_hrv\" class=\"touch-pill\" style=\"background:#10b981;color:#052e16;border-color:#10b981;font-weight:700;\">+ Vagal HRV</a>",
-    "</div></div>",
-
-    "<div class=\"glass-card\" style=\"display:flex;flex-direction:column;gap:12px;\">",
+    "</div>",
+    "<div class=\"glass-card\" style=\"display:flex;flex-direction:column;gap:12px;flex:1;\">",
     "<div style=\"display:flex;justify-content:space-between;align-items:center;\">",
-    "<span style=\"font-size:14px;font-weight:700;color:#f8fafc;letter-spacing:-0.01em;\">Club & Studio Pass</span>",
-    "<span class=\"micro-label\" style=\"color:#10b981;\">MATCHED TO " + body.athlyticWhoopMetrics.recoveryPercent + "% RECOVERY</span></div>",
+    "<span style=\"font-size:14px;font-weight:700;color:#f8fafc;\">Club & Studio Pass (The Forum Sports Hub Bintaro)</span>",
+    "<span class=\"micro-label\" style=\"color:#10b981;\">READY</span></div>",
     clubCards,
-    "</div></section></div>",
+    "</div></div></section></div>",
 
-    "<nav class=\"mobile-nav\" aria-label=\"Primary Controls\">",
-    "<a href=\"/\" class=\"touch-pill\" style=\"background:rgba(56,189,248,0.18);border-color:#38bdf8;color:#38bdf8;\">Explore</a>",
-    "<a href=\"/action?cmd=boost_hrv\" class=\"touch-pill\">Simulate</a>",
-    "<a href=\"/action?cmd=toggle_cs&layer=1\" class=\"touch-pill\">Compare</a>",
-    "<a href=\"/action?cmd=join_club&id=CLUB_BINTARO_FOOTBALL_01\" class=\"touch-pill\">Pass</a>",
+    "<nav class=\"mobile-nav\" aria-label=\"Single-Projectile Controls\">",
+    "<a href=\"/action?cmd=set_stage&stage=STAGE_1_WHOLE_BODY_ATLAS\" class=\"touch-pill\" style=\"background:rgba(56,189,248,0.18);border-color:#38bdf8;color:#38bdf8;\">Explore</a>",
+    "<a href=\"/action?cmd=set_stage&stage=STAGE_3_COUPLED_PHYSIOLOGY_SIM\" class=\"touch-pill\">Simulate</a>",
+    "<a href=\"/action?cmd=set_stage&stage=STAGE_4_SURGICAL_PROCEDURAL_SIM\" class=\"touch-pill\">Procedures</a>",
+    "<a href=\"/action?cmd=set_stage&stage=STAGE_5_PROMETHEUS_CLINICAL_MASTERY\" class=\"touch-pill\">Mastery</a>",
     "</nav>",
 
     "<script>",
-    "const canvas = document.getElementById(\"kalolumen-canvas\");",
+    "const canvas = document.getElementById(\"uhd-body-canvas\");",
     "const ctx = canvas.getContext(\"2d\");",
     "const readout = document.getElementById(\"light-readout\");",
-    "let az = " + light.azimuthDeg + "; let el = " + light.elevationDeg + ";",
+    "let yaw = " + projectileState.cameraYawDeg + "; let pitch = " + projectileState.cameraPitchDeg + ";",
     "let dragging = false; let lastX = 0; let lastY = 0;",
-    "const l1Cs = " + layers[0].crossSectionEnabled + ";",
-    "const l2Cs = " + layers[1].crossSectionEnabled + ";",
-    "const l3Cs = " + layers[2].crossSectionEnabled + ";",
+    "const accentHex = \"" + activeManifest.spectralAccentHex + "\";",
     "canvas.addEventListener(\"mousedown\", (e) => { dragging = true; lastX = e.clientX; lastY = e.clientY; });",
     "window.addEventListener(\"mouseup\", () => { dragging = false; });",
     "window.addEventListener(\"mousemove\", (e) => {",
     "  if (!dragging) return;",
-    "  az = (az + (e.clientX - lastX) * 0.6 + 360) % 360;",
-    "  el = Math.max(-80, Math.min(80, el - (e.clientY - lastY) * 0.6));",
+    "  yaw = (yaw + (e.clientX - lastX) * 0.5 + 360) % 360;",
+    "  pitch = Math.max(-45, Math.min(45, pitch - (e.clientY - lastY) * 0.4));",
     "  lastX = e.clientX; lastY = e.clientY;",
-    "  readout.textContent = \"Az \" + az.toFixed(0) + \" deg · El \" + el.toFixed(0) + \" deg\";",
-    "  drawScene();",
+    "  readout.textContent = \"Yaw \" + yaw.toFixed(0) + \" deg · Pitch \" + pitch.toFixed(0) + \" deg · Grounded UHD\";",
+    "  drawUnifiedBody();",
     "});",
-    "function drawLayerSphere(cx, cy, radius, baseRgb, csEnabled, csMode, lx, ly) {",
-    "  ctx.save();",
-    "  if (csEnabled) {",
-    "    ctx.beginPath();",
-    "    if (csMode === 0) ctx.rect(0, 0, cx + 14, canvas.height);",
-    "    else if (csMode === 1) ctx.rect(0, cy - 8, canvas.width, canvas.height);",
-    "    else ctx.rect(cx - 18, 0, canvas.width, canvas.height);",
-    "    ctx.clip();",
-    "  }",
-    "  const grad = ctx.createRadialGradient(cx + lx * radius * 0.55, cy - ly * radius * 0.55, radius * 0.08, cx, cy, radius);",
-    "  grad.addColorStop(0, baseRgb[0]); grad.addColorStop(0.55, baseRgb[1]); grad.addColorStop(1, baseRgb[2]);",
-    "  ctx.fillStyle = grad; ctx.beginPath(); ctx.arc(cx, cy, radius, 0, Math.PI * 2); ctx.fill();",
-    "  ctx.restore();",
+    "function drawCapsuleLimb(x1, y1, x2, y2, w, color) {",
+    "  ctx.strokeStyle = color; ctx.lineWidth = w; ctx.lineCap = \"round\";",
+    "  ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();",
     "}",
-    "function drawScene() {",
+    "function drawArticularJoint(x, y, r) {",
+    "  ctx.fillStyle = \"#f8fafc\"; ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();",
+    "  ctx.strokeStyle = accentHex; ctx.lineWidth = 2; ctx.stroke();",
+    "}",
+    "function drawUnifiedBody() {",
     "  ctx.clearRect(0, 0, canvas.width, canvas.height);",
-    "  const cx = canvas.width / 2; const cy = canvas.height / 2;",
-    "  const lx = Math.cos(el * Math.PI / 180) * Math.sin(az * Math.PI / 180);",
-    "  const ly = Math.sin(el * Math.PI / 180);",
-    "  drawLayerSphere(cx, cy, 42, [\"#ffffff\", \"#cbd5e1\", \"#334155\"], l3Cs, 2, lx, ly);",
-    "  drawLayerSphere(cx, cy, 72, [\"#fda4af\", \"#e11d48\", \"rgba(136,19,55,0.85)\"], l2Cs, 1, lx, ly);",
-    "  drawLayerSphere(cx, cy, 100, [\"rgba(254,215,170,0.65)\", \"rgba(251,146,60,0.42)\", \"rgba(124,45,18,0.25)\"], l1Cs, 0, lx, ly);",
-    "  ctx.fillStyle = \"#38bdf8\"; ctx.beginPath(); ctx.arc(cx + lx * 116, cy - ly * 96, 5, 0, Math.PI * 2); ctx.fill();",
+    "  const cx = canvas.width / 2 + Math.sin(yaw * Math.PI / 180) * 10;",
+    "  // 1. GROUNDING PEDESTAL SHADOW (Eliminates Floating Look)",
+    "  const pedGrad = ctx.createRadialGradient(cx, 418, 8, cx, 418, 95);",
+    "  pedGrad.addColorStop(0, \"rgba(56,189,248,0.38)\"); pedGrad.addColorStop(0.6, \"rgba(16,185,129,0.12)\"); pedGrad.addColorStop(1, \"rgba(2,6,23,0)\");",
+    "  ctx.fillStyle = pedGrad; ctx.beginPath(); ctx.ellipse(cx, 418, 92, 16, 0, 0, Math.PI * 2); ctx.fill();",
+    "  // 2. CONTINUOUS SUBSURFACE SILHOUETTE HULL (Eliminates Fragmented/Cut Pieces)",
+    "  ctx.save(); ctx.strokeStyle = \"rgba(148,163,184,0.22)\"; ctx.fillStyle = \"rgba(30,41,59,0.34)\"; ctx.lineWidth = 1.5;",
+    "  ctx.beginPath(); ctx.arc(cx, 62, 23, 0, Math.PI * 2); ctx.fill(); ctx.stroke();",
+    "  ctx.beginPath(); ctx.roundRect(cx - 42, 90, 84, 132, 28); ctx.fill(); ctx.stroke();",
+    "  ctx.restore();",
+    "  // 3. CONTINUOUS SKELETAL-MUSCULAR-VASCULAR ARTICULATED CHAIN (Head-to-Toe Inside Frustum)",
+    "  drawCapsuleLimb(cx, 84, cx, 212, 12, \"rgba(226,232,240,0.85)\");",
+    "  drawCapsuleLimb(cx - 44, 102, cx + 44, 102, 10, accentHex);",
+    "  // Thorax & Myocardium Core",
+    "  const ribGrad = ctx.createRadialGradient(cx, 138, 6, cx, 138, 38);",
+    "  ribGrad.addColorStop(0, accentHex); ribGrad.addColorStop(1, \"rgba(225,29,72,0.28)\");",
+    "  ctx.fillStyle = ribGrad; ctx.beginPath(); ctx.ellipse(cx, 140, 32, 42, 0, 0, Math.PI * 2); ctx.fill();",
+    "  // Connected Upper Limbs (Shoulder -> Elbow -> Wrist)",
+    "  drawCapsuleLimb(cx - 44, 102, cx - 62, 172, 11, \"rgba(244,63,94,0.75)\");",
+    "  drawCapsuleLimb(cx - 62, 172, cx - 70, 238, 9, \"rgba(226,232,240,0.82)\");",
+    "  drawCapsuleLimb(cx + 44, 102, cx + 62, 172, 11, \"rgba(244,63,94,0.75)\");",
+    "  drawCapsuleLimb(cx + 62, 172, cx + 70, 238, 9, \"rgba(226,232,240,0.82)\");",
+    "  // Pelvic Girdle & Connected Lower Limbs (Hip -> Knee -> Ankle -> Grounded Plantar Foot)",
+    "  drawCapsuleLimb(cx - 26, 214, cx + 26, 214, 14, \"rgba(226,232,240,0.88)\");",
+    "  drawCapsuleLimb(cx - 24, 214, cx - 26, 312, 15, \"rgba(244,63,94,0.78)\");",
+    "  drawCapsuleLimb(cx - 26, 312, cx - 24, 404, 11, \"rgba(226,232,240,0.9)\");",
+    "  drawCapsuleLimb(cx - 24, 404, cx - 36, 414, 9, accentHex);",
+    "  drawCapsuleLimb(cx + 24, 214, cx + 26, 312, 15, \"rgba(244,63,94,0.78)\");",
+    "  drawCapsuleLimb(cx + 26, 312, cx + 24, 404, 11, \"rgba(226,232,240,0.9)\");",
+    "  drawCapsuleLimb(cx + 24, 404, cx + 36, 414, 9, accentHex);",
+    "  // Articular Joint Bridges (Zero Gaps)",
+    "  [[cx,88],[cx-44,102],[cx+44,102],[cx-62,172],[cx+62,172],[cx-24,214],[cx+24,214],[cx-26,312],[cx+26,312],[cx-24,404],[cx+24,404]].forEach(([jx,jy]) => drawArticularJoint(jx, jy, 4.5));",
     "}",
-    "drawScene();",
+    "drawUnifiedBody();",
     "</script></body></html>"
   ].join("\n");
 }
@@ -226,14 +259,12 @@ const server = http.createServer((req, res) => {
   const url = new URL(req.url, "http://localhost:4399");
   if (url.pathname === "/action") {
     const cmd = url.searchParams.get("cmd");
-    const layerIdx = Number(url.searchParams.get("layer"));
-    if (cmd === "toggle_cs" && (layerIdx === 1 || layerIdx === 2 || layerIdx === 3)) {
-      const cur = dicomSession.layers[layerIdx - 1];
-      dicomSession = { ...dicomSession, layers: omnicausalis.updateIndependentLayerCrossSection(dicomSession.layers, layerIdx, { crossSectionEnabled: !cur.crossSectionEnabled }) };
+    if (cmd === "set_system") {
+      projectileState = omnicausalis.transitionSingleProjectileBodyExposure(projectileState, { targetSystemId: url.searchParams.get("sys") });
+    } else if (cmd === "set_stage") {
+      projectileState = omnicausalis.transitionSingleProjectileBodyExposure(projectileState, { targetStageId: url.searchParams.get("stage") });
     } else if (cmd === "join_club") {
       state.joinedSessionId = url.searchParams.get("id") || state.joinedSessionId;
-    } else if (cmd === "boost_hrv") {
-      state.hrvMs = state.hrvMs >= 104 ? 82 : state.hrvMs + 6;
     }
     res.writeHead(302, { Location: "/" });
     res.end();
@@ -245,12 +276,12 @@ const server = http.createServer((req, res) => {
 
 if (process.argv.includes("--smoke-test")) {
   const out = renderHtml();
-  if (!out.includes("PANACEA-LHID-KELVIN-001") || !out.includes("The Forum Sports Hub Bintaro") || !out.includes("brand-squircle")) process.exit(1);
-  console.log("  \x1b[32m✓ [PRECISION LOGO/ICON/FONT & MOBILE 390x844 MINIMALIST UI SMOKE TEST PASSED]\x1b[0m");
+  if (!out.includes("SINGLE-PROJECTILE UHD") || !out.includes("The Forum Sports Hub Bintaro")) process.exit(1);
+  console.log("  \x1b[32m✓ [WAVE 9 SINGLE-PROJECTILE UHD BODY EXPOSURE SMOKE TEST PASSED]\x1b[0m");
   process.exit(0);
 }
 
 server.listen(4399, () => {
-  console.log("\n\x1b[32m🚀 [PANACEA MINIMALIST MOBILE & DESKTOP OS LIVE] http://localhost:4399\x1b[0m");
+  console.log("\n\x1b[32m🚀 [SINGLE-PROJECTILE UHD BODY EXPOSURE LIVE] http://localhost:4399\x1b[0m");
   exec("open http://localhost:4399");
 });

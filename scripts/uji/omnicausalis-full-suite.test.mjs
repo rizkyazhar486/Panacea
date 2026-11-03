@@ -244,3 +244,34 @@ test("17. [WAVE 8 MOBILE MINIMALIST LOGO, MONOLINE SVG ICON & TABULAR TYPOGRAPHY
   assert.ok(svg.includes("viewBox=\"0 0 24 24\""));
   assert.ok(svg.includes("stroke-width=\"1.75\""));
 });
+
+test("18. [WAVE 9 SINGLE-PROJECTILE UHD BODY EXPOSURE: ZERO CLIPPING, ANTI-FLOATING & 11-SYSTEM REGISTRY]", () => {
+  assert.equal(omnicausalis.COMPLETE_11_SYSTEM_CANONICAL_ASSET_REGISTRY.length, 11);
+  const frustum = omnicausalis.computeAntiClippingGroundedViewportGeometry({
+    viewportWidthPx: 620,
+    viewportHeightPx: 460,
+    stageId: "STAGE_1_WHOLE_BODY_ATLAS"
+  });
+  assert.equal(frustum.headToToeFullyInsideFrustum, true);
+  assert.equal(frustum.antiFloatingAnchors.continuousSubsurfaceSilhouetteHullEnabled, true);
+  assert.equal(frustum.antiFloatingAnchors.plantarGroundingShadowPedestalEnabled, true);
+  assert.equal(frustum.antiFloatingAnchors.floatingDisconnectedMeshesPermitted, false);
+  const initial = {
+    sessionId: "S1",
+    activeSystemId: "MUSCULOSKELETAL_ARTICULAR",
+    activeStageId: "STAGE_1_WHOLE_BODY_ATLAS",
+    selectedFmaId: "FMA:7161",
+    cameraYawDeg: 15,
+    cameraPitchDeg: 10,
+    silhouetteHullOpacity0to1: 0.28,
+    transitionHistory: ["STAGE_1_WHOLE_BODY_ATLAS"]
+  };
+  const next = omnicausalis.transitionSingleProjectileBodyExposure(initial, {
+    targetStageId: "STAGE_3_COUPLED_PHYSIOLOGY_SIM",
+    targetSystemId: "CARDIOVASCULAR_CIRCULATORY"
+  });
+  assert.equal(next.activeSystemId, "CARDIOVASCULAR_CIRCULATORY");
+  assert.equal(next.activeStageId, "STAGE_3_COUPLED_PHYSIOLOGY_SIM");
+  assert.equal(next.selectedFmaId, "FMA:7088");
+  assert.equal(next.cameraYawDeg, 15);
+});
