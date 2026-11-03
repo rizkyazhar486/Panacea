@@ -20,6 +20,8 @@
  * Clinically reviewed: false (Educational biophysical sandbox, never manufactures patient telemetry).
  */
 
+import { kandunganOksigen } from '../../../lib/hemodinamik.ts';
+
 export const CARDIOPULMONARY_DISCLAIMER =
   'Derived mechanistic cardiopulmonary simulation proxy — educational model, not an automated diagnostic or therapeutic calculator' as const;
 
@@ -336,7 +338,7 @@ export function evaluateCardiopulmonaryCoupling(
   // DO2 = Q * (1.34 * Hb * (SaO2 / 100) + 0.0031 * PaO2) * 10 (mL/min)
   // PaO2 estimated ~ 90 mmHg baseline
   const pao2Est = Math.max(50, 95 * (estimatedSao2Pct / 100));
-  const cao2 = 1.34 * hemoglobinGPerDl * (estimatedSao2Pct / 100) + 0.0031 * pao2Est;
+  const cao2 = kandunganOksigen(hemoglobinGPerDl, estimatedSao2Pct / 100, pao2Est);
   const do2MlMin = Number((cardiacOutputLMin * cao2 * 10).toFixed(1));
 
   // 5. PV Loop Vertices (Isovolumic Contraction -> Ejection -> Isovolumic Relaxation -> Filling)
