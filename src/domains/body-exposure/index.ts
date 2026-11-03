@@ -372,4 +372,33 @@ export {
   type PvLoopPoint,
 } from './engine/cardiopulmonaryCouplingEngine'
 export { CardiopulmonaryCouplingDeck } from './ui/CardiopulmonaryCouplingDeck'
+export {
+  ORGAN_BIOMECHANICS_CATALOG,
+  SOFT_TISSUE_BIOMECHANICS_DISCLAIMER,
+  calculateNeoHookeanStress,
+  generateStressStrainCurve,
+  evaluatePalpationIndentation,
+  evaluateDiaphragmaticExcursion,
+  evaluatePeristalsis,
+  GI_PERISTALSIS_CATALOG,
+  type OrganMechanicalId,
+  type OrganBiomechanicsProfile,
+  type HyperelasticStressPoint,
+  type PalpationProbeInput,
+  type PalpationContactEvaluation,
+  type TissueContactSafetyStatus,
+  type RespirationMode,
+  type RespirationExcursionInput,
+  type VisceralDisplacementVector,
+  type DiaphragmaticExcursionEvaluation,
+  type GastrointestinalSegment,
+  type PeristalsisSegmentProfile,
+  type PeristalsisWavePoint,
+  type PeristalsisEvaluation,
+} from './engine/softTissueBiomechanicsEngine'
+export {
+  SoftTissueBiomechanicsDeck,
+  type SoftTissueBiomechanicsDeckProps,
+} from './ui/SoftTissueBiomechanicsDeck'
+
 
