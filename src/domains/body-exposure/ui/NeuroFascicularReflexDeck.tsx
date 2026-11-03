@@ -14,8 +14,12 @@ import {
   type CranialNerveProfile,
 } from '../engine/neuroFascicularTractographyEngine'
 
-export function NeuroFascicularReflexDeck() {
-  const [activeTab, setActiveTab] = useState<'nerves' | 'reflexes' | 'syndromes'>('nerves')
+export interface NeuroFascicularReflexDeckProps {
+  readonly initialTab?: 'nerves' | 'reflexes' | 'syndromes'
+}
+
+export function NeuroFascicularReflexDeck({ initialTab = 'nerves' }: NeuroFascicularReflexDeckProps = {}) {
+  const [activeTab, setActiveTab] = useState<'nerves' | 'reflexes' | 'syndromes'>(initialTab)
   const [selectedNerveId, setSelectedNerveId] = useState<string>('cn-3')
   const [selectedReflexId, setSelectedReflexId] = useState<string>('pupillary-light-reflex')
   const [stimulusSide, setStimulusSide] = useState<'left' | 'right'>('right')
