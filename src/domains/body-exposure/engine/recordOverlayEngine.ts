@@ -245,20 +245,75 @@ export const CANONICAL_ORGAN_BINDINGS: Readonly<Record<string, AnatomicalMultisc
     l7Pathway: 'nitric-oxide-vascular-tone-regulation',
     atlasDisclaimer: ATLAS_STRUCTURE_DISCLAIMER,
   }),
+  stomach: Object.freeze({
+    canonicalOrganId: 'stomach',
+    fmaId: 'FMA:7148',
+    uberonId: 'UBERON:0000945',
+    l1System: 'digestive-system',
+    l2Organ: 'stomach',
+    l3Substructure: 'gastric-mucosa-and-muscularis',
+    l4Tissue: 'gastric-glandular-epithelium',
+    l5Cell: 'parietal-and-chief-cell',
+    l7Pathway: 'gastric-acid-pepsin-secretion',
+    atlasDisclaimer: ATLAS_STRUCTURE_DISCLAIMER,
+  }),
+  spleen: Object.freeze({
+    canonicalOrganId: 'spleen',
+    fmaId: 'FMA:7196',
+    uberonId: 'UBERON:0002106',
+    l1System: 'lymphoid-immune-system',
+    l2Organ: 'spleen',
+    l3Substructure: 'splenic-white-and-red-pulp',
+    l4Tissue: 'lymphoid-tissue',
+    l5Cell: 'splenic-macrophage-and-b-cell',
+    l7Pathway: 'erythrocyte-clearance-and-humoral-immunity',
+    atlasDisclaimer: ATLAS_STRUCTURE_DISCLAIMER,
+  }),
+  thyroid: Object.freeze({
+    canonicalOrganId: 'thyroid',
+    fmaId: 'FMA:9603',
+    uberonId: 'UBERON:0002046',
+    l1System: 'endocrine-system',
+    l2Organ: 'thyroid-gland',
+    l3Substructure: 'thyroid-follicle',
+    l4Tissue: 'follicular-epithelium',
+    l5Cell: 'thyroid-follicular-cell',
+    l7Pathway: 'thyroglobulin-iodination-and-t3-t4-synthesis',
+    atlasDisclaimer: ATLAS_STRUCTURE_DISCLAIMER,
+  }),
+  bladder: Object.freeze({
+    canonicalOrganId: 'bladder',
+    fmaId: 'FMA:15900',
+    uberonId: 'UBERON:0001255',
+    l1System: 'renal-urinary-system',
+    l2Organ: 'urinary-bladder',
+    l3Substructure: 'detrusor-and-trigone',
+    l4Tissue: 'urothelium-transitional-epithelium',
+    l5Cell: 'umbrella-urothelial-cell',
+    l7Pathway: 'urothelial-barrier-and-micturition-compliance',
+    atlasDisclaimer: ATLAS_STRUCTURE_DISCLAIMER,
+  }),
 });
 
 const ORGAN_ALIASES: Readonly<Record<string, string>> = Object.freeze({
   jantung: 'heart',
   cardiac: 'heart',
   ginjal: 'kidney',
+  kidneys: 'kidney',
   renal: 'kidney',
   paru: 'lung',
+  lungs: 'lung',
   pulmonary: 'lung',
   hati: 'liver',
   hepar: 'liver',
   otak: 'brain',
   pembuluh_darah: 'vasculature',
   artery: 'vasculature',
+  lambung: 'stomach',
+  limpa: 'spleen',
+  tiroid: 'thyroid',
+  kandung_kemih: 'bladder',
+  urinary_bladder: 'bladder',
 });
 
 export type OverlayRejectionReason =
@@ -304,6 +359,7 @@ export interface RecordOverlaySuccessItem {
   readonly source: string;
   readonly truthClass: OverlayTruthClass;
   readonly referenceStatus: 'below-range' | 'within-range' | 'above-range' | 'unclassified';
+  readonly referenceRange: readonly [number, number] | null;
   readonly anatomicalBinding: AnatomicalMultiscaleBinding | null;
   readonly conversion: ConversionProvenance;
 }
@@ -658,6 +714,7 @@ export function computeCanonicalRecordOverlays(
             : 'canonical-record',
         truthClass,
         referenceStatus,
+        referenceRange: activeRefRange ?? null,
         anatomicalBinding,
         conversion,
       }),

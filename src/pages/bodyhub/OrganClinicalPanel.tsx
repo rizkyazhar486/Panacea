@@ -3,6 +3,7 @@ import { clinicalForOrgan, AUDIENCES, type Audience, type OrganPenyakit, type Or
 import { api, type PubmedArticle } from '../../lib/api'
 import { penjelasanOrgan, type KelainanBawaan } from '../../lib/organExplain'
 import type { AnatomyLayer } from '../../components/Body3D'
+import { OrganBiometricOverlayCard } from '../../domains/body-exposure/ui/OrganBiometricOverlayCard'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Isi klinis satu organ, terbuka SEKETIKA saat organnya diketuk di figur 3D.
@@ -286,6 +287,9 @@ export function OrganClinicalPanel({ organKey, organLabel, onLocate, audienceLua
         <p className="mt-1 text-[10.5px] text-neutral-400">{AUDIENCES.find((a) => a.key === audience)?.hint}</p>
       </div>
       )}
+
+      {/* Bedside Canonical Patient Observation Overlay (AI-EMR / Vitals / Labs) */}
+      <OrganBiometricOverlayCard organKey={organKey} organLabel={organLabel} />
 
       {/* Penjelasan organnya lebih dulu. Membuka tiroid atau mata dulu tidak
           menampilkan apa pun kalau organ itu kebetulan tidak punya banyak
