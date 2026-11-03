@@ -117,6 +117,7 @@ export { reviewLabel, type ReviewLabel } from './engine/reviewLabel'
 export { createPresentationLighting } from './adapters/studioLighting'
 export { AnatomicalLightingControls } from './ui/AnatomicalLightingControls'
 export { KaloLumenVolumetricStudio } from './ui/KaloLumenVolumetricStudio'
+export { ReferredPainDermatomeStudio } from './ui/ReferredPainDermatomeStudio'
 export { type PresentationLighting } from './engine/presentationLighting'
 
 export {
@@ -272,10 +273,15 @@ export {
 } from './engine/imagingPlaneEngine'
 export {
   DERMATOME_CONVERGENCE_SOURCE,
+  DERMATOME_SPATIAL_ANCHORS,
   REFERRED_PAIN_DISCLAIMER,
   VISCERAL_REFERRED_PAIN_TABLE,
+  calculateCentralSensitizationNociceptiveDrive,
   evaluateViscerosomaticConvergence,
+  type CalculateNociceptiveDriveInput,
+  type DermatomeSpatialAnchor,
   type EvaluateReferredPainInput,
+  type NociceptiveConvergenceTelemetry,
   type ReferredPainEvaluation,
   type ReferredPainFailure,
   type ReferredPainFailureReason,

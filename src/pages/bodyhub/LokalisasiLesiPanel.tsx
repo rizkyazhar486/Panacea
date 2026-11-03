@@ -2,6 +2,7 @@ import { lazy, Suspense, useMemo, useState } from 'react'
 import { Prosa } from '../../components/Prosa'
 import { EegScalpStudio } from './EegScalpStudio'
 import { PanelIsncsci } from './PanelIsncsci'
+import { ReferredPainDermatomeStudio } from '../../domains/body-exposure/ui/ReferredPainDermatomeStudio'
 
 // 3D dimuat hanya saat panel ini dibuka; ia membawa three.js dan nervous.glb.
 const LesiNeuro3D = lazy(() => import('./LesiNeuro3D').then((m) => ({ default: m.LesiNeuro3D })))
@@ -248,6 +249,15 @@ export function LokalisasiLesiPanel() {
           <Suspense fallback={<p className="text-sm text-neutral-500" role="status" aria-live="polite">Loading EEG source gate…</p>}>
             <BrainEegSourceGate />
           </Suspense>
+        </div>
+      </details>
+
+      <details className="rounded-2xl border border-neutral-200 p-3 dark:border-white/10" open>
+        <summary className="min-h-11 cursor-pointer text-xs font-black text-ink dark:text-white">
+          Viscerosomatic referred pain & 3D dermatome projection (Ruch-Woolf model)
+        </summary>
+        <div className="mt-3">
+          <ReferredPainDermatomeStudio />
         </div>
       </details>
 
