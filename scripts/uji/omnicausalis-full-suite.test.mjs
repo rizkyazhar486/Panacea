@@ -656,3 +656,54 @@ test("28. [PHASES 1-3 BODY EXPOSURE ATLAS CONSOLIDATION: LAYER PEEL, BVH PICKING
   assert.equal(probeFallback.activeBackend, "WEBGL2_DETERMINISTIC_FALLBACK");
   assert.equal(probeFallback.proprietaryUpscalerClaimed, false);
 });
+
+test("29. [WAVE 14 OPEN GAP RESOLUTION: HRA FEMALE V1.5 SEPARATE-SPACE ADMISSION, FASCIA/SKIN/NEUROVASCULAR MULTISCALE HANDOFF & H3 PACKET]", () => {
+  // 1. Gap 1 Resolved: HRA Female v1.5 Admitted in Separate Coordinate Space with 0 Non-Manifold Edges & CC BY 4.0
+  const hraAdm = omnicausalis.verifyAndAdmitHraFemaleV15FromRepoArtifacts();
+  assert.equal(hraAdm.admitted, true);
+  assert.equal(hraAdm.coordinateSpaceId, "HUBMAP_HRA_FEMALE_METRIC_SEPARATE_SPACE_V1_5");
+  assert.ok(hraAdm.verifiedNodeCount >= 12);
+
+  // 2. Gap 2 Resolved: Source-Backed Multiscale Stage Handoffs (Zero Fabricated Gross Meshes)
+  const fasciaHandoff = omnicausalis.executeSourceBackedMultiscaleGapHandoff("FASCIA_CONTINUUM", 1.2);
+  assert.equal(fasciaHandoff.usesFabricatedGrossMesh, false);
+  assert.equal(fasciaHandoff.targetDepthPanel, "SoftTissueBiomechanicsDeck");
+  const skinHandoff = omnicausalis.executeSourceBackedMultiscaleGapHandoff("SKIN_MICROANATOMY", 1.0);
+  assert.equal(skinHandoff.usesFabricatedGrossMesh, false);
+  assert.equal(skinHandoff.targetDepthPanel, "OpenCellPanel");
+  const nvHandoff = omnicausalis.executeSourceBackedMultiscaleGapHandoff("DISTAL_NEUROVASCULAR", 1.0);
+  assert.equal(nvHandoff.usesFabricatedGrossMesh, false);
+  assert.equal(nvHandoff.targetDepthPanel, "PerfusionChainPanel");
+
+  // 3. Gap 3 Resolved: H0-H2 Evidence Packet for H3 Clinician Review (Never Forges Clinician Signature)
+  const h3Pending = omnicausalis.buildClinicalReviewPacketForH3Signoff({
+    moduleId: "BODY_EXPOSURE_ATLAS_HOME",
+    commitSha: "112fec5ab9c67dd34897482e4a0d8e8026bd3f29",
+    testSuitesPassedCount: 30,
+    clinicianStrNumber: null
+  });
+  assert.equal(h3Pending.h0ToH2EngineeringVerified, true);
+  assert.equal(h3Pending.clinicallyReviewed, false);
+  assert.equal(h3Pending.forgedSignaturePermitted, false);
+});
+
+test("30. [AI AGENT TAKEOVER: TRACK 3 (AUTOPHAGY-MITOPHAGY & DE NOVO THERAPEUTICS) & TRACK 4 (WEARABLES SENSORIUM & 3D BIOMECHANICS)]", () => {
+  const track3 = omnicausalis.executeTrack3AutophagyMitophagyAndDeNovoTherapeutics({
+    fastingHours: 18,
+    exerciseMetabolicEquivalentMet: 7.5,
+    mitochondrialMembranePotentialMv: -105,
+    targetPathogenOrReceptorId: "PDB:6U9G_RYR2_STABILIZER"
+  });
+  assert.equal(track3.mitophagyClearanceState, "ACTIVE_PINK1_PARKIN_ULK1_MITOPHAGY");
+  assert.ok(track3.deNovoTherapeuticCandidate.predictedBindingFreeEnergyKcalMol < -11.0);
+
+  const track4 = omnicausalis.executeTrack4WearablesSensoriumAnd3DBiomechanics({
+    cadenceStepsPerMin: 176,
+    groundContactTimeMs: 218,
+    kneeValgusAngleDeg: 4.5,
+    mtpDorsiflexionDeg: 38,
+    wearableHrvRmssdMs: null
+  });
+  assert.equal(track4.aclShearRiskState, "SAFE_SAGITTAL_TRACKING");
+  assert.equal(track4.wearableAutonomicTelemetry.hrvRmssdMs, "MISSING_OBSERVATION");
+});

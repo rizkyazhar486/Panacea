@@ -17,7 +17,8 @@ function renderAtlasHomeHtml() {
   const selText = sel ? dict.structures[sel.sourceMeshName] : null;
   const searchRes = atlasState.searchQuery ? bx.searchStructures(atlasState.searchQuery, atlasState.locale) : null;
   const zoomInfo = bx.computeSemanticZoomRatio(2.2, atlasState.cameraDistanceMeters);
-  const gapBadge = atlasState.referenceBodyMode === "FEMALE_HRA_V1_5_REGIONAL" ? bx.getHonestGapBadgeForContext("female_whole_body") : null;
+  const hraStatus = bx.verifyAndAdmitHraFemaleV15FromRepoArtifacts();
+  const gapBadge = (!hraStatus.admitted && atlasState.referenceBodyMode === "FEMALE_HRA_V1_5_REGIONAL") ? bx.getHonestGapBadgeForContext("female_whole_body") : null;
 
   const stageButtons = [
     { id: "STAGE_1_ANATOMY", label: dict.stage1Anatomy },

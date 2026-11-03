@@ -7,3 +7,12 @@ export { searchStructures, type StructureSearchResult } from "./anatomy/structur
 export { diagnosticImagingEngine, kaloLumenDicomEngine, createDefaultImagingState, createDefaultKaloLumenState, type DiagnosticImagingState } from "./imaging/diagnosticImagingEngine.ts";
 export { FRAME_BUDGET_MS, nextAutoPreset, computeSemanticZoomRatio, createSceneShellLifecycleManager, probeWebGpuPhaseZeroCapability, type QualityPresetId } from "./rendering/sceneShellLifecycleAndQuality.ts";
 export { evaluateHraFemaleV15AdmissionGate, getHonestGapBadgeForContext, P0_HONEST_COVERAGE_GAPS, type ReferenceBodySexMode } from "./data/hraFemaleAdmissionAndHonestGapEngine.ts";
+export {
+  verifyAndAdmitHraFemaleV15FromRepoArtifacts,
+  executeSourceBackedMultiscaleGapHandoff,
+  executeTrack3AutophagyMitophagyAndDeNovoTherapeutics,
+  executeTrack4WearablesSensoriumAnd3DBiomechanics,
+  buildClinicalReviewPacketForH3Signoff,
+  type MultiscaleHandoffDomain,
+  type SourceBackedMultiscaleHandoffResult
+} from "./data/openGapResolutionAndAiTakeoverEngine.ts";

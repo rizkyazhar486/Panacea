@@ -88,3 +88,13 @@ export {
   type AtlasStageId,
   type BodyExposureAtlasHomeState
 } from "./ui/BodyExposureAtlasHome.tsx";
+// — WAVE 14: OPEN GAP RESOLUTION & AI TAKEOVER (TRACKS 3 & 4) —
+export {
+  verifyAndAdmitHraFemaleV15FromRepoArtifacts,
+  executeSourceBackedMultiscaleGapHandoff,
+  executeTrack3AutophagyMitophagyAndDeNovoTherapeutics,
+  executeTrack4WearablesSensoriumAnd3DBiomechanics,
+  buildClinicalReviewPacketForH3Signoff,
+  type MultiscaleHandoffDomain,
+  type SourceBackedMultiscaleHandoffResult
+} from "./engine/structureAtlas.ts";
