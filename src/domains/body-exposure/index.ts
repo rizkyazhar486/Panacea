@@ -400,5 +400,20 @@ export {
   SoftTissueBiomechanicsDeck,
   type SoftTissueBiomechanicsDeckProps,
 } from './ui/SoftTissueBiomechanicsDeck'
+export {
+  CRANIAL_NERVES,
+  BRAINSTEM_REFLEX_ARCS,
+  LONG_TRACTS,
+  NEURO_SYNDROMES,
+  simulateReflexArc,
+  evaluateNeurologicalSyndrome,
+  type CranialNerveProfile,
+  type BrainstemReflexArc,
+  type LongTractProfile,
+  type NeuroLesionSyndrome,
+  type ReflexSimulationResult,
+  type SyndromicDeficitResult,
+} from './engine/neuroFascicularTractographyEngine'
+export { NeuroFascicularReflexDeck } from './ui/NeuroFascicularReflexDeck'
 
 

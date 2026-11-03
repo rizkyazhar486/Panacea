@@ -144,7 +144,7 @@ export function CellLab() {
           {dipilih && (
             <div className="rounded-xl border border-brand/30 bg-brand/[0.04] p-3">
               <div className="flex items-baseline justify-between gap-2">
-                <div className="text-sm font-black text-ink dark:text-ink">{dipilih.nama}</div>
+                <div className="text-sm font-black text-ink dark:text-white">{dipilih.nama}</div>
                 <div className="shrink-0 text-[11px] font-bold text-neutral-500">
                   ≈{dipilih.ukuranUm} µm reference scale · {dipilih.membran === 0 ? 'no membrane' : `${dipilih.membran} membrane${dipilih.membran > 1 ? 's' : ''}`}
                 </div>
@@ -183,7 +183,7 @@ export function CellLab() {
       {jalur && tahap && ringkas && (
         <>
           <div className="rounded-xl border border-neutral-100 p-3 dark:border-white/10">
-            <div className="text-sm font-black text-ink dark:text-ink">{jalur.nama}</div>
+            <div className="text-sm font-black text-ink dark:text-white">{jalur.nama}</div>
             <div className="text-[11px] text-neutral-500">
               {jalur.masukan} → {jalur.keluaran} · in the {jalur.kompartemen.replace(/-/g, ' ')}
             </div>
@@ -201,7 +201,7 @@ export function CellLab() {
 
           <div className="rounded-xl border border-brand/30 bg-brand/[0.04] p-3">
             <div className="text-[10px] font-bold uppercase tracking-wide text-brand">Step {tahap.nomor}</div>
-            <div className="mt-0.5 text-sm font-black text-ink dark:text-ink">{tahap.enzim}</div>
+            <div className="mt-0.5 text-sm font-black text-ink dark:text-white">{tahap.enzim}</div>
             <div className="mt-1 text-[12px] font-semibold text-neutral-600 dark:text-neutral-400">
               {tahap.substrat} <span className="text-brand">→</span> {tahap.produk}
             </div>
@@ -247,7 +247,7 @@ export function CellLab() {
             {RANTAI.map((k) => (
               <div key={k.nomor} className="rounded-xl border border-neutral-100 p-3 dark:border-white/10">
                 <div className="flex items-baseline justify-between gap-2">
-                  <div className="text-sm font-black text-ink dark:text-ink">Complex {k.nomor}</div>
+                  <div className="text-sm font-black text-ink dark:text-white">Complex {k.nomor}</div>
                   <div className="shrink-0 text-[11px] font-bold text-brand-dark">
                     {k.protonDipompa > 0 ? `${k.protonDipompa} H⁺ pumped` : 'pumps no H⁺'}
                   </div>
@@ -293,7 +293,7 @@ export function CellLab() {
               {neraca.rincian.map((r) => (
                 <div key={r.sumber} className="flex items-baseline justify-between gap-3 text-[11px]">
                   <span className="min-w-0 text-neutral-600 dark:text-neutral-400">{r.sumber}</span>
-                  <span className="shrink-0 font-bold tabular-nums text-ink dark:text-ink">{r.atp}</span>
+                  <span className="shrink-0 font-bold tabular-nums text-ink dark:text-white">{r.atp}</span>
                 </div>
               ))}
             </div>

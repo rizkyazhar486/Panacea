@@ -191,7 +191,20 @@ export function FetalParcelInspector() {
           <label><input type="checkbox" aria-label={`Show region ${r.source_label}`} checked={visible.includes(r.source_label)} disabled={isolate} onChange={e => setVisible(current => e.target.checked ? [...current, r.source_label] : current.filter(n => n !== r.source_label))} /></label>
           <button aria-pressed={selected === r.source_label} onClick={() => setSelected(r.source_label)}><span style={{ background: FETAL_PARCEL_COLORS[r.source_label - 1] }} />Region {r.source_label}<small>{r.voxels.toLocaleString()} voxels</small></button>
         </div>)}</div>
-        {region && <article aria-label="Selected region evidence"><h2>Region {region.source_label}</h2><p>Source label {region.source_label} · {region.id} · identity unresolved</p>
+        {region && <article aria-label="Selected region evidence"><h2>Region {region.source_label}</h2>
+          {(() => {
+            const nonBg = Object.entries(region.organ_label_overlap_voxels)
+              .filter(([lbl]) => lbl !== '0')
+              .sort((a, b) => b[1] - a[1])
+            const topMatch = nonBg[0]
+            const topPct = topMatch && region.voxels > 0 ? ((topMatch[1] / region.voxels) * 100).toFixed(1) : null
+            return topMatch && topPct ? (
+              <div style={{ marginTop: '0.4rem', marginBottom: '0.6rem', padding: '0.4rem 0.6rem', borderRadius: '0.5rem', background: 'rgba(0,191,99,0.12)', border: '1px solid rgba(0,191,99,0.3)', color: '#00BF63', fontSize: '11px', fontWeight: 'bold' }}>
+                Candidate reference overlap: {organLabels[topMatch[0]] ?? `Label ${topMatch[0]}`} ({topPct}% voxels)
+              </div>
+            ) : null
+          })()}
+          <p>Source label {region.source_label} · {region.id} · identity unresolved</p>
           <dl><dt>Voxel volume</dt><dd>{region.voxel_volume_mm3.toFixed(2)} mm³</dd><dt>Surface volume</dt><dd>{region.surface_volume_mm3.toFixed(2)} mm³</dd>
             <dt>Discretization difference</dt><dd>{(region.mesh_volume_relative_error * 100).toFixed(2)}%</dd><dt>Connected components</dt><dd>{region.components}</dd><dt>Triangles</dt><dd>{region.triangles.toLocaleString()}</dd>
             <dt>Boundary / nonmanifold edges</dt><dd>{region.boundary_edges} / {region.nonmanifold_edges}</dd><dt>Older lung-mask overlap</dt><dd>{(wholeLungOverlap(region) * 100).toFixed(2)}%</dd></dl>
