@@ -205,7 +205,6 @@ export default function BiomechanicsMotionLab() {
   const [time, setTime] = useState(0)
   const [duration, setDuration] = useState(0)
   const [groupKey, setGroupKey] = useState('quads')
-  const [activeTab, setActiveTab] = useState<'atlas' | 'sensorium'>('sensorium')
   const [manualCyclePercent, setManualCyclePercent] = useState(0)
   const [selectedPresetId, setSelectedPresetId] = useState<PathologicalGaitPatternId>('normal-physiological-gait')
   const [bodyMassKg, setBodyMassKg] = useState(70)
@@ -278,54 +277,14 @@ export default function BiomechanicsMotionLab() {
     >
       <div className="flex flex-wrap items-start justify-between gap-3 border-b border-white/10 px-3 py-3 sm:px-4">
         <div>
-          <div className="text-[9px] font-black uppercase tracking-[0.18em] text-emerald-300">Biomechanics & Sensorium Lab</div>
-          <h3 className="mt-1 text-sm font-black">Original Motion ↔ 3D Anatomical Atlas ↔ Kinematics Pipeline</h3>
-          <p className="mt-1 max-w-3xl text-[10px] leading-relaxed text-white/55">
-            Pillar V multi-scale biomechanics: scrub real exercise footage or simulate physiological and pathological gait cycles.
-            Computes sagittal joint excursion (Hip, Knee, Ankle, 1st MTP Windlass), bimodal vertical Ground Reaction Force (GRF),
-            and bilateral Robinson Symmetry Index.
-          </p>
+          <div className="text-[9px] font-black uppercase tracking-[0.18em] text-emerald-300">Biomechanics motion lab</div>
+          <h3 className="mt-1 text-sm font-black">Original motion ↔ source-backed anatomical atlas</h3>
+          <p className="mt-1 max-w-3xl text-[10px] leading-relaxed text-white/55">A side-by-side workspace inspired by the supplied reference: scrub a real exercise video while inspecting the corresponding source-backed muscle atlas. The atlas remains rotatable and the same timeline stays visible on mobile.</p>
         </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <div style={{ display: 'flex', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', padding: '2px', backgroundColor: 'rgba(0,0,0,0.4)' }}>
-            <button
-              type="button"
-              onClick={() => setActiveTab('sensorium')}
-              style={{
-                borderRadius: '4px',
-                padding: '4px 10px',
-                fontSize: '10px',
-                fontWeight: 'bold',
-                backgroundColor: activeTab === 'sensorium' ? '#6ee7b7' : 'transparent',
-                color: activeTab === 'sensorium' ? '#000000' : 'rgba(255,255,255,0.6)',
-                border: 'none',
-                cursor: 'pointer',
-              }}
-            >
-              Kinematics Telemetry
-            </button>
-            <button
-              type="button"
-              onClick={() => setActiveTab('atlas')}
-              style={{
-                borderRadius: '4px',
-                padding: '4px 10px',
-                fontSize: '10px',
-                fontWeight: 'bold',
-                backgroundColor: activeTab === 'atlas' ? '#6ee7b7' : 'transparent',
-                color: activeTab === 'atlas' ? '#000000' : 'rgba(255,255,255,0.6)',
-                border: 'none',
-                cursor: 'pointer',
-              }}
-            >
-              Muscle Atlas
-            </button>
-          </div>
-          <label className="min-h-11 cursor-pointer rounded-xl border border-emerald-300/30 bg-emerald-300/10 px-3 py-2 text-[10px] font-black text-emerald-200">
-            Load motion video
-            <input className="sr-only" type="file" accept="video/*" onChange={(event) => loadVideo(event.target.files?.[0])} />
-          </label>
-        </div>
+        <label className="min-h-11 cursor-pointer rounded-xl border border-emerald-300/30 bg-emerald-300/10 px-3 py-2 text-[10px] font-black text-emerald-200">
+          Load motion video
+          <input className="sr-only" type="file" accept="video/*" onChange={(event) => loadVideo(event.target.files?.[0])} />
+        </label>
       </div>
 
       <p className="sr-only" role="status" aria-live="polite">{videoStatus}</p>
@@ -333,7 +292,7 @@ export default function BiomechanicsMotionLab() {
       <div className="grid min-h-0 grid-cols-1 md:min-h-[430px] md:grid-cols-2">
         <div className="relative min-h-[300px] border-b border-white/10 bg-black sm:min-h-[340px] md:min-h-[430px] md:border-b-0 md:border-r">
           <div className="absolute left-3 top-3 z-10 rounded-full bg-black/65 px-2 py-1 text-[10px] font-bold backdrop-blur">
-            {videoUrl ? `Video Time: ${time.toFixed(2)}s` : `Synthetic Cycle: ${effectiveCyclePercent}%`}
+            {videoUrl ? `Original · ${time.toFixed(2)}s` : `Kinematics · ${effectiveCyclePercent}% cycle`}
           </div>
           {videoUrl ? (
             <video
@@ -357,10 +316,8 @@ export default function BiomechanicsMotionLab() {
           ) : (
             <div className="flex h-full min-h-[300px] flex-col items-center justify-center px-6 text-center sm:min-h-[340px] md:min-h-[430px]">
               <div className="text-3xl" aria-hidden="true">＋</div>
-              <div className="mt-2 text-xs font-black">Load exercise clip or scrub synthetic gait</div>
-              <p className="mt-1 max-w-xs text-[10px] leading-relaxed text-white/45">
-                The video stays local in your browser. With or without video, the 3D Kinematics and Sensorium pipeline computes real-time joint telemetry and ground reaction forces.
-              </p>
+              <div className="mt-2 text-xs font-black">Load your exercise clip</div>
+              <p className="mt-1 max-w-xs text-[10px] leading-relaxed text-white/45">The video stays local in this browser session. Panacea does not claim pose tracking until a validated pose-estimation pipeline is connected.</p>
             </div>
           )}
           {videoError && (
@@ -377,9 +334,7 @@ export default function BiomechanicsMotionLab() {
           aria-label={`Source-backed rotatable muscle atlas. Current target: ${group.label}.`}
           aria-describedby="biomechanics-atlas-help biomechanics-atlas-state"
         >
-          <div className="pointer-events-none absolute left-3 top-3 z-10 rounded-full bg-black/55 px-2 py-1 text-[10px] font-bold backdrop-blur">
-            Source atlas · drag or touch to rotate
-          </div>
+          <div className="pointer-events-none absolute left-3 top-3 z-10 rounded-full bg-black/55 px-2 py-1 text-[10px] font-bold backdrop-blur">Source atlas · drag or touch to rotate</div>
           <p id="biomechanics-atlas-help" className="sr-only">Interactive 3D anatomy remains the primary visualization. Drag with a pointer or use touch gestures supported by the atlas viewer to inspect the model.</p>
           <p id="biomechanics-atlas-state" className="sr-only" role="status" aria-live="polite">{group.label} selected. {group.nodeNames.length} source atlas nodes are requested for highlighting.</p>
           <AtlasViewer3D
@@ -389,301 +344,264 @@ export default function BiomechanicsMotionLab() {
             tinggi={430}
           />
           <div className="pointer-events-none absolute bottom-3 left-3 right-3 z-10 rounded-xl border border-white/10 bg-black/65 p-2 backdrop-blur">
-            <div className="flex items-center justify-between gap-2">
-              <span className="text-[10px] font-black text-emerald-200">{group.label}</span>
-              <span className="text-[9px] text-white/45">{group.nodeNames.length} source nodes</span>
-            </div>
+            <div className="flex items-center justify-between gap-2"><span className="text-[10px] font-black text-emerald-200">{group.label}</span><span className="text-[9px] text-white/45">{group.nodeNames.length} source nodes</span></div>
             <p className="mt-1 line-clamp-2 text-[9px] leading-relaxed text-white/55">{group.penjelasan.aksi}</p>
           </div>
         </div>
       </div>
 
-      {/* Main Controls & Telemetry Dashboard */}
       <div className="space-y-3 border-t border-white/10 p-3 sm:p-4">
-        {/* Timeline Slider */}
+        {/* Preserved Original Video Timeline (Disabled when no video loaded) */}
         <div className="grid gap-2 sm:grid-cols-[1fr_auto] sm:items-center">
-          <label className="text-[9px] font-black uppercase tracking-wide text-white/50">
-            {duration > 0
-              ? `Synchronized video timeline · ${phase}`
-              : `Gait cycle phase · ${sagittal.phaseLabel} (${effectiveCyclePercent}%)`}
-            <input
-              aria-label="Motion timeline"
-              type="range"
-              min="0"
-              max={duration > 0 ? 1 : 100}
-              step={duration > 0 ? 0.001 : 1}
-              value={duration > 0 ? progress : manualCyclePercent}
-              onChange={(event) => {
-                const val = Number(event.target.value)
-                if (duration > 0) {
-                  seek(val)
-                } else {
-                  setManualCyclePercent(val)
-                }
-              }}
-              className="mt-2 block min-h-11 w-full accent-emerald-400"
-            />
+          <label className="text-[9px] font-black uppercase tracking-wide text-white/50">Synchronized timeline · {phase}
+            <input aria-label="Motion timeline" type="range" min="0" max="1" step="0.001" value={progress} disabled={!duration} onChange={(event) => seek(Number(event.target.value))} className="mt-2 block min-h-11 w-full accent-emerald-400" />
           </label>
-          <div className="text-right font-mono text-[10px] text-white/50">
-            {duration > 0 ? `${time.toFixed(2)} / ${duration.toFixed(2)} s` : `Cycle: ${effectiveCyclePercent}%`}
+          <div className="text-right font-mono text-[10px] text-white/50">{time.toFixed(2)} / {duration.toFixed(2)} s</div>
+        </div>
+
+        {/* Preserved Original Muscle / Tendon Targets (Always visible) */}
+        <div>
+          <div className="mb-1.5 text-[9px] font-black uppercase tracking-wide text-white/45">Muscle / tendon target</div>
+          <div className="flex gap-1.5 overflow-x-auto pb-1" role="group" aria-label="Muscle and tendon targets">
+            {WORKOUT_MUSCLE_GROUPS.map((item) => (
+              <button key={item.key} type="button" aria-pressed={group.key === item.key} onClick={() => setGroupKey(item.key)} className={`min-h-11 shrink-0 rounded-full border px-3 text-[10px] font-bold ${group.key === item.key ? 'border-emerald-300 bg-emerald-300 text-black' : 'border-white/10 text-white/60'}`}>{item.label}</button>
+            ))}
           </div>
         </div>
 
-        {activeTab === 'sensorium' ? (
-          <div className="space-y-3">
-            {/* Real-time Kinematic Telemetry Panels */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '8px' }}>
-              {/* Sagittal Hip Excursion */}
-              <div style={{ borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)', backgroundColor: 'rgba(255,255,255,0.035)', padding: '12px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <span className="text-[9px] font-black uppercase tracking-wide text-emerald-300">Hip Flexion / Extension</span>
-                  <span className="font-mono text-xs font-bold text-white">{sagittal.hipDeg}°</span>
-                </div>
-                <div style={{ marginTop: '8px', fontSize: '10px', color: 'rgba(255,255,255,0.6)' }}>
-                  Envelope: +25° to -15° (Δθ ≈ 40°)
-                </div>
-                <div style={{ marginTop: '4px', height: '6px', width: '100%', borderRadius: '9999px', backgroundColor: 'rgba(255,255,255,0.1)', overflow: 'hidden' }}>
-                  <div
-                    style={{
-                      height: '100%',
-                      backgroundColor: '#34d399',
-                      width: `${Math.min(100, Math.max(0, ((sagittal.hipDeg + 15) / 40) * 100))}%`,
-                    }}
-                  />
-                </div>
-              </div>
-
-              {/* Sagittal Knee Flexion */}
-              <div style={{ borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)', backgroundColor: 'rgba(255,255,255,0.035)', padding: '12px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <span className="text-[9px] font-black uppercase tracking-wide text-emerald-300">Knee Flexion</span>
-                  <span className="font-mono text-xs font-bold text-white">{sagittal.kneeDeg}°</span>
-                </div>
-                <div style={{ marginTop: '8px', fontSize: '10px', color: 'rgba(255,255,255,0.6)' }}>
-                  Peak swing clearance: 60°
-                </div>
-                <div style={{ marginTop: '4px', height: '6px', width: '100%', borderRadius: '9999px', backgroundColor: 'rgba(255,255,255,0.1)', overflow: 'hidden' }}>
-                  <div
-                    style={{
-                      height: '100%',
-                      backgroundColor: '#34d399',
-                      width: `${Math.min(100, Math.max(0, (sagittal.kneeDeg / 60) * 100))}%`,
-                    }}
-                  />
-                </div>
-              </div>
-
-              {/* Sagittal Ankle Dorsi/Plantarflexion */}
-              <div style={{ borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)', backgroundColor: 'rgba(255,255,255,0.035)', padding: '12px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <span className="text-[9px] font-black uppercase tracking-wide text-emerald-300">Ankle Joint</span>
-                  <span className="font-mono text-xs font-bold text-white">{sagittal.ankleDeg}°</span>
-                </div>
-                <div style={{ marginTop: '8px', fontSize: '10px', color: 'rgba(255,255,255,0.6)' }}>
-                  {sagittal.ankleDeg >= 0 ? `Dorsiflexion (+${sagittal.ankleDeg}°)` : `Plantarflexion (${sagittal.ankleDeg}°)`}
-                </div>
-                <div style={{ marginTop: '4px', height: '6px', width: '100%', borderRadius: '9999px', backgroundColor: 'rgba(255,255,255,0.1)', overflow: 'hidden' }}>
-                  <div
-                    style={{
-                      height: '100%',
-                      backgroundColor: '#34d399',
-                      width: `${Math.min(100, Math.max(0, ((sagittal.ankleDeg + 20) / 35) * 100))}%`,
-                    }}
-                  />
-                </div>
-              </div>
-
-              {/* 1st MTP Windlass Mechanism */}
-              <div style={{ borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)', backgroundColor: 'rgba(255,255,255,0.035)', padding: '12px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <span className="text-[9px] font-black uppercase tracking-wide text-emerald-300">1st MTP Joint (Hallux)</span>
-                  <span className="font-mono text-xs font-bold text-white">{sagittal.mtpDeg}°</span>
-                </div>
-                <div style={{ marginTop: '8px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '10px' }}>
-                  <span style={{ color: 'rgba(255,255,255,0.6)' }}>Excursion: 0° - 65°</span>
-                  {sagittal.windlassActive && (
-                    <span style={{ borderRadius: '4px', padding: '2px 6px', fontSize: '8px', fontWeight: 'bold', backgroundColor: '#6ee7b7', color: '#000000' }}>
-                      Windlass Active
-                    </span>
-                  )}
-                </div>
-                <div style={{ marginTop: '4px', height: '6px', width: '100%', borderRadius: '9999px', backgroundColor: 'rgba(255,255,255,0.1)', overflow: 'hidden' }}>
-                  <div
-                    style={{
-                      height: '100%',
-                      backgroundColor: '#34d399',
-                      width: `${Math.min(100, Math.max(0, (sagittal.mtpDeg / 65) * 100))}%`,
-                    }}
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* GRF & Symmetry Cards */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '8px' }}>
-              {/* Ground Reaction Force (GRF) */}
-              <div style={{ borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)', backgroundColor: 'rgba(255,255,255,0.035)', padding: '12px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <div>
-                    <div className="text-[9px] font-black uppercase tracking-wide text-emerald-300">Vertical Ground Reaction Force (Fz)</div>
-                    <div className="mt-1 text-xs font-black text-white">
-                      {grf.normalizedBw} BW · <span className="font-mono font-normal text-white/70">{grf.forceN} N</span>
-                    </div>
-                  </div>
-                  <span style={{ borderRadius: '9999px', border: '1px solid rgba(255,255,255,0.2)', padding: '2px 8px', fontSize: '9px', fontWeight: 'bold', color: 'rgba(255,255,255,0.8)', backgroundColor: 'rgba(0,0,0,0.5)' }}>
-                    {grf.phase}
-                  </span>
-                </div>
-                <div style={{ marginTop: '8px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '10px', color: 'rgba(255,255,255,0.6)' }}>
-                  <span>Loading rate: {grf.loadingRateBwPerSec} BW/s</span>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                    <span>Mass:</span>
-                    <input
-                      type="number"
-                      min="40"
-                      max="150"
-                      value={bodyMassKg}
-                      onChange={(e) => setBodyMassKg(Number(e.target.value) || 70)}
-                      style={{ width: '48px', borderRadius: '4px', border: '1px solid rgba(255,255,255,0.2)', backgroundColor: 'rgba(0,0,0,0.6)', padding: '2px 4px', textAlign: 'right', fontFamily: 'monospace', fontSize: '9px', color: '#ffffff' }}
-                    />
-                    <span>kg</span>
-                  </label>
-                </div>
-                <div style={{ marginTop: '8px', height: '8px', width: '100%', borderRadius: '9999px', backgroundColor: 'rgba(255,255,255,0.1)', overflow: 'hidden' }}>
-                  <div
-                    style={{
-                      height: '100%',
-                      width: `${Math.min(100, (grf.normalizedBw / 1.3) * 100)}%`,
-                      backgroundColor: grf.normalizedBw > 1.1 ? '#34d399' : grf.normalizedBw > 0 ? '#6ee7b7' : 'transparent',
-                    }}
-                  />
-                </div>
-              </div>
-
-              {/* Bilateral Gait Symmetry */}
-              <div style={{ borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)', backgroundColor: 'rgba(255,255,255,0.035)', padding: '12px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <div>
-                    <div className="text-[9px] font-black uppercase tracking-wide text-emerald-300">Bilateral Symmetry (Robinson SI)</div>
-                    <div className="mt-1 text-xs font-black text-white">
-                      GSS Composite: {symmetry.compositeSymmetryScore}%
-                    </div>
-                  </div>
-                  <span
-                    style={{
-                      borderRadius: '9999px',
-                      border: '1px solid',
-                      padding: '2px 8px',
-                      fontSize: '9px',
-                      fontWeight: 'bold',
-                      borderColor:
-                        symmetry.symmetryClass === 'normal-symmetric'
-                          ? 'rgba(110, 231, 183, 0.4)'
-                          : symmetry.symmetryClass === 'mild-asymmetry'
-                            ? 'rgba(252, 211, 77, 0.4)'
-                            : 'rgba(251, 113, 133, 0.4)',
-                      backgroundColor:
-                        symmetry.symmetryClass === 'normal-symmetric'
-                          ? 'rgba(110, 231, 183, 0.1)'
-                          : symmetry.symmetryClass === 'mild-asymmetry'
-                            ? 'rgba(252, 211, 77, 0.1)'
-                            : 'rgba(251, 113, 133, 0.1)',
-                      color:
-                        symmetry.symmetryClass === 'normal-symmetric'
-                          ? '#a7f3d0'
-                          : symmetry.symmetryClass === 'mild-asymmetry'
-                            ? '#fde68a'
-                            : '#fecdd3',
-                    }}
-                  >
-                    {symmetry.symmetryClass}
-                  </span>
-                </div>
-                <div style={{ marginTop: '8px', display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '4px', fontSize: '9px', color: 'rgba(255,255,255,0.6)' }}>
-                  <div>Stride SI: <span style={{ fontFamily: 'monospace', color: 'rgba(255,255,255,0.9)' }}>{symmetry.strideLengthSymmetryIndexPercent}%</span></div>
-                  <div>Stance SI: <span style={{ fontFamily: 'monospace', color: 'rgba(255,255,255,0.9)' }}>{symmetry.stancePercentSymmetryIndexPercent}%</span></div>
-                  <div>GRF Peak SI: <span style={{ fontFamily: 'monospace', color: 'rgba(255,255,255,0.9)' }}>{symmetry.peakGrfSymmetryIndexPercent}%</span></div>
-                </div>
-              </div>
-            </div>
-
-            {/* Pathological Gait Abnormality Explorer */}
-            <div style={{ borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)', backgroundColor: 'rgba(255,255,255,0.035)', padding: '12px' }}>
-              <div className="text-[9px] font-black uppercase tracking-wide text-emerald-300">Pathological Gait Abnormality Classification (Perry 2010)</div>
-              <div style={{ marginTop: '8px', display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-                {PATHOLOGICAL_PRESETS.map((p) => (
-                  <button
-                    key={p.id}
-                    type="button"
-                    onClick={() => handleSelectPreset(p)}
-                    style={{
-                      borderRadius: '8px',
-                      border: selectedPresetId === p.id ? '1px solid #6ee7b7' : '1px solid rgba(255,255,255,0.1)',
-                      backgroundColor: selectedPresetId === p.id ? '#6ee7b7' : 'transparent',
-                      color: selectedPresetId === p.id ? '#000000' : 'rgba(255,255,255,0.6)',
-                      padding: '4px 10px',
-                      fontSize: '9px',
-                      fontWeight: 'bold',
-                      cursor: 'pointer',
-                    }}
-                  >
-                    {p.label}
-                  </button>
-                ))}
-              </div>
-
-              {/* Evaluation findings */}
-              {pathologyEvaluation.ok && (
-                <div style={{ marginTop: '12px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', backgroundColor: 'rgba(0,0,0,0.4)', padding: '8px', fontSize: '10px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <span style={{ fontWeight: 'bold', color: '#a7f3d0' }}>{pathologyEvaluation.primaryPattern}</span>
-                    <span style={{ fontFamily: 'monospace', color: 'rgba(255,255,255,0.6)' }}>Stance:Swing = {pathologyEvaluation.stanceToSwingRatio}</span>
-                  </div>
-                  <div style={{ marginTop: '4px', color: 'rgba(255,255,255,0.8)' }}>
-                    <span style={{ fontWeight: 'bold', color: 'rgba(255,255,255,0.5)' }}>Correlate: </span>
-                    {pathologyEvaluation.anatomicalCorrelate}
-                  </div>
-                  <div style={{ marginTop: '2px', color: 'rgba(255,255,255,0.6)' }}>
-                    <span style={{ fontWeight: 'bold', color: 'rgba(255,255,255,0.5)' }}>Signatures: </span>
-                    {pathologyEvaluation.matchedSignatures.join('; ')}
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        ) : (
-          /* Muscle & Tendon Target Selector (Original Mode) */
-          <div>
-            <div className="mb-1.5 text-[9px] font-black uppercase tracking-wide text-white/45">Muscle / tendon target</div>
-            <div className="flex gap-1.5 overflow-x-auto pb-1" role="group" aria-label="Muscle and tendon targets">
-              {WORKOUT_MUSCLE_GROUPS.map((item) => (
-                <button
-                  key={item.key}
-                  type="button"
-                  aria-pressed={group.key === item.key}
-                  onClick={() => setGroupKey(item.key)}
-                  className={`min-h-11 shrink-0 rounded-full border px-3 text-[10px] font-bold ${
-                    group.key === item.key ? 'border-emerald-300 bg-emerald-300 text-black' : 'border-white/10 text-white/60'
-                  }`}
-                >
-                  {item.label}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Preserved Engineering Disclosures */}
+        {/* Preserved Original Scientific Boundaries (Always visible) */}
         <div className="grid gap-2 sm:grid-cols-3">
           <div className="rounded-xl border border-white/10 bg-white/[.035] p-3"><div className="text-[9px] font-black uppercase tracking-wide text-emerald-300">Pose</div><p className="mt-1 text-[10px] leading-relaxed text-white/55">BLOCKED until validated per-frame landmark inference is connected. No synthetic skeleton is drawn over the user video.</p></div>
           <div className="rounded-xl border border-white/10 bg-white/[.035] p-3"><div className="text-[9px] font-black uppercase tracking-wide text-emerald-300">Force vectors</div><p className="mt-1 text-[10px] leading-relaxed text-white/55">BLOCKED until subject scale, external load, segment kinematics and a validated inverse-dynamics model are available. Muscle highlighting is not a force estimate.</p></div>
           <div className="rounded-xl border border-white/10 bg-white/[.035] p-3"><div className="text-[9px] font-black uppercase tracking-wide text-emerald-300">Atlas provenance</div><p className="mt-1 text-[10px] leading-relaxed text-white/55">Only named nodes already bound to the shipped muscular atlas are highlighted. Missing tendons or structures are never substituted with neighbouring geometry.</p></div>
         </div>
 
-        {/* Clinical Disclaimer & Citations */}
-        <div className="rounded-xl border border-white/10 bg-white/[.02] p-3 text-[9px] text-white/45 space-y-1">
-          <div className="font-bold text-white/60">{GAIT_LIBRARY_DISCLAIMER}</div>
-          <div>Citations: {GAIT_BIOMECHANICS_SOURCE.citation} (PMID: {GAIT_BIOMECHANICS_SOURCE.pmid}); Hicks JH. J Anat. 1954 (PMID: 13129168).</div>
+        {/* Pillar V: 3D Gait Kinematics & Sensorium Pipeline Dashboard */}
+        <div style={{ marginTop: '16px', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '16px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+            <span className="text-[9px] font-black uppercase tracking-[0.18em] text-emerald-300">3D Gait Kinematics & Sensorium Pipeline (Pillar V)</span>
+            <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.6)' }}>
+              {sagittal.phaseLabel} ({effectiveCyclePercent}%)
+            </span>
+          </div>
+
+          {/* Interactive Simulation Cycle Scrubber */}
+          <div style={{ marginBottom: '12px' }}>
+            <label style={{ fontSize: '9px', fontWeight: 'bold', textTransform: 'uppercase', color: 'rgba(255,255,255,0.5)', display: 'block' }}>
+              Kinematics Simulation Cycle (0% - 100%)
+              <input
+                aria-label="Kinematics simulation cycle"
+                type="range"
+                min="0"
+                max="100"
+                step="1"
+                value={effectiveCyclePercent}
+                onChange={(e) => setManualCyclePercent(Number(e.target.value))}
+                style={{ marginTop: '4px', display: 'block', width: '100%', accentColor: '#34d399' }}
+              />
+            </label>
+          </div>
+
+          {/* 4 Sagittal Angle Telemetry Panels */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '8px', marginBottom: '12px' }}>
+            {/* Hip */}
+            <div style={{ borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)', backgroundColor: 'rgba(255,255,255,0.035)', padding: '12px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <span className="text-[9px] font-black uppercase tracking-wide text-emerald-300">Hip Flexion / Extension</span>
+                <span className="font-mono text-xs font-bold text-white">{sagittal.hipDeg}°</span>
+              </div>
+              <div style={{ marginTop: '8px', fontSize: '10px', color: 'rgba(255,255,255,0.6)' }}>
+                Envelope: +25° to -15° (Δθ ≈ 40°)
+              </div>
+              <div style={{ marginTop: '4px', height: '6px', width: '100%', borderRadius: '9999px', backgroundColor: 'rgba(255,255,255,0.1)', overflow: 'hidden' }}>
+                <div style={{ height: '100%', backgroundColor: '#34d399', width: `${Math.min(100, Math.max(0, ((sagittal.hipDeg + 15) / 40) * 100))}%` }} />
+              </div>
+            </div>
+
+            {/* Knee */}
+            <div style={{ borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)', backgroundColor: 'rgba(255,255,255,0.035)', padding: '12px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <span className="text-[9px] font-black uppercase tracking-wide text-emerald-300">Knee Flexion</span>
+                <span className="font-mono text-xs font-bold text-white">{sagittal.kneeDeg}°</span>
+              </div>
+              <div style={{ marginTop: '8px', fontSize: '10px', color: 'rgba(255,255,255,0.6)' }}>
+                Peak swing clearance: 60°
+              </div>
+              <div style={{ marginTop: '4px', height: '6px', width: '100%', borderRadius: '9999px', backgroundColor: 'rgba(255,255,255,0.1)', overflow: 'hidden' }}>
+                <div style={{ height: '100%', backgroundColor: '#34d399', width: `${Math.min(100, Math.max(0, (sagittal.kneeDeg / 60) * 100))}%` }} />
+              </div>
+            </div>
+
+            {/* Ankle */}
+            <div style={{ borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)', backgroundColor: 'rgba(255,255,255,0.035)', padding: '12px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <span className="text-[9px] font-black uppercase tracking-wide text-emerald-300">Ankle Joint</span>
+                <span className="font-mono text-xs font-bold text-white">{sagittal.ankleDeg}°</span>
+              </div>
+              <div style={{ marginTop: '8px', fontSize: '10px', color: 'rgba(255,255,255,0.6)' }}>
+                {sagittal.ankleDeg >= 0 ? `Dorsiflexion (+${sagittal.ankleDeg}°)` : `Plantarflexion (${sagittal.ankleDeg}°)`}
+              </div>
+              <div style={{ marginTop: '4px', height: '6px', width: '100%', borderRadius: '9999px', backgroundColor: 'rgba(255,255,255,0.1)', overflow: 'hidden' }}>
+                <div style={{ height: '100%', backgroundColor: '#34d399', width: `${Math.min(100, Math.max(0, ((sagittal.ankleDeg + 20) / 35) * 100))}%` }} />
+              </div>
+            </div>
+
+            {/* 1st MTP Windlass */}
+            <div style={{ borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)', backgroundColor: 'rgba(255,255,255,0.035)', padding: '12px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <span className="text-[9px] font-black uppercase tracking-wide text-emerald-300">1st MTP Joint (Hallux)</span>
+                <span className="font-mono text-xs font-bold text-white">{sagittal.mtpDeg}°</span>
+              </div>
+              <div style={{ marginTop: '8px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '10px' }}>
+                <span style={{ color: 'rgba(255,255,255,0.6)' }}>Excursion: 0° - 65°</span>
+                {sagittal.windlassActive && (
+                  <span style={{ borderRadius: '4px', padding: '2px 6px', fontSize: '8px', fontWeight: 'bold', backgroundColor: '#6ee7b7', color: '#000000' }}>
+                    Windlass Active
+                  </span>
+                )}
+              </div>
+              <div style={{ marginTop: '4px', height: '6px', width: '100%', borderRadius: '9999px', backgroundColor: 'rgba(255,255,255,0.1)', overflow: 'hidden' }}>
+                <div style={{ height: '100%', backgroundColor: '#34d399', width: `${Math.min(100, Math.max(0, (sagittal.mtpDeg / 65) * 100))}%` }} />
+              </div>
+            </div>
+          </div>
+
+          {/* GRF & Symmetry Cards */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '8px', marginBottom: '12px' }}>
+            {/* GRF */}
+            <div style={{ borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)', backgroundColor: 'rgba(255,255,255,0.035)', padding: '12px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div>
+                  <div className="text-[9px] font-black uppercase tracking-wide text-emerald-300">Vertical Ground Reaction Force (Fz)</div>
+                  <div className="mt-1 text-xs font-black text-white">
+                    {grf.normalizedBw} BW · <span className="font-mono font-normal text-white/70">{grf.forceN} N</span>
+                  </div>
+                </div>
+                <span style={{ borderRadius: '9999px', border: '1px solid rgba(255,255,255,0.2)', padding: '2px 8px', fontSize: '9px', fontWeight: 'bold', color: 'rgba(255,255,255,0.8)', backgroundColor: 'rgba(0,0,0,0.5)' }}>
+                  {grf.phase}
+                </span>
+              </div>
+              <div style={{ marginTop: '8px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '10px', color: 'rgba(255,255,255,0.6)' }}>
+                <span>Loading rate: {grf.loadingRateBwPerSec} BW/s</span>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <span>Mass:</span>
+                  <input
+                    type="number"
+                    min="40"
+                    max="150"
+                    value={bodyMassKg}
+                    onChange={(e) => setBodyMassKg(Number(e.target.value) || 70)}
+                    style={{ width: '48px', borderRadius: '4px', border: '1px solid rgba(255,255,255,0.2)', backgroundColor: 'rgba(0,0,0,0.6)', padding: '2px 4px', textAlign: 'right', fontFamily: 'monospace', fontSize: '9px', color: '#ffffff' }}
+                  />
+                  <span>kg</span>
+                </label>
+              </div>
+              <div style={{ marginTop: '8px', height: '8px', width: '100%', borderRadius: '9999px', backgroundColor: 'rgba(255,255,255,0.1)', overflow: 'hidden' }}>
+                <div
+                  style={{
+                    height: '100%',
+                    width: `${Math.min(100, (grf.normalizedBw / 1.3) * 100)}%`,
+                    backgroundColor: grf.normalizedBw > 1.1 ? '#34d399' : grf.normalizedBw > 0 ? '#6ee7b7' : 'transparent',
+                  }}
+                />
+              </div>
+            </div>
+
+            {/* Bilateral Gait Symmetry */}
+            <div style={{ borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)', backgroundColor: 'rgba(255,255,255,0.035)', padding: '12px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div>
+                  <div className="text-[9px] font-black uppercase tracking-wide text-emerald-300">Bilateral Symmetry (Robinson SI)</div>
+                  <div className="mt-1 text-xs font-black text-white">
+                    GSS Composite: {symmetry.compositeSymmetryScore}%
+                  </div>
+                </div>
+                <span
+                  style={{
+                    borderRadius: '9999px',
+                    border: '1px solid',
+                    padding: '2px 8px',
+                    fontSize: '9px',
+                    fontWeight: 'bold',
+                    borderColor:
+                      symmetry.symmetryClass === 'normal-symmetric'
+                        ? 'rgba(110, 231, 183, 0.4)'
+                        : symmetry.symmetryClass === 'mild-asymmetry'
+                          ? 'rgba(252, 211, 77, 0.4)'
+                          : 'rgba(251, 113, 133, 0.4)',
+                    backgroundColor:
+                      symmetry.symmetryClass === 'normal-symmetric'
+                        ? 'rgba(110, 231, 183, 0.1)'
+                        : symmetry.symmetryClass === 'mild-asymmetry'
+                          ? 'rgba(252, 211, 77, 0.1)'
+                          : 'rgba(251, 113, 133, 0.1)',
+                    color:
+                      symmetry.symmetryClass === 'normal-symmetric'
+                        ? '#a7f3d0'
+                        : symmetry.symmetryClass === 'mild-asymmetry'
+                          ? '#fde68a'
+                          : '#fecdd3',
+                  }}
+                >
+                  {symmetry.symmetryClass}
+                </span>
+              </div>
+              <div style={{ marginTop: '8px', display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '4px', fontSize: '9px', color: 'rgba(255,255,255,0.6)' }}>
+                <div>Stride SI: <span style={{ fontFamily: 'monospace', color: 'rgba(255,255,255,0.9)' }}>{symmetry.strideLengthSymmetryIndexPercent}%</span></div>
+                <div>Stance SI: <span style={{ fontFamily: 'monospace', color: 'rgba(255,255,255,0.9)' }}>{symmetry.stancePercentSymmetryIndexPercent}%</span></div>
+                <div>GRF Peak SI: <span style={{ fontFamily: 'monospace', color: 'rgba(255,255,255,0.9)' }}>{symmetry.peakGrfSymmetryIndexPercent}%</span></div>
+              </div>
+            </div>
+          </div>
+
+          {/* Pathological Gait Abnormality Explorer */}
+          <div style={{ borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)', backgroundColor: 'rgba(255,255,255,0.035)', padding: '12px', marginBottom: '12px' }}>
+            <div className="text-[9px] font-black uppercase tracking-wide text-emerald-300">Pathological Gait Abnormality Classification (Perry 2010)</div>
+            <div style={{ marginTop: '8px', display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+              {PATHOLOGICAL_PRESETS.map((p) => (
+                <button
+                  key={p.id}
+                  type="button"
+                  onClick={() => handleSelectPreset(p)}
+                  style={{
+                    borderRadius: '8px',
+                    border: selectedPresetId === p.id ? '1px solid #6ee7b7' : '1px solid rgba(255,255,255,0.1)',
+                    backgroundColor: selectedPresetId === p.id ? '#6ee7b7' : 'transparent',
+                    color: selectedPresetId === p.id ? '#000000' : 'rgba(255,255,255,0.6)',
+                    padding: '4px 10px',
+                    fontSize: '9px',
+                    fontWeight: 'bold',
+                    cursor: 'pointer',
+                  }}
+                >
+                  {p.label}
+                </button>
+              ))}
+            </div>
+
+            {pathologyEvaluation.ok && (
+              <div style={{ marginTop: '12px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', backgroundColor: 'rgba(0,0,0,0.4)', padding: '8px', fontSize: '10px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <span style={{ fontWeight: 'bold', color: '#a7f3d0' }}>{pathologyEvaluation.primaryPattern}</span>
+                  <span style={{ fontFamily: 'monospace', color: 'rgba(255,255,255,0.6)' }}>Stance:Swing = {pathologyEvaluation.stanceToSwingRatio}</span>
+                </div>
+                <div style={{ marginTop: '4px', color: 'rgba(255,255,255,0.8)' }}>
+                  <span style={{ fontWeight: 'bold', color: 'rgba(255,255,255,0.5)' }}>Correlate: </span>
+                  {pathologyEvaluation.anatomicalCorrelate}
+                </div>
+                <div style={{ marginTop: '2px', color: 'rgba(255,255,255,0.6)' }}>
+                  <span style={{ fontWeight: 'bold', color: 'rgba(255,255,255,0.5)' }}>Signatures: </span>
+                  {pathologyEvaluation.matchedSignatures.join('; ')}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Clinical Disclaimer & Citations */}
+          <div className="rounded-xl border border-white/10 bg-white/[.02] p-3 text-[9px] text-white/45 space-y-1">
+            <div className="font-bold text-white/60">{GAIT_LIBRARY_DISCLAIMER}</div>
+            <div>Citations: {GAIT_BIOMECHANICS_SOURCE.citation} (PMID: {GAIT_BIOMECHANICS_SOURCE.pmid}); Hicks JH. J Anat. 1954 (PMID: 13129168).</div>
+          </div>
         </div>
       </div>
     </section>
