@@ -21,10 +21,13 @@ export * from "./one-os/panacea-one-os-synchronizer.ts";
 export * from "./one-os/freedom-mocap-sepsis-talkvid-simready-engine.ts";
 export * from "./one-os/transcendental-seven-pillars-engine.ts";
 export * from "./one-os/elevenSystemMasterCalculatorsAndPageMatrix.ts";
+export * from "./one-os/systemTenWeakestLinkAndEightJourneysEngine.ts";
 export * from "./governance/post-expansion-maturation-gate.ts";
 export * from "./governance/universal-crash-shield.ts";
 export * from "./governance/astra-auto-healer-and-hippocratic-gate.ts";
 export * from "./governance/mobileMinimalistTypographyAndIconSystem.ts";
+export * from "./governance/securitySessionAndBolaGuardEngine.ts";
+export * from "./governance/mobilePerformanceTbtClsRecoveryEngine.ts";
 export * from "./personal-health/engine/gpsPaceCalorieAndFoodAiEngine.ts";
 export * from "./personal-health/engine/yourBodyHealthspanAndReclubPassEngine.ts";
 export * from "./personal-health/engine/correctSportsScienceAcwrEngine.ts";
@@ -32,3 +35,4 @@ export * from "./clinical-operations/model/downstreamHilirisasiFhirPacsBridge.ts
 export * from "./clinical-operations/model/fhirR4SepsisCareBundle.ts";
 export * from "./clinical-operations/model/sepsisOneHourBundleCds.ts";
 export * from "./clinical-operations/model/clinicalOneOsAndDicomWebOrchestrator.ts";
+export * from "./clinical-operations/model/longitudinalPersistenceInvariantsEngine.ts";
