@@ -272,7 +272,7 @@ export default function BiomechanicsMotionLab() {
 
   return (
     <section
-      data-biomechanics-motion-lab="v2"
+      data-biomechanics-motion-lab="v1"
       aria-label="Biomechanics motion lab"
       className="dark overflow-hidden rounded-2xl border border-emerald-900/30 bg-[#07110f] text-white shadow-sm"
     >
