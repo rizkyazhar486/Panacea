@@ -116,6 +116,9 @@ export {
 export { reviewLabel, type ReviewLabel } from './engine/reviewLabel'
 export { createPresentationLighting } from './adapters/studioLighting'
 export { AnatomicalLightingControls } from './ui/AnatomicalLightingControls'
+export { KaloLumenVolumetricStudio } from './ui/KaloLumenVolumetricStudio'
+export { ReferredPainDermatomeStudio } from './ui/ReferredPainDermatomeStudio'
+export { OrganBiometricOverlayCard } from './ui/OrganBiometricOverlayCard'
 export { type PresentationLighting } from './engine/presentationLighting'
 
 export {
@@ -271,10 +274,15 @@ export {
 } from './engine/imagingPlaneEngine'
 export {
   DERMATOME_CONVERGENCE_SOURCE,
+  DERMATOME_SPATIAL_ANCHORS,
   REFERRED_PAIN_DISCLAIMER,
   VISCERAL_REFERRED_PAIN_TABLE,
+  calculateCentralSensitizationNociceptiveDrive,
   evaluateViscerosomaticConvergence,
+  type CalculateNociceptiveDriveInput,
+  type DermatomeSpatialAnchor,
   type EvaluateReferredPainInput,
+  type NociceptiveConvergenceTelemetry,
   type ReferredPainEvaluation,
   type ReferredPainFailure,
   type ReferredPainFailureReason,
@@ -331,9 +339,16 @@ export {
 } from './engine/structureReviewWorkflowEngine'
 export {
   computeSubsurfacePenetrationDepth,
+  computeTissueDiffuseTransmittance,
   computeDirectionalLightVector,
   classifyHounsfieldLayer,
+  evaluateHounsfieldTransferFunction,
+  intersectRayAabb,
+  computeMprSliceCoordinates,
   createDefaultKaloLumenState,
+  DIAGNOSTIC_CT_PRESETS,
+  type DiagnosticCtWindowPreset,
+  type DiagnosticCtWindowPresetId,
   type KaloLumenLayerId,
   type MultiPlanarViewMode,
   type OpticalSubsurfaceScatteringProperties,
@@ -341,5 +356,20 @@ export {
   type DirectionalLightSourceState,
   type MultiPlanarClippingPlane,
   type KaloLumenEngineState,
+  type RayAabbIntersectionResult,
+  type MprSliceCoordinates,
 } from './engine/kaloLumenDicomEngine'
+export {
+  evaluateCardiopulmonaryCoupling,
+  CARDIOPULMONARY_DISCLAIMER,
+  CARDIOPULMONARY_PROVENANCE,
+  CARDIOPULMONARY_SCENARIO_PRESETS,
+  type CardiopulmonaryInput,
+  type CardiopulmonaryResult,
+  type CardiopulmonaryScenario,
+  type CardiopulmonarySuccess,
+  type CardiopulmonaryFailure,
+  type PvLoopPoint,
+} from './engine/cardiopulmonaryCouplingEngine'
+export { CardiopulmonaryCouplingDeck } from './ui/CardiopulmonaryCouplingDeck'
 

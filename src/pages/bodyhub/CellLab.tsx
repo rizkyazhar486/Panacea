@@ -10,6 +10,7 @@ import {
   evaluateEpitopeBindingAffinity,
   type DeNovoBinderCandidate,
 } from '../../domains/quantum-biology/index.ts'
+import { SubcellularMitochondrialAutophagyConsole } from '../../domains/quantum-biology/ui/SubcellularMitochondrialAutophagyConsole.tsx'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // LABORATORIUM SEL — organel dalam tiga dimensi, dan biokimia yang berjalan di
@@ -316,6 +317,8 @@ export function CellLab() {
 
       {tab === 'mitokondria' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <SubcellularMitochondrialAutophagyConsole />
+
           <div style={{ borderRadius: '0.75rem', border: '1px solid rgba(255,255,255,0.1)', backgroundColor: 'rgba(0,0,0,0.3)', padding: '0.875rem' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem' }}>
               <div>
