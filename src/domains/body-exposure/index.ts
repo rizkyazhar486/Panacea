@@ -98,3 +98,9 @@ export {
   type MultiscaleHandoffDomain,
   type SourceBackedMultiscaleHandoffResult
 } from "./engine/structureAtlas.ts";
+
+// — WAVE 15: UNIFIED REACT NAVIGATION & ENTRYPOINT BRIDGE —
+export {
+  resolveUnifiedBodyNavigation,
+  type UnifiedBodyNavigationTarget
+} from "./ui/bodyExposureReactBridge.ts";

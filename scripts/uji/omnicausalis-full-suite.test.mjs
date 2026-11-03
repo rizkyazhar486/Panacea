@@ -707,3 +707,22 @@ test("30. [AI AGENT TAKEOVER: TRACK 3 (AUTOPHAGY-MITOPHAGY & DE NOVO THERAPEUTIC
   assert.equal(track4.aclShearRiskState, "SAFE_SAGITTAL_TRACKING");
   assert.equal(track4.wearableAutonomicTelemetry.hrvRmssdMs, "MISSING_OBSERVATION");
 });
+
+test("31. [WAVE 15 UNIFIED ENTRYPOINT BRIDGE: YOUR BODY, BODYHUB & LEGACY STUDIOS CONVERGE INTO /body-exposure]", () => {
+  const fromYourBody = omnicausalis.resolveUnifiedBodyNavigation({
+    incomingPathOrAlias: "/your-body",
+    meshOrOrganQuery: "External abdominal oblique",
+    locale: "id"
+  });
+  assert.equal(fromYourBody.entrypointAliasUsed, "your-body");
+  assert.equal(fromYourBody.resolvedCanonicalPath, "/body-exposure");
+  assert.equal(fromYourBody.activeStructureCard.fmaId, "FMA:13335");
+  assert.ok(fromYourBody.activeStructureCard.title.includes("Obliquus Externus"));
+
+  const fromLegacyDeck = omnicausalis.resolveUnifiedBodyNavigation({
+    incomingPathOrAlias: "/bodyhub/CardiopulmonaryCouplingDeck",
+    locale: "en"
+  });
+  assert.equal(fromLegacyDeck.entrypointAliasUsed, "bodyhub");
+  assert.equal(fromLegacyDeck.resolvedCanonicalPath, "/body-exposure");
+});
