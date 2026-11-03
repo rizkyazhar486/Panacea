@@ -12,7 +12,8 @@ export type PathologicalGaitPatternId =
   | 'trendelenburg-abductor-gait'
   | 'hemiplegic-circumduction-gait'
   | 'parkinsonian-festinating-gait'
-  | 'cerebellar-ataxic-gait';
+  | 'cerebellar-ataxic-gait'
+  | 'antalgic-limping-gait';
 
 export const GAIT_LIBRARY_DISCLAIMER =
   'Biomechanical gait pattern reference — not an autonomous neurological diagnosis' as const;
@@ -147,6 +148,10 @@ export function classifyPathologicalGaitCycle(
     primaryPattern = 'parkinsonian-festinating-gait';
     anatomicalCorrelate = 'Nigrostriatal dopaminergic pathway (substantia nigra pars compacta)';
     signatures.push('High festinating cadence (> 135 steps/min) with reduced joint excursion');
+  } else if (input.stancePhasePercent < 52) {
+    primaryPattern = 'antalgic-limping-gait';
+    anatomicalCorrelate = 'Painful lower extremity joint, bone, or soft-tissue pathology (abbreviated stance to minimize weight-bearing)';
+    signatures.push('Abnormally shortened stance phase (< 52%) with reduced weight-bearing duration');
   } else {
     signatures.push('60:40 stance-to-swing physiological ratio with normal ankle clearance');
   }

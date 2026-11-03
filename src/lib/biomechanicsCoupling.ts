@@ -54,6 +54,15 @@ export const COUPLED_KINEMATICS: CoupledKinematicsNote[] = [
     interpretation: 'Do not rotate the entire cervical spine as one rigid cylinder around a single anatomical axis.',
     source: 'Standard cervical functional anatomy; qualitative whole-neck teaching model.',
   },
+  {
+    motionId: 'mtp-dorsiflexion-plantarflexion',
+    title: 'First MTP extension + plantar aponeurosis windlass mechanism',
+    primaryMotion: 'Dorsiflexion of the first metatarsophalangeal joint during terminal stance and pre-swing.',
+    coupledMotion: 'Dorsiflexion of the hallux winds the plantar aponeurosis around the head of the first metatarsal, elevating the medial longitudinal arch, shortening the foot, and locking the midtarsal joints into a rigid lever for propulsive push-off.',
+    structures: ['First metatarsal bone', 'Extensor hallucis longus', 'Flexor hallucis longus'],
+    interpretation: 'First MTP extension cannot be viewed in isolation; it directly couples hallux excursion to arch height, hindfoot inversion, and propulsion efficiency.',
+    source: 'Hicks JH. J Anat. 1954;88(1):25-30. PMID 13129168.',
+  },
 ]
 
 export function coupledKinematicsFor(motionId: string) {
