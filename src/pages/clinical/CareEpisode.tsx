@@ -82,6 +82,12 @@ import {
   addCostItem,
   updateCostItem,
   removeCostItem,
+  addDiagnosticOrder,
+  acknowledgeDiagnosticOrder,
+  closeDiagnosticOrder,
+  evaluateCareEpisodeDiagnosticSafety,
+  setReferralHandoff,
+  evaluateCareEpisodeReferralContinuity,
   type CandidateView,
   type StageStall,
 } from '../../lib/careEpisode'
@@ -604,6 +610,9 @@ function EpisodeCard({
         </div>
       )}
 
+      {/* Closed-Loop Diagnostic Result Routing & Alert Protocol (PAN-EXP-2026-01 / T-CLIN-80) */}
+      <DiagnosticClosedLoopSection episode={episode} onChange={onChange} />
+
       {/* Clinical Outcome Closure (T-CLIN-13) */}
       <OutcomeVerificationSection episode={episode} onChange={onChange} />
 
@@ -616,9 +625,33 @@ function EpisodeCard({
       {/* Post-Discharge Follow-Up & Readmission Risk Surveillance (T-CLIN-19) */}
       <ReadmissionSurveillanceSection episode={episode} supportiveResults={supportiveResults} />
 
-      {/* Inter-Facility Referral Handshake & Diagnostic Continuity (T-CLIN-20) */}
-      {episode.referralRecord && (
-        <ReferralHandshakeSection referral={episode.referralRecord} />
+      {/* Inter-Facility Referral Handshake & SLA Tracking (T-CLIN-20 / T-CLIN-85) */}
+      {(episode.referralRecord || episode.referralHandoff) && (
+        <ReferralHandshakeSection
+          episode={episode}
+          referral={
+            episode.referralRecord ?? {
+              referralId: episode.referralHandoff!.referralId,
+              sourceFacilityId: 'facility-primary',
+              sourceFacilityName: episode.facilityName || 'Primary Facility',
+              destinationFacilityId: episode.referralHandoff!.receivingFacilityId,
+              specialty: episode.referralHandoff!.specialtyCode,
+              urgency:
+                episode.referralHandoff!.urgencyTier === 'EMERGENCY_4H'
+                  ? 'emergency'
+                  : episode.referralHandoff!.urgencyTier === 'URGENT_48H'
+                  ? 'urgent'
+                  : 'routine',
+              clinicalIndication: episode.referralHandoff!.primaryDiagnosisIcd10,
+              status: episode.referralHandoff!.reconciledAtIso
+                ? 'completed'
+                : episode.referralHandoff!.triagedAtIso
+                ? 'acknowledged'
+                : 'dispatched',
+              auditDigest: `sha256:${episode.referralHandoff!.referralId}`,
+            }
+          }
+        />
       )}
 
       {/* Eden Three-Depth Progressive Disclosure & Plain-Language Clinical Companion (T-CLIN-21 / EDEN-01) */}
@@ -1153,7 +1186,203 @@ function ReadmissionSurveillanceSection({
   )
 }
 
-function ReferralHandshakeSection({ referral }: { referral: CareJourneyReferralRecord }) {
+function DiagnosticClosedLoopSection({
+  episode,
+  onChange,
+}: {
+  episode: CareEpisode
+  onChange: (ep: CareEpisode) => void
+}) {
+  const [closingOrderId, setClosingOrderId] = useState<string | null>(null)
+  const [mandatedAction, setMandatedAction] = useState<string>('')
+
+  const evaluations = useMemo(() => {
+    return evaluateCareEpisodeDiagnosticSafety(episode)
+  }, [episode])
+
+  if (!episode.diagnosticOrders || episode.diagnosticOrders.length === 0) {
+    return null
+  }
+
+  const criticalCount = evaluations.filter((e) => e.severity === 'CRITICAL_EMERGENCY').length
+  const overdueCount = evaluations.filter((e) => e.acknowledgementOverdue && !e.isClosed).length
+
+  return (
+    <div
+      className="mt-4 rounded-xl border border-neutral-200 dark:border-white/10 bg-neutral-50 dark:bg-white/[0.02] p-3.5"
+      data-care-diagnostic-closed-loop="v1"
+    >
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-neutral-200 dark:border-white/10 pb-2">
+        <div>
+          <div className="flex items-center gap-2 flex-wrap">
+            <h4 className="text-xs font-bold text-neutral-900 dark:text-white">
+              Closed-Loop Diagnostic Result Routing (T-CLIN-80)
+            </h4>
+            <span className="rounded-full bg-neutral-200 dark:bg-white/10 px-2 py-0.5 text-[10px] font-medium text-neutral-700 dark:text-white/80">
+              {episode.diagnosticOrders.length} order{episode.diagnosticOrders.length === 1 ? '' : 's'}
+            </span>
+            {criticalCount > 0 && (
+              <Badge tone="high">{criticalCount} CRITICAL</Badge>
+            )}
+            {overdueCount > 0 && (
+              <Badge tone="high">{overdueCount} OVERDUE</Badge>
+            )}
+          </div>
+          <p className="mt-0.5 text-[11px] text-neutral-500 dark:text-white/60">
+            High-consequence alert protocol, fail-closed escalation windows, and physician closure loop
+          </p>
+        </div>
+      </div>
+
+      <div className="mt-3 space-y-2">
+        {episode.diagnosticOrders.map((order) => {
+          const evalResult = evaluations.find((e) => e.orderId === order.orderId)
+          const isOverdue = evalResult?.acknowledgementOverdue
+          const isClosed = evalResult?.isClosed
+          const isCritical = order.severity === 'CRITICAL_EMERGENCY'
+          const isAbnormal = order.severity === 'ABNORMAL_PRIORITY'
+
+          return (
+            <div
+              key={order.orderId}
+              className="rounded-lg border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.03] p-2.5 text-xs"
+              data-order-id={order.orderId}
+              data-order-status={evalResult?.status ?? 'unknown'}
+            >
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1.5">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="font-bold text-neutral-900 dark:text-white">
+                    {order.testName}
+                  </span>
+                  <Badge tone={isCritical ? 'high' : isAbnormal ? 'low' : 'neutral'}>
+                    {order.severity.replace('_', ' ')}
+                  </Badge>
+                  <Badge tone={isClosed ? 'normal' : evalResult?.status.startsWith('ESCALATED') ? 'high' : order.acknowledgedAt ? 'brand' : 'low'}>
+                    {evalResult?.status.replace(/_/g, ' ') ?? 'EVALUATING'}
+                  </Badge>
+                </div>
+                <div className="text-[11px] text-neutral-500 font-mono">
+                  Accession: {order.accessionNumber}
+                </div>
+              </div>
+
+              <div className="mt-1 flex items-baseline gap-2 text-xs">
+                <span className="font-semibold text-neutral-800 dark:text-neutral-200">
+                  Result: {order.resultValue}{order.unit ? ` ${order.unit}` : ''}
+                </span>
+                {order.referenceRange && (
+                  <span className="text-[11px] text-neutral-400">
+                    (Ref: {order.referenceRange})
+                  </span>
+                )}
+                <span className="text-[10px] text-neutral-400">
+                  · {new Date(order.resultTimestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                </span>
+              </div>
+
+              {evalResult && (
+                <div className="mt-1.5 flex items-center justify-between text-[11px] text-neutral-600 dark:text-neutral-300">
+                  <span className={isOverdue && !isClosed ? 'font-bold text-ink' : ''}>
+                    Elapsed: {evalResult.elapsedMinutesSinceResult}m / Window: {evalResult.maxAllowedAcknowledgementWindowMinutes}m
+                    {isOverdue && !isClosed ? ' (OVERDUE)' : ''}
+                  </span>
+                  {evalResult.escalationTarget && (
+                    <span className="font-semibold text-neutral-700 dark:text-white/80">
+                      Target: {evalResult.escalationTarget.replace(/_/g, ' ')}
+                    </span>
+                  )}
+                </div>
+              )}
+
+              {evalResult?.safetyActionRequired && (
+                <div className="mt-1 text-[11px] text-neutral-500 italic">
+                  Action required: {evalResult.safetyActionRequired}
+                </div>
+              )}
+
+              {order.mandatedClinicalAction && (
+                <div className="mt-1.5 rounded bg-accent/5 border border-neutral-200 dark:border-white/10 p-1.5 text-[11px] text-neutral-700 dark:text-white/80">
+                  <strong>Documented action ({order.closedById}):</strong> {order.mandatedClinicalAction}
+                </div>
+              )}
+
+              {!isClosed && (
+                <div className="mt-2.5 flex items-center gap-2 pt-2 border-t border-neutral-100 dark:border-white/10">
+                  {!order.acknowledgedAt && (
+                    <Button
+                      variant="outline"
+                      className="!min-h-0 !px-2.5 !py-1 text-[11px]"
+                      onClick={() => {
+                        onChange(acknowledgeDiagnosticOrder(episode, order.orderId, 'clinician-active'))
+                      }}
+                    >
+                      Acknowledge Result
+                    </Button>
+                  )}
+                  {closingOrderId === order.orderId ? (
+                    <div className="flex items-center gap-2 w-full">
+                      <input
+                        type="text"
+                        value={mandatedAction}
+                        onChange={(e) => setMandatedAction(e.target.value)}
+                        placeholder="Mandated clinical action..."
+                        className={inputClass}
+                      />
+                      <Button
+                        className="!min-h-0 !px-2.5 !py-1 text-[11px]"
+                        disabled={!mandatedAction.trim()}
+                        onClick={() => {
+                          onChange(closeDiagnosticOrder(episode, order.orderId, 'clinician-active', mandatedAction))
+                          setClosingOrderId(null)
+                          setMandatedAction('')
+                        }}
+                      >
+                        Save & Close
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        className="!min-h-0 !px-2 !py-1 text-[11px]"
+                        onClick={() => {
+                          setClosingOrderId(null)
+                          setMandatedAction('')
+                        }}
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                  ) : (
+                    <Button
+                      variant="outline"
+                      className="!min-h-0 !px-2.5 !py-1 text-[11px]"
+                      onClick={() => {
+                        setClosingOrderId(order.orderId)
+                        setMandatedAction('')
+                      }}
+                    >
+                      Close Loop with Action
+                    </Button>
+                  )}
+                </div>
+              )}
+            </div>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
+function ReferralHandshakeSection({
+  episode,
+  referral,
+}: {
+  episode?: CareEpisode
+  referral: CareJourneyReferralRecord
+}) {
+  const refContinuity = useMemo(() => {
+    return episode ? evaluateCareEpisodeReferralContinuity(episode) : undefined
+  }, [episode])
+
   return (
     <div
       className="mt-4 rounded-xl border border-neutral-200 dark:border-white/10 bg-neutral-50 dark:bg-white/[0.02] p-3.5"
@@ -1165,7 +1394,7 @@ function ReferralHandshakeSection({ referral }: { referral: CareJourneyReferralR
         <div>
           <div className="flex items-center gap-2 flex-wrap">
             <h4 className="text-xs font-bold text-neutral-900 dark:text-white">
-              Inter-Facility Referral Handshake
+              Inter-Facility Referral Handshake & SLA Tracking (T-CLIN-85)
             </h4>
             <Badge
               tone={
@@ -1187,6 +1416,9 @@ function ReferralHandshakeSection({ referral }: { referral: CareJourneyReferralR
             >
               {referral.status.toUpperCase()}
             </Badge>
+            {refContinuity?.isOverdueDropoff && (
+              <Badge tone="high">DROPOFF OVERDUE</Badge>
+            )}
           </div>
           <p className="mt-1 text-xs text-neutral-700 dark:text-white/80">
             <strong>{referral.specialty}</strong> referral: {referral.clinicalIndication}
@@ -1194,10 +1426,32 @@ function ReferralHandshakeSection({ referral }: { referral: CareJourneyReferralR
           <p className="mt-0.5 text-[11px] text-neutral-500 dark:text-white/60">
             Route: {referral.sourceFacilityName} → {referral.destinationFacilityName || 'Pending destination match'}
           </p>
+          {refContinuity && (
+            <div className="mt-2 flex flex-wrap items-center gap-3 text-[11px] text-neutral-600 dark:text-neutral-300">
+              <span className={refContinuity.isOverdueDropoff ? 'font-bold text-ink' : ''}>
+                SLA: {refContinuity.elapsedHours}h / Limit: {refContinuity.slaLimitHours}h
+              </span>
+              <span>Status: {refContinuity.status.replace(/_/g, ' ')}</span>
+              {refContinuity.actionRequired !== 'NONE_NORMAL_PROGRESSION' && (
+                <span className="font-semibold text-neutral-700 dark:text-white/80">
+                  Action: {refContinuity.actionRequired.replace(/_/g, ' ')}
+                </span>
+              )}
+            </div>
+          )}
+          {refContinuity?.packetCompleteness && (
+            <div className="mt-2 flex items-center gap-2 flex-wrap text-[10px] text-neutral-500">
+              <span className="font-semibold">Packet:</span>
+              <span>Dx: {refContinuity.packetCompleteness.hasVerifiedDiagnosis ? '✓' : '✗'}</span>
+              <span>Diagnostics: {refContinuity.packetCompleteness.hasAttachedDiagnostics ? '✓' : '✗'}</span>
+              <span>Specialist: {refContinuity.packetCompleteness.hasReceivingSpecialistAssigned ? '✓' : '✗'}</span>
+              <span>Closed-Loop: {refContinuity.packetCompleteness.isClosedLoopSigned ? '✓' : '✗'}</span>
+            </div>
+          )}
         </div>
       </div>
       <div className="mt-2 text-[10px] font-mono text-neutral-400 dark:text-white/40 truncate">
-        Digest: {referral.auditDigest}
+        Digest: {refContinuity?.auditDigestSha256 ? `sha256:${refContinuity.auditDigestSha256}` : referral.auditDigest}
       </div>
     </div>
   )

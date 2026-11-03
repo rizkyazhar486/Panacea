@@ -24,7 +24,13 @@ import type {
   PlanItem,
   ProviderCandidate,
   SupportiveResult,
+  DiagnosticResultOrder,
+  ClosedLoopRoutingEvaluation,
+  ReferralHandoffOrder,
+  ReferralReconciliationEvaluation,
 } from './types.ts'
+import { evaluateClosedLoopResultRouting } from '../domains/clinical-operations/model/closedLoopResultRouting.ts'
+import { evaluateReferralHandoffContinuity } from '../domains/clinical-operations/model/referralHandoffReconciliation.ts'
 
 export const CARE_EPISODE_STAGES: CareEpisodeStageId[] = [
   'problem',
@@ -347,6 +353,139 @@ export function linkEpisodeComorbidity(
   }
 }
 
+// Closed-loop diagnostic result tracking and alert routing (PAN-EXP-2026-01 / T-CLIN-80)
+export function addDiagnosticOrder(
+  episode: CareEpisode,
+  order: DiagnosticResultOrder,
+  nowIso?: string,
+): CareEpisode {
+  const now = nowIso ?? new Date().toISOString()
+  const orders = episode.diagnosticOrders ?? []
+  const existingIdx = orders.findIndex((o) => o.orderId === order.orderId)
+  const updatedOrders =
+    existingIdx >= 0
+      ? orders.map((o, i) => (i === existingIdx ? order : o))
+      : [...orders, order]
+
+  return {
+    ...episode,
+    diagnosticOrders: updatedOrders,
+    updatedAt: now,
+  }
+}
+
+export function acknowledgeDiagnosticOrder(
+  episode: CareEpisode,
+  orderId: string,
+  clinicianId: string,
+  nowIso?: string,
+): CareEpisode {
+  const now = nowIso ?? new Date().toISOString()
+  const orders = (episode.diagnosticOrders ?? []).map((order) => {
+    if (order.orderId !== orderId) return order
+    return {
+      ...order,
+      acknowledgedAt: order.acknowledgedAt ?? now,
+      acknowledgedById: order.acknowledgedById ?? clinicianId,
+    }
+  })
+
+  return {
+    ...episode,
+    diagnosticOrders: orders,
+    updatedAt: now,
+  }
+}
+
+export function closeDiagnosticOrder(
+  episode: CareEpisode,
+  orderId: string,
+  clinicianId: string,
+  mandatedClinicalAction: string,
+  nowIso?: string,
+): CareEpisode {
+  const now = nowIso ?? new Date().toISOString()
+  const orders = (episode.diagnosticOrders ?? []).map((order) => {
+    if (order.orderId !== orderId) return order
+    return {
+      ...order,
+      acknowledgedAt: order.acknowledgedAt ?? now,
+      acknowledgedById: order.acknowledgedById ?? clinicianId,
+      closedAt: now,
+      closedById: clinicianId,
+      mandatedClinicalAction: mandatedClinicalAction.trim(),
+    }
+  })
+
+  return {
+    ...episode,
+    diagnosticOrders: orders,
+    updatedAt: now,
+  }
+}
+
+export function evaluateCareEpisodeDiagnosticSafety(
+  episode: CareEpisode,
+  evaluatedAtMs?: number,
+): ClosedLoopRoutingEvaluation[] {
+  if (!episode.diagnosticOrders || episode.diagnosticOrders.length === 0) return []
+  const evalMs =
+    evaluatedAtMs ??
+    (episode.updatedAt ? Date.parse(episode.updatedAt) : 0)
+  return episode.diagnosticOrders.map((order) => evaluateClosedLoopResultRouting(order, evalMs))
+}
+
+// Inter-facility referral handoff and specialist reconciliation protocol (T-CLIN-85)
+export function setReferralHandoff(
+  episode: CareEpisode,
+  order: ReferralHandoffOrder,
+  nowIso?: string,
+): CareEpisode {
+  const now = nowIso ?? new Date().toISOString()
+  const legacyStatus = order.reconciledAtIso
+    ? 'completed'
+    : order.triagedAtIso
+    ? 'acknowledged'
+    : 'dispatched'
+  const legacyUrgency =
+    order.urgencyTier === 'EMERGENCY_4H'
+      ? 'emergency'
+      : order.urgencyTier === 'URGENT_48H'
+      ? 'urgent'
+      : 'routine'
+
+  return {
+    ...episode,
+    referralHandoff: order,
+    referralRecord: {
+      referralId: order.referralId,
+      sourceFacilityId: 'facility-primary',
+      sourceFacilityName: episode.facilityName || 'Primary Facility',
+      destinationFacilityId: order.receivingFacilityId,
+      specialty: order.specialtyCode,
+      urgency: legacyUrgency,
+      clinicalIndication: order.primaryDiagnosisIcd10,
+      status: legacyStatus,
+      dispatchedAt: order.submittedAtIso,
+      acknowledgedAt: order.triagedAtIso,
+      acknowledgedBy: order.receivingConsultantId,
+      completedAt: order.reconciledAtIso,
+      auditDigest: `sha256:${order.referralId}:${legacyStatus}:${legacyUrgency}:${
+        legacyUrgency === 'emergency' ? 'vital-priority' : 'standard'
+      }`,
+    },
+    updatedAt: now,
+  }
+}
+
+export function evaluateCareEpisodeReferralContinuity(
+  episode: CareEpisode,
+  nowIso?: string,
+): ReferralReconciliationEvaluation | undefined {
+  if (!episode.referralHandoff) return undefined
+  return evaluateReferralHandoffContinuity(episode.referralHandoff, nowIso ?? new Date().toISOString())
+}
+
 // begun. Returns the record unchanged if there's no primary diagnosis yet,
 // or if it's already been seeded once.
 export function ensureEpisodeFromVerifiedPlan(record: EMRRecord): EMRRecord {
@@ -586,6 +725,7 @@ export interface StageStall {
   daysSinceUpdate: number
   expectedDays: number
   severity: StallSeverity
+  reason?: string
 }
 
 // Only 'active' stages can stall — 'blocked' already says why it's stuck,
@@ -602,6 +742,61 @@ export function detectStalls(episode: CareEpisode, now: Date = new Date()): Stag
     if (daysSinceUpdate >= expectedDays) out.push({ stage: s.stage, daysSinceUpdate, expectedDays, severity: 'stalled' })
     else if (daysSinceUpdate >= expectedDays * 0.7) out.push({ stage: s.stage, daysSinceUpdate, expectedDays, severity: 'watch' })
   }
+
+  // Diagnostic closed-loop escalations
+  if (episode.diagnosticOrders && episode.diagnosticOrders.length > 0) {
+    try {
+      const diagEvals = evaluateCareEpisodeDiagnosticSafety(episode, now.getTime())
+      for (const d of diagEvals) {
+        if (d.status === 'ESCALATED_CRITICAL_SAFETY') {
+          out.push({
+            stage: 'treatment',
+            daysSinceUpdate: Number((d.elapsedMinutesSinceResult / 1440).toFixed(2)),
+            expectedDays: Number((d.maxAllowedAcknowledgementWindowMinutes / 1440).toFixed(2)),
+            severity: 'stalled',
+            reason: `CRITICAL ALARM: Unacknowledged diagnostic result (${d.orderId}) elapsed ${d.elapsedMinutesSinceResult}m (max ${d.maxAllowedAcknowledgementWindowMinutes}m) — dispatched to Safety Officer & Rapid Response`,
+          })
+        } else if (d.status === 'ESCALATED_TO_ON_CALL') {
+          out.push({
+            stage: 'treatment',
+            daysSinceUpdate: Number((d.elapsedMinutesSinceResult / 1440).toFixed(2)),
+            expectedDays: Number((d.maxAllowedAcknowledgementWindowMinutes / 1440).toFixed(2)),
+            severity: 'stalled',
+            reason: `ESCALATION: Unacknowledged diagnostic result (${d.orderId}) rerouted to Secondary On-Call Physician`,
+          })
+        } else if (d.acknowledgementOverdue && !d.isClosed) {
+          out.push({
+            stage: 'treatment',
+            daysSinceUpdate: Number((d.elapsedMinutesSinceResult / 1440).toFixed(2)),
+            expectedDays: Number((d.maxAllowedAcknowledgementWindowMinutes / 1440).toFixed(2)),
+            severity: 'watch',
+            reason: `Overdue review for diagnostic result (${d.orderId})`,
+          })
+        }
+      }
+    } catch {
+      // Diagnostic order clock skew or invalid timestamp fails closed gracefully
+    }
+  }
+
+  // Referral handoff continuity drop-off stalls
+  if (episode.referralHandoff) {
+    try {
+      const refEval = evaluateCareEpisodeReferralContinuity(episode, now.toISOString())
+      if (refEval && refEval.isOverdueDropoff) {
+        out.push({
+          stage: 'provider',
+          daysSinceUpdate: Number((refEval.elapsedHours / 24).toFixed(1)),
+          expectedDays: Number((refEval.slaLimitHours / 24).toFixed(1)),
+          severity: 'stalled',
+          reason: `Referral drop-off overdue (${refEval.elapsedHours}h vs SLA ${refEval.slaLimitHours}h): Action required: ${refEval.actionRequired}`,
+        })
+      }
+    } catch {
+      // Referral continuity failure fails closed gracefully
+    }
+  }
+
   return out
 }
 
@@ -614,16 +809,17 @@ export function setExpectedDays(episode: CareEpisode, stage: CareEpisodeStageId,
 
 export type EpisodeHealth = 'on_track' | 'at_risk' | 'stalled'
 
-export function episodeHealth(episode: CareEpisode): EpisodeHealth {
+export function episodeHealth(episode: CareEpisode, now: Date = new Date()): EpisodeHealth {
   if (isComplete(episode)) return 'on_track'
   if (episode.stages.some((s) => s.status === 'blocked')) return 'stalled'
-  const stalls = detectStalls(episode)
+  const stalls = detectStalls(episode, now)
   if (stalls.some((s) => s.severity === 'stalled')) return 'stalled'
   if (stalls.length > 0) return 'at_risk'
   return 'on_track'
 }
 
 export function stallReason(stall: StageStall): string {
+  if (stall.reason) return stall.reason
   const days = Math.floor(stall.daysSinceUpdate)
   const verb = stall.severity === 'stalled' ? 'No update in' : 'Been open'
   return `${verb} ${days} day${days === 1 ? '' : 's'} on ${STAGE_LABEL[stall.stage]} — usually takes about ${stall.expectedDays} day${stall.expectedDays === 1 ? '' : 's'}.`
