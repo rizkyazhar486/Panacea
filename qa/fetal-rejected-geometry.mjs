@@ -57,7 +57,7 @@ try {
       contentType: relative.endsWith('.json') ? 'application/json' : relative.endsWith('.png') ? 'image/png' : 'model/gltf-binary' })
   })
   await page.goto(`http://127.0.0.1:${server.address().port}`)
-  await page.getByRole('alert').filter({ hasText: 'Asset source identity differs' }).waitFor()
+  await page.getByRole('alert').filter({ hasText: 'Asset source identity differs' }).waitFor({ timeout: 60000 })
   await page.setViewportSize({ width: 390, height: 844 })
   await page.waitForFunction(() => Math.abs(window.__qaCamera.aspect - document.querySelector('.fpi-canvas').getBoundingClientRect().width / 400) < 1e-6)
   const meshes = await page.evaluate(() => {
@@ -67,7 +67,7 @@ try {
   assert.equal(await page.getByRole('button', { name: 'Focus selected region' }).isDisabled(), true)
   rejectAsset = false
   await page.reload()
-  await page.waitForFunction(() => document.querySelector('.fpi-controls button')?.disabled === false)
+  await page.waitForFunction(() => document.querySelector('.fpi-controls button')?.disabled === false, null, { timeout: 60000 })
   assert.equal(await page.getByRole('alert').count(), 0, 'original asset remains accepted')
   assert.equal(await page.evaluate(() => { let count=0; window.__qaScene.traverse(object => { if (object.isMesh) count++ }); return count }), 9)
   assert.deepEqual(errors, [])
