@@ -204,3 +204,43 @@ test("15. [WAVE 5 MEDSCIHUB / MEDSTUDYHUB 6-DEPTH PROJECTIONS, OSCE CHECKLIST & 
   assert.equal(profProj.generatedSvgMediaAsset.sha256Hash.length, 64);
   assert.equal(profProj.osceStationChecklist.length, 4);
 });
+
+test("16. [WAVE 7 HEPATOBILIARY-PANCREATIC POSTPRANDIAL DYNAMICS & LAPAROSCOPIC CRITICAL VIEW OF SAFETY]", () => {
+  const meal = omnicausalis.simulateHepatobiliaryPancreaticPostprandialDynamics({
+    fastingPlasmaGlucoseMgDl: 84,
+    fastingInsulinUiuMl: 6.5,
+    ingestedCarbohydrateGrams: 55,
+    ingestedProteinGrams: 38,
+    ingestedFatGrams: 22,
+    minutesPostprandial: 45
+  });
+  assert.ok(meal.plasmaGlucoseMgDl > 84);
+  assert.equal(meal.hepaticGlycogenSynthaseActive, true);
+  const cvsSafe = omnicausalis.evaluateLaparoscopicCholecystectomyCriticalViewOfSafety({
+    sessionId: "LAP-CHOLE-01",
+    hepatocysticTriangleCleared: true,
+    lowerThirdGallbladderMobilizedFromCysticPlate: true,
+    exactlyTwoStructuresEnteringGallbladderConfirmed: true,
+    distanceFromCommonBileDuctMm: 7.5
+  });
+  assert.equal(cvsSafe.clipAndDividePermittedInSimulation, true);
+  const cvsUnsafe = omnicausalis.evaluateLaparoscopicCholecystectomyCriticalViewOfSafety({
+    sessionId: "LAP-CHOLE-02",
+    hepatocysticTriangleCleared: true,
+    lowerThirdGallbladderMobilizedFromCysticPlate: false,
+    exactlyTwoStructuresEnteringGallbladderConfirmed: true,
+    distanceFromCommonBileDuctMm: 3.0
+  });
+  assert.equal(cvsUnsafe.clipAndDividePermittedInSimulation, false);
+});
+
+test("17. [WAVE 8 MOBILE MINIMALIST LOGO, MONOLINE SVG ICON & TABULAR TYPOGRAPHY CONTRACT]", () => {
+  const tokens = omnicausalis.getCanonicalMobileMinimalistDesignTokens();
+  assert.equal(tokens.brandMark.squircleSizePx, 40);
+  assert.equal(tokens.iconSystem.containerTouchTargetPx, 44);
+  assert.equal(tokens.iconSystem.rawEmojiBannedInPrimaryChrome, true);
+  assert.equal(tokens.mobileViewport390x844Contract.horizontalOverflowPermitted, false);
+  const svg = omnicausalis.renderMonolineSvgIcon("BRAND_CADUCEUS_INFINITY", "#38bdf8", 20);
+  assert.ok(svg.includes("viewBox=\"0 0 24 24\""));
+  assert.ok(svg.includes("stroke-width=\"1.75\""));
+});
