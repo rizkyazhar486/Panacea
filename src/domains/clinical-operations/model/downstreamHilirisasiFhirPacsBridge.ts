@@ -27,7 +27,8 @@ export type TruthClass =
 export const MISSING_OBSERVATION = Symbol('PANACEA_MISSING_OBSERVATION');
 
 // ── Standard FIPS 180-4 SHA-256 Engine (Pure, Isomorphic, Synchronous) ───────
-export { sha256Hex } from '../../../shared/kernel/sha256.ts'
+import { sha256Hex } from '../../../shared/kernel/sha256.ts'
+export { sha256Hex }
 
 /**
  * Generates an RFC 4122 compliant deterministic UUIDv4-derivative from a seed string.
