@@ -116,6 +116,7 @@ export {
 export { PoliPatientFlowBoard } from './ui/PoliPatientFlowBoard'
 export { CareContinuityPanel, type CareContinuityPanelProps } from './ui/CareContinuityPanel'
 export { EdenLongitudinalInsightSection } from './ui/EdenLongitudinalInsightSection'
+export { PantheonClinicalDecisionSupportConsole } from './ui/PantheonClinicalDecisionSupportConsole'
 
 export {
   deriveEdenLongitudinalInsight,
@@ -266,4 +267,13 @@ export {
   type AcwrRecoveryRecommendationInput,
   type AcwrRecoveryRecommendationOutput,
 } from './model/downstreamHilirisasiFhirPacsBridge'
+
+export {
+  evaluatePantheonClinicalConsensus,
+  type ClinicalSpecialtyId,
+  type SpecialtyAgentVote,
+  type GuidelineConflictItem,
+  type BedsideCdsOrchestrationInput,
+  type PantheonConsensusEvaluation,
+} from './model/pantheonClinicalConsensusEngine'
 

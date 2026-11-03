@@ -1,6 +1,12 @@
 import { Link } from 'react-router-dom'
 import { useStore } from '../../lib/store'
-import { derivePoliPatientFlow, PoliPatientFlowBoard, CareContinuityPanel, deriveCareContinuityState } from '../../domains/clinical-operations'
+import {
+  derivePoliPatientFlow,
+  PoliPatientFlowBoard,
+  CareContinuityPanel,
+  deriveCareContinuityState,
+  PantheonClinicalDecisionSupportConsole,
+} from '../../domains/clinical-operations'
 import { deriveEncounterOutcomeJob } from '../../domains/clinical-operations/model/encounterOutcomeJob'
 import { PanaceaZoneNav } from '../../components/PanaceaZoneNav'
 import { VisitCommandCenter } from '../../components/VisitCommandCenter'
@@ -80,6 +86,14 @@ export function VisitOS() {
           <ClinicalPatientContext />
         </div>
       )}
+      <details style={{ borderRadius: '16px', border: '1px solid rgba(255,255,255,0.1)', background: '#080d1a', padding: '16px', color: '#ffffff' }}>
+        <summary style={{ cursor: 'pointer', userSelect: 'none', fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#38bdf8' }}>
+          ICU Bedside Clinical Decision Support · Pantheon Arbiter Console
+        </summary>
+        <div style={{ marginTop: '12px' }}>
+          <PantheonClinicalDecisionSupportConsole />
+        </div>
+      </details>
       {outcomeJob && (
         <section aria-label="Encounter outcome workflow" data-encounter-outcome-job="v1" className="rounded-2xl border border-emerald-400/20 bg-[#081410] px-4 py-4 sm:px-5">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
