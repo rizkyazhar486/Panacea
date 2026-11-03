@@ -87,14 +87,10 @@ try {
       await page.getByPlaceholder('nama@email.com').waitFor({ timeout: 30000 })
     }
     const logout = async (page) => {
-      await page.evaluate(() => {
-        document.documentElement.style.scrollBehavior = 'auto'
-        window.scrollTo(0, 0)
-      })
+      await page.evaluate(() => window.scrollTo(0, 0))
       const direct = page.getByRole('button', { name: 'Log out', exact: true })
       if (await direct.first().isVisible().catch(() => false)) { await direct.first().click(); return }
-      const menuBtn = page.getByRole('button', { name: 'Menu akun dan keluar' })
-      await menuBtn.click({ force: true }).catch(() => menuBtn.click())
+      await page.getByRole('button', { name: 'Menu akun dan keluar' }).click()
       await page.getByRole('button', { name: 'Log out' }).click()
     }
     const masuk = (page) => page.getByRole('button', { name: /^Masuk( \/ Daftar Gratis)?$/ }).first()
