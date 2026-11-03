@@ -135,6 +135,28 @@ export const WHOLE_BODY_JOINT_PROFILES: WholeBodyJointProfile[] = [
       { id: 'hindfoot-inversion-eversion', label: 'Inversion / eversion', plane: 'multiplanar', axis: 'oblique', minDeg: -15, maxDeg: 35, neutralDeg: 0, negativeLabel: 'Eversion', positiveLabel: 'Inversion', drivers: ['tibialis posterior/anterior', 'fibularis longus/brevis'], opposers: ['opposing invertor/evertor group'], passiveRestraints: ['lateral/medial ligament complexes', 'subtalar articular geometry'], structureHints: ['tibialis posterior', 'tibialis anterior', 'fibularis', 'talus', 'calcaneus'], teachingNote: 'Inversion/eversion is multiplanar and distributed across hindfoot/midtarsal joints; this axis is deliberately labeled as an educational simplification.' },
     ],
   },
+  {
+    id: 'first-mtp', label: 'First metatarsophalangeal (MTP)', region: 'lower-limb', sourceGeometry: 'native-geometry',
+    nodeHints: ['First metatarsal bone', 'Extensor hallucis longus', 'Flexor hallucis longus', 'Abductor hallucis'],
+    motions: [
+      {
+        id: 'mtp-dorsiflexion-plantarflexion',
+        label: 'Dorsiflexion / plantarflexion',
+        plane: 'sagittal',
+        axis: 'mediolateral',
+        minDeg: -35,
+        maxDeg: 65,
+        neutralDeg: 0,
+        negativeLabel: 'Plantarflexion',
+        positiveLabel: 'Dorsiflexion',
+        drivers: ['extensor hallucis longus', 'extensor hallucis brevis'],
+        opposers: ['flexor hallucis longus', 'flexor hallucis brevis'],
+        passiveRestraints: ['plantar plate', 'collateral ligaments', 'plantar aponeurosis'],
+        structureHints: ['First metatarsal bone', 'Extensor hallucis longus', 'Flexor hallucis longus'],
+        teachingNote: 'Terminal stance requires up to 60°-65° of 1st MTP dorsiflexion to engage the Hicks windlass mechanism, tensioning the plantar fascia and stabilizing the medial longitudinal arch for rigid push-off.',
+      },
+    ],
+  },
 ]
 
 export const WHOLE_BODY_BIOMECHANICS_DISCLOSURE = {

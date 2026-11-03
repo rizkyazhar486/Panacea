@@ -220,6 +220,20 @@ export {
   type PathologicalGaitPatternId,
 } from './engine/pathologicalGaitEngine'
 export {
+  KINEMATICS_SENSORIUM_METADATA,
+  calculateSagittalKinematics,
+  calculateVerticalGrf,
+  calculateRobinsonSymmetryIndex,
+  evaluateGaitSymmetry,
+  synthesizeKinematicTelemetry,
+  type GaitCyclePhaseId,
+  type SagittalKinematicsProfile,
+  type VerticalGrfProfile,
+  type GaitSymmetryInput,
+  type GaitSymmetryMetrics,
+  type KinematicTelemetryEnvelope,
+} from './engine/gaitKinematicsSensoriumEngine'
+export {
   VQ_EQUATION_SOURCE,
   VQ_LAB_DISCLAIMER,
   evaluateVqAndAlveolarGradient,
