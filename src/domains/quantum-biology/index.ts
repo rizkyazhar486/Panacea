@@ -8,6 +8,11 @@ export {
 } from './engine/epitopeBinderEngine.ts'
 
 export {
+  computeMitchellProtonMotiveForce,
+  evaluateSubcellularMitochondrialDynamics,
+} from './engine/subcellularMitochondrialDynamicsEngine.ts'
+
+export {
   AMR_EPITOPE_CATALOG,
 } from './data/amrEpitopeCatalog.ts'
 
@@ -18,3 +23,14 @@ export type {
   DeNovoBinderCandidate,
   BindingAffinityEvaluationResult,
 } from './model/quantumProteinTypes.ts'
+
+export type {
+  SubcellularViabilityStatus,
+  SubcellularMitochondrialInput,
+  SubcellularMitochondrialEvaluationResult,
+  ElectronTransportChainFlux,
+  ChemiosmoticBioenergetics,
+  ReactiveOxygenSpeciesDynamics,
+  MetabolicNutrientRheostat,
+  AutophagicFluxMitophagyState,
+} from './model/subcellularMitochondrialTypes.ts'
