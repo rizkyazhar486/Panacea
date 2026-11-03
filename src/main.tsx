@@ -429,6 +429,8 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/shape-forming" element={<Navigate to="/latihan?t=bentuk" replace />} />
               <Route path="/consult" element={<Consult />} />
               <Route path="/visit-os" element={<VisitOS />} />
+              {/* Preserve care-episode return links while keeping one canonical VisitOS page. */}
+              <Route path="/visit" element={<Navigate to="/visit-os" replace />} />
               <Route path="/poli" element={<VisitOS />} />
               <Route path="/hospitals" element={<Hospitals />} />
               <Route path="/pharmacy" element={<Pharmacy />} />
