@@ -444,3 +444,45 @@ test("25. [PHASE 2 & 3 MERGED PILLARS #2990-#2999: PINK1-PARKIN MITOPHAGY, REFER
   assert.equal(blockedOverlay.overlayPermitted, false);
   assert.equal(blockedOverlay.blockReason, "CROSS_PATIENT_MISMATCH_BLOCKED");
 });
+
+test("26. [PHASE 3 & 7 HISTORICAL PR TRIAGE (#2877-#3000), OCR PROVENANCE, VISITOS RETURN BOOKMARK & WHOLE-BODY WORKBENCH]", () => {
+  assert.equal(omnicausalis.COLLISION_SENSITIVE_PR_TRIAGE_LEDGER.length, 11);
+  const ocr = omnicausalis.ingestStructuredOcrClinicalDocument({
+    documentId: "DOC-LAB-01",
+    patientCanonicalId: "PT-101",
+    rawExtractedTokens: { hemoglobinGPerDl: 14.8, lactateMmolL: 1.4 },
+    ocrConfidence0to1: 0.88
+  });
+  assert.equal(ocr.provenanceClass, "IMPORTED");
+  assert.equal(ocr.requiresHumanClinicianConfirmation, true);
+  assert.equal(ocr.autoSignedAsClinicalFact, false);
+  const visitBookmark = omnicausalis.buildVisitOsNextStepAndReturnBookmark({
+    episodeId: "EP-2026-11",
+    patientCanonicalId: "PT-101",
+    originRoute: "/clinical/visitos",
+    activeAnatomicalFmaId: "FMA:7088",
+    cameraYawPitch: [14, 8],
+    pendingLabLactate: true,
+    meanArterialPressureMmHg: 74
+  });
+  assert.equal(visitBookmark.interactionsRequiredToReachAction, 1);
+  assert.deepEqual(visitBookmark.activeCameraYawPitch, [14, 8]);
+  const wb1 = omnicausalis.executeWholeBodyPhysiologyWorkbenchJourney({
+    selectedSystemId: "CARDIOVASCULAR_CIRCULATORY",
+    customEndSystolicElastanceEes: 2.0,
+    activeSessionPatientId: "PT-101",
+    patientConsentGranted: true,
+    cameraYawPitch: [18, 12]
+  });
+  const wb2 = omnicausalis.executeWholeBodyPhysiologyWorkbenchJourney({
+    selectedSystemId: "CARDIOVASCULAR_CIRCULATORY",
+    customEndSystolicElastanceEes: 3.0,
+    activeSessionPatientId: "PT-101",
+    patientConsentGranted: true,
+    cameraYawPitch: [18, 12]
+  });
+  assert.ok(wb2.cardiopulmonaryOutput.endSystolicPressureMmHg > wb1.cardiopulmonaryOutput.endSystolicPressureMmHg);
+  assert.equal(wb2.simulationTruthClass, "SIMULATED_EDUCATIONAL");
+  assert.equal(wb2.patientBiometricTruthClass, "OBSERVED_CLINICAL");
+  assert.equal(wb2.returnedToAnatomyWithoutContextLoss, true);
+});
