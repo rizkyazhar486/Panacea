@@ -20,6 +20,7 @@ export * from "./golden-journey/respiratory-neuro-golden-journey.ts";
 export * from "./one-os/panacea-one-os-synchronizer.ts";
 export * from "./one-os/freedom-mocap-sepsis-talkvid-simready-engine.ts";
 export * from "./one-os/transcendental-seven-pillars-engine.ts";
+export * from "./one-os/elevenSystemMasterCalculatorsAndPageMatrix.ts";
 export * from "./governance/post-expansion-maturation-gate.ts";
 export * from "./governance/universal-crash-shield.ts";
 export * from "./governance/astra-auto-healer-and-hippocratic-gate.ts";

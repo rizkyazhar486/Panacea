@@ -275,3 +275,22 @@ test("18. [WAVE 9 SINGLE-PROJECTILE UHD BODY EXPOSURE: ZERO CLIPPING, ANTI-FLOAT
   assert.equal(next.selectedFmaId, "FMA:7088");
   assert.equal(next.cameraYawDeg, 15);
 });
+
+test("19. [WAVE 10 ALL 11 BODY SYSTEM CALCULATORS & 7-PAGE INFLOW/OUTFLOW WORKFLOW MATRIX]", () => {
+  const calcs = omnicausalis.computeAllElevenBodySystemCalculations();
+  assert.equal(calcs.length, 11);
+  calcs.forEach((c) => {
+    assert.ok(c.primaryFormula.length > 5);
+    assert.ok(c.primaryMetricValue.length > 2);
+    assert.ok(c.authoritativeSource.length > 3);
+    assert.ok(c.outflowTargetPage.startsWith("PAGE_"));
+  });
+  const pages = omnicausalis.SEVEN_PAGE_MASTER_WORKFLOW_MATRIX;
+  assert.equal(pages.length, 7);
+  pages.forEach((p) => {
+    assert.ok(p.inflowSources.length >= 2);
+    assert.ok(p.activeEnginesAndCalculations.length >= 2);
+    assert.ok(p.outflowDestinations.length >= 2);
+    assert.ok(p.authoritativeResources.length >= 2);
+  });
+});
