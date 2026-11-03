@@ -214,7 +214,12 @@ export function KaloLumenVolumetricStudio(): React.ReactElement {
               border: '1px solid rgba(255, 255, 255, 0.05)',
             }}
           >
-            <svg viewBox="-120 -120 240 240" style={{ width: '100%', height: '100%' }}>
+            <svg
+              viewBox="-120 -120 240 240"
+              role="img"
+              aria-label="KaloLumen volumetric raymarching projection"
+              style={{ width: '100%', height: '100%' }}
+            >
               <defs>
                 <radialGradient id="sssGlow" cx="50%" cy="50%" r="50%">
                   <stop offset="0%" stopColor="#38bdf8" stopOpacity={0.4} />
@@ -252,7 +257,7 @@ export function KaloLumenVolumetricStudio(): React.ReactElement {
               )}
             </svg>
             <div style={{ position: 'absolute', bottom: '8px', left: '8px', fontSize: '9px', color: '#64748b', fontFamily: 'monospace' }}>
-              Ray Hit: {rayHit.hit ? `tNear=${rayHit.tNear} tFar=${rayHit.tFar}` : 'No Intersection'} · Slice: {mprCoords.sliceIndex} ({mprCoords.sliceMm}mm)
+              Ray Hit: {rayHit.hit ? `tNear=${rayHit.tNear} tFar=${rayHit.tFar}` : 'No Intersection'} · Slice: <span className="font-[var(--font-angka)]">{mprCoords.sliceIndex}</span> (<span className="font-[var(--font-angka)]">{mprCoords.sliceMm}</span>mm)
             </div>
           </div>
 
@@ -260,8 +265,8 @@ export function KaloLumenVolumetricStudio(): React.ReactElement {
           {viewMode !== 'VOLUMETRIC_3D' && (
             <div>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', color: '#94a3b8' }}>
-                <span>Slice Position: {mprCoords.sliceMm} mm</span>
-                <span>Voxel: {mprCoords.sliceIndex} / {mprCoords.axisDimensionPx}</span>
+                <span>Slice Position: <span className="font-[var(--font-angka)]">{mprCoords.sliceMm}</span> mm</span>
+                <span>Voxel: <span className="font-[var(--font-angka)]">{mprCoords.sliceIndex}</span> / <span className="font-[var(--font-angka)]">{mprCoords.axisDimensionPx}</span></span>
               </div>
               <input
                 type="range"
@@ -269,6 +274,7 @@ export function KaloLumenVolumetricStudio(): React.ReactElement {
                 max={1}
                 step={0.005}
                 value={sliceOffset}
+                aria-label="Multi-planar slice offset"
                 onChange={(e) => setSliceOffset(parseFloat(e.target.value))}
                 style={{ width: '100%', accentColor: '#38bdf8', marginTop: '0.25rem' }}
               />
@@ -297,13 +303,14 @@ export function KaloLumenVolumetricStudio(): React.ReactElement {
             <div>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', color: '#cbd5e1' }}>
                 <span>Azimuth</span>
-                <span style={{ color: '#38bdf8', fontWeight: 700 }}>{azimuth}°</span>
+                <span className="font-[var(--font-angka)]" style={{ color: '#38bdf8', fontWeight: 700 }}>{azimuth}°</span>
               </div>
               <input
                 type="range"
                 min={0}
                 max={360}
                 value={azimuth}
+                aria-label="Light azimuth angle"
                 onChange={(e) => setAzimuth(parseInt(e.target.value, 10))}
                 style={{ width: '100%', accentColor: '#38bdf8' }}
               />
@@ -311,13 +318,14 @@ export function KaloLumenVolumetricStudio(): React.ReactElement {
             <div>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', color: '#cbd5e1' }}>
                 <span>Elevation</span>
-                <span style={{ color: '#38bdf8', fontWeight: 700 }}>{elevation}°</span>
+                <span className="font-[var(--font-angka)]" style={{ color: '#38bdf8', fontWeight: 700 }}>{elevation}°</span>
               </div>
               <input
                 type="range"
                 min={-90}
                 max={90}
                 value={elevation}
+                aria-label="Light elevation angle"
                 onChange={(e) => setElevation(parseInt(e.target.value, 10))}
                 style={{ width: '100%', accentColor: '#38bdf8' }}
               />
@@ -336,16 +344,22 @@ export function KaloLumenVolumetricStudio(): React.ReactElement {
                 <input type="checkbox" checked={layer1Visible} onChange={(e) => setLayer1Visible(e.target.checked)} />
                 <span style={{ color: '#f472b6' }}>Skin &amp; Fat (-300..20 HU)</span>
               </label>
-              <input
-                type="range"
-                min={0}
-                max={1}
-                step={0.05}
-                value={layer1Opacity}
-                disabled={!layer1Visible}
-                onChange={(e) => setLayer1Opacity(parseFloat(e.target.value))}
-                style={{ width: '90px', accentColor: '#f472b6' }}
-              />
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                <span className="font-[var(--font-angka)]" style={{ color: '#f472b6', fontSize: '10px', minWidth: '32px', textAlign: 'right' }}>
+                  {Math.round(layer1Opacity * 100)}%
+                </span>
+                <input
+                  type="range"
+                  min={0}
+                  max={1}
+                  step={0.05}
+                  value={layer1Opacity}
+                  disabled={!layer1Visible}
+                  aria-label="Skin and subcutaneous fat opacity"
+                  onChange={(e) => setLayer1Opacity(parseFloat(e.target.value))}
+                  style={{ width: '90px', accentColor: '#f472b6' }}
+                />
+              </div>
             </div>
 
             {/* Layer 2 */}
@@ -354,16 +368,22 @@ export function KaloLumenVolumetricStudio(): React.ReactElement {
                 <input type="checkbox" checked={layer2Visible} onChange={(e) => setLayer2Visible(e.target.checked)} />
                 <span style={{ color: '#ef4444' }}>Viscera &amp; Muscle (20..199 HU)</span>
               </label>
-              <input
-                type="range"
-                min={0}
-                max={1}
-                step={0.05}
-                value={layer2Opacity}
-                disabled={!layer2Visible}
-                onChange={(e) => setLayer2Opacity(parseFloat(e.target.value))}
-                style={{ width: '90px', accentColor: '#ef4444' }}
-              />
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                <span className="font-[var(--font-angka)]" style={{ color: '#ef4444', fontSize: '10px', minWidth: '32px', textAlign: 'right' }}>
+                  {Math.round(layer2Opacity * 100)}%
+                </span>
+                <input
+                  type="range"
+                  min={0}
+                  max={1}
+                  step={0.05}
+                  value={layer2Opacity}
+                  disabled={!layer2Visible}
+                  aria-label="Viscera and muscle opacity"
+                  onChange={(e) => setLayer2Opacity(parseFloat(e.target.value))}
+                  style={{ width: '90px', accentColor: '#ef4444' }}
+                />
+              </div>
             </div>
 
             {/* Layer 3 */}
@@ -372,16 +392,22 @@ export function KaloLumenVolumetricStudio(): React.ReactElement {
                 <input type="checkbox" checked={layer3Visible} onChange={(e) => setLayer3Visible(e.target.checked)} />
                 <span style={{ color: '#38bdf8' }}>Cortical Bone &amp; Vessels (200..3000 HU)</span>
               </label>
-              <input
-                type="range"
-                min={0}
-                max={1}
-                step={0.05}
-                value={layer3Opacity}
-                disabled={!layer3Visible}
-                onChange={(e) => setLayer3Opacity(parseFloat(e.target.value))}
-                style={{ width: '90px', accentColor: '#38bdf8' }}
-              />
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                <span className="font-[var(--font-angka)]" style={{ color: '#38bdf8', fontSize: '10px', minWidth: '32px', textAlign: 'right' }}>
+                  {Math.round(layer3Opacity * 100)}%
+                </span>
+                <input
+                  type="range"
+                  min={0}
+                  max={1}
+                  step={0.05}
+                  value={layer3Opacity}
+                  disabled={!layer3Visible}
+                  aria-label="Cortical bone and vessels opacity"
+                  onChange={(e) => setLayer3Opacity(parseFloat(e.target.value))}
+                  style={{ width: '90px', accentColor: '#38bdf8' }}
+                />
+              </div>
             </div>
           </div>
 
@@ -392,15 +418,15 @@ export function KaloLumenVolumetricStudio(): React.ReactElement {
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.5rem', fontSize: '11px' }}>
               <div>
-                <span style={{ color: '#64748b' }}>Skin d_pen:</span> <strong style={{ color: '#f472b6' }}>{skinPen}mm</strong>
-                <div style={{ fontSize: '10px', color: '#94a3b8' }}>T_d: {Math.round(skinTransmittance * 100)}%</div>
+                <span style={{ color: '#64748b' }}>Skin d_pen:</span> <strong className="font-[var(--font-angka)]" style={{ color: '#f472b6' }}>{skinPen}mm</strong>
+                <div className="font-[var(--font-angka)]" style={{ fontSize: '10px', color: '#94a3b8' }}>T_d: {Math.round(skinTransmittance * 100)}%</div>
               </div>
               <div>
-                <span style={{ color: '#64748b' }}>Viscera d_pen:</span> <strong style={{ color: '#ef4444' }}>{visceraPen}mm</strong>
-                <div style={{ fontSize: '10px', color: '#94a3b8' }}>T_d: {Math.round(visceraTransmittance * 100)}%</div>
+                <span style={{ color: '#64748b' }}>Viscera d_pen:</span> <strong className="font-[var(--font-angka)]" style={{ color: '#ef4444' }}>{visceraPen}mm</strong>
+                <div className="font-[var(--font-angka)]" style={{ fontSize: '10px', color: '#94a3b8' }}>T_d: {Math.round(visceraTransmittance * 100)}%</div>
               </div>
               <div>
-                <span style={{ color: '#64748b' }}>Bone d_pen:</span> <strong style={{ color: '#38bdf8' }}>{bonePen}mm</strong>
+                <span style={{ color: '#64748b' }}>Bone d_pen:</span> <strong className="font-[var(--font-angka)]" style={{ color: '#38bdf8' }}>{bonePen}mm</strong>
                 <div style={{ fontSize: '10px', color: '#94a3b8' }}>High scatter</div>
               </div>
             </div>
