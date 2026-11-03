@@ -249,6 +249,10 @@ export interface CareEpisode {
   linkedComorbidities?: string[]
   // Inter-facility referral handshake & diagnostic continuity record (T-CLIN-20)
   referralRecord?: CareJourneyReferralRecord
+  // Closed-loop diagnostic result tracking and escalation protocol (PAN-EXP-2026-01 / T-CLIN-80)
+  diagnosticOrders?: DiagnosticResultOrder[]
+  // Inter-facility referral handoff & specialist reconciliation protocol (T-CLIN-85)
+  referralHandoff?: ReferralHandoffOrder
   // Eden three-depth progressive disclosure preference (T-CLIN-21 / EDEN-01)
   edenDepthPreference?: EdenDisclosureDepth
   // Eden universal language preference (T-CLIN-29 / EDEN-09)
@@ -264,6 +268,8 @@ export type CareJourneyTimelineEventKind =
   | 'milestone_verified'
   | 'milestone_fulfilled'
   | 'outcome_verified'
+  | 'diagnostic_result_routed'
+  | 'referral_reconciliation_updated'
 
 export interface CareJourneyTimelineEvent {
   id: string
@@ -318,6 +324,94 @@ export interface CareJourneyReferralRecord {
   acknowledgedBy?: string
   completedAt?: string
   auditDigest: string
+}
+
+// Closed-loop diagnostic result tracking and alert routing (PAN-EXP-2026-01 / T-CLIN-80)
+export type DiagnosticResultSeverity = 'CRITICAL_EMERGENCY' | 'ABNORMAL_PRIORITY' | 'ROUTINE_INFORMATIONAL'
+
+export type ClosedLoopClosureStatus =
+  | 'PENDING_CLINICIAN_REVIEW'
+  | 'ACKNOWLEDGED_ACTION_PENDING'
+  | 'CLOSED_WITH_CLINICAL_ACTION'
+  | 'ESCALATED_TO_ON_CALL'
+  | 'ESCALATED_CRITICAL_SAFETY'
+
+export interface DiagnosticResultOrder {
+  orderId: string
+  accessionNumber: string
+  patientId: string
+  orderingClinicianId: string
+  testName: string
+  resultValue: string
+  numericValue?: number
+  unit?: string
+  referenceRange?: string
+  severity: DiagnosticResultSeverity
+  resultTimestamp: string // ISO-8601
+  acknowledgedAt?: string
+  acknowledgedById?: string
+  closedAt?: string
+  closedById?: string
+  mandatedClinicalAction?: string
+}
+
+export interface ClosedLoopRoutingEvaluation {
+  orderId: string
+  accessionNumber: string
+  severity: DiagnosticResultSeverity
+  status: ClosedLoopClosureStatus
+  elapsedMinutesSinceResult: number
+  maxAllowedAcknowledgementWindowMinutes: number
+  acknowledgementOverdue: boolean
+  escalationTarget?: 'PRIMARY_CLINICIAN' | 'SECONDARY_ON_CALL' | 'SAFETY_OFFICER_RAPID_RESPONSE'
+  auditDigest: string
+  safetyActionRequired: string
+  isClosed: boolean
+}
+
+// Inter-facility referral handoff and specialist reconciliation protocol (T-CLIN-85)
+export type ReferralUrgencyTier = 'EMERGENCY_4H' | 'URGENT_48H' | 'ROUTINE_14D'
+
+export type ReferralHandoffStatus =
+  | 'SUBMITTED_PENDING_TRIAGE'
+  | 'TRIAGED_ACCEPTED'
+  | 'APPOINTMENT_SCHEDULED'
+  | 'ENCOUNTER_COMPLETED_PENDING_REPORT'
+  | 'CLOSED_LOOP_RECONCILED'
+  | 'ESCALATED_OVERDUE_DROPOFF'
+
+export interface ReferralHandoffOrder {
+  referralId: string
+  patientId: string
+  referringClinicianId: string
+  receivingFacilityId: string
+  specialtyCode: string
+  primaryDiagnosisIcd10: string
+  urgencyTier: ReferralUrgencyTier
+  submittedAtIso: string
+  attachedDiagnosticReportIds: string[]
+  triagedAtIso?: string
+  scheduledAppointmentAtIso?: string
+  consultationCompletedAtIso?: string
+  receivingConsultantId?: string
+  consultationSummaryNote?: string
+  reconciledAtIso?: string
+}
+
+export interface ReferralReconciliationEvaluation {
+  referralId: string
+  status: ReferralHandoffStatus
+  elapsedHours: number
+  slaLimitHours: number
+  isOverdueDropoff: boolean
+  actionRequired: 'NONE_NORMAL_PROGRESSION' | 'REMIND_RECEIVING_FACILITY' | 'ESCALATE_TO_CARE_COORDINATOR' | 'IMMEDIATE_CLINICAL_OUTREACH'
+  packetCompleteness: {
+    hasVerifiedDiagnosis: boolean
+    hasAttachedDiagnostics: boolean
+    hasReceivingSpecialistAssigned: boolean
+    isClosedLoopSigned: boolean
+  }
+  auditDigestSha256: string
 }
 
 export type EdenDisclosureDepth = 'simple' | 'explore' | 'deep'

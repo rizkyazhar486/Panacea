@@ -923,6 +923,117 @@ export function deriveCareJourneyTimelineEvents(
     }
   }
 
+  // 5b. Diagnostic closed-loop result timeline events (PAN-EXP-2026-01 / T-CLIN-80)
+  if (Array.isArray(episode.diagnosticOrders)) {
+    for (const d of episode.diagnosticOrders) {
+      if (isValidIso(d.resultTimestamp)) {
+        events.push({
+          id: `evt-${episode.id}-diag-${d.orderId}-result`,
+          episodeId: episode.id,
+          episodeTitle: episode.title,
+          kind: 'diagnostic_result_routed',
+          timestamp: d.resultTimestamp,
+          title: `Diagnostic Result: ${d.testName}`,
+          description: `${d.resultValue}${d.unit ? ' ' + d.unit : ''} (${d.severity})`,
+          stage: 'treatment',
+          badge: d.severity === 'CRITICAL_EMERGENCY' ? 'Critical Alert' : 'Diagnostic',
+          severity: d.severity === 'CRITICAL_EMERGENCY' ? 'warning' : 'info',
+        })
+      }
+      if (isValidIso(d.acknowledgedAt)) {
+        events.push({
+          id: `evt-${episode.id}-diag-${d.orderId}-ack`,
+          episodeId: episode.id,
+          episodeTitle: episode.title,
+          kind: 'diagnostic_result_routed',
+          timestamp: d.acknowledgedAt!,
+          title: `Result Acknowledged: ${d.testName}`,
+          stage: 'treatment',
+          actorId: d.acknowledgedById,
+          badge: 'Acknowledged',
+          severity: 'info',
+        })
+      }
+      if (isValidIso(d.closedAt)) {
+        events.push({
+          id: `evt-${episode.id}-diag-${d.orderId}-closed`,
+          episodeId: episode.id,
+          episodeTitle: episode.title,
+          kind: 'diagnostic_result_routed',
+          timestamp: d.closedAt!,
+          title: `Result Closed: ${d.testName}`,
+          description: d.mandatedClinicalAction ? `Action: ${d.mandatedClinicalAction}` : undefined,
+          stage: 'treatment',
+          actorId: d.closedById,
+          badge: 'Closed Loop',
+          severity: 'success',
+        })
+      }
+    }
+  }
+
+  // 5c. Referral handoff continuity timeline events (T-CLIN-85)
+  if (episode.referralHandoff) {
+    const rh = episode.referralHandoff
+    if (isValidIso(rh.submittedAtIso)) {
+      events.push({
+        id: `evt-${episode.id}-ref-${rh.referralId}-submitted`,
+        episodeId: episode.id,
+        episodeTitle: episode.title,
+        kind: 'referral_reconciliation_updated',
+        timestamp: rh.submittedAtIso,
+        title: `Referral Dispatched: ${rh.specialtyCode}`,
+        description: `Primary Dx: ${rh.primaryDiagnosisIcd10} (${rh.urgencyTier})`,
+        stage: 'provider',
+        actorId: rh.referringClinicianId,
+        badge: 'Dispatched',
+        severity: 'info',
+      })
+    }
+    if (isValidIso(rh.triagedAtIso)) {
+      events.push({
+        id: `evt-${episode.id}-ref-${rh.referralId}-triaged`,
+        episodeId: episode.id,
+        episodeTitle: episode.title,
+        kind: 'referral_reconciliation_updated',
+        timestamp: rh.triagedAtIso!,
+        title: `Referral Triaged: ${rh.specialtyCode}`,
+        stage: 'provider',
+        actorId: rh.receivingConsultantId,
+        badge: 'Triaged',
+        severity: 'info',
+      })
+    }
+    if (isValidIso(rh.scheduledAppointmentAtIso)) {
+      events.push({
+        id: `evt-${episode.id}-ref-${rh.referralId}-scheduled`,
+        episodeId: episode.id,
+        episodeTitle: episode.title,
+        kind: 'referral_reconciliation_updated',
+        timestamp: rh.scheduledAppointmentAtIso!,
+        title: `Specialist Appointment Scheduled`,
+        stage: 'provider',
+        badge: 'Scheduled',
+        severity: 'info',
+      })
+    }
+    if (isValidIso(rh.reconciledAtIso)) {
+      events.push({
+        id: `evt-${episode.id}-ref-${rh.referralId}-reconciled`,
+        episodeId: episode.id,
+        episodeTitle: episode.title,
+        kind: 'referral_reconciliation_updated',
+        timestamp: rh.reconciledAtIso!,
+        title: `Specialist Care Reconciled: ${rh.specialtyCode}`,
+        description: rh.consultationSummaryNote,
+        stage: 'followUp',
+        actorId: rh.receivingConsultantId,
+        badge: 'Reconciled',
+        severity: 'success',
+      })
+    }
+  }
+
   // 6. Explicit episode timeline events merged and deduplicated
   if (Array.isArray(episode.timelineEvents)) {
     for (const evt of episode.timelineEvents) {
