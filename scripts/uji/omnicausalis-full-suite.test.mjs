@@ -391,3 +391,23 @@ test("22. [P2-P5 MOBILE 390x844 TBT/CLS RECOVERY, 8 CONVERGED JOURNEYS (A-H) & W
   assert.equal(report.metrics.journeyRecoveryRatePercent, 100.0);
   assert.equal(report.sTechnicalWeakestLink, 10);
 });
+
+test("23. [WAVE 12 BODY EXPOSURE TOTAL MULTISCALE ATLAS: 9-LEVEL SEMANTIC ZOOM, 11-SYSTEM NEUROVASCULAR/HISTOLOGY & RAYCAST PICKER]", () => {
+  assert.equal(omnicausalis.DEEP_11_SYSTEM_MULTISCALE_ATLAS.length, 11);
+  omnicausalis.DEEP_11_SYSTEM_MULTISCALE_ATLAS.forEach((spec) => {
+    assert.ok(spec.fmaId.startsWith("FMA:"));
+    assert.ok(spec.uberonId.startsWith("UBERON:"));
+    assert.ok(spec.cellOntologyId.includes("CL:"));
+    assert.ok(spec.rcsbPdbId.includes("PDB:"));
+    assert.ok(spec.reactomePathwayId.includes("R-HSA-"));
+    assert.ok(spec.grossAnatomyAndNeurovascular.arterialSupply.length > 10);
+    assert.ok(spec.grossAnatomyAndNeurovascular.venousDrainage.length > 10);
+    assert.ok(spec.grossAnatomyAndNeurovascular.innervation.length > 10);
+    assert.ok(spec.grossAnatomyAndNeurovascular.lymphaticDrainage.length > 10);
+    assert.ok(spec.nineLevelScaleChain.level9GenomicLocus.length > 5);
+  });
+  const pickedHeart = omnicausalis.inspectOrganByNormalizedCanvasCoords(0.52, 0.31);
+  assert.equal(pickedHeart.systemId, "CARDIOVASCULAR_CIRCULATORY");
+  const pickedBrain = omnicausalis.inspectOrganByNormalizedCanvasCoords(0.50, 0.11);
+  assert.equal(pickedBrain.systemId, "NERVOUS_NEUROLOGICAL");
+});

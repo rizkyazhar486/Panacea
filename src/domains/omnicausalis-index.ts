@@ -9,6 +9,7 @@ export * from "./body-exposure/engine/crossOrganPhysiologicalCouplingEngine.ts";
 export * from "./body-exposure/engine/universalSurgicalCabgAndProceduralEngine.ts";
 export * from "./body-exposure/engine/hepatobiliaryPancreaticAndLaparoscopicEngine.ts";
 export * from "./body-exposure/engine/singleProjectileUhdBodyExposureEngine.ts";
+export * from "./body-exposure/engine/bodyExposureTotalMultiscaleAtlasEngine.ts";
 export * from "./prometheus/competitive-bots/anime-sparring-arena.ts";
 export * from "./prometheus/argon-edu-complete-suite.ts";
 export * from "./prometheus/omnicausalis-route-registry.ts";
