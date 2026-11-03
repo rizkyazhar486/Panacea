@@ -14,54 +14,12 @@ import {
 } from '../model/types.ts'
 
 const REFS: ScientificReference[] = [
-  {
-    id: 'ref:mitchell-1961',
-    kind: 'peer_reviewed',
-    citation: 'Mitchell P. Coupling of phosphorylation to electron and hydrogen transfer by a chemi-osmotic type of mechanism. Nature 1961;191:144-148.',
-    doi: '10.1038/191144a0',
-    license: 'publisher copyright; cited only, no text reproduced',
-    verification: 'cited_not_retrieved',
-  },
-  {
-    id: 'ref:murphy-ros-2009',
-    kind: 'peer_reviewed',
-    citation: 'Murphy MP. How mitochondria produce reactive oxygen species. Biochem J 2009;417(1):1-13.',
-    doi: '10.1042/BJ20081386',
-    license: 'publisher copyright; cited only, no text reproduced',
-    verification: 'cited_not_retrieved',
-  },
-  {
-    id: 'ref:hardie-ampk-2012',
-    kind: 'peer_reviewed',
-    citation: 'Hardie DG, Ross FA, Hawley SA. AMPK: a nutrient and energy sensor that maintains energy homeostasis. Nat Rev Mol Cell Biol 2012;13(4):251-262.',
-    doi: '10.1038/nrm3311',
-    license: 'publisher copyright; cited only, no text reproduced',
-    verification: 'cited_not_retrieved',
-  },
-  {
-    id: 'ref:mizushima-autophagy-2011',
-    kind: 'peer_reviewed',
-    citation: 'Mizushima N, Komatsu M. Autophagy: renovation of cells and tissues. Cell 2011;147(4):728-741.',
-    doi: '10.1016/j.cell.2011.10.026',
-    license: 'publisher copyright; cited only, no text reproduced',
-    verification: 'cited_not_retrieved',
-  },
-  {
-    id: 'ref:hgnc-mt-nd1',
-    kind: 'peer_reviewed',
-    citation: 'HUGO Gene Nomenclature Committee (HGNC). Approved gene symbol MT-ND1 (mitochondrially encoded NADH:ubiquinone oxidoreductase core subunit 1).',
-    url: 'https://www.genenames.org/data/gene-symbol-report/#!/hgnc_id/HGNC:7455',
-    license: 'CC0',
-    verification: 'cited_not_retrieved',
-  },
-  {
-    id: 'ref:hgnc-prkaa1',
-    kind: 'peer_reviewed',
-    citation: 'HUGO Gene Nomenclature Committee (HGNC). Approved gene symbol PRKAA1 (protein kinase AMP-activated catalytic subunit alpha 1).',
-    url: 'https://www.genenames.org/data/gene-symbol-report/#!/hgnc_id/HGNC:9376',
-    license: 'CC0',
-    verification: 'cited_not_retrieved',
-  },
+  { id: 'ref:mitchell-1961', kind: 'peer_reviewed', citation: 'Mitchell P. Coupling of phosphorylation to electron and hydrogen transfer by a chemi-osmotic type of mechanism. Nature 1961;191:144-148.', doi: '10.1038/191144a0', license: 'publisher copyright; cited only, no text reproduced', verification: 'cited_not_retrieved' },
+  { id: 'ref:murphy-ros-2009', kind: 'peer_reviewed', citation: 'Murphy MP. How mitochondria produce reactive oxygen species. Biochem J 2009;417(1):1-13.', doi: '10.1042/BJ20081386', license: 'publisher copyright; cited only, no text reproduced', verification: 'cited_not_retrieved' },
+  { id: 'ref:hardie-ampk-2012', kind: 'peer_reviewed', citation: 'Hardie DG, Ross FA, Hawley SA. AMPK: a nutrient and energy sensor that maintains energy homeostasis. Nat Rev Mol Cell Biol 2012;13(4):251-262.', doi: '10.1038/nrm3311', license: 'publisher copyright; cited only, no text reproduced', verification: 'cited_not_retrieved' },
+  { id: 'ref:mizushima-autophagy-2011', kind: 'peer_reviewed', citation: 'Mizushima N, Komatsu M. Autophagy: renovation of cells and tissues. Cell 2011;147(4):728-741.', doi: '10.1016/j.cell.2011.10.026', license: 'publisher copyright; cited only, no text reproduced', verification: 'cited_not_retrieved' },
+  { id: 'ref:hgnc-mt-nd1', kind: 'peer_reviewed', citation: 'HUGO Gene Nomenclature Committee (HGNC). Approved gene symbol MT-ND1.', url: 'https://www.genenames.org/data/gene-symbol-report/#!/hgnc_id/HGNC:7455', license: 'CC0', verification: 'cited_not_retrieved' },
+  { id: 'ref:hgnc-prkaa1', kind: 'peer_reviewed', citation: 'HUGO Gene Nomenclature Committee (HGNC). Approved gene symbol PRKAA1.', url: 'https://www.genenames.org/data/gene-symbol-report/#!/hgnc_id/HGNC:9376', license: 'CC0', verification: 'cited_not_retrieved' },
 ]
 
 const SCHEMATIC: VisualizationBinding = { representation: 'schematic', spatialPrecision: 'none', note: 'Subcellular organellar schematic.' }
