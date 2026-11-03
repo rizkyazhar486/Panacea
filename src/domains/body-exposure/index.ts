@@ -116,6 +116,7 @@ export {
 export { reviewLabel, type ReviewLabel } from './engine/reviewLabel'
 export { createPresentationLighting } from './adapters/studioLighting'
 export { AnatomicalLightingControls } from './ui/AnatomicalLightingControls'
+export { KaloLumenVolumetricStudio } from './ui/KaloLumenVolumetricStudio'
 export { type PresentationLighting } from './engine/presentationLighting'
 
 export {
@@ -331,9 +332,16 @@ export {
 } from './engine/structureReviewWorkflowEngine'
 export {
   computeSubsurfacePenetrationDepth,
+  computeTissueDiffuseTransmittance,
   computeDirectionalLightVector,
   classifyHounsfieldLayer,
+  evaluateHounsfieldTransferFunction,
+  intersectRayAabb,
+  computeMprSliceCoordinates,
   createDefaultKaloLumenState,
+  DIAGNOSTIC_CT_PRESETS,
+  type DiagnosticCtWindowPreset,
+  type DiagnosticCtWindowPresetId,
   type KaloLumenLayerId,
   type MultiPlanarViewMode,
   type OpticalSubsurfaceScatteringProperties,
@@ -341,5 +349,7 @@ export {
   type DirectionalLightSourceState,
   type MultiPlanarClippingPlane,
   type KaloLumenEngineState,
+  type RayAabbIntersectionResult,
+  type MprSliceCoordinates,
 } from './engine/kaloLumenDicomEngine'
 
