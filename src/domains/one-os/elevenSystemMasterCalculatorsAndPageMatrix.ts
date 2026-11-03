@@ -1,3 +1,4 @@
+import { DEFAULT_OXYGEN_CONTENT_CONVENTION, oxygenContentMlDl } from "../../lib/physiology/oxygenContentConventions.ts";
 import { COMPLETE_11_SYSTEM_CANONICAL_ASSET_REGISTRY, type CanonicalBodySystemId } from "../body-exposure/engine/singleProjectileUhdBodyExposureEngine.ts";
 import { executeCrossOrganCoupledSimulation } from "../body-exposure/engine/crossOrganPhysiologicalCouplingEngine.ts";
 import { simulateHepatobiliaryPancreaticPostprandialDynamics } from "../body-exposure/engine/hepatobiliaryPancreaticAndLaparoscopicEngine.ts";
@@ -39,7 +40,7 @@ export function computeAllElevenBodySystemCalculations(): readonly SystemQuantit
   // Hematological CaO2 = (1.34 * Hb * SaO2) + (0.0031 * PaO2)
   const hbGdl = 15.2;
   const saO2Frac = 0.98;
-  const caO2MlDl = Number(((1.34 * hbGdl * saO2Frac) + (0.0031 * coupled.respiratoryAndAcidBase.arterialPo2MmHg)).toFixed(2));
+  const caO2MlDl = Number(oxygenContentMlDl(DEFAULT_OXYGEN_CONTENT_CONVENTION, hbGdl, saO2Frac, coupled.respiratoryAndAcidBase.arterialPo2MmHg).toFixed(2));
   // Lymphatic Systemic Immune-Inflammation Index (SII) = (Platelets * Neutrophils) / Lymphocytes
   const siiIndex = Math.round((250 * 3.8) / 2.2);
   // Reproductive Uteroplacental / Pelvic Arterial Resistance Index (RI) = (PSV - EDV) / PSV

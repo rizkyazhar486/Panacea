@@ -411,3 +411,36 @@ test("23. [WAVE 12 BODY EXPOSURE TOTAL MULTISCALE ATLAS: 9-LEVEL SEMANTIC ZOOM, 
   const pickedBrain = omnicausalis.inspectOrganByNormalizedCanvasCoords(0.50, 0.11);
   assert.equal(pickedBrain.systemId, "NERVOUS_NEUROLOGICAL");
 });
+
+test("24. [PHASE 1 P0 PR #3000 FIX: OXYGEN-CONTENT CONVENTION REGISTRY & PV-LOOP ELASTANCE COUPLING]", () => {
+  const consistency = omnicausalis.verifyCrossEngineCardiopulmonaryConsistency();
+  assert.equal(consistency.maeCardiacOutput, 0);
+  assert.equal(consistency.rConsistencyRatio, 1.0);
+  assert.equal(consistency.pvLoopRecalculatedOnEesChange, true);
+  assert.equal(consistency.deckBaseline.units.caO2, "mL O2/dL");
+  assert.equal(consistency.deckBaseline.units.do2, "mL O2/min");
+});
+
+test("25. [PHASE 2 & 3 MERGED PILLARS #2990-#2999: PINK1-PARKIN MITOPHAGY, REFERRED PAIN DERMATOMES & BIOMETRIC CONSENT GUARD]", () => {
+  const mitophagy = omnicausalis.simulatePink1ParkinMitophagyAndProtonMotiveForce({
+    membranePotentialDeltaPsiMv: -95,
+    mitochondrialMatrixPh: 7.8,
+    cytosolicPh: 7.2,
+    nadPlusToNadhRatio: 2.5
+  });
+  assert.equal(mitophagy.depolarizationTriggered, true);
+  assert.equal(mitophagy.mitophagyFluxState, "ACTIVE_PARKIN_MITOPHAGY_CLEARANCE");
+  const kehr = omnicausalis.mapVisceralOrganToReferredPainDermatome("GALLBLADDER_BILIARY");
+  assert.ok(kehr.visceralAfferentSegments.includes("C4"));
+  const blockedOverlay = omnicausalis.bindAuthorizedPatientBiometricToOrganOverlay({
+    activeSessionPatientId: "PT-01",
+    observationPatientId: "PT-02",
+    patientConsentGranted: true,
+    targetOrganFmaId: "FMA:7088",
+    observedHeartRateBpm: 72,
+    observedAtEpochMs: 1000,
+    nowEpochMs: 2000
+  });
+  assert.equal(blockedOverlay.overlayPermitted, false);
+  assert.equal(blockedOverlay.blockReason, "CROSS_PATIENT_MISMATCH_BLOCKED");
+});

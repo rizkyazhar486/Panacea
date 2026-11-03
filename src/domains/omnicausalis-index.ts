@@ -1,3 +1,4 @@
+export * from "../lib/physiology/oxygenContentConventions.ts";
 export * from "./body-exposure/omnicausalis-multiscale-bridge.ts";
 export * from "./body-exposure/argon-bx-complete-suite.ts";
 export * from "./body-exposure/nextgen-uhd-pbr-viewport-engine.ts";
@@ -10,6 +11,8 @@ export * from "./body-exposure/engine/universalSurgicalCabgAndProceduralEngine.t
 export * from "./body-exposure/engine/hepatobiliaryPancreaticAndLaparoscopicEngine.ts";
 export * from "./body-exposure/engine/singleProjectileUhdBodyExposureEngine.ts";
 export * from "./body-exposure/engine/bodyExposureTotalMultiscaleAtlasEngine.ts";
+export * from "./body-exposure/engine/cardiopulmonaryCouplingEngine.ts";
+export * from "./body-exposure/engine/tenMergedPillarsUnifiedWorkbenchEngine.ts";
 export * from "./prometheus/competitive-bots/anime-sparring-arena.ts";
 export * from "./prometheus/argon-edu-complete-suite.ts";
 export * from "./prometheus/omnicausalis-route-registry.ts";
