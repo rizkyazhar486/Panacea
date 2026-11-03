@@ -486,3 +486,13 @@ test("26. [PHASE 3 & 7 HISTORICAL PR TRIAGE (#2877-#3000), OCR PROVENANCE, VISIT
   assert.equal(wb2.patientBiometricTruthClass, "OBSERVED_CLINICAL");
   assert.equal(wb2.returnedToAnatomyWithoutContextLoss, true);
 });
+
+test("27. [Z-ANATOMY CLEAR INDONESIAN ATLAS: COMPLETE FUNCTION, PHYSIOLOGY, ORIGIN/INSERTION, VESSELS & NERVES FOR ALL ORGAN CHIPS]", () => {
+  assert.equal(omnicausalis.Z_ANATOMY_CLEAR_ATLAS_CARDS.length, 8);
+  const oblique = omnicausalis.findClearStructureCard("External abdominal oblique");
+  assert.equal(oblique.fmaId, "FMA:13335");
+  assert.ok(oblique.clearFunctionSummary.includes("rotasi torso"));
+  assert.ok(oblique.originInsertionOrLocation.includes("Ligamentum Inguinale"));
+  const ear = omnicausalis.findClearStructureCard("Ear");
+  assert.ok(ear.clinicalAndDailyRelevance.includes("THT-KL"));
+});
