@@ -10,9 +10,11 @@ import { EXAM_INFO, EXAM_ORDER, questionsForExam, type ExamTrack } from '../../l
 import '../../styles/panacea2026.css'
 import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 
-type Section = 'evidence' | 'practice' | 'osce' | 'case-bank' | 'station-sim' | 'skills' | 'procedures' | 'therapy' | 'diseases' | 'mnemonik' | 'techniques' | 'timeline' | 'usmle'
+type Section = 'golden-journey' | 'prometheus' | 'evidence' | 'practice' | 'osce' | 'case-bank' | 'station-sim' | 'skills' | 'procedures' | 'therapy' | 'diseases' | 'mnemonik' | 'techniques' | 'timeline' | 'usmle'
 
 const SECTIONS: { id: Section; label: string; emoji: string }[] = [
+  { id: 'golden-journey', label: 'Golden Journey', emoji: '🌟' },
+  { id: 'prometheus', label: 'Prometheus Arena', emoji: '⚔️' },
   { id: 'evidence', label: 'Live Evidence', emoji: '🔎' },
   { id: 'practice', label: 'Questions', emoji: '❓' },
   { id: 'diseases', label: 'Diseases', emoji: '🧬' },
@@ -28,6 +30,8 @@ const SECTIONS: { id: Section; label: string; emoji: string }[] = [
   { id: 'timeline', label: 'Exam Plan', emoji: '📅' },
 ]
 
+const GoldenJourneyWorkbench = lazy(() => import('../../domains/medstudyhub/ui/GoldenJourneyWorkbench.tsx').then((m) => ({ default: m.GoldenJourneyWorkbench })))
+const PrometheusArenaView = lazy(() => import('../../domains/prometheus-learning/ui/PrometheusArenaView.tsx').then((m) => ({ default: m.PrometheusArenaView })))
 const SkdiSkillsSection = lazy(() => import('./SkdiSkillsSection'))
 const SkdiTherapySection = lazy(() => import('./SkdiTherapySection'))
 const SkdiDiseaseDirectorySection = lazy(() => import('./SkdiDiseaseDirectorySection'))
@@ -92,6 +96,8 @@ export function MedStudyHub() {
       {section === 'timeline' && <TimelineSection />}
 
       <Suspense fallback={<SectionFallback />}>
+        {section === 'golden-journey' && <GoldenJourneyWorkbench />}
+        {section === 'prometheus' && <PrometheusArenaView />}
         {section === 'case-bank' && <OsceCaseBankSection />}
         {section === 'station-sim' && <StationSimulatorSection />}
         {section === 'skills' && <SkdiSkillsSection />}

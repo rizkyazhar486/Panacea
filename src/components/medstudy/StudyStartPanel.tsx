@@ -2,9 +2,11 @@ import { LearningModeSwitch } from '../LearningModeSwitch'
 import { ENRICHMENT_LIBRARY } from '../../data/enrichmentLibrary'
 import { getLearningMode, learningModeProfile } from '../../lib/learningMode'
 
-export type StudyStartSection = 'evidence' | 'practice' | 'osce' | 'case-bank' | 'procedures' | 'therapy' | 'diseases' | 'mnemonik' | 'usmle'
+export type StudyStartSection = 'golden-journey' | 'prometheus' | 'evidence' | 'practice' | 'osce' | 'case-bank' | 'procedures' | 'therapy' | 'diseases' | 'mnemonik' | 'usmle'
 
 const PATHS: { section: StudyStartSection; icon: string; title: string; body: string }[] = [
+  { section: 'golden-journey', icon: '🌟', title: 'Golden Journey (3D ↔ Case)', body: '15-step multimodal loop: 3D cardiac anatomy → Wiggers hemodynamics → acute clinical vignette → exact 3D return.' },
+  { section: 'prometheus', icon: '⚔️', title: 'Prometheus Arena', body: 'Compete in fast-paced physiology retrieval practice against anime AI bots with live PV-loop coupling.' },
   { section: 'evidence', icon: '🔎', title: 'Search live evidence', body: 'Europe PMC, anatomy ontology, registered trials and FDA drug labels.' },
   { section: 'diseases', icon: '🧬', title: 'Understand a disease', body: 'Etiology → mechanism → pathology → symptoms → diagnosis → treatment.' },
   { section: 'therapy', icon: '💊', title: 'Learn drugs & therapy', body: 'Start with why a treatment works, then indications, risks and practical use.' },

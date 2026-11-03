@@ -24,6 +24,15 @@ export interface BodyExposureViewportBookmark {
   readonly crossSectionNormalLps: readonly [number, number, number] | null;
 }
 
+export const CANONICAL_LV_BOOKMARK: BodyExposureViewportBookmark = Object.freeze({
+  fmaId: 'FMA:7101',
+  uberonId: 'UBERON:0002084',
+  isolatedStructureId: 'heart-left-ventricle',
+  scaleLevel: 'L3',
+  cameraTargetLpsMm: Object.freeze([12.5, -18.0, 4.2] as const),
+  crossSectionNormalLps: Object.freeze([0, 0, 1] as const),
+});
+
 export interface GoldenJourneyStepContract {
   readonly stepNumber: GoldenJourneyStepIndex;
   readonly phase: 'body-exposure-anatomy' | 'physiology-simulation' | 'prometheus-education' | 'assessment-and-retention';
