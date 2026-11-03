@@ -249,8 +249,8 @@ export function OrganBiometricOverlayCard({ organKey, organLabel }: Props): Reac
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <span
-                    className="font-[var(--font-angka)]"
                     style={{
+                      fontFamily: 'var(--font-angka)',
                       fontSize: '13px',
                       fontWeight: 900,
                       color: isAbnormal ? '#b91c1c' : '#047857',

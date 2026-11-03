@@ -44,11 +44,26 @@ await new Promise(resolve => server.listen(0, '127.0.0.1', resolve))
 let browser
 try {
   const { chromium } = await import('@playwright/test')
-  browser = await chromium.launch({ ...(process.env.CHROME_PATH ? { executablePath: process.env.CHROME_PATH } : {}),
-    args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader'] })
+  browser = await chromium.launch({
+    ...(process.env.CHROME_PATH ? { executablePath: process.env.CHROME_PATH } : {}),
+    headless: true,
+    args: [
+      '--use-gl=angle',
+      '--use-angle=swiftshader',
+      '--enable-webgl',
+      '--enable-unsafe-swiftshader',
+      '--ignore-gpu-blocklist',
+    ],
+  })
   const page = await browser.newPage({ viewport: { width: 1440, height: 900 } })
   const errors = []
-  page.on('pageerror', e => errors.push(e.message))
+  page.on('console', msg => {
+    if (msg.type() === 'error') console.error('PAGE ERROR LOG:', msg.text())
+  })
+  page.on('pageerror', e => {
+    console.error('PAGE UNCAUGHT ERROR:', e.message)
+    errors.push(e.message)
+  })
   let rejectAsset = true
   await page.route('**/bodyexposure/dataset-inspection/fetal-parcels/**', async route => {
     const relative = new URL(route.request().url()).pathname.split('/fetal-parcels/')[1]
@@ -57,7 +72,13 @@ try {
       contentType: relative.endsWith('.json') ? 'application/json' : relative.endsWith('.png') ? 'image/png' : 'model/gltf-binary' })
   })
   await page.goto(`http://127.0.0.1:${server.address().port}`)
-  await page.getByRole('alert').filter({ hasText: 'Asset source identity differs' }).waitFor({ timeout: 60000 })
+  try {
+    await page.getByRole('alert').filter({ hasText: 'Asset source identity differs' }).waitFor({ timeout: 60000 })
+  } catch (err) {
+    const alerts = await page.getByRole('alert').allTextContents()
+    console.error('ALERTS ON PAGE AT TIMEOUT:', alerts)
+    throw err
+  }
   await page.setViewportSize({ width: 390, height: 844 })
   await page.waitForFunction(() => Math.abs(window.__qaCamera.aspect - document.querySelector('.fpi-canvas').getBoundingClientRect().width / 400) < 1e-6)
   const meshes = await page.evaluate(() => {
