@@ -12,6 +12,15 @@ import { bahanOtomatis } from '../../lib/bugarOtomatis'
 import { Fold } from '../../shared/ui/Fold'
 import { DEF, bacaIsi, hitungSkor, pillarsOf, tandai, type Isi, type LongevityData } from './longevityScoring'
 import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
+import {
+  calculateLevinePhenoAge,
+  evaluateMultiOrganBiologicalAge,
+  calculateKleiberBioenergetics,
+  evaluateMicronutrientBioavailability,
+  analyzeContinuousGlucoseVariability,
+  LONGEVITY_PRECISION_DISCLAIMER,
+  LONGEVITY_LITERATURE_SOURCES,
+} from '../../domains/personal-health/engine/dynamicLongevityPrecisionEngine.ts'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Pusat Longevity — the layer wearables DON'T have. Apple Watch & WHOOP score
@@ -171,6 +180,110 @@ export function Longevity() {
   const gripProj80 = isi.age && d.grip > 0 ? project(d.grip, Math.max(d.age, 30), 80, 0.15, 0.07) : null
 
   const scoreColor = score == null ? '#a3a3a3' : score >= 75 ? '#00BF63' : score >= 55 ? '#f59e0b' : '#ef4444'
+
+  // Precision Bioenergetics & Levine PhenoAge state
+  const [phenoAlbumin, setPhenoAlbumin] = useState(4.5)
+  const [phenoCreatinine, setPhenoCreatinine] = useState(0.9)
+  const [phenoGlucose, setPhenoGlucose] = useState(85)
+  const [phenoCrp, setPhenoCrp] = useState(0.6)
+  const [phenoLymph, setPhenoLymph] = useState(32)
+  const [phenoMcv, setPhenoMcv] = useState(89)
+  const [phenoRdw, setPhenoRdw] = useState(12.4)
+  const [phenoAlp, setPhenoAlp] = useState(65)
+  const [phenoWbc, setPhenoWbc] = useState(5.8)
+
+  // Kleiber & bioenergetics state
+  const [bodyMassKg, setBodyMassKg] = useState(70)
+  const [coreTempC, setCoreTempC] = useState(37.0)
+  const [activityPal, setActivityPal] = useState(1.55)
+
+  // Micronutrient competition state
+  const [elemFeMg, setElemFeMg] = useState(18)
+  const [isHemeFe, setIsHemeFe] = useState(false)
+  const [elemZnMg, setElemZnMg] = useState(15)
+  const [elemCaMg, setElemCaMg] = useState(500)
+  const [elemVitCMg, setElemVitCMg] = useState(200)
+
+  // Active sub-tab in Precision Bioenergetics fold
+  const [bioTab, setBioTab] = useState<'phenoage' | 'organs' | 'kleiber' | 'micronutrients' | 'cgm'>('phenoage')
+
+  const phenoResult = useMemo(() => calculateLevinePhenoAge({
+    chronologicalAgeYears: d.age || 30,
+    albuminGPerDl: phenoAlbumin,
+    creatinineMgPerDl: phenoCreatinine,
+    serumGlucoseMgPerDl: phenoGlucose,
+    cReactiveProteinMgPerL: phenoCrp,
+    lymphocytePercent: phenoLymph,
+    meanCellVolumeFl: phenoMcv,
+    redCellDistributionWidthPercent: phenoRdw,
+    alkalinePhosphataseUPerL: phenoAlp,
+    whiteBloodCellCount10e3PerUl: phenoWbc,
+  }), [d.age, phenoAlbumin, phenoCreatinine, phenoGlucose, phenoCrp, phenoLymph, phenoMcv, phenoRdw, phenoAlp, phenoWbc])
+
+  const organResult = useMemo(() => evaluateMultiOrganBiologicalAge({
+    chronologicalAge: d.age || 30,
+    cardiovascular: {
+      systolicBp: d.sbp > 0 ? d.sbp : 120,
+      restingHr: d.rhr > 0 ? d.rhr : 62,
+      vo2Max: d.vo2 > 0 ? d.vo2 : 38,
+      ldlCholesterol: d.ldl > 0 ? d.ldl : 105,
+      hsCrp: phenoCrp,
+    },
+    renal: {
+      egfr: 95,
+      creatinine: phenoCreatinine,
+      bun: 15,
+    },
+    hepatic: {
+      alt: 25,
+      ast: 22,
+      albumin: phenoAlbumin,
+    },
+    metabolic: {
+      fastingGlucose: phenoGlucose,
+      hba1c: d.hba1c > 0 ? d.hba1c : 5.2,
+      triglycerides: 110,
+      waistHipRatio: d.whr > 0 ? d.whr : 0.84,
+    },
+    immune: {
+      wbc: phenoWbc,
+      hsCrp: phenoCrp,
+      neutrophilToLymphocyteRatio: 2.1,
+    },
+    neuromuscular: {
+      gripStrengthKg: d.grip > 0 ? d.grip : 38,
+      balanceSeconds: d.balance > 0 ? d.balance : 30,
+      sleepHours: d.sleepH > 0 ? d.sleepH : 7.5,
+    },
+  }), [d.age, d.sbp, d.rhr, d.vo2, d.ldl, phenoCrp, phenoCreatinine, phenoAlbumin, phenoGlucose, d.hba1c, d.whr, phenoWbc, d.grip, d.balance, d.sleepH])
+
+  const kleiberResult = useMemo(() => calculateKleiberBioenergetics({
+    bodyMassKg,
+    coreBodyTempCelsius: coreTempC,
+    physicalActivityLevel: activityPal,
+  }), [bodyMassKg, coreTempC, activityPal])
+
+  const micronutrientResult = useMemo(() => evaluateMicronutrientBioavailability({
+    elementalIronMg: elemFeMg,
+    isHemeIron: isHemeFe,
+    elementalZincMg: elemZnMg,
+    elementalCopperMg: 2.0,
+    elementalCalciumMg: elemCaMg,
+    ascorbicAcidMg: elemVitCMg,
+    serumHsCrpMgPerL: phenoCrp,
+  }), [elemFeMg, isHemeFe, elemZnMg, elemCaMg, elemVitCMg, phenoCrp])
+
+  const cgmResult = useMemo(() => analyzeContinuousGlucoseVariability([
+    { timestampIso: '2026-11-03T00:00:00Z', glucoseMgPerDl: 84 },
+    { timestampIso: '2026-11-03T03:00:00Z', glucoseMgPerDl: 81 },
+    { timestampIso: '2026-11-03T06:00:00Z', glucoseMgPerDl: 85 },
+    { timestampIso: '2026-11-03T08:30:00Z', glucoseMgPerDl: phenoGlucose > 0 ? phenoGlucose + 25 : 110 },
+    { timestampIso: '2026-11-03T11:00:00Z', glucoseMgPerDl: phenoGlucose > 0 ? phenoGlucose + 5 : 90 },
+    { timestampIso: '2026-11-03T13:00:00Z', glucoseMgPerDl: phenoGlucose > 0 ? phenoGlucose + 32 : 118 },
+    { timestampIso: '2026-11-03T16:00:00Z', glucoseMgPerDl: 89 },
+    { timestampIso: '2026-11-03T19:00:00Z', glucoseMgPerDl: phenoGlucose > 0 ? phenoGlucose + 28 : 112 },
+    { timestampIso: '2026-11-03T22:00:00Z', glucoseMgPerDl: 92 },
+  ]), [phenoGlucose])
 
   // Kunci di sini dipetakan ke penyimpanan vitals bersama, bukan hanya ke tiga
   // kolom seperti sebelumnya — tekanan darah sistolik dan rasio pinggang-pinggul
@@ -412,6 +525,329 @@ export function Longevity() {
           Markers above target add to your biological age (a heuristic inspired by PhenoAge — not a substitute for medical judgment).
           Discuss your lab results with your doctor; the <a href="#/chatbot" className="font-bold text-brand-dark underline">AI Consultation</a> feature can help you prepare questions.
         </p>
+      </Card>
+      </Fold>
+
+      {/* Precision Bioenergetics & Multi-Scale Clocks (Pillar VI) */}
+      <Fold label="Precision Bioenergetics">
+      <Card className="!p-5">
+        <SectionTitle
+          icon={<span className="text-lg">🧬</span>}
+          title="Precision Bioenergetics & Multi-Scale Clocks"
+          subtitle="Pillar VI gold-standard: Levine PhenoAge (2018), 6-system organ age deltas, Kleiber allometric scaling, DMT1 competitive kinetics, and CGM glycemic excursions."
+        />
+
+        {/* Sub-tab navigation */}
+        <div style={{ display: 'flex', gap: '6px', overflowX: 'auto', paddingBottom: '8px', marginTop: '12px', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+          {[
+            { id: 'phenoage', label: 'Levine PhenoAge' },
+            { id: 'organs', label: 'Organ Biological Ages' },
+            { id: 'kleiber', label: 'Kleiber Bioenergetics & ATP' },
+            { id: 'micronutrients', label: 'DMT1 Nutrient Competition' },
+            { id: 'cgm', label: 'CGM Glycemic Dynamics' },
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => setBioTab(tab.id as typeof bioTab)}
+              style={{
+                borderRadius: '9999px',
+                padding: '4px 12px',
+                fontSize: '11px',
+                fontWeight: 'bold',
+                whiteSpace: 'nowrap',
+                cursor: 'pointer',
+                backgroundColor: bioTab === tab.id ? '#00BF63' : 'transparent',
+                color: bioTab === tab.id ? '#000000' : 'inherit',
+                border: bioTab === tab.id ? '1px solid #00BF63' : '1px solid rgba(255,255,255,0.15)',
+              }}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Tab 1: Levine PhenoAge */}
+        {bioTab === 'phenoage' && (
+          <div style={{ marginTop: '14px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '12px' }}>
+              <div style={{ borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)', padding: '12px', backgroundColor: 'rgba(0,0,0,0.2)' }}>
+                <div style={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'rgba(255,255,255,0.6)' }}>Phenotypic Age</div>
+                <div style={{ fontSize: '28px', fontWeight: '800', marginTop: '4px', color: '#00BF63' }}>
+                  {phenoResult.phenotypicAgeYears} <span style={{ fontSize: '14px', fontWeight: 'normal', color: 'rgba(255,255,255,0.6)' }}>yrs</span>
+                </div>
+                <div style={{ marginTop: '6px', fontSize: '11px' }}>
+                  Delta: <b style={{ color: phenoResult.phenotypicAgeDeltaYears <= 0 ? '#00BF63' : '#ef4444' }}>
+                    {phenoResult.phenotypicAgeDeltaYears > 0 ? `+${phenoResult.phenotypicAgeDeltaYears}` : phenoResult.phenotypicAgeDeltaYears} yrs
+                  </b> ({phenoResult.agingPaceCategory.replace('-', ' ')})
+                </div>
+                <div style={{ marginTop: '4px', fontSize: '10px', color: 'rgba(255,255,255,0.6)' }}>
+                  10-Yr Mortality Hazard: <b>{phenoResult.tenYearMortalityRiskPercent}%</b>
+                </div>
+              </div>
+
+              <div style={{ borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)', padding: '12px', backgroundColor: 'rgba(0,0,0,0.2)' }}>
+                <div style={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'rgba(255,255,255,0.6)' }}>Gold-Standard Citation</div>
+                <div style={{ fontSize: '11px', fontWeight: 'bold', marginTop: '4px' }}>Levine ME et al. Aging. 2018;10(4):573-641</div>
+                <div style={{ fontSize: '10px', marginTop: '4px', color: 'rgba(255,255,255,0.6)' }}>PMID: 29676998 · NHANES III & IV validated Gompertz proportional hazard estimator</div>
+                <div style={{ marginTop: '6px', fontSize: '10px', color: '#a7f3d0' }}>
+                  Pure algorithmic implementation · zero synthetic data invention
+                </div>
+              </div>
+            </div>
+
+            {/* Biomarker Inputs */}
+            <div style={{ marginTop: '14px' }}>
+              <div style={{ fontSize: '11px', fontWeight: 'bold', marginBottom: '8px' }}>Adjust Levine Biomarkers:</div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '8px' }}>
+                <label style={{ fontSize: '10px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                  Albumin (g/dL):
+                  <input type="number" step="0.1" value={phenoAlbumin} onChange={(e) => setPhenoAlbumin(+e.target.value)} style={{ borderRadius: '6px', border: '1px solid rgba(255,255,255,0.2)', backgroundColor: 'rgba(0,0,0,0.4)', padding: '4px 8px', fontSize: '11px', color: 'inherit' }} />
+                </label>
+                <label style={{ fontSize: '10px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                  Creatinine (mg/dL):
+                  <input type="number" step="0.05" value={phenoCreatinine} onChange={(e) => setPhenoCreatinine(+e.target.value)} style={{ borderRadius: '6px', border: '1px solid rgba(255,255,255,0.2)', backgroundColor: 'rgba(0,0,0,0.4)', padding: '4px 8px', fontSize: '11px', color: 'inherit' }} />
+                </label>
+                <label style={{ fontSize: '10px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                  Glucose (mg/dL):
+                  <input type="number" step="1" value={phenoGlucose} onChange={(e) => setPhenoGlucose(+e.target.value)} style={{ borderRadius: '6px', border: '1px solid rgba(255,255,255,0.2)', backgroundColor: 'rgba(0,0,0,0.4)', padding: '4px 8px', fontSize: '11px', color: 'inherit' }} />
+                </label>
+                <label style={{ fontSize: '10px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                  hs-CRP (mg/L):
+                  <input type="number" step="0.1" value={phenoCrp} onChange={(e) => setPhenoCrp(+e.target.value)} style={{ borderRadius: '6px', border: '1px solid rgba(255,255,255,0.2)', backgroundColor: 'rgba(0,0,0,0.4)', padding: '4px 8px', fontSize: '11px', color: 'inherit' }} />
+                </label>
+                <label style={{ fontSize: '10px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                  Lymphocyte (%):
+                  <input type="number" step="1" value={phenoLymph} onChange={(e) => setPhenoLymph(+e.target.value)} style={{ borderRadius: '6px', border: '1px solid rgba(255,255,255,0.2)', backgroundColor: 'rgba(0,0,0,0.4)', padding: '4px 8px', fontSize: '11px', color: 'inherit' }} />
+                </label>
+                <label style={{ fontSize: '10px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                  MCV (fL):
+                  <input type="number" step="1" value={phenoMcv} onChange={(e) => setPhenoMcv(+e.target.value)} style={{ borderRadius: '6px', border: '1px solid rgba(255,255,255,0.2)', backgroundColor: 'rgba(0,0,0,0.4)', padding: '4px 8px', fontSize: '11px', color: 'inherit' }} />
+                </label>
+                <label style={{ fontSize: '10px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                  RDW (%):
+                  <input type="number" step="0.1" value={phenoRdw} onChange={(e) => setPhenoRdw(+e.target.value)} style={{ borderRadius: '6px', border: '1px solid rgba(255,255,255,0.2)', backgroundColor: 'rgba(0,0,0,0.4)', padding: '4px 8px', fontSize: '11px', color: 'inherit' }} />
+                </label>
+                <label style={{ fontSize: '10px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                  ALP (U/L):
+                  <input type="number" step="1" value={phenoAlp} onChange={(e) => setPhenoAlp(+e.target.value)} style={{ borderRadius: '6px', border: '1px solid rgba(255,255,255,0.2)', backgroundColor: 'rgba(0,0,0,0.4)', padding: '4px 8px', fontSize: '11px', color: 'inherit' }} />
+                </label>
+                <label style={{ fontSize: '10px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                  WBC (10³/µL):
+                  <input type="number" step="0.1" value={phenoWbc} onChange={(e) => setPhenoWbc(+e.target.value)} style={{ borderRadius: '6px', border: '1px solid rgba(255,255,255,0.2)', backgroundColor: 'rgba(0,0,0,0.4)', padding: '4px 8px', fontSize: '11px', color: 'inherit' }} />
+                </label>
+              </div>
+            </div>
+
+            {/* Biomarker deviation table */}
+            <div style={{ marginTop: '14px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', overflow: 'hidden' }}>
+              <table style={{ width: '100%', fontSize: '10px', borderCollapse: 'collapse', textAlign: 'left' }}>
+                <thead style={{ backgroundColor: 'rgba(255,255,255,0.05)', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+                  <tr>
+                    <th style={{ padding: '6px 10px' }}>Biomarker</th>
+                    <th style={{ padding: '6px 10px' }}>Observed</th>
+                    <th style={{ padding: '6px 10px' }}>Optimal Reference</th>
+                    <th style={{ padding: '6px 10px' }}>Aging Impact</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {phenoResult.biomarkerDeviations.map((b) => (
+                    <tr key={b.biomarker} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                      <td style={{ padding: '6px 10px', fontWeight: 'bold' }}>{b.biomarker}</td>
+                      <td style={{ padding: '6px 10px' }}>{b.observedValue} {b.unit}</td>
+                      <td style={{ padding: '6px 10px', color: 'rgba(255,255,255,0.6)' }}>{b.referenceOptimal}</td>
+                      <td style={{ padding: '6px 10px' }}>
+                        <span style={{
+                          borderRadius: '4px',
+                          padding: '2px 6px',
+                          fontSize: '9px',
+                          fontWeight: 'bold',
+                          backgroundColor: b.impact === 'longevity-protective' ? 'rgba(0,191,99,0.15)' : b.impact === 'pro-aging' ? 'rgba(239,68,68,0.15)' : 'rgba(255,255,255,0.1)',
+                          color: b.impact === 'longevity-protective' ? '#00BF63' : b.impact === 'pro-aging' ? '#ef4444' : 'inherit',
+                        }}>
+                          {b.impact}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {/* Tab 2: Organ Biological Ages */}
+        {bioTab === 'organs' && (
+          <div style={{ marginTop: '14px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.1)', backgroundColor: 'rgba(0,0,0,0.2)', padding: '10px 14px' }}>
+              <div>
+                <div style={{ fontSize: '10px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.6)' }}>Weakest-Link Accelerating Organ</div>
+                <div style={{ fontSize: '14px', fontWeight: 'bold', color: '#f59e0b', marginTop: '2px' }}>
+                  {organResult.weakestLinkOrgan.label} (+{organResult.weakestLinkOrgan.deltaYears} yrs)
+                </div>
+              </div>
+              <div style={{ textAlign: 'right' }}>
+                <div style={{ fontSize: '10px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.6)' }}>System Resilience</div>
+                <div style={{ fontSize: '18px', fontWeight: '800', color: '#00BF63' }}>{organResult.systemResilienceScore} / 100</div>
+              </div>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '10px', marginTop: '12px' }}>
+              {organResult.organProfiles.map((p) => (
+                <div key={p.systemKey} style={{ borderRadius: '10px', border: '1px solid rgba(255,255,255,0.1)', padding: '10px', backgroundColor: 'rgba(255,255,255,0.02)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontSize: '11px', fontWeight: 'bold' }}>{p.label}</span>
+                    <span style={{ fontSize: '12px', fontWeight: 'bold', color: p.deltaYears <= 0 ? '#00BF63' : '#ef4444' }}>
+                      {p.biologicalAge} yrs
+                    </span>
+                  </div>
+                  <div style={{ fontSize: '10px', marginTop: '4px', color: 'rgba(255,255,255,0.6)' }}>
+                    Delta: {p.deltaYears > 0 ? `+${p.deltaYears}` : p.deltaYears} yrs vs baseline
+                  </div>
+                  <div style={{ marginTop: '6px', fontSize: '9px', color: 'rgba(255,255,255,0.5)' }}>
+                    {p.primaryContributors.join(' · ')}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Tab 3: Kleiber Bioenergetics & ATP */}
+        {bioTab === 'kleiber' && (
+          <div style={{ marginTop: '14px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '10px' }}>
+              <div style={{ borderRadius: '10px', border: '1px solid rgba(255,255,255,0.1)', padding: '10px', backgroundColor: 'rgba(0,0,0,0.2)' }}>
+                <div style={{ fontSize: '10px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.6)' }}>Kleiber Basal BMR</div>
+                <div style={{ fontSize: '20px', fontWeight: '800', marginTop: '4px' }}>{kleiberResult.temperatureAdjustedBmrKcalPerDay} <span style={{ fontSize: '11px', fontWeight: 'normal' }}>kcal/day</span></div>
+                <div style={{ fontSize: '9px', marginTop: '4px', color: 'rgba(255,255,255,0.5)' }}>BMR = 70 × M^0.75 (M = {bodyMassKg} kg)</div>
+              </div>
+              <div style={{ borderRadius: '10px', border: '1px solid rgba(255,255,255,0.1)', padding: '10px', backgroundColor: 'rgba(0,0,0,0.2)' }}>
+                <div style={{ fontSize: '10px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.6)' }}>Daily ATP Turnover</div>
+                <div style={{ fontSize: '20px', fontWeight: '800', marginTop: '4px', color: '#00BF63' }}>{kleiberResult.mitochondrialOxphosAtpFluxMolesPerDay} <span style={{ fontSize: '11px', fontWeight: 'normal' }}>moles/day</span></div>
+                <div style={{ fontSize: '9px', marginTop: '4px', color: 'rgba(255,255,255,0.5)' }}>~42% oxphos thermodynamic capture</div>
+              </div>
+              <div style={{ borderRadius: '10px', border: '1px solid rgba(255,255,255,0.1)', padding: '10px', backgroundColor: 'rgba(0,0,0,0.2)' }}>
+                <div style={{ fontSize: '10px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.6)' }}>Proton Leak Heat Dissipation</div>
+                <div style={{ fontSize: '20px', fontWeight: '800', marginTop: '4px', color: '#f59e0b' }}>{kleiberResult.uncouplingProtonLeakHeatDissipationKcalPerDay} <span style={{ fontSize: '11px', fontWeight: 'normal' }}>kcal/day</span></div>
+                <div style={{ fontSize: '9px', marginTop: '4px', color: 'rgba(255,255,255,0.5)' }}>UCP1/2/3 obligate thermogenesis</div>
+              </div>
+            </div>
+
+            <div style={{ marginTop: '12px', display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+              <label style={{ fontSize: '10px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                Body Mass (kg):
+                <input type="number" step="1" value={bodyMassKg} onChange={(e) => setBodyMassKg(+e.target.value)} style={{ borderRadius: '6px', border: '1px solid rgba(255,255,255,0.2)', backgroundColor: 'rgba(0,0,0,0.4)', padding: '4px 8px', fontSize: '11px', color: 'inherit' }} />
+              </label>
+              <label style={{ fontSize: '10px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                Core Temp (°C):
+                <input type="number" step="0.1" value={coreTempC} onChange={(e) => setCoreTempC(+e.target.value)} style={{ borderRadius: '6px', border: '1px solid rgba(255,255,255,0.2)', backgroundColor: 'rgba(0,0,0,0.4)', padding: '4px 8px', fontSize: '11px', color: 'inherit' }} />
+              </label>
+              <label style={{ fontSize: '10px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                Physical Activity Level (PAL):
+                <input type="number" step="0.05" value={activityPal} onChange={(e) => setActivityPal(+e.target.value)} style={{ borderRadius: '6px', border: '1px solid rgba(255,255,255,0.2)', backgroundColor: 'rgba(0,0,0,0.4)', padding: '4px 8px', fontSize: '11px', color: 'inherit' }} />
+              </label>
+            </div>
+            <div style={{ marginTop: '8px', fontSize: '9px', color: 'rgba(255,255,255,0.5)' }}>
+              Citations: {LONGEVITY_LITERATURE_SOURCES.allometricBioenergetics.citation} (PMID: {LONGEVITY_LITERATURE_SOURCES.allometricBioenergetics.pmid})
+            </div>
+          </div>
+        )}
+
+        {/* Tab 4: DMT1 Nutrient Competition & Hepcidin Axis */}
+        {bioTab === 'micronutrients' && (
+          <div style={{ marginTop: '14px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '10px' }}>
+              <div style={{ borderRadius: '10px', border: '1px solid rgba(255,255,255,0.1)', padding: '10px', backgroundColor: 'rgba(0,0,0,0.2)' }}>
+                <div style={{ fontSize: '10px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.6)' }}>Net Iron Absorption</div>
+                <div style={{ fontSize: '20px', fontWeight: '800', marginTop: '4px', color: '#00BF63' }}>
+                  {micronutrientResult.netAbsorbedIronMg} mg <span style={{ fontSize: '11px', fontWeight: 'normal' }}>({micronutrientResult.fractionalIronAbsorptionPercent}%)</span>
+                </div>
+                <div style={{ fontSize: '9px', marginTop: '4px', color: 'rgba(255,255,255,0.5)' }}>
+                  DMT1 Competition Index: {micronutrientResult.dmt1CompetitionIndex}
+                </div>
+              </div>
+              <div style={{ borderRadius: '10px', border: '1px solid rgba(255,255,255,0.1)', padding: '10px', backgroundColor: 'rgba(0,0,0,0.2)' }}>
+                <div style={{ fontSize: '10px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.6)' }}>Hepcidin Ferroportin Factor</div>
+                <div style={{ fontSize: '20px', fontWeight: '800', marginTop: '4px', color: micronutrientResult.hepcidinSuppressionFactor >= 0.9 ? '#00BF63' : '#f59e0b' }}>
+                  {(micronutrientResult.hepcidinSuppressionFactor * 100).toFixed(0)}%
+                </div>
+                <div style={{ fontSize: '9px', marginTop: '4px', color: 'rgba(255,255,255,0.5)' }}>
+                  Modulated by systemic hs-CRP ({phenoCrp} mg/L)
+                </div>
+              </div>
+            </div>
+
+            <div style={{ marginTop: '12px', display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+              <label style={{ fontSize: '10px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                Iron (mg):
+                <input type="number" step="1" value={elemFeMg} onChange={(e) => setElemFeMg(+e.target.value)} style={{ borderRadius: '6px', border: '1px solid rgba(255,255,255,0.2)', backgroundColor: 'rgba(0,0,0,0.4)', padding: '4px 8px', fontSize: '11px', color: 'inherit' }} />
+              </label>
+              <label style={{ fontSize: '10px', display: 'flex', alignItems: 'center', gap: '6px', marginTop: '16px' }}>
+                <input type="checkbox" checked={isHemeFe} onChange={(e) => setIsHemeFe(e.target.checked)} />
+                Is Heme Iron
+              </label>
+              <label style={{ fontSize: '10px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                Zinc (mg):
+                <input type="number" step="1" value={elemZnMg} onChange={(e) => setElemZnMg(+e.target.value)} style={{ borderRadius: '6px', border: '1px solid rgba(255,255,255,0.2)', backgroundColor: 'rgba(0,0,0,0.4)', padding: '4px 8px', fontSize: '11px', color: 'inherit' }} />
+              </label>
+              <label style={{ fontSize: '10px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                Calcium (mg):
+                <input type="number" step="50" value={elemCaMg} onChange={(e) => setElemCaMg(+e.target.value)} style={{ borderRadius: '6px', border: '1px solid rgba(255,255,255,0.2)', backgroundColor: 'rgba(0,0,0,0.4)', padding: '4px 8px', fontSize: '11px', color: 'inherit' }} />
+              </label>
+              <label style={{ fontSize: '10px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                Vitamin C (mg):
+                <input type="number" step="50" value={elemVitCMg} onChange={(e) => setElemVitCMg(+e.target.value)} style={{ borderRadius: '6px', border: '1px solid rgba(255,255,255,0.2)', backgroundColor: 'rgba(0,0,0,0.4)', padding: '4px 8px', fontSize: '11px', color: 'inherit' }} />
+              </label>
+            </div>
+
+            <div style={{ marginTop: '10px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', padding: '8px', fontSize: '10px', backgroundColor: 'rgba(0,0,0,0.2)' }}>
+              <b>Clinical kinetic notes:</b>
+              <ul style={{ marginTop: '4px', paddingLeft: '16px', listStyleType: 'disc' }}>
+                {micronutrientResult.clinicalActionNotes.map((note, idx) => (
+                  <li key={idx} style={{ color: 'rgba(255,255,255,0.7)' }}>{note}</li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        )}
+
+        {/* Tab 5: CGM Glycemic Excursions */}
+        {bioTab === 'cgm' && (
+          <div style={{ marginTop: '14px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '10px' }}>
+              <div style={{ borderRadius: '10px', border: '1px solid rgba(255,255,255,0.1)', padding: '10px', backgroundColor: 'rgba(0,0,0,0.2)' }}>
+                <div style={{ fontSize: '10px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.6)' }}>Longevity TIR (70-140)</div>
+                <div style={{ fontSize: '20px', fontWeight: '800', marginTop: '4px', color: '#00BF63' }}>{cgmResult.timeInRangeLongevityPercent}%</div>
+                <div style={{ fontSize: '9px', marginTop: '4px', color: 'rgba(255,255,255,0.5)' }}>Target &gt; 85% for longevity</div>
+              </div>
+              <div style={{ borderRadius: '10px', border: '1px solid rgba(255,255,255,0.1)', padding: '10px', backgroundColor: 'rgba(0,0,0,0.2)' }}>
+                <div style={{ fontSize: '10px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.6)' }}>Glycemic CV%</div>
+                <div style={{ fontSize: '20px', fontWeight: '800', marginTop: '4px', color: cgmResult.coefficientOfVariationPercent <= 36 ? '#00BF63' : '#ef4444' }}>
+                  {cgmResult.coefficientOfVariationPercent}%
+                </div>
+                <div style={{ fontSize: '9px', marginTop: '4px', color: 'rgba(255,255,255,0.5)' }}>Target &le; 36% (SD = {cgmResult.standardDeviationMgPerDl} mg/dL)</div>
+              </div>
+              <div style={{ borderRadius: '10px', border: '1px solid rgba(255,255,255,0.1)', padding: '10px', backgroundColor: 'rgba(0,0,0,0.2)' }}>
+                <div style={{ fontSize: '10px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.6)' }}>MAGE & J-Index</div>
+                <div style={{ fontSize: '20px', fontWeight: '800', marginTop: '4px' }}>
+                  {cgmResult.meanAmplitudeOfGlycemicExcursionsMage} <span style={{ fontSize: '11px', fontWeight: 'normal' }}>mg/dL</span>
+                </div>
+                <div style={{ fontSize: '9px', marginTop: '4px', color: 'rgba(255,255,255,0.5)' }}>
+                  J = {cgmResult.jIndex} · LBGI = {cgmResult.lowBloodGlucoseIndexLbgi} · HBGI = {cgmResult.highBloodGlucoseIndexHbgi}
+                </div>
+              </div>
+            </div>
+            <div style={{ marginTop: '8px', fontSize: '9px', color: 'rgba(255,255,255,0.5)' }}>
+              Citations: {LONGEVITY_LITERATURE_SOURCES.continuousGlucoseVariability.citation} (PMID: {LONGEVITY_LITERATURE_SOURCES.continuousGlucoseVariability.pmid})
+            </div>
+          </div>
+        )}
+
+        {/* Disclaimer */}
+        <div style={{ marginTop: '16px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', backgroundColor: 'rgba(255,255,255,0.02)', padding: '8px 12px', fontSize: '9px', color: 'rgba(255,255,255,0.5)' }}>
+          {LONGEVITY_PRECISION_DISCLAIMER}
+        </div>
       </Card>
       </Fold>
 

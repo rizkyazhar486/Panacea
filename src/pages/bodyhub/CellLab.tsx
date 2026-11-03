@@ -4,6 +4,12 @@ import {
   ORGANEL, JALUR_METABOLIK, RANTAI, ringkasJalur, neracaGlukosa, neracaAsamLemak,
   ATP_PER_NADH, ATP_PER_FADH2, PROTON_PER_ATP, type Antarjemput,
 } from '../../lib/cellBio'
+import { evaluateMitochondrialQualityControl } from '../../lib/discovery/mitochondrialUprMitophagyEngine'
+import {
+  AMR_EPITOPE_CATALOG,
+  evaluateEpitopeBindingAffinity,
+  type DeNovoBinderCandidate,
+} from '../../domains/quantum-biology/index.ts'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // LABORATORIUM SEL — organel dalam tiga dimensi, dan biokimia yang berjalan di
@@ -17,7 +23,7 @@ import {
 // yang tidak punya mitokondria tetap hidup.
 // ─────────────────────────────────────────────────────────────────────────────
 
-type Tab = 'sel' | 'glikolisis' | 'tca' | 'rantai' | 'neraca'
+type Tab = 'sel' | 'glikolisis' | 'tca' | 'rantai' | 'neraca' | 'mitokondria' | 'quantum-binder'
 
 const TABS: Array<{ id: Tab; label: string }> = [
   { id: 'sel', label: 'Cell' },
@@ -25,6 +31,8 @@ const TABS: Array<{ id: Tab; label: string }> = [
   { id: 'tca', label: 'TCA cycle' },
   { id: 'rantai', label: 'Respiratory chain' },
   { id: 'neraca', label: 'ATP balance' },
+  { id: 'mitokondria', label: 'Mitophagy & Dynamics' },
+  { id: 'quantum-binder', label: 'Quantum AMR Binder' },
 ]
 
 export function CellLab() {
@@ -42,6 +50,52 @@ export function CellLab() {
     : null
   const tahap = jalur?.tahap[Math.min(tahapAktif, jalur.tahap.length - 1)]
   const ringkas = jalur ? ringkasJalur(jalur) : null
+
+  // Mitophagy state
+  const [deltaPsiMv, setDeltaPsiMv] = useState(-140)
+  const [misfoldedRatio, setMisfoldedRatio] = useState(0.2)
+  const [lysosomalPh, setLysosomalPh] = useState(4.8)
+  const [atf5Active, setAtf5Active] = useState(true)
+
+  const mitoFlux = useMemo(() => {
+    return evaluateMitochondrialQualityControl({
+      membranePotentialDeltaPsiMv: deltaPsiMv,
+      matrixMisfoldedProteinRatio: misfoldedRatio,
+      lysosomalAcidityPh: lysosomalPh,
+      atf5RetrogradeSignalingActive: atf5Active,
+    })
+  }, [deltaPsiMv, misfoldedRatio, lysosomalPh, atf5Active])
+
+  // Quantum AMR Binder state
+  const [selectedTargetId, setSelectedTargetId] = useState('TARGET-MRSA-PBP2A')
+  const [binderSequence, setBinderSequence] = useState('DYKIKTGFYDKLKDEYGYK')
+  const [binderScaffold, setBinderScaffold] = useState<DeNovoBinderCandidate['designedScaffoldKind']>('NANOBODY_VHH')
+
+  const currentEpitopeTarget = useMemo(() => {
+    return AMR_EPITOPE_CATALOG.find((t) => t.targetId === selectedTargetId) ?? AMR_EPITOPE_CATALOG[0]
+  }, [selectedTargetId])
+
+  const bindingEval = useMemo(() => {
+    try {
+      const candidate: DeNovoBinderCandidate = {
+        binderId: 'DESIGN-CANDIDATE-01',
+        binderName: 'Custom De Novo Engineered Binder',
+        sequence: binderSequence.trim().toUpperCase(),
+        targetId: currentEpitopeTarget.targetId,
+        computedMolecularWeightDa: binderSequence.length * 110,
+        designedScaffoldKind: binderScaffold,
+      }
+      return {
+        ok: true as const,
+        result: evaluateEpitopeBindingAffinity(currentEpitopeTarget, candidate, '2026-11-03T12:00:00.000Z'),
+      }
+    } catch (err) {
+      return {
+        ok: false as const,
+        error: err instanceof Error ? err.message : String(err),
+      }
+    }
+  }, [currentEpitopeTarget, binderSequence, binderScaffold])
 
   return (
     <div className="space-y-3">
@@ -258,6 +312,237 @@ export function CellLab() {
             </div>
           )}
         </>
+      )}
+
+      {tab === 'mitokondria' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <div style={{ borderRadius: '0.75rem', border: '1px solid rgba(255,255,255,0.1)', backgroundColor: 'rgba(0,0,0,0.3)', padding: '0.875rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem' }}>
+              <div>
+                <span style={{ fontSize: '9px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.14em', color: '#10b981' }}>
+                  Pillar I · Mitochondrial Quality Control &amp; Dynamics
+                </span>
+                <h3 style={{ fontSize: '1rem', fontWeight: 900, color: '#ffffff', marginTop: '0.25rem' }}>
+                  PINK1-Parkin Mitophagy &amp; UPRmt Flux Simulator
+                </h3>
+              </div>
+              <span style={{
+                borderRadius: '9999px',
+                padding: '0.25rem 0.625rem',
+                fontSize: '9px',
+                fontWeight: 800,
+                backgroundColor:
+                  mitoFlux.mitochondrialViabilityStatus === 'HEALTHY_POLARIZED' ? 'rgba(6,78,59,0.7)' :
+                  mitoFlux.mitochondrialViabilityStatus === 'STRESSED_UPRMT_COMPENSATION' ? 'rgba(120,53,15,0.7)' :
+                  mitoFlux.mitochondrialViabilityStatus === 'DEPOLARIZED_MITOPHAGY_COMMITTED' ? 'rgba(88,28,135,0.7)' : 'rgba(127,29,29,0.7)',
+                color:
+                  mitoFlux.mitochondrialViabilityStatus === 'HEALTHY_POLARIZED' ? '#6ee7b7' :
+                  mitoFlux.mitochondrialViabilityStatus === 'STRESSED_UPRMT_COMPENSATION' ? '#fcd34d' :
+                  mitoFlux.mitochondrialViabilityStatus === 'DEPOLARIZED_MITOPHAGY_COMMITTED' ? '#d8b4fe' : '#fca5a5',
+                border: '1px solid rgba(255,255,255,0.15)',
+              }}>
+                {mitoFlux.mitochondrialViabilityStatus.replace(/_/g, ' ')}
+              </span>
+            </div>
+            <p style={{ marginTop: '0.375rem', fontSize: '11px', color: '#94a3b8', lineHeight: '1.4' }}>
+              Simulates proteotoxic stress, retrograde nuclear compensation (ATF5/Hsp60), MFN1/2 fusion blockade, and autophagic clearance. Ref: {mitoFlux.metadata.referenceBasis}.
+            </p>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '0.75rem' }}>
+            <div style={{ borderRadius: '0.75rem', border: '1px solid rgba(255,255,255,0.1)', backgroundColor: 'rgba(0,0,0,0.2)', padding: '0.75rem' }}>
+              <label htmlFor="input-deltapsi" style={{ fontSize: '11px', fontWeight: 700, color: '#e2e8f0', display: 'flex', justifyContent: 'space-between' }}>
+                <span>Membrane Potential (ΔΨm):</span>
+                <span style={{ color: deltaPsiMv > -105 ? '#f87171' : '#34d399' }}>{deltaPsiMv} mV</span>
+              </label>
+              <input
+                id="input-deltapsi"
+                type="range" min="-180" max="-40" step="5" value={deltaPsiMv}
+                onChange={(e) => setDeltaPsiMv(Number(e.target.value))}
+                style={{ width: '100%', marginTop: '0.375rem' }}
+              />
+              <span style={{ fontSize: '9px', color: '#64748b', display: 'block', marginTop: '0.125rem' }}>
+                Normal polarized: -180 to -140 mV. Depolarization &gt; -105 mV stabilizes PINK1 on OMM.
+              </span>
+            </div>
+
+            <div style={{ borderRadius: '0.75rem', border: '1px solid rgba(255,255,255,0.1)', backgroundColor: 'rgba(0,0,0,0.2)', padding: '0.75rem' }}>
+              <label htmlFor="input-misfolded" style={{ fontSize: '11px', fontWeight: 700, color: '#e2e8f0', display: 'flex', justifyContent: 'space-between' }}>
+                <span>Matrix Misfolded Ratio:</span>
+                <span style={{ color: misfoldedRatio > 0.4 ? '#fbbf24' : '#60a5fa' }}>{(misfoldedRatio * 100).toFixed(0)}%</span>
+              </label>
+              <input
+                id="input-misfolded"
+                type="range" min="0" max="1" step="0.05" value={misfoldedRatio}
+                onChange={(e) => setMisfoldedRatio(Number(e.target.value))}
+                style={{ width: '100%', marginTop: '0.375rem' }}
+              />
+              <span style={{ fontSize: '9px', color: '#64748b', display: 'block', marginTop: '0.125rem' }}>
+                Proteotoxic accumulation triggers ClpP protease &amp; mitochondrial UPRmt.
+              </span>
+            </div>
+
+            <div style={{ borderRadius: '0.75rem', border: '1px solid rgba(255,255,255,0.1)', backgroundColor: 'rgba(0,0,0,0.2)', padding: '0.75rem' }}>
+              <label htmlFor="input-lysosomal-ph" style={{ fontSize: '11px', fontWeight: 700, color: '#e2e8f0', display: 'flex', justifyContent: 'space-between' }}>
+                <span>Lysosomal pH:</span>
+                <span style={{ color: lysosomalPh > 5.5 ? '#f87171' : '#34d399' }}>{lysosomalPh.toFixed(1)}</span>
+              </label>
+              <input
+                id="input-lysosomal-ph"
+                type="range" min="4.0" max="7.0" step="0.1" value={lysosomalPh}
+                onChange={(e) => setLysosomalPh(Number(e.target.value))}
+                style={{ width: '100%', marginTop: '0.375rem' }}
+              />
+              <span style={{ fontSize: '9px', color: '#64748b', display: 'block', marginTop: '0.125rem' }}>
+                Normal acidic digestion pH 4.5–5.0. De-acidification blocks degradation.
+              </span>
+            </div>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '0.5rem', textAlign: 'center' }}>
+            <div style={{ padding: '0.625rem', borderRadius: '0.5rem', backgroundColor: '#0f172a', border: '1px solid #1e293b' }}>
+              <span style={{ fontSize: '9px', color: '#94a3b8', display: 'block' }}>PINK1/Parkin Priming</span>
+              <span style={{ fontSize: '1rem', fontWeight: 900, color: '#38bdf8' }}>{mitoFlux.pink1ParkinPrimingScore.toFixed(2)}</span>
+            </div>
+            <div style={{ padding: '0.625rem', borderRadius: '0.5rem', backgroundColor: '#0f172a', border: '1px solid #1e293b' }}>
+              <span style={{ fontSize: '9px', color: '#94a3b8', display: 'block' }}>p-Ser65-Ub Rate</span>
+              <span style={{ fontSize: '1rem', fontWeight: 900, color: '#a78bfa' }}>{mitoFlux.ubiquitinPhosphorylationRate.toFixed(2)}</span>
+            </div>
+            <div style={{ padding: '0.625rem', borderRadius: '0.5rem', backgroundColor: '#0f172a', border: '1px solid #1e293b' }}>
+              <span style={{ fontSize: '9px', color: '#94a3b8', display: 'block' }}>MFN1/2 Degradation</span>
+              <span style={{ fontSize: '1rem', fontWeight: 900, color: '#f87171' }}>{mitoFlux.mfn1Mfn2DegradationPercentage.toFixed(0)}%</span>
+            </div>
+            <div style={{ padding: '0.625rem', borderRadius: '0.5rem', backgroundColor: '#0f172a', border: '1px solid #1e293b' }}>
+              <span style={{ fontSize: '9px', color: '#94a3b8', display: 'block' }}>Autophagosome (LC3-II)</span>
+              <span style={{ fontSize: '1rem', fontWeight: 900, color: '#34d399' }}>{(mitoFlux.autophagosomalEngulfmentRatio * 100).toFixed(0)}%</span>
+            </div>
+            <div style={{ padding: '0.625rem', borderRadius: '0.5rem', backgroundColor: '#0f172a', border: '1px solid #1e293b' }}>
+              <span style={{ fontSize: '9px', color: '#94a3b8', display: 'block' }}>Lysosomal Clearance</span>
+              <span style={{ fontSize: '1rem', fontWeight: 900, color: '#fbbf24' }}>{mitoFlux.lysosomalClearanceCompletionPercentage.toFixed(0)}%</span>
+            </div>
+            <div style={{ padding: '0.625rem', borderRadius: '0.5rem', backgroundColor: '#0f172a', border: '1px solid #1e293b' }}>
+              <span style={{ fontSize: '9px', color: '#94a3b8', display: 'block' }}>Hsp60 Induction</span>
+              <span style={{ fontSize: '1rem', fontWeight: 900, color: '#e2e8f0' }}>{mitoFlux.uprmtRetrogradeResponse.chaperoneUpregulationFold.toFixed(2)}×</span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {tab === 'quantum-binder' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <div style={{ borderRadius: '0.75rem', border: '1px solid rgba(255,255,255,0.1)', backgroundColor: 'rgba(0,0,0,0.3)', padding: '0.875rem' }}>
+            <span style={{ fontSize: '9px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.14em', color: '#06b6d4' }}>
+              Pillar I · De Novo Therapeutics &amp; Quantum Biology
+            </span>
+            <h3 style={{ fontSize: '1rem', fontWeight: 900, color: '#ffffff', marginTop: '0.25rem' }}>
+              Marcus Electron Transfer &amp; De Novo AMR Epitope Binder
+            </h3>
+            <p style={{ marginTop: '0.375rem', fontSize: '11px', color: '#94a3b8', lineHeight: '1.4' }}>
+              Computes Marcus non-adiabatic electron transfer kinetics and Eisenberg-McLachlan solvation free energy for engineered nanobodies against priority AMR bacterial targets.
+            </p>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '0.75rem' }}>
+            <div style={{ borderRadius: '0.75rem', border: '1px solid rgba(255,255,255,0.1)', backgroundColor: 'rgba(0,0,0,0.2)', padding: '0.75rem' }}>
+              <label htmlFor="select-target-id" style={{ fontSize: '11px', fontWeight: 700, color: '#e2e8f0', display: 'block', marginBottom: '0.375rem' }}>
+                Select Pathogen AMR Target:
+              </label>
+              <select
+                id="select-target-id"
+                value={selectedTargetId}
+                onChange={(e) => setSelectedTargetId(e.target.value)}
+                style={{ width: '100%', minHeight: '38px', padding: '0.375rem 0.5rem', borderRadius: '0.5rem', backgroundColor: '#0f172a', border: '1px solid #334155', color: '#ffffff', fontSize: '11px', fontWeight: 600 }}
+              >
+                {AMR_EPITOPE_CATALOG.map((t) => (
+                  <option key={t.targetId} value={t.targetId}>
+                    {t.organism}: {t.targetName} ({t.pdbAccessionReference})
+                  </option>
+                ))}
+              </select>
+              <div style={{ marginTop: '0.5rem', fontSize: '10px', color: '#94a3b8' }}>
+                <b>Epitope:</b> <span style={{ fontFamily: 'monospace', color: '#38bdf8' }}>{currentEpitopeTarget.epitopeSequence}</span>
+                <div style={{ marginTop: '0.125rem', color: '#64748b' }}>{currentEpitopeTarget.clinicalSignificance}</div>
+              </div>
+            </div>
+
+            <div style={{ borderRadius: '0.75rem', border: '1px solid rgba(255,255,255,0.1)', backgroundColor: 'rgba(0,0,0,0.2)', padding: '0.75rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.375rem' }}>
+                <label htmlFor="input-binder-seq" style={{ fontSize: '11px', fontWeight: 700, color: '#e2e8f0' }}>De Novo Sequence (3–30 AA):</label>
+                <div style={{ display: 'flex', gap: '0.25rem' }}>
+                  <button type="button" onClick={() => setBinderSequence('DYKIKTGFYDKLKDEYGYK')} style={{ fontSize: '9px', padding: '0.125rem 0.375rem', borderRadius: '0.25rem', backgroundColor: '#1e293b', color: '#38bdf8', border: 'none', cursor: 'pointer' }}>VHH</button>
+                  <button type="button" onClick={() => setBinderSequence('RWKWRFWKWLKKL')} style={{ fontSize: '9px', padding: '0.125rem 0.375rem', borderRadius: '0.25rem', backgroundColor: '#1e293b', color: '#38bdf8', border: 'none', cursor: 'pointer' }}>Peptide</button>
+                </div>
+              </div>
+              <input
+                id="input-binder-seq"
+                type="text"
+                value={binderSequence}
+                onChange={(e) => setBinderSequence(e.target.value.toUpperCase())}
+                style={{ width: '100%', minHeight: '38px', padding: '0.375rem 0.5rem', borderRadius: '0.5rem', backgroundColor: '#0f172a', border: '1px solid #334155', color: '#ffffff', fontSize: '12px', fontFamily: 'monospace', fontWeight: 700 }}
+              />
+              <div style={{ marginTop: '0.375rem', display: 'flex', justifyContent: 'space-between', fontSize: '10px', color: '#64748b' }}>
+                <span>Scaffold: {binderScaffold}</span>
+                <span>Length: {binderSequence.trim().length} AA</span>
+              </div>
+            </div>
+          </div>
+
+          {bindingEval.ok ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '0.5rem', textAlign: 'center' }}>
+                <div style={{ padding: '0.625rem', borderRadius: '0.5rem', backgroundColor: '#0f172a', border: '1px solid #1e293b' }}>
+                  <span style={{ fontSize: '9px', color: '#94a3b8', display: 'block' }}>Binding Free Energy ΔG</span>
+                  <span style={{ fontSize: '1rem', fontWeight: 900, color: bindingEval.result.bindingFreeEnergy_dG_kcal_mol < 0 ? '#34d399' : '#f87171' }}>
+                    {bindingEval.result.bindingFreeEnergy_dG_kcal_mol.toFixed(2)} kcal/mol
+                  </span>
+                </div>
+                <div style={{ padding: '0.625rem', borderRadius: '0.5rem', backgroundColor: '#0f172a', border: '1px solid #1e293b' }}>
+                  <span style={{ fontSize: '9px', color: '#94a3b8', display: 'block' }}>Predicted Kd</span>
+                  <span style={{ fontSize: '1rem', fontWeight: 900, color: '#38bdf8' }}>
+                    {bindingEval.result.dissociationConstant_Kd_nM < 1000
+                      ? `${bindingEval.result.dissociationConstant_Kd_nM.toFixed(1)} nM`
+                      : `${(bindingEval.result.dissociationConstant_Kd_nM / 1000).toFixed(2)} µM`}
+                  </span>
+                </div>
+                <div style={{ padding: '0.625rem', borderRadius: '0.5rem', backgroundColor: '#0f172a', border: '1px solid #1e293b' }}>
+                  <span style={{ fontSize: '9px', color: '#94a3b8', display: 'block' }}>Buried Surface Area</span>
+                  <span style={{ fontSize: '1rem', fontWeight: 900, color: '#fbbf24' }}>
+                    {bindingEval.result.buriedSurfaceArea_A2.toFixed(0)} Å²
+                  </span>
+                </div>
+                <div style={{ padding: '0.625rem', borderRadius: '0.5rem', backgroundColor: '#0f172a', border: '1px solid #1e293b' }}>
+                  <span style={{ fontSize: '9px', color: '#94a3b8', display: 'block' }}>Shape Comp. (Sc)</span>
+                  <span style={{ fontSize: '1rem', fontWeight: 900, color: '#a78bfa' }}>
+                    {bindingEval.result.shapeComplementarityScore.toFixed(2)}
+                  </span>
+                </div>
+                <div style={{ padding: '0.625rem', borderRadius: '0.5rem', backgroundColor: '#0f172a', border: '1px solid #1e293b' }}>
+                  <span style={{ fontSize: '9px', color: '#94a3b8', display: 'block' }}>Efficacy Tier</span>
+                  <span style={{ fontSize: '0.75rem', fontWeight: 800, color: '#6ee7b7' }}>
+                    {bindingEval.result.neutralizationEfficacyTier.replace(/_/g, ' ')}
+                  </span>
+                </div>
+              </div>
+
+              {bindingEval.result.electronTransferKinetics && (
+                <div style={{ borderRadius: '0.5rem', border: '1px solid rgba(6,182,212,0.3)', backgroundColor: 'rgba(8,47,73,0.3)', padding: '0.75rem' }}>
+                  <span style={{ fontSize: '9px', fontWeight: 900, color: '#38bdf8', textTransform: 'uppercase' }}>
+                    Marcus Electron Transfer Kinetics
+                  </span>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem', marginTop: '0.25rem', fontSize: '11px', color: '#cbd5e1' }}>
+                    <div>Reorganization energy (λ): <b>{bindingEval.result.electronTransferKinetics.reorganizationEnergyLambda_eV} eV</b></div>
+                    <div>Coupling matrix (Hda): <b>{bindingEval.result.electronTransferKinetics.electronicCouplingHda_meV} meV</b></div>
+                    <div>Marcus rate constant (kET): <b style={{ color: '#34d399', fontFamily: 'monospace' }}>{bindingEval.result.electronTransferKinetics.rateConstant_kET_s1.toExponential(3)} s⁻¹</b></div>
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div style={{ padding: '0.75rem', borderRadius: '0.5rem', backgroundColor: '#450a0a', border: '1px solid #991b1b', color: '#fca5a5', fontSize: '11px' }}>
+              ⚠️ Design error: {bindingEval.error}
+            </div>
+          )}
+        </div>
       )}
     </div>
   )
