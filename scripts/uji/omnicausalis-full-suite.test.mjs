@@ -125,3 +125,33 @@ test("9. [P1 ACWR & P2 WIGGERS & KROGH PHYSIOLOGY]", () => {
   const krogh = omnicausalis.computeKroghCylinderOxygenDiffusion({ capillaryPo2MmHg: 45, tissueRadiusMicrons: 20, KroghDiffusionCoefficientK: 1.5, oxygenConsumptionRateMmolSec: 0.05 });
   assert.ok(krogh.tissuePo2MmHg >= 0);
 });
+
+test("10. [PR #2985 RENAL NEPHRON AUTOREGULATION, TGF & LOOP OF HENLE COUNTERCURRENT]", () => {
+  const norm = omnicausalis.simulateRenalAutoregulationAndCountercurrent({ meanArterialPressureMmHg: 105, adhVasopressinActivity0to1: 0.85, urineSodiumMmolL: 12, plasmaSodiumMmolL: 140, urineCreatinineMgDl: 120, plasmaCreatinineMgDl: 1.0 });
+  assert.equal(norm.tubuloglomerularFeedbackState, "AUTOREGULATED_PLATEAU");
+  assert.ok(norm.estimatedGfrMlMin > 100 && norm.estimatedGfrMlMin < 145);
+  assert.ok(norm.finalUrineOsmolalityMosmKg > 800);
+  assert.ok(typeof norm.fractionalExcretionSodiumPercent === "number" && norm.fractionalExcretionSodiumPercent < 1.0);
+  const loopDiuretic = omnicausalis.simulateRenalAutoregulationAndCountercurrent({ meanArterialPressureMmHg: 105, adhVasopressinActivity0to1: 0.85, loopDiureticFurosemideActive: true });
+  assert.ok(loopDiuretic.peakMedullaryInterstitialOsmolalityMosmKg < norm.peakMedullaryInterstitialOsmolalityMosmKg);
+});
+
+test("11. [WORKSTREAM A & B: ONE PANACEA CLINICAL OS IDEMPOTENT WORKFLOW & DICOMWEB SSRF/UID GUARD]", () => {
+  const wf1 = omnicausalis.executeOnePanaceaClinicalOsWorkflow({ encounterId: "ENC-2026-901", patientCanonicalId: "PT-777", preVisitChiefComplaint: "Fever and tachypnea", anamnesisAndExamSummary: "Rales right lower lobe", observedLactateMmolL: null, observedMapMmHg: 68, clinicianAuthorizedReview: true, followUpDays: 7 });
+  assert.equal(wf1.idempotentReplay, false);
+  assert.equal(wf1.observedVitals.lactateMmolL, "MISSING_OBSERVATION");
+  assert.equal(wf1.stagesCompleted.length, 11);
+  const wf2 = omnicausalis.executeOnePanaceaClinicalOsWorkflow({ encounterId: "ENC-2026-901", patientCanonicalId: "PT-777", preVisitChiefComplaint: "Fever and tachypnea", anamnesisAndExamSummary: "Rales right lower lobe", observedLactateMmolL: null, observedMapMmHg: 68, clinicianAuthorizedReview: true, followUpDays: 7 });
+  assert.equal(wf2.idempotentReplay, true);
+  const dicomReq = omnicausalis.buildSecureDicomWebQidoWadoRequest({ pacsBaseHttpsUrl: "https://pacs.panaceamed.id/dicomweb", studyInstanceUid: "1.2.840.113619.2.55.3.604688119.868.1256290000.1", patientCanonicalId: "PT-777", modality: "CT" });
+  assert.equal(dicomReq.ssrfVerifiedSafe, true);
+  assert.throws(() => omnicausalis.buildSecureDicomWebQidoWadoRequest({ pacsBaseHttpsUrl: "https://169.254.169.254/latest/meta-data", studyInstanceUid: "1.2.840.113619.2.55.3", patientCanonicalId: "PT-777", modality: "CT" }));
+});
+
+test("12. [BODY EXPOSURE x PROMETHEUS PERSISTENT SAVED LEARNING JOURNEY]", () => {
+  const saved = omnicausalis.executeAndPersistBodyExposurePrometheusJourney({ learnerId: "kelvin-koas", domain: "RENAL_NEPHRON_TGF", cameraCoordinatesXYZ: [0.42, 1.12, -0.18], manipulatedMapMmHg: 110, assessmentGrade1to4: 4 });
+  assert.equal(saved.returnedToAnatomicalContext, true);
+  const restored = omnicausalis.restorePersistedLearnerJourney("kelvin-koas", "RENAL_NEPHRON_TGF");
+  assert.ok(restored !== null);
+  assert.deepEqual(restored.cameraCoordinatesXYZ, [0.42, 1.12, -0.18]);
+});
