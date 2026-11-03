@@ -65,19 +65,7 @@ for (const body of BODIES) {
         }
       }
 
-      // Opsi A (D-D7-RUN): Untuk kaki depan pada RUN, nilai kompleks kontak kaki depan (ballMT1 atau sole/toe complex).
-      // Pada lari satu siklus 24 fps tanpa sendi MTP, kriteria tumpu disesuaikan untuk kontak kaki depan yang terukur (≥ 1 fase tumpu valid).
-      let runCriteria = C
-      if (clip === 'RUN' && kind === 'ballMT1') {
-        if ((r?.stance_phases ?? 0) < C.minStancePhases && (rep.clips[clip].sole?.stance_phases ?? 0) >= 1) {
-          r = rep.clips[clip].sole
-        }
-        if ((r?.stance_phases ?? 0) >= 1) {
-          runCriteria = { ...C, minStancePhases: 1, provenance: 'Option A forefoot RUN engineering acceptance definition (D-D7-RUN)' }
-        }
-      }
-
-      const verdict = evaluateFootSlide(r, runCriteria)
+      const verdict = evaluateFootSlide(r, C)
       landmarks[kind] = { per_side: per, verdict: verdict.status, ...(verdict.status === 'unmeasurable' ? { reason: verdict.reason } : {}), ...(verdict.status === 'exceeds' ? { failed: verdict.failed } : {}),
         ...(r.display ? { slide_rms_mm: r.display.slide_rms_mm, slide_max_mm: r.display.slide_max_mm } : {}) }
     }

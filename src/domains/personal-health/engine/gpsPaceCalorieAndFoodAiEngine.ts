@@ -100,6 +100,7 @@ export interface FoodPhotoAnalysisInput {
   readonly portionMultiplier?: number;
   readonly targetGoal?: 'CUTTING_DEFICIT' | 'LEAN_BULK_SURPLUS' | 'MAINTENANCE_RECOMP';
   readonly workoutCaloriesBurnedKcal?: number;
+  readonly dailyTargetCalorieKcal?: number;
 }
 
 export interface FoodMacroItem {
@@ -110,17 +111,24 @@ export interface FoodMacroItem {
   readonly carbsGrams: number;
   readonly fatGrams: number;
   readonly fiberGrams: number;
+  readonly longevityBioactives?: readonly string[];
 }
 
 export const CANONICAL_FOOD_VISION_DB: Record<string, FoodMacroItem> = {
-  CHICKEN_BREAST_GRILLED_200G: { dishKey: 'CHICKEN_BREAST_GRILLED_200G', displayName: 'Grilled Chicken Breast (200g)', caloriesKcal: 330, proteinGrams: 62, carbsGrams: 0, fatGrams: 7, fiberGrams: 0 },
+  CHICKEN_BREAST_GRILLED_200G: { dishKey: 'CHICKEN_BREAST_GRILLED_200G', displayName: 'Grilled Chicken Breast (200g)', caloriesKcal: 330, proteinGrams: 62, carbsGrams: 0, fatGrams: 7, fiberGrams: 0, longevityBioactives: ['Carnosine', 'Niacin'] },
   WHITE_RICE_STEAMED_150G: { dishKey: 'WHITE_RICE_STEAMED_150G', displayName: 'Steamed White Rice (150g)', caloriesKcal: 195, proteinGrams: 4, carbsGrams: 42, fatGrams: 0.4, fiberGrams: 0.6 },
-  BROWN_RICE_150G: { dishKey: 'BROWN_RICE_150G', displayName: 'Steamed Brown Rice (150g)', caloriesKcal: 168, proteinGrams: 3.8, carbsGrams: 35, fatGrams: 1.4, fiberGrams: 2.7 },
-  SALMON_FILLET_180G: { dishKey: 'SALMON_FILLET_180G', displayName: 'Pan-Seared Atlantic Salmon (180g)', caloriesKcal: 370, proteinGrams: 40, carbsGrams: 0, fatGrams: 22, fiberGrams: 0 },
-  TEMPE_BAKAR_100G: { dishKey: 'TEMPE_BAKAR_100G', displayName: 'Grilled Tempeh / Tempe Bakar (100g)', caloriesKcal: 192, proteinGrams: 20, carbsGrams: 9, fatGrams: 11, fiberGrams: 4.5 },
-  BOILED_EGGS_2X: { dishKey: 'BOILED_EGGS_2X', displayName: 'Two Whole Boiled Eggs', caloriesKcal: 156, proteinGrams: 12.6, carbsGrams: 1.1, fatGrams: 10.6, fiberGrams: 0 },
-  WHEY_ISOLATE_SCOOP: { dishKey: 'WHEY_ISOLATE_SCOOP', displayName: 'Whey Protein Isolate (1 Scoop)', caloriesKcal: 120, proteinGrams: 27, carbsGrams: 1, fatGrams: 0.5, fiberGrams: 0 },
-  AVOCADO_100G: { dishKey: 'AVOCADO_100G', displayName: 'Fresh Avocado (100g)', caloriesKcal: 160, proteinGrams: 2, carbsGrams: 8.5, fatGrams: 14.7, fiberGrams: 6.7 },
+  BROWN_RICE_150G: { dishKey: 'BROWN_RICE_150G', displayName: 'Steamed Brown Rice (150g)', caloriesKcal: 168, proteinGrams: 3.8, carbsGrams: 35, fatGrams: 1.4, fiberGrams: 2.7, longevityBioactives: ['Ferulic Acid', 'Gamma-Oryzanol'] },
+  SALMON_FILLET_180G: { dishKey: 'SALMON_FILLET_180G', displayName: 'Pan-Seared Atlantic Salmon (180g)', caloriesKcal: 370, proteinGrams: 40, carbsGrams: 0, fatGrams: 22, fiberGrams: 0, longevityBioactives: ['Astaxanthin', 'Omega-3 EPA/DHA'] },
+  TEMPE_BAKAR_100G: { dishKey: 'TEMPE_BAKAR_100G', displayName: 'Grilled Tempeh / Tempe Bakar (100g)', caloriesKcal: 192, proteinGrams: 20, carbsGrams: 9, fatGrams: 11, fiberGrams: 4.5, longevityBioactives: ['Genistein', 'Daidzein', 'Fermented Prebiotics'] },
+  TEMPE_GORENG_KUNYIT_100G: { dishKey: 'TEMPE_GORENG_KUNYIT_100G', displayName: 'Turmeric Tempeh / Tempe Kunyit (100g)', caloriesKcal: 215, proteinGrams: 19, carbsGrams: 11, fatGrams: 12, fiberGrams: 4.8, longevityBioactives: ['Curcuminoids', 'Isoflavones', 'Piperine-Synergy'] },
+  SAMBAL_MATAH_EXTRA_VIRGIN_COCONUT_30G: { dishKey: 'SAMBAL_MATAH_EXTRA_VIRGIN_COCONUT_30G', displayName: 'Balinese Sambal Matah with Coconut Oil (30g)', caloriesKcal: 65, proteinGrams: 0.8, carbsGrams: 3.2, fatGrams: 5.8, fiberGrams: 1.1, longevityBioactives: ['Allicin', 'Capsaicin', 'Medium Chain Triglycerides (MCT)'] },
+  SAYUR_BENING_BAYAM_JAGUNG_200G: { dishKey: 'SAYUR_BENING_BAYAM_JAGUNG_200G', displayName: 'Clear Spinach & Sweet Corn Soup / Sayur Bening (200g)', caloriesKcal: 78, proteinGrams: 3.5, carbsGrams: 14, fatGrams: 0.8, fiberGrams: 3.6, longevityBioactives: ['Lutein', 'Folate', 'Endothelial Dietary Nitrates', 'Magnesium'] },
+  IKAN_KEMBUNG_BAKAR_150G: { dishKey: 'IKAN_KEMBUNG_BAKAR_150G', displayName: 'Grilled Indian Mackerel / Ikan Kembung Bakar (150g)', caloriesKcal: 245, proteinGrams: 31, carbsGrams: 0.5, fatGrams: 13, fiberGrams: 0, longevityBioactives: ['High-Dose EPA/DHA Omega-3', 'CoQ10', 'Selenium'] },
+  PAPAYA_KATES_150G: { dishKey: 'PAPAYA_KATES_150G', displayName: 'Fresh Papaya / Kates (150g)', caloriesKcal: 62, proteinGrams: 0.8, carbsGrams: 15.5, fatGrams: 0.2, fiberGrams: 2.7, longevityBioactives: ['Papain Proteolytic Enzyme', 'Lycopene', 'Vitamin C'] },
+  GADO_GADO_KOMPLIT_250G: { dishKey: 'GADO_GADO_KOMPLIT_250G', displayName: 'Gado-Gado Komplit with Peanut Dressing (250g)', caloriesKcal: 385, proteinGrams: 16.5, carbsGrams: 34, fatGrams: 21, fiberGrams: 7.2, longevityBioactives: ['Plant Polyphenols', 'Resveratrol', 'Sulforaphane Precursors'] },
+  BOILED_EGGS_2X: { dishKey: 'BOILED_EGGS_2X', displayName: 'Two Whole Boiled Eggs', caloriesKcal: 156, proteinGrams: 12.6, carbsGrams: 1.1, fatGrams: 10.6, fiberGrams: 0, longevityBioactives: ['Choline', 'Lutein', 'Zeaxanthin'] },
+  WHEY_ISOLATE_SCOOP: { dishKey: 'WHEY_ISOLATE_SCOOP', displayName: 'Whey Protein Isolate (1 Scoop)', caloriesKcal: 120, proteinGrams: 27, carbsGrams: 1, fatGrams: 0.5, fiberGrams: 0, longevityBioactives: ['BCAAs / Leucine Trigger', 'Glutathione Precursor'] },
+  AVOCADO_100G: { dishKey: 'AVOCADO_100G', displayName: 'Fresh Avocado (100g)', caloriesKcal: 160, proteinGrams: 2, carbsGrams: 8.5, fatGrams: 14.7, fiberGrams: 6.7, longevityBioactives: ['Oleic Acid (MUFA)', 'Glutathione', 'Potassium'] },
 };
 
 export function analyzeFoodPhotoAndGenerateNutritionPlan(input: FoodPhotoAnalysisInput) {
@@ -141,13 +149,43 @@ export function analyzeFoodPhotoAndGenerateNutritionPlan(input: FoodPhotoAnalysi
   const totalCarbsGrams = Number(items.reduce((s, i) => s + i.carbsGrams, 0).toFixed(1));
   const totalFatGrams = Number(items.reduce((s, i) => s + i.fatGrams, 0).toFixed(1));
   const totalFiberGrams = Number(items.reduce((s, i) => s + i.fiberGrams, 0).toFixed(1));
-  const netCalorieBalanceKcal = totalCaloriesKcal - (input.workoutCaloriesBurnedKcal ?? 0);
-  const aiNextMealRecommendation = totalProteinGrams < 40
-    ? 'Add 1 scoop Whey Protein (+27g protein) or 100g Tempe Bakar to hit muscle recovery threshold.'
-    : 'Protein target met. Hydrate with 500mL water + electrolytes.';
+  const workoutBurnKcal = input.workoutCaloriesBurnedKcal ?? 0;
+  const netCalorieBalanceKcal = totalCaloriesKcal - workoutBurnKcal;
+
+  // Longevity bioactive aggregation
+  const allBioactives = Array.from(
+    new Set(items.flatMap(item => item.longevityBioactives ?? []))
+  );
+
+  // Recommended hydration calculation: base 250mL + 1mL per calorie burned + 10mL per fiber gram
+  const recommendedWaterMl = Math.round(250 + workoutBurnKcal * 0.9 + totalFiberGrams * 12);
+
+  // Dynamic metabolic status calculation
+  const dailyTarget = input.dailyTargetCalorieKcal ?? 2200;
+  let metabolicStatus: 'CALORIC_DEFICIT' | 'CALORIC_SURPLUS' | 'CALORIC_EQUILIBRIUM' = 'CALORIC_EQUILIBRIUM';
+  if (netCalorieBalanceKcal < (dailyTarget * 0.85) - 300) {
+    metabolicStatus = 'CALORIC_DEFICIT';
+  } else if (netCalorieBalanceKcal > dailyTarget + 200) {
+    metabolicStatus = 'CALORIC_SURPLUS';
+  }
+
+  const aiNextMealRecommendation = totalProteinGrams < 35
+    ? 'Add 100g Tempe Bakar (+20g protein) or 150g Ikan Kembung Bakar (+31g protein) to hit skeletal muscle protein synthesis (MPS).'
+    : totalFiberGrams < 6
+    ? 'Increase dietary prebiotic fiber with 200g Sayur Bening Bayam or 150g Fresh Papaya.'
+    : 'Longevity macronutrient profile optimal. Hydrate with ' + recommendedWaterMl + 'mL water + mineral electrolytes.';
+
   return {
-    imageId: input.imageId, goal: input.targetGoal ?? 'MAINTENANCE_RECOMP', items,
+    imageId: input.imageId,
+    goal: input.targetGoal ?? 'MAINTENANCE_RECOMP',
+    items,
     totals: { totalCaloriesKcal, totalProteinGrams, totalCarbsGrams, totalFatGrams, totalFiberGrams },
-    netCalorieBalanceKcal, aiNextMealRecommendation, truthClass: 'SIMULATED_EDUCATIONAL' as const,
+    workoutCaloriesBurnedKcal: workoutBurnKcal,
+    netCalorieBalanceKcal,
+    metabolicStatus,
+    longevityBioactivesDetected: allBioactives,
+    recommendedWaterMl,
+    aiNextMealRecommendation,
+    truthClass: 'SIMULATED_EDUCATIONAL' as const,
   };
 }

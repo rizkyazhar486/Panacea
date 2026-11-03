@@ -1,5 +1,5 @@
 {
- "source": "/private/tmp/claude-501/-Users-rizkyazhar-Developer-Panaceamed-id/ebba082e-b2de-4f0c-af23-90190375c008/scratchpad/f/female_dec.glb",
+ "source": "/tmp/gait_decoded_female.glb",
  "clips": {
   "RUN": {
    "duration_s": 0.75,
@@ -8,9 +8,9 @@
    "animated_rotation_channels": 8,
    "max_seam_deg": 0.0,
    "worst_seam_bone": "TOE.L",
-   "max_omega_jump_deg_s": 417.5,
-   "worst_omega_jump_bone": "TOE.R",
-   "median_omega_jump_deg_s": 113.0,
+   "max_omega_jump_deg_s": 449.7,
+   "worst_omega_jump_bone": "TOE.L",
+   "median_omega_jump_deg_s": 147.8,
    "omega_jump_deg_s_by_bone": {
     "FOOT.L": 88.6,
     "FOOT.R": 31.8,
@@ -18,14 +18,14 @@
     "SHIN.R": 250.8,
     "THIGH.L": 64.1,
     "THIGH.R": 137.4,
-    "TOE.L": 9.3,
+    "TOE.L": 449.7,
     "TOE.R": 417.5
    },
    "seam_jump_over_interior_p95": {
     "THIGH.L": 0.28,
     "SHIN.L": 0.37,
     "FOOT.L": 0.22,
-    "TOE.L": 0.01,
+    "TOE.L": 0.66,
     "THIGH.R": 0.65,
     "SHIN.R": 0.52,
     "FOOT.R": 0.09,
@@ -35,7 +35,7 @@
     "THIGH.L": 0.23,
     "SHIN.L": 0.33,
     "FOOT.L": 0.17,
-    "TOE.L": 0.01,
+    "TOE.L": 0.55,
     "THIGH.R": 0.49,
     "SHIN.R": 0.37,
     "FOOT.R": 0.05,
@@ -43,14 +43,14 @@
    },
    "bones_seam_jump_above_interior_max": [],
    "static_keyed_bones": [],
-   "median_mean_angular_speed_deg_s": 210.6,
+   "median_mean_angular_speed_deg_s": 201.9,
    "translation": {
     "RIG.VHF_LOWER_LIMB": {
      "drift_m": 0.0,
-     "vel_jump_m_s": 0.3119,
+     "vel_jump_m_s": 0.3417,
      "range_m": [
       0.0,
-      0.0735,
+      0.0834,
       0.0
      ]
     }

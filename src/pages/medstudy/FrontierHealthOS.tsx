@@ -5,6 +5,9 @@ import { PanaceaFrontierSeven } from '../../components/frontier/PanaceaFrontierS
 import { PanaceaHopeStack } from '../../components/frontier/PanaceaHopeStack'
 import { PanaceaRealityEngine } from '../../components/frontier/PanaceaRealityEngine'
 const AGILongevitySystemsLab = lazy(() => import('../bodyhub/AGILongevitySystemsLab'))
+const OmnicausalisCommandDeck = lazy(() =>
+  import('../../domains/omnicausalis/index.ts').then((m) => ({ default: m.OmnicausalisCommandDeck })),
+)
 import {
   FRONTIER_CATEGORIES,
   FRONTIER_FEATURES,
@@ -165,6 +168,12 @@ export function FrontierHealthOS() {
         <summary className="min-h-11 cursor-pointer text-xs font-black text-brand">Open longevity research orchestration sandbox</summary>
         <Suspense fallback={<div className="p-3 text-xs text-neutral-500" role="status">Loading sandbox…</div>}>
           <AGILongevitySystemsLab />
+        </Suspense>
+      </details>
+      <details className="rounded-2xl border border-neutral-200 p-3 dark:border-white/10">
+        <summary className="min-h-11 cursor-pointer text-xs font-black text-brand">Open Omnicausalis Transcendental Command Deck (KaloLumen 3DCG • BioEmu-2 • BindCraft2 • SepsisAgent/REMOP)</summary>
+        <Suspense fallback={<div className="p-3 text-xs text-neutral-500" role="status">Loading Omnicausalis Command Deck…</div>}>
+          <OmnicausalisCommandDeck />
         </Suspense>
       </details>
     </div>

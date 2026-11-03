@@ -5,6 +5,7 @@ import { PersonalBodyAvatar3D } from '../PersonalBodyAvatar3D'
 import { SurfaceGuide } from '../SurfaceGuide'
 import { BatasKlaimKesehatan } from '../BatasKlaimKesehatan'
 
+const PersonalBodyGlassTelemetry = lazy(() => import('./PersonalBodyGlassTelemetry').then(m => ({ default: m.PersonalBodyGlassTelemetry })))
 const UnifiedHumanSimulationProjector = lazy(() => import('../../pages/bodyhub/UnifiedHumanSimulationProjector'))
 const PersonalAvatarCameraCapture = lazy(() => import('../../pages/bodyhub/PersonalAvatarCameraCapture'))
 
@@ -238,7 +239,8 @@ function PermukaanTubuh({
         </div>
       ) : null}
 
-      <footer className="border-t border-white/10 px-3 py-2 sm:px-4">
+      <footer className="border-t border-white/10 px-3 py-4 sm:px-4 space-y-4">
+        <Suspense fallback={null}><PersonalBodyGlassTelemetry /></Suspense>
         <p className="text-[11px] leading-relaxed text-white/65">Your outer avatar is personal; internal anatomy is a source-backed reference.</p>
         <SurfaceGuide
           label="How to use"
@@ -255,3 +257,4 @@ function PermukaanTubuh({
 }
 
 export default PersonalBodyUnifiedSurface
+export { PersonalBodyGlassTelemetry } from './PersonalBodyGlassTelemetry'

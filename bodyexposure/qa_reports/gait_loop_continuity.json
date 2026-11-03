@@ -1,5 +1,5 @@
 {
- "source": "/var/folders/ks/34gmdyz12ng1q80z69vpvt040000gn/T/tmp.ncsjfMBF1i/g.glb",
+ "source": "/tmp/gait_decoded_male.glb",
  "clips": {
   "RUN": {
    "duration_s": 0.75,
@@ -10,7 +10,7 @@
    "worst_seam_bone": "TOE.L",
    "max_omega_jump_deg_s": 417.5,
    "worst_omega_jump_bone": "TOE.R",
-   "median_omega_jump_deg_s": 86.9,
+   "median_omega_jump_deg_s": 85.1,
    "omega_jump_deg_s_by_bone": {
     "FOOT.L": 88.6,
     "FOOT.R": 31.8,
@@ -20,7 +20,7 @@
     "SHIN.R": 250.7,
     "THIGH.L": 64.1,
     "THIGH.R": 137.4,
-    "TOE.L": 89.1,
+    "TOE.L": 7.3,
     "TOE.R": 417.5,
     "UPPER_ARM.L": 85.1,
     "UPPER_ARM.R": 12.6
@@ -33,7 +33,7 @@
     "THIGH.L": 0.28,
     "SHIN.L": 0.37,
     "FOOT.L": 0.22,
-    "TOE.L": 0.15,
+    "TOE.L": 0.01,
     "THIGH.R": 0.65,
     "SHIN.R": 0.52,
     "FOOT.R": 0.09,
@@ -47,7 +47,7 @@
     "THIGH.L": 0.23,
     "SHIN.L": 0.33,
     "FOOT.L": 0.17,
-    "TOE.L": 0.14,
+    "TOE.L": 0.01,
     "THIGH.R": 0.49,
     "SHIN.R": 0.37,
     "FOOT.R": 0.05,
@@ -55,25 +55,25 @@
    },
    "bones_seam_jump_above_interior_max": [],
    "static_keyed_bones": [],
-   "median_mean_angular_speed_deg_s": 164.1,
+   "median_mean_angular_speed_deg_s": 168.7,
    "translation": {
     "RIG.ADULT_MALE": {
      "drift_m": 0.0,
-     "vel_jump_m_s": 0.3326,
+     "vel_jump_m_s": 0.2036,
      "range_m": [
       0.0,
-      0.0784,
+      0.0885,
       0.0
      ]
     }
    },
    "ankle_stance": {
-    "intervals": 7,
-    "mean_ap_velocity_m_s": -2.577,
-    "cv": 0.194,
+    "intervals": 8,
+    "mean_ap_velocity_m_s": -2.613,
+    "cv": 0.182,
     "p10_p90_m_s": [
-     -2.92,
-     -2.11
+     -2.9,
+     -2.23
     ],
     "note": "EXPERIMENTAL. In-place clip: a supporting ankle moves backward relative to the pelvis, so foot sliding can only be judged against a root speed that the viewer does not yet apply. Stance is approximated by ankle height (no toe or heel bone), which also admits swing intervals in WALK; read the RUN figure with care and treat WALK as not verified"
    }

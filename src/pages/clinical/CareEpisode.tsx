@@ -52,6 +52,7 @@ import {
   deriveEdenNuclearLaminBridge,
   deriveEdenEscrtMachineryBridge,
   EdenLongitudinalInsightSection,
+  generatePanaceaLhidEnvelope,
 } from '../../domains/clinical-operations'
 import {
   CARE_EPISODE_STAGES,
@@ -1001,9 +1002,21 @@ function JourneyTimelineSection({ episode }: { episode: CareEpisode }) {
 }
 
 function CareJourneyExportSection({ episode }: { episode: CareEpisode }) {
+  const { activePatient } = useStore()
   const [expanded, setExpanded] = useState(false)
   const [copied, setCopied] = useState(false)
   const packet = useMemo(() => exportCareJourneySummary(episode), [episode])
+  const lhidEnvelope = useMemo(() => generatePanaceaLhidEnvelope({
+    patientId: activePatient?.id || 'PT-ACTIVE',
+    ageYears: 45,
+    truthClass: 'OBSERVED_CLINICAL',
+    isClinicallyReviewed: isComplete(episode),
+    metadata: {
+      episodeId: episode.id,
+      stageCount: episode.stages.length,
+      auditDigest: packet.auditDigest,
+    },
+  }), [episode, activePatient?.id, packet.auditDigest])
 
   return (
     <div
@@ -1020,9 +1033,15 @@ function CareJourneyExportSection({ episode }: { episode: CareEpisode }) {
               <span className="font-mono text-[10px]">{packet.standard}</span>
             </Badge>
           </div>
-          <p className="mt-0.5 text-[11px] text-neutral-500 dark:text-white/60 font-mono truncate max-w-md">
+          <p className="mt-0.5 text-neutral-500 dark:text-white/60 font-mono truncate" style={{ fontSize: '11px', maxWidth: '28rem' }}>
             Digest: {packet.auditDigest}
           </p>
+          <div className="mt-1 font-mono text-neutral-500 dark:text-neutral-400" style={{ fontSize: '10px' }}>
+            <span>Identity: {lhidEnvelope.lhid}</span>
+            <span className="block text-neutral-400 dark:text-neutral-500 truncate" style={{ fontSize: '9px', maxWidth: '24rem' }}>
+              SHA-256: {lhidEnvelope.cryptographicSha256}
+            </span>
+          </div>
         </div>
         <div className="flex items-center gap-2">
           <Button
@@ -1030,7 +1049,11 @@ function CareJourneyExportSection({ episode }: { episode: CareEpisode }) {
             className="!min-h-0 !px-2.5 !py-1 text-[11px]"
             onClick={() => {
               if (typeof navigator !== 'undefined' && navigator.clipboard) {
-                navigator.clipboard.writeText(JSON.stringify(packet, null, 2)).catch(() => {})
+                const combined = {
+                  handoffPacket: packet,
+                  lhidEnvelope,
+                }
+                navigator.clipboard.writeText(JSON.stringify(combined, null, 2)).catch(() => {})
               }
               setCopied(true)
               setTimeout(() => setCopied(false), 2000)

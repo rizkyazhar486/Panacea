@@ -239,22 +239,34 @@ for name, subj, trial in CLIPS:
     if name != "WALK" and all(f"TOE.{sd}" in P.keys() for sd in ("L", "R")):
         sc0 = bpy.context.scene; sc0.frame_start, sc0.frame_end = 0, len(idx) - 1
         side_meshes = {sd: [o for o in bpy.data.objects if o.type == 'MESH' and o.parent_bone in (f"FOOT.{sd}", f"TOE.{sd}")] for sd in ("L", "R")}
-        def side_low(sd):
+        calc_meshes = {sd: [o for o in side_meshes[sd] if "CALCANEUS" in o.name] for sd in ("L", "R")}
+        fore_meshes = {sd: [o for o in side_meshes[sd] if o.parent_bone == f"FOOT.{sd}" and "CALCANEUS" not in o.name] for sd in ("L", "R")}
+        def mesh_low(ms):
             dg = bpy.context.evaluated_depsgraph_get(); low = math.inf
-            for o in side_meshes[sd]:
+            for o in ms:
                 vs = o.evaluated_get(dg).data.vertices; M = o.matrix_world
                 for i in range(0, len(vs), 7): low = min(low, (M @ vs[i].co).z)
             return low
         lows = {sd: [] for sd in ("L", "R")}
+        calcs = {sd: [] for sd in ("L", "R")}
+        fores = {sd: [] for sd in ("L", "R")}
         for fr in range(len(idx)):
             sc0.frame_set(fr)
-            for sd in ("L", "R"): lows[sd].append(side_low(sd))
+            for sd in ("L", "R"):
+                lows[sd].append(mesh_low(side_meshes[sd]))
+                calcs[sd].append(mesh_low(calc_meshes[sd]))
+                fores[sd].append(mesh_low(fore_meshes[sd]))
         for sd in ("L", "R"):
             if name == "WALK":  # pelvis kelak diturunkan per frame sampai kaki terendah menapak: tumpu = dalam 15 mm dari kaki terendah frame itu
                 stance = [fr for fr in range(len(idx)) if lows[sd][fr] - min(lows["L"][fr], lows["R"][fr]) < 0.015]
-            else:  # lari: naik-turun pelvis dari mocap; tumpu = tinggi kaki + bob dalam 15 mm dari minimum sisi itu
-                zz = [lows[sd][fr] + bobs[fr] for fr in range(len(idx))]; m = min(zz)
-                stance = [fr for fr, z in enumerate(zz) if z - m < 0.015]
+            else:  # lari: naik-turun pelvis dari mocap; tumpu kaki depan = 3 frame berurutan terendah dengan postur forefoot (kalkaneus >= 16 mm di atas kaki depan)
+                zz = [fores[sd][fr] + bobs[fr] for fr in range(len(idx))]
+                n_cyc = len(idx) - 1
+                ff_ok = [calcs[sd][fr] - fores[sd][fr] >= 0.016 for fr in range(n_cyc)]
+                cands = [k for k in range(n_cyc) if all(ff_ok[(k + d) % n_cyc] for d in range(3))] or list(range(n_cyc))
+                k0 = min(cands, key=lambda k: zz[k] + zz[(k + 1) % n_cyc] + zz[(k + 2) % n_cyc])
+                cyc_st = {k0, (k0 + 1) % n_cyc, (k0 + 2) % n_cyc}
+                stance = sorted(cyc_st | ({n_cyc} if 0 in cyc_st else set()))
             pb = P[f"TOE.{sd}"]; fixes = []
             for fr in stance:
                 sc0.frame_set(fr); before = math.degrees(pb.rotation_euler.x)
@@ -284,9 +296,11 @@ for name, subj, trial in CLIPS:
         sc.frame_set(fr); base_low.append(lowest_now())
     if name == "WALK":  # selalu ada kaki menumpu: pelvis diturunkan/dinaikkan agar kaki terendah tepat di lantai
         zs = [-l for l in base_low]
-    else:  # lari punya fase melayang: naik-turun dari mocap (dikoreksi drift seperti sudut), digeser agar titik terendah siklus di lantai
+    else:  # lari punya fase melayang: naik-turun dari mocap (dikoreksi drift seperti sudut), pada frame tumpu kaki ditempel ke lantai (-base_low)
         n1 = len(bobs) - 1; bobs = [b - (bobs[-1] - bobs[0]) * k / n1 for k, b in enumerate(bobs)]
-        c = -min(l + b for l, b in zip(base_low, bobs)); zs = [b + c for b in bobs]
+        c = -min(l + b for l, b in zip(base_low, bobs))
+        all_stance = {f["frame"] for sd in ("L", "R") for f in toe_fix.get(sd, [])}
+        zs = [-base_low[fr] if fr in all_stance else bobs[fr] + c for fr in range(len(idx))]
     for fr, z in enumerate(zs, start=0):
         arm.location.z = base_z + z; arm.keyframe_insert("location", index=2, frame=fr)
     arm.location.z = base_z
