@@ -45,3 +45,5 @@ export * from "./body-exposure/data/zAnatomyClearIndonesianAtlas.ts";
 
 export * from "./body-exposure/index.ts";
 export * from "../locales/bodyExposureLocales.ts";
+
+export * from "./one-os/sevenTierMasterMindmapUnifierEngine.ts";

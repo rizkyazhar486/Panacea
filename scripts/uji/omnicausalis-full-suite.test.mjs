@@ -726,3 +726,31 @@ test("31. [WAVE 15 UNIFIED ENTRYPOINT BRIDGE: YOUR BODY, BODYHUB & LEGACY STUDIO
   assert.equal(fromLegacyDeck.entrypointAliasUsed, "bodyhub");
   assert.equal(fromLegacyDeck.resolvedCanonicalPath, "/body-exposure");
 });
+
+test("32. [WAVE 16 SEVEN-TIER MASTER MINDMAP UNIFICATION: QUANTUM -> UHD TWIN -> SENSORIUM -> CDSS -> EMR -> PAYER -> PLANETARY EXPOSOME]", () => {
+  const unified = omnicausalis.executeUnifiedSevenTierMasterMindmap({
+    citizenCanonicalId: "kelvin-001",
+    encounterId: "ENC-MINDMAP-32",
+    locale: "id",
+    targetOrganQuery: "External abdominal oblique"
+  });
+  assert.equal(unified.unificationStatus, "SEVEN_TIERS_UNIFIED_SINGLE_CANONICAL_STATE");
+  assert.equal(unified.longitudinalHealthId, "PANACEA-LHID-KELVIN-001");
+  // Tier 1 Quantum/Cellular
+  assert.ok(unified.tier1QuantumCellular.ampkToMtorRatio > 1.0);
+  // Tier 2 UHD Digital Twin & Atlas Home
+  assert.equal(unified.tier2UhdDigitalTwin.canonicalPath, "/body-exposure");
+  assert.equal(unified.tier2UhdDigitalTwin.activeStructureCard.fmaId, "FMA:13335");
+  assert.equal(unified.tier2UhdDigitalTwin.hraFemaleAdmittedSeparateSpace, true);
+  // Tier 3 Sensorium & Reclub/ClassPass
+  assert.equal(unified.tier3SensoriumBiomechanics.biomechanics.aclShearRiskState, "SAFE_SAGITTAL_TRACKING");
+  assert.ok(unified.tier3SensoriumBiomechanics.topMatchedSession.venueName.includes("Bintaro"));
+  // Tier 4 CDSS & Cardiopulmonary (Canonical O2 Registry)
+  assert.ok(unified.tier4AutonomousCdssPantheon.cardiopulmonaryDeck.oxygenDeliveryMlPerMin > 800);
+  // Tier 5 Zero-Loss EMR
+  assert.equal(unified.tier5ZeroLossEmr.stagesCompleted.length, 11);
+  // Tier 6 Universal Payer & H3 Guard
+  assert.equal(unified.tier6UniversalPayer.h3ReviewPacket.clinicallyReviewed, false);
+  // Tier 7 Planetary Exposome
+  assert.equal(unified.tier7PlanetaryExposome.outdoorTrainingRecommendation, "OUTDOOR_AEROBIC_PERMITTED_WITH_HYDRATION");
+});
