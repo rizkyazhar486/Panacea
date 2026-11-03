@@ -155,3 +155,52 @@ test("12. [BODY EXPOSURE x PROMETHEUS PERSISTENT SAVED LEARNING JOURNEY]", () =>
   assert.ok(restored !== null);
   assert.deepEqual(restored.cameraCoordinatesXYZ, [0.42, 1.12, -0.18]);
 });
+
+test("13. [WAVE 1-4 CROSS-ORGAN PHYSIOLOGICAL COUPLING: HEMORRHAGE, EXERCISE & SALTATORY CONDUCTION]", () => {
+  const base = omnicausalis.executeCrossOrganCoupledSimulation({ scenarioId: "BASELINE_HOMEOSTASIS" });
+  const bleed = omnicausalis.executeCrossOrganCoupledSimulation({ scenarioId: "ACUTE_HEMORRHAGE_CLASS_II", circulatingBloodVolumeMl: 3750 });
+  assert.ok(bleed.cardiovascular.heartRateBpm > base.cardiovascular.heartRateBpm);
+  assert.ok(bleed.cardiovascular.strokeVolumeMl < base.cardiovascular.strokeVolumeMl);
+  assert.ok(bleed.renalAndElectrolyte.estimatedGfrMlMin < base.renalAndElectrolyte.estimatedGfrMlMin);
+  const demyelinated = omnicausalis.executeCrossOrganCoupledSimulation({ scenarioId: "BASELINE_HOMEOSTASIS", myelinInternodeIntegrity0to1: 0.35 });
+  assert.ok(demyelinated.neuroMuscularAndMicrovascular.oneMeterTractLatencyMs > base.neuroMuscularAndMicrovascular.oneMeterTractLatencyMs);
+});
+
+test("14. [WAVE 6 UNIVERSAL SURGICAL SIMULATOR EXTENSION: CABG LIMA-TO-LAD POISEUILLE FLOW & PHRENIC GUARD]", () => {
+  const cabgPatent = omnicausalis.evaluateCabgEducationalSurgicalSimulation({
+    sessionId: "CABG-SIM-01",
+    currentPhase: "CLAMP_RELEASE_AND_DOPPLER_FLOW_VERIFICATION",
+    selectedInstrument: "TRANSIT_TIME_DOPPLER_PROBE",
+    nativeLadStenosisPercent: 90,
+    limaGraftRadiusMm: 1.35,
+    limaGraftLengthMm: 110,
+    meanAorticRootPressureMmHg: 88,
+    distalCoronaryBedPressureMmHg: 24,
+    anastomosisPatencyQuality0to1: 0.96,
+    distanceToLeftPhrenicNerveMm: 14
+  });
+  assert.equal(cabgPatent.poiseuilleGraftHemodynamics.graftFlowClinicallyAdequateInModel, true);
+  assert.equal(cabgPatent.structuresAtRiskAlert, "SAFE_DISSECTION_CORRIDOR");
+  const cabgStenotic = omnicausalis.evaluateCabgEducationalSurgicalSimulation({
+    sessionId: "CABG-SIM-02",
+    currentPhase: "LAD_ARTERIOTOMY_AND_DISTAL_ANASTOMOSIS",
+    selectedInstrument: "CASTROVIEJO_NEEDLE_HOLDER_8_0",
+    nativeLadStenosisPercent: 90,
+    limaGraftRadiusMm: 1.35,
+    limaGraftLengthMm: 110,
+    meanAorticRootPressureMmHg: 88,
+    distalCoronaryBedPressureMmHg: 24,
+    anastomosisPatencyQuality0to1: 0.25,
+    distanceToLeftPhrenicNerveMm: 3.2
+  });
+  assert.ok(cabgStenotic.poiseuilleGraftHemodynamics.limaGraftFlowMlMin < cabgPatent.poiseuilleGraftHemodynamics.limaGraftFlowMlMin);
+  assert.ok(cabgStenotic.structuresAtRiskAlert.includes("PHRENIC_NERVE_PROXIMITY_WARNING"));
+});
+
+test("15. [WAVE 5 MEDSCIHUB / MEDSTUDYHUB 6-DEPTH PROJECTIONS, OSCE CHECKLIST & SHA-256 SVG MEDIA]", () => {
+  const publicProj = omnicausalis.projectDiseaseConceptByDepthMode("ACS_LAD_ISCHEMIA", "PUBLIC_EVERYDAY");
+  const profProj = omnicausalis.projectDiseaseConceptByDepthMode("ACS_LAD_ISCHEMIA", "PROFESSOR_RESEARCH");
+  assert.notEqual(publicProj.mechanisticExplanation, profProj.mechanisticExplanation);
+  assert.equal(profProj.generatedSvgMediaAsset.sha256Hash.length, 64);
+  assert.equal(profProj.osceStationChecklist.length, 4);
+});
