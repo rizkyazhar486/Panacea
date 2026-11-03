@@ -1,4 +1,5 @@
 import { lazy, Suspense, useEffect, useMemo, useState } from 'react'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { Fold } from '../../shared/ui/Fold'
 import { resolveBodySystemSourceWave, type BodySystemId } from '../../lib/bodySystemSourceWave'
 import { getBodySemanticZoomStop, isMicroscopicBodyScale, type BodySemanticScale } from '../../lib/bodySemanticZoom'
@@ -161,6 +162,10 @@ export default function UnifiedHumanSimulationProjector({
   compact = false,
   requestedStructure = null,
 }: UnifiedHumanSimulationProjectorProps) {
+  const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+  const isGoldenRestored = searchParams.get('goldenRestored') === 'true'
+
   const [internalDomain, setInternalDomain] = useState<SimulationDomain>('anatomy')
   const [selectedStructureName, setSelectedStructureName] = useState<string | null>(null)
   const [semanticZoom, setSemanticZoom] = useState<{ scale: BodySemanticScale; relativeZoom: number }>({ scale: 'whole-body', relativeZoom: 1 })
@@ -194,6 +199,15 @@ export default function UnifiedHumanSimulationProjector({
   useEffect(() => {
     if (domain === 'localization' && selectedSystemId !== 'nervous') onSystemChange('nervous')
   }, [domain, onSystemChange, selectedSystemId])
+
+  useEffect(() => {
+    if (isGoldenRestored) {
+      if (selectedSystemId !== 'cardiovascular') {
+        onSystemChange('cardiovascular')
+      }
+      setSelectedStructureName('heart-left-ventricle')
+    }
+  }, [isGoldenRestored, onSystemChange, selectedSystemId])
 
   function selectDomain(next: SimulationDomain) {
     if (requestedDomain === undefined) setInternalDomain(next)
@@ -374,6 +388,30 @@ export default function UnifiedHumanSimulationProjector({
                 <p className="mt-1 line-clamp-6 whitespace-pre-line text-[9px] leading-relaxed text-white/42">{selectedStructureEducation}</p>
               </details>
             )}
+          </div>
+
+          {/* Golden Journey 3D <-> Case Bridge */}
+          <div style={{ marginTop: '0.75rem', borderRadius: '1rem', border: '1px solid rgba(165,243,252,0.2)', backgroundColor: 'rgba(8,47,73,0.3)', padding: '0.625rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.25rem' }}>
+              <span style={{ fontSize: '8px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.15em', color: '#a5f3fc' }}>
+                Golden Journey (EDU-6)
+              </span>
+              {isGoldenRestored && (
+                <span style={{ borderRadius: '9999px', backgroundColor: 'rgba(6,78,59,0.7)', border: '1px solid #059669', padding: '0.125rem 0.5rem', fontSize: '8px', fontWeight: 800, color: '#6ee7b7' }}>
+                  ✓ Step 15 Restored
+                </span>
+              )}
+            </div>
+            <p style={{ marginTop: '0.25rem', fontSize: '9px', lineHeight: '1.4', color: 'rgba(255,255,255,0.6)' }}>
+              15-step multimodal loop: Left Ventricle (FMA:7101) → Wiggers hemodynamics → acute clinical vignette → exact 3D return.
+            </p>
+            <button
+              type="button"
+              onClick={() => navigate('/med-study?bagian=golden-journey')}
+              style={{ marginTop: '0.5rem', width: '100%', minHeight: '36px', borderRadius: '0.5rem', border: '1px solid rgba(165,243,252,0.4)', backgroundColor: 'rgba(6,182,212,0.15)', padding: '0.375rem 0.5rem', fontSize: '9px', fontWeight: 900, color: '#cffafe', cursor: 'pointer' }}
+            >
+              🌟 Launch Golden Educational Journey →
+            </button>
           </div>
 
           <div className="mt-3 rounded-2xl border border-amber-300/12 bg-amber-300/[.045] p-2.5 text-[9px] leading-relaxed text-amber-100/65">
