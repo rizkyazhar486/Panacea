@@ -359,4 +359,17 @@ export {
   type RayAabbIntersectionResult,
   type MprSliceCoordinates,
 } from './engine/kaloLumenDicomEngine'
+export {
+  evaluateCardiopulmonaryCoupling,
+  CARDIOPULMONARY_DISCLAIMER,
+  CARDIOPULMONARY_PROVENANCE,
+  CARDIOPULMONARY_SCENARIO_PRESETS,
+  type CardiopulmonaryInput,
+  type CardiopulmonaryResult,
+  type CardiopulmonaryScenario,
+  type CardiopulmonarySuccess,
+  type CardiopulmonaryFailure,
+  type PvLoopPoint,
+} from './engine/cardiopulmonaryCouplingEngine'
+export { CardiopulmonaryCouplingDeck } from './ui/CardiopulmonaryCouplingDeck'
 

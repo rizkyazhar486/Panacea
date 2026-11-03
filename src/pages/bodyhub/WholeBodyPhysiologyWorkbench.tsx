@@ -10,6 +10,7 @@ import {
 } from '../../lib/wholeBodyPhysiologyOS'
 import { PHYSIOLOGY_DEEP_DIVES } from '../../lib/physiologyDeepDives'
 import { humanPhysiologyCoverageSnapshot } from '../../lib/humanPhysiologyCoverage'
+import { CardiopulmonaryCouplingDeck } from '../../domains/body-exposure'
 
 const SIGNAL_LABELS = {
   oxygenDemand: 'O₂ demand',
@@ -243,6 +244,12 @@ export default function WholeBodyPhysiologyWorkbench() {
               </article>
             </div>
           </div>
+
+          {(selectedSystemId === 'cardiovascular' || selectedSystemId === 'respiratory') && (
+            <div className="mt-3">
+              <CardiopulmonaryCouplingDeck />
+            </div>
+          )}
 
           <div className="mt-3 rounded-2xl border border-white/8 bg-black/25 p-3 text-[9px] leading-relaxed text-white/40">
             <span className="font-black text-white/60">Boundary:</span> {WHOLE_BODY_PHYSIOLOGY_BOUNDARY}
