@@ -28,7 +28,15 @@ const bundle = await build({
     import {FetalParcelInspector} from './src/pages/bodyhub/FetalParcelInspector';
     createRoot(document.getElementById('root')).render(<MemoryRouter><FetalParcelInspector/></MemoryRouter>);`, resolveDir: root, loader: 'tsx' },
   bundle: true, write: false, format: 'esm', jsx: 'automatic', outfile: 'app.js',
-  define: { 'import.meta.env.BASE_URL': '"/"', 'process.env.NODE_ENV': '"production"' },
+  define: {
+    'import.meta.env.BASE_URL': '"/"',
+    'import.meta.env.VITE_API_URL': '""',
+    'import.meta.env.MODE': '"production"',
+    'import.meta.env.DEV': 'false',
+    'import.meta.env.PROD': 'true',
+    'import.meta.env': '{"BASE_URL":"/","VITE_API_URL":"","MODE":"production","DEV":false,"PROD":true}',
+    'process.env.NODE_ENV': '"production"',
+  },
   plugins: [{ name: 'test-camera', setup(builder) {
     builder.onLoad({ filter: /FetalParcelInspector\.tsx$/ }, () => ({ loader: 'tsx', resolveDir: `${root}src/pages/bodyhub`,
       contents: component.replace('const controls = new OrbitControls(camera, renderer.domElement)',
