@@ -3,7 +3,7 @@
 // Grounded in Mitchell Chemiosmotic Hypothesis (Nobel Prize 1978), Brand/Murphy ROS Kinetics, and AMPK/mTORC1 Switch
 
 import { isValidIsoTimestamp } from '../../../shared/kernel/isoTimestamp.ts'
-import { sha256Hex } from '../../clinical-operations/model/downstreamHilirisasiFhirPacsBridge.ts'
+import { sha256Hex } from '../../clinical-operations/index.ts'
 import type {
   SubcellularMitochondrialInput,
   SubcellularMitochondrialEvaluationResult,
