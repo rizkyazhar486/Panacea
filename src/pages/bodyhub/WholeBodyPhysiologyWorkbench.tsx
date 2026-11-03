@@ -10,7 +10,7 @@ import {
 } from '../../lib/wholeBodyPhysiologyOS'
 import { PHYSIOLOGY_DEEP_DIVES } from '../../lib/physiologyDeepDives'
 import { humanPhysiologyCoverageSnapshot } from '../../lib/humanPhysiologyCoverage'
-import { CardiopulmonaryCouplingDeck } from '../../domains/body-exposure'
+import { CardiopulmonaryCouplingDeck, SoftTissueBiomechanicsDeck } from '../../domains/body-exposure'
 
 const SIGNAL_LABELS = {
   oxygenDemand: 'O₂ demand',
@@ -248,6 +248,12 @@ export default function WholeBodyPhysiologyWorkbench() {
           {(selectedSystemId === 'cardiovascular' || selectedSystemId === 'respiratory') && (
             <div className="mt-3">
               <CardiopulmonaryCouplingDeck />
+            </div>
+          )}
+
+          {(selectedSystemId === 'digestive' || selectedSystemId === 'respiratory' || selectedSystemId === 'renal' || selectedSystemId === 'hepatic-metabolic') && (
+            <div className="mt-3">
+              <SoftTissueBiomechanicsDeck />
             </div>
           )}
 
