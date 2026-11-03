@@ -1,6 +1,10 @@
 import { strict as assert } from 'node:assert';
 import {
   buildFhirBundleForSepsisCare,
+  buildFhirPatientResource,
+  buildFhirConditionResource,
+  buildFhirEncounterResource,
+  validateFhirR4Bundle,
   buildDicomWebPacsStudyMetadata,
   generatePanaceaLhidEnvelope,
   coupleAcwrRecoveryToClassPass,
@@ -9,6 +13,7 @@ import {
   validateDicomUid,
   validatePacsEndpointUrl,
   queryDicomWebStudy,
+  FHIR_CODE_SYSTEMS,
   MISSING_OBSERVATION,
   type DicomWebStudyQueryResult,
 } from '../../src/domains/clinical-operations/index.ts';
@@ -317,4 +322,204 @@ console.log('[TEST] Starting Downstream Hilirisasi FHIR/PACS & ACWR Bridge Test 
   console.log('✓ Case 9: Gabbett ACWR & autonomic recovery recommendation engine verified across all 4 zones');
 }
 
-console.log('ALL DOWNSTREAM HILIRISASI FHIR/PACS TESTS PASSED GREEN (10/10).');
+// ── 10. Standard FHIR Code System URIs Verification ──────────────────────────
+{
+  assert.equal(FHIR_CODE_SYSTEMS.LOINC, 'http://loinc.org');
+  assert.equal(FHIR_CODE_SYSTEMS.SNOMED_CT, 'http://snomed.info/sct');
+  assert.equal(FHIR_CODE_SYSTEMS.ICD10, 'http://hl7.org/fhir/sid/icd-10');
+  assert.equal(FHIR_CODE_SYSTEMS.UCUM, 'http://unitsofmeasure.org');
+  assert.equal(FHIR_CODE_SYSTEMS.ACT_CODE, 'http://terminology.hl7.org/CodeSystem/v3-ActCode');
+  assert.equal(FHIR_CODE_SYSTEMS.CONDITION_CLINICAL, 'http://terminology.hl7.org/CodeSystem/condition-clinical');
+  assert.equal(FHIR_CODE_SYSTEMS.CONDITION_VER_STATUS, 'http://terminology.hl7.org/CodeSystem/condition-ver-status');
+  assert.equal(FHIR_CODE_SYSTEMS.CONDITION_CATEGORY, 'http://terminology.hl7.org/CodeSystem/condition-category');
+  assert.equal(FHIR_CODE_SYSTEMS.OBSERVATION_INTERPRETATION, 'http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation');
+  assert.equal(FHIR_CODE_SYSTEMS.PANACEA_TRUTH_CLASS, 'http://panaceamed.id/fhir/truth-class');
+
+  console.log('✓ Case 10: Standard FHIR Code System URIs (LOINC, SNOMED, ICD-10, UCUM, HL7) verified');
+}
+
+// ── 11. Dedicated FHIR Resource Builders (Patient, Condition, Encounter) ─────
+{
+  // 11a. Patient resource
+  const patient = buildFhirPatientResource({
+    patientId: 'PT-SEPSIS-771',
+    truthClass: 'OBSERVED_CLINICAL',
+    gender: 'female',
+    birthDate: '1975-04-12',
+    timestampIso: '2026-11-03T10:00:00.000Z',
+  });
+  assert.equal(patient.resourceType, 'Patient');
+  assert.equal(patient.active, true);
+  assert.equal(patient.gender, 'female');
+  assert.equal(patient.birthDate, '1975-04-12');
+  assert.equal(patient.identifier?.[0].system, 'http://panaceamed.id/patient-id');
+  assert.ok(patient.identifier?.[0].value.startsWith('pt-'));
+  // Never exposes raw patientId in public identifier
+  assert.ok(!patient.identifier?.[0].value.includes('PT-SEPSIS-771'));
+
+  // 11b. Condition resource (Sepsis)
+  const condition = buildFhirConditionResource({
+    patientId: 'PT-SEPSIS-771',
+    truthClass: 'OBSERVED_CLINICAL',
+    encounterId: 'ENC-ICU-001',
+    timestampIso: '2026-11-03T10:00:00.000Z',
+  });
+  assert.equal(condition.resourceType, 'Condition');
+  assert.equal(condition.clinicalStatus.coding[0].code, 'active');
+  assert.equal(condition.verificationStatus?.coding[0].code, 'confirmed');
+  assert.equal(condition.code.coding[0].system, FHIR_CODE_SYSTEMS.SNOMED_CT);
+  assert.equal(condition.code.coding[0].code, '91302008'); // Sepsis
+  assert.equal(condition.code.coding[1].system, FHIR_CODE_SYSTEMS.ICD10);
+  assert.equal(condition.code.coding[1].code, 'A41.9'); // Sepsis, unspecified organism
+  assert.equal(condition.encounter?.reference, 'Encounter/ENC-ICU-001');
+
+  // 11c. Encounter resource (Emergency resuscitation)
+  const encounter = buildFhirEncounterResource({
+    encounterId: 'ENC-ICU-001',
+    patientId: 'PT-SEPSIS-771',
+    status: 'in-progress',
+    encounterClass: 'EMER',
+    truthClass: 'OBSERVED_CLINICAL',
+    timestampIso: '2026-11-03T10:00:00.000Z',
+  });
+  assert.equal(encounter.resourceType, 'Encounter');
+  assert.equal(encounter.status, 'in-progress');
+  assert.equal(encounter.class.code, 'EMER');
+  assert.equal(encounter.class.system, FHIR_CODE_SYSTEMS.ACT_CODE);
+  assert.equal(encounter.type?.[0].coding[0].code, '91302008');
+
+  console.log('✓ Case 11: Dedicated Patient, Condition (SNOMED/ICD-10), and Encounter builders verified');
+}
+
+// ── 12. Full Comprehensive Sepsis Care Bundle ────────────────────────────────
+{
+  const fullBundle = buildFhirBundleForSepsisCare({
+    patientId: 'PT-FULL-901',
+    lactateMmolL: 4.5,
+    meanArterialPressureMmhg: 55,
+    antibioticAdministered: true,
+    fluidResuscitationOrdered: true,
+    fluidResuscitationAdministered: true,
+    truthClass: 'OBSERVED_CLINICAL',
+    encounterId: 'ENC-ER-440',
+    includePatientResource: true,
+    includeConditionResource: true,
+    timestampIso: '2026-11-03T11:00:00.000Z',
+  });
+
+  assert.equal(fullBundle.resourceType, 'Bundle');
+  assert.equal(fullBundle.type, 'collection');
+  // 1 Patient + 1 Encounter + 1 Condition + 2 Observations (lactate, MAP) + 1 CarePlan + 1 Provenance = 7
+  assert.equal(fullBundle.total, 7);
+  assert.equal(fullBundle.entry.length, 7);
+
+  const resTypes = fullBundle.entry.map((e) => e.resource.resourceType);
+  assert.ok(resTypes.includes('Patient'), 'Bundle must contain Patient');
+  assert.ok(resTypes.includes('Encounter'), 'Bundle must contain Encounter');
+  assert.ok(resTypes.includes('Condition'), 'Bundle must contain Condition');
+  assert.ok(resTypes.includes('Observation'), 'Bundle must contain Observation');
+  assert.ok(resTypes.includes('CarePlan'), 'Bundle must contain CarePlan');
+  assert.ok(resTypes.includes('Provenance'), 'Bundle must contain Provenance');
+
+  // Verify all entries have valid urn:uuid fullUrls and matching resource IDs
+  for (const entry of fullBundle.entry) {
+    assert.ok(entry.fullUrl.startsWith('urn:uuid:'));
+    assert.equal(entry.resource.id, entry.fullUrl.replace('urn:uuid:', ''));
+  }
+
+  console.log('✓ Case 12: Comprehensive 7-resource Sepsis Care Bundle verified');
+}
+
+// ── 13. Genuine FHIR R4 Bundle Validator Conformance ─────────────────────────
+{
+  // 13a. Standard 4-resource collection bundle validates cleanly
+  const standardBundle = buildFhirBundleForSepsisCare({
+    patientId: 'PT-STD-101',
+    lactateMmolL: 2.5,
+    meanArterialPressureMmhg: 70,
+    antibioticAdministered: false,
+    fluidResuscitationOrdered: false,
+  });
+  const stdValidation = validateFhirR4Bundle(standardBundle);
+  assert.equal(stdValidation.valid, true, `Validation failed: ${stdValidation.errors.join(', ')}`);
+  assert.equal(stdValidation.errors.length, 0);
+
+  // 13b. Full 7-resource bundle validates cleanly
+  const fullBundle = buildFhirBundleForSepsisCare({
+    patientId: 'PT-VAL-202',
+    lactateMmolL: 3.8,
+    meanArterialPressureMmhg: 60,
+    antibioticAdministered: true,
+    fluidResuscitationOrdered: true,
+    encounterId: 'ENC-RESUS-99',
+    includePatientResource: true,
+    includeConditionResource: true,
+  });
+  const fullValidation = validateFhirR4Bundle(fullBundle);
+  assert.equal(fullValidation.valid, true, `Validation failed: ${fullValidation.errors.join(', ')}`);
+  assert.equal(fullValidation.errors.length, 0);
+
+  console.log('✓ Case 13: Genuine FHIR R4 Bundle Validator confirms valid conformance on bundles');
+}
+
+// ── 14. FHIR R4 Bundle Validator Fail-Closed Negative Controls ────────────────
+{
+  // 14a. Non-Bundle resourceType
+  const nonBundle = { resourceType: 'Observation', id: 'obs-1' };
+  const r1 = validateFhirR4Bundle(nonBundle);
+  assert.equal(r1.valid, false);
+  assert.ok(r1.errors.some((e) => e.includes("resourceType must be 'Bundle'")));
+
+  // 14b. Invalid Bundle type
+  const badType = { resourceType: 'Bundle', type: 'invalid-type', total: 0, entry: [] };
+  const r2 = validateFhirR4Bundle(badType);
+  assert.equal(r2.valid, false);
+  assert.ok(r2.errors.some((e) => e.includes('not a valid FHIR R4 BundleType')));
+
+  // 14c. Total count mismatch
+  const countMismatch = {
+    resourceType: 'Bundle',
+    type: 'collection',
+    total: 5,
+    entry: [],
+  };
+  const r3 = validateFhirR4Bundle(countMismatch);
+  assert.equal(r3.valid, false);
+  assert.ok(r3.errors.some((e) => e.includes('does not match entry length')));
+
+  // 14d. Malformed fullUrl
+  const malformedUrl = {
+    resourceType: 'Bundle',
+    type: 'collection',
+    total: 1,
+    entry: [
+      {
+        fullUrl: 'not-a-valid-url-or-uuid',
+        resource: { resourceType: 'Observation', id: 'obs-1' },
+      },
+    ],
+  };
+  const r4 = validateFhirR4Bundle(malformedUrl);
+  assert.equal(r4.valid, false);
+  assert.ok(r4.errors.some((e) => e.includes('must be a valid urn:uuid or absolute URL')));
+
+  // 14e. Resource id not matching UUID in urn:uuid fullUrl
+  const idMismatch = {
+    resourceType: 'Bundle',
+    type: 'collection',
+    total: 1,
+    entry: [
+      {
+        fullUrl: 'urn:uuid:12345678-1234-4234-8234-123456789abc',
+        resource: { resourceType: 'Observation', id: 'completely-different-id', status: 'final', code: { coding: [{ system: 'http://loinc.org', code: '1-1' }] }, subject: { reference: 'Patient/1' } },
+      },
+    ],
+  };
+  const r5 = validateFhirR4Bundle(idMismatch);
+  assert.equal(r5.valid, false);
+  assert.ok(r5.errors.some((e) => e.includes('must match UUID in fullUrl')));
+
+  console.log('✓ Case 14: FHIR R4 Bundle Validator fail-closed negative control tests verified');
+}
+
+console.log('ALL DOWNSTREAM HILIRISASI FHIR/PACS TESTS PASSED GREEN (15/15).');

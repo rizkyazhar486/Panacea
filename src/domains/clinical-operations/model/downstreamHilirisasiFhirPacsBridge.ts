@@ -135,7 +135,22 @@ export function generateDeterministicUuid(seed: string): string {
   return `${p1}-${p2}-${p3}-${p4}-${p5}`;
 }
 
-// ── FHIR R4 Interfaces ───────────────────────────────────────────────────────
+// ── FHIR R4 Standard Code Systems & Interfaces ───────────────────────────────
+
+export const FHIR_CODE_SYSTEMS = {
+  LOINC: 'http://loinc.org',
+  SNOMED_CT: 'http://snomed.info/sct',
+  ICD10: 'http://hl7.org/fhir/sid/icd-10',
+  UCUM: 'http://unitsofmeasure.org',
+  ACT_CODE: 'http://terminology.hl7.org/CodeSystem/v3-ActCode',
+  CONDITION_CLINICAL: 'http://terminology.hl7.org/CodeSystem/condition-clinical',
+  CONDITION_VER_STATUS: 'http://terminology.hl7.org/CodeSystem/condition-ver-status',
+  CONDITION_CATEGORY: 'http://terminology.hl7.org/CodeSystem/condition-category',
+  OBSERVATION_INTERPRETATION: 'http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation',
+  DATA_OPERATION: 'http://terminology.hl7.org/CodeSystem/v3-DataOperation',
+  PROVENANCE_PARTICIPANT_TYPE: 'http://terminology.hl7.org/CodeSystem/provenance-participant-type',
+  PANACEA_TRUTH_CLASS: 'http://panaceamed.id/fhir/truth-class',
+} as const;
 
 export interface FhirCoding {
   readonly system: string;
@@ -146,6 +161,13 @@ export interface FhirCoding {
 export interface FhirCodeableConcept {
   readonly coding: readonly FhirCoding[];
   readonly text?: string;
+}
+
+export interface FhirIdentifier {
+  readonly use?: 'usual' | 'official' | 'temp' | 'secondary' | 'old';
+  readonly type?: FhirCodeableConcept;
+  readonly system: string;
+  readonly value: string;
 }
 
 export interface FhirResourceHeader {
@@ -159,11 +181,20 @@ export interface FhirResourceHeader {
   };
 }
 
+export interface FhirPatientResource extends FhirResourceHeader {
+  readonly resourceType: 'Patient';
+  readonly active?: boolean;
+  readonly identifier?: readonly FhirIdentifier[];
+  readonly gender?: 'male' | 'female' | 'other' | 'unknown';
+  readonly birthDate?: string;
+}
+
 export interface FhirObservationResource extends FhirResourceHeader {
   readonly resourceType: 'Observation';
-  readonly status: 'preliminary' | 'final' | 'amended';
+  readonly status: 'registered' | 'preliminary' | 'final' | 'amended' | 'corrected' | 'cancelled' | 'entered-in-error' | 'unknown';
   readonly code: FhirCodeableConcept;
   readonly subject: { readonly reference: string };
+  readonly encounter?: { readonly reference: string };
   readonly effectiveDateTime: string;
   readonly valueQuantity?: {
     readonly value: number;
@@ -175,12 +206,38 @@ export interface FhirObservationResource extends FhirResourceHeader {
   readonly interpretation?: readonly FhirCodeableConcept[];
 }
 
+export interface FhirConditionResource extends FhirResourceHeader {
+  readonly resourceType: 'Condition';
+  readonly clinicalStatus: FhirCodeableConcept;
+  readonly verificationStatus?: FhirCodeableConcept;
+  readonly category?: readonly FhirCodeableConcept[];
+  readonly severity?: FhirCodeableConcept;
+  readonly code: FhirCodeableConcept;
+  readonly subject: { readonly reference: string };
+  readonly encounter?: { readonly reference: string };
+  readonly onsetDateTime?: string;
+  readonly recordedDate?: string;
+}
+
+export interface FhirEncounterResource extends FhirResourceHeader {
+  readonly resourceType: 'Encounter';
+  readonly status: 'planned' | 'arrived' | 'triaged' | 'in-progress' | 'onleave' | 'finished' | 'cancelled';
+  readonly class: FhirCoding;
+  readonly type?: readonly FhirCodeableConcept[];
+  readonly subject: { readonly reference: string };
+  readonly period?: {
+    readonly start: string;
+    readonly end?: string;
+  };
+}
+
 export interface FhirCarePlanResource extends FhirResourceHeader {
   readonly resourceType: 'CarePlan';
-  readonly status: 'draft' | 'active' | 'completed' | 'revoked';
-  readonly intent: 'proposal' | 'plan' | 'order';
+  readonly status: 'draft' | 'active' | 'on-hold' | 'revoked' | 'completed' | 'entered-in-error' | 'unknown';
+  readonly intent: 'proposal' | 'plan' | 'order' | 'option';
   readonly category: readonly FhirCodeableConcept[];
   readonly subject: { readonly reference: string };
+  readonly encounter?: { readonly reference: string };
   readonly activity: readonly {
     readonly detail: {
       readonly code: FhirCodeableConcept;
@@ -201,16 +258,29 @@ export interface FhirProvenanceResource extends FhirResourceHeader {
   }[];
 }
 
+export type FhirBundleType =
+  | 'document'
+  | 'message'
+  | 'transaction'
+  | 'transaction-response'
+  | 'batch'
+  | 'batch-response'
+  | 'history'
+  | 'searchset'
+  | 'collection';
+
+export interface FhirBundleEntry {
+  readonly fullUrl: string;
+  readonly resource: FhirResourceHeader;
+}
+
 export interface FhirBundle {
   readonly resourceType: 'Bundle';
   readonly id: string;
-  readonly type: 'transaction' | 'collection' | 'document';
+  readonly type: FhirBundleType;
   readonly timestamp: string;
   readonly total: number;
-  readonly entry: readonly {
-    readonly fullUrl: string;
-    readonly resource: FhirResourceHeader;
-  }[];
+  readonly entry: readonly FhirBundleEntry[];
 }
 
 // ── DICOMweb Interfaces ─────────────────────────────────────────────────────
@@ -334,7 +404,239 @@ export function validatePacsEndpointUrl(
   return { valid: true, cleanUrl };
 }
 
+// ── FHIR R4 Resource Builders (Patient, Condition, Encounter) ───────────────
+
+/**
+ * Builds a standard FHIR R4 Patient resource with an anonymized opaque identifier
+ * derived deterministically from the canonical Panacea patient identity.
+ */
+export function buildFhirPatientResource(params: {
+  readonly patientId: string;
+  readonly truthClass?: TruthClass;
+  readonly gender?: 'male' | 'female' | 'other' | 'unknown';
+  readonly birthDate?: string;
+  readonly timestampIso?: string;
+  readonly idOverride?: string;
+}): FhirPatientResource {
+  const now = params.timestampIso && !Number.isNaN(Date.parse(params.timestampIso))
+    ? params.timestampIso
+    : new Date().toISOString();
+  const truth = params.truthClass ?? 'OBSERVED_CLINICAL';
+  const isEducational = truth === 'SIMULATED_EDUCATIONAL';
+  const opaqueId = `pt-${sha256Hex(`PANACEA_PATIENT:${params.patientId}`).slice(0, 12)}`;
+  const resourceId = params.idOverride ?? opaqueId;
+
+  return {
+    resourceType: 'Patient',
+    id: resourceId,
+    meta: {
+      versionId: '1',
+      lastUpdated: now,
+      profile: ['http://hl7.org/fhir/StructureDefinition/Patient'],
+      tag: [
+        {
+          system: FHIR_CODE_SYSTEMS.PANACEA_TRUTH_CLASS,
+          code: truth,
+          display: isEducational ? 'Simulated Educational Patient' : 'Clinical Patient Record',
+        },
+      ],
+    },
+    active: true,
+    identifier: [
+      {
+        use: 'official',
+        system: 'http://panaceamed.id/patient-id',
+        value: opaqueId,
+      },
+    ],
+    gender: params.gender,
+    birthDate: params.birthDate,
+  };
+}
+
+/**
+ * Builds a standard FHIR R4 Condition resource for Sepsis or other clinical disorders
+ * with full SNOMED CT and ICD-10 code systems, clinical status, and verification status.
+ */
+export function buildFhirConditionResource(params: {
+  readonly patientId: string;
+  readonly conditionCode?: {
+    readonly snomedCode?: string;
+    readonly snomedDisplay?: string;
+    readonly icd10Code?: string;
+    readonly icd10Display?: string;
+  };
+  readonly clinicalStatus?: 'active' | 'recurrence' | 'relapse' | 'inactive' | 'remission' | 'resolved';
+  readonly verificationStatus?: 'unconfirmed' | 'provisional' | 'differential' | 'confirmed' | 'refuted' | 'entered-in-error';
+  readonly encounterId?: string;
+  readonly truthClass?: TruthClass;
+  readonly timestampIso?: string;
+  readonly idOverride?: string;
+}): FhirConditionResource {
+  const now = params.timestampIso && !Number.isNaN(Date.parse(params.timestampIso))
+    ? params.timestampIso
+    : new Date().toISOString();
+  const truth = params.truthClass ?? 'OBSERVED_CLINICAL';
+  const isEducational = truth === 'SIMULATED_EDUCATIONAL';
+  const conditionUuid = params.idOverride ?? generateDeterministicUuid(`condition:sepsis:${params.patientId}:${now}`);
+  const opaquePatientRef = `Patient/pt-${sha256Hex(`PANACEA_PATIENT:${params.patientId}`).slice(0, 12)}`;
+
+  const snomedCode = params.conditionCode?.snomedCode ?? '91302008';
+  const snomedDisplay = params.conditionCode?.snomedDisplay ?? 'Sepsis (disorder)';
+  const icd10Code = params.conditionCode?.icd10Code ?? 'A41.9';
+  const icd10Display = params.conditionCode?.icd10Display ?? 'Sepsis, unspecified organism';
+
+  const codings: FhirCoding[] = [
+    {
+      system: FHIR_CODE_SYSTEMS.SNOMED_CT,
+      code: snomedCode,
+      display: snomedDisplay,
+    },
+    {
+      system: FHIR_CODE_SYSTEMS.ICD10,
+      code: icd10Code,
+      display: icd10Display,
+    },
+  ];
+
+  const clinicalStatus = params.clinicalStatus ?? 'active';
+  const verificationStatus = params.verificationStatus ?? (isEducational ? 'provisional' : 'confirmed');
+
+  return {
+    resourceType: 'Condition',
+    id: conditionUuid,
+    meta: {
+      versionId: '1',
+      lastUpdated: now,
+      profile: ['http://hl7.org/fhir/StructureDefinition/Condition'],
+      tag: [
+        {
+          system: FHIR_CODE_SYSTEMS.PANACEA_TRUTH_CLASS,
+          code: truth,
+          display: isEducational ? 'Simulated Educational Condition' : 'Clinical Diagnosis',
+        },
+      ],
+    },
+    clinicalStatus: {
+      coding: [
+        {
+          system: FHIR_CODE_SYSTEMS.CONDITION_CLINICAL,
+          code: clinicalStatus,
+          display: clinicalStatus.charAt(0).toUpperCase() + clinicalStatus.slice(1),
+        },
+      ],
+    },
+    verificationStatus: {
+      coding: [
+        {
+          system: FHIR_CODE_SYSTEMS.CONDITION_VER_STATUS,
+          code: verificationStatus,
+          display: verificationStatus.charAt(0).toUpperCase() + verificationStatus.slice(1),
+        },
+      ],
+    },
+    category: [
+      {
+        coding: [
+          {
+            system: FHIR_CODE_SYSTEMS.CONDITION_CATEGORY,
+            code: 'encounter-diagnosis',
+            display: 'Encounter Diagnosis',
+          },
+        ],
+      },
+    ],
+    code: {
+      coding: codings,
+      text: isEducational
+        ? `Educational Simulation: ${snomedDisplay}`
+        : `${snomedDisplay} (${icd10Code})`,
+    },
+    subject: { reference: opaquePatientRef },
+    encounter: params.encounterId ? { reference: `Encounter/${params.encounterId}` } : undefined,
+    onsetDateTime: now,
+    recordedDate: now,
+  };
+}
+
+/**
+ * Builds a standard FHIR R4 Encounter resource documenting patient admission,
+ * emergency triage, or outpatient encounter context.
+ */
+export function buildFhirEncounterResource(params: {
+  readonly encounterId: string;
+  readonly patientId: string;
+  readonly status?: 'planned' | 'arrived' | 'triaged' | 'in-progress' | 'onleave' | 'finished' | 'cancelled';
+  readonly encounterClass?: 'EMER' | 'IMP' | 'AMB' | 'ACUTE';
+  readonly truthClass?: TruthClass;
+  readonly timestampIso?: string;
+  readonly idOverride?: string;
+}): FhirEncounterResource {
+  const now = params.timestampIso && !Number.isNaN(Date.parse(params.timestampIso))
+    ? params.timestampIso
+    : new Date().toISOString();
+  const truth = params.truthClass ?? 'OBSERVED_CLINICAL';
+  const isEducational = truth === 'SIMULATED_EDUCATIONAL';
+  const opaquePatientRef = `Patient/pt-${sha256Hex(`PANACEA_PATIENT:${params.patientId}`).slice(0, 12)}`;
+  const encClass = params.encounterClass ?? 'EMER';
+  const classDisplay = encClass === 'EMER' ? 'emergency' : encClass === 'IMP' ? 'inpatient encounter' : 'ambulatory';
+  const resourceId = params.idOverride ?? params.encounterId;
+
+  return {
+    resourceType: 'Encounter',
+    id: resourceId,
+    meta: {
+      versionId: '1',
+      lastUpdated: now,
+      profile: ['http://hl7.org/fhir/StructureDefinition/Encounter'],
+      tag: [
+        {
+          system: FHIR_CODE_SYSTEMS.PANACEA_TRUTH_CLASS,
+          code: truth,
+          display: isEducational ? 'Simulated Educational Encounter' : 'Clinical Encounter',
+        },
+      ],
+    },
+    status: params.status ?? 'in-progress',
+    class: {
+      system: FHIR_CODE_SYSTEMS.ACT_CODE,
+      code: encClass,
+      display: classDisplay,
+    },
+    type: [
+      {
+        coding: [
+          {
+            system: FHIR_CODE_SYSTEMS.SNOMED_CT,
+            code: '91302008',
+            display: 'Sepsis (disorder)',
+          },
+        ],
+        text: 'Sepsis Resuscitation Encounter',
+      },
+    ],
+    subject: { reference: opaquePatientRef },
+    period: {
+      start: now,
+    },
+  };
+}
+
 // ── FHIR R4 Bundle Builder for Sepsis Care ───────────────────────────────────
+
+export interface BuildFhirBundleForSepsisCareParams {
+  readonly patientId: string;
+  readonly lactateMmolL?: number | typeof MISSING_OBSERVATION;
+  readonly meanArterialPressureMmhg?: number | typeof MISSING_OBSERVATION;
+  readonly antibioticAdministered: boolean;
+  readonly fluidResuscitationOrdered: boolean;
+  readonly fluidResuscitationAdministered?: boolean;
+  readonly truthClass?: TruthClass;
+  readonly encounterId?: string;
+  readonly timestampIso?: string;
+  readonly includePatientResource?: boolean;
+  readonly includeConditionResource?: boolean;
+}
 
 /**
  * Generates an HL7 FHIR R4 Bundle containing Encounter Observations, CarePlan, and Provenance
@@ -347,17 +649,7 @@ export function validatePacsEndpointUrl(
  *   without explicit confirmation of administration.
  * - Zero-fabrication: unmeasured parameters are strictly omitted from Observations.
  */
-export function buildFhirBundleForSepsisCare(params: {
-  readonly patientId: string;
-  readonly lactateMmolL?: number | typeof MISSING_OBSERVATION;
-  readonly meanArterialPressureMmhg?: number | typeof MISSING_OBSERVATION;
-  readonly antibioticAdministered: boolean;
-  readonly fluidResuscitationOrdered: boolean;
-  readonly fluidResuscitationAdministered?: boolean;
-  readonly truthClass?: TruthClass;
-  readonly encounterId?: string;
-  readonly timestampIso?: string;
-}): FhirBundle {
+export function buildFhirBundleForSepsisCare(params: BuildFhirBundleForSepsisCareParams): FhirBundle {
   const now = params.timestampIso && !Number.isNaN(Date.parse(params.timestampIso))
     ? params.timestampIso
     : new Date().toISOString();
@@ -367,10 +659,62 @@ export function buildFhirBundleForSepsisCare(params: {
 
   // Anonymized/Opaque patient reference for privacy
   const opaquePatientRef = `Patient/pt-${sha256Hex(`PANACEA_PATIENT:${params.patientId}`).slice(0, 12)}`;
+  const patientUuid = generateDeterministicUuid(`patient:${params.patientId}`);
+  const encounterUuid = params.encounterId
+    ? generateDeterministicUuid(`encounter:${params.encounterId}:${now}`)
+    : undefined;
 
   const bundleUuid = generateDeterministicUuid(`bundle:sepsis:${params.patientId}:${now}`);
   const entries: { fullUrl: string; resource: FhirResourceHeader }[] = [];
   const targetResourceUuids: string[] = [];
+
+  // Optional Patient Resource in bundle
+  if (params.includePatientResource) {
+    const patientRes = buildFhirPatientResource({
+      patientId: params.patientId,
+      truthClass: truth,
+      timestampIso: now,
+      idOverride: patientUuid,
+    });
+    targetResourceUuids.push(`urn:uuid:${patientUuid}`);
+    entries.push({
+      fullUrl: `urn:uuid:${patientUuid}`,
+      resource: patientRes,
+    });
+  }
+
+  // Optional Encounter Resource in bundle
+  if (params.encounterId && encounterUuid) {
+    const encounterRes = buildFhirEncounterResource({
+      encounterId: params.encounterId,
+      patientId: params.patientId,
+      truthClass: truth,
+      timestampIso: now,
+      idOverride: encounterUuid,
+    });
+    targetResourceUuids.push(`urn:uuid:${encounterUuid}`);
+    entries.push({
+      fullUrl: `urn:uuid:${encounterUuid}`,
+      resource: encounterRes,
+    });
+  }
+
+  // Optional Condition Resource (Sepsis diagnosis)
+  if (params.includeConditionResource) {
+    const conditionUuid = generateDeterministicUuid(`condition:sepsis:${params.patientId}:${now}`);
+    const conditionRes = buildFhirConditionResource({
+      patientId: params.patientId,
+      truthClass: truth,
+      timestampIso: now,
+      encounterId: encounterUuid ?? params.encounterId,
+      idOverride: conditionUuid,
+    });
+    targetResourceUuids.push(`urn:uuid:${conditionUuid}`);
+    entries.push({
+      fullUrl: `urn:uuid:${conditionUuid}`,
+      resource: conditionRes,
+    });
+  }
 
   // Observation 1: Blood Lactate (LOINC 600-7)
   if (params.lactateMmolL !== undefined && params.lactateMmolL !== MISSING_OBSERVATION) {
@@ -391,7 +735,7 @@ export function buildFhirBundleForSepsisCare(params: {
         profile: ['http://hl7.org/fhir/StructureDefinition/Observation'],
         tag: [
           {
-            system: 'http://panaceamed.id/fhir/truth-class',
+            system: FHIR_CODE_SYSTEMS.PANACEA_TRUTH_CLASS,
             code: truth,
             display: isEducational ? 'Simulated Educational Exercise' : 'Clinical Observation',
           },
@@ -401,7 +745,7 @@ export function buildFhirBundleForSepsisCare(params: {
       code: {
         coding: [
           {
-            system: 'http://loinc.org',
+            system: FHIR_CODE_SYSTEMS.LOINC,
             code: '600-7',
             display: 'Lactate [Moles/volume] in Blood',
           },
@@ -409,11 +753,12 @@ export function buildFhirBundleForSepsisCare(params: {
         text: 'Serum/Plasma Lactate Level',
       },
       subject: { reference: opaquePatientRef },
+      encounter: encounterUuid ? { reference: `urn:uuid:${encounterUuid}` } : undefined,
       effectiveDateTime: now,
       valueQuantity: {
         value: Number(params.lactateMmolL.toFixed(2)),
         unit: 'mmol/L',
-        system: 'http://unitsofmeasure.org',
+        system: FHIR_CODE_SYSTEMS.UCUM,
         code: 'mmol/L',
       },
       interpretation: isElevated
@@ -421,7 +766,7 @@ export function buildFhirBundleForSepsisCare(params: {
             {
               coding: [
                 {
-                  system: 'http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation',
+                  system: FHIR_CODE_SYSTEMS.OBSERVATION_INTERPRETATION,
                   code: isCritical ? 'CH' : 'H',
                   display: isCritical ? 'Critically High' : 'High',
                 },
@@ -461,7 +806,7 @@ export function buildFhirBundleForSepsisCare(params: {
         profile: ['http://hl7.org/fhir/StructureDefinition/Observation'],
         tag: [
           {
-            system: 'http://panaceamed.id/fhir/truth-class',
+            system: FHIR_CODE_SYSTEMS.PANACEA_TRUTH_CLASS,
             code: truth,
             display: isEducational ? 'Simulated Educational Exercise' : 'Clinical Observation',
           },
@@ -471,7 +816,7 @@ export function buildFhirBundleForSepsisCare(params: {
       code: {
         coding: [
           {
-            system: 'http://loinc.org',
+            system: FHIR_CODE_SYSTEMS.LOINC,
             code: '8478-0',
             display: 'Mean blood pressure',
           },
@@ -479,11 +824,12 @@ export function buildFhirBundleForSepsisCare(params: {
         text: 'Mean Arterial Pressure (MAP)',
       },
       subject: { reference: opaquePatientRef },
+      encounter: encounterUuid ? { reference: `urn:uuid:${encounterUuid}` } : undefined,
       effectiveDateTime: now,
       valueQuantity: {
         value: Math.round(params.meanArterialPressureMmhg),
         unit: 'mmHg',
-        system: 'http://unitsofmeasure.org',
+        system: FHIR_CODE_SYSTEMS.UCUM,
         code: 'mm[Hg]',
       },
       interpretation: isHypotensive
@@ -491,7 +837,7 @@ export function buildFhirBundleForSepsisCare(params: {
             {
               coding: [
                 {
-                  system: 'http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation',
+                  system: FHIR_CODE_SYSTEMS.OBSERVATION_INTERPRETATION,
                   code: 'L',
                   display: 'Low (<65 mmHg threshold for sepsis hypoperfusion)',
                 },
@@ -528,7 +874,7 @@ export function buildFhirBundleForSepsisCare(params: {
     {
       detail: {
         code: {
-          coding: [{ system: 'http://snomed.info/sct', code: '433112001', display: 'Broad spectrum antibiotic therapy' }],
+          coding: [{ system: FHIR_CODE_SYSTEMS.SNOMED_CT, code: '433112001', display: 'Broad spectrum antibiotic therapy' }],
         },
         status: antibioticStatus,
         description: isEducational
@@ -539,7 +885,7 @@ export function buildFhirBundleForSepsisCare(params: {
     {
       detail: {
         code: {
-          coding: [{ system: 'http://snomed.info/sct', code: '266800008', display: 'Intravenous fluid replacement' }],
+          coding: [{ system: FHIR_CODE_SYSTEMS.SNOMED_CT, code: '266800008', display: 'Intravenous fluid replacement' }],
         },
         status: fluidStatus,
         description: isEducational
@@ -559,7 +905,7 @@ export function buildFhirBundleForSepsisCare(params: {
       profile: ['http://hl7.org/fhir/StructureDefinition/CarePlan'],
       tag: [
         {
-          system: 'http://panaceamed.id/fhir/truth-class',
+          system: FHIR_CODE_SYSTEMS.PANACEA_TRUTH_CLASS,
           code: truth,
           display: isEducational ? 'Simulated Educational Proposal' : 'Clinical Care Plan',
         },
@@ -571,7 +917,7 @@ export function buildFhirBundleForSepsisCare(params: {
       {
         coding: [
           {
-            system: 'http://snomed.info/sct',
+            system: FHIR_CODE_SYSTEMS.SNOMED_CT,
             code: '91302008',
             display: 'Sepsis (disorder)',
           },
@@ -582,6 +928,7 @@ export function buildFhirBundleForSepsisCare(params: {
       },
     ],
     subject: { reference: opaquePatientRef },
+    encounter: encounterUuid ? { reference: `urn:uuid:${encounterUuid}` } : undefined,
     activity: activities,
   };
 
@@ -606,7 +953,7 @@ export function buildFhirBundleForSepsisCare(params: {
     activity: {
       coding: [
         {
-          system: 'http://terminology.hl7.org/CodeSystem/v3-DataOperation',
+          system: FHIR_CODE_SYSTEMS.DATA_OPERATION,
           code: isEducational ? 'SIMULATE' : 'CREATE',
           display: isEducational ? 'Educational Simulation' : 'Clinical Resource Creation',
         },
@@ -618,7 +965,7 @@ export function buildFhirBundleForSepsisCare(params: {
         type: {
           coding: [
             {
-              system: 'http://terminology.hl7.org/CodeSystem/provenance-participant-type',
+              system: FHIR_CODE_SYSTEMS.PROVENANCE_PARTICIPANT_TYPE,
               code: 'author',
               display: 'Authoring Software System',
             },
@@ -641,6 +988,137 @@ export function buildFhirBundleForSepsisCare(params: {
     timestamp: now,
     total: entries.length,
     entry: entries,
+  };
+}
+
+// ── FHIR R4 Bundle Validator ─────────────────────────────────────────────────
+
+export interface FhirBundleValidationResult {
+  readonly valid: boolean;
+  readonly errors: readonly string[];
+}
+
+/**
+ * Validates genuine HL7 FHIR Release 4 conformance for a Bundle resource.
+ * Machine-verifies resourceType, BundleType, total vs entry count, RFC 4122 / URL fullUrls,
+ * and essential required fields for Patient, Observation, Condition, CarePlan, Encounter, and Provenance.
+ */
+export function validateFhirR4Bundle(bundle: unknown): FhirBundleValidationResult {
+  const errors: string[] = [];
+  if (!bundle || typeof bundle !== 'object') {
+    return { valid: false, errors: ['FHIR Bundle must be a non-null object'] };
+  }
+  const b = bundle as Record<string, any>;
+  if (b.resourceType !== 'Bundle') {
+    errors.push(`resourceType must be 'Bundle', received '${b.resourceType}'`);
+  }
+  const validTypes: FhirBundleType[] = [
+    'document',
+    'message',
+    'transaction',
+    'transaction-response',
+    'batch',
+    'batch-response',
+    'history',
+    'searchset',
+    'collection',
+  ];
+  if (!validTypes.includes(b.type)) {
+    errors.push(`Bundle.type '${b.type}' is not a valid FHIR R4 BundleType`);
+  }
+  if (typeof b.total !== 'number' || !Number.isInteger(b.total) || b.total < 0) {
+    errors.push(`Bundle.total must be a non-negative integer, received '${b.total}'`);
+  }
+  if (!Array.isArray(b.entry)) {
+    errors.push('Bundle.entry must be an array');
+  } else {
+    if (b.total !== b.entry.length) {
+      errors.push(`Bundle.total (${b.total}) does not match entry length (${b.entry.length})`);
+    }
+    const urnUuidPattern = /^urn:uuid:[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    const httpUrlPattern = /^https?:\/\/.+/i;
+
+    for (let i = 0; i < b.entry.length; i++) {
+      const e = b.entry[i];
+      if (!e || typeof e !== 'object') {
+        errors.push(`entry[${i}] must be an object`);
+        continue;
+      }
+      if (typeof e.fullUrl !== 'string' || (!urnUuidPattern.test(e.fullUrl) && !httpUrlPattern.test(e.fullUrl))) {
+        errors.push(`entry[${i}].fullUrl must be a valid urn:uuid or absolute URL, received '${e.fullUrl}'`);
+      }
+      const res = e.resource;
+      if (!res || typeof res !== 'object') {
+        errors.push(`entry[${i}].resource must be an object`);
+        continue;
+      }
+      if (typeof res.resourceType !== 'string' || !res.resourceType.trim()) {
+        errors.push(`entry[${i}].resource.resourceType is required`);
+      }
+      if (typeof res.id !== 'string' || !res.id.trim()) {
+        errors.push(`entry[${i}].resource.id is required`);
+      }
+      if (typeof e.fullUrl === 'string' && e.fullUrl.startsWith('urn:uuid:')) {
+        const expectedId = e.fullUrl.replace('urn:uuid:', '');
+        if (res.id !== expectedId) {
+          errors.push(`entry[${i}].resource.id ('${res.id}') must match UUID in fullUrl ('${expectedId}')`);
+        }
+      }
+
+      // Resource-specific FHIR R4 verification
+      if (res.resourceType === 'Observation') {
+        if (!res.status) errors.push(`entry[${i}] Observation requires status`);
+        if (!res.code || !Array.isArray(res.code.coding) || res.code.coding.length === 0) {
+          errors.push(`entry[${i}] Observation requires code.coding array`);
+        }
+        if (!res.subject || !res.subject.reference) {
+          errors.push(`entry[${i}] Observation requires subject.reference`);
+        }
+      } else if (res.resourceType === 'Condition') {
+        if (!res.clinicalStatus || !Array.isArray(res.clinicalStatus.coding)) {
+          errors.push(`entry[${i}] Condition requires clinicalStatus.coding`);
+        }
+        if (!res.code || !Array.isArray(res.code.coding) || res.code.coding.length === 0) {
+          errors.push(`entry[${i}] Condition requires code.coding array`);
+        }
+        if (!res.subject || !res.subject.reference) {
+          errors.push(`entry[${i}] Condition requires subject.reference`);
+        }
+      } else if (res.resourceType === 'CarePlan') {
+        if (!res.status) errors.push(`entry[${i}] CarePlan requires status`);
+        if (!res.intent) errors.push(`entry[${i}] CarePlan requires intent`);
+        if (!res.subject || !res.subject.reference) {
+          errors.push(`entry[${i}] CarePlan requires subject.reference`);
+        }
+      } else if (res.resourceType === 'Encounter') {
+        if (!res.status) errors.push(`entry[${i}] Encounter requires status`);
+        if (!res.class || !res.class.system || !res.class.code) {
+          errors.push(`entry[${i}] Encounter requires class with system and code`);
+        }
+        if (!res.subject || !res.subject.reference) {
+          errors.push(`entry[${i}] Encounter requires subject.reference`);
+        }
+      } else if (res.resourceType === 'Patient') {
+        if (res.active === undefined && !res.identifier) {
+          errors.push(`entry[${i}] Patient requires active flag or identifier`);
+        }
+      } else if (res.resourceType === 'Provenance') {
+        if (!Array.isArray(res.target) || res.target.length === 0) {
+          errors.push(`entry[${i}] Provenance requires non-empty target array`);
+        }
+        if (!res.recorded) {
+          errors.push(`entry[${i}] Provenance requires recorded timestamp`);
+        }
+        if (!Array.isArray(res.agent) || res.agent.length === 0) {
+          errors.push(`entry[${i}] Provenance requires non-empty agent array`);
+        }
+      }
+    }
+  }
+
+  return {
+    valid: errors.length === 0,
+    errors,
   };
 }
 
