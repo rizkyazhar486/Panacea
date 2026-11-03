@@ -146,22 +146,43 @@ export { parseFetalMriContext, type FetalMriContext, type FetalMriRegion, type F
 export { correlateImagingPlane, type ImagingPlane, type AtlasBox, type PlaneResult } from './engine/imagingPlaneEngine'
 
 export {
+  AHA17_CORONARY_TERRITORY_SOURCE,
+  AHA17_CORONARY_TERRITORY_TABLE,
   AHA17_LIMITATIONS,
   AHA17_RINGS,
   AHA17_SEGMENT_COUNT,
   AHA17_SEGMENT_NAMES,
   AHA17_SOURCES,
+  AHA17_TERRITORY_LIMITATIONS,
+  ATLAS_REFERENCE_LABEL,
   DOMINANCE_PREVALENCE,
   branchForSegment,
+  evaluateAHA17PerfusionBurden,
+  mapCoronaryToAHA17,
   territoryForArtery,
   type CoronaryArtery,
+  type CoronaryArteryId,
   type CoronaryBranch,
+  type CoronaryDominanceColumns,
+  type CoronaryDominanceInput,
+  type CoronaryTerritoryTable,
+  type CoronaryTerritoryTableRow,
   type Dominance,
   type EvidenceKind,
+  type KnownCoronaryDominance,
+  type MapCoronaryOptions,
+  type PerfusionBurdenInput,
+  type PerfusionBurdenResult,
   type SegmentEvidence,
   type SegmentInfo,
   type SegmentResult,
   type TerritoryResult,
+  type VascularFailureReason,
+  type VascularMapping,
+  type VascularMappingFailure,
+  type VascularMappingSuccess,
+  type VascularTerritorySource,
+  type VascularTruthClass,
 } from './engine/vascularTerritoryEngine'
 
 export { CoronaryTerritoryPanel } from './ui/CoronaryTerritoryPanel'
@@ -187,30 +208,6 @@ export {
   type SensoryModality,
   type SensoryTractFinding,
 } from './engine/lesionLocalizerEngine'
-
-export {
-  AHA17_CORONARY_TERRITORY_SOURCE,
-  AHA17_CORONARY_TERRITORY_TABLE,
-  AHA17_TERRITORY_LIMITATIONS,
-  ATLAS_REFERENCE_LABEL,
-  evaluateAHA17PerfusionBurden,
-  mapCoronaryToAHA17,
-  type CoronaryArteryId,
-  type CoronaryDominanceColumns,
-  type CoronaryDominanceInput,
-  type CoronaryTerritoryTable,
-  type CoronaryTerritoryTableRow,
-  type KnownCoronaryDominance,
-  type MapCoronaryOptions,
-  type PerfusionBurdenInput,
-  type PerfusionBurdenResult,
-  type VascularFailureReason,
-  type VascularMapping,
-  type VascularMappingFailure,
-  type VascularMappingSuccess,
-  type VascularTerritorySource,
-  type VascularTruthClass,
-} from './engine/vascularTerritoryEngine'
 export {
   GAIT_BIOMECHANICS_SOURCE,
   GAIT_LIBRARY_DISCLAIMER,
@@ -415,5 +412,27 @@ export {
   type SyndromicDeficitResult,
 } from './engine/neuroFascicularTractographyEngine'
 export { NeuroFascicularReflexDeck } from './ui/NeuroFascicularReflexDeck'
+
+// — CANONICAL BODY EXPOSURE ATLAS HOME —
+export { BodyExposureAtlasHome } from './ui/BodyExposureAtlasHome'
+export {
+  ATLAS_LAYERS,
+  ANATOMICAL_REGIONS,
+  type AtlasStage,
+  type LayerSpec,
+  type SelectedStructureInfo,
+} from './engine/atlasHomeConfig'
+
+// — DESCRIPTIVE REGISTRY ALIASES (structureAtlas) —
+export {
+  atlasEnvelope,
+  organFactIndex,
+  organKeyIndex,
+  firstSentence,
+  atlasRegionNames,
+  structureTypeFromName,
+  diagnosticImagingEngine,
+} from './engine/structureAtlas'
+
 
 
