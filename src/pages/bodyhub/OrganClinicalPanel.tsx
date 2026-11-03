@@ -4,7 +4,7 @@ import { api, type PubmedArticle } from '../../lib/api'
 import { penjelasanOrgan, type KelainanBawaan } from '../../lib/organExplain'
 import type { AnatomyLayer } from '../../components/Body3D'
 import { OrganBiometricOverlayCard } from '../../domains/body-exposure/ui/OrganBiometricOverlayCard'
-import { CardiopulmonaryCouplingDeck, SoftTissueBiomechanicsDeck } from '../../domains/body-exposure'
+import { CardiopulmonaryCouplingDeck, SoftTissueBiomechanicsDeck, NeuroFascicularReflexDeck } from '../../domains/body-exposure'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Isi klinis satu organ, terbuka SEKETIKA saat organnya diketuk di figur 3D.
@@ -296,6 +296,13 @@ export function OrganClinicalPanel({ organKey, organLabel, onLocate, audienceLua
       {['heart', 'lungs', 'jantung', 'paru'].includes(organKey.toLowerCase()) && (
         <div style={{ marginTop: '8px' }}>
           <CardiopulmonaryCouplingDeck />
+        </div>
+      )}
+
+      {/* 4D Cranial Nerve Reflex Arcs & Tractography Deficit Deck */}
+      {['brain', 'otak', 'spinal', 'medula', 'nervous', 'saraf'].some((k) => organKey.toLowerCase().includes(k)) && (
+        <div style={{ marginTop: '8px' }}>
+          <NeuroFascicularReflexDeck />
         </div>
       )}
 

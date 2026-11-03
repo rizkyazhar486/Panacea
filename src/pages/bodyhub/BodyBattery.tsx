@@ -116,7 +116,7 @@ export function BodyBattery() {
 
       {!memuat && !gagal && !hasil.cukupData && (
         <Card>
-          <p className="text-sm font-bold text-ink dark:text-ink">Cannot be computed yet</p>
+          <p className="text-sm font-bold text-ink dark:text-white">Cannot be computed yet</p>
           <p className="mt-1 text-sm leading-relaxed text-neutral-500">{hasil.alasan}</p>
           <p className="mt-3 text-sm leading-relaxed text-neutral-500">
             Body Battery needs a heart-rate trace, not just a daily summary. How to get more of it is in
@@ -139,8 +139,8 @@ export function BodyBattery() {
                 <div className="mt-1 text-sm font-bold" style={{ color: saran.warna }}>{saran.judul}</div>
               </div>
               <div className="text-right text-xs text-neutral-500">
-                <div>Highest <b className="tabular-nums text-ink dark:text-ink">{hasil.tertinggi}</b></div>
-                <div>Lowest <b className="tabular-nums text-ink dark:text-ink">{hasil.terendah}</b></div>
+                <div>Highest <b className="tabular-nums text-ink dark:text-white">{hasil.tertinggi}</b></div>
+                <div>Lowest <b className="tabular-nums text-ink dark:text-white">{hasil.terendah}</b></div>
               </div>
             </div>
             <div className="mt-3 h-2 overflow-hidden rounded-full bg-neutral-100 dark:bg-white/10">
@@ -207,7 +207,7 @@ export function BodyBattery() {
                 {hasil.peristiwa.map((p, i) => (
                   <div key={i} className="flex items-start justify-between gap-3 rounded-xl bg-neutral-50 px-3 py-2 dark:bg-white/5">
                     <div className="min-w-0">
-                      <div className="text-sm font-bold text-ink dark:text-ink">{p.label}</div>
+                      <div className="text-sm font-bold text-ink dark:text-white">{p.label}</div>
                       <div className="text-[12px] text-neutral-500">{jam(p.mulai)} – {jam(p.selesai)}</div>
                     </div>
                     <span className={`shrink-0 text-sm font-black tabular-nums ${p.jenis === 'isi' ? 'text-emerald-500' : 'text-red-500'}`}>
@@ -224,11 +224,11 @@ export function BodyBattery() {
             <div className="mt-3 grid grid-cols-2 gap-3 text-sm">
               <div>
                 <div className="text-[11px] text-neutral-500">Resting heart rate</div>
-                <div className="font-black tabular-nums text-ink dark:text-ink">{hasil.istirahat} bpm</div>
+                <div className="font-black tabular-nums text-ink dark:text-white">{hasil.istirahat} bpm</div>
               </div>
               <div>
                 <div className="text-[11px] text-neutral-500">Maximum heart rate</div>
-                <div className="font-black tabular-nums text-ink dark:text-ink">{hasil.hrMaks} bpm</div>
+                <div className="font-black tabular-nums text-ink dark:text-white">{hasil.hrMaks} bpm</div>
               </div>
             </div>
             <Prosa kelas="mt-3 text-sm leading-relaxed text-neutral-500">Garmin computes Body Battery from continuously recorded heart-rate variability. Apple Watch does not record it that way, so this page uses where the heart rate sits within your heart-rate reserve: near resting it charges, far above it drains, and sleep charges fastest. The direction is the same, but the numbers will not match Garmin exactly.</Prosa>
