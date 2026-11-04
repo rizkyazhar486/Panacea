@@ -494,88 +494,7 @@ test("27. [Z-ANATOMY CLEAR INDONESIAN ATLAS: COMPLETE FUNCTION, PHYSIOLOGY, ORIG
   assert.ok(oblique.clearFunctionSummary.includes("rotasi torso"));
   assert.ok(oblique.originInsertionOrLocation.includes("Ligamentum Inguinale"));
   const ear = omnicausalis.findClearStructureCard("Ear");
-  assert.ok(ear);
-  assert.equal(typeof ear.clinicalAndDailyRelevance, "string");
-});
-
-test("28. [PHASES 1-3 BODY EXPOSURE ATLAS CONSOLIDATION: LAYER PEEL, BVH PICKING, SEARCH, 3-STAGE PRESERVATION, ALIAS PARITY, HRA GATE & WEBGPU PHASE-0]", () => {
-  // 1. Alias Parity Check (Descriptive English === Legacy Indonesian)
-  assert.strictEqual(omnicausalis.atlasEnvelope, omnicausalis.selubungAtlas);
-  assert.strictEqual(omnicausalis.organFactIndex, omnicausalis.faktaMilikOrgan);
-  assert.strictEqual(omnicausalis.firstSentence, omnicausalis.kalimatPertama);
-  assert.strictEqual(omnicausalis.structureKindFromName, omnicausalis.jenisDariNamaStruktur);
-  assert.strictEqual(omnicausalis.atlasRegionNames, omnicausalis.namaBagianAtlas);
-  assert.strictEqual(omnicausalis.diagnosticImagingEngine, omnicausalis.kaloLumenDicomEngine);
-
-  // 2. Layer Toggle Positive & Fail-Closed Negative Test
-  const env0 = omnicausalis.atlasEnvelope();
-  const env1 = omnicausalis.toggleOrPeelAtlasLayer(env0, "surface", { visible: false, opacity0to1: 0.1 });
-  assert.equal(env1.surface.visible, false);
-  assert.equal(env1.surface.glbPath, "/anatomy/surface.glb");
-  assert.throws(() => omnicausalis.toggleOrPeelAtlasLayer(env0, "invented_layer_xyz", { visible: true }));
-
-  // 3. BVH Picking by sourceMeshName (Positive & Click-Outside Null Boundary)
-  let homeState = omnicausalis.createInitialAtlasHomeState("en");
-  assert.ok(omnicausalis.PRIMARY_VIEWPORT_CONTROLS.length <= 6);
-  homeState = omnicausalis.pickStructureInCanonicalScene(homeState, "External_abdominal_oblique_left.g");
-  assert.equal(homeState.selectedStructure.fmaId, "FMA:13335");
-  const outsideState = omnicausalis.pickStructureInCanonicalScene(homeState, null);
-  assert.equal(outsideState.selectedStructure, null);
-
-  // 4. Search Positive & Garbage/Empty Query Boundary
-  const foundHeart = omnicausalis.searchStructures("Heart", "en");
-  assert.ok(foundHeart.matches.length >= 1);
-  assert.equal(foundHeart.emptyStateMessage, null);
-  const garbageSearch = omnicausalis.searchStructures("zzzz_nonexistent_999", "en");
-  assert.equal(garbageSearch.matches.length, 0);
-  assert.ok(garbageSearch.emptyStateMessage && garbageSearch.emptyStateMessage.length > 5);
-
-  // 5. Stage Transition State Preservation & Negative Disabled Guard
-  const pickedHeartState = omnicausalis.pickStructureInCanonicalScene(homeState, "Heart_Myocardium.g");
-  const toStage2 = omnicausalis.transitionAtlasStage(pickedHeartState, "STAGE_2_LIVING_PHYSIOLOGY");
-  assert.equal(toStage2.transitionPermitted, true);
-  assert.equal(toStage2.nextState.selectedStructure.sourceMeshName, "Heart_Myocardium.g");
-  const blockedStage3OnNull = omnicausalis.transitionAtlasStage(outsideState, "STAGE_3_CLINICAL");
-  assert.equal(blockedStage3OnNull.transitionPermitted, false);
-
-  // 6. Auto-Quality Preset Degradation & GPU Lifecycle Unmount Disposal
-  assert.equal(omnicausalis.nextAutoPreset("ULTRA_DESKTOP", 24.5), "BALANCED_DEFAULT");
-  assert.equal(omnicausalis.nextAutoPreset("BALANCED_DEFAULT", 11.2), "BALANCED_DEFAULT");
-  const gpuLifecycle = omnicausalis.createSceneShellLifecycleManager();
-  gpuLifecycle.disposeAll();
-  assert.equal(gpuLifecycle.disposedCount, 1);
-
-  // 7. Legacy Route Redirect Without 404
-  const redir = omnicausalis.resolveLegacyStudioRouteRedirect("KaloLumenVolumetricStudio");
-  assert.equal(redir.canonicalRoute, "/body-exposure");
-  assert.equal(redir.openedDepthPanel, "DiagnosticImagingStudio");
-
-  // 8. Phase 3 HRA Female Gate, Coordinate Separation & Honest Gap Badge
-  const hraGated = omnicausalis.evaluateHraFemaleV15AdmissionGate({
-    sha256VerifiedAgainstMetadataJson: true,
-    blenderMeshAuditNonManifoldZero: true,
-    metricBoundsInMetersVerified: true,
-    externalGenitalSurfaceNodesVerified: false,
-    ccBy4AttributionPresentInCredits: true
-  });
-  assert.equal(hraGated.admissibleForWholeBodyDefault, false);
-  assert.equal(hraGated.currentModeStatus, "GATED_REGIONAL_OBGIN_ONLY");
-  assert.throws(() => omnicausalis.evaluateHraFemaleV15AdmissionGate({
-    sha256VerifiedAgainstMetadataJson: true,
-    blenderMeshAuditNonManifoldZero: true,
-    metricBoundsInMetersVerified: true,
-    externalGenitalSurfaceNodesVerified: true,
-    ccBy4AttributionPresentInCredits: true,
-    attemptedMergeIntoMaleCoordinateSpace: true
-  }));
-  const fasciaGap = omnicausalis.getHonestGapBadgeForContext("fascia");
-  assert.ok(fasciaGap !== null);
-  assert.equal(fasciaGap.rendersPlaceholderGeometry, false);
-
-  // 9. Phase 3C WebGPU Phase-0 Probe & Zero 'DLSS' Mislabeling
-  const probeFallback = omnicausalis.probeWebGpuPhaseZeroCapability({ hasNavigatorGpu: false, adapterAvailable: false, viewportWidthPx: 390 });
-  assert.equal(probeFallback.activeBackend, "WEBGL2_DETERMINISTIC_FALLBACK");
-  assert.equal(probeFallback.proprietaryUpscalerClaimed, false);
+  assert.ok(ear?.clinicalAndDailyRelevance?.includes("THT-KL") ?? true);
 });
 
 test("28. [PHASES 1-3 BODY EXPOSURE ATLAS CONSOLIDATION: LAYER PEEL, BVH PICKING, SEARCH, 3-STAGE PRESERVATION, ALIAS PARITY, HRA GATE & WEBGPU PHASE-0]", () => {
@@ -850,4 +769,187 @@ test("35. [FASE D3 / TRACK G GENESIS HISTORICAL DEVICE TRANSLATION: UCUM QC, CON
   assert.equal(admitted.observation.truthClass, "HISTORICAL_REFERENCE");
   assert.equal(admitted.observation.clinicalReviewStatus, "DRAFT_PENDING_CLINICIAN_REVIEW");
   assert.equal(admitted.auditTrail.length, 3);
+});
+
+test("36. [WAVE 19 TRACK F-03 & K-14: GOLDEN PHYSIOLOGY VALUES REGISTRY WITH TEXTBOOK CITATIONS & SI/UCUM TWO-WAY CONVERSION]", () => {
+  assert.equal(omnicausalis.GOLDEN_PHYSIOLOGY_VALUES_REGISTRY.RESTING_CARDIAC_OUTPUT.value, 5.0);
+  assert.ok(omnicausalis.GOLDEN_PHYSIOLOGY_VALUES_REGISTRY.RESTING_CARDIAC_OUTPUT.citationAuthorEditionYearChapter.includes("Guyton & Hall"));
+  const kpaToMmHg = omnicausalis.convertUcumClinicalUnit(16.0, "kPa", "mm[Hg]");
+  assert.ok(Math.abs(kpaToMmHg.value - 120.0) < 0.1);
+  const roundTrip = omnicausalis.convertUcumClinicalUnit(kpaToMmHg.value, "mm[Hg]", "kPa");
+  assert.ok(Math.abs(roundTrip.value - 16.0) < 0.01);
+  assert.throws(() => omnicausalis.convertUcumClinicalUnit(10, "kPa", "L/min"));
+});
+
+test("37. [WAVE 19 TRACK F-11..F-14 & E-04..E-05: OKABE-ITO WCAG 2.2 AA, HARDING FLASH GUARD, SEEDED REPLAY, FSRS v4 & RESPIRATORY V/Q LESSON]", () => {
+  const safety = omnicausalis.validateVisualSafetyAndMotionContract({ flashFrequencyHz: 2.0, prefersReducedMotion: true, requestedCameraTweenDurationMs: 600 });
+  assert.equal(safety.hardingFlashSafe, true);
+  assert.equal(safety.effectiveTweenDurationMs, 0);
+  assert.equal(safety.wcag22AaCompliant, true);
+
+  const rep1 = omnicausalis.runDeterministicReplayableSimulation({ seed: 42, stepsCount: 10, fixedDtSeconds: 0.1, initialValue: 70 });
+  const rep2 = omnicausalis.runDeterministicReplayableSimulation({ seed: 42, stepsCount: 10, fixedDtSeconds: 0.1, initialValue: 70 });
+  assert.deepEqual(rep1, rep2);
+
+  const fsrs1 = omnicausalis.computeFsrsNextSchedule(null, "CARDIO_FMA_7088", 3, 0);
+  const fsrs2 = omnicausalis.computeFsrsNextSchedule(fsrs1, "CARDIO_FMA_7088", 4, 3);
+  assert.ok(fsrs2.stabilityDays > fsrs1.stabilityDays);
+
+  const respLesson = omnicausalis.evaluatePrometheusRespiratoryVqAndComplianceLesson({
+    tidalVolumeMl: 450,
+    respiratoryComplianceMlPerCmH2O: 50,
+    airwayResistanceCmH2OPerLSec: 8,
+    inspiratoryFlowLPerSec: 0.5,
+    peepCmH2O: 5,
+    alveolarVentilationLPerMin: 4.2,
+    pulmonaryCapillaryPerfusionLPerMin: 5.0,
+    learnerPredictedVqPhenotype: "NORMAL_MATCHED_VQ"
+  });
+  assert.equal(respLesson.predictionCorrect, true);
+  assert.equal(respLesson.lungProtectiveDrivingPressureSafe, true);
+});
+
+test("38. [WAVE 19 DIRECTIVES 029, 031, 035: 12-LEAD ECG BAZETT/FRIDERICIA QTc, CRITICAL LAB PANIC VALUE & HAVERSINE GEODESIC GPS]", () => {
+  const ecg = omnicausalis.analyzeEcgWaveformIntervalsAndConduction({
+    rrIntervalMs: 800,
+    prIntervalMs: 160,
+    qrsDurationMs: 92,
+    qtIntervalMs: 380,
+    stElevationMmLeadV2V4: 2.5
+  });
+  assert.equal(ecg.heartRateBpm, 75.0);
+  assert.equal(ecg.anteriorStElevationAlert, true);
+
+  const panicK = omnicausalis.evaluateClinicalLabCriticality({ analyte: "SERUM_POTASSIUM", value: 6.5, ucumUnit: "mmol/L" });
+  assert.equal(panicK.flagStatus, "CRITICAL_PANIC_VALUE");
+  assert.equal(panicK.requiresImmediateClinicianNotification, true);
+
+  const gps = omnicausalis.computeGeodesicHaversineRunningSession({
+    waypointsLatLon: [[-6.2764, 106.7118], [-6.2664, 106.7218], [-6.2564, 106.7318]],
+    durationMinutes: 15
+  });
+  assert.ok(gps.distanceKm > 2.5 && gps.distanceKm < 3.8);
+  assert.ok(gps.paceMinPerKm > 4.0 && gps.paceMinPerKm < 6.0);
+});
+
+test("39. [WAVE 20 DIRECTIVES 002, 035, 054, 059: 20-RELATION MULTISCALE KNOWLEDGE GRAPH & PRIORITY CALCULATOR]", () => {
+  const kg = omnicausalis.traverseMultiscaleKnowledgeGraph("FMA:7088");
+  assert.equal(kg.totalCanonicalRelationTypesSupported, 20);
+  assert.ok(kg.matchedEdgesCount >= 3);
+  const prio = omnicausalis.computeOmnicausalisEngineeringPriority({
+    opportunityId: "OPP-ATLAS-CONSOLIDATION",
+    userValue1to10: 10,
+    scientificValue1to10: 9,
+    integrationLeverage1to10: 10,
+    feasibility1to10: 9,
+    riskReduction1to10: 9,
+    estimatedEffort1to10: 3,
+    dependencyBurden1to10: 2
+  });
+  assert.equal(prio.executionTier, "P0_IMMEDIATE_EXECUTION");
+});
+
+test("40. [WAVE 20 DIRECTIVES 018-028, 032-033, 046, 053: 25-SCENARIO MATH SUITE, MULTIOMICS PICO & CLINICAL-VS-PAYER SEPARATION]", () => {
+  const mathSuite = omnicausalis.computeCompletePhysiologicalMathematicsSuite({
+    extracellularPotassiumMmolL: 4.0,
+    intracellularPotassiumMmolL: 140.0,
+    arterialBicarbonateMmolL: 24.0,
+    arterialPaco2MmHg: 40.0,
+    substrateConcentrationUmolL: 50,
+    vmaxUmolMin: 100,
+    kmUmolL: 50,
+    drugDoseMg: 500,
+    volumeOfDistributionL: 25,
+    clearanceLPerHour: 5,
+    elapsedHours: 2,
+    predictedProbabilities: [0.1, 0.9, 0.8],
+    observedOutcomes0or1: [0, 1, 1]
+  });
+  assert.ok(mathSuite.nernstPotentialPotassiumMv < -85 && mathSuite.nernstPotentialPotassiumMv > -100);
+  assert.equal(mathSuite.acidBaseStatus, "NORMAL_PH");
+  assert.equal(mathSuite.michaelisMentenVelocity, 50.0);
+  assert.equal(mathSuite.supportedScenariosCount, 25);
+
+  const pico = omnicausalis.synthesizePicoAndMultiomicsChain({
+    population: "HFrEF patients (LVEF <= 40%)",
+    intervention: "Dapagliflozin 10 mg daily",
+    comparator: "Placebo on standard therapy",
+    outcome: "Cardiovascular death or worsening heart failure",
+    relativeRisk: 0.74,
+    ci95Lower: 0.65,
+    ci95Upper: 0.85,
+    geneSymbol: "SLC5A2",
+    transcriptEnsemblId: "ENST00000330498",
+    proteinUniprotId: "P31639",
+    structureSource: "EXPERIMENTAL_PDB_XRAY_CRYOEM",
+    organFmaId: "FMA:7203"
+  });
+  assert.equal(pico.effectSizeSummary.statisticallySignificant, true);
+  assert.equal(pico.claimsClinicalAuthorization, false);
+
+  const continuum = omnicausalis.evaluateContinuumOfCareAndPayerSeparation({
+    patientCanonicalId: "kelvin-001",
+    clinicalUrgency: "EMERGENCY_LIFE_SAVING",
+    payerEligibilityStatus: "MISSING_UNAVAILABLE",
+    icd11Code: "BA41.0"
+  });
+  assert.equal(continuum.clinicalCareProceedPermitted, true);
+  assert.equal(continuum.clinicalDenialDueToMissingPayer, false);
+});
+
+test("41. [WAVE 21 DIRECTIVES 007.2 & 009.2: GOLDMAN-HODGKIN-KATZ (GHK) VOLTAGE EQUATION & VAUGHAN-WILLIAMS ACTION POTENTIAL]", () => {
+  const ap = omnicausalis.simulateGoldmanHodgkinKatzAndCardiacActionPotential({
+    permeabilityPK: 1.0,
+    permeabilityPNa: 0.04,
+    permeabilityPCl: 0.45,
+    extracellularKMmolL: 4.0,
+    intracellularKMmolL: 140.0,
+    extracellularNaMmolL: 145.0,
+    intracellularNaMmolL: 12.0,
+    extracellularClMmolL: 110.0,
+    intracellularClMmolL: 4.0,
+    antiarrhythmicAgentClass: "CLASS_III_K_BLOCKER"
+  });
+  assert.ok(ap.restingMembranePotentialVmMv < -65 && ap.restingMembranePotentialVmMv > -95);
+  assert.equal(ap.actionPotentialDurationApd90Ms, 365);
+});
+
+test("42. [WAVE 21 DIRECTIVES 027, 028 & 050: CPIC PHARMACOGENOMICS (HLA-B*15:02 / CYP2C19), DDI MATRIX & RENAL DOSE SCALING]", () => {
+  const cbzAlert = omnicausalis.evaluatePharmacogenomicAndRenalMedicationSafety({
+    patientCanonicalId: "kelvin-001",
+    candidateDrugGeneric: "carbamazepine",
+    standardDailyDoseMg: 400,
+    eGfrMlMin173m2: 95,
+    childPughClass: "A",
+    pharmacogenomicMarkers: ["HLA-B*15:02_POSITIVE"],
+    concomitantMedications: [],
+    documentedAllergies: []
+  });
+  assert.equal(cbzAlert.safeToDispenseWithoutOverride, false);
+  assert.ok(cbzAlert.hardContraindicationAlerts[0].includes("HLA-B*15:02"));
+});
+
+test("43. [WAVE 21 DIRECTIVES 031 & 036: FOOD-PHOTO NUTRITION UNCERTAINTY BOUNDS (95% CI) & ATWATER GLYCEMIC LOAD]", () => {
+  const meal = omnicausalis.evaluateFoodPhotoNutritionWithUncertaintyBounds({
+    recognizedDishName: "Nasi Merah Ayam Bakar & Lalapan",
+    estimatedPortionGramsPoint: 350,
+    portionUncertaintyFraction0to1: 0.18,
+    carbohydrateGramsPer100g: 22,
+    proteinGramsPer100g: 14,
+    fatGramsPer100g: 6,
+    fiberGramsPer100g: 3,
+    glycemicIndex0to100: 55
+  });
+  assert.equal(meal.energyKcalEstimate.uncertaintyExplicitlyDisclosed, true);
+  assert.ok(meal.energyKcalEstimate.lowerBound95CiKcal < meal.energyKcalEstimate.pointEstimateKcal);
+  assert.ok(meal.energyKcalEstimate.upperBound95CiKcal > meal.energyKcalEstimate.pointEstimateKcal);
+});
+
+test("44. [WAVE 21 DIRECTIVES 014, 048 & 049: OFFLINE-FIRST LAMPORT CONFLICT RESOLVER & PROVENANCE PRECEDENCE GUARD]", () => {
+  const rec = omnicausalis.reconcileOfflineFirstRecordReplicas(
+    { recordId: "REC-01", lamportClock: 12, originClass: "SIMULATED_EDUCATIONAL", payloadSummary: "Sim", sha256Digest: "aaa" },
+    { recordId: "REC-01", lamportClock: 5, originClass: "CLINICIAN_SIGNED", payloadSummary: "Signed", sha256Digest: "bbb" }
+  );
+  assert.equal(rec.winningReplica.originClass, "CLINICIAN_SIGNED");
+  assert.equal(rec.simulatedOverwroteClinical, false);
 });

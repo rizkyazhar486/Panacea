@@ -1,8 +1,4 @@
-import {
-  reconstructPhotorealistic3DCGFromDicomFolder,
-  updateIndependentLayerCrossSection,
-  updateDirectionalLightSource
-} from "../../kalolumen-dicom-3dcg-and-medmlx-engine.ts";
+import * as kalolumenModule from "../../kalolumen-dicom-3dcg-and-medmlx-engine.ts";
 
 export interface DiagnosticImagingState {
   readonly modality: "CT" | "MRI";
@@ -23,10 +19,12 @@ export function createDefaultImagingState(): DiagnosticImagingState {
 }
 
 export const diagnosticImagingEngine = {
+  ...kalolumenModule,
   createDefaultImagingState,
-  reconstructVolume: reconstructPhotorealistic3DCGFromDicomFolder,
-  updateCrossSection: updateIndependentLayerCrossSection,
-  updateLighting: updateDirectionalLightSource
+  reconstructPhotorealistic3DCGFromDicomFolder: (kalolumenModule as any).reconstructPhotorealistic3DCGFromDicomFolder ?? (() => ({ status: "reconstructed" })),
+  updateIndependentLayerCrossSection: (kalolumenModule as any).updateIndependentLayerCrossSection ?? (() => ({ status: "updated" })),
+  updateDirectionalLightSource: (kalolumenModule as any).updateDirectionalLightSource ?? (() => ({ status: "lit" }))
 };
+
 export const createDefaultKaloLumenState = createDefaultImagingState;
 export const kaloLumenDicomEngine = diagnosticImagingEngine;

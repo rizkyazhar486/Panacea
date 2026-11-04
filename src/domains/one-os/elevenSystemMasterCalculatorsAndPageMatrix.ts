@@ -37,7 +37,7 @@ export function computeAllElevenBodySystemCalculations(): readonly SystemQuantit
 
   // Endocrine HOMA-IR = (Glucose_mg/dL * Insulin_uIU/mL) / 405
   const homaIr = Number(((84 * 6.2) / 405).toFixed(2));
-  // Hematological CaO2 = (1.34 * Hb * SaO2) + (0.0031 * PaO2)
+  // Hematological CaO2 = (alpha_Hb * Hb * SaO2) + (alpha_dissolved * PaO2)
   const hbGdl = 15.2;
   const saO2Frac = 0.98;
   const caO2MlDl = Number(oxygenContentMlDl(DEFAULT_OXYGEN_CONTENT_CONVENTION, hbGdl, saO2Frac, coupled.respiratoryAndAcidBase.arterialPo2MmHg).toFixed(2));
@@ -138,7 +138,7 @@ export function computeAllElevenBodySystemCalculations(): readonly SystemQuantit
     {
       systemId: "HEMATOLOGICAL_MARROW",
       displayName: "Hematological / Marrow",
-      primaryFormula: "CaO2 = (1.34 * Hb * SaO2) + (0.0031 * PaO2)",
+      primaryFormula: "CaO2 = (alpha_Hb * Hb * SaO2) + (alpha_dissolved * PaO2)",
       primaryMetricLabel: "Arterial O2 Content (CaO2)",
       primaryMetricValue: caO2MlDl + " mL O2/dL (Hb " + hbGdl + " g/dL)",
       secondaryMetricLabel: "Krogh Microvascular Tissue PO2",

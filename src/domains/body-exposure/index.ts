@@ -2,7 +2,7 @@
 // PANACEAMED — BODY EXPOSURE PUBLIC DOMAIN API (CURATED SINGLE ENTRYPOINT)
 // ============================================================================
 
-// — MODEL & DATA CONTRACTS —
+// ── MODEL ──────────────────────────────────────────────
 export {
   ORGAN_FACT_REGISTRY,
   SHIPPED_Z_ANATOMY_GLB_LAYERS,
@@ -16,7 +16,7 @@ export {
   type ReferenceBodySexMode
 } from "./engine/structureAtlas.ts";
 
-// — GROSS ANATOMY ENGINE —
+// ── ENGINE: GROSS ANATOMY ────────────────────────────────
 export {
   atlasEnvelope,
   selubungAtlas,
@@ -32,20 +32,16 @@ export {
   atlasRegionNames,
   namaBagianAtlas,
   searchStructures,
-  type StructureSearchResult
-} from "./engine/structureAtlas.ts";
-
-// — RENDERING, QUALITY & LIFECYCLE ENGINE —
-export {
   FRAME_BUDGET_MS,
   nextAutoPreset,
   computeSemanticZoomRatio,
   createSceneShellLifecycleManager,
   probeWebGpuPhaseZeroCapability,
+  type StructureSearchResult,
   type QualityPresetId
 } from "./engine/structureAtlas.ts";
 
-// — IMAGING ENGINE (CT / MRI / MPR) —
+// ── ENGINE: IMAGING ────────────────────────────────────
 export {
   diagnosticImagingEngine,
   kaloLumenDicomEngine,
@@ -54,14 +50,31 @@ export {
   type DiagnosticImagingState
 } from "./engine/structureAtlas.ts";
 
-// — PHYSIOLOGY SIMULATION ENGINE —
+// ── ENGINE: PHYSIOLOGY ─────────────────────────────────
 export { evaluateCardiopulmonaryCouplingDeck, type CardiopulmonaryCouplingInput } from "./engine/cardiopulmonaryCouplingEngine.ts";
 export { computeWiggersCardiacCyclePressure, computeKroghCylinderOxygenDiffusion } from "./engine/wiggersAndKroghPhysiologyEngine.ts";
 export { simulateRenalAutoregulationAndCountercurrent } from "./engine/renalNephronAutoregulationEngine.ts";
 export { executeCrossOrganCoupledSimulation } from "./engine/crossOrganPhysiologicalCouplingEngine.ts";
 export { simulateHepatobiliaryPancreaticPostprandialDynamics } from "./engine/hepatobiliaryPancreaticAndLaparoscopicEngine.ts";
 
-// — CLINICAL CORRELATION & SURGICAL SIMULATION —
+// ── ENGINE: CLINICAL CORRELATION ───────────────────────
+// Single unified vascularTerritoryEngine block (Zero Duplicate Exports)
+export {
+  AHA17_SEGMENT_COUNT,
+  ATLAS_REFERENCE_LABEL,
+  AHA17_CORONARY_TERRITORY_SOURCE,
+  AHA17_LIMITATIONS,
+  AHA17_TERRITORY_LIMITATIONS,
+  AHA17_SOURCES,
+  DOMINANCE_PREVALENCE,
+  AHA17_RINGS,
+  AHA17_SEGMENT_NAMES,
+  AHA17_CORONARY_TERRITORY_TABLE,
+  branchForSegment,
+  territoryForArtery,
+  mapCoronaryToAHA17,
+  evaluateAHA17PerfusionBurden
+} from "./engine/clinical/vascularTerritoryUnified.ts";
 export { evaluateCabgEducationalSurgicalSimulation } from "./engine/universalSurgicalCabgAndProceduralEngine.ts";
 export { evaluateLaparoscopicCholecystectomyCriticalViewOfSafety } from "./engine/hepatobiliaryPancreaticAndLaparoscopicEngine.ts";
 export {
@@ -71,13 +84,28 @@ export {
   verifyCrossEngineCardiopulmonaryConsistency
 } from "./engine/tenMergedPillarsUnifiedWorkbenchEngine.ts";
 
-// — SOURCE ADMISSION & HONEST GAP REVIEW —
+// ── ENGINE: BIOMECHANICS & GAIT ────────────────────────
 export {
-  evaluateHraFemaleV15AdmissionGate,
-  getHonestGapBadgeForContext
+  executeTrack4WearablesSensoriumAnd3DBiomechanics,
+  executeSourceBackedMultiscaleGapHandoff,
+  type MultiscaleHandoffDomain,
+  type SourceBackedMultiscaleHandoffResult
 } from "./engine/structureAtlas.ts";
 
-// — UI (CANONICAL ATLAS HOME ENTRYPOINT) —
+// ── ADAPTERS ───────────────────────────────────────────
+export {
+  evaluateHraFemaleV15AdmissionGate,
+  getHonestGapBadgeForContext,
+  verifyAndAdmitHraFemaleV15FromRepoArtifacts,
+  executeTrack3AutophagyMitophagyAndDeNovoTherapeutics,
+  buildClinicalReviewPacketForH3Signoff
+} from "./engine/structureAtlas.ts";
+
+// ── UI (cross-domain only) ───────────────────────────────
+// @internal studio decks (KaloLumenVolumetricStudio, ReferredPainDermatomeStudio,
+// CardiopulmonaryCouplingDeck, SoftTissueBiomechanicsDeck, FiveStageVisualAtlas,
+// OrganBiometricOverlayCard) are reachable from BodyExposureAtlasHome depth panels,
+// and are intentionally excluded from the domain public API.
 export {
   BodyExposureAtlasHome,
   PRIMARY_VIEWPORT_CONTROLS,
@@ -87,19 +115,7 @@ export {
   resolveLegacyStudioRouteRedirect,
   type AtlasStageId,
   type BodyExposureAtlasHomeState
-} from "./ui/BodyExposureAtlasHome.tsx";
-// — WAVE 14: OPEN GAP RESOLUTION & AI TAKEOVER (TRACKS 3 & 4) —
-export {
-  verifyAndAdmitHraFemaleV15FromRepoArtifacts,
-  executeSourceBackedMultiscaleGapHandoff,
-  executeTrack3AutophagyMitophagyAndDeNovoTherapeutics,
-  executeTrack4WearablesSensoriumAnd3DBiomechanics,
-  buildClinicalReviewPacketForH3Signoff,
-  type MultiscaleHandoffDomain,
-  type SourceBackedMultiscaleHandoffResult
-} from "./engine/structureAtlas.ts";
-
-// — WAVE 15: UNIFIED REACT NAVIGATION & ENTRYPOINT BRIDGE —
+} from "./ui/BodyExposureAtlasHome.ts";
 export {
   resolveUnifiedBodyNavigation,
   type UnifiedBodyNavigationTarget

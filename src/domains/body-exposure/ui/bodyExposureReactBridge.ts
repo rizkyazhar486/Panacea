@@ -6,7 +6,7 @@ import {
   PRIMARY_VIEWPORT_CONTROLS,
   type AtlasStageId,
   type BodyExposureAtlasHomeState
-} from "./BodyExposureAtlasHome.tsx";
+} from "./BodyExposureAtlasHome.ts";
 import {
   organFactIndex,
   firstSentence,

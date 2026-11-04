@@ -1,0 +1,26 @@
+{
+  "generatedOn": "2026-11-04",
+  "limitBytes": 115200,
+  "beforeOptimizationBytes": 115199,
+  "afterOptimizationBytes": 111779,
+  "headroomBytes": 3421,
+  "meetsMinimum2000BytesHeadroom": true,
+  "topSharedUtilityDeduplications": [
+    {
+      "pattern": ".glass-card / backdrop-filter shell",
+      "savedBytes": 1180
+    },
+    {
+      "pattern": ".touch-pill / .stage-pill interactive controls",
+      "savedBytes": 940
+    },
+    {
+      "pattern": ".micro-label / tabular-nums telemetry badges",
+      "savedBytes": 720
+    },
+    {
+      "pattern": "Scoped inline style extraction across 12 absorbed studios",
+      "savedBytes": 580
+    }
+  ]
+}

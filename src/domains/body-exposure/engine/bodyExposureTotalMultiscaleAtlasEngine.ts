@@ -412,7 +412,7 @@ export const DEEP_11_SYSTEM_MULTISCALE_ATLAS: readonly DeepSystemAnatomicalPhysi
       level9GenomicLocus: "HBB (11p15.4), F2 (11p11.2), EPO (7q22.1)"
     },
     physiologicalMechanics: {
-      governingEquation: "CaO2 = (1.34 * Hb * SaO2) + (0.0031 * PaO2) ; DO2 = CO * CaO2 * 10",
+      governingEquation: "CaO2 = (alpha_Hb * Hb * SaO2) + (alpha_dissolved * PaO2) ; DO2 = CO * CaO2 * 10",
       homeostaticReferenceRange: "Hb 13.5-17.5 g/dL · CaO2 18-20 mL O2/dL · DO2 900-1100 mL/min · Platelets 150-400 x10^3/uL",
       regulatoryFeedbackLoop: "Renal Peritubular HIF-2alpha Oxygen Sensing -> Erythropoietin (EPO) -> Marrow Erythropoiesis",
       crossSystemCouplingTargets: ["RESPIRATORY_PULMONARY", "CARDIOVASCULAR_CIRCULATORY", "RENAL_URINARY"]
