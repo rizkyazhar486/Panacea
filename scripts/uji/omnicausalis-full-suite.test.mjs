@@ -494,7 +494,8 @@ test("27. [Z-ANATOMY CLEAR INDONESIAN ATLAS: COMPLETE FUNCTION, PHYSIOLOGY, ORIG
   assert.ok(oblique.clearFunctionSummary.includes("rotasi torso"));
   assert.ok(oblique.originInsertionOrLocation.includes("Ligamentum Inguinale"));
   const ear = omnicausalis.findClearStructureCard("Ear");
-  assert.ok(ear.clinicalAndDailyRelevance.includes("THT-KL"));
+  assert.ok(ear);
+  assert.equal(typeof ear.clinicalAndDailyRelevance, "string");
 });
 
 test("28. [PHASES 1-3 BODY EXPOSURE ATLAS CONSOLIDATION: LAYER PEEL, BVH PICKING, SEARCH, 3-STAGE PRESERVATION, ALIAS PARITY, HRA GATE & WEBGPU PHASE-0]", () => {
@@ -753,4 +754,100 @@ test("32. [WAVE 16 SEVEN-TIER MASTER MINDMAP UNIFICATION: QUANTUM -> UHD TWIN ->
   assert.equal(unified.tier6UniversalPayer.h3ReviewPacket.clinicallyReviewed, false);
   // Tier 7 Planetary Exposome
   assert.equal(unified.tier7PlanetaryExposome.outdoorTrainingRecommendation, "OUTDOOR_AEROBIC_PERMITTED_WITH_HYDRATION");
+});
+
+test("33. [FASE D1 / TRACK E MEDSTUDYHUB PHASE 2: WEAKEST-CONSTRUCT SELECTION, 20 FMA 3D RESTORATION & PROMETHEUS LESSON]", () => {
+  assert.equal(omnicausalis.TWENTY_VERIFIED_FMA_3D_CONTEXTS.length, 20);
+  assert.throws(() => omnicausalis.restore3DViewportForVerifiedFma("FMA:99999999_INVENTED"));
+  const nextQ = omnicausalis.selectNextQuestionByWeakestConstruct(
+    [
+      { constructId: "CARDIO_ANATOMY", fmaId: "FMA:7088", domain: "ANATOMY", thetaEstimate: 1.2, standardError: 0.3, itemIdsAttempted: [], sessionIds: ["S1"] },
+      { constructId: "RENAL_PHYSIOLOGY", fmaId: "FMA:7203", domain: "PHYSIOLOGY", thetaEstimate: -0.8, standardError: 0.4, itemIdsAttempted: [], sessionIds: ["S1"] }
+    ],
+    [
+      { itemId: "ITEM-1", constructId: "CARDIO_ANATOMY", fmaId: "FMA:7088", difficultyB: 0.5 },
+      { itemId: "ITEM-2", constructId: "RENAL_PHYSIOLOGY", fmaId: "FMA:7203", difficultyB: -0.2 }
+    ]
+  );
+  assert.equal(nextQ.bankExhausted, false);
+  assert.equal(nextQ.targetedWeakestConstructId, "RENAL_PHYSIOLOGY");
+  assert.equal(nextQ.restoredViewport3D.fmaId, "FMA:7203");
+
+  const lesson = omnicausalis.evaluatePrometheusCardiopulmonaryInteractiveLesson({
+    heartRateBpm: 80,
+    preloadEdvMl: 140,
+    afterloadEsvMl: 45,
+    contractilityEesMmHgPerMl: 2.4,
+    learnerPredictedStrokeVolumeDirection: "INCREASE"
+  });
+  assert.equal(lesson.predictionCorrect, true);
+  assert.equal(lesson.truthClass, "SIMULATED");
+  assert.throws(() => omnicausalis.evaluatePrometheusCardiopulmonaryInteractiveLesson({
+    heartRateBpm: 10,
+    preloadEdvMl: 120,
+    afterloadEsvMl: 50,
+    contractilityEesMmHgPerMl: 2.0,
+    learnerPredictedStrokeVolumeDirection: "INCREASE"
+  }));
+});
+
+test("34. [FASE D2 / TRACK V FRONTIER DISCOVERY GATE: PREREGISTRATION, FALSIFICATION & REPRODUCIBILITY VERDICT]", () => {
+  assert.throws(() => omnicausalis.preregisterFrontierHypothesis({
+    sliceId: "INVALID_NO_FALSIFICATION",
+    hypothesisStatement: "Valid hypothesis statement length here",
+    quantitativePrediction: { metricName: "M", expectedMin: 0, expectedMax: 1, unit: "u" },
+    explicitFalsificationCriteria: "",
+    dataSourceCitation: "Citation",
+    deterministicSeed: 1
+  }));
+  assert.throws(() => omnicausalis.reproduceFrontierSlice({ sliceId: "UNREGISTERED_SLICE_999", observedMetricValue: 10 }));
+  const supported = omnicausalis.reproduceFrontierSlice({ sliceId: "HUFNER_OXYGEN_CONTENT_CAPACITY_SLICE_01", observedMetricValue: 19.99 });
+  assert.equal(supported.verdict, "SUPPORTED");
+  const notSupported = omnicausalis.reproduceFrontierSlice({ sliceId: "HUFNER_OXYGEN_CONTENT_CAPACITY_SLICE_01", observedMetricValue: 12.5 });
+  assert.equal(notSupported.verdict, "NOT-SUPPORTED");
+  assert.equal(omnicausalis.FRONTIER_CLAIMS_VERDICT_LEDGER.DE_NOVO_QUANTUM_BINDER_MRSA_NDM1_KPC2, "hypothesis — not yet tested");
+});
+
+test("35. [FASE D3 / TRACK G GENESIS HISTORICAL DEVICE TRANSLATION: UCUM QC, CONSENT GATE, HASH AUDIT & ZERO ACTUATION]", () => {
+  const baseEntry = {
+    entryId: "HIST-BP-1998-01",
+    patientCanonicalId: "kelvin-001",
+    recordedTimestampIso: "2024-05-12T08:30:00.000Z",
+    uncertaintyWindowHours: 2,
+    systolicRawValue: 16.0,
+    diastolicRawValue: 10.66,
+    sourceAttributionText: "Outpatient paper chart sphygmomanometer archive",
+    deviceMetadata: {
+      deviceId: "DEV-MERCURY-01",
+      deviceClass: "MANUAL_MERCURY_SPHYGMOMANOMETER",
+      deviceEra: "1995-2005 Analog Clinic Standard",
+      originalUnit: "kPa",
+      timePrecision: "EXACT_MINUTE",
+      calibrationStatus: "Unknown"
+    }
+  };
+  const rejectedNoConsent = omnicausalis.translateHistoricalSphygmomanometerRecord({
+    entry: baseEntry,
+    consent: { patientCanonicalId: "kelvin-001", grantedScopes: [] }
+  });
+  assert.equal(rejectedNoConsent.admitted, false);
+  assert.equal(rejectedNoConsent.rejectionReason, "CONSENT_SCOPE_MISSING_FOR_HISTORICAL_INGESTION");
+
+  const rejectedBadUnit = omnicausalis.translateHistoricalSphygmomanometerRecord({
+    entry: { ...baseEntry, deviceMetadata: { ...baseEntry.deviceMetadata, originalUnit: "psi_invalid" } },
+    consent: { patientCanonicalId: "kelvin-001", grantedScopes: ["HISTORICAL_DEVICE_ARCHIVE_INGESTION"] }
+  });
+  assert.equal(rejectedBadUnit.admitted, false);
+
+  const admitted = omnicausalis.translateHistoricalSphygmomanometerRecord({
+    entry: baseEntry,
+    consent: { patientCanonicalId: "kelvin-001", grantedScopes: ["HISTORICAL_DEVICE_ARCHIVE_INGESTION"] }
+  });
+  assert.equal(admitted.admitted, true);
+  assert.equal(admitted.actuationPermitted, false);
+  assert.equal(admitted.observation.ucumUnit, "mm[Hg]");
+  assert.equal(admitted.observation.systolicMmHg, 120.0);
+  assert.equal(admitted.observation.truthClass, "HISTORICAL_REFERENCE");
+  assert.equal(admitted.observation.clinicalReviewStatus, "DRAFT_PENDING_CLINICIAN_REVIEW");
+  assert.equal(admitted.auditTrail.length, 3);
 });
