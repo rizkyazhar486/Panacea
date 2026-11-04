@@ -150,7 +150,7 @@ export function SnpProfiler() {
       {found.map(({ snp, genotype, interp }) => (
         <Card key={snp.rsid} className="!p-5">
           <div className="flex items-center justify-between gap-2">
-            <div className="text-[15px] font-black text-ink dark:text-ink">{snp.gene}</div>
+            <div className="text-[15px] font-black text-ink dark:text-white">{snp.gene}</div>
             <Badge tone="brand">{snp.rsid} · {genotype}</Badge>
           </div>
           <div className="text-[12px] text-neutral-500">{snp.trait}</div>

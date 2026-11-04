@@ -85,7 +85,7 @@ export function AirQuality() {
           Location is used only to fetch air-quality data. Tips are general US-AQI banding plus optional self-identified sensitivity — follow your own asthma/COPD action plan and local public-health alerts.
         </p>
 
-        <label className="mt-3 flex items-center gap-2 rounded-xl border border-neutral-200 px-3 py-2 text-sm font-semibold text-ink dark:border-white/10 dark:text-ink">
+        <label className="mt-3 flex items-center gap-2 rounded-xl border border-neutral-200 px-3 py-2 text-sm font-semibold text-ink dark:border-white/10 dark:text-white">
           <input type="checkbox" checked={sensitive} onChange={(e) => setSens(e.target.checked)} />
           I have asthma, COPD, or airborne allergies
         </label>
@@ -147,7 +147,7 @@ function Pollutant({ label, value, unit, note }: { label: string; value: number;
   return (
     <div className="rounded-xl bg-neutral-50 p-3 text-center dark:bg-white/5">
       <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-500">{label}</div>
-      <div className="text-lg font-black text-ink dark:text-ink">{Number.isFinite(value) ? value : '—'}<span className="ml-0.5 text-[10px] font-medium text-neutral-500">{unit}</span></div>
+      <div className="text-lg font-black text-ink dark:text-white">{Number.isFinite(value) ? value : '—'}<span className="ml-0.5 text-[10px] font-medium text-neutral-500">{unit}</span></div>
       <div className="text-[10px] text-neutral-500">{note}</div>
     </div>
   )

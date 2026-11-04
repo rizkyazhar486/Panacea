@@ -242,7 +242,7 @@ export function StructureFinder({ onSorot, onLapisan }: StructureFinderProps) {
 
       {dipilih && (
         <div className="rounded-xl border border-brand/30 bg-brand/[0.04] p-3">
-          <div className="text-sm font-black text-ink dark:text-ink">{namaTampil(dipilih)}</div>
+          <div className="text-sm font-black text-ink dark:text-white">{namaTampil(dipilih)}</div>
           <div className="mt-0.5 text-[11px] text-neutral-500">
             Whole-body · {LAPISAN.find((l) => l.k === dipilih.l)?.label} ·{' '}
             {WILAYAH.find((w) => w.kunci === dipilih.w)?.label ?? dipilih.w} ·{' '}
@@ -259,7 +259,7 @@ export function StructureFinder({ onSorot, onLapisan }: StructureFinderProps) {
       {atlasDipilih && (
         <div className="space-y-2 rounded-xl border border-brand/30 bg-brand/[0.04] p-3">
           <div>
-            <div className="text-sm font-black text-ink dark:text-ink">{atlasDipilih.name}</div>
+            <div className="text-sm font-black text-ink dark:text-white">{atlasDipilih.name}</div>
             <div className="mt-0.5 text-[11px] text-neutral-500">
               Specialty atlas · {atlasDipilih.moduleLabel} · {atlasDipilih.kind}
               {atlasDipilih.region ? ` · ${atlasDipilih.region}` : ''}

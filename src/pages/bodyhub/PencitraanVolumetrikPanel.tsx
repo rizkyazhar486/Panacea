@@ -191,6 +191,9 @@ export function PencitraanVolumetrikPanel({ selectedSourceStructureName }: Penci
                     {k.min} … {k.maks} HU · {bagian === 0 ? 'outside' : penuh ? 'fully inside' : `${Math.round(bagian * 100)}% inside`}
                   </span>
                 </div>
+                <div style={{ marginTop: '4px', height: '4px', borderRadius: '2px', background: 'rgba(150,150,150,0.15)', overflow: 'hidden' }}>
+                  <div style={{ height: '100%', width: `${Math.round(bagian * 100)}%`, background: bagian > 0.9 ? '#00BF63' : bagian > 0 ? '#38bdf8' : 'transparent', transition: 'width 0.15s ease' }} />
+                </div>
                 <p className="mt-0.5 text-[11px] leading-relaxed text-neutral-600 dark:text-neutral-400">{k.catatan}</p>
               </li>
             )

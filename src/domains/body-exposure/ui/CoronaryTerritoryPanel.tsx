@@ -19,9 +19,14 @@ const BRANCH_STYLE: Record<CoronaryBranch, string> = {
   RCA: 'border-rose-600! bg-rose-100! text-rose-950! dark:border-rose-400! dark:bg-rose-500/25! dark:text-rose-50!',
 }
 
-export function CoronaryTerritoryPanel() {
+export interface CoronaryTerritoryPanelProps {
+  readonly defaultOpen?: boolean
+}
+
+export function CoronaryTerritoryPanel({ defaultOpen = false }: CoronaryTerritoryPanelProps = {}) {
   const [filter, setFilter] = useState<Filter>('ALL')
   const [selected, setSelected] = useState<number | null>(null)
+  const [isOpen, setIsOpen] = useState<boolean>(defaultOpen)
 
   const bySegment = useMemo(() => {
     const map = new Map<number, SegmentInfo>()
@@ -34,7 +39,12 @@ export function CoronaryTerritoryPanel() {
   const detail = selected === null ? null : branchForSegment(selected)
 
   return (
-    <details className="rounded-2xl border border-neutral-200 p-3 text-sm dark:border-white/10" data-testid="coronary-territory-panel">
+    <details
+      className="rounded-2xl border border-neutral-200 p-3 text-sm dark:border-white/10"
+      data-testid="coronary-territory-panel"
+      open={isOpen}
+      onToggle={(e) => setIsOpen(e.currentTarget.open)}
+    >
       <summary className="cursor-pointer font-bold">Coronary territories on the 17-segment heart model (reference)</summary>
       <p className="mt-2 rounded-xl bg-amber-50 p-2 text-[13px] text-amber-900 dark:bg-amber-400/10 dark:text-amber-100" role="note">
         Atlas reference — not patient-specific: a population-average assignment, because real coronary supply varies, and not for diagnosis or procedural targeting.
