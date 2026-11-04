@@ -66,3 +66,9 @@ export * from "./body-exposure/engine/clinical/electrophysiologyHodgkinHuxleyAnd
 export * from "./clinical-operations/model/pharmacogenomicsAndDrugInteractionSafetyEngine.ts";
 export * from "./personal-health/engine/nutritionMetabolicFluxAndFoodUncertaintyEngine.ts";
 export * from "./one-os/offlineFirstConflictResolverAndDisasterRecoveryEngine.ts";
+
+export * from "./clinical-operations/adapter/satusehatFhirR4AdapterEngine.ts";
+export * from "./body-exposure/ui/webgpuMultiscaleAnatomyViewportController.ts";
+export * from "./body-exposure/ui/appleHigDarkFuturisticThemeEngine.ts";
+export * from "./body-exposure/ui/bodyExposureUnifiedCockpitHydrator.ts";
+export * from "./medstudyhub/engine/clinicalClerkshipCaseSimulatorEngine.ts";

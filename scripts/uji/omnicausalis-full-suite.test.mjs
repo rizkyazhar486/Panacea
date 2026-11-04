@@ -953,3 +953,129 @@ test("44. [WAVE 21 DIRECTIVES 014, 048 & 049: OFFLINE-FIRST LAMPORT CONFLICT RES
   assert.equal(rec.winningReplica.originClass, "CLINICIAN_SIGNED");
   assert.equal(rec.simulatedOverwroteClinical, false);
 });
+
+test("45. [WAVE 33 PILLAR 1: WEBGPU 3D RAYCAST PICKER, 5-STAGE LAYER PEEL & REAL-TIME CLINICAL/GHK HANDOFF]", () => {
+  const hitEar = omnicausalis.resolveWebGpuAnatomyRaycastAndLayerPeel({
+    pointerNdcX: 0.15,
+    pointerNdcY: 0.42,
+    hitMeshNameOrOrganQuery: "Ear",
+    hitDistanceMm: 312.5,
+    worldNormalVector: [0, 0, 1],
+    activePeelStage: 3,
+    activeAntiarrhythmicClass: "NONE"
+  });
+  assert.equal(hitEar.routePath, "/body-exposure");
+  assert.equal(hitEar.raycastSelection.resolvedOrganChip, "Ear");
+  assert.ok(hitEar.realTimeClinicalCard.clinicalAndDailyRelevance.includes("THT-KL"));
+  assert.equal(hitEar.activeLayerPeel.stageIndex, 3);
+  assert.equal(hitEar.interactiveCapabilities.bvhAccelerationActive, true);
+});
+
+test("46. [WAVE 33 PILLAR 2: GITHUB ACTIONS CI/CD WORKFLOW VERIFICATION (NODE.JS v24 & ZERO-FAIL GATES)]", () => {
+  const workflowRelPath = ".github/workflows/omnicausalis-ci.yml";
+  assert.equal(fs.existsSync(workflowRelPath), true);
+  const wfText = fs.readFileSync(workflowRelPath, "utf8");
+  assert.ok(wfText.includes('node-version: "24.x"'));
+  assert.ok(wfText.includes("node --test scripts/uji/omnicausalis-full-suite.test.mjs"));
+});
+
+test("47. [WAVE 33 PILLAR 3: SATUSEHAT FHIR R4 STAGING BUNDLE (OBSERVATION, CONDITION & CPIC-GATED MEDICATIONREQUEST)]", () => {
+  const bundle = omnicausalis.buildSatuSehatFhirR4StagingBundle({
+    bundleId: "BUNDLE-SATUSEHAT-2026-001",
+    observation: {
+      encounterId: "ENC-2026-9081",
+      patientNik: "3275011234560001",
+      practitionerNik: "1234567890123456",
+      observationTypeCode: "8480-6",
+      observationTypeName: "Systolic blood pressure",
+      numericValue: 122,
+      unitOfMeasure: "mm[Hg]",
+      effectiveDateTime: "2026-11-05T03:00:00Z",
+      interpretationFlag: "N"
+    },
+    condition: {
+      encounterId: "ENC-2026-9081",
+      patientNik: "3275011234560001",
+      practitionerNik: "1234567890123456",
+      icd10Code: "G40.9",
+      icd10Display: "Epilepsy, unspecified",
+      snomedCtCode: "84757009",
+      snomedCtDisplay: "Epilepsy",
+      clinicalStatus: "active",
+      recordedDate: "2026-11-05"
+    },
+    medicationRequest: {
+      encounterId: "ENC-2026-9081",
+      patientNik: "3275011234560001",
+      practitionerNik: "1234567890123456",
+      kfaCode: "93001019",
+      kfaDisplayName: "Carbamazepine 200 mg Tablet",
+      dosageInstructionText: "2 x 1 tablet sehari",
+      authoredOn: "2026-11-05T03:05:00Z",
+      cpicSafetyEvaluationInput: {
+        patientCanonicalId: "3275011234560001",
+        candidateDrugGeneric: "carbamazepine",
+        standardDailyDoseMg: 400,
+        eGfrMlMin173m2: 92,
+        childPughClass: "A",
+        pharmacogenomicMarkers: ["HLA-B*15:02_POSITIVE"],
+        concomitantMedications: [],
+        documentedAllergies: []
+      }
+    }
+  });
+  assert.equal(bundle.resourceType, "Bundle");
+  assert.equal(bundle.entry.length, 3);
+  const medEntry = bundle.entry[2].resource;
+  assert.equal(medEntry.resourceType, "MedicationRequest");
+  assert.equal(medEntry.status, "on-hold");
+  assert.equal(medEntry.cpicPharmacogenomicGovernance.safeToDispenseWithoutOverride, false);
+});
+
+test("48. [WAVE 33 PILLAR 4: APPLE HIG & DARK FUTURISTIC GLASSMORPHISM UI ENGINE (MOBILE, IPAD WARD TABLET & DESKTOP)]", () => {
+  const tabletTheme = omnicausalis.computeAppleHigDarkFuturisticLayoutAndTokens({
+    viewportWidthPx: 1024,
+    viewportHeightPx: 768,
+    ambientLuxLevel: 15,
+    prefersReducedMotion: false
+  });
+  assert.equal(tabletTheme.formFactor, "TABLET_WARD_IPAD_SPLIT");
+  assert.ok(tabletTheme.ergonomicsAndAccessibility.minimumTouchTargetPx >= 44);
+  assert.ok(tabletTheme.ergonomicsAndAccessibility.wcagTextContrastRatio >= 7.0);
+  assert.ok(tabletTheme.darkFuturisticGlassTokens.glassBackdropFilterCss.includes("blur(24px)"));
+});
+
+test("49. [WAVE 34 EXPANSION: UNIFIED /body-exposure COCKPIT HYDRATOR (THEME + 3D RAYCAST + LAYER PEEL)]", () => {
+  const cockpit = omnicausalis.hydrateUnifiedBodyExposureCockpitState({
+    viewportWidthPx: 1440,
+    viewportHeightPx: 900,
+    ambientLuxLevel: 20,
+    prefersReducedMotion: false,
+    selectedOrganQuery: "Heart",
+    activePeelStage: 3,
+    pointerNdcX: 0.0,
+    pointerNdcY: 0.1,
+    activeAntiarrhythmicClass: "CLASS_III_K_BLOCKER"
+  });
+  assert.equal(cockpit.canonicalRoute, "/body-exposure");
+  assert.equal(cockpit.cockpitStatus, "READY_INTERACTIVE_3D");
+  assert.equal(cockpit.themeAndLayout.formFactor, "DESKTOP_COMMAND_WORKSTATION");
+  assert.equal(cockpit.headerHudSummary.activeFmaId, "FMA:7088");
+});
+
+test("50. [WAVE 34 EXPANSION: CLINICAL CLERKSHIP (KOAS THT-KL) & UKMPPD CASE SIMULATOR WITH FSRS v4]", () => {
+  const entCase = omnicausalis.evaluateClinicalClerkshipCaseScenario({
+    scenarioId: "SHKD-THT-2026-01",
+    department: "THT_KL",
+    targetOrganQuery: "Ear",
+    chiefComplaintId: "Penurunan pendengaran telinga kanan disertai otore mukopurulen",
+    keyPhysicalExamFindingId: "Otoskopi: perforasi sentral membran timpani, tes Rinne negatif, Weber lateralisasi ke kanan",
+    candidateDiagnosisIcd10: "H66.9",
+    studentSelfRatingFsrs: 4
+  });
+  assert.equal(entCase.department, "THT_KL");
+  assert.equal(entCase.linkedAnatomicalStructure.organChip, "Ear");
+  assert.ok(entCase.linkedAnatomicalStructure.clinicalRelevance.includes("THT-KL"));
+  assert.ok(entCase.nextSpacedRepetitionSchedule.nextIntervalDays >= 1);
+});
+
