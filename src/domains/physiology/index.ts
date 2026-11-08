@@ -9,3 +9,5 @@ export type {
   ParameterDeclaration, PersonalizationObservation, PersonalizationProposal, PersonalizationBlocker,
   PersonalizationBlockerCode, PersonalizationDecision,
 } from './model/personalization'
+export { transpulmonaryPressure, TRANSPULMONARY_SOURCE, TRANSPULMONARY_BOUNDARY } from './engine/transpulmonaryPressure'
+export type { TranspulmonaryInput, TranspulmonaryResult } from './engine/transpulmonaryPressure'
