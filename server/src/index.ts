@@ -1,5 +1,6 @@
 import { randomUUID } from 'node:crypto'
 import { middlewareObservabilitas, ringkasanObservabilitas, jalurAman, egressPerRute } from './domains/observability/observabilitas.js'
+import { pasangHealthRingan } from './domains/observability/healthRingan.js'
 import { bungkusFetch, ringkasanEgressKeluar } from './domains/observability/egressKeluar.js'
 import { bersihkanGalatKlien, catatGalatKlien, ringkasanGalatKlien, daftarGalatKlien } from './domains/observability/galatKlien.js'
 import { existsSync as adaBerkas, readFileSync as bacaBerkas } from 'node:fs'
@@ -276,6 +277,7 @@ mountVisitRoutes(app)
 app.use(['/api/auth', '/api/login', '/api/dev-login'], authLimiter)
 
 // --- health / capability discovery ---
+pasangHealthRingan(app) // probe 2 byte untuk healthCheckPath Render; /api/health di bawah tetap penuh
 app.get('/api/health', (_req, res) => {
   res.json({
     ok: true,
