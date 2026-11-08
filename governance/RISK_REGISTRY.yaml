@@ -722,7 +722,16 @@ risks:
       writes sent and skipped, and JSON byte estimates (not BSON on the wire, not driver reads
       or protocol overhead). Web-push and SMTP traffic is NOT counted, streamed request bodies
       are counted as unknown rather than zero,
-      and the counters reset on restart. No egress budget controller exists yet; the
+      and the counters reset on restart. Live measurement 2026-11-08 (owner-pasted /api/health; two samples):
+      at build 9739773d, 4.4 h after restart, /api/health was called 3608 times for 4,730,395 B
+      (about 87% of measured response bytes) because render.yaml pointed healthCheckPath at it;
+      Mongo sent 674,957 B. After #3007 (build dd1a967d, about 6 h after restart) /healthz was called
+      4501 times for 9,002 B, /api/health 44 times for 59,088 B, /api/news 6 times for 39,104 B and
+      Mongo sent 44,579 B, so measured response bytes are about 107 KB in about 6 h (roughly 98% below
+      the first sample's hourly rate). Extrapolated, that is on the order of tens of MB per month; this is
+      a projection from two short samples, not billed bandwidth. Whether the owner-reported 5.41 GB came
+      from the pre-#2944 full-collection writes or from traffic this counter does not see stays UNVERIFIED
+      until the Render Bandwidth graph for a full day is compared with egress. No egress budget controller exists yet; the
       application cannot cap Render-billed traffic.
     evidence:
       - server/src/irisanPenyimpanan.ts
