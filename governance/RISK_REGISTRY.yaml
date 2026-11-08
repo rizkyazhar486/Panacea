@@ -731,7 +731,16 @@ risks:
       the first sample's hourly rate). Extrapolated, that is on the order of tens of MB per month; this is
       a projection from two short samples, not billed bandwidth. Whether the owner-reported 5.41 GB came
       from the pre-#2944 full-collection writes or from traffic this counter does not see stays UNVERIFIED
-      until the Render Bandwidth graph for a full day is compared with egress. No egress budget controller exists yet; the
+      until the Render Bandwidth graph for a full day is compared with egress. Render Network Metrics, Outbound
+      Bandwidth, last 12 h, one point per hour, owner screenshot 2026-11-08 19:57 WIB, values read by eye (about +-1 MB):
+      about 8 MB/h rising to about 19 MB/h in the hours before the 09:19 WIB manual deploy, then about 1 MB/h after it
+      and about 0.5 MB/h after the /healthz change. The backend ran build c430b9643 until that deploy (verify-deployed-sha,
+      run 102), which predates #2944 and so still upserted every document on each save. The pre-deploy rate (a sustained
+      8-19 MB/h is roughly 6-14 GB per 30 days) is the same order as the owner-reported 5.41 GB and consistent with that
+      write amplification being the dominant source; this is consistent, not proven, because only 12 h and one deploy
+      boundary are visible. The remaining about 0.5 MB/h is about 25x the 18 KB/h of response bodies counted by egress;
+      the likely gap is HTTP headers and TLS framing on roughly 12 health checks per minute (headers are not counted),
+      which is unverified. At about 0.5 MB/h the 30-day total is about 360 MB. No egress budget controller exists yet; the
       application cannot cap Render-billed traffic.
     evidence:
       - server/src/irisanPenyimpanan.ts
