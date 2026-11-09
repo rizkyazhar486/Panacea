@@ -97,7 +97,7 @@ gagal('teks-tidak-dimodifikasi', () => { const i = base(); const aneh = '<script
 // ── kemurnian dan arah dependensi (CLAUDE.md §2) ──
 import { readFileSync } from 'node:fs'
 for (const f of ['engine/synthesize.ts', 'model/types.ts'])
-  gagal(`murni:${f}`, () => assert.ok(!/Date\.now\(|Math\.random\(|fetch\(|localStorage|document\.|window\.|XMLHttpRequest/.test(readFileSync(`src/domains/evidence-synthesis/${f}`, 'utf8').replace(/\/\/.*$/gm, '')), f))  // komentar dikecualikan: boleh menyebut larangannya
+  gagal(`murni:${f}`, () => assert.ok(!/Date\.now\(|Math\.random\(|fetch\(|localStorage|document\.|window\.|XMLHttpRequest/.test(readFileSync(`src/domains/evidence-synthesis/${f}`, 'utf8').replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, '')), f))  // komentar (baris dan blok) dikecualikan: boleh menyebut larangannya
 gagal('model-hanya-impor-tipe-dari-lib', () => { const m = readFileSync('src/domains/evidence-synthesis/model/types.ts', 'utf8'); for (const l of m.split('\n').filter((s) => /^import /.test(s))) assert.match(l, /^import type /, l) })
 gagal('pintu-publik', async () => { const idx = readFileSync('src/domains/evidence-synthesis/index.ts', 'utf8'); for (const n of ['synthesize', 'SYNTHESIS_BOUNDARY', 'SynthesisResult', 'SourceRecord']) assert.ok(idx.includes(n), n) })
 console.log('evidence-synthesis: OK')
