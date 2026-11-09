@@ -1,7 +1,10 @@
 import { useEffect, useState } from 'react'
-import { Card, SectionTitle, Field, inputClass, Button, Badge } from '../../components/ui'
+import { Field, inputClass } from '../../components/ui/ui'
 import { IconHeart, IconPhone, IconShield } from '../../components/icons'
 import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
+import { tr } from '../../lib/i18n'
+import { useBahasa } from '../../lib/useBahasa'
+import { ageYears, contactTelHref, emergencyDisplayNumber, emergencyShareText, emergencyTelHref, mapsUrl } from '../../domains/emergency-card/engine/emergencyCard'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Emergency Medical Card + SOS — a lock-screen-style card a paramedic or
@@ -29,24 +32,26 @@ const BLOOD = ['', 'O+', 'O−', 'A+', 'A−', 'B+', 'B−', 'AB+', 'AB−']
 function load(): EmData { try { return { ...DEF, ...JSON.parse(localStorage.getItem(KEY) || '{}') } } catch { return DEF } }
 
 export function EmergencyCard() {
+  useBahasa()
   const [d, setD] = useState<EmData>(load)
   const [editing, setEditing] = useState(() => !localStorage.getItem(KEY))
   const [locStatus, setLocStatus] = useState<'idle' | 'getting' | 'ok' | 'fail'>('idle')
-  const [mapsUrl, setMapsUrl] = useState('')
+  const [mapUrl, setMapUrl] = useState('')
 
   useEffect(() => { try { localStorage.setItem(KEY, JSON.stringify(d)) } catch { /* ignore */ } }, [d])
   const u = (p: Partial<EmData>) => setD((x) => ({ ...x, ...p }))
 
   function shareLocation() {
+    if (locStatus === 'getting') return // tanpa kirim ganda saat lokasi sedang diambil
     if (!navigator.geolocation) { setLocStatus('fail'); return }
     setLocStatus('getting')
     navigator.geolocation.getCurrentPosition(
       (pos) => {
-        const { latitude, longitude } = pos.coords
-        const url = `https://maps.google.com/?q=${latitude},${longitude}`
-        setMapsUrl(url); setLocStatus('ok')
+        const url = mapsUrl(pos.coords.latitude, pos.coords.longitude)
+        if (!url) { setLocStatus('fail'); return } // koordinat tak valid: gagal tertutup, tidak dibagikan
+        setMapUrl(url); setLocStatus('ok')
         // Try the native share sheet so it can go to WhatsApp/SMS/etc.
-        const text = `🚨 EMERGENCY — ${d.name || 'I'} need help. My location: ${url}${d.bloodType ? ` · Blood type ${d.bloodType}` : ''}${d.allergies ? ` · Allergies: ${d.allergies}` : ''}`
+        const text = emergencyShareText({ name: d.name, url, bloodType: d.bloodType, allergies: d.allergies })
         if (navigator.share) navigator.share({ title: 'Emergency location', text }).catch(() => {})
       },
       () => setLocStatus('fail'),
@@ -54,53 +59,73 @@ export function EmergencyCard() {
     )
   }
 
-  const age = d.dob ? Math.floor((Date.now() - new Date(d.dob).getTime()) / (365.25 * 864e5)) : null
+  const age = ageYears(d.dob, Date.now())
+  const contactHref = contactTelHref(d.emergencyPhone)
+  const callNumber = emergencyDisplayNumber(d.localEmergencyNumber)
 
   return (
-    <div className="mx-auto max-w-2xl space-y-5 pb-24">
-      {/* SOS actions — always on top */}
-      <Card className="!p-5">
-        <SectionTitle icon={<IconPhone size={20} />} title="Emergency SOS" subtitle="Local emergency card + one-tap call/share — not a clinically validated Panacea emergency system" />
-        <BatasKlaimKesehatan permukaan="care.emergency-card" />
-        <p className="mt-2 text-[12px] leading-relaxed text-neutral-500">
-          Stored on this device until you tap SOS or share. Does not replace certified emergency services, medical-alert devices, or institutional triage. Verify the local emergency number for your country.
-        </p>
-        <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <a href={`tel:${(d.localEmergencyNumber || '112').replace(/[^0-9+]/g, '')}`}
-            className="flex items-center justify-center gap-2 rounded-2xl bg-rose-500 py-4 text-base font-black text-white transition active:scale-95">
-            📞 Call {d.localEmergencyNumber || '112'}
-          </a>
-          <button onClick={shareLocation}
-            className="flex items-center justify-center gap-2 rounded-2xl bg-ink py-4 text-base font-black text-white transition active:scale-95 dark:bg-white/10">
-            📍 {locStatus === 'getting' ? 'Getting location…' : 'Share my location'}
-          </button>
+    <div className="emc-page">
+      {/* SOS — selalu di atas: satu tindakan utama, tombol panggil raksasa */}
+      <section className="emc-sos" aria-labelledby="emc-sos-title">
+        <div>
+          <div className="emc-eyebrow">{tr('Emergency')}</div>
+          <h2 id="emc-sos-title" className="emc-title">{tr('Emergency SOS')}</h2>
         </div>
-        {d.emergencyPhone && (
-          <a href={`tel:${d.emergencyPhone.replace(/[^0-9+]/g, '')}`}
-            className="mt-3 flex items-center justify-center gap-2 rounded-2xl border border-neutral-200 py-3 text-sm font-bold text-ink transition active:scale-95 dark:border-white/10 dark:text-ink">
-            👤 Call emergency contact{d.emergencyName ? ` — ${d.emergencyName}` : ''}
-          </a>
-        )}
-        {locStatus === 'ok' && mapsUrl && (
-          <p className="mt-3 rounded-xl bg-brand-50 px-3 py-2 text-xs font-semibold text-brand-dark">
-            Location ready. <a href={mapsUrl} target="_blank" rel="noreferrer" className="underline">Open map</a> — send it to your contact if the share sheet didn't open.
+
+        <a href={emergencyTelHref(d.localEmergencyNumber)} className="emc-call" data-testid="emc-call" aria-label={`${tr('Call')} ${callNumber}`}>
+          <span className="emc-call__icon" aria-hidden="true"><IconPhone size={36} /></span>
+          <span>
+            <span className="emc-call__label">{tr('Call')}</span>
+            <span className="emc-call__number">{callNumber}</span>
+          </span>
+        </a>
+
+        <div className={'emc-tiles' + (contactHref ? '' : ' emc-tiles--single')}>
+          <button type="button" className="emc-tile" onClick={shareLocation} disabled={locStatus === 'getting'} data-testid="emc-share">
+            <span className="emc-tile__glyph" aria-hidden="true">📍</span>
+            {locStatus === 'getting' ? tr('Getting location…') : tr('Share my location')}
+          </button>
+          {contactHref ? (
+            <a href={contactHref} className="emc-tile emc-tile--contact" data-testid="emc-contact">
+              <span className="emc-tile__glyph" aria-hidden="true">👤</span>
+              {tr('Call my contact')}
+              {d.emergencyName && <span className="emc-tile__sub">{d.emergencyName}</span>}
+            </a>
+          ) : (
+            <button type="button" className="emc-tile emc-tile--ghost" onClick={() => setEditing(true)} data-testid="emc-add-contact">
+              <span className="emc-tile__glyph" aria-hidden="true">➕</span>
+              {tr('Add a contact')}
+            </button>
+          )}
+        </div>
+
+        {locStatus === 'ok' && mapUrl && (
+          <p className="emc-status emc-status--ok" role="status">
+            {tr('Location ready.')} <a href={mapUrl} target="_blank" rel="noreferrer" style={{ textDecoration: 'underline' }}>{tr('Open map')}</a> — {tr("send it to your contact if the share sheet didn't open.")}
           </p>
         )}
-        {locStatus === 'fail' && <p className="mt-3 rounded-xl bg-red-50 px-3 py-2 text-xs font-semibold text-red-600">Couldn't get your location. Enable GPS/location permission and try again.</p>}
-      </Card>
+        {locStatus === 'fail' && <p className="emc-status emc-status--bad" role="alert">{tr("Couldn't get your location. Enable GPS/location permission and try again.")}</p>}
 
-      {/* The card itself */}
-      <Card className="!p-0 overflow-hidden">
-        <div className="bg-rose-500 px-5 py-3 text-white">
-          <div className="flex items-center justify-between">
-            <span className="flex items-center gap-2 text-sm font-black uppercase tracking-wide"><IconShield size={16} /> Medical ID</span>
-            <button onClick={() => setEditing((e) => !e)} className="text-xs font-bold underline">{editing ? 'Done' : 'Edit'}</button>
-          </div>
+        {/* Teks batas klaim: kata-katanya TIDAK diubah dan sengaja tidak diterjemahkan (perubahan memerlukan peninjau klinis). */}
+        <div className="emc-note" data-pmd-unclamped="true">
+          <p style={{ margin: 0, fontWeight: 700 }}>Local emergency card + one-tap call/share — not a clinically validated Panacea emergency system</p>
+          <BatasKlaimKesehatan permukaan="care.emergency-card" />
+          <p>
+            Stored on this device until you tap SOS or share. Does not replace certified emergency services, medical-alert devices, or institutional triage. Verify the local emergency number for your country.
+          </p>
+        </div>
+      </section>
+
+      {/* Kartu Identitas Medis */}
+      <section className="emc-id" aria-labelledby="emc-id-title">
+        <div className="emc-id__bar">
+          <span className="emc-id__tag" id="emc-id-title"><IconShield size={18} /> {tr('Medical ID')}</span>
+          <button type="button" className="emc-pill" onClick={() => setEditing((e) => !e)} data-testid="emc-edit">{editing ? tr('Done') : tr('Edit')}</button>
         </div>
 
         {editing ? (
-          <div className="space-y-3 p-5">
-            <div className="grid grid-cols-2 gap-3">
+          <div className="emc-form">
+            <div className="emc-form__row">
               <Field label="Full name"><input className={inputClass} value={d.name} onChange={(e) => u({ name: e.target.value })} /></Field>
               <Field label="Date of birth"><input className={inputClass} type="date" value={d.dob} onChange={(e) => u({ dob: e.target.value })} /></Field>
               <Field label="Blood type">
@@ -108,56 +133,64 @@ export function EmergencyCard() {
                   {BLOOD.map((b) => <option key={b} value={b}>{b || '—'}</option>)}
                 </select>
               </Field>
-              <Field label="Local emergency number"><input className={inputClass} value={d.localEmergencyNumber} onChange={(e) => u({ localEmergencyNumber: e.target.value })} placeholder="112 / 118 / 911" /></Field>
+              <Field label="Local emergency number"><input className={inputClass} value={d.localEmergencyNumber} onChange={(e) => u({ localEmergencyNumber: e.target.value })} placeholder="112 / 118 / 911" inputMode="tel" /></Field>
             </div>
             <Field label="Allergies (comma-separated)"><input className={inputClass} value={d.allergies} onChange={(e) => u({ allergies: e.target.value })} placeholder="Penicillin, peanuts…" /></Field>
             <Field label="Medical conditions"><input className={inputClass} value={d.conditions} onChange={(e) => u({ conditions: e.target.value })} placeholder="Asthma, diabetes…" /></Field>
             <Field label="Current medications"><input className={inputClass} value={d.medications} onChange={(e) => u({ medications: e.target.value })} placeholder="Insulin, salbutamol…" /></Field>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="emc-form__row">
               <Field label="Emergency contact name"><input className={inputClass} value={d.emergencyName} onChange={(e) => u({ emergencyName: e.target.value })} /></Field>
-              <Field label="Emergency contact phone"><input className={inputClass} value={d.emergencyPhone} onChange={(e) => u({ emergencyPhone: e.target.value })} /></Field>
+              <Field label="Emergency contact phone"><input className={inputClass} value={d.emergencyPhone} onChange={(e) => u({ emergencyPhone: e.target.value })} inputMode="tel" /></Field>
             </div>
             <Field label="Other notes"><input className={inputClass} value={d.notes} onChange={(e) => u({ notes: e.target.value })} placeholder="Pacemaker, pregnancy, DNR wishes…" /></Field>
-            <label className="flex items-center gap-2 text-sm font-semibold text-ink dark:text-ink">
-              <input type="checkbox" checked={d.organDonor} onChange={(e) => u({ organDonor: e.target.checked })} /> Registered organ donor
+            <label className="flex items-center gap-3 text-sm font-semibold">
+              <input type="checkbox" checked={d.organDonor} onChange={(e) => u({ organDonor: e.target.checked })} /> {tr('Registered organ donor')}
             </label>
-            <Button onClick={() => setEditing(false)} className="w-full">Save card</Button>
+            <button type="button" className="emc-cta" onClick={() => setEditing(false)} data-testid="emc-save">{tr('Save card')}</button>
           </div>
         ) : (
-          <div className="space-y-3 p-5">
-            <div>
-              <div className="text-2xl font-black text-ink dark:text-ink">{d.name || 'Add your name'}</div>
-              <div className="text-sm text-neutral-500">{age != null ? `${age} yrs` : ''}{d.organDonor ? ' · 🫀 Organ donor' : ''}</div>
+          <div className="emc-id__body">
+            <div className="emc-id__head">
+              <div style={{ minWidth: 0 }}>
+                <h2 className="emc-name">{d.name || tr('Add your name')}</h2>
+                <div className="emc-sub">{age != null ? `${age} ${tr('yrs')}` : ''}{d.organDonor ? ` · 🫀 ${tr('Organ donor')}` : ''}</div>
+              </div>
+              {d.bloodType && <div className="emc-blood" data-testid="emc-blood"><b>{d.bloodType}</b><span>{tr('Blood')}</span></div>}
             </div>
-            <div className="flex flex-wrap gap-2">
-              {d.bloodType && <Badge tone="critical">Blood {d.bloodType}</Badge>}
-              {d.allergies && <Badge tone="critical">⚠️ Allergies</Badge>}
-            </div>
-            <Row label="Allergies" value={d.allergies} danger />
-            <Row label="Conditions" value={d.conditions} />
-            <Row label="Medications" value={d.medications} />
-            <Row label="Emergency contact" value={[d.emergencyName, d.emergencyPhone].filter(Boolean).join(' · ')} />
-            <Row label="Notes" value={d.notes} />
-            {!d.name && <p className="text-xs text-neutral-500">Tap <b>Edit</b> to fill in your details — they're saved on this device and shown here even offline.</p>}
+            {d.allergies && (
+              <div className="emc-alert" role="note" data-testid="emc-allergies">
+                <span className="emc-alert__glyph" aria-hidden="true">⚠️</span>
+                <div><b>{tr('Allergies')}</b><span>{d.allergies}</span></div>
+              </div>
+            )}
+            {(d.conditions || d.medications || d.emergencyName || d.emergencyPhone || d.notes) && (
+              <div className="emc-facts">
+                <Fact label={tr('Conditions')} value={d.conditions} />
+                <Fact label={tr('Medications')} value={d.medications} />
+                <Fact label={tr('Emergency contact')} value={[d.emergencyName, d.emergencyPhone].filter(Boolean).join(' · ')} />
+                <Fact label={tr('Notes')} value={d.notes} />
+              </div>
+            )}
+            {!d.name && (
+              <div className="emc-empty">
+                <p>{tr('Tap Edit to fill in your details. They are saved on this device and shown here even offline.')}</p>
+                <button type="button" className="emc-cta" onClick={() => setEditing(true)} data-testid="emc-fill">{tr('Fill in my card')}</button>
+              </div>
+            )}
           </div>
         )}
-      </Card>
+      </section>
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
+      <div className="emc-foot" style={{ gridColumn: '1 / -1' }}>
         <IconHeart size={12} className="mr-1 inline" /> Saved only on this device and shown even without internet. Location is shared only when you tap the button. Tip: install Panaceamed to your home screen and add this page as a shortcut so it's reachable fast in an emergency. Local emergency numbers vary — set yours above (112 works in many countries).
       </div>
     </div>
   )
 }
 
-function Row({ label, value, danger }: { label: string; value: string; danger?: boolean }) {
+function Fact({ label, value }: { label: string; value: string }) {
   if (!value) return null
-  return (
-    <div className="grid grid-cols-[110px_1fr] gap-3 border-t border-neutral-100 pt-2 dark:border-white/10">
-      <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-500">{label}</div>
-      <div className={'text-sm ' + (danger ? 'font-bold text-rose-600' : 'text-ink dark:text-white')}>{value}</div>
-    </div>
-  )
+  return <div className="emc-fact"><b>{label}</b><span>{value}</span></div>
 }
 
 export default EmergencyCard
