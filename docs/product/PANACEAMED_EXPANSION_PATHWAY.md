@@ -131,3 +131,21 @@ Owner direction (2026-11-09): the pathway must also centre on surveillance. In t
 ## 11. Board rows opened by this document
 
 Only the work that is reachable now is on the board (see `docs/governance/TASK_BOARD.md`, section "Expansion pathway"): the machine-checkable domain manifest, a kernel-reuse audit of existing pages, the attributed-source schema, the entry-gate checklist, a cross-domain export test, and for surveillance the contract validator, the blind-spot registry, the aggregate release gate and the system-safety ledger. Everything else stays a direction until it passes the gates above.
+
+## 12. Owner focus: recovery, rejuvenation, anti-aging and longevity (2026-11-09)
+
+Owner direction: focus more on recovery, rejuvenation, anti-aging and longevity. This is already the product centre in `DOCS/longevity/LONGEVITY_FIRST_MASTER_DIRECTIVE.md`; this section only records it as the current priority for the autonomous loop and states the form it takes.
+
+**Form.** Personal baseline, then longitudinal measurement, then early deviation, then explanation and a personal action, then re-measurement, then clinician escalation when appropriate. Panaceamed measures and explains healthy ageing and recovery. It does not claim to reverse ageing, rejuvenate, extend lifespan or treat a condition; a biological-age figure is a model output with its uncertainty, not a lifespan or treatment result, and no product, supplement, therapy or visit is presented as causing a change.
+
+**Already on main (measured, not built here).** `/longevity` (Longevity Center), `/readiness` (Readiness and Recovery), `/tubuh?t=pulih` (recovery tracker), the biological-age trajectory and health-profile baseline engines in `src/lib`.
+
+**Measured gaps (390x844, Playwright, simulated session, 0 page errors, 0 horizontal overflow, 0 targets under 44 px on all three).**
+
+| Page | Height | Actions on the first screen | First-screen state |
+|---|---|---|---|
+| `/longevity` | 1233 px | 9 | empty ring and dashes; asks for age, sex and at least 4 pillars before showing anything |
+| `/readiness` | 2865 px | 11 | three typed numbers (HRV, resting HR, sleep hours) before any result |
+| `/tubuh?t=pulih` | 3835 px | 18 | long page; recovery tracker below the fold |
+
+These numbers are one run on one simulated profile, not a usability study and not a comparison with another product. Rows T-LONG-01..04 on the task board are the reachable slices; each must reuse the existing records, show missing data as missing, and be sabotaged so its gate fails by name.

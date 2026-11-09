@@ -277,6 +277,10 @@ Method: for each open PR, every file it changes was compared with main; no PR ha
 | T-EXP-08 | Aggregate release gate: minimum cell size with suppression, tested against re-identification attempts; no individual-level output from an aggregate pipeline | — | any-ai | READY | — |
 | T-EXP-09 | System-safety ledger: prediction-versus-reality records plus adverse-event and near-miss intake schema with a named reviewer (ties T-H27-06, T-H27-07) | — | any-ai | READY | — |
 | T-EXP-10 | Integrate the outbreak-surveillance engine (open PR #2894) behind the aggregate release gate instead of rebuilding it; only after T-EXP-06 and T-EXP-08 exist | — | any-ai | READY | — |
+| T-LONG-01 | Longevity Center first screen shows an empty ring with dashes and asks for age, sex and at least 4 pillars before showing anything; give it one 'enter this first' step and show what is already known from the person's own records (missing stays missing). Measured 2026-11-09 at 390x844: 1233 px tall, 0 horizontal overflow, 0 targets under 44 px, 9 actions on the first screen | — | any-ai | READY | — |
+| T-LONG-02 | One-tap daily recovery check-in on the Simple screen (5 large faces) that writes into the existing Readiness record instead of a second store; /readiness today needs 3 typed numbers (HRV, resting HR, sleep hours) before the person sees anything (2865 px tall, 11 actions on the first screen) | — | any-ai | READY | — |
+| T-LONG-03 | Personal baseline and trend from the person's own entries (14-day mean vs prior 14 days, minimum entries stated, no population norm presented as a personal one); reuse bioAgeTrajectory/healthProfileBaseline, do not add a new engine | — | any-ai | READY | — |
+| T-LONG-04 | Recovery-visit entry (sauna, thermal, bath-house, recovery centre) as a user-entered observation with source type USER_ENTERED, shown beside sleep and readiness, never as a treatment effect | — | any-ai | READY | — |
 
 ## Waiting on humans
 
