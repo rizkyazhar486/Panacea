@@ -1,0 +1,149 @@
+/*
+ * Kartu Darurat — hanya dimuat oleh halaman ini (chunk malas), jadi tidak menambah CSS pemblokir.
+ * Skala: jarak 8/12/16/24/32, radius 20/28, huruf 12/14/18/20/32/56. Satu fokus per layar:
+ * tombol panggil raksasa dulu, kartu identitas medis kemudian. Mobile: satu kolom; ≥1024px: dua kolom.
+ */
+.emc-page {
+  --emc-ink: #0f172a;
+  --emc-muted: #475569;
+  --emc-surface: #ffffff;
+  --emc-surface-2: #f1f5f9;
+  --emc-line: rgba(15, 23, 42, 0.1);
+  --emc-danger-bg: #fff1f2;
+  --emc-danger-ink: #9f1239;
+  --emc-focus: #2563eb;
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 8px 0 96px;
+  display: grid;
+  gap: 24px;
+  color: var(--emc-ink);
+}
+:root.dark .emc-page {
+  --emc-ink: #f8fafc;
+  --emc-muted: #cbd5e1;
+  --emc-surface: #11161d;
+  --emc-surface-2: #1a212b;
+  --emc-line: rgba(255, 255, 255, 0.12);
+  --emc-danger-bg: #3b0d18;
+  --emc-danger-ink: #fecdd3;
+  --emc-focus: #93c5fd;
+}
+@media (min-width: 1024px) {
+  .emc-page { grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); align-items: start; gap: 32px; }
+}
+.emc-page :where(a, button):focus-visible { outline: 4px solid var(--emc-focus); outline-offset: 3px; }
+
+/* ── Panel SOS ─────────────────────────────────────────────────────────── */
+.emc-sos { display: grid; gap: 16px; }
+.emc-eyebrow { font-size: 12px; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; color: var(--emc-danger-ink); }
+.emc-title { margin: 0; font-size: 32px; line-height: 1.1; font-weight: 900; letter-spacing: -0.02em; }
+
+.emc-call {
+  position: relative; isolation: isolate; overflow: hidden;
+  display: flex; align-items: center; gap: 20px; padding: 20px 24px; border-radius: 28px; text-decoration: none; color: #fff;
+  background: linear-gradient(135deg, #e11d48 0%, #be123c 55%, #881337 100%);
+  box-shadow: 0 18px 40px -12px rgba(190, 18, 60, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.28);
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+.emc-call::before { /* kilau lembut, bukan dekorasi tanpa arti: menandai bagian yang ditekan */
+  content: ''; position: absolute; inset: -40% -20% auto auto; width: 70%; height: 140%; z-index: -1;
+  background: radial-gradient(closest-side, rgba(255, 255, 255, 0.28), transparent 70%);
+}
+.emc-call:active { transform: scale(0.97); box-shadow: 0 8px 20px -10px rgba(190, 18, 60, 0.6); }
+.emc-call__icon {
+  flex: 0 0 auto; display: grid; place-items: center; width: 72px; height: 72px; border-radius: 999px;
+  background: rgba(255, 255, 255, 0.2); box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.5);
+  animation: emc-ring 2.4s ease-out infinite;
+}
+.emc-call__label { display: block; font-size: 18px; font-weight: 700; opacity: 0.95; }
+.emc-call__number { display: block; font-size: 56px; line-height: 1; font-weight: 900; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+@keyframes emc-ring {
+  0% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.45); }
+  70%, 100% { box-shadow: 0 0 0 18px rgba(255, 255, 255, 0); }
+}
+
+.emc-tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.emc-tile {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; text-align: center; padding: 16px 12px; border-radius: 20px; border: 0; cursor: pointer; text-decoration: none;
+  font: inherit; font-size: 18px; font-weight: 800; line-height: 1.2; color: #fff; white-space: normal; overflow-wrap: anywhere;
+  background: linear-gradient(160deg, #1e293b, #0f172a); box-shadow: 0 10px 24px -14px rgba(15, 23, 42, 0.7);
+  transition: transform 0.18s ease;
+}
+.emc-tile:active { transform: scale(0.96); }
+.emc-tile[disabled] { opacity: 0.7; cursor: progress; }
+.emc-tile--contact { background: linear-gradient(160deg, #047857, #065f46); }
+.emc-tile--ghost { background: var(--emc-surface-2); color: var(--emc-ink); box-shadow: inset 0 0 0 2px var(--emc-line); }
+.emc-tile__glyph { font-size: 32px; line-height: 1; }
+.emc-tile__sub { font-size: 14px; font-weight: 600; opacity: 0.85; }
+.emc-tiles--single { grid-template-columns: 1fr; }
+
+.emc-note { padding: 16px; border-radius: 20px; background: var(--emc-surface-2); font-size: 14px; line-height: 1.55; color: var(--emc-muted); }
+.emc-note p { margin: 8px 0 0; }
+.emc-status { margin: 0; padding: 12px 16px; border-radius: 16px; font-size: 14px; font-weight: 700; line-height: 1.4; }
+.emc-status--ok { background: #ecfdf5; color: #065f46; }
+.emc-status--bad { background: var(--emc-danger-bg); color: var(--emc-danger-ink); }
+:root.dark .emc-status--ok { background: #052e22; color: #a7f3d0; }
+
+/* ── Kartu Identitas Medis ─────────────────────────────────────────────── */
+.emc-id { overflow: hidden; border-radius: 28px; background: var(--emc-surface); box-shadow: 0 24px 48px -28px rgba(15, 23, 42, 0.45), 0 0 0 1px var(--emc-line); }
+.emc-id__bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 16px 12px 24px; color: #fff; background: linear-gradient(120deg, #0f172a 0%, #1e293b 60%, #be123c 140%); }
+.emc-id__tag { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 900; letter-spacing: 0.12em; text-transform: uppercase; }
+.emc-pill { padding: 0 20px; border-radius: 999px; border: 2px solid rgba(255, 255, 255, 0.55); background: transparent; color: #fff; font: inherit; font-size: 16px; font-weight: 800; cursor: pointer; }
+.emc-pill:active { background: rgba(255, 255, 255, 0.18); }
+.emc-id__body { display: grid; gap: 24px; padding: 24px; }
+.emc-id__head { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.emc-name { margin: 0; font-size: 32px; line-height: 1.1; font-weight: 900; letter-spacing: -0.02em; overflow-wrap: anywhere; }
+.emc-sub { margin-top: 4px; font-size: 18px; color: var(--emc-muted); }
+.emc-blood { flex: 0 0 auto; display: grid; place-items: center; align-content: center; width: 92px; height: 92px; border-radius: 999px; color: #fff; text-align: center; background: radial-gradient(circle at 30% 25%, #e11d48, #9f1239 75%); box-shadow: 0 12px 24px -10px rgba(190, 18, 60, 0.6); }
+.emc-blood b { font-size: 32px; line-height: 1; font-weight: 900; }
+.emc-blood span { font-size: 12px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; opacity: 0.9; }
+.emc-alert { display: flex; gap: 12px; align-items: flex-start; padding: 16px 20px; border-radius: 20px; background: var(--emc-danger-bg); color: var(--emc-danger-ink); border-inline-start: 6px solid #e11d48; }
+.emc-alert__glyph { font-size: 28px; line-height: 1; }
+.emc-alert b { display: block; font-size: 12px; font-weight: 900; letter-spacing: 0.14em; text-transform: uppercase; }
+.emc-alert span { display: block; margin-top: 4px; font-size: 20px; font-weight: 800; line-height: 1.3; overflow-wrap: anywhere; }
+.emc-facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+.emc-fact { padding: 16px; border-radius: 20px; background: var(--emc-surface-2); }
+.emc-fact b { display: block; font-size: 12px; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; color: var(--emc-muted); }
+.emc-fact span { display: block; margin-top: 6px; font-size: 18px; font-weight: 700; line-height: 1.35; overflow-wrap: anywhere; }
+.emc-empty { display: grid; gap: 16px; justify-items: start; padding: 24px; border-radius: 20px; background: var(--emc-surface-2); }
+.emc-empty p { margin: 0; font-size: 18px; line-height: 1.5; color: var(--emc-muted); }
+.emc-cta { padding: 0 28px; border-radius: 20px; border: 0; font: inherit; font-size: 20px; font-weight: 900; color: #fff; cursor: pointer; background: linear-gradient(135deg, #0f172a, #1e293b); }
+.emc-cta:active { transform: scale(0.97); }
+.emc-foot { padding: 16px; border-radius: 20px; font-size: 14px; line-height: 1.55; text-align: center; color: var(--emc-muted); background: var(--emc-surface-2); }
+
+/* ── Formulir: besar dan lega, bukan kecil dan padat ───────────────────── */
+.emc-form { display: grid; gap: 16px; padding: 24px; }
+.emc-form input:not([type='checkbox']), .emc-form select { font-size: 18px !important; border-radius: 16px; }
+.emc-form input[type='checkbox'] { width: 28px; height: 28px; }
+.emc-form label { font-size: 16px; }
+.emc-form__row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+
+@media (max-width: 420px) {
+  .emc-call { gap: 16px; padding: 16px 20px; }
+  .emc-call__icon { width: 60px; height: 60px; }
+  .emc-call__number { font-size: 48px; }
+  .emc-id__body, .emc-form { padding: 20px 16px; }
+  .emc-id__head { align-items: flex-start; }
+  .emc-blood { width: 80px; height: 80px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .emc-call__icon { animation: none; }
+  .emc-call, .emc-tile, .emc-cta { transition: none; }
+}
+
+/*
+ * LANTAI UKURAN. Dua aturan global menyusutkan kontrol ini tanpa pesan: kepadatan mobile
+ * (.pmd-page-stage[data-spatial='false'] :where(button, a[href]) { min-height: 42px }, spesifisitas 0,2,0) dan lantai sentuh
+ * (touch-targets.css: html:root body :is(button, input…):not([data-touch-compact]) { min-height: 44px }, 0,3,3).
+ * Memakai teknik yang didokumentasikan repo (awalan `html:root body`) dan kelas digandakan: kolom kelas = 4 > 3, menang
+ * tanpa !important dan tanpa bergantung pada urutan pemuatan stylesheet. Terukur di browser: lihat uji + laporan PR.
+ */
+html:root body .emc-page .emc-call.emc-call { min-height: 136px; }
+html:root body .emc-page .emc-tile.emc-tile { min-height: 112px; }
+html:root body .emc-page .emc-cta.emc-cta { min-height: 64px; }
+html:root body .emc-page .emc-pill.emc-pill { min-height: 48px; }
+html:root body .emc-page .emc-form :is(input:not([type='checkbox']), select) { min-height: 56px; }
+@media (max-width: 420px) {
+  html:root body .emc-page .emc-call.emc-call { min-height: 120px; }
+}
