@@ -123,5 +123,6 @@ const id: Record<string, string> = {
   'Notes': 'Catatan',
   'Tap Edit to fill in your details. They are saved on this device and shown here even offline.': 'Ketuk Ubah untuk mengisi data Anda. Data disimpan di perangkat ini dan tampil di sini meski tanpa internet.',
   'Fill in my card': 'Isi kartu saya',
+  'Also makes text and buttons bigger on every page.': 'Juga memperbesar teks dan tombol di semua halaman.',
 }
 export default id
