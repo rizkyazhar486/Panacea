@@ -222,4 +222,4 @@ export function buildAcceptedVisitFhirObservation(
 }
 
 export const VISIT_FHIR_PUBLICATION_BOUNDARY =
-  'Only clinician-accepted device observations with an explicitly verified LOINC/UCUM mapping may be converted by this module. Conversion does not submit to SATUSEHAT, reconcile IHS identities, or certify conformance.'
+  'Only device observations with active clinical-support consent, clinician acceptance, and an explicitly verified LOINC/UCUM mapping may be converted by this module. Conversion does not submit to SATUSEHAT, reconcile IHS identities, or certify conformance.'
