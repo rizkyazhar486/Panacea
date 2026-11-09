@@ -258,7 +258,7 @@ Method: for each open PR, every file it changes was compared with main; no PR ha
 | T-H27-01 | Whole-body canonical state: per-system truth lanes plus a `VERTICAL GAP` registry covering every organ system | — | any-ai | READY | — |
 | T-H27-02 | Care Passport: export/import round trip (golden file) and consent revocation that provably stops access | — | any-ai | READY | — |
 | T-H27-03 | Dataset provenance gate: machine-checked record (source, licence/consent scope, SHA-256, use limits, steward declaration), fails closed | — | any-ai | READY | — |
-| T-H27-04 | STR-gated reviewer role: STR stored as a claim until a registry check exists, append-only signed reviews, AI cannot write | — | any-ai | READY | — |
+| T-H27-04 | STR/SIP-gated reviewer role: STR and SIP entered once, stored as claims until a registry check exists, reused for every signature, never requested from other users; append-only signed reviews, AI cannot write | — | any-ai | READY | — |
 | T-H27-05 | One episode end to end in staging with two cross-system synthetic fixtures; result returns to the same record | — | any-ai | READY | — |
 | T-H27-06 | Drift-awareness: pre-registered protocol, retrospective test, kill criterion | — | any-ai | READY | — |
 | T-H27-07 | Evidence ledger and owner review pack: measured / derived / simulated / unknown / not claimed per capability | — | any-ai | READY | — |

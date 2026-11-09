@@ -8,7 +8,7 @@
 
 1. **Replace everything, drop nothing, improve everything.** Every element of the two PDFs is kept in an improved form (section 3). Where an element could harm people, the improvement is the design rule that makes it safe; the ambition stays.
 2. **Scope is the whole human body as one system**, not a single clinical domain.
-3. **Datasets must be lawful, with no extra human re-verification of the dataset.** The only human verification allowed anywhere in the product is by a user who holds an **STR** (Surat Tanda Registrasi).
+3. **Datasets must be lawful, with no extra human re-verification of the dataset.** The only human verification allowed anywhere in the product is by a user who holds an **STR** (Surat Tanda Registrasi); patient-level signing additionally needs the signer's **SIP** (Surat Izin Praktik).
 
 ## 2. The concept
 
@@ -45,7 +45,9 @@ The whole body is modelled as **one coupled system**: the shared longitudinal st
 - A review stores reviewer identity, STR (as sensitive data), scope, timestamp and a hash of the reviewed content; it is append-only and AI cannot write it.
 - Content without an STR-holder's signed review stays a draft, and `clinically_reviewed` stays false.
 - Other users contribute their own data and consent; they cannot verify clinical content.
-- Open item: whether practice licence (SIP) must also be recorded for patient-level signing (owner to confirm).
+- **SIP is mandatory for patient-level signing** (owner, 2026-11-09). STR and SIP are each entered **once**, at the reviewer's first signing, and reused for every later signature; nobody is asked twice.
+- **Never a burden for anyone else.** Only a person who chooses to verify or sign clinical content ever sees STR/SIP fields. Patients, caregivers, community health workers and every other user are never asked for them and lose nothing without them.
+- SIP, like STR, is a claim until an authoritative registry check exists, and is stored as sensitive data. If a number is mistyped, correcting it is one edit, not a new onboarding.
 
 ## 5. Five capabilities (whole-body)
 
