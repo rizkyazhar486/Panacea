@@ -79,5 +79,21 @@ const id: Record<string, string> = {
   'Something bent or missing': 'Ada yang bengkok/hilang',
   'Never': 'Belum pernah',
   'Seven days': 'Tujuh hari',
+  // Layar Sederhana
+  'What do you need?': 'Anda perlu apa?',
+  'I need help': 'Saya butuh bantuan',
+  'Open my emergency card': 'Buka kartu darurat saya',
+  'My medicines': 'Obat saya',
+  'See what to take and when': 'Lihat apa yang diminum dan kapan',
+  'Ask a question': 'Tanya sesuatu',
+  'Type your question and read the answer': 'Ketik pertanyaan, lalu baca jawabannya',
+  'My body': 'Tubuh saya',
+  'See my health numbers': 'Lihat angka kesehatan saya',
+  'See everything': 'Lihat semuanya',
+  'Language': 'Bahasa',
+  '✓ This screen opens first. Tap to turn off.': '✓ Layar ini dibuka lebih dulu. Ketuk untuk mematikan.',
+  'Make this my first screen': 'Jadikan ini layar pertama saya',
+  'This device could not save your choice.': 'Perangkat ini tidak bisa menyimpan pilihan Anda.',
+  'Too many buttons? Tap here for the simple screen': 'Terlalu banyak tombol? Ketuk di sini untuk layar sederhana',
 }
 export default id
