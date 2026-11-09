@@ -61,8 +61,10 @@ gagal('undangan-membungkus', () => assert.match(undangan, /white-space:normal/))
 
 // pengkabelan: beranda memuat undangan + pilihan layar pertama; rute /simple dimuat malas
 const home = readFileSync('src/pages/dashboard/Home.tsx', 'utf8')
+const beranda = readFileSync('src/pages/HomeSocialWorkspace.tsx', 'utf8')
 gagal('home-membaca-pilihan', () => assert.match(home, /readSimpleStart\(\)\) return <SimpleHome/))
-gagal('home-menampilkan-undangan', () => assert.match(home, /<SimpleModeInvite \/>/))
+gagal('home-menampilkan-undangan', () => assert.match(beranda, /<SimpleModeInvite \/>/))
+gagal('dapat-dicari-dua-ketukan', () => assert.match(readFileSync('src/components/layout/Shell.tsx', 'utf8'), /to: '\/simple'/))
 gagal('rute-simple-malas', () => assert.match(main, /const SimpleHome = lazy\(/))
 // aturan kemurnian: model/engine tanpa I/O
 for (const f of ['model/simpleActions.ts', 'engine/simpleModePreference.ts'])
