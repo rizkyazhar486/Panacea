@@ -251,6 +251,18 @@ Method: for each open PR, every file it changes was compared with main; no PR ha
 | #2679 | no | 2026-10-22 | 8 | fix(e4): prevent PHI scanner from leaking findings into CI l | Keep: rebase + rerun CI |
 | #2694 | no | 2026-10-23 | 6 | docs(governance): human gates become a deferred final stage  | Keep: rebase + rerun CI |
 
+## Horizon 2027 (owner-approved concept 2026-11-09; see `docs/product/PANACEAMED_HORIZON_2027_CONCEPT.md`)
+
+| ID | Task | Criterion | Lane | Status | PR / evidence |
+|---|---|---|---|---|---|
+| T-H27-01 | Whole-body canonical state: per-system truth lanes plus a `VERTICAL GAP` registry covering every organ system | — | any-ai | READY | — |
+| T-H27-02 | Care Passport: export/import round trip (golden file) and consent revocation that provably stops access | — | any-ai | READY | — |
+| T-H27-03 | Dataset provenance gate: machine-checked record (source, licence/consent scope, SHA-256, use limits, steward declaration), fails closed | — | any-ai | READY | — |
+| T-H27-04 | STR-gated reviewer role: STR stored as a claim until a registry check exists, append-only signed reviews, AI cannot write | — | any-ai | READY | — |
+| T-H27-05 | One episode end to end in staging with two cross-system synthetic fixtures; result returns to the same record | — | any-ai | READY | — |
+| T-H27-06 | Drift-awareness: pre-registered protocol, retrospective test, kill criterion | — | any-ai | READY | — |
+| T-H27-07 | Evidence ledger and owner review pack: measured / derived / simulated / unknown / not claimed per capability | — | any-ai | READY | — |
+
 ## Waiting on humans
 
 Deferred to the final stage (H3), see [EXTERNAL_GATES.md](EXTERNAL_GATES.md). Agents do not ask or re-raise these; they are reviewed when the
