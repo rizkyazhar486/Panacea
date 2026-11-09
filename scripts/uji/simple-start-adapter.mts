@@ -14,7 +14,7 @@ const kelas = new Set<string>()
   setItem: (k: string, v: string) => { if (gagalTulis.has(k)) throw new Error('tulis ditolak'); data.set(k, String(v)) },
   removeItem: (k: string) => { data.delete(k) }, clear: () => data.clear(), key: () => null, length: 0,
 } as Storage
-;(globalThis as unknown as { document: unknown }).document = { documentElement: { classList: { toggle: (n: string, f?: boolean) => { const on = f ?? !kelas.has(n); if (on) kelas.add(n); else kelas.delete(n); return on }, contains: (n: string) => kelas.has(n) } } }
+;(globalThis as unknown as { document: unknown }).document = { documentElement: { style: { fontSize: '' }, classList: { toggle: (n: string, f?: boolean) => { const on = f ?? !kelas.has(n); if (on) kelas.add(n); else kelas.delete(n); return on }, contains: (n: string) => kelas.has(n) } } }
 const reset = () => { data = new Map(); gagalTulis = new Set(); gagalBaca = false; kelas.clear() }
 
 const { readSimpleStart, writeSimpleStart } = await import('../../src/domains/simple-mode/adapters/simpleModeStorage.ts')
