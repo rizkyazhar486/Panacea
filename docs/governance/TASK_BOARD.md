@@ -263,6 +263,16 @@ Method: for each open PR, every file it changes was compared with main; no PR ha
 | T-H27-06 | Drift-awareness: pre-registered protocol, retrospective test, kill criterion | — | any-ai | READY | — |
 | T-H27-07 | Evidence ledger and owner review pack: measured / derived / simulated / unknown / not claimed per capability | — | any-ai | READY | — |
 
+## Expansion pathway (owner-requested direction 2026-11-09; see `docs/product/PANACEAMED_EXPANSION_PATHWAY.md`)
+
+| ID | Task | Criterion | Lane | Status | PR / evidence |
+|---|---|---|---|---|---|
+| T-EXP-01 | Domain manifest schema and validator: named users, lawful sources, kernel reuse, falsifiable measure, kill criterion, exit path; fails closed when any field is missing | — | any-ai | READY | — |
+| T-EXP-02 | Kernel-reuse audit: list every page and engine that stores or derives its own person or patient state outside the canonical state, with the convergence plan; no new silo | — | any-ai | READY | — |
+| T-EXP-03 | Attributed-source schema for teachings and guidance: source, tradition, edition or translation, licence, contested flag; AI may translate but not rule | — | any-ai | READY | — |
+| T-EXP-04 | Entry-gate checklist (five gates) as a PR-shape check for any new domain or ring | — | any-ai | READY | — |
+| T-EXP-05 | Cross-domain export and revocation test: one export contains every domain's data for a person and revocation stops access in all of them | — | any-ai | READY | — |
+
 ## Waiting on humans
 
 Deferred to the final stage (H3), see [EXTERNAL_GATES.md](EXTERNAL_GATES.md). Agents do not ask or re-raise these; they are reviewed when the
