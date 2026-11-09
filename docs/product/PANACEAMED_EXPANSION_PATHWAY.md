@@ -101,6 +101,33 @@ These matter to many people's decisions, so they are supported with strict rules
 - A failed safety gate blocks, defers or escalates; no domain, benchmark or revenue target compensates for it.
 - Federation over concentration: standards and portability are preferred to ownership of other parties' systems.
 
-## 10. Board rows opened by this document
+## 10. Surveillance: four lanes, one contract
 
-Only the work that is reachable now is on the board (see `docs/governance/TASK_BOARD.md`, section "Expansion pathway"): the machine-checkable domain manifest, a kernel-reuse audit of existing pages, the attributed-source schema, the entry-gate checklist, and a cross-domain export test. Everything else stays a direction until it passes the gates above.
+Owner direction (2026-11-09): the pathway must also centre on surveillance. In this repository surveillance means **permissioned observability** ([Human Observability doctrine](../../governance/doctrine/PANACEA_HUMAN_OBSERVABILITY_DOCTRINE.md)), applied in four lanes. It is a kernel capability (the *observe* step of every domain), not a ring and not a separate silo.
+
+| Lane | Observes | Who holds it | Output |
+|---|---|---|---|
+| A. Permissioned observability | One person's own longitudinal state: sensors, records, daily life | The person | Their own timeline with every blind spot shown as unknown |
+| B. Public-health surveillance | Aggregate, anonymised trends and outbreak signals | Planners and clinicians, from thresholded aggregates only | Signals that are hypotheses for a human epidemiologist |
+| C. System-safety surveillance | Panaceamed itself: drift, prediction versus reality, adverse events, near misses | The product and its named reviewers | A ledger that keeps the bad months |
+| D. Occupational and environmental | Exposures and safety flags, opt-in | The worker or resident; the employer sees only flags the worker authorises | Alerts the person controls |
+
+**The surveillance contract (every lane, checked by a validator that fails closed):**
+
+1. **Purpose-bound consent**, recorded per purpose, revocable, with a test that revocation actually stops access.
+2. **Proportionality and retention:** collect the minimum the purpose needs and state when it is deleted.
+3. **Visible blind spots:** an expected but missing or stale signal is shown as unknown, never filled in; empty is never zero.
+4. **Access lineage:** the person can read who looked at what, when and why.
+5. **Aggregate release gate (lane B and D):** a minimum cell size with suppression, tested against re-identification attempts; no individual-level output from an aggregate pipeline.
+6. **Signal is not diagnosis:** an anomaly raises a question for a named human; it never triggers a clinical, legal or employment action by itself.
+7. **Exit:** everything observed about a person can be exported and its consent withdrawn.
+
+**Red lines (not built, whatever the framing):** tracking an identifiable person without their knowing consent, including a partner, family member, employee or tenant; any use of observed health data to price, deny, ration or discipline; mandated monitoring by an insurer or employer; individual-level reporting to any authority without a lawful basis that a qualified human has confirmed. Capability meant for aggregate or self-monitoring is not exposed in a form that makes covert use of one person's data easy.
+
+**Existing work to reuse, not duplicate:** the longitudinal, consent and replay primitives named in the doctrine; the Visit realtime freshness thresholds; the Reality Gap and prediction-versus-reality records planned in Horizon 2027 (T-H27-06, T-H27-07); the environment source adapter ([ENVIRONMENT-SOURCE-ADAPTER](../../DOCS/environment/ENVIRONMENT-SOURCE-ADAPTER.md)) and the device fabric ([MEDICAL-DEVICE-FABRIC](../../DOCS/clinical-research/MEDICAL-DEVICE-FABRIC.md)). The outbreak-surveillance engine in open PR #2894 is the natural lane B engine: it should be integrated behind the aggregate release gate rather than rebuilt, and must pass the contract above before it reaches users.
+
+**What stays a direction:** lane D has no named user or lawful source yet, so it gets no task until it passes the entry gates in section 5.
+
+## 11. Board rows opened by this document
+
+Only the work that is reachable now is on the board (see `docs/governance/TASK_BOARD.md`, section "Expansion pathway"): the machine-checkable domain manifest, a kernel-reuse audit of existing pages, the attributed-source schema, the entry-gate checklist, a cross-domain export test, and for surveillance the contract validator, the blind-spot registry, the aggregate release gate and the system-safety ledger. Everything else stays a direction until it passes the gates above.
