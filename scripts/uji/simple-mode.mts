@@ -50,7 +50,11 @@ gagal('render-4-tombol-utama', () => assert.equal((html.match(/data-testid="simp
 gagal('render-ada-lihat-semuanya', () => assert.match(html, /data-testid="simple-everything"/))
 gagal('render-tanpa-h1-ganda', () => assert.equal((html.match(/<h1/g) ?? []).length, 0))  // Shell sudah memiliki satu h1
 gagal('render-judul-satu-h2', () => assert.equal((html.match(/<h2/g) ?? []).length, 1))
-gagal('render-bahasa-tujuh-tombol', () => assert.equal((html.match(/<button[^>]*aria-pressed/g) ?? []).length, 7 + 1))  // 7 bahasa + sakelar layar pertama
+// Tombol ber-aria-pressed: 7 bahasa + sakelar layar pertama + 5 wajah check-in tidur (recovery-checkin, ditambahkan sesudah tes ini ditulis).
+// Jumlah bahasa dipatok sendiri lewat atribut lang supaya penambahan wajah tidak menyembunyikan bahasa yang hilang.
+gagal('render-bahasa-tujuh-tombol', () => assert.equal((html.match(/<button[^>]*aria-pressed/g) ?? []).length, 7 + 1 + 5))
+gagal('render-bahasa-persis-tujuh', () => assert.equal((html.match(/<button[^>]*aria-pressed[^>]*lang="/g) ?? []).length, 7))
+gagal('render-lima-wajah-tidur', () => assert.equal((html.match(/data-testid="sleep-[1-5]"/g) ?? []).length, 5))
 gagal('render-tanpa-gulir-samping', () => assert.ok(!/overflow-x|width:\s*\d{4,}px/.test(html)))
 for (const m of html.matchAll(/min-height:(\d+)px/g)) gagal('sasaran-sentuh-≥72', () => assert.ok(Number(m[1]) >= 72, m[0]))
 gagal('render-kalimat-sumber-inggris', () => assert.match(html, /What do you need\?/))
