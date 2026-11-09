@@ -8,7 +8,7 @@ export function SimpleModeInvite() {
   useBahasa()
   return (
     <Link to={SIMPLE_ROUTE} data-testid="simple-invite"
-      style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, minHeight: 72, padding: '12px 16px', margin: '8px 16px', borderRadius: 16, background: '#1d4ed8', color: '#fff', fontSize: 22, fontWeight: 800, textDecoration: 'none', textAlign: 'center', whiteSpace: 'normal', overflowWrap: 'anywhere' }}>
+      style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, minHeight: 72, padding: '12px 16px', margin: '8px 0', borderRadius: 16, background: '#1d4ed8', color: '#fff', fontSize: 22, fontWeight: 800, textDecoration: 'none', textAlign: 'center', whiteSpace: 'normal', overflowWrap: 'anywhere' }}>
       <span aria-hidden="true">👆</span>{tr('Too many buttons? Tap here for the simple screen')}
     </Link>
   )
