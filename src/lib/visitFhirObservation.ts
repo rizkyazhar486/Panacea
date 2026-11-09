@@ -112,10 +112,49 @@ function iso(value: string, field: string): string {
  * an explicitly verified LOINC+UCUM mapping and the event is already accepted
  * by a named human reviewer.
  */
+function assertActiveClinicalSupportConsent(
+  event: LongitudinalEvent<number>,
+  evaluatedAtIso: string,
+): void {
+  const consent = event.consent
+  if (
+    !consent
+    || consent.granted !== true
+    || !Array.isArray(consent.purposes)
+    || !consent.purposes.includes('clinical-support')
+  ) {
+    throw new Error('visit_fhir_requires_active_clinical_support_consent')
+  }
+
+  const evaluatedAt = Date.parse(iso(evaluatedAtIso, 'evaluatedAt'))
+  const grantedAt = Date.parse(iso(consent.grantedAt, 'event.consent.grantedAt'))
+  if (grantedAt > evaluatedAt) {
+    throw new Error('visit_fhir_consent_not_yet_effective')
+  }
+  if (consent.expiresAt !== undefined) {
+    const expiresAt = Date.parse(iso(consent.expiresAt, 'event.consent.expiresAt'))
+    if (expiresAt <= evaluatedAt) throw new Error('visit_fhir_consent_expired')
+  }
+  if (consent.revokedAt !== undefined) {
+    const revokedAt = Date.parse(iso(consent.revokedAt, 'event.consent.revokedAt'))
+    if (revokedAt <= evaluatedAt) throw new Error('visit_fhir_consent_revoked')
+  }
+}
+
+/**
+ * Convert one clinician-accepted Visit OS longitudinal event into a FHIR R4
+ * Observation suitable for the existing SATUSEHAT transport layer.
+ *
+ * This function performs no network I/O. It fails closed unless the metric has
+ * an explicitly verified LOINC+UCUM mapping, the event has active
+ * clinical-support consent, and it is accepted by a named clinician reviewer.
+ */
 export function buildAcceptedVisitFhirObservation(
   event: LongitudinalEvent<number>,
   refs: VisitFhirReferences,
+  evaluatedAtIso: string = new Date().toISOString(),
 ): VisitFhirObservation {
+  assertActiveClinicalSupportConsent(event, evaluatedAtIso)
   if (event.review.state !== 'accepted' || !event.review.reviewerId?.trim() || !event.review.reviewedAt) {
     throw new Error('visit_fhir_requires_clinician_accepted_event')
   }
