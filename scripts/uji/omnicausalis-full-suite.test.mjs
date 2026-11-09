@@ -971,10 +971,11 @@ test("45. [WAVE 33 PILLAR 1: WEBGPU 3D RAYCAST PICKER, 5-STAGE LAYER PEEL & REAL
   assert.equal(hitEar.interactiveCapabilities.bvhAccelerationActive, true);
 });
 
-test("46. [WAVE 33 PILLAR 2: GITHUB ACTIONS CI/CD WORKFLOW VERIFICATION (NODE.JS v24 & ZERO-FAIL GATES)]", () => {
+test("46. [WAVE 33 PILLAR 2: GITHUB ACTIONS CI/CD WORKFLOW VERIFICATION (NODE.JS v24 & ZERO-FAIL GATES)]", async () => {
+  const nodeFs = await import("node:fs");
   const workflowRelPath = ".github/workflows/omnicausalis-ci.yml";
-  assert.equal(fs.existsSync(workflowRelPath), true);
-  const wfText = fs.readFileSync(workflowRelPath, "utf8");
+  assert.equal(nodeFs.existsSync(workflowRelPath), true);
+  const wfText = nodeFs.readFileSync(workflowRelPath, "utf8");
   assert.ok(wfText.includes('node-version: "24.x"'));
   assert.ok(wfText.includes("node --test scripts/uji/omnicausalis-full-suite.test.mjs"));
 });
@@ -1079,3 +1080,185 @@ test("50. [WAVE 34 EXPANSION: CLINICAL CLERKSHIP (KOAS THT-KL) & UKMPPD CASE SIM
   assert.ok(entCase.nextSpacedRepetitionSchedule.nextIntervalDays >= 1);
 });
 
+test("51. [WAVE 36 EXPANSION: WEBGPU / THREE.JS DRACO MESH LOD STREAMER & GPU VRAM BUDGET GUARD]", () => {
+  const lodPlan = omnicausalis.planWebGpuDracoMeshStreamAndLod({
+    organQuery: "Heart",
+    cameraDistanceMm: 180,
+    availableGpuVramMb: 1024,
+    targetFrameRateHz: 120
+  });
+  assert.equal(lodPlan.fmaId, "FMA:7088");
+  assert.equal(lodPlan.selectedLodTier, "LOD0_ULTRA_SURGICAL");
+  assert.equal(lodPlan.dracoCompressionActive, true);
+  assert.equal(lodPlan.withinGpuBudget, true);
+});
+
+test("52. [WAVE 36 EXPANSION: MULTI-DEPARTMENT INDONESIAN CLINICAL CLERKSHIP CASE BANK (THT-KL, CARDIO, SURGERY, NEURO, IPD)]", () => {
+  const results = omnicausalis.runAllClerkshipCaseBankSimulations(4);
+  assert.equal(results.length, 5);
+  assert.equal(results[0].department, "THT_KL");
+  assert.equal(results[0].linkedAnatomicalStructure.organChip, "Ear");
+  assert.equal(results[1].linkedAnatomicalStructure.organChip, "Heart");
+  assert.equal(results[2].linkedAnatomicalStructure.organChip, "External abdominal oblique");
+});
+
+test("53. [WAVE 37 SPECIALTY 1: THT-KL PURE-TONE AUDIOMETRY (PTA), AIR-BONE GAP, RINNE/WEBER & BPPV EPLEY]", () => {
+  const entEval = omnicausalis.evaluateOtorhinolaryngologyAudiometryAndVestibular({
+    earSide: "RIGHT_AD",
+    airConductionDb: { hz500: 45, hz1000: 50, hz2000: 45, hz4000: 40 },
+    boneConductionDb: { hz500: 15, hz1000: 15, hz2000: 20, hz4000: 10 },
+    dixHallpikeTriggeredNystagmus: "UPBEATING_TORSIONAL_GEOTROPIC"
+  });
+  assert.equal(entEval.acPtaDb, 45);
+  assert.equal(entEval.bcPtaDb, 15);
+  assert.equal(entEval.airBoneGapDb, 30);
+  assert.equal(entEval.hearingLossType, "CONDUCTIVE_HEARING_LOSS_CHL");
+  assert.equal(entEval.expectedTuningFork512Hz.rinne, "NEGATIVE_BC_GT_AC");
+  assert.equal(entEval.bppvCanalAndManeuver.firstLineRepositioningManeuver, "EPLEY_CANALITH_REPOSITIONING_MANEUVER");
+});
+
+test("54. [WAVE 37 SPECIALTY 2: SLEDAI-2K LUPUS ACTIVITY & ANIFROLUMAB (IFNAR1) BIOLOGIC STEWARDSHIP]", () => {
+  const sleEval = omnicausalis.evaluateSleSledai2kAndAnifrolumabEligibility({
+    patientId: "PAT-SLE-2026-01",
+    activeDomains: {
+      arthritisGe2Joints: true,
+      malarOrInflammatoryRash: true,
+      mucosalUlcers: true,
+      lowComplementC3OrC4: true,
+      increasedAntiDsDna: true
+    },
+    currentPrednisoneEquivalentMgDay: 15,
+    hydroxychloroquineAdherent: true,
+    typeIInterferonGeneSignatureHigh: true,
+    activeSevereLupusNephritisOrCnsLupus: false
+  });
+  assert.equal(sleEval.sledai2kTotalScore, 12);
+  assert.equal(sleEval.diseaseActivityCategory, "SEVERE_HIGH_ACTIVITY");
+  assert.equal(sleEval.anifrolumabBiologicDecision.eligibleForAnifrolumab300MgQ4W, true);
+  assert.equal(sleEval.glucocorticoidStewardship.requiresGlucocorticoidTaperingProtocol, true);
+});
+
+test("55. [WAVE 37 SPECIALTY 3: HYPERBARIC SCUBA GAS LAWS (DALTON ppO2 / NITROX MOD) & TEED EAR BAROTRAUMA]", () => {
+  const diveEval = omnicausalis.evaluateHyperbaricDiveAndEarBarotrauma({
+    depthMetersSeawater: 28,
+    fractionOxygenFo2: 0.32, // EANx32 Nitrox
+    maxSafePpO2Ata: 1.4,
+    otoscopyFindingOnAscent: "NORMAL_TYMPANIC_MEMBRANE"
+  });
+  assert.equal(diveEval.ambientPressureAta, 3.8);
+  assert.equal(diveEval.partialPressureO2Ata, 1.216);
+  assert.equal(diveEval.maximumOperatingDepthMeters, 33.8);
+  assert.equal(diveEval.safetyFlags.withinRecreationalModLimit, true);
+  assert.equal(diveEval.entMiddleEarBarotrauma.teedBarotraumaGrade, 0);
+});
+
+test("56. [WAVE 37 INFRASTRUCTURE 4: OMNICAUSALIS HTTP/REST GATEWAY & /body-exposure HTML DARK COCKPIT]", () => {
+  const htmlRes = omnicausalis.handleOmnicausalisGatewayRequest({
+    method: "GET",
+    pathname: "/body-exposure",
+    queryOrgan: "Ear"
+  });
+  assert.equal(htmlRes.statusCode, 200);
+  assert.ok(htmlRes.body.includes("FMA:52780"));
+  assert.ok(htmlRes.body.includes("THT-KL"));
+});
+
+
+
+// ============================================================================
+// WAVE 38: PANACEAMED PRE-2030 VISUAL MEDICAL OS & POST-2030 DAILY-NEEDS GRID
+// ============================================================================
+import {
+  conditionEdgeSensoriumAndDualSpine,
+  evaluate4DStateSpaceAndClinicalLoop,
+  actuateCivilizationalDailyNeedsGrid,
+  evaluateMasterplanGovernanceAlgorithms
+} from "../../src/core/panaceamedMasterplanHorizonEngine.mjs";
+
+test("57. [WAVE 38 HORIZON I PILLAR 1: EDGE SENSORIUM CONDITIONING, DUAL-PATHWAY SPINE & 4D VISUAL OS]", () => {
+  const res = conditionEdgeSensoriumAndDualSpine({
+    patientId: "PNC-IDN-001",
+    organTarget: "CORONARY_MYOCARDIUM_4D",
+    samplingRateHz: 500,
+    maxSignalFreqHz: 125,
+    rawWaveformMv: [0.82, 0.91, 5.40, 0.88, 0.85, 0.93, 0.89, 0.87],
+    powerlineNoiseDb: -2.5,
+    interstitialGlucoseMgDl: 148,
+    nocturnalCufflessBpMmHg: { systolic: 136, diastolic: 86 }
+  });
+  assert.strictEqual(res.nyquistCompliant, true);
+  assert.strictEqual(res.adaptiveDownsampledHz, 250);
+  assert.strictEqual(res.notchAttenuatedDb, -44.5);
+  assert.strictEqual(res.artifactsRejected, 1);
+  assert.strictEqual(res.fhirObservationBundle.resourceType, "Bundle");
+  assert.strictEqual(res.fhirObservationBundle.entry.length, 2);
+  assert.strictEqual(res.visualMedicalOs4D.scale, "PEPTIDE_TO_ORGAN_4D");
+  assert.strictEqual(res.visualMedicalOs4D.failureModeMapped, true);
+  assert.ok(res.visualMedicalOs4D.calibratedConfidence > 0.95);
+});
+
+test("58. [WAVE 38 HORIZON I PILLAR 2: 4D STATE-SPACE CORTEX, N-OF-1 Z-SCORE DRIFT & ZERO-CLICK CLINICAL LOOP]", () => {
+  const res = evaluate4DStateSpaceAndClinicalLoop({
+    patientId: "PNC-IDN-001",
+    activeMedications: ["CLOPIDOGREL"],
+    cyp2c19Phenotype: "POOR_METABOLIZER",
+    phase0MonthsElapsed: 14,
+    modelSensitivity: 0.968,
+    baselineSpecialistSensitivity: 0.892
+  });
+  assert.strictEqual(res.preSymptomaticAlert, true);
+  assert.ok(res.leadTimeHoursBeforeAcute >= 48 && res.leadTimeHoursBeforeAcute <= 168);
+  assert.strictEqual(res.pgxAlertTriggered, true);
+  assert.strictEqual(res.autonomousCpoeOrders.length, 3);
+  assert.ok(res.zeroClickSoapNote.plan.includes("Prasugrel/Ticagrelor"));
+  assert.strictEqual(res.phase0Gate.phase0Status, "PROCEED_TO_PHASE_1_WEDGE");
+});
+
+test("59. [WAVE 38 HORIZON II PILLAR 3: POST-2030 CIVILIZATIONAL EFFECTOR GRID & 6 DAILY-NEED LINEAGES]", () => {
+  const res = actuateCivilizationalDailyNeedsGrid({
+    interstitialGlucoseMgDl: 132,
+    bloodLactateMmolL: 2.4,
+    urineSpecificGravity: 1.026,
+    indoorCo2Ppm: 1150,
+    indoorPm25UgM3: 28,
+    sleepStage: "SLOW_WAVE_N3",
+    coreBodyTempC: 36.9,
+    prefrontalHbO2Pct: 61,
+    sympatheticToneIndex: 7.8,
+    cortisolTrendNgMl: 19.4,
+    muscleSmO2Pct: 49,
+    lumbarFlexionDeg: 28,
+    il6PgMl: 6.8,
+    cfDnaFragmentationIndex: 0.24,
+    epigeneticAgeVelocity: 1.14,
+    longitudinalAdherencePct: 98.4,
+    multiOrganResilienceScore: 91.5
+  });
+  assert.strictEqual(res.nonClinicalVarianceGovernedPct, 85);
+  assert.strictEqual(res.allSixLineagesOperational, true);
+  assert.strictEqual(res.lineages.lineageA_Metabolic.waterRemineralizationMgL.magnesium, 85);
+  assert.strictEqual(res.lineages.lineageB_Shelter.hepaFarUvc222nmActive, true);
+  assert.strictEqual(res.lineages.lineageC_NeuroCognitive.highStressDigitalThrottleActive, true);
+  assert.strictEqual(res.lineages.lineageD_Kinetic.exoskeletonAssistTorqueNm, 18.5);
+  assert.strictEqual(res.lineages.lineageE_Prophylactic.transdermalMicrofluidicPatchActive, true);
+  assert.strictEqual(res.lineages.lineageF_Actuarial.dynamicPremiumDiscountPct, 42.5);
+});
+
+test("60. [WAVE 38 GOVERNANCE PILLAR 4: 5-AXIS PRIORITY SCORING, CLOSED-LOOP FLYWHEEL & NORTH-STAR ENGINE]", () => {
+  const approved = evaluateMasterplanGovernanceAlgorithms({
+    candidateInitiative: "4D_CARDIOMETABOLIC_TELEMETRY_AND_HABITAT_ACTUATION"
+  });
+  assert.strictEqual(approved.priorityDecision.status, "APPROVED_HIGH_COMPOUNDING_MOAT");
+  assert.ok(approved.priorityDecision.score > 9.0);
+  assert.strictEqual(approved.flywheelVerification.loopClosed, true);
+  assert.strictEqual(approved.flywheelVerification.sampleComplexityReductionPct, 19.0);
+  assert.strictEqual(approved.flywheelVerification.flywheelClassification, "SOVEREIGN_COMPOUNDING_FLYWHEEL_VERIFIED");
+  assert.strictEqual(approved.northStarStatus.talentDensityTargetMet, true);
+
+  const rejected = evaluateMasterplanGovernanceAlgorithms({
+    candidateInitiative: "SHORT_TERM_LICENSING_WITHOUT_EXCLUSIVE_DATA",
+    scores: { deltaM: 8.5, eD: 0, lW: 7.0, rS: 6.0, fN: 5.0 }
+  });
+  assert.strictEqual(rejected.priorityDecision.score, 0);
+  assert.strictEqual(rejected.priorityDecision.status, "REJECTED_HARD_CONSTRAINT_OR_MOAT_BREACH");
+});
