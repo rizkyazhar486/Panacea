@@ -105,7 +105,7 @@ export const PANACEA_SPACES: readonly ProductSpace[] = [
 const EXACT_SPACE_ROUTES: Readonly<Record<ProductSpaceId, readonly string[]>> = {
   today: [
     '/', '/profile', '/health-data', '/ikhtisar', '/harian', '/tubuh', '/vitapulse',
-    '/assessment', '/notifications', '/notifikasi', '/search', '/cari',
+    '/assessment', '/notifications', '/notifikasi', '/search', '/cari', '/simple',
   ],
   body: [
     '/body-explorer', '/body', '/body-toolkit', '/organ-vitality', '/radiology',

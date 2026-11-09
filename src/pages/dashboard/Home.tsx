@@ -1,6 +1,7 @@
 import { Navigate } from 'react-router-dom'
 import { useStore } from '../../lib/store'
 import { HomeSocialWorkspace } from '../HomeSocialWorkspace'
+import { readSimpleStart, SimpleHome, SimpleModeInvite } from '../../domains/simple-mode'
 
 // Role-aware landing stays intact for contributor/verifier/admin accounts.
 // Patient, doctor and owner accounts now land in one Home workspace that
@@ -19,6 +20,14 @@ export function Home() {
     case 'admin':
       return <Navigate to="/admin" replace />
     default:
-      return <HomeSocialWorkspace />
+      // Orang yang memilih Layar Sederhana sebagai layar pertama melihatnya lebih dulu;
+      // yang lain mendapat satu tautan besar menuju layar itu.
+      if (readSimpleStart()) return <SimpleHome />
+      return (
+        <>
+          <SimpleModeInvite />
+          <HomeSocialWorkspace />
+        </>
+      )
   }
 }

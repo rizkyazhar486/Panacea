@@ -36,6 +36,7 @@ const PusatGizi = lazy(() => import('./pages/bodyhub/PusatGizi').then((m) => ({ 
 const ClinicalScores = lazy(() => import('./pages/ClinicalScores').then((m) => ({ default: m.ClinicalScores })))
 const Translator = lazy(() => import('./pages/clinical/Translator').then((m) => ({ default: m.Translator })))
 const BodyExplorer = lazy(() => import('./pages/bodyhub/BodyExplorer').then((m) => ({ default: m.BodyExplorer })))
+const SimpleHome = lazy(() => import('./domains/simple-mode').then((m) => ({ default: m.SimpleHome })))
 const BodyExposureAtlasHome = lazy(() => import('./domains/body-exposure').then((m) => ({ default: m.BodyExposureAtlasHome })))
 const CanonicalBody = lazy(() => import('./pages/bodyhub/CanonicalBody').then((m) => ({ default: m.CanonicalBody })))
 const FetalParcelInspector = lazy(() => import('./pages/bodyhub/FetalParcelInspector').then((m) => ({ default: m.FetalParcelInspector })))
@@ -209,6 +210,7 @@ createRoot(document.getElementById('root')!).render(
           <Suspense fallback={<PageLoader />}>
             <Routes>
               <Route path="/" element={<Home />} />
+              <Route path="/simple" element={<SimpleHome />} />
               <Route path="/chatbot" element={<Chatbot />} />
               <Route path="/emr" element={<EMR />} />
               <Route path="/planning" element={<Planning />} />
