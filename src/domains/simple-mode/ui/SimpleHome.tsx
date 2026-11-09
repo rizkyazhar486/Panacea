@@ -2,6 +2,7 @@ import { useState, type CSSProperties } from 'react'
 import { Link } from 'react-router-dom'
 import { LANGS, setLang, tr } from '../../../lib/i18n'
 import { useBahasa } from '../../../lib/useBahasa'
+import { SleepCheckin } from '../../recovery-checkin/index'
 import { readSimpleStart, writeSimpleStart } from '../adapters/simpleModeStorage'
 import { SEE_EVERYTHING_ROUTE, SIMPLE_ACTIONS } from '../model/simpleActions'
 
@@ -47,6 +48,8 @@ export function SimpleHome() {
           </span>
         </Link>
       ))}
+
+      <SleepCheckin />
 
       <Link to={SEE_EVERYTHING_ROUTE} data-testid="simple-everything" style={tombolSekunder}>{tr('See everything')}</Link>
 
