@@ -119,6 +119,8 @@ for (const sel of ['.emc-call', '.emc-blood', '.emc-id__bar', '.emc-tile', '.emc
   gagal(`kontras-putih:${sel}`, () => { assert.ok(latar.length > 0, `tak ada warna latar terbaca di ${sel}`); for (const h of latar) assert.ok(kontrasPutih(h) >= 4.5, `${sel} ${h}=${kontrasPutih(h).toFixed(2)}`) })
   void warna
 }
+// anggaran lapisan-tambal-dilarang.mts: CSS baru tidak boleh menambah penanda prioritas paksa (dihitung juga di komentar)
+gagal('tanpa-penanda-prioritas-paksa', () => assert.ok(!/!important/.test(css), 'CSS kartu darurat memakai spesifisitas, bukan prioritas paksa'))
 gagal('gerak-dihormati', () => assert.match(css, /prefers-reduced-motion:\s*reduce[\s\S]*animation:\s*none/))
 gagal('fokus-terlihat', () => assert.match(css, /:focus-visible\s*\{\s*outline:\s*4px/))
 gagal('dua-kolom-desktop', () => assert.match(css, /min-width:\s*1024px[\s\S]*grid-template-columns/))

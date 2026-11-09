@@ -114,7 +114,7 @@
 
 /* ── Formulir: besar dan lega, bukan kecil dan padat ───────────────────── */
 .emc-form { display: grid; gap: 16px; padding: 24px; }
-.emc-form input:not([type='checkbox']), .emc-form select { font-size: 18px !important; border-radius: 16px; }
+.emc-form input:not([type='checkbox']), .emc-form select { border-radius: 16px; }
 .emc-form input[type='checkbox'] { width: 28px; height: 28px; }
 .emc-form label { font-size: 16px; }
 .emc-form__row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
@@ -137,7 +137,7 @@
  * (.pmd-page-stage[data-spatial='false'] :where(button, a[href]) { min-height: 42px }, spesifisitas 0,2,0) dan lantai sentuh
  * (touch-targets.css: html:root body :is(button, input…):not([data-touch-compact]) { min-height: 44px }, 0,3,3).
  * Memakai teknik yang didokumentasikan repo (awalan `html:root body`) dan kelas digandakan: kolom kelas = 4 > 3, menang
- * tanpa !important dan tanpa bergantung pada urutan pemuatan stylesheet. Terukur di browser: lihat uji + laporan PR.
+ * tanpa penanda prioritas paksa dan tanpa bergantung pada urutan pemuatan stylesheet. Terukur di browser: lihat uji + laporan PR.
  */
 html:root body .emc-page .emc-call.emc-call { min-height: 136px; }
 html:root body .emc-page .emc-tile.emc-tile { min-height: 112px; }
