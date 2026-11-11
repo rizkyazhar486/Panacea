@@ -31,7 +31,10 @@ const norm = (v: Vec3): Vec3 => { const l = Math.hypot(...v); return [v[0] / l, 
  * Input tidak valid → null (fail closed).
  */
 export function viewPose(view: AnatomicalView, center: Vec3, size: Vec3, vfovDeg: number, aspect: number, margin = 1.15): CameraPose | null {
-  if (!DIRS[view] || !finite(center) || !finite(size) || size.some((s) => s < 0) || !(vfovDeg > 0 && vfovDeg < 180)
+  // Own-property check, not a truthiness lookup: 'constructor', 'toString' or '__proto__' are truthy on any
+  // object and used to slip through, then throw further down instead of returning null.
+  if (typeof view !== 'string' || !Object.prototype.hasOwnProperty.call(DIRS, view) || !Array.isArray(center) || !Array.isArray(size)
+      || !finite(center) || !finite(size) || size.some((s) => s < 0) || !(vfovDeg > 0 && vfovDeg < 180)
       || !Number.isFinite(aspect) || aspect <= 0 || !Number.isFinite(margin) || margin <= 0) return null
   const { dir, up } = DIRS[view]
   const d = norm(dir)
