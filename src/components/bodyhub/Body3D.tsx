@@ -3,7 +3,18 @@ import * as THREE from 'three'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
-import { tissueShading, applyBakedAoToLayer } from '../../domains/body-exposure'
+import {
+  tissueShading,
+  applyBakedAoToLayer,
+  firstPickableIndex,
+  stepTween,
+  viewPose,
+  type CameraPose,
+  type CameraTween,
+  type PickCandidate,
+  type RegionFrame,
+  type Vec3,
+} from '../../domains/body-exposure'
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js'
 import { keburaman, geserBuka, KEDALAMAN, type KunciLapisan } from '../../lib/dissection'
 import {
@@ -115,6 +126,47 @@ function isDescendantOf(obj: THREE.Object3D, ancestor: THREE.Object3D): boolean 
     p = p.parent
   }
   return false
+}
+
+/**
+ * Apa yang dibaca kebijakan pilih dari satu objek yang ditembus sinar: apakah ia (dan semua induknya) tampil,
+ * dan seberapa pudar materialnya dibanding opasitas dasarnya sendiri. Raycaster three tidak memeriksa
+ * `visible` maupun opasitas; tanpa ini ketukan pada otot bisa memilih wilayah kulit yang sudah dipudarkan
+ * diseksi, atau teks bantu sumber yang disembunyikan.
+ */
+function kandidatPilih(obj: THREE.Object3D): PickCandidate {
+  let visible = true
+  for (let p: THREE.Object3D | null = obj; p; p = p.parent) {
+    if (!p.visible) { visible = false; break }
+  }
+  const material = (obj as THREE.Mesh).material
+  const daftar = Array.isArray(material) ? material : [material]
+  let opacity = 0
+  let baseOpacity = 0
+  for (const m of daftar) {
+    if (!m) continue
+    const dasar = typeof m.userData.body3dBaseOpacity === 'number' ? m.userData.body3dBaseOpacity as number : m.opacity
+    if (m.opacity >= opacity) { opacity = m.opacity; baseOpacity = dasar }
+  }
+  return { visible, opacity, baseOpacity }
+}
+
+/** Mode aksesibilitas aplikasi (lib/theme) atau preferensi sistem: perpindahan kamera langsung, tanpa animasi. */
+function gerakDikurangi(): boolean {
+  return document.documentElement.classList.contains('reduce-motion')
+    || window.matchMedia('(prefers-reduced-motion: reduce)').matches
+}
+
+const LAMA_TERBANG_S = 0.7
+const tripel = (v: THREE.Vector3): Vec3 => [v.x, v.y, v.z]
+const jarakTripel = (a: Vec3, b: Vec3) => Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2])
+const tripelSah = (v: unknown): v is Vec3 => Array.isArray(v) && v.length === 3 && v.every((n) => typeof n === 'number' && Number.isFinite(n))
+
+/** Perintah 'frame' datang lewat event window, jadi bentuknya diperiksa dulu; yang tidak sah diabaikan. */
+function bingkaiSah(frame: unknown): frame is RegionFrame {
+  if (!frame || typeof frame !== 'object') return false
+  const f = frame as Partial<RegionFrame>
+  return typeof f.view === 'string' && tripelSah(f.center) && tripelSah(f.size)
 }
 
 // ─── Mode tampilan radiologi ────────────────────────────────────────────────
@@ -236,9 +288,15 @@ interface Props {
   motion: MotionState
   unfold: number
   dissect: number
-  onPick: (rawName: string, label: string) => void
+  /** `layer` is the atlas file the tapped structure came from (absent when it cannot be resolved). */
+  onPick: (rawName: string, label: string, layer?: AnatomyLayer['key']) => void
   /** Replaces the default tall stage so a caller can keep one fact in the same viewport. */
   stageClassName?: string
+  /**
+   * What "home" frames, in atlas coordinates. When given, the first fit and `reset` fit this box for the
+   * actual screen shape (portrait or landscape) instead of the default three-quarter presentation pose.
+   */
+  homeFrame?: RegionFrame
 }
 
 function latarGradasi(atas: number, bawah: number): THREE.Texture {
@@ -328,8 +386,12 @@ export function Body3D({
   dissect,
   onPick,
   stageClassName,
+  homeFrame,
 }: Props) {
   const containerRef = useRef<HTMLDivElement>(null)
+  const homeFrameRef = useRef(homeFrame)
+  homeFrameRef.current = homeFrame
+  const flyToRef = useRef<(pose: CameraPose, limits: { minDistance: number; maxDistance: number }) => void>(() => undefined)
   const groupsRef = useRef<Partial<Record<AnatomyLayer['key'], THREE.Group>>>({})
   const layersRef = useRef(layers)
   layersRef.current = layers
@@ -419,6 +481,31 @@ export function Body3D({
     let inViewport = true
     let documentVisible = !document.hidden
 
+    // Perpindahan kamera yang DIMINTA (bingkai wilayah, fokus struktur, kembali ke awal) ditempuh, bukan
+    // dilompati: lompatan membuat pembelajar kehilangan orientasi. Posenya dihitung stepTween (murni, diuji
+    // terpisah) dan setiap langkah digambar lewat penjadwal bersama di bawah — tidak ada loop RAF kedua.
+    // Selama terbang, bingkai berikutnya diminta dari dalam renderFrame; begitu sampai, viewer kembali diam.
+    let penerbangan: { tween: CameraTween; terakhir: number; minDistance: number; maxDistance: number } | null = null
+    const terapkanPose = (pose: CameraPose) => {
+      camera.position.set(pose.position[0], pose.position[1], pose.position[2])
+      controls.target.set(pose.target[0], pose.target[1], pose.target[2])
+    }
+    const majukanPenerbangan = () => {
+      if (!penerbangan) return
+      const kini = performance.now()
+      const langkah = stepTween(penerbangan.tween, (kini - penerbangan.terakhir) / 1000)
+      penerbangan.terakhir = kini
+      if (!langkah.ok) { penerbangan = null; return }
+      terapkanPose(langkah.pose)
+      if (langkah.done) {
+        controls.minDistance = penerbangan.minDistance
+        controls.maxDistance = penerbangan.maxDistance
+        penerbangan = null
+      } else {
+        penerbangan.tween = langkah.tween
+      }
+    }
+
     // Body3D shares the same demand-render lifecycle as the rest of the Body
     // runtime. The scheduler coalesces bursty invalidations into one frame and
     // never owns a permanent RAF loop.
@@ -426,8 +513,10 @@ export function Body3D({
     const renderScheduler = createBodyRenderScheduler({
       canRender: () => inViewport && documentVisible && !contextLifecycle.isLost(),
       renderFrame: () => {
+        majukanPenerbangan()
         controls.update()
         renderer.render(scene, camera)
+        if (penerbangan) renderScheduler.request()
       },
       requestFrame: (callback) => requestAnimationFrame(callback),
       cancelFrame: (frameId) => cancelAnimationFrame(frameId),
@@ -448,6 +537,30 @@ export function Body3D({
 
     requestRenderRef.current = requestRender
     controls.addEventListener('change', requestRender)
+
+    const terbangKe = (to: CameraPose, batas: { minDistance: number; maxDistance: number }) => {
+      const from: CameraPose = { position: tripel(camera.position), target: tripel(controls.target), up: [0, 1, 0] }
+      const sudahDiSana = jarakTripel(from.position, to.position) < 1e-4 && jarakTripel(from.target, to.target) < 1e-4
+      if (sudahDiSana || gerakDikurangi()) {
+        penerbangan = null
+        controls.minDistance = batas.minDistance
+        controls.maxDistance = batas.maxDistance
+        terapkanPose(to)
+        controls.update()
+        requestRender()
+        return
+      }
+      // Selama terbang batas jarak dilonggarkan supaya OrbitControls tidak menjepit pose antara; batas tujuan
+      // dipasang saat tiba.
+      controls.minDistance = Math.min(controls.minDistance, batas.minDistance)
+      controls.maxDistance = Math.max(controls.maxDistance, batas.maxDistance)
+      penerbangan = { tween: { from, to, elapsedS: 0, durationS: LAMA_TERBANG_S }, terakhir: performance.now(), ...batas }
+      requestRender()
+    }
+    flyToRef.current = terbangKe
+    // Tangan pengguna selalu menang atas penerbangan yang sedang berjalan.
+    const batalkanPenerbangan = () => { penerbangan = null }
+    controls.addEventListener('start', batalkanPenerbangan)
 
     const resize = () => {
       const w = container.clientWidth
@@ -484,8 +597,11 @@ export function Body3D({
       raycaster.setFromCamera(pointer, camera)
       const targets = Object.values(groupsRef.current).filter((g): g is THREE.Group => !!g)
       const hits = raycaster.intersectObjects(targets, true)
-      if (hits.length === 0) return
-      const hitObject = hits[0].object
+      // Yang dipilih adalah benda terdekat yang BENAR-BENAR terlihat: lapisan yang dipudarkan diseksi dan
+      // simpul yang disembunyikan dilewati, sehingga ketukan menembus ke struktur padat di baliknya.
+      const pilih = firstPickableIndex(hits.map((hit) => kandidatPilih(hit.object)))
+      if (pilih < 0) return
+      const hitObject = hits[pilih].object
       let obj: THREE.Object3D | null = hitObject
       while (obj && !obj.userData.originalName) obj = obj.parent
       if (obj) {
@@ -495,7 +611,7 @@ export function Body3D({
           return Boolean(group && isDescendantOf(hitObject, group))
         })
         publishAnatomySourceSelection(rawName, sourceLayer?.file)
-        onPickRef.current(rawName, humanizeStructureName(rawName))
+        onPickRef.current(rawName, humanizeStructureName(rawName), sourceLayer?.key)
       }
     }
     renderer.domElement.addEventListener('pointerdown', onPointerDown)
@@ -525,7 +641,7 @@ export function Body3D({
     document.addEventListener('visibilitychange', onVisibilityChange)
 
     const onCameraCommand = (e: Event) => {
-      const custom = e as CustomEvent<{ action?: 'zoomIn' | 'zoomOut' | 'reset' | 'front' | 'back' | 'backdrop'; backdrop?: string }>
+      const custom = e as CustomEvent<{ action?: 'zoomIn' | 'zoomOut' | 'reset' | 'front' | 'back' | 'backdrop' | 'frame'; backdrop?: string; frame?: unknown }>
       const action = custom.detail?.action
       const ctrl = controlsRef.current
       const cam = cameraRef.current
@@ -541,12 +657,23 @@ export function Body3D({
         requestRender()
       } else if (action === 'reset' && homeFramingRef.current) {
         const home = homeFramingRef.current
-        cam.position.copy(home.position)
-        ctrl.target.copy(home.target)
-        ctrl.minDistance = home.minDistance
-        ctrl.maxDistance = home.maxDistance
-        ctrl.update()
-        requestRender()
+        terbangKe(
+          { position: tripel(home.position), target: tripel(home.target), up: [0, 1, 0] },
+          { minDistance: home.minDistance, maxDistance: home.maxDistance },
+        )
+      } else if (action === 'frame') {
+        // Bingkai satu kotak (koordinat atlas) dari arah anatomis bernama, untuk bentuk layar yang sekarang.
+        // Kotak atau arah yang tidak sah membuat viewPose mengembalikan null: kamera dibiarkan di tempatnya.
+        const bingkai = custom.detail?.frame
+        const pose = bingkaiSah(bingkai) ? viewPose(bingkai.view, bingkai.center, bingkai.size, cam.fov, cam.aspect) : null
+        if (pose) {
+          const jarak = jarakTripel(pose.position, pose.target)
+          const home = homeFramingRef.current
+          terbangKe(pose, {
+            minDistance: Math.min(home?.minDistance ?? jarak * 0.15, jarak * 0.15),
+            maxDistance: Math.max(home?.maxDistance ?? jarak * 4, jarak * 4),
+          })
+        }
       } else if (action === 'front' && homeFramingRef.current) {
         const target = ctrl.target
         const dist = cam.position.distanceTo(target)
@@ -577,9 +704,12 @@ export function Body3D({
 
     return () => {
       requestRenderRef.current = () => undefined
+      flyToRef.current = () => undefined
+      penerbangan = null
       renderScheduler.dispose()
       contextLifecycle.dispose()
       controls.removeEventListener('change', requestRender)
+      controls.removeEventListener('start', batalkanPenerbangan)
       visibilityObserver.disconnect()
       document.removeEventListener('visibilitychange', onVisibilityChange)
       window.removeEventListener('panacea:body3d-camera', onCameraCommand)
@@ -680,12 +810,22 @@ export function Body3D({
                 const center = box.getCenter(new THREE.Vector3())
                 const size = box.getSize(new THREE.Vector3())
                 const height = Math.max(size.y, 0.1)
-                const dist = height * 1.38
-                camera.position.set(
-                  center.x + dist * 0.22,
-                  center.y + height * 0.04,
-                  center.z + dist * 0.94,
-                )
+                let dist = height * 1.38
+                // Pemanggil yang menyatakan bingkai awalnya sendiri (koordinat atlas) mendapat seluruh kotak itu
+                // muat di layar apa pun; tanpa itu, pose presentasi tiga-perempat yang lama tetap dipakai.
+                const rumah = homeFrameRef.current
+                const poseRumah = bingkaiSah(rumah) ? viewPose(rumah.view, rumah.center, rumah.size, camera.fov, camera.aspect) : null
+                if (poseRumah) {
+                  camera.position.set(poseRumah.position[0], poseRumah.position[1], poseRumah.position[2])
+                  center.set(poseRumah.target[0], poseRumah.target[1], poseRumah.target[2])
+                  dist = jarakTripel(poseRumah.position, poseRumah.target)
+                } else {
+                  camera.position.set(
+                    center.x + dist * 0.22,
+                    center.y + height * 0.04,
+                    center.z + dist * 0.94,
+                  )
+                }
                 camera.near = Math.max(dist / 100, 0.01)
                 camera.far = dist * 20
                 camera.updateProjectionMatrix()
@@ -902,20 +1042,20 @@ export function Body3D({
           4.5,
         )
         if (pose) {
-          camera.position.set(pose.position.x, pose.position.y, pose.position.z)
-          controls.target.set(pose.target.x, pose.target.y, pose.target.z)
-          const distance = camera.position.distanceTo(controls.target)
-          controls.minDistance = Math.max(pose.span * 0.08, 0.005)
-          controls.maxDistance = Math.max(pose.span * 12, distance * 8)
-          controls.update()
+          const position: Vec3 = [pose.position.x, pose.position.y, pose.position.z]
+          const target: Vec3 = [pose.target.x, pose.target.y, pose.target.z]
+          const distance = jarakTripel(position, target)
+          flyToRef.current(
+            { position, target, up: [0, 1, 0] },
+            { minDistance: Math.max(pose.span * 0.08, 0.005), maxDistance: Math.max(pose.span * 12, distance * 8) },
+          )
         }
       } else if (!focusKeywords && homeFramingRef.current) {
         const home = homeFramingRef.current
-        camera.position.copy(home.position)
-        controls.target.copy(home.target)
-        controls.minDistance = home.minDistance
-        controls.maxDistance = home.maxDistance
-        controls.update()
+        flyToRef.current(
+          { position: tripel(home.position), target: tripel(home.target), up: [0, 1, 0] },
+          { minDistance: home.minDistance, maxDistance: home.maxDistance },
+        )
       }
     }
     requestRenderRef.current()

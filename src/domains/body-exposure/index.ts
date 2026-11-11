@@ -423,6 +423,37 @@ export {
   type SelectedStructureInfo,
 } from './engine/atlasHomeConfig'
 
+// — ATLAS STAGE (pure logic the home and the shared viewer both read) —
+export {
+  ATLAS_DEPTH_ORDER,
+  ATLAS_MAX_DEPTH,
+  formatLayerSize,
+  isAtlasDepth,
+  layerAtDepth,
+  planStageLayers,
+  plateShows,
+  type AtlasLayerId,
+  type AtlasLayerInfo,
+  type AtlasLayerOverrides,
+  type AtlasPlateMode,
+  type StageLayerPlan,
+} from './engine/atlas-stage/stageLayers'
+export {
+  ATLAS_BODY_EXTENT,
+  ATLAS_REGIONS,
+  regionContains,
+  regionFrame,
+  regionFrameById,
+  type AtlasRegion,
+  type RegionFrame,
+} from './engine/atlas-stage/regionFraming'
+export { PICK_MIN_FADE, firstPickableIndex, isPickable, type PickCandidate } from './engine/atlas-stage/pickPolicy'
+export { readAtlasSide, sideFromCentreX, type AtlasSide, type AtlasSideReading } from './engine/atlas-stage/sideLabel'
+export { describeStructure } from './engine/atlas-stage/structureInfo'
+export { SHEET_SNAPS, nextSnap, sheetHeight, snapAfterDrag, type SheetSnap } from './engine/atlas-stage/sheetSnap'
+export { ATLAS_SIDE_LABEL_REVIEW, type SideLabelReviewKind } from './data/atlasSideLabelReview'
+export type { AtlasCameraCommand, AtlasViewerComponent, AtlasViewerProps } from './engine/atlas-stage/viewerContract'
+
 // — DESCRIPTIVE REGISTRY ALIASES (structureAtlas) —
 export {
   atlasEnvelope,
