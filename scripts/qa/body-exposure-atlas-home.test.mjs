@@ -22,11 +22,14 @@ test('AtlasHome: All 7 Shipped Z-Anatomy Layers are fully indexed', () => {
     assert.ok(layer.file.endsWith('.glb'), `Layer ${id} must reference a .glb file`)
     assert.ok(layer.label.length > 0, `Layer ${id} must have a human-readable label`)
     assert.ok(layer.color.startsWith('#'), `Layer ${id} must have a hex color`)
-    assert.ok(layer.defaultOpacity > 0 && layer.defaultOpacity <= 1, `Layer ${id} opacity must be in (0, 1]`)
 
     // Verify file exists on disk in public/anatomy/
     const filePath = path.join(process.cwd(), 'public', 'anatomy', layer.file)
     assert.ok(fs.existsSync(filePath), `Physical GLB file must exist at ${filePath}`)
+    // The home no longer carries its own opacity per layer (the shared viewer keeps source materials), so the
+    // old "opacity in (0, 1]" check has nothing to read. What the home does show is the download size, and
+    // that must be the real one — exact bytes, not a range.
+    assert.equal(layer.sizeBytes, fs.statSync(filePath).size, `Layer ${id} sizeBytes must equal the shipped file size`)
   }
 })
 
@@ -50,10 +53,22 @@ test('AtlasHome: Anatomical regions cover whole body and major somatic compartme
   assert.ok(regionIds.includes('abdomen'), 'Must include abdomen')
   assert.ok(regionIds.includes('pelvis'), 'Must include pelvis')
 
+  // Regions used to be a fixed targetY/distance pair tuned for a body centred on the origin. The shipped atlas
+  // stands on the floor (y 0 .. 1.743 m), so "Head & Neck" (targetY 0.72) pointed at the thigh and the default
+  // view showed only the legs (measured in a real browser). A region is now a height window in the atlas's
+  // own metres; the camera distance is derived from it per screen shape. scripts/uji/atlas-stage-assets.mts
+  // re-measures the GLB and checks each window against real landmarks.
   for (const reg of ANATOMICAL_REGIONS) {
-    assert.ok(Number.isFinite(reg.targetY), `Region ${reg.id} targetY must be finite`)
-    assert.ok(reg.distance > 0, `Region ${reg.id} camera distance must be positive`)
+    assert.ok(Number.isFinite(reg.y[0]) && Number.isFinite(reg.y[1]), `Region ${reg.id} height window must be finite`)
+    assert.ok(reg.y[1] > reg.y[0], `Region ${reg.id} height window must have positive height`)
+    assert.ok(reg.y[0] >= 0 && reg.y[1] <= 1.76, `Region ${reg.id} must lie within the standing body (0 .. 1.76 m)`)
+    assert.ok(reg.halfWidthX > 0 && reg.halfWidthX <= 0.4, `Region ${reg.id} half-width must be positive and within the arm span`)
   }
+  const centre = (id) => { const r = ANATOMICAL_REGIONS.find((x) => x.id === id); return (r.y[0] + r.y[1]) / 2 }
+  assert.ok(centre('head-neck') > centre('thorax'), 'Head & neck must be framed above the thorax')
+  assert.ok(centre('thorax') > centre('abdomen'), 'Thorax must be framed above the abdomen')
+  assert.ok(centre('abdomen') > centre('pelvis'), 'Abdomen must be framed above the pelvis')
+  assert.ok(centre('pelvis') > centre('lower-limb'), 'Pelvis must be framed above the lower limbs')
 })
 
 test('AtlasHome: Stage 3 Clinical Suite & Progressive Disclosure Integration', () => {
