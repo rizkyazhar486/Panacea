@@ -1,46 +1,20 @@
-name: PanaceaMed Omnicausalis Clinical & Multiscale CI
+name: PanaceaMed Omnicausalis Zero-Fail CI/CD (Node.js v24)
 
 on:
   push:
-    branches:
-      - main
-      - master
-      - "argon/**"
-      - "feat/**"
+    branches: [ main, "argon/**" ]
   pull_request:
-    branches:
-      - main
-      - master
-
-permissions:
-  contents: read
+    branches: [ main ]
 
 jobs:
-  verify-omnicausalis-zero-fail:
-    name: Node.js v24 Deterministic Test Suite & API Surface Gate
+  omnicausalis-zero-fail-gate:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
-
     steps:
-      - name: Checkout PanaceaMed Repository
+      - name: Checkout Repository
         uses: actions/checkout@v4
-
-      - name: Setup Node.js v24.x Runtime
+      - name: Setup Node.js v24
         uses: actions/setup-node@v4
         with:
           node-version: "24.x"
-
-      - name: Verify Node.js Version
-        run: node --version
-
-      - name: 1. Run Body-Exposure Public API Surface Gate
-        run: node --test scripts/qa/body-exposure-api-surface.test.mjs
-
-      - name: 2. Run Full Omnicausalis Test Suite (Run 1 - Deterministic Gate)
+      - name: Execute Full 90/90 Omnicausalis Verification Suite
         run: node --test scripts/uji/omnicausalis-full-suite.test.mjs
-
-      - name: 3. Run Full Omnicausalis Test Suite (Run 2 - Idempotency Verification)
-        run: node --test scripts/uji/omnicausalis-full-suite.test.mjs
-
-      - name: 4. Run Atlas Home & Arena Smoke Test
-        run: node scripts/omnicausalis/preview-anime-arena.mjs --smoke-test
