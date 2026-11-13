@@ -1,5 +1,10 @@
 // @panacea-claim-boundary: simulation-not-clinical
-export type OmnicausalisTruthClass = 'OBSERVED_CLINICAL' | 'DERIVED_CLINICAL' | 'SIMULATED_EDUCATIONAL';
+export type OmnicausalisTruthClass =
+  | 'OBSERVED_CLINICAL'
+  | 'DERIVED_CLINICAL'
+  | 'SIMULATED_EDUCATIONAL'
+  | 'REFERENCE_NORMATIVE';
+
 export const OMNICAUSALIS_SAFETY_DISCLAIMER =
   'Simulation and research decision-support output only (clinically_reviewed=false). Never use for autonomous clinical diagnosis, prescription, or device actuation without qualified human physician review.' as const;
 
@@ -80,3 +85,80 @@ export interface LongevityEnergyBalanceSummary {
   readonly totalIntakeKcal: number; readonly workoutExpenditureKcal: number; readonly totalExpenditureKcal: number;
   readonly netEnergyBalanceKcal: number; readonly autonomicReadinessIndex: number;
 }
+
+// --- 7 Transcendental Pillars Extensions (Panacea-OS Master Mindmap) ---
+export interface MitochondrialAutophagyInput {
+  readonly deltaPsiMMv: number; // [-220, -40] mV
+  readonly nadPlusToNadhRatio: number; // [0.1, 20]
+  readonly ampkToMtorRatio: number; // [0.1, 10]
+  readonly substrateOxygenSaturationPct: number; // [10, 100]
+}
+export interface MitochondrialAutophagySummary {
+  readonly oxPhosAtpFluxIndex: number; // [0, 100]
+  readonly lc3IITurnoverRate: number; // [0, 100]
+  readonly pink1ParkinMitophagyActive: boolean;
+  readonly lysosomalFusionEfficiencyPct: number; // [0, 100]
+  readonly bioenergeticResilienceScore: number; // [0, 100]
+}
+
+export type UniversalDeviceEra = 'past_analog_digitized' | 'present_wearable_cgm' | 'future_bioimpedance_array';
+export interface UniversalDeviceTelemetryInput {
+  readonly deviceId: string; readonly deviceEra: UniversalDeviceEra; readonly consentVerified: boolean;
+  readonly provenanceSource: string; readonly timePrecisionMs: number;
+  readonly heartRateBpm: number | null; readonly hrvRmssdMs: number | null;
+  readonly cgmGlucoseMgDl: number | null; readonly thoracicBioimpedanceOhm: number | null;
+}
+export interface UniversalDeviceEnvelopeSummary {
+  readonly deviceId: string; readonly deviceEra: UniversalDeviceEra; readonly timePrecisionMs: number;
+  readonly recordedChannelsCount: number; readonly missingChannels: readonly string[];
+  readonly normalizedTelemetry: {
+    readonly heartRateBpm: number | null; readonly hrvRmssdMs: number | null;
+    readonly cgmGlucoseMgDl: number | null; readonly thoracicBioimpedanceOhm: number | null;
+  };
+}
+
+export type SpecialistDomainId = 'cardiology' | 'nephrology' | 'pulmonology' | 'infectious_disease';
+export interface PantheonConsensusInput {
+  readonly lvefPct: number; readonly egfrMlMin173m2: number; readonly paO2FiO2Ratio: number;
+  readonly lactateMmolL: number; readonly meanArterialPressureMmHg: number;
+}
+export interface PantheonConsensusEvaluation {
+  readonly conflictDetected: boolean; readonly conflictSummary: readonly string[];
+  readonly harmonizedProtocol: readonly { readonly specialist: SpecialistDomainId; readonly directive: string }[];
+  readonly requiresHumanPhysicianSignoff: true;
+}
+
+export type OneOsEncounterStage = 'pre_visit' | 'bedside_encounter' | 'closed_loop_referral' | 'universal_payer_claim';
+export interface OneOsEncounterPayerInput {
+  readonly encounterId: string; readonly patientIdentityVerified: boolean; readonly currentStage: OneOsEncounterStage;
+  readonly icd10PrimaryCode: string; readonly diagnosticReferralClosed: boolean; readonly clinicianSignedOff: boolean;
+}
+export interface OneOsEncounterPayerSummary {
+  readonly encounterId: string; readonly currentStage: OneOsEncounterStage;
+  readonly zeroLossContinuityVerified: boolean; readonly payerClaimReady: boolean; readonly blockingReasons: readonly string[];
+}
+
+export interface SensoriumBiometricsGaitInput {
+  readonly cgmReadingsMgDl: readonly number[]; readonly hrvRmssdMs: number | null; readonly hrvSdnnMs: number | null;
+  readonly spo2Pct: number | null; readonly mtpDorsiflexionDeg: number; readonly calcaneusFloorClearanceMm: number;
+}
+export interface SensoriumBiometricsGaitSummary {
+  readonly cgmTimeInRangePct: number; readonly cgmTimeBelowRangePct: number; readonly cgmTimeAboveRangePct: number;
+  readonly gmiEstimatedA1cPct: number; readonly hrvRmssdMs: number | null; readonly hrvSdnnMs: number | null;
+  readonly spo2Pct: number | null; readonly footStrikeClassification: 'forefoot_strike' | 'midfoot_strike' | 'rearfoot_strike';
+}
+
+export interface NusantaraFunctionalDish {
+  readonly dishId: string; readonly displayName: string; readonly proteinG: number;
+  readonly carbsG: number; readonly fatG: number; readonly solubleFiberG: number; readonly bioactiveHighlight: string;
+}
+export interface LongevityExposomeInput {
+  readonly chronologicalAgeYears: number; readonly phenoAgeEstimateYears: number;
+  readonly fsrsCurrentStabilityDays: number; readonly daysSinceLastThermalHabit: number;
+  readonly saunaMinutesWeekly: number; readonly pm25UgM3: number; readonly uvIndex: number; readonly circadianDaylightLux: number;
+}
+export interface LongevityExposomeSummary {
+  readonly bioAgeDeltaYears: number; readonly fsrsNextStabilityDays: number;
+  readonly exposomeOxidativeBurdenIndex: number; readonly longevityRecoveryScore: number;
+}
+export type InteractionGrammarStage = 'see' | 'ask' | 'zoom' | 'why' | 'what_if' | 'act';
