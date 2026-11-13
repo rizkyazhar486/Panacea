@@ -58,7 +58,7 @@ export function fold(text) {
     .replace(/[αβγδκμ]/g, (letter) => ` ${GREEK[letter]} `)
     .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
     .normalize('NFKD')
-    .replace(/[̀-ͯ]/g, '')
+    .replace(/[\u0300-\u036f]/g, '')
     .toLowerCase()
 }
 
