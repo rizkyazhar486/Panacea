@@ -14,6 +14,7 @@ import {
   type CranialNerveProfile,
 } from '../engine/neuroFascicularTractographyEngine'
 import { DECK_ACTIVE_FILL } from './deck-kit/deckA11y'
+import { OculomotorLesionLab } from './OculomotorLesionLab'
 
 export interface NeuroFascicularReflexDeckProps {
   readonly initialTab?: 'nerves' | 'reflexes' | 'syndromes'
@@ -181,6 +182,14 @@ export function NeuroFascicularReflexDeck({ initialTab = 'nerves' }: NeuroFascic
                 <span style={{ color: '#38bdf8', fontSize: '0.65rem', textTransform: 'uppercase', fontWeight: 800, display: 'block' }}>Clinical Bedside Maneuver</span>
                 <span style={{ color: '#f1f5f9', fontWeight: 600 }}>{activeNerve.clinicalTest}</span>
               </div>
+              {['cn-3', 'cn-4', 'cn-6'].includes(activeNerve.id) && (
+                <div style={{ marginTop: '0.5rem' }}>
+                  <div style={{ fontSize: '0.65rem', fontWeight: 800, textTransform: 'uppercase', color: '#a78bfa', marginBottom: '0.4rem', letterSpacing: '0.08em' }}>
+                    Interactive 9-Cardinal Gaze Motility Simulator
+                  </div>
+                  <OculomotorLesionLab />
+                </div>
+              )}
             </div>
           </div>
         </div>

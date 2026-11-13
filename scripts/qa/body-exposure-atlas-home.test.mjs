@@ -81,10 +81,12 @@ test('AtlasHome: Stage 3 Clinical Suite & Progressive Disclosure Integration', (
   assert.ok(content.includes('2. Living Physiology'), 'Must include Stage 2 label')
   assert.ok(content.includes('3. Clinical Relevance'), 'Must include Stage 3 label')
 
-  // Check 3 interactive clinical suite components integrated into Stage 3
+  // Check interactive clinical suite components integrated into Stage 3
   assert.ok(content.includes('<CoronaryTerritoryPanel'), 'Must embed CoronaryTerritoryPanel in Stage 3')
   assert.ok(content.includes('<ReferredPainDermatomeStudio'), 'Must embed ReferredPainDermatomeStudio in Stage 3')
   assert.ok(content.includes('<NeuroFascicularReflexDeck initialTab="syndromes"'), 'Must embed NeuroFascicularReflexDeck with syndromes in Stage 3')
+  assert.ok(content.includes('<KaloLumenVolumetricStudio'), 'Must embed KaloLumenVolumetricStudio in Stage 3')
+  assert.ok(content.includes('Diagnostic Imaging'), 'Must include Diagnostic Imaging clinical tool')
 
   // Check 3 living physiology simulation decks integrated into Stage 2
   assert.ok(content.includes('<CardiopulmonaryCouplingDeck'), 'Must embed CardiopulmonaryCouplingDeck in Stage 2')
@@ -99,4 +101,10 @@ test('AtlasHome: Stage 3 Clinical Suite & Progressive Disclosure Integration', (
   // Check Side Panel collapsible and dual-mode support (whole-body vs focused structure)
   assert.ok(content.includes('isSidePanelOpen'), 'Must support side panel toggle')
   assert.ok(content.includes('Whole-Body Exploration'), 'Must support whole-body mode exploration')
+
+  // Check Oculomotor motility simulator integration in NeuroFascicularReflexDeck
+  const neuroDeckPath = path.join(process.cwd(), 'src', 'domains', 'body-exposure', 'ui', 'NeuroFascicularReflexDeck.tsx')
+  assert.ok(fs.existsSync(neuroDeckPath), 'NeuroFascicularReflexDeck.tsx must exist')
+  const neuroContent = fs.readFileSync(neuroDeckPath, 'utf8')
+  assert.ok(neuroContent.includes('<OculomotorLesionLab'), 'Must embed OculomotorLesionLab in NeuroFascicularReflexDeck')
 })

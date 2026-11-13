@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { Link } from 'react-router-dom'
 import * as THREE from 'three'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js'
@@ -866,6 +867,18 @@ export function CanonicalBody() {
           title="Canonical human bodies"
           subtitle="Source-backed anatomical bodies from the Body Exposure master. Tap any structure to see where its geometry comes from. Educational models — not patient-specific anatomy."
         />
+        <div style={{ marginBottom: '0.75rem', display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '0.5rem', borderRadius: '0.75rem', border: '1px solid rgba(0, 191, 99, 0.3)', background: 'rgba(0, 191, 99, 0.08)', padding: '0.75rem', fontSize: '0.75rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <span style={{ fontWeight: 900, color: '#00BF63' }}>✦ Consolidated Atlas Home</span>
+            <span style={{ color: '#94a3b8' }}>Looking for the interactive 3D human atlas with 7 Z-Anatomy layers & living physiology?</span>
+          </div>
+          <Link
+            to="/body-exposure"
+            style={{ borderRadius: '0.5rem', background: '#00BF63', padding: '0.35rem 0.75rem', fontSize: '0.75rem', fontWeight: 800, color: '#ffffff', textDecoration: 'none' }}
+          >
+            Launch Atlas Home →
+          </Link>
+        </div>
         <div className="no-scrollbar -mx-1 flex gap-2 overflow-x-auto px-1 pb-1" role="tablist" aria-label="Body">
           {(matrix?.bodies ?? []).map((b) => {
             // tersedia hanya bila berkas web tubuh ini benar-benar diterbitkan

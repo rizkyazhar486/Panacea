@@ -653,12 +653,20 @@ export function BodyExplorer() {
         title="Body Explorer"
         info="A real 3D anatomy model. Tap any bone, muscle, vessel, nerve, or organ to inspect it, rotate with one finger, and pinch to zoom."
       />
-      <Link
-        to="/body-exposure/canonical"
-        className="inline-flex min-h-11 items-center justify-center rounded-xl border border-brand/50 bg-brand/10 px-4 py-2 text-sm font-semibold text-brand transition hover:bg-brand/15"
-      >
-        Open canonical whole-body 3D atlas →
-      </Link>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+        <Link
+          to="/body-exposure"
+          style={{ display: 'inline-flex', minHeight: '44px', alignItems: 'center', justifyContent: 'center', borderRadius: '0.75rem', border: '1px solid #00BF63', background: '#00BF63', padding: '0.5rem 1rem', fontSize: '0.875rem', fontWeight: 700, color: '#ffffff', textDecoration: 'none' }}
+        >
+          Open 3D Human Atlas Home (BioDigital Progressive Disclosure) →
+        </Link>
+        <Link
+          to="/body-exposure/canonical"
+          style={{ display: 'inline-flex', minHeight: '44px', alignItems: 'center', justifyContent: 'center', borderRadius: '0.75rem', border: '1px solid rgba(0, 191, 99, 0.5)', background: 'rgba(0, 191, 99, 0.1)', padding: '0.5rem 1rem', fontSize: '0.875rem', fontWeight: 600, color: '#00BF63', textDecoration: 'none' }}
+        >
+          Canonical Variant Matrices (LOD1–LOD4) →
+        </Link>
+      </div>
       <BatasKlaimKesehatan permukaan="body.explorer" className="mt-2 text-[11px] leading-snug text-white/55" />
       <Card>
         {/* Kotak cari di ATAS modelnya. Struktur yang dicari orang hampir
