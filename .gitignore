@@ -80,6 +80,7 @@ server/data/clinical-rag/*.partial
 # Keadaan lokal alat ruflo/swarm, bukan isi repositori.
 .claude-flow/
 .swarm/
+.anchor/
 ruvector.db
 agentdb.rvf
 agentdb.rvf.lock
