@@ -89,6 +89,7 @@ export function StageSearch({ compact, layers, onSelect }: StageSearchProps) {
         </svg>
         <input
           ref={inputRef}
+          className="as-search-input"
           type="text"
           role="searchbox"
           inputMode="search"

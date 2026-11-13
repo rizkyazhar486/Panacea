@@ -110,6 +110,13 @@ gagal('ponsel-mulai-dari-pelat-fokus-yang-ringan', () => {
   assert.match(lebar, /data-atlas-plate="peeled"/, 'berpasangan: layar lebar mulai dari tubuh terkupas')
   assert.match(ponsel, /data-atlas-depth="0"/); assert.match(lebar, /data-atlas-depth="0"/)
 })
+gagal('panggung-menyatakan-cakupan-gelap-di-kedua-proyeksi', () => {
+  // Panggung gelap di KEDUA tema aplikasi: tanpa cakupan ini panel ber-`dark:` yang diproyeksikan ke sini saat aplikasi
+  // bertema terang memakai teks tema-terang di atas latar gelap (terukur axe: 2.44:1).
+  assert.match(lebar, /<div class="as-root dark"/); assert.match(ponsel, /<div class="as-root dark"/)
+  assert.equal(hitung(lebar, /class="as-root/g), 1); assert.equal(hitung(ponsel, /class="as-root/g), 1)
+  assert.match(lebar, /<input[^>]*class="as-search-input"[^>]*role="searchbox"/)
+})
 gagal('berpasangan-lebar-vs-ponsel-hanya-proyeksi-yang-berbeda', () => { assert.doesNotMatch(lebar, /data-atlas-sheet=/); assert.doesNotMatch(ponsel, /Deck ⇥/); assert.match(lebar, /Deck ⇥/) })
 
 // ── cacat yang pernah terukur tidak boleh kembali: beranda tidak memiliki adegan WebGL sendiri ──
@@ -123,7 +130,12 @@ gagal('beranda-tidak-memiliki-webgl-sendiri', () => {
 gagal('tanpa-html-mentah-atau-eval', () => { for (const s of [sumberBeranda, ...sumberUi]) assert.doesNotMatch(s, /dangerouslySetInnerHTML|\.innerHTML|\beval\(|new Function\(|document\.write/) })
 gagal('gaya-tanpa-important-dan-gerak-opt-in', () => {
   const css = sumberUi[2]
-  assert.doesNotMatch(css, /!important/); assert.match(css, /prefers-reduced-motion: no-preference/); assert.match(css, /html:not\(\.reduce-motion\)/)
+  // Satu-satunya !important yang diizinkan: kolom cari harus tetap transparan melawan aturan global
+  // `.dark input { background-color … !important }`, yang tidak dapat dikalahkan tanpa !important (terukur: kotak abu-abu
+  // di dalam pil cari pada tema gelap). Di luar aturan itu CSS panggung tetap tanpa !important.
+  const aturanCari = '[data-atlas-stage] .as-root input.as-search-input { background-color: transparent !important; border-color: transparent !important; }'
+  assert.ok(css.includes(aturanCari), 'aturan kolom cari ada, persis'); assert.doesNotMatch(css.replace(aturanCari, ''), /!important/)
+  assert.match(css, /prefers-reduced-motion: no-preference/); assert.match(css, /html:not\(\.reduce-motion\)/)
   assert.equal(hitung(css, /transition:/g), 2); assert.equal(hitung(css.split('@media (prefers-reduced-motion: no-preference)')[0], /transition:/g), 0, 'transisi hanya ada di dalam blok opt-in')
 })
 gagal('akar-komposisi-menyambung-penampil-bersama', () => {

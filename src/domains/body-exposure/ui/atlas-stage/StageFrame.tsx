@@ -7,7 +7,7 @@
 import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent, type ReactNode } from 'react'
 import { nextSnap, sheetHeight, snapAfterDrag, type SheetSnap } from '../../engine/atlas-stage/sheetSnap'
 import type { AtlasPlateMode } from '../../engine/atlas-stage/stageLayers'
-import { STAGE_CSS, TONE, eyebrow, glass, rootFrame, stageGlow, subtleButton } from './stageTokens'
+import { STAGE_CSS, STAGE_ROOT_CLASS, TONE, eyebrow, glass, rootFrame, stageGlow, subtleButton } from './stageTokens'
 
 /** Height of the phone sheet when only its header shows (px). */
 export const SHEET_PEEK = 148
@@ -41,7 +41,7 @@ export function WideStage({ plate, depth, viewer, search, rail, regionChips, ref
   return (
     <section data-atlas-stage="v2" data-atlas-projection="wide" data-atlas-plate={plate} data-atlas-depth={depth} data-pmd-body-exposure="true" data-pmd-unclamped="true" data-pmd-liquid="off" aria-label="Body Exposure 3D atlas" style={{ color: TONE.text }}>
       <style>{STAGE_CSS}</style>
-      <div className="as-root" style={{ ...rootFrame, minHeight: 620, maxHeight: 940, display: 'grid', gridTemplateRows: 'auto minmax(0, 1fr)' }}>
+      <div className={STAGE_ROOT_CLASS} style={{ ...rootFrame, minHeight: 620, maxHeight: 940, display: 'grid', gridTemplateRows: 'auto minmax(0, 1fr)' }}>
         <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 12, padding: '10px 16px', borderBottom: `1px solid ${TONE.line}`, background: TONE.panelSolid }}>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, minWidth: 0 }}>
             <span style={{ ...eyebrow, fontSize: 12, color: TONE.liveText }}>{title}</span>
@@ -140,7 +140,7 @@ export function PhoneStage({ plate, depth, viewer, search, rail, regionChips, re
   return (
     <section data-atlas-stage="v2" data-atlas-projection="phone" data-atlas-plate={plate} data-atlas-depth={depth} data-pmd-body-exposure="true" data-pmd-unclamped="true" data-pmd-liquid="off" aria-label="Body Exposure 3D atlas" style={{ color: TONE.text }}>
       <style>{STAGE_CSS}</style>
-      <div ref={stageRef} className="as-root" style={{ ...rootFrame, minHeight: 560, position: 'relative', background: TONE.bg }}>
+      <div ref={stageRef} className={STAGE_ROOT_CLASS} style={{ ...rootFrame, minHeight: 560, position: 'relative', background: TONE.bg }}>
         <div style={{ position: 'absolute', left: 0, right: 0, top: 0, bottom: canvasInset }}>{viewer}</div>
         <div style={{ position: 'absolute', left: 0, right: 0, top: 0, bottom: SHEET_PEEK }}>
           <div aria-hidden style={stageGlow} />

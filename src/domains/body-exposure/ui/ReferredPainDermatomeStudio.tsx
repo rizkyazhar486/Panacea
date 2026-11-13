@@ -2,6 +2,8 @@
 // High-Definition Viscerosomatic Referred Pain & 3D Dermatome Projection Studio
 // Models convergence-projection theory (Ruch TC, 1946) & central sensitization (Woolf CJ, 2011)
 // Employs scoped inline styles to protect strict bundle budget: cssBlokirGzip <= 115200
+// The two accent TEXT colours are theme-aware utility pairs that the stylesheet already ships (no new CSS):
+// a single fixed colour cannot reach 4.5:1 on both a light page and the dark atlas stage, where this studio is also shown.
 
 import React, { useMemo, useState } from 'react'
 import {
@@ -12,6 +14,7 @@ import {
   calculateCentralSensitizationNociceptiveDrive,
   type VisceralOrganKey,
 } from '../engine/referredPainEngine.ts'
+import { DECK_ACTIVE_FILL } from './deck-kit/deckA11y.ts'
 
 const ORGAN_OPTIONS: readonly { key: VisceralOrganKey; label: string; badge: string }[] = [
   { key: 'heart-myocardium', label: 'Heart (Angina / Myocardium)', badge: 'T1–T5, C3–C5' },
@@ -94,13 +97,13 @@ export function ReferredPainDermatomeStudio(): React.ReactElement {
             Viscerosomatic Referred Pain & 3D Dermatome Projection
           </h4>
           <span
+            className="text-emerald-800 dark:text-emerald-200"
             style={{
               fontSize: '10px',
               fontWeight: 800,
               padding: '2px 8px',
               borderRadius: '999px',
               backgroundColor: 'rgba(16, 185, 129, 0.15)',
-              color: '#059669',
               border: '1px solid rgba(16, 185, 129, 0.3)',
               textTransform: 'uppercase',
               letterSpacing: '0.06em',
@@ -117,13 +120,13 @@ export function ReferredPainDermatomeStudio(): React.ReactElement {
 
       {/* Safety & Truth Class Disclaimer */}
       <div
+        className="text-amber-900 dark:text-amber-100"
         style={{
           padding: '8px 12px',
           borderRadius: '10px',
           backgroundColor: 'rgba(245, 158, 11, 0.1)',
           border: '1px solid rgba(245, 158, 11, 0.3)',
           fontSize: '11px',
-          color: '#b45309',
           lineHeight: 1.45,
         }}
         role="note"
@@ -191,9 +194,10 @@ export function ReferredPainDermatomeStudio(): React.ReactElement {
             <span style={{ fontSize: '11px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
               Dermatome Cutaneous Map ({projectionView.toUpperCase()})
             </span>
-            <div style={{ display: 'flex', gap: '4px' }}>
+            <div role="group" aria-label="Body side shown" style={{ display: 'flex', gap: '4px' }}>
               <button
                 type="button"
+                aria-pressed={projectionView === 'anterior'}
                 onClick={() => setProjectionView('anterior')}
                 style={{
                   minHeight: '28px',
@@ -202,8 +206,8 @@ export function ReferredPainDermatomeStudio(): React.ReactElement {
                   fontWeight: 700,
                   borderRadius: '6px',
                   border: '1px solid',
-                  borderColor: projectionView === 'anterior' ? '#3b82f6' : 'rgba(148, 163, 184, 0.3)',
-                  backgroundColor: projectionView === 'anterior' ? '#3b82f6' : 'transparent',
+                  borderColor: projectionView === 'anterior' ? DECK_ACTIVE_FILL : 'rgba(148, 163, 184, 0.3)',
+                  backgroundColor: projectionView === 'anterior' ? DECK_ACTIVE_FILL : 'transparent',
                   color: projectionView === 'anterior' ? '#ffffff' : 'inherit',
                   cursor: 'pointer',
                 }}
@@ -212,6 +216,7 @@ export function ReferredPainDermatomeStudio(): React.ReactElement {
               </button>
               <button
                 type="button"
+                aria-pressed={projectionView === 'posterior'}
                 onClick={() => setProjectionView('posterior')}
                 style={{
                   minHeight: '28px',
@@ -220,8 +225,8 @@ export function ReferredPainDermatomeStudio(): React.ReactElement {
                   fontWeight: 700,
                   borderRadius: '6px',
                   border: '1px solid',
-                  borderColor: projectionView === 'posterior' ? '#3b82f6' : 'rgba(148, 163, 184, 0.3)',
-                  backgroundColor: projectionView === 'posterior' ? '#3b82f6' : 'transparent',
+                  borderColor: projectionView === 'posterior' ? DECK_ACTIVE_FILL : 'rgba(148, 163, 184, 0.3)',
+                  backgroundColor: projectionView === 'posterior' ? DECK_ACTIVE_FILL : 'transparent',
                   color: projectionView === 'posterior' ? '#ffffff' : 'inherit',
                   cursor: 'pointer',
                 }}

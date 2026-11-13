@@ -60,6 +60,13 @@ export const iconButton: CSSProperties = {
   flex: 'none',
 }
 
+/**
+ * Class of the stage root. The stage is a dark surface in BOTH app themes, so it declares the dark scope itself
+ * (`dark:` utilities resolve against the nearest `.dark` ancestor). Without it, a theme-aware panel projected
+ * here while the app is in light theme renders its light-theme text on this dark ground — measured at 2.44:1.
+ */
+export const STAGE_ROOT_CLASS = 'as-root dark'
+
 export const rootFrame: CSSProperties = {
   width: '100%',
   borderRadius: 24,
@@ -112,6 +119,7 @@ export const STAGE_CSS = `
 [data-atlas-stage] .as-root { height: calc(100vh - 104px); height: calc(100dvh - 104px); }
 [data-atlas-stage] button, [data-atlas-stage] input { font: inherit; }
 [data-atlas-stage] .as-focus:focus-visible { outline: 2px solid ${TONE.ref}; outline-offset: 2px; }
+[data-atlas-stage] .as-root input.as-search-input { background-color: transparent !important; border-color: transparent !important; }
 [data-atlas-stage] .as-field:focus-within { border-color: ${TONE.ref}; box-shadow: 0 0 0 2px rgba(92, 214, 255, 0.3); }
 [data-atlas-stage] .as-hover:hover { border-color: ${TONE.lineStrong}; background: rgba(148, 197, 255, 0.12); }
 [data-atlas-stage] .as-scroll { scrollbar-width: none; }
