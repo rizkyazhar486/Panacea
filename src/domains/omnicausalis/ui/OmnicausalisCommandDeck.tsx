@@ -5,9 +5,9 @@ import {
   DEFAULT_KALOLUMEN_LAYERS, NUSANTARA_FUNCTIONAL_DISHES, PROTEIN_FIGHTER_BOTS,
   evaluateBioEmuConformationalEnsemble, evaluateDeNovoBinderCandidate, evaluateKaloLumenReconstruction,
   evaluateLongevityEnergyBalance, evaluateLongevityNutritionAndExposome, evaluateMitochondrialAutophagyDynamics,
-  evaluateOneOsEncounterPayerHarmonization, evaluatePantheonMultiSpecialistConsensus, evaluateRemopReceptorOccupancy,
-  evaluateSensoriumBiometricsAndGait, evaluateSepsisSafeguard, mapTextToVrmVisemeFrames,
-  runProteinFighterArenaRound, translateUniversalDeviceEnvelope,
+  evaluateOmnicausalisMultiscaleCoupling, evaluateOneOsEncounterPayerHarmonization, evaluatePantheonMultiSpecialistConsensus,
+  evaluateRemopReceptorOccupancy, evaluateSensoriumBiometricsAndGait, evaluateSepsisSafeguard,
+  mapTextToVrmVisemeFrames, runProteinFighterArenaRound, translateUniversalDeviceEnvelope,
 } from '../engine/omnicausalisEngine.ts';
 import {
   OMNICAUSALIS_SAFETY_DISCLAIMER, type InteractionGrammarStage, type IonChannelTargetId,
@@ -40,6 +40,7 @@ export const OmnicausalisCommandDeck: React.FC = () => {
   const [norepiNm, setNorepiNm] = useState(45);
   const [mtpAngleDeg, setMtpAngleDeg] = useState(28);
   const [saunaMinutes, setSaunaMinutes] = useState(60);
+  const [residualPct, setResidualPct] = useState(8);
 
   const kaloLumenResult = useMemo(() => evaluateKaloLumenReconstruction({
     studyId: 'KALOLUMEN-CT-THORAX-01', sliceCount, voxelSpacingMm: [0.7, 0.7, 1.0],
@@ -106,6 +107,27 @@ export const OmnicausalisCommandDeck: React.FC = () => {
     weightKg: 70, intakeProteinG: 145, intakeCarbsG: 240, intakeFatG: 68,
     restingMetabolicRateKcal: 1680, workoutMet: 7.5, workoutDurationMinutes: 45, hrvRmssdMs: 72, sleepEfficiencyPct: 91,
   }), []);
+
+  const multiscaleCoupling = useMemo(() => evaluateOmnicausalisMultiscaleCoupling({
+    bioEmuOpenProbability: bioEmuResult.payload.openProbability,
+    mitoOxPhosAtpFluxIndex: mitoResult.payload.oxPhosAtpFluxIndex,
+    mitophagyActive: mitoResult.payload.pink1ParkinMitophagyActive,
+    remopReceptorOccupancy: remopResult.payload.fractionalOccupancy,
+    sepsisSofaTotalScore: sepsisResult.payload.sofaTotalScore,
+    cgmTimeInRangePct: sensoriumResult.payload.cgmTimeInRangePct,
+    footStrikeClassification: sensoriumResult.payload.footStrikeClassification,
+    bioAgeDeltaYears: longevityExposome.payload.bioAgeDeltaYears,
+    exposomeOxidativeBurdenIndex: longevityExposome.payload.exposomeOxidativeBurdenIndex,
+    recordedDeviceChannelsCount: udtEnvelope.payload.recordedChannelsCount,
+    predictionVsObservedResidualPct: residualPct,
+  }), [
+    bioEmuResult.payload.openProbability, mitoResult.payload.oxPhosAtpFluxIndex,
+    mitoResult.payload.pink1ParkinMitophagyActive, remopResult.payload.fractionalOccupancy,
+    sepsisResult.payload.sofaTotalScore, sensoriumResult.payload.cgmTimeInRangePct,
+    sensoriumResult.payload.footStrikeClassification, longevityExposome.payload.bioAgeDeltaYears,
+    longevityExposome.payload.exposomeOxidativeBurdenIndex, udtEnvelope.payload.recordedChannelsCount,
+    residualPct,
+  ]);
 
   const cardStyle: React.CSSProperties = { backgroundColor: '#0f172a', border: '1px solid #1e293b', borderRadius: '0.875rem', padding: isDesktop ? '1.125rem' : '0.875rem' };
   const boxStyle: React.CSSProperties = { padding: '0.625rem', borderRadius: '0.5rem', backgroundColor: '#020617', border: '1px solid #1e293b', fontSize: '0.75rem' };
@@ -233,6 +255,47 @@ export const OmnicausalisCommandDeck: React.FC = () => {
               {visemePreview.slice(0, 4).map((vf) => <span key={vf.index} style={{ fontSize: '0.6875rem', fontFamily: 'monospace', padding: '0.125rem 0.4rem', borderRadius: '0.375rem', backgroundColor: '#1e293b', color: '#38bdf8' }}>{vf.token}→{vf.viseme}</span>)}
             </div>
           </div>
+        </div>
+      </div>
+
+      <div style={{ ...cardStyle, marginTop: '1rem' }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
+          <span style={{ fontSize: '0.75rem', fontWeight: 800, textTransform: 'uppercase', color: '#38bdf8' }}>
+            Multiscale Omnicausalis Coupling & Reality Engine Identifiability Gate
+          </span>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+            <span style={{ fontSize: '0.6875rem', fontWeight: 800, padding: '0.125rem 0.5rem', borderRadius: '9999px', backgroundColor: multiscaleCoupling.payload.parameterIdentifiabilityVerified ? '#064e3b' : '#78350f', color: multiscaleCoupling.payload.parameterIdentifiabilityVerified ? '#34d399' : '#fbbf24' }}>
+              {multiscaleCoupling.payload.parameterIdentifiabilityVerified ? 'IDENTIFIABLE (Calibration Permitted)' : 'UNIDENTIFIED (Calibration Locked)'}
+            </span>
+            <span style={{ fontSize: '0.6875rem', fontWeight: 700, padding: '0.125rem 0.5rem', borderRadius: '9999px', backgroundColor: '#1e293b', color: '#cbd5e1' }}>
+              isolatedFromCanonicalHistory={String(multiscaleCoupling.payload.isolatedFromCanonicalHistory)}
+            </span>
+          </div>
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: isDesktop ? 'repeat(4, minmax(0, 1fr))' : 'repeat(2, minmax(0, 1fr))', gap: '0.5rem', marginBottom: '0.75rem' }}>
+          <div style={boxStyle}>
+            <span style={{ color: '#94a3b8', display: 'block', fontSize: '0.6875rem' }}>Myocardial Bioenergetic Reserve</span>
+            <span style={{ fontWeight: 800, color: '#34d399', fontSize: '0.875rem' }}>{multiscaleCoupling.payload.myocardialBioenergeticReservePct}%</span>
+          </div>
+          <div style={boxStyle}>
+            <span style={{ color: '#94a3b8', display: 'block', fontSize: '0.6875rem' }}>Coupled Hemodynamic Stability</span>
+            <span style={{ fontWeight: 800, color: multiscaleCoupling.payload.vascularHyporeactivityRisk ? '#fb7185' : '#38bdf8', fontSize: '0.875rem' }}>
+              {multiscaleCoupling.payload.coupledHemodynamicStabilityIndex}/100 {multiscaleCoupling.payload.vascularHyporeactivityRisk ? '(Hyporeactive Alert)' : ''}
+            </span>
+          </div>
+          <div style={boxStyle}>
+            <span style={{ color: '#94a3b8', display: 'block', fontSize: '0.6875rem' }}>Systemic Allostatic Load</span>
+            <span style={{ fontWeight: 800, color: '#a855f7', fontSize: '0.875rem' }}>{multiscaleCoupling.payload.systemicAllostaticLoadIndex}/100</span>
+          </div>
+          <div style={boxStyle}>
+            <label>
+              <span style={{ color: '#94a3b8', display: 'block', fontSize: '0.6875rem' }}>Prediction-vs-Reality Residual ({residualPct}% • Gap {multiscaleCoupling.payload.realityGapScore}%)</span>
+              <input type="range" min={0} max={40} value={residualPct} onChange={(e) => setResidualPct(Number(e.target.value))} style={{ width: '100%', minHeight: '44px' }} />
+            </label>
+          </div>
+        </div>
+        <div style={{ ...boxStyle, color: '#cbd5e1', fontSize: '0.6875rem' }}>
+          {multiscaleCoupling.payload.counterfactualBranchSummary}
         </div>
       </div>
     </section>

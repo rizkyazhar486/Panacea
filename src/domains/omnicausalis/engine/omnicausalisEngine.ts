@@ -9,6 +9,7 @@ import {
   type LongevityEnergyBalanceSummary, type LongevityExposomeInput,
   type LongevityExposomeSummary, type MitochondrialAutophagyInput,
   type MitochondrialAutophagySummary, type NusantaraFunctionalDish,
+  type OmnicausalisMultiscaleCouplingInput, type OmnicausalisMultiscaleCouplingSummary,
   type OmnicausalisTruthClass, type OneOsEncounterPayerInput,
   type OneOsEncounterPayerSummary, type PantheonConsensusEvaluation,
   type PantheonConsensusInput, type ProteinFighterArenaRoundResult,
@@ -428,3 +429,70 @@ export function evaluateLongevityNutritionAndExposome(input: LongevityExposomeIn
     bioAgeDeltaYears, fsrsNextStabilityDays, exposomeOxidativeBurdenIndex, longevityRecoveryScore,
   });
 }
+
+export function evaluateOmnicausalisMultiscaleCoupling(
+  input: OmnicausalisMultiscaleCouplingInput,
+): TruthClassEnvelope<OmnicausalisMultiscaleCouplingSummary> {
+  if (!input || !isFiniteInRange(input.bioEmuOpenProbability, 0, 1) || !isFiniteInRange(input.mitoOxPhosAtpFluxIndex, 0, 100)) {
+    throw new Error('omnicausalis: bioEmuOpenProbability [0,1] and mitoOxPhosAtpFluxIndex [0,100] required');
+  }
+  if (!isFiniteInRange(input.remopReceptorOccupancy, 0, 1) || !isFiniteInRange(input.sepsisSofaTotalScore, 0, 24)) {
+    throw new Error('omnicausalis: remopReceptorOccupancy [0,1] and sepsisSofaTotalScore [0,24] required');
+  }
+  if (!isFiniteInRange(input.cgmTimeInRangePct, 0, 100) || !isFiniteInRange(input.bioAgeDeltaYears, -40, 40) || !isFiniteInRange(input.exposomeOxidativeBurdenIndex, 0, 100)) {
+    throw new Error('omnicausalis: cgmTimeInRangePct, bioAgeDeltaYears, or exposomeOxidativeBurdenIndex out of bounds');
+  }
+  if (!Number.isInteger(input.recordedDeviceChannelsCount) || !isFiniteInRange(input.recordedDeviceChannelsCount, 0, 32) || !isFiniteInRange(input.predictionVsObservedResidualPct, 0, 100)) {
+    throw new Error('omnicausalis: recordedDeviceChannelsCount [0,32] integer and predictionVsObservedResidualPct [0,100] required');
+  }
+
+  const calciumCouplingEfficiency = 1 - Math.abs(input.bioEmuOpenProbability - 0.55) * 0.8;
+  const mitophagyPenalty = input.mitophagyActive ? 14 : 0;
+  const myocardialBioenergeticReservePct = roundTo(
+    Math.min(100, Math.max(0, input.mitoOxPhosAtpFluxIndex * calciumCouplingEfficiency - mitophagyPenalty)),
+    1,
+  );
+
+  const sofaBurdenPenalty = (input.sepsisSofaTotalScore / 24) * 55;
+  const receptorSupportBonus = input.remopReceptorOccupancy * 28 * (myocardialBioenergeticReservePct / 100);
+  const coupledHemodynamicStabilityIndex = roundTo(
+    Math.min(100, Math.max(0, 0.65 * myocardialBioenergeticReservePct + receptorSupportBonus - sofaBurdenPenalty)),
+    1,
+  );
+
+  const vascularHyporeactivityRisk =
+    input.remopReceptorOccupancy >= 0.65 && (myocardialBioenergeticReservePct < 45 || input.sepsisSofaTotalScore >= 8);
+
+  const gaitLoadPenalty = input.footStrikeClassification === 'rearfoot_strike' ? 8 : input.footStrikeClassification === 'midfoot_strike' ? 3 : 0;
+  const glycemicDysregulation = (100 - input.cgmTimeInRangePct) * 0.45;
+  const agingPenalty = Math.max(0, input.bioAgeDeltaYears) * 2.2;
+  const systemicAllostaticLoadIndex = roundTo(
+    Math.min(100, Math.max(0, glycemicDysregulation + input.exposomeOxidativeBurdenIndex * 0.4 + agingPenalty + gaitLoadPenalty)),
+    1,
+  );
+
+  const parameterIdentifiabilityVerified =
+    input.recordedDeviceChannelsCount >= 3 && input.predictionVsObservedResidualPct <= 15;
+  const unrecordedChannelPenalty = Math.max(0, 4 - input.recordedDeviceChannelsCount) * 8;
+  const realityGapScore = roundTo(
+    Math.min(100, Math.max(0, input.predictionVsObservedResidualPct + unrecordedChannelPenalty)),
+    1,
+  );
+
+  const counterfactualBranchSummary = parameterIdentifiabilityVerified
+    ? `Identifiable multiscale branch (Reserve ${myocardialBioenergeticReservePct}%, Stability ${coupledHemodynamicStabilityIndex}/100, Allostatic Load ${systemicAllostaticLoadIndex}/100, Reality Gap ${realityGapScore}%). Isolated from canonical history.`
+    : `Calibration locked: parameter identifiability requires >=3 recorded device channels and residual <=15% (current Reality Gap ${realityGapScore}%). Isolated counterfactual only.`;
+
+  return createTruthEnvelope('SIMULATED_EDUCATIONAL', 'Omnicausalis Multiscale Coupling & Reality Engine Identifiability Gate', {
+    myocardialBioenergeticReservePct,
+    coupledHemodynamicStabilityIndex,
+    vascularHyporeactivityRisk,
+    systemicAllostaticLoadIndex,
+    parameterIdentifiabilityVerified,
+    realityGapScore,
+    isolatedFromCanonicalHistory: true,
+    requiresHumanPhysicianSignoff: true,
+    counterfactualBranchSummary,
+  });
+}
+
