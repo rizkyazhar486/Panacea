@@ -22,6 +22,7 @@ import { SoftTissueBiomechanicsDeck } from './SoftTissueBiomechanicsDeck'
 import { NeuroFascicularReflexDeck } from './NeuroFascicularReflexDeck'
 import { CoronaryTerritoryPanel } from './CoronaryTerritoryPanel'
 import { ReferredPainDermatomeStudio } from './ReferredPainDermatomeStudio'
+import { KaloLumenVolumetricStudio } from './KaloLumenVolumetricStudio'
 import { LayerList, StructureCard, StructureHeader } from './atlas-stage/AnatomyInspector'
 import { DepthRail } from './atlas-stage/DepthRail'
 import { PhoneStage, WideStage } from './atlas-stage/StageFrame'
@@ -43,7 +44,7 @@ interface BodyExposureAtlasHomeProps {
 }
 
 type PhysiologySystem = 'cardiopulmonary' | 'soft_tissue' | 'neuro'
-type ClinicalTool = 'vascular' | 'referred_pain' | 'neuro_localizer'
+type ClinicalTool = 'vascular' | 'referred_pain' | 'neuro_localizer' | 'diagnostic_imaging'
 
 const STAGES: readonly { id: AtlasStage; label: string; short: string }[] = [
   { id: 'anatomy', label: '1. Anatomy', short: 'Anatomy' },
@@ -54,16 +55,24 @@ const STAGE_TITLE: Record<AtlasStage, string> = { anatomy: 'Anatomical Architect
 const STAGE_BLURB: Record<AtlasStage, string> = {
   anatomy: 'Seven source layers in dissection order. Tap a structure on the body, or search it by name.',
   physiology: 'Mechanistic simulations: haemodynamics, soft-tissue viscoelasticity and cranial reflexes.',
-  clinical: 'Vascular territories (AHA 17), referred-pain dermatomes (C1–S5) and syndromic deficit localizers.',
+  clinical: 'Vascular territories (AHA 17), referred-pain dermatomes (C1–S5), syndromic deficit localizers, and multi-planar diagnostic imaging (CT/MRI MPR).',
 }
 const PHYSIOLOGY: readonly { id: PhysiologySystem; label: string }[] = [{ id: 'cardiopulmonary', label: 'Cardiopulmonary PV' }, { id: 'soft_tissue', label: 'Soft Tissue' }, { id: 'neuro', label: 'Neuro Reflexes' }]
-const CLINICAL: readonly { id: ClinicalTool; label: string }[] = [{ id: 'vascular', label: 'Vascular Perfusion' }, { id: 'referred_pain', label: 'Referred Pain' }, { id: 'neuro_localizer', label: 'Syndromic Localizer' }]
+const CLINICAL: readonly { id: ClinicalTool; label: string }[] = [
+  { id: 'vascular', label: 'Vascular Perfusion' },
+  { id: 'referred_pain', label: 'Referred Pain' },
+  { id: 'neuro_localizer', label: 'Syndromic Localizer' },
+  { id: 'diagnostic_imaging', label: 'Diagnostic Imaging' },
+]
 
 const layerSpec = (id: AtlasLayerId | null) => ATLAS_LAYERS.find((layer) => layer.id === id) ?? null
 
 /** Which simulation deck and clinical tool a structure opens first. Routing only; it claims nothing. */
 function decksFor(info: SelectedStructureInfo): { physiology: PhysiologySystem; clinical: ClinicalTool } {
   const lower = `${info.cleanName} ${info.meshName}`.toLowerCase()
+  if (info.layerId === 'skeletal' || /bone|femur|tibia|vertebra|skull|rib/.test(lower)) {
+    return { physiology: 'soft_tissue', clinical: 'diagnostic_imaging' }
+  }
   if (info.layerId === 'cardiovascular' || /heart|aorta|coronar|arter|vein/.test(lower)) return { physiology: 'cardiopulmonary', clinical: 'vascular' }
   if (info.layerId === 'nervous' || /brain|nerve|cord|pons|medulla/.test(lower)) return { physiology: 'neuro', clinical: 'neuro_localizer' }
   return { physiology: 'soft_tissue', clinical: 'referred_pain' }
@@ -215,6 +224,7 @@ export function BodyExposureAtlasHome({ Viewer, sendCamera }: BodyExposureAtlasH
       {clinicalTool === 'vascular' && <CoronaryTerritoryPanel defaultOpen={true} />}
       {clinicalTool === 'referred_pain' && <ReferredPainDermatomeStudio />}
       {clinicalTool === 'neuro_localizer' && <NeuroFascicularReflexDeck initialTab="syndromes" />}
+      {clinicalTool === 'diagnostic_imaging' && <KaloLumenVolumetricStudio />}
       <Note color={TONE.gate}>
         <b>Clinical Gate:</b> Reference correlation for educational and mechanistic study. Does not constitute autonomous patient diagnosis or signed radiological report.
       </Note>
