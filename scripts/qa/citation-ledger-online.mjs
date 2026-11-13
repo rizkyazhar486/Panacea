@@ -69,6 +69,42 @@ export function compareEntry(entry, summary) {
   return out
 }
 
+/** Ambil ringkasan NCBI untuk sekumpulan PMID; jaringan gagal, 429 dan 5xx dicoba ulang dengan jeda membesar. */
+async function summariesFor(pmids, { fetchJson, sleep, attempts }) {
+  const url = `${ESUMMARY}?db=pubmed&retmode=json&tool=${TOOL}&id=${pmids.join(',')}`
+  let reason = ''
+  for (let attempt = 1; attempt <= attempts; attempt += 1) {
+    try {
+      const parsed = await fetchJson(url)
+      if (parsed && typeof parsed === 'object' && parsed.result && typeof parsed.result === 'object') return { body: parsed, reason: '' }
+      return { body: null, reason: 'response had no result object' }
+    } catch (error) {
+      reason = `${error?.status ?? 'network'}: ${String(error?.message ?? error).slice(0, 120)}`
+      const retryable = error?.status === undefined || error.status === 429 || error.status >= 500
+      if (!retryable) break
+      if (attempt < attempts) await sleep(1000 * 2 ** (attempt - 1))
+    }
+  }
+  return { body: null, reason }
+}
+
+/**
+ * Kenari: pasangan yang SUDAH diketahui salah. PMID 6638198 pernah dikutip di main sebagai makalah Sunagawa 1983;
+ * NCBI mencatatnya sebagai makalah lain. Bila pemeriksa ini tidak lagi menangkap pasangan itu — karena NCBI
+ * mengubah bentuk jawabannya atau kode ini rusak — hasil "semua cocok" tidak bisa dipercaya, jadi kenari yang
+ * lolos adalah kegagalan.
+ */
+export const CANARY = Object.freeze({ pmid: '6638198', authors: 'Sunagawa K, Maughan WL, Burkhoff D, et al.', title: 'Left ventricular interaction with arterial load studied in isolated canine ventricle.', source: 'Am J Physiol', pubDate: '1983-11' })
+
+export async function verifyCanary({ fetchJson, sleep, attempts = 4 }) {
+  const { body, reason } = await summariesFor([CANARY.pmid], { fetchJson, sleep, attempts })
+  if (body === null) return { state: 'tidak-terputuskan', reason }
+  const found = compareEntry(CANARY, body.result[CANARY.pmid]).map((item) => item.rule)
+  return found.includes('daring-judul-berbeda') && found.includes('daring-penulis-berbeda')
+    ? { state: 'tertangkap', reason: '' }
+    : { state: 'lolos', reason: `expected a title and first-author mismatch, got [${found.join(', ')}]` }
+}
+
 /**
  * Periksa seluruh ledger. `fetchJson(url)` dan `sleep(ms)` disuntikkan (boundary jaringan dan waktu).
  * Kegagalan jaringan, 429 dan 5xx dicoba ulang; bila tetap gagal, PMID di batch itu dilaporkan "tidak bisa
@@ -81,21 +117,7 @@ export async function verifyLedger({ ledger, fetchJson, sleep, batchSize = 100, 
   let checked = 0
   for (let start = 0; start < entries.length; start += batchSize) {
     const batch = entries.slice(start, start + batchSize)
-    const url = `${ESUMMARY}?db=pubmed&retmode=json&tool=${TOOL}&id=${batch.map((entry) => entry.pmid).join(',')}`
-    let body = null
-    let reason = ''
-    for (let attempt = 1; attempt <= attempts && body === null; attempt += 1) {
-      try {
-        const parsed = await fetchJson(url)
-        if (parsed && typeof parsed === 'object' && parsed.result && typeof parsed.result === 'object') body = parsed
-        else { reason = 'response had no result object'; break }
-      } catch (error) {
-        reason = `${error?.status ?? 'network'}: ${String(error?.message ?? error).slice(0, 120)}`
-        const retryable = error?.status === undefined || error.status === 429 || error.status >= 500
-        if (!retryable) break
-        if (attempt < attempts) await sleep(1000 * 2 ** (attempt - 1))
-      }
-    }
+    const { body, reason } = await summariesFor(batch.map((entry) => entry.pmid), { fetchJson, sleep, attempts })
     if (body === null) {
       for (const entry of batch) inconclusive.push({ pmid: entry.pmid, reason })
       continue
@@ -108,7 +130,26 @@ export async function verifyLedger({ ledger, fetchJson, sleep, batchSize = 100, 
   return { checked, mismatches, inconclusive }
 }
 
-export const exitCodeOf = (result) => (result.mismatches.length > 0 ? 1 : result.inconclusive.length > 0 ? 2 : 0)
+/** 1 bila ada entri tidak cocok atau kenari lolos; 2 bila ada yang tidak bisa diputuskan; 0 hanya bila semuanya terbukti. */
+export function exitCodeOf(result, canary = { state: 'tertangkap' }) {
+  if (result.mismatches.length > 0 || canary.state === 'lolos') return 1
+  if (result.inconclusive.length > 0 || canary.state !== 'tertangkap') return 2
+  return 0
+}
+
+/**
+ * Jalankan seluruh pemeriksaan dan laporkan. Mengembalikan kode keluar; `log`/`error` disuntikkan agar bisa diuji.
+ */
+export async function run({ ledger, fetchJson, sleep, log, error }) {
+  const result = await verifyLedger({ ledger, fetchJson, sleep })
+  const canary = await verifyCanary({ fetchJson, sleep })
+  for (const item of result.mismatches) error(item.message)
+  if (result.inconclusive.length > 0) error(`citation-ledger-online: daring-tidak-terputuskan: ${result.inconclusive.length} entries could not be checked (${result.inconclusive[0].reason}) — this is NOT a pass`)
+  if (canary.state === 'lolos') error(`citation-ledger-online: daring-kenari-lolos: a pairing known to be wrong (PMID ${CANARY.pmid} as "${CANARY.title}") was not caught — ${canary.reason}. A clean result cannot be trusted.`)
+  if (canary.state === 'tidak-terputuskan') error(`citation-ledger-online: daring-tidak-terputuskan: the canary could not be checked (${canary.reason}) — this is NOT a pass`)
+  log(`citation-ledger-online: ${result.checked}/${ledger.entries.length} entries re-resolved against NCBI, ${result.mismatches.length} mismatches, ${result.inconclusive.length} inconclusive; known-wrong canary: ${canary.state}`)
+  return exitCodeOf(result, canary)
+}
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
   const root = fileURLToPath(new URL('../..', import.meta.url))
@@ -119,9 +160,5 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
     return response.json()
   }
   const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
-  const result = await verifyLedger({ ledger, fetchJson, sleep })
-  for (const item of result.mismatches) console.error(item.message)
-  if (result.inconclusive.length > 0) console.error(`citation-ledger-online: daring-tidak-terputuskan: ${result.inconclusive.length} entries could not be checked (${result.inconclusive[0].reason}) — this is NOT a pass`)
-  console.log(`citation-ledger-online: ${result.checked}/${ledger.entries.length} entries re-resolved against NCBI, ${result.mismatches.length} mismatches, ${result.inconclusive.length} inconclusive`)
-  process.exit(exitCodeOf(result))
+  process.exit(await run({ ledger, fetchJson, sleep, log: console.log, error: console.error }))
 }

@@ -2,7 +2,7 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 import { readFileSync } from 'node:fs'
-import { compareEntry, ESUMMARY, exitCodeOf, sameTitle, tokens, verifyLedger } from './citation-ledger-online.mjs'
+import { CANARY, compareEntry, ESUMMARY, exitCodeOf, run, sameTitle, tokens, verifyCanary, verifyLedger } from './citation-ledger-online.mjs'
 
 const rules = (list) => list.map((item) => item.rule)
 const ENTRY = { pmid: '6638199', authors: 'Sunagawa K, Maughan WL, Burkhoff D, et al.', title: 'Left ventricular interaction with arterial load studied in isolated canine ventricle.', source: 'Am J Physiol', pubDate: '1983-11', doi: '10.1152/ajpheart.1983.245.5.H773', verifiedOn: '2026-11-13' }
@@ -141,6 +141,76 @@ test('verifikasi: ketidakcocokan mengalahkan tidak-terputuskan pada kode keluar'
   assert.equal(result.inconclusive.length, 1)
   assert.equal(exitCodeOf(result), 1)
   assert.equal(exitCodeOf({ mismatches: [], inconclusive: [] }), 0)
+})
+
+const BKAILY = { uid: '6638198', pubdate: '1983 Nov', sortfirstauthor: 'Bkaily G', title: 'Effect of Na+- or Ca2+-filled liposomes on electrical activity of cultured heart cells.', articleids: [] }
+
+test('kenari: pasangan yang diketahui salah tertangkap, dan hanya PMID kenari yang dikirim', async () => {
+  const urls = []
+  const state = await verifyCanary({ fetchJson: async (url) => { urls.push(url); return bodyFor(BKAILY) }, sleep: async () => {} })
+  assert.deepEqual(state, { state: 'tertangkap', reason: '' })
+  assert.deepEqual(urls, [`${ESUMMARY}?db=pubmed&retmode=json&tool=citation-ledger-check&id=6638198`])
+  assert.equal(CANARY.pmid, '6638198')
+})
+
+test('kenari: bila pasangan salah itu lolos, hasil bersih tidak dipercaya (kode keluar 1)', async () => {
+  // NCBI tiruan mengembalikan rekaman yang cocok dengan klaim salah: pemeriksa tidak lagi bisa membedakan
+  const agreeing = { uid: '6638198', pubdate: '1983 Nov', sortfirstauthor: 'Sunagawa K', title: CANARY.title, articleids: [] }
+  const passed = await verifyCanary({ fetchJson: async () => bodyFor(agreeing), sleep: async () => {} })
+  assert.equal(passed.state, 'lolos')
+  assert.equal(exitCodeOf({ mismatches: [], inconclusive: [] }, passed), 1)
+  // hanya judul yang berbeda belum cukup: kenari menuntut judul DAN penulis pertama berbeda
+  const half = await verifyCanary({ fetchJson: async () => bodyFor({ ...agreeing, title: BKAILY.title }), sleep: async () => {} })
+  assert.equal(half.state, 'lolos')
+  assert.match(half.reason, /got \[daring-judul-berbeda\]/)
+})
+
+test('kenari: NCBI tak terjangkau atau rekaman hilang = tidak terputuskan / lolos, tidak pernah lulus diam-diam', async () => {
+  const down = await verifyCanary({ fetchJson: async () => { throw new Error('ENOTFOUND') }, sleep: async () => {}, attempts: 2 })
+  assert.equal(down.state, 'tidak-terputuskan')
+  assert.equal(exitCodeOf({ mismatches: [], inconclusive: [] }, down), 2)
+  const missing = await verifyCanary({ fetchJson: async () => ({ result: {} }), sleep: async () => {} })
+  assert.equal(missing.state, 'lolos')
+  assert.equal(exitCodeOf({ mismatches: [], inconclusive: [] }, { state: 'tertangkap' }), 0)
+  assert.equal(exitCodeOf({ mismatches: [], inconclusive: [] }), 0)
+})
+
+const runWith = async (fetchJson) => {
+  const out = []
+  const err = []
+  const code = await run({ ledger: ledgerOf(ENTRY, KROGH), fetchJson, sleep: async () => {}, log: (line) => out.push(line), error: (line) => err.push(line) })
+  return { code, out, err }
+}
+const ncbi = (canaryRecord, patch = {}) => async (url) => (url.endsWith('id=6638198') ? bodyFor(canaryRecord) : bodyFor({ ...SUMMARY, ...patch }, KROGH_SUMMARY))
+
+test('jalankan: ledger cocok dan kenari tertangkap = kode 0, satu baris laporan, tanpa galat', async () => {
+  const { code, out, err } = await runWith(ncbi(BKAILY))
+  assert.equal(code, 0)
+  assert.deepEqual(err, [])
+  assert.deepEqual(out, ['citation-ledger-online: 2/2 entries re-resolved against NCBI, 0 mismatches, 0 inconclusive; known-wrong canary: tertangkap'])
+})
+
+test('jalankan: kenari lolos membuat run gagal walau ledger cocok', async () => {
+  const { code, err } = await runWith(ncbi({ uid: '6638198', pubdate: '1983 Nov', sortfirstauthor: 'Sunagawa K', title: CANARY.title, articleids: [] }))
+  assert.equal(code, 1)
+  assert.equal(err.length, 1)
+  assert.match(err[0], /daring-kenari-lolos: a pairing known to be wrong \(PMID 6638198/)
+})
+
+test('jalankan: entri tidak cocok dilaporkan dengan namanya dan kode 1', async () => {
+  const { code, err, out } = await runWith(ncbi(BKAILY, { sortfirstauthor: 'Sagawa K' }))
+  assert.equal(code, 1)
+  assert.match(err[0], /daring-penulis-berbeda: PMID 6638199/)
+  assert.match(out[0], /1 mismatches, 0 inconclusive; known-wrong canary: tertangkap/)
+})
+
+test('jalankan: NCBI tak terjangkau = kode 2 dan dua baris "NOT a pass" (ledger dan kenari)', async () => {
+  const { code, err, out } = await runWith(async () => { throw Object.assign(new Error('HTTP 400'), { status: 400 }) })
+  assert.equal(code, 2)
+  assert.equal(err.length, 2)
+  assert.match(err[0], /daring-tidak-terputuskan: 2 entries could not be checked \(400: HTTP 400\) — this is NOT a pass/)
+  assert.match(err[1], /daring-tidak-terputuskan: the canary could not be checked/)
+  assert.match(out[0], /0\/2 entries re-resolved/)
 })
 
 test('workflow: pemeriksa daring berjalan saat ledger berubah, terjadwal, dan hanya dengan izin baca', () => {
