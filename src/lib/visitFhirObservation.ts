@@ -152,7 +152,7 @@ function assertActiveClinicalSupportConsent(
 export function buildAcceptedVisitFhirObservation(
   event: LongitudinalEvent<number>,
   refs: VisitFhirReferences,
-  evaluatedAtIso: string = new Date().toISOString(),
+  evaluatedAtIso: string = event.review?.reviewedAt ?? event.recordedAt,
 ): VisitFhirObservation {
   assertActiveClinicalSupportConsent(event, evaluatedAtIso)
   if (event.review.state !== 'accepted' || !event.review.reviewerId?.trim() || !event.review.reviewedAt) {
