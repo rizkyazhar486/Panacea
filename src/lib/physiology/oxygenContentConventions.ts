@@ -57,7 +57,7 @@ export const OXYGEN_CONTENT_CONVENTIONS: readonly OxygenContentConvention[] = [
     hufnerMlO2PerGHb: 1.39,
     dissolvedMlO2PerDlPerMmHg: 0.0034,
     evidence: [
-      { id: 'elso-vv-2021', kind: 'pmid', reference: '33965970 / PMCID PMC8315725' },
+      { id: 'elso-vv-2021', kind: 'pmid', reference: '33965970 / PMCID PMC8315725' }, // Tonna et al. 2021, ELSO VV ECMO guideline
     ],
     sourcePrintedHbUnit: 'g/L',
     sourcePrintedDissolvedCoefficient: 0.0034,

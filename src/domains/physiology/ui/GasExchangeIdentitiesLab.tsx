@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { deadSpacePanel, shuntPanel, type PanelView } from '../engine/gasIdentityPanel'
 
+// Citations linked by this lab: PMID 28223465 (Bourgoin 2017), 16126784 (Tang 2005), 8599295 (Wandrup 1995), 964271 (Stalder 1976).
 const pubmed = (pmid: string) => `https://pubmed.ncbi.nlm.nih.gov/${pmid}/`
 
 function Field({ label, unit, value, onChange }: { label: string; unit: string; value: string; onChange: (next: string) => void }) {
