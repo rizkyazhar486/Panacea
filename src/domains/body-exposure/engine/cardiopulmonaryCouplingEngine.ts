@@ -10,7 +10,7 @@
  *
  * Scientific Provenance:
  * - Sunagawa K, et al. Left ventricular interaction with arterial load studied in isolated canine ventricle.
- *   Am J Physiol. 1983;245(5):H773-H780. PMID: 6638198.
+ *   Am J Physiol. 1983;245(5 Pt 1):H773-H780. PMID: 6638199.
  * - Suga H, Sagawa K. Instantaneous pressure-volume relationships and their ratio in the excised,
  *   supported canine left ventricle. Circ Res. 1974;35(1):117-126. PMID: 4841253.
  * - West JB. Respiratory Physiology: The Essentials. 10th ed. Wolters Kluwer; 2016.
@@ -27,8 +27,8 @@ export const CARDIOPULMONARY_DISCLAIMER =
 
 export const CARDIOPULMONARY_PROVENANCE = Object.freeze({
   primaryCitation:
-    'Sunagawa K, Maughan WL, Burkhoff D, Sagawa K. Left ventricular interaction with arterial load. Am J Physiol. 1983;245(5):H773-H780.',
-  pmid: '6638198',
+    'Sunagawa K, Maughan WL, Burkhoff D, Sagawa K. Left ventricular interaction with arterial load studied in isolated canine ventricle. Am J Physiol. 1983;245(5 Pt 1):H773-H780.',
+  pmid: '6638199',
   physiologicalBasis: 'Frank-Starling law, Suga-Sagawa elastance, Laplace tension, West lung zones, Fick principle',
   formVerified: true as const,
 });

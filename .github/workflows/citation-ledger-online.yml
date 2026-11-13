@@ -1,0 +1,38 @@
+name: Citation Ledger Online Check
+
+# Re-resolves every entry of governance/LITERATURE_CITATION_LEDGER.json against NCBI E-utilities, so a ledger
+# entry that does not match what PubMed returns cannot be merged. The offline gate in the build covers the rest.
+on:
+  pull_request:
+    paths:
+      - 'governance/LITERATURE_CITATION_LEDGER.json'
+      - 'scripts/qa/citation-ledger.mjs'
+      - 'scripts/qa/citation-ledger-online.mjs'
+      - '.github/workflows/citation-ledger-online.yml'
+  schedule:
+    - cron: '17 3 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: citation-ledger-online-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  citation-ledger-online:
+    name: citation-ledger-online
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Re-resolve the ledger against NCBI
+        run: node scripts/qa/citation-ledger-online.mjs

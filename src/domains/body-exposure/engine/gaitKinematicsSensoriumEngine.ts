@@ -12,7 +12,8 @@
  * - Perry J, Burnfield JM. Gait Analysis: Normal and Pathological Function. 2nd ed. SLACK; 2010.
  * - Winter DA. Biomechanics and Motor Control of Human Movement. 4th ed. Wiley; 2009.
  * - Hicks JH. The mechanics of the foot. II. The plantar aponeurosis and the arch. J Anat. 1954;88(1):25-30. PMID: 13129168.
- * - Robinson RO, Herzog W, Nigg BM. J Manipulative Physiol Ther. 1987;10(4):172-176. PMID: 3655546.
+ * - Robinson RO, Herzog W, Nigg BM. Use of force platform variables to quantify the effects of chiropractic
+ *   manipulation on gait symmetry. J Manipulative Physiol Ther. 1987;10(4):172-176. PMID: 2958572.
  */
 
 import {
@@ -281,7 +282,7 @@ export function calculateVerticalGrf(
 /**
  * Calculates Robinson's Symmetry Index (SI):
  * SI = (2 * |X_L - X_R| / (X_L + X_R)) * 100%
- * Reference: Robinson et al. (1987) PMID: 3655546
+ * Reference: Robinson et al. (1987) PMID: 2958572
  */
 export function calculateRobinsonSymmetryIndex(leftVal: number, rightVal: number): number {
   if (!Number.isFinite(leftVal) || !Number.isFinite(rightVal)) return 0;

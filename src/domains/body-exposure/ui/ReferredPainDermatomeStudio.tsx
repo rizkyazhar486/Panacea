@@ -114,7 +114,7 @@ export function ReferredPainDermatomeStudio(): React.ReactElement {
         </div>
         <p style={{ margin: '4px 0 0 0', fontSize: '11px', lineHeight: 1.5, opacity: 0.75 }}>
           Mechanistic simulation of visceral afferent nociceptive convergence onto second-order spinothalamic neurons,
-          including Woolf central sensitization plasticity (PMID: 21415174).
+          including Woolf central sensitization plasticity (PMID: 20961685).
         </p>
       </div>
 
