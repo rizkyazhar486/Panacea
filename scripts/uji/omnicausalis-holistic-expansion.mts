@@ -1,10 +1,13 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import {
-  DEFAULT_KALOLUMEN_LAYERS, PROTEIN_FIGHTER_BOTS, assertTruthClassTransitionAllowed,
+  DEFAULT_KALOLUMEN_LAYERS, NUSANTARA_FUNCTIONAL_DISHES, PROTEIN_FIGHTER_BOTS, assertTruthClassTransitionAllowed,
   computeDirectionalLightVector, createTruthEnvelope, evaluateBioEmuConformationalEnsemble,
   evaluateDeNovoBinderCandidate, evaluateKaloLumenReconstruction, evaluateLongevityEnergyBalance,
-  evaluateRemopReceptorOccupancy, evaluateSepsisSafeguard, mapTextToVrmVisemeFrames, runProteinFighterArenaRound,
+  evaluateLongevityNutritionAndExposome, evaluateMitochondrialAutophagyDynamics,
+  evaluateOneOsEncounterPayerHarmonization, evaluatePantheonMultiSpecialistConsensus,
+  evaluateRemopReceptorOccupancy, evaluateSensoriumBiometricsAndGait, evaluateSepsisSafeguard,
+  mapTextToVrmVisemeFrames, runProteinFighterArenaRound, translateUniversalDeviceEnvelope,
 } from '../../src/domains/omnicausalis-index.ts';
 
 // 1. Truth-Class Segregation Guard
@@ -134,7 +137,95 @@ import {
   assert.ok(energy.payload.autonomicReadinessIndex > 70);
 }
 
-// 6. Purity & Determinism Guard
+// 6. Pilar I — Subcellular Mitochondrial OxPhos & Autophagy/Mitophagy Dynamics
+{
+  const healthyMito = evaluateMitochondrialAutophagyDynamics({
+    deltaPsiMMv: -165, nadPlusToNadhRatio: 5.0, ampkToMtorRatio: 3.0, substrateOxygenSaturationPct: 98,
+  });
+  assert.equal(healthyMito.truthClass, 'SIMULATED_EDUCATIONAL');
+  assert.equal(healthyMito.payload.pink1ParkinMitophagyActive, false);
+  assert.ok(healthyMito.payload.oxPhosAtpFluxIndex > 80);
+  assert.ok(healthyMito.payload.bioenergeticResilienceScore > 75);
+
+  const depolarizedMito = evaluateMitochondrialAutophagyDynamics({
+    deltaPsiMMv: -85, nadPlusToNadhRatio: 1.5, ampkToMtorRatio: 1.2, substrateOxygenSaturationPct: 90,
+  });
+  assert.equal(depolarizedMito.payload.pink1ParkinMitophagyActive, true);
+  assert.ok(depolarizedMito.payload.oxPhosAtpFluxIndex < healthyMito.payload.oxPhosAtpFluxIndex);
+}
+
+// 7. Pilar II — Universal Device Translation OS (Empty Is Not Zero + Consent Gate)
+{
+  const udt = translateUniversalDeviceEnvelope({
+    deviceId: 'UDT-HIST-ECG-1998', deviceEra: 'past_analog_digitized', provenanceSource: 'DIGITIZED_PAPER_TRACE',
+    consentVerified: true, timePrecisionMs: 40,
+    heartRateBpm: 74, hrvRmssdMs: 52, cgmGlucoseMgDl: null, thoracicBioimpedanceOhm: null,
+  });
+  assert.equal(udt.truthClass, 'REFERENCE_NORMATIVE');
+  assert.equal(udt.payload.normalizedTelemetry.heartRateBpm, 74);
+  assert.equal(udt.payload.normalizedTelemetry.cgmGlucoseMgDl, null);
+  assert.deepEqual(udt.payload.missingChannels, ['cgmGlucoseMgDl', 'thoracicBioimpedanceOhm']);
+  assert.equal(udt.payload.recordedChannelsCount, 2);
+
+  assert.throws(() => translateUniversalDeviceEnvelope({
+    deviceId: 'UDT-NO-CONSENT', deviceEra: 'present_wearable_cgm', provenanceSource: 'BLE_RING',
+    consentVerified: false, timePrecisionMs: 1000,
+    heartRateBpm: 70, hrvRmssdMs: null, cgmGlucoseMgDl: 95, thoracicBioimpedanceOhm: null,
+  }), /consentVerified === true/);
+}
+
+// 8. Pilar III & IV — Pantheon Multi-Specialist Consensus & One-OS Payer Harmonization
+{
+  const pantheon = evaluatePantheonMultiSpecialistConsensus({
+    lvefPct: 32, meanArterialPressureMmHg: 58,
+    lactateMmolL: 3.8, egfrMlMin173m2: 34, paO2FiO2Ratio: 170,
+  });
+  assert.equal(pantheon.truthClass, 'DERIVED_CLINICAL');
+  assert.equal(pantheon.payload.harmonizedProtocol.length, 4);
+  assert.equal(pantheon.payload.conflictDetected, true);
+  assert.equal(pantheon.payload.requiresHumanPhysicianSignoff, true);
+
+  const oneOsUnsigned = evaluateOneOsEncounterPayerHarmonization({
+    encounterId: 'ENC-001', currentStage: 'universal_payer_claim', patientIdentityVerified: true,
+    icd10PrimaryCode: 'A41.9', diagnosticReferralClosed: true, clinicianSignedOff: false,
+  });
+  assert.equal(oneOsUnsigned.payload.zeroLossContinuityVerified, true);
+  assert.equal(oneOsUnsigned.payload.payerClaimReady, false);
+  assert.ok(oneOsUnsigned.payload.blockingReasons.includes('clinician_signature_required'));
+
+  const oneOsSigned = evaluateOneOsEncounterPayerHarmonization({
+    encounterId: 'ENC-002', currentStage: 'universal_payer_claim', patientIdentityVerified: true,
+    icd10PrimaryCode: 'A41.9', diagnosticReferralClosed: true, clinicianSignedOff: true,
+  });
+  assert.equal(oneOsSigned.payload.payerClaimReady, true);
+  assert.equal(oneOsSigned.payload.blockingReasons.length, 0);
+}
+
+// 9. Pilar V & VI — Sensorium CGM/Gait, Nusantara Functional Nutrition & Planetary Exposome
+{
+  const sensorium = evaluateSensoriumBiometricsAndGait({
+    cgmReadingsMgDl: [85, 95, 110, 140, 195, 65, 120, 130, 105, 100],
+    hrvRmssdMs: 64, hrvSdnnMs: null, spo2Pct: 98,
+    mtpDorsiflexionDeg: 26, calcaneusFloorClearanceMm: 18,
+  });
+  assert.equal(sensorium.payload.cgmTimeInRangePct, 80);
+  assert.equal(sensorium.payload.cgmTimeBelowRangePct, 10);
+  assert.equal(sensorium.payload.cgmTimeAboveRangePct, 10);
+  assert.equal(sensorium.payload.footStrikeClassification, 'forefoot_strike');
+  assert.equal(sensorium.payload.hrvSdnnMs, null);
+
+  assert.equal(NUSANTARA_FUNCTIONAL_DISHES.length, 4);
+  const longevity = evaluateLongevityNutritionAndExposome({
+    chronologicalAgeYears: 45, phenoAgeEstimateYears: 40.5,
+    fsrsCurrentStabilityDays: 14, daysSinceLastThermalHabit: 2,
+    saunaMinutesWeekly: 75, pm25UgM3: 12, uvIndex: 4, circadianDaylightLux: 12000,
+  });
+  assert.equal(longevity.payload.bioAgeDeltaYears, -4.5);
+  assert.ok(longevity.payload.fsrsNextStabilityDays > 14);
+  assert.ok(longevity.payload.longevityRecoveryScore > 80);
+}
+
+// 10. Purity & Determinism Guard
 {
   const src = readFileSync(new URL('../../src/domains/omnicausalis/engine/omnicausalisEngine.ts', import.meta.url), 'utf8');
   for (const forbidden of ['window.', 'localStorage', 'sessionStorage', 'Date.now(', 'Math.random(']) {
@@ -142,4 +233,4 @@ import {
   }
 }
 
-console.log('omnicausalis: truth-class guard, KaloLumen 3-layer DICOM, BioEmu-2/BindCraft2/ProteinFighter, SepsisAgent/REMOP, VRM visemes, and longevity energy balance verified');
+console.log('omnicausalis: all 7 Transcendental Pillars (Quantum/Mitochondria, KaloLumen/UDT-OS, Sepsis/Pantheon, Zero-Loss EMR/One-OS Payer, Sensorium Gait/CGM, Nusantara Longevity/Exposome, Interaction Grammar) verified');

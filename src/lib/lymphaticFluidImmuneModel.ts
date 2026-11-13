@@ -23,6 +23,7 @@ export const LYMPHATIC_EDUCATION_MODEL = {
     'Lymphatic vessels participate in immune-cell trafficking through tissue and lymph-node pathways.',
   ],
   evidence: [
+    // PMID 9419570: Witte & Witte 1995, Disorders of lymph flow. PMID 24503053: Berggreen & Wiig 2014, lymphatic function in periodontal disease.
     { pmid: '9419570', role: 'Background review describing lymph transport, tissue-fluid/macromolecule return, propulsion, and impaired immune-cell trafficking in lymphatic failure.', source: 'PubMed' },
     { pmid: '24503053', role: 'Review describing lymphatic fluid drainage and immune-cell trafficking in a tissue-specific context.', source: 'PubMed' },
   ],

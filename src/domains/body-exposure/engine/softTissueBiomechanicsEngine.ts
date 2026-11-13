@@ -11,7 +11,10 @@
  *
  * Scientific Provenance:
  * - Fung YC. Biomechanics: Mechanical Properties of Living Tissues. 2nd ed. Springer; 1993.
- * - Carter FJ, et al. Measurements of the in vivo properties of human liver and spleen. Med Image Anal. 2001;5(4):249-261. PMID: 11731275.
+ * - Carter FJ, Frank TG, Davies PJ, McLean D, Cuschieri A. Measurements and modelling of the compliance of human
+ *   and porcine organs. Med Image Anal. 2001;5(4):231-236. PMID: 11731303.
+ *   (Carter reports indentation moduli near 0.27 MPa for human liver. The catalog values below are on the
+ *   elastography scale of a few kPa and are NOT taken from this paper: their source is an open provenance gap.)
  * - Sneddon IN. Boussinesq problem for a punch of arbitrary profile. Int J Eng Sci. 1965;3(1):47-57.
  * - Horgan CO. The Remarkable Neo-Hookean Strain Energy Function. J Elasticity. 2021;144(2):127-142.
  * - Huizinga JD, et al. Cellular origin of the gastrointestinal electrical pacemaker. Nature. 1995;373(6510):147-149.

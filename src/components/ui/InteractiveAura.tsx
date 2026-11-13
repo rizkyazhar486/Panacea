@@ -1,13 +1,15 @@
 import { useEffect, useRef } from 'react'
+import { AURA_FRAME_INTERVAL_MS, auraMayAnimate, auraPhysicsSteps } from '../../shared/ui/auraFramePolicy'
 
 // Lightweight pointer-reactive "constellation" canvas — drifting nodes that
 // connect with thin lines and lean toward the cursor. No dependencies; capped
-// node count for performance; disabled under the reduced-motion preference.
+// node count for performance. Stops under the in-app reduce-motion setting AND
+// the OS prefers-reduced-motion preference, while off screen or in a hidden tab,
+// and redraws at most 30 fps (each redraw forces a full-page frame; see auraFramePolicy).
 export function InteractiveAura({ className = '' }: { className?: string }) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
 
   useEffect(() => {
-    if (document.documentElement.classList.contains('reduce-motion')) return
     const canvas = canvasRef.current
     if (!canvas) return
     const context = canvas.getContext('2d')
@@ -17,6 +19,10 @@ export function InteractiveAura({ className = '' }: { className?: string }) {
     const ctx = context
 
     let raf = 0
+    let timer = 0
+    let lastDraw: number | null = null
+    let onScreen = true
+    const media = window.matchMedia?.('(prefers-reduced-motion: reduce)') ?? null
     let w = 0
     let h = 0
     const dpr = Math.min(window.devicePixelRatio || 1, 2)
@@ -44,8 +50,7 @@ export function InteractiveAura({ className = '' }: { className?: string }) {
       }))
     }
 
-    function tick() {
-      ctx.clearRect(0, 0, w, h)
+    function step() {
       for (const n of nodes) {
         // Gentle drift + subtle pull toward the cursor.
         const dx = mouse.x - n.x
@@ -61,6 +66,12 @@ export function InteractiveAura({ className = '' }: { className?: string }) {
         n.y += n.vy
         if (n.x < 0 || n.x > w) n.vx *= -1
         if (n.y < 0 || n.y > h) n.vy *= -1
+      }
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, w, h)
+      for (const n of nodes) {
         ctx.beginPath()
         ctx.arc(n.x, n.y, 1.8, 0, Math.PI * 2)
         ctx.fillStyle = 'rgba(0,191,99,0.55)'
@@ -82,7 +93,49 @@ export function InteractiveAura({ className = '' }: { className?: string }) {
           }
         }
       }
+    }
+
+    function mayAnimate() {
+      return auraMayAnimate({
+        reduceMotionClass: document.documentElement.classList.contains('reduce-motion'),
+        prefersReducedMotion: media?.matches === true,
+        onScreen,
+        documentHidden: document.hidden,
+      })
+    }
+
+    function stop() {
+      window.clearTimeout(timer)
+      cancelAnimationFrame(raf)
+      timer = 0
+      raf = 0
+      lastDraw = null
+    }
+
+    function tick(now: number) {
+      raf = 0
+      if (!mayAnimate()) return stop()
+      const steps = auraPhysicsSteps(lastDraw, now)
+      for (let i = 0; i < steps; i++) step()
+      if (steps > 0) {
+        draw()
+        lastDraw = now
+      }
+      // A timer, not a rAF chain: between redraws no frame is requested at all.
+      timer = window.setTimeout(() => {
+        timer = 0
+        raf = requestAnimationFrame(tick)
+      }, AURA_FRAME_INTERVAL_MS)
+    }
+
+    function start() {
+      if (raf || timer || !mayAnimate()) return
       raf = requestAnimationFrame(tick)
+    }
+
+    function sync() {
+      if (mayAnimate()) start()
+      else stop()
     }
 
     function onMove(e: PointerEvent) {
@@ -96,12 +149,24 @@ export function InteractiveAura({ className = '' }: { className?: string }) {
     }
 
     resize()
-    raf = requestAnimationFrame(tick)
+    const visibility = typeof IntersectionObserver === 'function'
+      ? new IntersectionObserver((entries) => {
+        onScreen = entries.some((entry) => entry.isIntersecting)
+        sync()
+      })
+      : null
+    visibility?.observe(cv)
+    start()
+    media?.addEventListener?.('change', sync)
+    document.addEventListener('visibilitychange', sync)
     window.addEventListener('resize', resize)
     window.addEventListener('pointermove', onMove)
     window.addEventListener('pointerleave', onLeave)
     return () => {
-      cancelAnimationFrame(raf)
+      stop()
+      visibility?.disconnect()
+      media?.removeEventListener?.('change', sync)
+      document.removeEventListener('visibilitychange', sync)
       window.removeEventListener('resize', resize)
       window.removeEventListener('pointermove', onMove)
       window.removeEventListener('pointerleave', onLeave)

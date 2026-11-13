@@ -6,15 +6,23 @@ import {
   type DirectionalVector3D, type KaloLumenLayerConfig,
   type KaloLumenLightingAngles, type KaloLumenReconstructionInput,
   type KaloLumenReconstructionSummary, type LongevityEnergyBalanceInput,
-  type LongevityEnergyBalanceSummary, type OmnicausalisTruthClass,
-  type ProteinFighterArenaRoundResult, type ProteinFighterBotProfile,
-  type RemopReceptorDoseInput, type RemopReceptorOccupancyResult,
-  type SepsisSafeguardEvaluation, type SepsisScreeningInput,
-  type TruthClassEnvelope, type VisemeFrame, type VrmVisemeKey,
+  type LongevityEnergyBalanceSummary, type LongevityExposomeInput,
+  type LongevityExposomeSummary, type MitochondrialAutophagyInput,
+  type MitochondrialAutophagySummary, type NusantaraFunctionalDish,
+  type OmnicausalisTruthClass, type OneOsEncounterPayerInput,
+  type OneOsEncounterPayerSummary, type PantheonConsensusEvaluation,
+  type PantheonConsensusInput, type ProteinFighterArenaRoundResult,
+  type ProteinFighterBotProfile, type RemopReceptorDoseInput,
+  type RemopReceptorOccupancyResult, type SensoriumBiometricsGaitInput,
+  type SensoriumBiometricsGaitSummary, type SepsisSafeguardEvaluation,
+  type SepsisScreeningInput, type TruthClassEnvelope,
+  type UniversalDeviceEnvelopeSummary, type UniversalDeviceTelemetryInput,
+  type VisemeFrame, type VrmVisemeKey,
 } from '../model/types.ts';
 
 const GAS_CONSTANT_KCAL_MOL_K = 0.00198720425864083;
 const VALID_AMINO_ACIDS = /^[ACDEFGHIKLMNPQRSTVWY]+$/;
+const VALID_ICD10 = /^[A-TV-Z][0-9][0-9AB](?:\.[0-9A-TV-Z]{1,4})?$/;
 
 function isFiniteInRange(val: unknown, min: number, max: number): val is number {
   return typeof val === 'number' && Number.isFinite(val) && val >= min && val <= max;
@@ -33,7 +41,10 @@ export function createTruthEnvelope<T>(
   if (!provenanceSource || typeof provenanceSource !== 'string' || !provenanceSource.trim()) {
     throw new Error('omnicausalis: provenanceSource must be a non-empty string');
   }
-  if (truthClass !== 'OBSERVED_CLINICAL' && truthClass !== 'DERIVED_CLINICAL' && truthClass !== 'SIMULATED_EDUCATIONAL') {
+  if (
+    truthClass !== 'OBSERVED_CLINICAL' && truthClass !== 'DERIVED_CLINICAL' &&
+    truthClass !== 'SIMULATED_EDUCATIONAL' && truthClass !== 'REFERENCE_NORMATIVE'
+  ) {
     throw new Error(`omnicausalis: unsupported truthClass "${String(truthClass)}"`);
   }
   return Object.freeze({
@@ -48,6 +59,9 @@ export function assertTruthClassTransitionAllowed(
 ): void {
   if (sourceTruthClass === 'SIMULATED_EDUCATIONAL' && targetTruthClass !== 'SIMULATED_EDUCATIONAL') {
     throw new Error(`omnicausalis: truth-class violation — SIMULATED_EDUCATIONAL data cannot be promoted to ${targetTruthClass}`);
+  }
+  if (sourceTruthClass === 'REFERENCE_NORMATIVE' && (targetTruthClass === 'OBSERVED_CLINICAL' || targetTruthClass === 'DERIVED_CLINICAL')) {
+    throw new Error(`omnicausalis: truth-class violation — REFERENCE_NORMATIVE cannot masquerade as ${targetTruthClass}`);
   }
   if (sourceTruthClass === 'DERIVED_CLINICAL' && targetTruthClass === 'OBSERVED_CLINICAL') {
     throw new Error('omnicausalis: truth-class violation — DERIVED_CLINICAL calculation cannot overwrite OBSERVED_CLINICAL truth');
@@ -201,7 +215,7 @@ export function evaluateSepsisSafeguard(input: SepsisScreeningInput): TruthClass
       bundle.push('5. Apply vasopressors if hypotensive during or after fluid resuscitation to maintain MAP >= 65 mmHg (physician-governed).');
     }
   }
-  return createTruthEnvelope('DERIVED_CLINICAL', 'Surviving Sepsis Campaign 2021 / Sepsis-3 (Singer et al., JAMA 2016)', {
+  return createTruthEnvelope('DERIVED_CLINICAL', 'Surviving Sepsis Campaign 2021 / Sepsis-3 Consensus', {
     qSofaScore, qSofaHighRisk, sofaTotalScore,
     organSubscores: Object.freeze({ respiration, coagulation, liver, cardiovascular, cns, renal }),
     survivingSepsisOneHourBundle: Object.freeze(bundle), requiresHumanPhysicianSignoff: true,
@@ -258,5 +272,159 @@ export function evaluateLongevityEnergyBalance(input: LongevityEnergyBalanceInpu
   const autonomicReadinessIndex = roundTo(Math.min(100, Math.max(0, Math.min(50, (Math.log(input.hrvRmssdMs) / Math.log(120)) * 50) + (input.sleepEfficiencyPct / 100) * 50)), 1);
   return createTruthEnvelope('DERIVED_CLINICAL', 'Atwater Macronutrient Equivalents & Ainsworth Compendium of Physical Activities', {
     totalIntakeKcal, workoutExpenditureKcal, totalExpenditureKcal, netEnergyBalanceKcal, autonomicReadinessIndex,
+  });
+}
+
+// --- 7 Transcendental Pillars Extensions ---
+
+export function evaluateMitochondrialAutophagyDynamics(input: MitochondrialAutophagyInput): TruthClassEnvelope<MitochondrialAutophagySummary> {
+  if (!input || !isFiniteInRange(input.deltaPsiMMv, -220, -40)) throw new Error('omnicausalis: deltaPsiMMv must be in [-220, -40] mV');
+  if (!isFiniteInRange(input.nadPlusToNadhRatio, 0.1, 20) || !isFiniteInRange(input.ampkToMtorRatio, 0.1, 10)) {
+    throw new Error('omnicausalis: nadPlusToNadhRatio [0.1,20] or ampkToMtorRatio [0.1,10] out of bounds');
+  }
+  if (!isFiniteInRange(input.substrateOxygenSaturationPct, 10, 100)) throw new Error('omnicausalis: substrateOxygenSaturationPct must be in [10, 100]');
+
+  const psiNormalized = Math.min(1, Math.max(0, (-input.deltaPsiMMv - 60) / 120));
+  const redoxFactor = Math.min(1, input.nadPlusToNadhRatio / 5);
+  const oxPhosAtpFluxIndex = roundTo(Math.min(100, Math.max(0, 100 * psiNormalized * (0.65 + 0.35 * redoxFactor) * (input.substrateOxygenSaturationPct / 100))), 2);
+  const lc3IITurnoverRate = roundTo(Math.min(100, Math.max(0, (Math.atan(input.ampkToMtorRatio / 1.5) / (Math.PI / 2)) * 100)), 2);
+  const pink1ParkinMitophagyActive = input.deltaPsiMMv > -110;
+  const lysosomalFusionEfficiencyPct = roundTo(Math.min(100, Math.max(0, 0.6 * lc3IITurnoverRate + 40 * redoxFactor)), 2);
+  const bioenergeticResilienceScore = roundTo(0.55 * oxPhosAtpFluxIndex + 0.45 * lysosomalFusionEfficiencyPct, 2);
+
+  return createTruthEnvelope('SIMULATED_EDUCATIONAL', 'Mitochondrial OxPhos Proton-Motive Force & AMPK/mTOR Autophagy Kinetics Model', {
+    oxPhosAtpFluxIndex, lc3IITurnoverRate, pink1ParkinMitophagyActive, lysosomalFusionEfficiencyPct, bioenergeticResilienceScore,
+  });
+}
+
+export function translateUniversalDeviceEnvelope(input: UniversalDeviceTelemetryInput): TruthClassEnvelope<UniversalDeviceEnvelopeSummary> {
+  if (!input || !input.consentVerified) throw new Error('omnicausalis: UDT-OS requires explicit consentVerified === true');
+  if (typeof input.deviceId !== 'string' || !input.deviceId.trim()) throw new Error('omnicausalis: deviceId is required');
+  if (!isFiniteInRange(input.timePrecisionMs, 1, 86400000)) throw new Error('omnicausalis: timePrecisionMs must be in [1, 86400000] ms');
+
+  const checkNullable = (v: number | null, min: number, max: number, name: string): number | null => {
+    if (v === null) return null;
+    if (!isFiniteInRange(v, min, max)) throw new Error(`omnicausalis: ${name} out of valid physiological bounds [${min}, ${max}]`);
+    return v;
+  };
+  const heartRateBpm = checkNullable(input.heartRateBpm, 20, 260, 'heartRateBpm');
+  const hrvRmssdMs = checkNullable(input.hrvRmssdMs, 2, 300, 'hrvRmssdMs');
+  const cgmGlucoseMgDl = checkNullable(input.cgmGlucoseMgDl, 20, 600, 'cgmGlucoseMgDl');
+  const thoracicBioimpedanceOhm = checkNullable(input.thoracicBioimpedanceOhm, 10, 150, 'thoracicBioimpedanceOhm');
+
+  const missingChannels: string[] = [];
+  if (heartRateBpm === null) missingChannels.push('heartRateBpm');
+  if (hrvRmssdMs === null) missingChannels.push('hrvRmssdMs');
+  if (cgmGlucoseMgDl === null) missingChannels.push('cgmGlucoseMgDl');
+  if (thoracicBioimpedanceOhm === null) missingChannels.push('thoracicBioimpedanceOhm');
+
+  const truthClass: OmnicausalisTruthClass = input.deviceEra === 'past_analog_digitized' ? 'REFERENCE_NORMATIVE' : 'OBSERVED_CLINICAL';
+  return createTruthEnvelope(truthClass, input.provenanceSource, {
+    deviceId: input.deviceId.trim(), deviceEra: input.deviceEra, timePrecisionMs: input.timePrecisionMs,
+    recordedChannelsCount: 4 - missingChannels.length, missingChannels: Object.freeze(missingChannels),
+    normalizedTelemetry: Object.freeze({ heartRateBpm, hrvRmssdMs, cgmGlucoseMgDl, thoracicBioimpedanceOhm }),
+  });
+}
+
+export function evaluatePantheonMultiSpecialistConsensus(input: PantheonConsensusInput): TruthClassEnvelope<PantheonConsensusEvaluation> {
+  if (!input || !isFiniteInRange(input.lvefPct, 10, 85) || !isFiniteInRange(input.egfrMlMin173m2, 2, 160)) {
+    throw new Error('omnicausalis: lvefPct [10,85] and egfrMlMin173m2 [2,160] required');
+  }
+  if (!isFiniteInRange(input.paO2FiO2Ratio, 30, 600) || !isFiniteInRange(input.lactateMmolL, 0.2, 30) || !isFiniteInRange(input.meanArterialPressureMmHg, 25, 180)) {
+    throw new Error('omnicausalis: paO2FiO2Ratio, lactateMmolL, or meanArterialPressureMmHg out of bounds');
+  }
+  const conflictSummary: string[] = [];
+  if ((input.lactateMmolL >= 2.5 || input.meanArterialPressureMmHg < 65) && (input.lvefPct < 40 || input.paO2FiO2Ratio < 200)) {
+    conflictSummary.push('Volume Resuscitation vs Cardiopulmonary Congestion: Sepsis hypoperfusion favors crystalloid bolus, whereas HFrEF (LVEF < 40%) or ARDS (P/F < 200) risks pulmonary edema.');
+  }
+  if (input.lactateMmolL >= 2.0 && input.egfrMlMin173m2 < 45) {
+    conflictSummary.push('Empiric Antimicrobial Clearance vs Renal Function: Sepsis requires immediate broad-spectrum coverage, whereas eGFR < 45 mL/min/1.73m2 requires renal dose adjustment and nephrotoxin avoidance.');
+  }
+  const harmonizedProtocol = Object.freeze([
+    Object.freeze({ specialist: 'cardiology' as const, directive: input.lvefPct < 40 ? 'Use dynamic stroke-volume / passive-leg-raise responsiveness with 250 mL aliquots and early norepinephrine to maintain MAP >= 65 mmHg.' : 'Standard hemodynamic preload optimization with MAP >= 65 mmHg.' }),
+    Object.freeze({ specialist: 'nephrology' as const, directive: input.egfrMlMin173m2 < 45 ? 'Use balanced crystalloids (avoid hyperchloremic 0.9% NaCl) and adjust maintenance antimicrobial intervals to eGFR.' : 'Monitor hourly urine output >= 0.5 mL/kg/h and serial creatinine.' }),
+    Object.freeze({ specialist: 'pulmonology' as const, directive: input.paO2FiO2Ratio < 200 ? 'Lung-protective ventilation (6 mL/kg PBW, plateau pressure <= 30 cmH2O) and conservative post-stabilization fluid balance.' : 'Maintain SpO2 92-96% and monitor work of breathing.' }),
+    Object.freeze({ specialist: 'infectious_disease' as const, directive: 'Obtain paired blood cultures prior to full-loading-dose empiric antimicrobials; re-evaluate de-escalation at 48h.' }),
+  ]);
+  return createTruthEnvelope('DERIVED_CLINICAL', 'Pantheon Multi-Specialist Comorbidity Consensus Engine', {
+    conflictDetected: conflictSummary.length > 0, conflictSummary: Object.freeze(conflictSummary),
+    harmonizedProtocol, requiresHumanPhysicianSignoff: true,
+  });
+}
+
+export function evaluateOneOsEncounterPayerHarmonization(input: OneOsEncounterPayerInput): TruthClassEnvelope<OneOsEncounterPayerSummary> {
+  if (!input || typeof input.encounterId !== 'string' || !input.encounterId.trim()) throw new Error('omnicausalis: encounterId is required');
+  const blockingReasons: string[] = [];
+  if (!input.patientIdentityVerified) blockingReasons.push('patient_identity_unverified');
+  if (!VALID_ICD10.test((input.icd10PrimaryCode ?? '').trim().toUpperCase())) blockingReasons.push('invalid_or_missing_icd10_code');
+  if (!input.diagnosticReferralClosed) blockingReasons.push('closed_loop_referral_pending');
+  if (!input.clinicianSignedOff) blockingReasons.push('clinician_signature_required');
+
+  return createTruthEnvelope('DERIVED_CLINICAL', 'One-OS Longitudinal Encounter & Universal Payer Readiness Gate', {
+    encounterId: input.encounterId.trim(), currentStage: input.currentStage,
+    zeroLossContinuityVerified: input.patientIdentityVerified && input.diagnosticReferralClosed,
+    payerClaimReady: blockingReasons.length === 0, blockingReasons: Object.freeze(blockingReasons),
+  });
+}
+
+export function evaluateSensoriumBiometricsAndGait(input: SensoriumBiometricsGaitInput): TruthClassEnvelope<SensoriumBiometricsGaitSummary> {
+  if (!input || !Array.isArray(input.cgmReadingsMgDl) || input.cgmReadingsMgDl.length === 0) {
+    throw new Error('omnicausalis: cgmReadingsMgDl must be a non-empty array of glucose values');
+  }
+  for (const g of input.cgmReadingsMgDl) {
+    if (!isFiniteInRange(g, 20, 600)) throw new Error('omnicausalis: CGM reading out of [20, 600] mg/dL');
+  }
+  if (!isFiniteInRange(input.mtpDorsiflexionDeg, -45, 75) || !isFiniteInRange(input.calcaneusFloorClearanceMm, 0, 250)) {
+    throw new Error('omnicausalis: MTP dorsiflexion or calcaneus clearance out of bounds');
+  }
+  const n = input.cgmReadingsMgDl.length;
+  const inRange = input.cgmReadingsMgDl.filter((g) => g >= 70 && g <= 180).length;
+  const below = input.cgmReadingsMgDl.filter((g) => g < 70).length;
+  const above = input.cgmReadingsMgDl.filter((g) => g > 180).length;
+  const meanGlucose = input.cgmReadingsMgDl.reduce((acc, g) => acc + g, 0) / n;
+  const gmiEstimatedA1cPct = roundTo(3.31 + 0.02392 * meanGlucose, 2);
+  const footStrikeClassification =
+    input.calcaneusFloorClearanceMm >= 15 && input.mtpDorsiflexionDeg >= 12
+      ? 'forefoot_strike'
+      : input.calcaneusFloorClearanceMm < 5
+        ? 'rearfoot_strike'
+        : 'midfoot_strike';
+
+  return createTruthEnvelope('DERIVED_CLINICAL', 'Sensorium CGM International Consensus & Markerless 3D MTP Gait Kinematics', {
+    cgmTimeInRangePct: roundTo((inRange / n) * 100, 1), cgmTimeBelowRangePct: roundTo((below / n) * 100, 1),
+    cgmTimeAboveRangePct: roundTo((above / n) * 100, 1), gmiEstimatedA1cPct,
+    hrvRmssdMs: input.hrvRmssdMs, hrvSdnnMs: input.hrvSdnnMs, spo2Pct: input.spo2Pct, footStrikeClassification,
+  });
+}
+
+export const NUSANTARA_FUNCTIONAL_DISHES: readonly NusantaraFunctionalDish[] = Object.freeze([
+  Object.freeze({ dishId: 'tempe_fermentasi_isoflavon', displayName: 'Tempe Kedelai Fermentasi Panggang', proteinG: 31, carbsG: 16, fatG: 14, solubleFiberG: 7.5, bioactiveHighlight: 'Aglycone Soy Isoflavones (Genistein/Daidzein) & Postbiotic Paraprobiotics' }),
+  Object.freeze({ dishId: 'ikan_gabus_pepes_albumin', displayName: 'Pepes Ikan Gabus (Channa striata) Kunyit', proteinG: 38, carbsG: 5, fatG: 7, solubleFiberG: 2.2, bioactiveHighlight: 'Bioavailable Serum Albumin Precursors, Zinc & Curcuminoids' }),
+  Object.freeze({ dishId: 'sayur_kelor_moringa_bening', displayName: 'Sayur Bening Daun Kelor (Moringa oleifera)', proteinG: 9, carbsG: 14, fatG: 2, solubleFiberG: 6.8, bioactiveHighlight: 'Sulforaphane-like Isothiocyanates, Quercetin & Nrf2 Activators' }),
+  Object.freeze({ dishId: 'nasi_merah_antosianin', displayName: 'Nasi Beras Merah Organik & Kacang Hijau', proteinG: 11, carbsG: 48, fatG: 3, solubleFiberG: 6.4, bioactiveHighlight: 'Cyanidin-3-Glucoside Anthocyanins & Resistant Starch Butyrate Substrate' }),
+]);
+
+export function evaluateLongevityNutritionAndExposome(input: LongevityExposomeInput): TruthClassEnvelope<LongevityExposomeSummary> {
+  if (!input || !isFiniteInRange(input.chronologicalAgeYears, 18, 120) || !isFiniteInRange(input.phenoAgeEstimateYears, 15, 130)) {
+    throw new Error('omnicausalis: chronologicalAgeYears [18,120] and phenoAgeEstimateYears [15,130] required');
+  }
+  if (!isFiniteInRange(input.fsrsCurrentStabilityDays, 0.5, 3650) || !isFiniteInRange(input.daysSinceLastThermalHabit, 0, 365)) {
+    throw new Error('omnicausalis: FSRS stability or daysSinceLastThermalHabit out of bounds');
+  }
+  if (!isFiniteInRange(input.saunaMinutesWeekly, 0, 300) || !isFiniteInRange(input.pm25UgM3, 0, 500) || !isFiniteInRange(input.uvIndex, 0, 20) || !isFiniteInRange(input.circadianDaylightLux, 0, 120000)) {
+    throw new Error('omnicausalis: saunaMinutesWeekly, pm25UgM3, uvIndex, or circadianDaylightLux out of bounds');
+  }
+  const bioAgeDeltaYears = roundTo(input.phenoAgeEstimateYears - input.chronologicalAgeYears, 2);
+  const retrievability = Math.exp(-input.daysSinceLastThermalHabit / Math.max(1, input.fsrsCurrentStabilityDays));
+  const fsrsNextStabilityDays = roundTo(input.fsrsCurrentStabilityDays * (1 + 0.22 * (1 - 0.5 * retrievability)), 2);
+  const pm25Penalty = Math.min(60, (input.pm25UgM3 / 35) * 35);
+  const uvPenalty = input.uvIndex > 8 ? (input.uvIndex - 8) * 3 : 0;
+  const luxProtection = Math.min(18, (Math.log10(Math.max(10, input.circadianDaylightLux)) / 4) * 18);
+  const exposomeOxidativeBurdenIndex = roundTo(Math.min(100, Math.max(0, 20 + pm25Penalty + uvPenalty - luxProtection)), 1);
+  const thermalBonus = Math.min(20, (input.saunaMinutesWeekly / 60) * 15);
+  const longevityRecoveryScore = roundTo(Math.min(100, Math.max(0, 75 - bioAgeDeltaYears * 2.5 + thermalBonus - exposomeOxidativeBurdenIndex * 0.35)), 1);
+
+  return createTruthEnvelope('SIMULATED_EDUCATIONAL', 'FSRS Circadian/Thermal Habit Engine, PhenoAge Delta & Planetary Exposome Matrix', {
+    bioAgeDeltaYears, fsrsNextStabilityDays, exposomeOxidativeBurdenIndex, longevityRecoveryScore,
   });
 }

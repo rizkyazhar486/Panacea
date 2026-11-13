@@ -2,6 +2,7 @@ import { useState, type CSSProperties } from 'react'
 import { Link } from 'react-router-dom'
 import { LANGS, setLang, tr } from '../../../lib/i18n'
 import { useBahasa } from '../../../lib/useBahasa'
+import { SleepCheckin } from '../../recovery-checkin/index'
 import { readSimpleStart, writeSimpleStart } from '../adapters/simpleModeStorage'
 import { SEE_EVERYTHING_ROUTE, SIMPLE_ACTIONS } from '../model/simpleActions'
 
@@ -48,6 +49,8 @@ export function SimpleHome() {
         </Link>
       ))}
 
+      <SleepCheckin />
+
       <Link to={SEE_EVERYTHING_ROUTE} data-testid="simple-everything" style={tombolSekunder}>{tr('See everything')}</Link>
 
       <section aria-label={tr('Language')} style={{ display: 'grid', gap: 10 }}>
@@ -65,6 +68,8 @@ export function SimpleHome() {
       <button type="button" onClick={ganti} aria-pressed={mulaiDi} data-testid="simple-start-toggle" style={tombolSekunder}>
         {mulaiDi ? tr('✓ This screen opens first. Tap to turn off.') : tr('Make this my first screen')}
       </button>
+      {/* data-pmd-unclamped: penjelasan efek tombol ini harus terbaca penuh, bukan teks redup yang bisa diketuk (skrip visual-first). */}
+      <div data-pmd-unclamped="true"><p style={{ margin: 0, fontSize: 19, lineHeight: 1.4, fontWeight: 600 }}>{tr('Also makes text and buttons bigger on every page.')}</p></div>
       {gagalSimpan && <p role="alert" style={{ fontSize: 20, margin: 0 }}>{tr('This device could not save your choice.')}</p>}
     </main>
   )

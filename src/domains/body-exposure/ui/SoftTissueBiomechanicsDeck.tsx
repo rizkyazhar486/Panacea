@@ -12,13 +12,22 @@ import {
   GI_PERISTALSIS_CATALOG,
   SOFT_TISSUE_BIOMECHANICS_DISCLAIMER,
 } from '../engine/softTissueBiomechanicsEngine';
+import { sliderValueText } from './deck-kit/deckA11y';
 
 export interface SoftTissueBiomechanicsDeckProps {
   initialOrganId?: OrganMechanicalId;
+  /** View to open first. Anything that is not one of the three views opens palpation. */
+  initialTab?: BiomechanicsDeckTab;
   onOrganSelect?: (organId: OrganMechanicalId) => void;
 }
 
-type BiomechanicsDeckTab = 'palpation' | 'diaphragm_excursion' | 'peristalsis';
+export type BiomechanicsDeckTab = 'palpation' | 'diaphragm_excursion' | 'peristalsis';
+const DECK_TABS: readonly BiomechanicsDeckTab[] = ['palpation', 'diaphragm_excursion', 'peristalsis'];
+const TAB_LABEL: Record<BiomechanicsDeckTab, { icon: string; text: string }> = {
+  palpation: { icon: '🩺', text: 'Palpation Contact' },
+  diaphragm_excursion: { icon: '🫁', text: '4D Diaphragm Shift' },
+  peristalsis: { icon: '🌊', text: 'GI Peristalsis' },
+};
 
 const colors = {
   bgCard: '#0f172a',
@@ -54,6 +63,8 @@ const SliderControl: React.FC<{
       max={max}
       step={step}
       value={value}
+      aria-label={label}
+      aria-valuetext={sliderValueText(value, unit, 1)}
       onChange={(e) => onChange(parseFloat(e.target.value))}
       style={{ width: '100%', accentColor: color }}
     />
@@ -62,9 +73,10 @@ const SliderControl: React.FC<{
 
 export const SoftTissueBiomechanicsDeck: React.FC<SoftTissueBiomechanicsDeckProps> = ({
   initialOrganId = 'liver_normal',
+  initialTab = 'palpation',
   onOrganSelect,
 }) => {
-  const [activeTab, setActiveTab] = useState<BiomechanicsDeckTab>('palpation');
+  const [activeTab, setActiveTab] = useState<BiomechanicsDeckTab>(DECK_TABS.includes(initialTab) ? initialTab : 'palpation');
   const [selectedOrganId, setSelectedOrganId] = useState<OrganMechanicalId>(initialOrganId);
   const [indentationDepthMm, setIndentationDepthMm] = useState<number>(4.0);
   const [indentationVelocityMmS, setIndentationVelocityMmS] = useState<number>(10.0);
@@ -127,11 +139,12 @@ export const SoftTissueBiomechanicsDeck: React.FC<SoftTissueBiomechanicsDeckProp
         </div>
 
         {/* Tab Buttons */}
-        <div style={{ display: 'flex', gap: '4px', backgroundColor: colors.bgHeader, padding: '3px', borderRadius: '8px' }}>
-          {(['palpation', 'diaphragm_excursion', 'peristalsis'] as const).map((tab) => (
+        <div role="group" aria-label="Biomechanics view" style={{ display: 'flex', flexWrap: 'wrap', maxWidth: '100%', gap: '4px', backgroundColor: colors.bgHeader, padding: '3px', borderRadius: '8px' }}>
+          {DECK_TABS.map((tab) => (
             <button
               key={tab}
               type="button"
+              aria-pressed={activeTab === tab}
               onClick={() => setActiveTab(tab)}
               style={{
                 backgroundColor: activeTab === tab ? colors.cyan : 'transparent',
@@ -144,7 +157,7 @@ export const SoftTissueBiomechanicsDeck: React.FC<SoftTissueBiomechanicsDeckProp
                 cursor: 'pointer',
               }}
             >
-              {tab === 'palpation' ? '🩺 Palpation Contact' : tab === 'diaphragm_excursion' ? '🫁 4D Diaphragm Shift' : '🌊 GI Peristalsis'}
+              <span aria-hidden="true">{TAB_LABEL[tab].icon} </span>{TAB_LABEL[tab].text}
             </button>
           ))}
         </div>
@@ -154,13 +167,14 @@ export const SoftTissueBiomechanicsDeck: React.FC<SoftTissueBiomechanicsDeckProp
       {activeTab === 'palpation' && (
         <div>
           {/* Organ Selector Chips */}
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '16px' }}>
+          <div role="group" aria-label="Tissue" style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '16px' }}>
             {Object.values(ORGAN_BIOMECHANICS_CATALOG).map((org) => {
               const sel = org.id === selectedOrganId;
               return (
                 <button
                   key={org.id}
                   type="button"
+                  aria-pressed={sel}
                   onClick={() => handleOrganChange(org.id)}
                   style={{
                     backgroundColor: sel ? 'rgba(6, 182, 212, 0.2)' : 'rgba(30, 41, 59, 0.6)',
@@ -173,7 +187,7 @@ export const SoftTissueBiomechanicsDeck: React.FC<SoftTissueBiomechanicsDeckProp
                     fontWeight: sel ? 600 : 400,
                   }}
                 >
-                  {org.label} <span style={{ fontSize: '0.6rem', opacity: 0.7 }}>({org.youngsModulusKPa} kPa)</span>
+                  {org.label} <span style={{ fontSize: '0.6rem' }}>({org.youngsModulusKPa} kPa)</span>
                 </button>
               );
             })}
@@ -189,7 +203,7 @@ export const SoftTissueBiomechanicsDeck: React.FC<SoftTissueBiomechanicsDeckProp
                 </span>
               </div>
               <div style={{ width: '100%', height: '170px' }}>
-                <svg viewBox="0 0 300 160" style={{ width: '100%', height: '100%', overflow: 'visible' }}>
+                <svg viewBox="0 0 300 160" role="img" aria-label={`Neo-Hookean stress–strain curve for ${organProfile.label}: ${currentStressPoint.cauchyTrueStressKPa} kPa at the current indentation, capsular yield ${organProfile.capsularYieldStressKPa} kPa`} style={{ width: '100%', height: '100%', overflow: 'visible' }}>
                   <defs>
                     <clipPath id={clipId}><rect x="35" y="10" width="250" height="130" /></clipPath>
                   </defs>
@@ -280,11 +294,12 @@ export const SoftTissueBiomechanicsDeck: React.FC<SoftTissueBiomechanicsDeckProp
       {/* TAB 2: Diaphragmatic Shift */}
       {activeTab === 'diaphragm_excursion' && (
         <div>
-          <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '12px' }}>
+          <div role="group" aria-label="Breathing mode" style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '12px' }}>
             {(['tidal', 'deep_inspiration', 'mechanical_peep', 'apnea'] as RespirationMode[]).map((mode) => (
               <button
                 key={mode}
                 type="button"
+                aria-pressed={respirationMode === mode}
                 onClick={() => setRespirationMode(mode)}
                 style={{
                   backgroundColor: respirationMode === mode ? 'rgba(6, 182, 212, 0.2)' : 'rgba(30, 41, 59, 0.6)',
@@ -310,7 +325,7 @@ export const SoftTissueBiomechanicsDeck: React.FC<SoftTissueBiomechanicsDeckProp
                 <span style={{ color: colors.cyan, fontWeight: 700, fontFamily: 'monospace' }}>Δz = -{diaphragmResult.instantaneousDiaphragmDescentMm} mm</span>
               </div>
               <div style={{ width: '100%', height: '170px' }}>
-                <svg viewBox="0 0 300 160" style={{ width: '100%', height: '100%' }}>
+                <svg viewBox="0 0 300 160" role="img" aria-label={`Diaphragm excursion: descent ${diaphragmResult.instantaneousDiaphragmDescentMm} mm, with the liver, stomach, spleen and kidney shifting below it`} style={{ width: '100%', height: '100%' }}>
                   <path d="M 50 20 C 50 120 70 150 150 150 C 230 150 250 120 250 20" fill="none" stroke="#475569" strokeWidth="1.5" strokeDasharray="3 3" />
                   {(() => {
                     const d = Math.min(60, (diaphragmResult.instantaneousDiaphragmDescentMm / 75) * 55);
@@ -380,7 +395,7 @@ export const SoftTissueBiomechanicsDeck: React.FC<SoftTissueBiomechanicsDeckProp
       {/* TAB 3: Peristalsis */}
       {activeTab === 'peristalsis' && (
         <div>
-          <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '12px' }}>
+          <div role="group" aria-label="Gut segment" style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '12px' }}>
             {(Object.keys(GI_PERISTALSIS_CATALOG) as GastrointestinalSegment[]).map((segKey) => {
               const seg = GI_PERISTALSIS_CATALOG[segKey];
               const sel = segKey === selectedSegment;
@@ -388,6 +403,7 @@ export const SoftTissueBiomechanicsDeck: React.FC<SoftTissueBiomechanicsDeckProp
                 <button
                   key={segKey}
                   type="button"
+                  aria-pressed={sel}
                   onClick={() => setSelectedSegment(segKey)}
                   style={{
                     backgroundColor: sel ? 'rgba(6, 182, 212, 0.2)' : 'rgba(30, 41, 59, 0.6)',
@@ -400,7 +416,7 @@ export const SoftTissueBiomechanicsDeck: React.FC<SoftTissueBiomechanicsDeckProp
                     fontWeight: sel ? 600 : 400,
                   }}
                 >
-                  {seg.label} <span style={{ fontSize: '0.65rem', opacity: 0.8 }}>({seg.pacingFrequencyCpm} cpm)</span>
+                  {seg.label} <span style={{ fontSize: '0.65rem' }}>({seg.pacingFrequencyCpm} cpm)</span>
                 </button>
               );
             })}
@@ -413,7 +429,7 @@ export const SoftTissueBiomechanicsDeck: React.FC<SoftTissueBiomechanicsDeckProp
                 <span style={{ color: colors.cyan, fontWeight: 700, fontFamily: 'monospace' }}>t = {simulationTimeSec.toFixed(1)}s</span>
               </div>
               <div style={{ width: '100%', height: '170px' }}>
-                <svg viewBox="0 0 300 160" style={{ width: '100%', height: '100%' }}>
+                <svg viewBox="0 0 300 160" role="img" aria-label={`Peristaltic wave along the ${peristalsisResult.segment.label}: lumen radius ${peristalsisResult.currentLumenRadiusAtProbeMm} mm at the 6 cm probe, ${simulationTimeSec.toFixed(1)} s into the cycle`} style={{ width: '100%', height: '100%' }}>
                   <line x1="30" y1="80" x2="280" y2="80" stroke="#334155" strokeWidth="1" strokeDasharray="3 3" />
                   {(() => {
                     const rMax = peristalsisResult.segment.baselineLumenRadiusMm;
