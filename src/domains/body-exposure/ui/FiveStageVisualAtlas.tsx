@@ -467,7 +467,7 @@ export function FiveStageVisualAtlas({
       >
         <summary className="flex min-h-[44px] cursor-pointer items-center justify-between gap-2 text-xs font-black text-cyan-100">
           <span>Textbook &amp; peer-reviewed journal sources · governing multiscale equations</span>
-          <span className="text-[9px] font-bold uppercase tracking-[.14em] text-white/45">
+          <span className="shrink-0 whitespace-nowrap text-[9px] font-bold uppercase tracking-[.14em] text-white/45">
             {ATLAS_LITERATURE_SOURCES.length} references
           </span>
         </summary>
