@@ -81,7 +81,7 @@ assert.equal(rise.truthClass, 'generic-physiology')
 assert.equal(fall.truthClass, 'generic-physiology')
 assert.throws(() => deriveBaroreflexDirection('noise' as never), /unsupported baroreflex perturbation/i)
 
-for (const ref of ['NCBI Bookshelf NBK538172', 'PMID 24095187']) {
+for (const ref of ['NCBI Bookshelf NBK538172', 'PMID 12228049']) {
   assert.ok(BAROREFLEX_EVIDENCE.some((item) => item.reference === ref), `missing evidence ${ref}`)
 }
 for (const required of ['does not estimate a patient', 'chronic pressure resetting', 'chemoreflexes', 'renal volume control']) {

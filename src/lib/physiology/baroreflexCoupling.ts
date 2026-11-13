@@ -35,9 +35,9 @@ export const BAROREFLEX_EVIDENCE = [
     role: 'Supports carotid-sinus and aortic-arch stretch sensing, CN IX/X afferents, NTS integration, and reciprocal autonomic responses to arterial-pressure perturbation.',
   },
   {
-    id: 'pmid-24095187',
-    reference: 'PMID 24095187',
-    role: 'Review anchor for arterial baroreflex control of sympathetic and parasympathetic cardiovascular outflow.',
+    id: 'pmid-12228049',
+    reference: 'PMID 12228049',
+    role: 'Review (Lanfranchi & Somers 2002): the arterial baroreflex contributes to short-term regulation of blood pressure and cardiovascular variability.',
   },
 ] as const
 
