@@ -53,9 +53,9 @@ test('Holistic Clarity: Atlas Home WideStage exposes quick-links to canonical at
   assert.ok(fs.existsSync(filePath), 'StageFrame.tsx must exist')
   const content = fs.readFileSync(filePath, 'utf8')
 
-  assert.ok(content.includes('to="/body-exposure/canonical"'), 'WideStage must link to canonical 3D')
-  assert.ok(content.includes('to="/body-exposure/fetal-dataset"'), 'WideStage must link to fetal dataset')
-  assert.ok(content.includes('to="/radiology"'), 'WideStage must link to radiology MPR')
+  assert.ok(content.includes('href="#/body-exposure/canonical"'), 'WideStage must link to canonical 3D')
+  assert.ok(content.includes('href="#/body-exposure/fetal-dataset"'), 'WideStage must link to fetal dataset')
+  assert.ok(content.includes('href="#/radiology"'), 'WideStage must link to radiology MPR')
 })
 
 test('Holistic Clarity: Radiology workspace links to Atlas Home and Body Explorer without broken hash links', () => {

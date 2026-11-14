@@ -5,7 +5,6 @@
 // gesture and the measured height it snaps within.
 
 import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent, type ReactNode } from 'react'
-import { Link } from 'react-router-dom'
 import { nextSnap, sheetHeight, snapAfterDrag, type SheetSnap } from '../../engine/atlas-stage/sheetSnap'
 import type { AtlasPlateMode } from '../../engine/atlas-stage/stageLayers'
 import { STAGE_CSS, STAGE_ROOT_CLASS, TONE, eyebrow, glass, rootFrame, stageGlow, subtleButton } from './stageTokens'
@@ -50,15 +49,15 @@ export function WideStage({ plate, depth, viewer, search, rail, regionChips, ref
               <span style={{ fontSize: 12, color: TONE.faint }}>{caption}</span>
             </div>
             <nav aria-label="Atlas modules" style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11 }}>
-              <Link to="/body-exposure/canonical" style={{ color: TONE.dim, textDecoration: 'none', padding: '2px 8px', borderRadius: 6, border: `1px solid ${TONE.line}`, background: 'rgba(255,255,255,0.02)' }}>
+              <a href="#/body-exposure/canonical" style={{ color: TONE.dim, textDecoration: 'none', padding: '2px 8px', borderRadius: 6, border: `1px solid ${TONE.line}`, background: 'rgba(255,255,255,0.02)' }}>
                 Canonical 3D
-              </Link>
-              <Link to="/body-exposure/fetal-dataset" style={{ color: TONE.dim, textDecoration: 'none', padding: '2px 8px', borderRadius: 6, border: `1px solid ${TONE.line}`, background: 'rgba(255,255,255,0.02)' }}>
+              </a>
+              <a href="#/body-exposure/fetal-dataset" style={{ color: TONE.dim, textDecoration: 'none', padding: '2px 8px', borderRadius: 6, border: `1px solid ${TONE.line}`, background: 'rgba(255,255,255,0.02)' }}>
                 Fetal Dataset
-              </Link>
-              <Link to="/radiology" style={{ color: TONE.dim, textDecoration: 'none', padding: '2px 8px', borderRadius: 6, border: `1px solid ${TONE.line}`, background: 'rgba(255,255,255,0.02)' }}>
+              </a>
+              <a href="#/radiology" style={{ color: TONE.dim, textDecoration: 'none', padding: '2px 8px', borderRadius: 6, border: `1px solid ${TONE.line}`, background: 'rgba(255,255,255,0.02)' }}>
                 Radiology MPR
-              </Link>
+              </a>
             </nav>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
