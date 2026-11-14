@@ -219,18 +219,18 @@ gagal('katalog_bawaan_semua_sitasi_terverifikasi_ledger', () => {
       assert.equal(citation.url, kanonik)
     }
   }
-  assert.equal(jumlah, 27, 'jumlah sitasi yang ditampilkan (terukur: 16 mekanisme, 27 sitasi)')
+  assert.equal(jumlah, 38, 'jumlah sitasi yang ditampilkan (terukur: 20 mekanisme, 38 sitasi; 11 dari empat kopling fisiologi)')
 })
 gagal('katalog_bawaan_jumlah_terukur', () => {
   // Diukur dari data saat mesin ini dibuat. Menambah fisiologi bersumber menaikkan angka ini — ubah secara sadar.
-  assert.equal(katalog.mechanisms.length, 16)
+  assert.equal(katalog.mechanisms.length, 20)
   assert.equal(katalog.gaps.length, 17)
   const index = planSystemIndex(katalog)
   assert.equal(index.ok, true)
   if (!index.ok) return
   assert.deepEqual(index.rows.map((row) => [row.id, row.mechanismCount, row.gapCount, row.sourced]), [
-    ['cardiovascular', 1, 0, true], ['nervous', 1, 0, true], ['respiratory', 3, 1, true], ['digestive', 3, 7, true],
-    ['urinary', 2, 2, true], ['endocrine', 4, 2, true], ['reproductive', 1, 3, true], ['lymphatic-immune', 1, 2, true],
+    ['cardiovascular', 4, 0, true], ['nervous', 2, 0, true], ['respiratory', 5, 1, true], ['digestive', 3, 7, true],
+    ['urinary', 3, 2, true], ['endocrine', 4, 2, true], ['reproductive', 1, 3, true], ['lymphatic-immune', 1, 2, true],
     ['musculoskeletal', 0, 0, false], ['sensory-ent', 0, 0, false], ['integumentary-surface', 1, 0, true],
   ])
 })
@@ -281,10 +281,26 @@ gagal('mekanisme_bersama_muncul_di_kedua_sistem', () => {
   assert.deepEqual(baro('cardiovascular')!.citations.map((c) => c.id), ['NBK538172', '12228049'])
   assert.equal(baro('cardiovascular')!.summary.at(-2), 'When arterial pressure rises: baroreceptor stretch increases, afferent firing increases, sympathetic outflow decreases, vagal outflow increases, heart rate decreases, contractility decreases, arteriolar tone decreases, venous tone decreases.')
 })
+gagal('kopling_fisiologi_tampil_di_setiap_sistem_yang_digabungkannya', () => {
+  const ids = (id: BodySystemId) => tampilan(id).mechanisms.map((m) => m.id)
+  assert.deepEqual(ids('cardiovascular'), ['arterial-baroreflex', 'pressure-flow-chain', 'cerebral-perfusion-pressure', 'fick-oxygen-mass-balance'])
+  assert.deepEqual(ids('nervous'), ['arterial-baroreflex', 'cerebral-perfusion-pressure'])
+  assert.deepEqual(ids('respiratory').slice(-2), ['acid-base-bicarbonate-buffer', 'fick-oxygen-mass-balance'])
+  assert.deepEqual(ids('urinary').slice(-1), ['acid-base-bicarbonate-buffer'])
+  const sumber = (id: string) => katalog.mechanisms.find((m) => m.id === id)!.citations.map((c) => c.id)
+  assert.deepEqual(sumber('pressure-flow-chain'), ['NBK556075', 'NBK470455', 'NBK538226', 'NBK537271'])
+  assert.deepEqual(sumber('cerebral-perfusion-pressure'), ['NBK537271', 'NBK482119'])
+  assert.deepEqual(sumber('acid-base-bicarbonate-buffer'), ['NBK308', 'NBK493167', 'NBK536919'])
+  assert.deepEqual(sumber('fick-oxygen-mass-balance'), ['NBK606091', 'NBK493219'])
+  // Klaim tetap kata demi kata dari modul sumber; judul ditampilkan bila modul menyertakannya.
+  assert.equal(katalog.mechanisms.find((m) => m.id === 'pressure-flow-chain')!.citations[0].note,
+    'Physiology, Systemic Vascular Resistance: Systemic vascular resistance relates the mean arterial-to-venous pressure drop to cardiac output.')
+  for (const m of katalog.mechanisms.filter((x) => x.origin.includes('/physiology/'))) assert.deepEqual(m.summary.length > 0, m.id === 'arterial-baroreflex', `${m.id}: ringkasan hanya dari data modul`)
+})
 gagal('celah_organ_parsial_bila_sebagian_bersumber', () => {
   const urinarius = tampilan('urinary')
   assert.deepEqual(urinarius.organGaps.map((g) => [g.subject, g.partial]), [['Kidney', true], ['Urinary bladder', false]])
-  assert.deepEqual(urinarius.mechanisms.map((m: PhysiologyMechanism) => m.id), ['renal-autoregulation-context', 'kidney-glomerulus-filtration'])
+  assert.deepEqual(urinarius.mechanisms.map((m: PhysiologyMechanism) => m.id), ['renal-autoregulation-context', 'kidney-glomerulus-filtration', 'acid-base-bicarbonate-buffer'])
 })
 gagal('sistem_tanpa_sumber_tetap_terencana_dengan_jujur', () => {
   const muskulo = tampilan('musculoskeletal')
