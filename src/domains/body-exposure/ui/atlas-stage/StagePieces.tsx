@@ -52,11 +52,18 @@ export function Segmented<T extends string>({ label, value, options, onChange }:
   )
 }
 
-/** The bar that says which picked structure a stage is coupled to, with a way to clear it. */
-export function CouplingBadge({ prefix, name, layer, onClear, children }: { prefix: string; name: string; layer: string; onClear: () => void; children?: ReactNode }) {
+const COUPLED = { background: 'rgba(0, 191, 99, 0.08)', border: '1px solid rgba(0, 191, 99, 0.25)', color: TONE.liveText, dot: TONE.live }
+const UNCOUPLED = { background: TONE.raised, border: `1px solid ${TONE.line}`, color: TONE.dim, dot: TONE.faint }
+
+/**
+ * The bar that says which picked structure a stage is coupled to, with a way to clear it. Green only when the
+ * stage really is coupled to the pick; a pick nothing here models keeps the neutral tone.
+ */
+export function CouplingBadge({ prefix, name, layer, onClear, coupled = true, children }: { prefix: string; name: string; layer: string; onClear: () => void; coupled?: boolean; children?: ReactNode }) {
+  const tone = coupled ? COUPLED : UNCOUPLED
   return (
-    <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '4px 8px', padding: '4px 4px 4px 12px', borderRadius: 12, background: 'rgba(0, 191, 99, 0.08)', border: '1px solid rgba(0, 191, 99, 0.25)', color: TONE.liveText, fontSize: 12, fontWeight: 600 }}>
-      <span aria-hidden style={{ width: 6, height: 6, borderRadius: '50%', background: TONE.live, flex: 'none' }} />
+    <div data-coupled={coupled} style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '4px 8px', padding: '4px 4px 4px 12px', borderRadius: 12, background: tone.background, border: tone.border, color: tone.color, fontSize: 12, fontWeight: 600 }}>
+      <span aria-hidden style={{ width: 6, height: 6, borderRadius: '50%', background: tone.dot, flex: 'none' }} />
       <span style={{ flex: '1 1 auto', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
         {prefix} <b>{name}</b> ({layer})
       </span>

@@ -131,3 +131,17 @@ test('AtlasHome: every short segment label is contained in its accessible name (
     assert.ok(visible.length <= 11, `${id}: "${visible}" is too long for a quarter of the phone panel`)
   }
 })
+
+test('AtlasHome: a pick no deck models claims no deck and no clinical target', () => {
+  const content = fs.readFileSync(path.join(process.cwd(), 'src', 'domains', 'body-exposure', 'ui', 'BodyExposureAtlasHome.tsx'), 'utf8')
+  // The routing is the pure routePick (scripts/uji/atlas-pick-route.mts); the stage only applies it.
+  assert.ok(content.includes('const route = routePick(info)'), 'a pick must be routed by routePick')
+  assert.ok(!/decksFor\(info\)/.test(content), 'the stage must not route a pick around routePick')
+  assert.ok(content.includes('if (route.clinicalTool) setClinicalTool(route.clinicalTool)'), 'no clinical tool is forced when nothing targets the structure')
+  // The badges say how the pick is coupled; "Clinical target" only when a deck models the structure.
+  assert.ok(content.includes("prefix={pickRoute?.basis === 'deck' ? 'Clinical target:' : 'No clinical tool for:'}"), 'clinical badge must not claim a target without a deck')
+  assert.ok(content.includes("prefix={pickRoute?.basis === 'unmapped' ? 'Not yet mapped:' : 'Coupled to:'}"), 'physiology badge must say when a structure is not mapped')
+  // The green "coupled" tone follows the same basis as the words.
+  assert.ok(content.includes("coupled={pickRoute?.basis === 'deck'}"), 'clinical badge must be green only for a deck target')
+  assert.ok(content.includes("coupled={pickRoute?.basis !== 'unmapped'}"), 'physiology badge must be green only when coupled')
+})
