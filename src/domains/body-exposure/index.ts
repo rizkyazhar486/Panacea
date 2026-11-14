@@ -465,5 +465,14 @@ export {
   diagnosticImagingEngine,
 } from './engine/structureAtlas'
 
+// — ORGANIC MULTI-SCALE ATLAS DECK RESOLUTION —
+export {
+  decksFor,
+  type PhysiologySystem,
+  type ClinicalTool,
+  type StructureCouplingContext,
+} from './engine/atlasStageDecks'
+
+
 
 
