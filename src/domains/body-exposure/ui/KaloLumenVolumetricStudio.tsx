@@ -2,7 +2,7 @@
 // KaloLumen 3-Layer DICOM Volumetric Raymarching & Multi-Planar Reconstruction (MPR) Studio
 // Dual-projection responsive UI built with scoped inline styles to protect bundle budget
 
-import React, { useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import {
   DIAGNOSTIC_CT_PRESETS,
   computeDirectionalLightVector,
@@ -17,8 +17,18 @@ import {
   type MultiPlanarViewMode,
 } from '../engine/kaloLumenDicomEngine.ts'
 
-export function KaloLumenVolumetricStudio(): React.ReactElement {
-  const [selectedPresetId, setSelectedPresetId] = useState<DiagnosticCtWindowPresetId>('MEDIASTINUM_SOFT_TISSUE')
+export interface KaloLumenVolumetricStudioProps {
+  readonly initialPresetId?: DiagnosticCtWindowPresetId
+}
+
+export function KaloLumenVolumetricStudio({ initialPresetId = 'MEDIASTINUM_SOFT_TISSUE' }: KaloLumenVolumetricStudioProps = {}): React.ReactElement {
+  const [selectedPresetId, setSelectedPresetId] = useState<DiagnosticCtWindowPresetId>(initialPresetId)
+
+  useEffect(() => {
+    if (initialPresetId) {
+      setSelectedPresetId(initialPresetId)
+    }
+  }, [initialPresetId])
   const [viewMode, setViewMode] = useState<MultiPlanarViewMode>('VOLUMETRIC_3D')
   const [azimuth, setAzimuth] = useState<number>(45)
   const [elevation, setElevation] = useState<number>(30)

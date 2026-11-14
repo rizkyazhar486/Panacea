@@ -1,4 +1,4 @@
-import React, { useState, useId } from 'react';
+import React, { useState, useId, useEffect } from 'react';
 import {
   ORGAN_BIOMECHANICS_CATALOG,
   OrganMechanicalId,
@@ -78,6 +78,14 @@ export const SoftTissueBiomechanicsDeck: React.FC<SoftTissueBiomechanicsDeckProp
 }) => {
   const [activeTab, setActiveTab] = useState<BiomechanicsDeckTab>(DECK_TABS.includes(initialTab) ? initialTab : 'palpation');
   const [selectedOrganId, setSelectedOrganId] = useState<OrganMechanicalId>(initialOrganId);
+
+  useEffect(() => {
+    if (initialOrganId) setSelectedOrganId(initialOrganId);
+  }, [initialOrganId]);
+
+  useEffect(() => {
+    if (initialTab && DECK_TABS.includes(initialTab)) setActiveTab(initialTab);
+  }, [initialTab]);
   const [indentationDepthMm, setIndentationDepthMm] = useState<number>(4.0);
   const [indentationVelocityMmS, setIndentationVelocityMmS] = useState<number>(10.0);
   const [toolTipRadiusMm, setToolTipRadiusMm] = useState<number>(2.5);
