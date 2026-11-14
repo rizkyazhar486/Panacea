@@ -1,1 +1,3 @@
-export * from './omnicausalis/index.ts';
+export * from './omnicausalis/model/types.ts';
+export * from './omnicausalis/engine/omnicausalisEngine.ts';
+
