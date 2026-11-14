@@ -46,6 +46,9 @@ import { PRESSURE_FLOW_BOUNDARY, PRESSURE_FLOW_EVIDENCE } from '../../../../lib/
 import { CEREBRAL_PERFUSION_BOUNDARY, CEREBRAL_PERFUSION_EVIDENCE } from '../../../../lib/physiology/cerebralPerfusionCoupling.ts'
 import { ACID_BASE_COUPLING_BOUNDARY, ACID_BASE_COUPLING_EVIDENCE } from '../../../../lib/physiology/acidBaseCoupling.ts'
 import { FICK_OXYGEN_EXTRACTION_BOUNDARY, FICK_OXYGEN_EXTRACTION_EVIDENCE } from '../../../../lib/physiology/fickOxygenExtraction.ts'
+import { MUSCULOSKELETAL_PHYSIOLOGY } from '../../data/education/musculoskeletalPhysiology.ts'
+import { SENSORY_PHYSIOLOGY } from '../../data/education/sensoryPhysiology.ts'
+import type { SourcedPhysiology } from '../../data/education/sourcedPhysiology.ts'
 import {
   readEducationNetwork,
   readEducationSources,
@@ -59,6 +62,7 @@ import {
 import type { SystemPhysiologyCatalog } from './systemPhysiology.ts'
 
 const lib = (file: string) => `src/lib/${file}`
+const domainData = (file: string) => `src/domains/body-exposure/data/education/${file}`
 
 /** System-wide graphs first, then one graph per organ. The system of each comes from the graph's own constant. */
 export const EDUCATION_SOURCES: readonly EducationSource[] = [
@@ -171,6 +175,12 @@ export function couplingMechanismInputs(): ReferencedMechanismInput[] {
   ]
 }
 
+/** Physiology written for the systems the older graphs left without any source; read like every other mechanism. */
+export const DOMAIN_PHYSIOLOGY: readonly { origin: string; entries: readonly SourcedPhysiology[] }[] = [
+  { origin: domainData('musculoskeletalPhysiology.ts'), entries: MUSCULOSKELETAL_PHYSIOLOGY },
+  { origin: domainData('sensoryPhysiology.ts'), entries: SENSORY_PHYSIOLOGY },
+]
+
 function build(): SystemPhysiologyCatalog {
   const labels = new Map(BODY_SYSTEM_SOURCE_WAVE.map((system) => [system.id, system.label] as const))
   const mechanisms: PhysiologyMechanism[] = []
@@ -196,6 +206,7 @@ function build(): SystemPhysiologyCatalog {
 
   keep(readReferencedMechanism(baroreflexMechanismInput(), labels))
   for (const input of couplingMechanismInputs()) keep(readReferencedMechanism(input, labels))
+  for (const { origin, entries } of DOMAIN_PHYSIOLOGY) for (const entry of entries) keep(readReferencedMechanism({ ...entry, origin }, labels))
 
   return {
     systems: BODY_SYSTEM_SOURCE_WAVE.map(({ id, label }) => ({ id, label })),
