@@ -4,12 +4,14 @@
 // LCP/CLS/tugas panjang dikumpulkan dengan PerformanceObserver sejak dokumen mulai; TBT = jumlah (durasi - 50 ms) tugas panjang setelah FCP (proksi lab untuk INP);
 // ukuran = encodedBodySize sumber daya (tanpa kompresi di server preview, jadi sama dengan ukuran berkas). Acuan anggaran = ambang "baik" Web Vitals
 // (scripts/qa/perf-stats.mjs). BATAS: runner CI bukan perangkat pengguna dan tidak ada data lapangan (RUM); angka ini bukti lab, bukan klaim pengalaman pengguna.
-// Mode: LAPORAN (tanpa baseline) — gagal hanya bila sebuah halaman tidak dapat diukur sama sekali. Ratchet dari nilai terukur CI adalah langkah berikutnya.
+// Mode: tanpa PERF_BASELINE = LAPORAN (gagal hanya bila halaman tidak dapat diukur). Dengan PERF_BASELINE (CI) = GERBANG ratchet pada bytesJs, requests
+// dan CLS (scripts/qa/perf-ratchet.mjs); LCP/TBT hanya dilaporkan karena terlalu bising antar-run runner untuk digerbang.
 //
 // Jalankan: server API dan `vite preview` (build produksi) aktif, lalu
 //   PLAYWRIGHT_MODULE=<path>/playwright/index.js CHROME=<path chrome> QA_OUT=<json> QA_URL=http://localhost:5191/ node scripts/qa/perf-audit.mjs
-import { writeFileSync } from 'node:fs'
+import { readFileSync, writeFileSync } from 'node:fs'
 import { ANGGARAN, agregat, cumulativeLayoutShift, statusAnggaran, totalBlockingTime } from './perf-stats.mjs'
+import { bandingkanPerf } from './perf-ratchet.mjs'
 import { enoughPerfEvidence, minimumPerfSamples, perfSampleProblem } from './perf-sample-coverage.mjs'
 
 const pw = await import(process.env.PLAYWRIGHT_MODULE || 'playwright')
@@ -91,3 +93,11 @@ writeFileSync(process.env.QA_OUT || 'perf-evidence.json', JSON.stringify(ringkas
 for (const r of hasil) console.log(`${r.viewport} ${r.halaman.padEnd(15)} n=${r.sampelSah} lcp=${r.agg.lcpMs.median?.toFixed(0) ?? '-'}ms cls=${r.agg.cls.median?.toFixed(3) ?? '-'} tbt=${r.agg.tbtMs.median?.toFixed(0) ?? '-'}ms js=${r.agg.bytesJs.median ?? '-'}B req=${r.agg.requests.median ?? '-'} [${r.anggaran.lcpMs}/${r.anggaran.cls}/${r.anggaran.tbtMs}]`)
 console.log(`perf-audit: ${hasil.length} pengukuran; anggaran lulus ${ringkas.ringkasanAnggaran.lulus}, melebihi ${ringkas.ringkasanAnggaran.melebihi}, tak terukur ${ringkas.ringkasanAnggaran.takTerukur}; halaman dengan sampel metrik lengkap kurang dari mayoritas: ${gagalUkur}`)
 if (gagalUkur > 0) { console.error(`perf-audit: ${gagalUkur} halaman tidak cukup sampel metrik lengkap`); process.exit(1) }
+if (process.env.PERF_BASELINE) {
+  let baseline = null
+  try { baseline = JSON.parse(readFileSync(process.env.PERF_BASELINE, 'utf8')) } catch (e) { console.error(`perf-audit: PERF_BASELINE tidak terbaca: ${e.message}`) }
+  const gagalRatchet = bandingkanPerf(hasil, baseline)
+  for (const g of gagalRatchet) console.error(`perf-audit ratchet: ${g}`)
+  if (gagalRatchet.length > 0) process.exit(1)
+  console.log(`perf-audit ratchet: lulus (${hasil.length} pengukuran vs ${process.env.PERF_BASELINE})`)
+}
