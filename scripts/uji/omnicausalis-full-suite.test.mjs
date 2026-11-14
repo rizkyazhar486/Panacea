@@ -1166,7 +1166,7 @@ test("56. [WAVE 37 INFRASTRUCTURE 4: OMNICAUSALIS HTTP/REST GATEWAY & /body-expo
 
 
 // ============================================================================
-// WAVE 120: PANACEAMED PRE-2030 VISUAL MEDICAL OS & POST-2030 DAILY-NEEDS GRID
+// WAVE 140: PANACEAMED PRE-2030 VISUAL MEDICAL OS & POST-2030 DAILY-NEEDS GRID
 // ============================================================================
 import {
   conditionEdgeSensoriumAndDualSpine,
@@ -1175,7 +1175,7 @@ import {
   evaluateMasterplanGovernanceAlgorithms
 } from "../../src/core/panaceamedMasterplanHorizonEngine.mjs";
 
-test("57. [WAVE 120 HORIZON I PILLAR 1: EDGE SENSORIUM CONDITIONING, DUAL-PATHWAY SPINE & 4D VISUAL OS]", () => {
+test("57. [WAVE 140 HORIZON I PILLAR 1: EDGE SENSORIUM CONDITIONING, DUAL-PATHWAY SPINE & 4D VISUAL OS]", () => {
   const res = conditionEdgeSensoriumAndDualSpine({
     patientId: "PNC-IDN-001",
     organTarget: "CORONARY_MYOCARDIUM_4D",
@@ -1197,7 +1197,7 @@ test("57. [WAVE 120 HORIZON I PILLAR 1: EDGE SENSORIUM CONDITIONING, DUAL-PATHWA
   assert.ok(res.visualMedicalOs4D.calibratedConfidence > 0.95);
 });
 
-test("58. [WAVE 120 HORIZON I PILLAR 2: 4D STATE-SPACE CORTEX, N-OF-1 Z-SCORE DRIFT & ZERO-CLICK CLINICAL LOOP]", () => {
+test("58. [WAVE 140 HORIZON I PILLAR 2: 4D STATE-SPACE CORTEX, N-OF-1 Z-SCORE DRIFT & ZERO-CLICK CLINICAL LOOP]", () => {
   const res = evaluate4DStateSpaceAndClinicalLoop({
     patientId: "PNC-IDN-001",
     activeMedications: ["CLOPIDOGREL"],
@@ -1214,7 +1214,7 @@ test("58. [WAVE 120 HORIZON I PILLAR 2: 4D STATE-SPACE CORTEX, N-OF-1 Z-SCORE DR
   assert.strictEqual(res.phase0Gate.phase0Status, "PROCEED_TO_PHASE_1_WEDGE");
 });
 
-test("59. [WAVE 120 HORIZON II PILLAR 3: POST-2030 CIVILIZATIONAL EFFECTOR GRID & 6 DAILY-NEED LINEAGES]", () => {
+test("59. [WAVE 140 HORIZON II PILLAR 3: POST-2030 CIVILIZATIONAL EFFECTOR GRID & 6 DAILY-NEED LINEAGES]", () => {
   const res = actuateCivilizationalDailyNeedsGrid({
     interstitialGlucoseMgDl: 132,
     bloodLactateMmolL: 2.4,
@@ -1244,7 +1244,7 @@ test("59. [WAVE 120 HORIZON II PILLAR 3: POST-2030 CIVILIZATIONAL EFFECTOR GRID 
   assert.strictEqual(res.lineages.lineageF_Actuarial.dynamicPremiumDiscountPct, 42.5);
 });
 
-test("60. [WAVE 120 GOVERNANCE PILLAR 4: 5-AXIS PRIORITY SCORING, CLOSED-LOOP FLYWHEEL & NORTH-STAR ENGINE]", () => {
+test("60. [WAVE 140 GOVERNANCE PILLAR 4: 5-AXIS PRIORITY SCORING, CLOSED-LOOP FLYWHEEL & NORTH-STAR ENGINE]", () => {
   const approved = evaluateMasterplanGovernanceAlgorithms({
     candidateInitiative: "4D_CARDIOMETABOLIC_TELEMETRY_AND_HABITAT_ACTUATION"
   });
@@ -1264,7 +1264,7 @@ test("60. [WAVE 120 GOVERNANCE PILLAR 4: 5-AXIS PRIORITY SCORING, CLOSED-LOOP FL
 });
 
 
-// === WAVE 39 & WAVE 120 OMNICAUSALIS APEX EXPANSION (TESTS 61-70) ===
+// === WAVE 39 & WAVE 140 OMNICAUSALIS APEX EXPANSION (TESTS 61-70) ===
 import * as apexEngine from '../../src/core/panaceamedOmnicausalisApexEngine.mjs';
 
 test('61. [WAVE 39 PILLAR 1A: SDPTG SECOND-DERIVATIVE PPG FIDUCIALS & TAKAZAWA VASCULAR AGING INDEX]', () => {
@@ -1350,7 +1350,7 @@ test('66. [WAVE 39 PILLAR 3B: SATUSEHAT FHIR R4 KFA CODING & DETECTEDISSUE PROVE
   assert.equal(medReqEntries[0].resource.medicationCodeableConcept.coding[0].system, 'http://sys-ids.kemkes.go.id/kfa');
 });
 
-test('67. [WAVE 120 PILLAR 1A: N-OF-1 MAHALANOBIS Z-SCORE DRIFT & ZERO-CLICK V2X ROBOTAXI STEMI CATH-LAB PRE-ACTIVATION]', () => {
+test('67. [WAVE 140 PILLAR 1A: N-OF-1 MAHALANOBIS Z-SCORE DRIFT & ZERO-CLICK V2X ROBOTAXI STEMI CATH-LAB PRE-ACTIVATION]', () => {
   const res = apexEngine.evaluateWave40AutonomousV2xTriageBridge({
     liveTelemetry: { hrBpm: 124, spo2Pct: 90.5, sbpMmHg: 172, ecgStElevationMm: 3.2, unilateralArmDriftPositive: false }
   });
@@ -1360,7 +1360,7 @@ test('67. [WAVE 120 PILLAR 1A: N-OF-1 MAHALANOBIS Z-SCORE DRIFT & ZERO-CLICK V2X
   assert.equal(res.autonomousV2xDispatch.cabinEffectorCommand.cabinO2EnrichmentPct, 35);
 });
 
-test('68. [WAVE 120 PILLAR 1B: WAVES 21-37 UNIFIED CLINICAL REGRESSION (LAMPORT, WEBGPU, THT-KL, SLEDAI-2K, SCUBA)]', () => {
+test('68. [WAVE 140 PILLAR 1B: WAVES 21-37 UNIFIED CLINICAL REGRESSION (LAMPORT, WEBGPU, THT-KL, SLEDAI-2K, SCUBA)]', () => {
   const w21 = apexEngine.evaluateWave21LamportAndNutrition();
   const w33 = apexEngine.evaluateWave33To36WebGpuAndClerkship();
   const w37 = apexEngine.evaluateWave37SpecialtyClinicalTriad();
@@ -1371,14 +1371,14 @@ test('68. [WAVE 120 PILLAR 1B: WAVES 21-37 UNIFIED CLINICAL REGRESSION (LAMPORT,
   assert.equal(w37.hyperbaricDiveMedicine.maxOperatingDepthMetersAt1_4Ata, 33.75);
 });
 
-test('69. [WAVE 120 PILLAR 2A: POST-2030 6 DAILY-NEED LINEAGES & 5-AXIS GOVERNANCE NORTH-STAR ENGINE]', () => {
+test('69. [WAVE 140 PILLAR 2A: POST-2030 6 DAILY-NEED LINEAGES & 5-AXIS GOVERNANCE NORTH-STAR ENGINE]', () => {
   const master = apexEngine.runOmnicausalisApexMasterFlywheel();
   assert.equal(Object.keys(master.civilizationalSixLineages).length, 6);
   assert.ok(master.compositeNorthStarIndex >= 95.0);
   assert.equal(master.fiveAxisGovernance.satusehatR4InteroperabilityScore, 100);
 });
 
-test('70. [WAVE 120 PILLAR 2B: DETERMINISTIC SHA-256 AUDIT LEDGER & SUB-15MS RUNTIME VERIFICATION]', () => {
+test('70. [WAVE 140 PILLAR 2B: DETERMINISTIC SHA-256 AUDIT LEDGER & SUB-15MS RUNTIME VERIFICATION]', () => {
   const run1 = apexEngine.runOmnicausalisApexMasterFlywheel();
   const run2 = apexEngine.runOmnicausalisApexMasterFlywheel();
   assert.equal(run1.sha256ProvenanceSeal.length, 64);
@@ -1387,7 +1387,7 @@ test('70. [WAVE 120 PILLAR 2B: DETERMINISTIC SHA-256 AUDIT LEDGER & SUB-15MS RUN
 });
 
 
-// === WAVE 41 TO WAVE 120 OMNICAUSALIS SINGULARITY & NOBLE PROSPERITY EXPANSION (TESTS 71-90) ===
+// === WAVE 41 TO WAVE 140 OMNICAUSALIS SINGULARITY & NOBLE PROSPERITY EXPANSION (TESTS 71-90) ===
 import * as nodeFs from 'node:fs';
 import * as nodePath from 'node:path';
 import * as singularityEngine from '../../src/core/panaceamedOmnicausalisSingularityEngine.mjs';
@@ -1506,41 +1506,41 @@ test('85. [WAVE 45 PILLAR 5C: UNIFIED SINGULARITY MASTER ENGINE (WAVES 21-45) DE
   assert.ok(runA.executionDurationMs < 50);
 });
 
-test('86. [WAVE 120 NOBLE PILLAR 1: FEDERATED HOSPITAL COOPERATION MESH & ZERO-KNOWLEDGE OPEN FHIR COMMONS]', () => {
+test('86. [WAVE 140 NOBLE PILLAR 1: FEDERATED HOSPITAL COOPERATION MESH & ZERO-KNOWLEDGE OPEN FHIR COMMONS]', () => {
   const res = singularityEngine.evaluateWave46NobleProsperityAndDiscoveryCommons();
   assert.equal(res.federatedCooperationMesh.participatingNodeCount, 3);
   assert.equal(res.federatedCooperationMesh.totalPatientsProtected, 44000);
   assert.equal(res.federatedCooperationMesh.allNodesOpenFhir, true);
 });
 
-test('87. [WAVE 120 NOBLE PILLAR 2: OPEN-SCIENCE SENOLYTIC & GENOMIC DISCOVERY ENGINE]', () => {
+test('87. [WAVE 140 NOBLE PILLAR 2: OPEN-SCIENCE SENOLYTIC & GENOMIC DISCOVERY ENGINE]', () => {
   const res = singularityEngine.evaluateWave46NobleProsperityAndDiscoveryCommons();
   assert.equal(res.openDiscoveryEngine.discoveryStatus, 'ACTIVE_OPEN_SCIENCE_COMMONS_SYNTHESIS');
   assert.ok(res.openDiscoveryEngine.novelSenolyticTargetsDiscovered >= 4);
   assert.ok(res.ninePillarsHarmonyMatrix.discoveryYieldIndex >= 95);
 });
 
-test('88. [WAVE 120 NOBLE PILLAR 3: HOUSEHOLD HEALTHSPAN PROSPERITY DIVIDEND & COMMUNITY TOGETHERNESS SOLIDARITY]', () => {
+test('88. [WAVE 140 NOBLE PILLAR 3: HOUSEHOLD HEALTHSPAN PROSPERITY DIVIDEND & COMMUNITY TOGETHERNESS SOLIDARITY]', () => {
   const res = singularityEngine.evaluateWave46NobleProsperityAndDiscoveryCommons();
   assert.equal(res.ninePillarsHarmonyMatrix.togethernessSolidarityIndex, 100);
   assert.ok(res.ninePillarsHarmonyMatrix.prosperityDividendIndex >= 95);
 });
 
-test('89. [WAVE 120 NOBLE PILLAR 4: CREATIVE BIOMARKER NOVELTY & HIPPOCRATIC NOBLE STEWARDSHIP VERIFICATION]', () => {
+test('89. [WAVE 140 NOBLE PILLAR 4: CREATIVE BIOMARKER NOVELTY & HIPPOCRATIC NOBLE STEWARDSHIP VERIFICATION]', () => {
   const res = singularityEngine.evaluateWave46NobleProsperityAndDiscoveryCommons();
   assert.ok(res.ninePillarsHarmonyMatrix.creativityIndex >= 95);
   assert.ok(res.ninePillarsHarmonyMatrix.noveltyEmergenceIndex >= 95);
   assert.equal(res.ninePillarsHarmonyMatrix.nobleStewardshipIndex, 100);
 });
 
-test('90. [WAVE 120 NOBLE PILLAR 5: NINE-PILLAR CIVILIZATIONAL HARMONY CONVERGENCE (150/150 MASTER GATE)]', () => {
+test('90. [WAVE 140 NOBLE PILLAR 5: NINE-PILLAR CIVILIZATIONAL HARMONY CONVERGENCE (170/170 MASTER GATE)]', () => {
   const res = singularityEngine.evaluateWave46NobleProsperityAndDiscoveryCommons();
   assert.ok(res.compositeNobleProsperityScore >= 96);
   assert.equal(res.civilizationalVerdict, 'NOBLE_COOPERATIVE_PROSPERITY_ACHIEVED');
 });
 
 
-// === WAVE 47 TO WAVE 120 NEXT-GEN ARGON CORTEX & HYDROGEN SPINE EXPANSION (TESTS 91-110) ===
+// === WAVE 47 TO WAVE 140 NEXT-GEN ARGON CORTEX & HYDROGEN SPINE EXPANSION (TESTS 91-110) ===
 import * as nextGenArgon from '../../src/core/panaceamedNextGenArgonCortex.mjs';
 import * as nextGenHydrogen from '../../src/core/panaceamedNextGenHydrogenSpine.mjs';
 
@@ -1666,7 +1666,7 @@ test('108. [WAVE 59 HYDROGEN SPINE 4B: ZERO-CLICK CATH-LAB & NEURO-ICU PRE-ARRIV
   assert.equal(res.cathLabPreActivated, true);
 });
 
-test('109. [WAVE 120 TANDEM MASTER 5A: ARGON CORTEX x HYDROGEN SPINE UNIFIED ORCHESTRATOR DETERMINISM]', () => {
+test('109. [WAVE 140 TANDEM MASTER 5A: ARGON CORTEX x HYDROGEN SPINE UNIFIED ORCHESTRATOR DETERMINISM]', () => {
   const run1 = nextGenHydrogen.runPanaceaMedNextGenTandemOrchestrator();
   const run2 = nextGenHydrogen.runPanaceaMedNextGenTandemOrchestrator();
   assert.equal(run1.tandemSha256Seal.length, 64);
@@ -1674,7 +1674,7 @@ test('109. [WAVE 120 TANDEM MASTER 5A: ARGON CORTEX x HYDROGEN SPINE UNIFIED ORC
   assert.ok(run1.executionDurationMs < 25);
 });
 
-test('110. [WAVE 120 TANDEM MASTER 5B: LIVE COCKPIT SERVER DAEMON (scripts/start-cockpit.mjs) INTEGRITY]', () => {
+test('110. [WAVE 140 TANDEM MASTER 5B: LIVE COCKPIT SERVER DAEMON (scripts/start-cockpit.mjs) INTEGRITY]', () => {
   const daemonPath = nodePath.resolve('scripts/start-cockpit.mjs');
   assert.equal(nodeFs.existsSync(daemonPath), true);
   const daemonText = nodeFs.readFileSync(daemonPath, 'utf8');
@@ -1683,7 +1683,7 @@ test('110. [WAVE 120 TANDEM MASTER 5B: LIVE COCKPIT SERVER DAEMON (scripts/start
 });
 
 
-// === WAVE 61 TO WAVE 120 SOVEREIGN END-TO-END EXPANSION (TESTS 111-120) ===
+// === WAVE 61 TO WAVE 140 SOVEREIGN END-TO-END EXPANSION (TESTS 111-120) ===
 import * as sovereignEngine from '../../src/core/panaceamedSovereignEndToEndEngine.mjs';
 
 test('111. [WAVE 61 EPISTEMIC PILLAR 1A: CLAIM-GUARD ZERO-VIOLATION & TRUTH-CLASS ENFORCEMENT]', () => {
@@ -1755,7 +1755,7 @@ test('119. [WAVE 79 SOVEREIGN PILLAR 4A: OBJECT.FREEZE IMMUTABILITY & LINT:RATCH
   assert.equal(Object.isFrozen(master.wave69JknTwin), true);
 });
 
-test('120. [WAVE 120 SOVEREIGN PILLAR 4B: END-TO-END WAVES 21-80 DETERMINISTIC SHA-256 SEAL & SUB-15MS RUNTIME]', () => {
+test('120. [WAVE 140 SOVEREIGN PILLAR 4B: END-TO-END WAVES 21-80 DETERMINISTIC SHA-256 SEAL & SUB-15MS RUNTIME]', () => {
   const run1 = sovereignEngine.runPanaceaMedSovereignEndToEndOrchestrator();
   const run2 = sovereignEngine.runPanaceaMedSovereignEndToEndOrchestrator();
   assert.equal(run1.masterSha256Seal.length, 64);
@@ -1764,7 +1764,7 @@ test('120. [WAVE 120 SOVEREIGN PILLAR 4B: END-TO-END WAVES 21-80 DETERMINISTIC S
 });
 
 
-// === WAVE 81 TO WAVE 120 OMNICAUSALIS CENTURY MILESTONE EXPANSION (TESTS 121-135) ===
+// === WAVE 81 TO WAVE 140 OMNICAUSALIS CENTURY MILESTONE EXPANSION (TESTS 121-135) ===
 import * as centuryEngine from '../../src/core/panaceamedCenturyWave100Engine.mjs';
 
 test('121. [WAVE 81 ED25519 SIGNOFF 1A: CRYPTOGRAPHIC PHYSICIAN DIGITAL SIGNATURE GENERATION & VERIFICATION]', () => {
@@ -1863,7 +1863,7 @@ test('134. [WAVE 99 CENTURY MASTER 5B: LIVE SERVER DAEMON SSE & CENTURY v3 ROUTE
   assert.ok(daemonText.includes('/api/v3/century/master'));
 });
 
-test('135. [WAVE 120 CENTURY MASTER 5C: DETERMINISTIC SHA-256 CENTURY SEAL & SUB-20MS EXECUTION GATE]', () => {
+test('135. [WAVE 140 CENTURY MASTER 5C: DETERMINISTIC SHA-256 CENTURY SEAL & SUB-20MS EXECUTION GATE]', () => {
   const run1 = centuryEngine.runOmnicausalisCenturyWave100Master();
   const run2 = centuryEngine.runOmnicausalisCenturyWave100Master();
   assert.equal(run1.centurySha256Seal.length, 64);
@@ -1872,7 +1872,7 @@ test('135. [WAVE 120 CENTURY MASTER 5C: DETERMINISTIC SHA-256 CENTURY SEAL & SUB
 });
 
 
-// === WAVE 101 TO WAVE 120 EMBODIED CYBERNETIC, HUMAN KINEMATICS & ROBOTIC OS EXPANSION (TESTS 136-150) ===
+// === WAVE 101 TO WAVE 140 EMBODIED CYBERNETIC, HUMAN KINEMATICS & ROBOTIC OS EXPANSION (TESTS 136-150) ===
 import * as embodiedOs from '../../src/core/panaceamedEmbodiedRoboticKinematicsOs.mjs';
 
 test('136. [WAVE 101 HUMAN NATURE 1A: CAMERA I-VT GAZE FIXATION (<30 DEG/S) & HONOR MAGICOS GAZE-DWELL INTENT]', () => {
@@ -1977,10 +1977,190 @@ test('149. [WAVE 119 EMBODIED OS 5C: UNIFIED WAVES 21-120 METADATA & 150-TEST TA
   assert.equal(master.embodiedOsVersion, 'PANACEAMED_EMBODIED_ROBOTIC_OS_WAVE_120_V1');
 });
 
-test('150. [WAVE 120 EMBODIED OS 5D: DETERMINISTIC SHA-256 EMBODIED SEAL & SUB-25MS FULL EXECUTION]', () => {
+test('150. [WAVE 140 EMBODIED OS 5D: DETERMINISTIC SHA-256 EMBODIED SEAL & SUB-25MS FULL EXECUTION]', () => {
   const run1 = embodiedOs.runPanaceaMedWave120EmbodiedRoboticMasterOs();
   const run2 = embodiedOs.runPanaceaMedWave120EmbodiedRoboticMasterOs();
   assert.equal(run1.embodiedMasterSha256Seal.length, 64);
   assert.equal(run1.embodiedMasterSha256Seal, run2.embodiedMasterSha256Seal);
+  assert.ok(run1.executionDurationMs < 25);
+});
+
+
+// === WAVE 121 TO WAVE 140 SHENZHEN NEXT-GEN & NATURAL TCM PROACTIVE OS EXPANSION (TESTS 151-170) ===
+import * as shenzhenTcmOs from '../../src/core/panaceamedShenzhenTcmProactiveLifecycleOs.mjs';
+
+test('151. [WAVE 121 SENSOR FRONTIER 1A: RAWSTREAM 90-DAY ENCRYPTED EDGE-LOCAL-ONLY ANTI-EXFILTRATION GUARD]', () => {
+  const res = shenzhenTcmOs.evaluateWave121To124SensorFrontierAndRawStream({ attemptCloudRawUpload: true });
+  assert.equal(res.rawStreamContract.locality, 'EDGE_DEVICE_LOCAL_ONLY_NEVER_SYNCED');
+  assert.equal(res.rawStreamContract.encryptedWindowDays, 90);
+  assert.equal(res.rawStreamContract.rawSyncBlockedByPolicy, true);
+  assert.equal(res.rawStreamContract.exfiltrationAttemptIntercepted, true);
+});
+
+test('152. [WAVE 122 SENSOR FRONTIER 1B: GRAPHENE FET CYSTATIN-C (0.05 AG/UL) PRE-SYMPTOMATIC CKD EARLY DETECTION]', () => {
+  const normal = shenzhenTcmOs.evaluateWave121To124SensorFrontierAndRawStream();
+  const ckdAlert = shenzhenTcmOs.evaluateWave121To124SensorFrontierAndRawStream({
+    frontierSensors: {
+      grapheneFetUrinaryCystatinCAgPerUl: 0.08,
+      hydrogelContactLensGlucoseMgDl: 105,
+      sinocare15DayCgmGlucoseMgDl: 106,
+      lingWatchCufflessSbpMmHg: 120,
+      lingWatchCufflessDbpMmHg: 76,
+      jcRingMedX3Spo2Pct: 98.2,
+      breathAmmoniaPpb: 400,
+      imuPlantarGaitAsymmetryPct: 2.0,
+      bioresorbableImplantIcpMmHg: 11.0
+    }
+  });
+  assert.equal(normal.sensorFrontierTelemetry.preSymptomaticCkdFlag, false);
+  assert.equal(ckdAlert.sensorFrontierTelemetry.preSymptomaticCkdFlag, true);
+});
+
+test('153. [WAVE 123 SENSOR FRONTIER 1C: HYDROGEL SMART CONTACT LENS vs SINOCARE 15-DAY COIN CGM CONCORDANCE]', () => {
+  const res = shenzhenTcmOs.evaluateWave121To124SensorFrontierAndRawStream();
+  assert.ok(res.sensorFrontierTelemetry.glucoseConcordanceDeltaMgDl <= 5.0);
+  assert.equal(res.sensorFrontierTelemetry.cufflessBpValidStandardJan2026, true);
+});
+
+test('154. [WAVE 124 SENSOR FRONTIER 1D: IMU + PLANTAR GAIT ASYMMETRY PRE-DIAGNOSIS PARKINSON DETECTION]', () => {
+  const res = shenzhenTcmOs.evaluateWave121To124SensorFrontierAndRawStream({
+    frontierSensors: {
+      grapheneFetUrinaryCystatinCAgPerUl: 0.02,
+      hydrogelContactLensGlucoseMgDl: 98,
+      sinocare15DayCgmGlucoseMgDl: 99,
+      lingWatchCufflessSbpMmHg: 118,
+      lingWatchCufflessDbpMmHg: 75,
+      jcRingMedX3Spo2Pct: 98.5,
+      breathAmmoniaPpb: 350,
+      imuPlantarGaitAsymmetryPct: 9.4,
+      bioresorbableImplantIcpMmHg: 10.5
+    }
+  });
+  assert.equal(res.sensorFrontierTelemetry.preSymptomaticParkinsonGaitFlag, true);
+});
+
+test('155. [WAVE 125 PROACTIVE MONITORING 2A: 30-DAY PERSONAL BASELINE Z-SCORE & RUITANG YELLOW TIER (Z>=2 FOR 2H)]', () => {
+  const res = shenzhenTcmOs.evaluateWave125To128DerivedSignalsAndTierStateMachine();
+  assert.equal(res.derivedSignal.baselineWindowDays, 30);
+  assert.ok(res.derivedSignal.compositeMaxZScore >= 2.0);
+  assert.equal(res.tierState.tier, 'YELLOW');
+  assert.equal(res.tierState.requiresHumanPhysicianSignoff, false);
+});
+
+test('156. [WAVE 126 PROACTIVE MONITORING 2B: RUITANG RED TIER ESCALATION (PATIENT -> FAMILY -> DOCTOR < 60 MIN)]', () => {
+  const res = shenzhenTcmOs.evaluateWave125To128DerivedSignalsAndTierStateMachine({
+    currentWindow: {
+      rhrBpm: 88,
+      hrvRmssdMs: 28,
+      skinTempC: 37.8,
+      spo2Pct: 94.0,
+      sbpMmHg: 186,
+      glucoseMgDl: 265,
+      sustainedAnomalyHours: 4.0,
+      trendSlopePerHour: 1.85
+    }
+  });
+  assert.equal(res.tierState.tier, 'RED');
+  assert.equal(res.tierState.requiresHumanPhysicianSignoff, true);
+  assert.ok(res.clinicalProtocolBinding.orderedEscalationPath.includes('CLINICIAN_TELEMEDICINE_ESCALATION_WITHIN_60_MIN'));
+});
+
+test('157. [WAVE 127 PROACTIVE MONITORING 2C: CHINA-PAR 10-YEAR ASCVD RISK & SINGLE-SCORE UX (PANACEA_SCORE)]', () => {
+  const res = shenzhenTcmOs.evaluateWave125To128DerivedSignalsAndTierStateMachine();
+  assert.ok(res.derivedSignal.cvRisk10YearPct > 5.0);
+  assert.ok(res.derivedSignal.panaceaScore >= 10 && res.derivedSignal.panaceaScore <= 100);
+  assert.ok(res.derivedSignal.singleActionableRecommendation.length > 20);
+});
+
+test('158. [WAVE 128 PROACTIVE MONITORING 2D: NON-DIAGNOSTIC AI REGULATORY GUARDRAIL (EDUCATION & TRIAGE ONLY)]', () => {
+  const res = shenzhenTcmOs.evaluateWave125To128DerivedSignalsAndTierStateMachine();
+  assert.equal(res.tierState.aiPositioningGuardrail, 'EDUCATION_AND_TRIAGE_ONLY_NOT_AUTONOMOUS_DIAGNOSIS');
+});
+
+test('159. [WAVE 129 NATURAL TCM 3A: ZIWU LIUZHU 12-MERIDIAN CIRCADIAN ORGAN CLOCK (04:00 LUNG FEI MERIDIAN)]', () => {
+  const res = shenzhenTcmOs.evaluateWave129To132NaturalTcmAndFoodPhotoAi({ observationHour24: 4 });
+  assert.equal(res.ziwuLiuzhuCircadianClock.activeMeridian.shichen, 'YIN');
+  assert.equal(res.ziwuLiuzhuCircadianClock.activeMeridian.organId, 'LUNG_FEI');
+  assert.equal(res.ziwuLiuzhuCircadianClock.zhiWeiBingPreventiveStage, 'PRE_CLINICAL_HOMEOSTATIC_TUNING');
+});
+
+test('160. [WAVE 130 NATURAL TCM 3B: TANGYUAN PHOTO-TO-NUTRITION AI & SI QI WU WEI CONSTITUTION ALIGNMENT]', () => {
+  const res = shenzhenTcmOs.evaluateWave129To132NaturalTcmAndFoodPhotoAi();
+  assert.equal(res.foodEntryPhotoNutritionAi.dishCount, 3);
+  assert.ok(res.foodEntryPhotoNutritionAi.netCarbsG < 40);
+  assert.equal(res.foodEntryPhotoNutritionAi.constitutionAligned, true);
+  assert.equal(res.foodEntryPhotoNutritionAi.portionSuggestion, 'PORSI_SEIMBANG_OPTIMAL');
+});
+
+test('161. [WAVE 131 NATURAL TCM 3C: BAIDU x SHANGHAI UNIV OF SPORT TAI CHI / BADUANJIN & MODERATED COMMUNITY HBA1C (-0.8%)]', () => {
+  const res = shenzhenTcmOs.evaluateWave129To132NaturalTcmAndFoodPhotoAi();
+  assert.ok(res.taiChiAndCommunityGamification.prescribedMindBodyMovement.includes('BADUANJIN_BROCADE_3'));
+  assert.equal(res.taiChiAndCommunityGamification.earnedBadge, 'GOLD_METABOLIC_HARMONY_STREAK_21D');
+  assert.equal(res.taiChiAndCommunityGamification.projected6MonthHba1cReductionPct, -0.8);
+});
+
+test('162. [WAVE 133 OFFLINE SYNC 4A: DELTA QUEUE FILTERING (DROP RAWSTREAM, PRIORITIZE RED TIERSTATE)]', () => {
+  const res = shenzhenTcmOs.evaluateWave133To136OfflineFirstDeltaSyncEngine();
+  assert.equal(res.offlineSyncQueue.droppedRawStreamCount, 1);
+  assert.equal(res.offlineSyncQueue.syncableDeltaCount, 2);
+  assert.equal(res.offlineSyncQueue.orderedSyncIds[0], 'evt_03');
+  assert.equal(res.offlineSyncQueue.immediatePushTriggered, true);
+});
+
+test('163. [WAVE 135 OFFLINE SYNC 4B: DETERMINISTIC GOVERNANCE-SIGNED RULE-PACK CONFLICT RESOLUTION]', () => {
+  const res = shenzhenTcmOs.evaluateWave133To136OfflineFirstDeltaSyncEngine();
+  assert.equal(res.rulePackConflictResolution.activeRulePackVersion, '2026.11');
+  assert.equal(res.rulePackConflictResolution.deterministicUpgradeApplied, true);
+});
+
+test('164. [WAVE 137 SHENZHEN INFRA 5A: EHANG EH216-S AUTONOMOUS eVTOL MEDEVAC & COLD-CHAIN CARGO DRONE]', () => {
+  const res = shenzhenTcmOs.evaluateWave137To140ShenzhenNextGenInfrastructure();
+  assert.equal(res.lowAltitudeEconomyEvtolAndDrones.aircraftModel, 'EHANG_EH216_S_CAAC_TYPE_CERTIFIED');
+  assert.equal(res.lowAltitudeEconomyEvtolAndDrones.evtolFlightCleared, true);
+  assert.ok(res.lowAltitudeEconomyEvtolAndDrones.evtolEtaMinutes < 12.0);
+  assert.equal(res.lowAltitudeEconomyEvtolAndDrones.cargoColdChainIntact, true);
+});
+
+test('165. [WAVE 138 SHENZHEN INFRA 5B: BYD XUANJI / AION / ZEEKR NEV CABIN OS AUTONOMOUS EMERGENCY PULL-OVER]', () => {
+  const res = shenzhenTcmOs.evaluateWave137To140ShenzhenNextGenInfrastructure();
+  assert.equal(res.nevMobileHealthCabinOs.nevAutonomousPullOverAction, 'ENGAGE_L4_SAFE_SHOULDER_STOP_ACTIVATE_CABIN_O2_AND_V2X_SOS');
+  assert.equal(res.nevMobileHealthCabinOs.v2hEmergencyHospitalBackupReady, true);
+});
+
+test('166. [WAVE 139 SHENZHEN INFRA 5C: NEURACLE/TSINGHUA "NEO" EPIDURAL BCI & 21-DOF BIONIC HAND 48H INSURANCE CODING]', () => {
+  const res = shenzhenTcmOs.evaluateWave137To140ShenzhenNextGenInfrastructure();
+  assert.equal(res.neuracleNeoBciAndBionicHand.bionicHandDof, 21);
+  assert.equal(res.neuracleNeoBciAndBionicHand.closedLoopNeuroPlasticityActive, true);
+  assert.equal(res.neuracleNeoBciAndBionicHand.nationalInsuranceReimbursedWithin48h, true);
+});
+
+test('167. [WAVE 140 SHENZHEN INFRA 5D: COMMERCIAL QUANTUM (QAOA), UNDERSEA DATA CENTER (PUE<=1.10) & FUSION GRID]', () => {
+  const res = shenzhenTcmOs.evaluateWave137To140ShenzhenNextGenInfrastructure();
+  assert.ok(res.quantumUnderseaAndFusionGrid.qaoaRouteOptimizationSpeedupFactor > 10);
+  assert.equal(res.quantumUnderseaAndFusionGrid.meetsSub1_10UnderseaPueTarget, true);
+  assert.ok(res.quantumUnderseaAndFusionGrid.fiveGAdvancedSliceLatencyMs < 2.0);
+});
+
+test('168. [WAVE 140 MASTER GATE 6A: OBJECT.FREEZE IMMUTABILITY ACROSS ALL SHENZHEN & TCM SUBSYSTEMS]', () => {
+  const master = shenzhenTcmOs.runPanaceaMedWave140ShenzhenTcmMasterOs();
+  assert.equal(Object.isFrozen(master), true);
+  assert.equal(Object.isFrozen(master.wave124Sensors), true);
+  assert.equal(Object.isFrozen(master.wave128Tiers), true);
+  assert.equal(Object.isFrozen(master.wave132TcmFood), true);
+  assert.equal(Object.isFrozen(master.wave140Infra), true);
+});
+
+test('169. [WAVE 140 MASTER GATE 6B: UNIFIED WAVES 21-140 METADATA & 170-TEST SUITE TARGET VERIFICATION]', () => {
+  const master = shenzhenTcmOs.runPanaceaMedWave140ShenzhenTcmMasterOs();
+  assert.equal(master.totalWavesUnified, 140);
+  assert.equal(master.totalTestSuitesTarget, 170);
+  assert.equal(master.shenzhenTcmOsVersion, 'PANACEAMED_SHENZHEN_TCM_PROACTIVE_OS_WAVE_140_V1');
+});
+
+test('170. [WAVE 140 MASTER GATE 6C: DETERMINISTIC SHA-256 MASTER SEAL & SUB-25MS EXECUTION TIME]', () => {
+  const run1 = shenzhenTcmOs.runPanaceaMedWave140ShenzhenTcmMasterOs();
+  const run2 = shenzhenTcmOs.runPanaceaMedWave140ShenzhenTcmMasterOs();
+  assert.equal(run1.shenzhenTcmMasterSha256Seal.length, 64);
+  assert.equal(run1.shenzhenTcmMasterSha256Seal, run2.shenzhenTcmMasterSha256Seal);
   assert.ok(run1.executionDurationMs < 25);
 });

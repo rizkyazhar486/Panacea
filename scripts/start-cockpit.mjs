@@ -1,3 +1,4 @@
+import { runPanaceaMedWave140ShenzhenTcmMasterOs } from '../src/core/panaceamedShenzhenTcmProactiveLifecycleOs.mjs';
 import { runPanaceaMedWave120EmbodiedRoboticMasterOs } from '../src/core/panaceamedEmbodiedRoboticKinematicsOs.mjs';
 /**
  * @file scripts/start-cockpit.mjs
@@ -40,6 +41,13 @@ const server = http.createServer((req, res) => {
     const snapshot = runPanaceaMedNextGenTandemOrchestrator();
     res.writeHead(200, { 'content-type': 'application/json; charset=utf-8' });
     res.end(JSON.stringify(snapshot, null, 2));
+    return;
+  }
+
+  if (req.method === 'GET' && urlPath === '/api/v5/shenzhen/tcm-proactive') {
+    const shenzhenTcm = runPanaceaMedWave140ShenzhenTcmMasterOs();
+    res.writeHead(200, { 'content-type': 'application/json; charset=utf-8' });
+    res.end(JSON.stringify(shenzhenTcm, null, 2));
     return;
   }
 
