@@ -1,9 +1,15 @@
 // Deterministic learning-progress reducer: scoring, idempotent submission, prerequisite gating and spaced review.
 // Spaced review = classic Leitner boxes (public-domain technique; Leitner 1972): correct → next box, wrong → box 0;
 // interval days per box = [1,2,4,8,16]. This is a simple scheduler, NOT an optimised/validated algorithm. Day numbers are injected integers.
-import { LEARNING_SCHEMA_VERSION, type LearningCatalog, type LearningProgress, type Question } from '../model/types.ts'
+import { LEARNING_SCHEMA_VERSION, type LearningCatalog, type LearningProgress, type Question, type ReviewState } from '../model/types.ts'
 
 export const LEITNER_INTERVAL_DAYS = [1, 2, 4, 8, 16] as const
+
+/** One Leitner step, shared by question practice and self-rated recall (recall.ts): a success moves up one box (capped), a miss returns to box 0. */
+export function leitnerNext(prev: ReviewState | undefined, success: boolean, day: number): ReviewState {
+  const box = success ? Math.min((prev?.box ?? -1) + 1, LEITNER_INTERVAL_DAYS.length - 1) : 0
+  return { box, dueDay: day + LEITNER_INTERVAL_DAYS[box]! }
+}
 
 export const newProgress = (userId: string): LearningProgress => ({ schemaVersion: LEARNING_SCHEMA_VERSION, userId, attempts: {}, review: {}, startedLessons: [] })
 
@@ -42,14 +48,12 @@ export function submitAnswer(p: LearningProgress, c: LearningCatalog, input: { u
   if (prior) return { ok: true, progress: p, feedback: mk(true, prior.correct) } // duplicate submission: state unchanged
 
   const correct = opt.id === q.correctOptionId
-  const prev = p.review[q.id]
-  const box = correct ? Math.min((prev?.box ?? -1) + 1, LEITNER_INTERVAL_DAYS.length - 1) : 0
   return {
     ok: true, feedback: mk(false, correct),
     progress: {
       ...p,
       attempts: { ...p.attempts, [q.id]: [...(p.attempts[q.id] ?? []), { attemptId: input.attemptId, optionId: opt.id, correct, day: input.day }] },
-      review: { ...p.review, [q.id]: { box, dueDay: input.day + LEITNER_INTERVAL_DAYS[box]! } },
+      review: { ...p.review, [q.id]: leitnerNext(p.review[q.id], correct, input.day) },
     },
   }
 }

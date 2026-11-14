@@ -145,3 +145,13 @@ test('AtlasHome: a pick no deck models claims no deck and no clinical target', (
   assert.ok(content.includes("coupled={pickRoute?.basis === 'deck'}"), 'clinical badge must be green only for a deck target')
   assert.ok(content.includes("coupled={pickRoute?.basis !== 'unmapped'}"), 'physiology badge must be green only when coupled')
 })
+
+test('AtlasHome: a running self-check is the only main action on the Physiology panel', () => {
+  const content = fs.readFileSync(path.join(process.cwd(), 'src', 'domains', 'body-exposure', 'ui', 'BodyExposureAtlasHome.tsx'), 'utf8')
+  // Measured at 390×844: during a self-check the stage's green "Advance to Stage 3" sat directly under the green
+  // "Show what the sources say" — two main actions in one viewport. The explorer reports its session; the stage
+  // hides its own next-step button only while one runs on the Systems view.
+  assert.ok(content.includes('onSessionChange={setSelfCheckOpen}'), 'the explorer must report when a self-check opens or closes')
+  assert.ok(content.includes("{!(physiologyView === 'systems' && selfCheckOpen) && ("), 'the stage advance button must step aside during a self-check')
+  assert.equal(content.match(/Advance to Stage 3: Clinical Relevance/g)?.length, 1, 'one advance button, not a second copy')
+})

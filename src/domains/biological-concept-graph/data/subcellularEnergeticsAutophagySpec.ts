@@ -31,7 +31,9 @@ const REF_MURPHY = ['ref:murphy-ros-2009']
 const REF_HARDIE = ['ref:hardie-ampk-2012']
 const REF_MIZUSHIMA = ['ref:mizushima-autophagy-2011']
 
-const n = (x: Omit<ConceptNode, 'learningObjectives'> & { learningObjectives?: readonly string[] }): ConceptNode => ({ learningObjectives: [], ...x })
+// Pure: builds a node and touches nothing else. Without the annotation Rollup keeps the whole spec (the spread reads its
+// argument) in every bundle that imports this domain's index, used or not.
+const n = /* @__NO_SIDE_EFFECTS__ */ (x: Omit<ConceptNode, 'learningObjectives'> & { learningObjectives?: readonly string[] }): ConceptNode => ({ learningObjectives: [], ...x })
 
 const NODES: ConceptNode[] = [
   n({

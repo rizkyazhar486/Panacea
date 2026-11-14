@@ -104,6 +104,8 @@ export function BodyExposureAtlasHome({ Viewer, sendCamera }: BodyExposureAtlasH
   // The Physiology stage opens on the body systems; picking a structure routes to its simulation deck instead.
   const [physiologyView, setPhysiologyView] = useState<PhysiologyView>('systems')
   const [systemFocus, setSystemFocus] = useState<BodySystemId | null>(null)
+  /** A self-check is a focus mode: while one runs, the stage's own next-step button steps aside. */
+  const [selfCheckOpen, setSelfCheckOpen] = useState(false)
   const [clinicalTool, setClinicalTool] = useState<ClinicalTool>('vascular')
 
   const plan = useMemo(() => planStageLayers({ depth, mode, overrides }), [depth, mode, overrides])
@@ -252,7 +254,7 @@ export function BodyExposureAtlasHome({ Viewer, sendCamera }: BodyExposureAtlasH
       <Segmented label="Physiology view" value={physiologyView} options={PHYSIOLOGY} onChange={setPhysiologyView} />
       {physiologyView === 'systems' && (
         <Suspense fallback={<Note color={TONE.ref}>Loading body systems…</Note>}>
-          <SystemPhysiologyExplorer systemId={systemFocus} onSystem={openSystem} onSimulate={simulate} />
+          <SystemPhysiologyExplorer systemId={systemFocus} onSystem={openSystem} onSimulate={simulate} onSessionChange={setSelfCheckOpen} />
         </Suspense>
       )}
       {physiologyView === 'cardiopulmonary' && <CardiopulmonaryCouplingDeck />}
@@ -270,7 +272,9 @@ export function BodyExposureAtlasHome({ Viewer, sendCamera }: BodyExposureAtlasH
           <b>Simulation Truth Class:</b> mechanistic_simulation_proxy · Deterministic ordinary differential equations with zero synthetic biomarkers. A simulation, not a reading from a body.
         </Note>
       )}
-      <button type="button" onClick={() => openStage('clinical')} className="as-focus as-fade" style={primaryButton}>Advance to Stage 3: Clinical Relevance →</button>
+      {!(physiologyView === 'systems' && selfCheckOpen) && (
+        <button type="button" onClick={() => openStage('clinical')} className="as-focus as-fade" style={primaryButton}>Advance to Stage 3: Clinical Relevance →</button>
+      )}
     </>
   )
 
