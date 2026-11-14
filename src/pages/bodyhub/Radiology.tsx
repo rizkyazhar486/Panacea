@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { Card, SectionTitle } from '../../components/ui'
 import { IconSearch, IconActivity } from '../../components/icons'
 import { DicomCrossplanes3D } from '../../components/DicomCrossplanes3D'
@@ -320,12 +321,12 @@ export function Radiology() {
               >
                 Measure {ukur ? 'on' : 'off'}
               </button>
-              <a
-                href="#/body-explorer"
+              <Link
+                to="/body-exposure"
                 className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-[10px] font-black text-white/75 hover:bg-white/10"
               >
-                Open 3D anatomy ↗
-              </a>
+                Open 3D atlas ↗
+              </Link>
             </div>
           </header>
 
@@ -574,9 +575,14 @@ export function Radiology() {
                   <p className="mt-1 text-[10px] leading-relaxed text-cyan-100/55">
                     The anatomy atlas can be opened beside this study, but Panacea does not pretend that textbook geometry is registered to this person's scan.
                   </p>
-                  <a href="#/body-explorer" className="mt-3 inline-flex rounded-xl bg-cyan-300 px-3 py-2 text-[10px] font-black text-slate-950">
-                    Open Body Explorer
-                  </a>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <Link to="/body-exposure" className="inline-flex rounded-xl bg-cyan-300 px-3 py-2 text-[10px] font-black text-slate-950 transition hover:bg-cyan-200">
+                      Open Atlas Home
+                    </Link>
+                    <Link to="/body-explorer" className="inline-flex rounded-xl border border-white/20 bg-white/10 px-3 py-2 text-[10px] font-black text-white transition hover:bg-white/20">
+                      Open Body Explorer
+                    </Link>
+                  </div>
                 </div>
               </div>
             </aside>
