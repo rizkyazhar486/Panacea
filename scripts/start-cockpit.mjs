@@ -1,3 +1,4 @@
+import { runPanaceaMedWave120EmbodiedRoboticMasterOs } from '../src/core/panaceamedEmbodiedRoboticKinematicsOs.mjs';
 /**
  * @file scripts/start-cockpit.mjs
  * @description PanaceaMed Wave 100 Live Interactive Cockpit & SSE Server Daemon
@@ -39,6 +40,13 @@ const server = http.createServer((req, res) => {
     const snapshot = runPanaceaMedNextGenTandemOrchestrator();
     res.writeHead(200, { 'content-type': 'application/json; charset=utf-8' });
     res.end(JSON.stringify(snapshot, null, 2));
+    return;
+  }
+
+  if (req.method === 'GET' && urlPath === '/api/v4/embodied/robotics') {
+    const embodied = runPanaceaMedWave120EmbodiedRoboticMasterOs();
+    res.writeHead(200, { 'content-type': 'application/json; charset=utf-8' });
+    res.end(JSON.stringify(embodied, null, 2));
     return;
   }
 
