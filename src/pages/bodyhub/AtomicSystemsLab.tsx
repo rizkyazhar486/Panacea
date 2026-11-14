@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { Link } from 'react-router-dom'
 import {
   ATOMIC_CHALLENGES,
   ATOMIC_SIMULATION_DISCLOSURE,
@@ -28,6 +29,13 @@ export function AtomicSystemsLab() {
 
   return (
     <section className="space-y-3" aria-label="Atomic systems engineering research sandbox">
+      <div className="flex items-center gap-2 text-[11px] text-neutral-400">
+        <Link to="/body-exposure" className="text-brand font-bold hover:underline">
+          ← Whole-Body Atlas
+        </Link>
+        <span>·</span>
+        <span>Atomic Systems Sandbox</span>
+      </div>
       <div className="rounded-2xl border border-white/10 bg-black/30 p-3">
         <div className="flex items-center justify-between gap-3">
           <div>

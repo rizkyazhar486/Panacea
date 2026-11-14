@@ -169,8 +169,32 @@ export function FetalParcelInspector() {
   }, [loaded, visible, isolate, selected, section, cut, opacity])
 
   return <main className="fetal-parcel-inspector">
-    <header><Link to="/body-exposure/canonical">← Body Exposure atlas</Link><h1>Fetal segmentation dataset</h1>
+    <header>
+      <nav aria-label="Atlas breadcrumbs" style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 11, marginBottom: 8, flexWrap: 'wrap' }}>
+        <Link to="/body-exposure" style={{ color: '#00BF63', textDecoration: 'none', fontWeight: 700 }}>
+          ← Whole-Body Atlas Home
+        </Link>
+        <span style={{ color: '#64748b' }}>·</span>
+        <Link to="/body-exposure/canonical" style={{ color: '#94a3b8', textDecoration: 'none' }}>
+          Adult Canonical Atlas
+        </Link>
+      </nav>
+      <h1>Fetal segmentation dataset</h1>
       <p>KCL population-average MRI · nine numeric regions · anatomical identities unresolved · clinical review pending.</p>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, margin: '8px 0' }}>
+        <span style={{ fontSize: '10px', fontWeight: 800, padding: '3px 8px', borderRadius: 6, background: 'rgba(56,189,248,0.12)', color: '#38bdf8', border: '1px solid rgba(56,189,248,0.25)' }}>
+          21–38 WEEKS GA POPULATION AVERAGE
+        </span>
+        <span style={{ fontSize: '10px', fontWeight: 800, padding: '3px 8px', borderRadius: 6, background: 'rgba(168,85,247,0.12)', color: '#c084fc', border: '1px solid rgba(168,85,247,0.25)' }}>
+          KCL T2-WEIGHTED MRI (3D NUMERIC VOXELS)
+        </span>
+        <span style={{ fontSize: '10px', fontWeight: 800, padding: '3px 8px', borderRadius: 6, background: 'rgba(16,185,129,0.12)', color: '#34d399', border: '1px solid rgba(16,185,129,0.25)' }}>
+          TRUTH CLASS: ATLAS_REFERENCE_LABEL
+        </span>
+        <span style={{ fontSize: '10px', fontWeight: 800, padding: '3px 8px', borderRadius: 6, background: 'rgba(245,158,11,0.12)', color: '#fbbf24', border: '1px solid rgba(245,158,11,0.25)' }}>
+          CLINICAL REVIEW PENDING · UNRESOLVED LABELS
+        </span>
+      </div>
       <Prosa kelas="fpi-note">Colours distinguish source labels. Display cuts and transparency change the view only. No named lobes are added to the canonical atlas.</Prosa>
     </header>
     {error && <p role="alert">{error}</p>}
