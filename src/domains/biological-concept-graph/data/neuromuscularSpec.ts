@@ -13,7 +13,9 @@ const NERVOUS3D: VisualizationBinding = { representation: 'anatomical_3d', asset
 
 const OS = ['ref:openstax-ap2e-nmj'], KANDEL = ['ref:kandel-principles-5e'], BOTH = ['ref:openstax-ap2e-nmj', 'ref:kandel-principles-5e']
 
-const n = (x: Omit<ConceptNode, 'learningObjectives'> & { learningObjectives?: readonly string[] }): ConceptNode => ({ learningObjectives: [], ...x })
+// Pure: builds a node and touches nothing else. Without the annotation Rollup keeps the whole spec (the spread reads its
+// argument) in every bundle that imports this domain's index, used or not.
+const n = /* @__NO_SIDE_EFFECTS__ */ (x: Omit<ConceptNode, 'learningObjectives'> & { learningObjectives?: readonly string[] }): ConceptNode => ({ learningObjectives: [], ...x })
 
 const NODES: ConceptNode[] = [
   n({ id: 'pcg:human_body', label: 'Human body', scale: 'whole_body', parentId: null, definition: 'The whole organism, root of the anatomical hierarchy.', referenceIds: OS, visualization: { representation: 'anatomical_3d', assetKey: 'adult_male.surface', spatialPrecision: 'organ_level' } }),
