@@ -35,6 +35,20 @@ test('ringan: data sistem tubuh, jembatan fisiologi dan OS fisiologi tidak menye
   assert.ok(bytes < LIGHT_LIMIT_BYTES, `light entry bundles to ${bytes} bytes, limit ${LIGHT_LIMIT_BYTES}`)
 })
 
+/** Batas atas mesin fisiologi per sistem (byte, termifikasi). Sekarang ~95 kB, hampir semuanya teks graf edukasi. */
+const ENGINE_LIMIT_BYTES = 120_000
+
+test('ringan: mesin fisiologi per sistem (katalog, perencana, struktur → sistem) tidak menyeret indeks tubuh', async () => {
+  const { inputs, bytes } = await bundle([
+    "import { defaultPhysiologyCatalog } from './src/domains/body-exposure/engine/system-physiology/physiologyCatalog.ts'",
+    "import { planSystemIndex } from './src/domains/body-exposure/engine/system-physiology/systemPhysiology.ts'",
+    "import { systemsForStructure } from './src/domains/body-exposure/engine/system-physiology/structureSystem.ts'",
+    "console.log(planSystemIndex(defaultPhysiologyCatalog()), systemsForStructure('Heart', 'cardiovascular'))",
+  ].join('\n'))
+  assert.equal(touches(inputs, HEAVY), false, `the system-physiology engine pulled ${HEAVY}`)
+  assert.ok(bytes < ENGINE_LIMIT_BYTES, `system-physiology engine bundles to ${bytes} bytes, limit ${ENGINE_LIMIT_BYTES}`)
+})
+
 test('ringan: modul data sistem tubuh tidak mengimpor apa pun', async () => {
   const { inputs } = await bundle("import { BODY_SYSTEM_SOURCE_WAVE } from './src/domains/body-exposure/data/bodySystems.ts'\nconsole.log(BODY_SYSTEM_SOURCE_WAVE)")
   assert.deepEqual(inputs.filter((input) => input !== 'entry.ts').map((input) => input.replace(/^.*\/src\//, 'src/')), ['src/domains/body-exposure/data/bodySystems.ts'])

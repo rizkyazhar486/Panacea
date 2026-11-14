@@ -108,3 +108,26 @@ test('AtlasHome: Stage 3 Clinical Suite & Progressive Disclosure Integration', (
   const neuroContent = fs.readFileSync(neuroDeckPath, 'utf8')
   assert.ok(neuroContent.includes('<OculomotorLesionLab'), 'Must embed OculomotorLesionLab in NeuroFascicularReflexDeck')
 })
+
+test('AtlasHome: Stage 2 opens on every body system, loaded on demand', () => {
+  const content = fs.readFileSync(path.join(process.cwd(), 'src', 'domains', 'body-exposure', 'ui', 'BodyExposureAtlasHome.tsx'), 'utf8')
+  // The catalog carries the text of every education graph (~20 kB gzip): it must stay out of the stage chunk.
+  assert.ok(content.includes("lazy(() => import('./system-physiology/SystemPhysiologyExplorer'))"), 'Systems view must be lazy-loaded')
+  assert.ok(!/from '\.\.\/engine\/system-physiology\/physiologyCatalog/.test(content), 'the stage must not import the catalog statically')
+  assert.ok(content.includes("useState<PhysiologyView>('systems')"), 'Stage 2 must open on the body systems')
+  assert.ok(content.includes('<SystemPhysiologyExplorer'), 'Stage 2 must render the body-system explorer')
+})
+
+test('AtlasHome: every short segment label is contained in its accessible name (WCAG 2.5.3)', () => {
+  const content = fs.readFileSync(path.join(process.cwd(), 'src', 'domains', 'body-exposure', 'ui', 'BodyExposureAtlasHome.tsx'), 'utf8')
+  const options = [...content.matchAll(/\{ id: '([^']+)', label: '([^']+)'(?:, short: '([^']+)')? \}/g)]
+    .filter(([, id]) => ['systems', 'cardiopulmonary', 'soft_tissue', 'neuro', 'vascular', 'referred_pain', 'neuro_localizer', 'diagnostic_imaging'].includes(id))
+  assert.equal(options.length, 8, 'the four physiology views and the four clinical tools')
+  for (const [, id, label, short] of options) {
+    const visible = short ?? label
+    assert.ok(label.toLowerCase().includes(visible.toLowerCase()), `${id}: visible "${visible}" is not part of its name "${label}"`)
+    // About 80 px per button with four on a phone panel, and the stage's buttons do not wrap: measured at 390 px,
+    // "Referred Pain" (13) was clipped while "Soft Tissue" (11) fit.
+    assert.ok(visible.length <= 11, `${id}: "${visible}" is too long for a quarter of the phone panel`)
+  }
+})

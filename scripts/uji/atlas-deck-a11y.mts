@@ -13,6 +13,9 @@ import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { ORGAN_BIOMECHANICS_CATALOG, GI_PERISTALSIS_CATALOG } from '../../src/domains/body-exposure/engine/softTissueBiomechanicsEngine.ts'
 import { DECK_ACTIVE_FILL, sliderValueText } from '../../src/domains/body-exposure/ui/deck-kit/deckA11y.ts'
+import { defaultPhysiologyCatalog } from '../../src/domains/body-exposure/engine/system-physiology/physiologyCatalog.ts'
+import { planSystemPhysiology } from '../../src/domains/body-exposure/engine/system-physiology/systemPhysiology.ts'
+import { simulationsFor } from '../../src/domains/body-exposure/engine/system-physiology/systemSimulations.ts'
 
 const gagal = (nama: string, f: () => void) => { try { f() } catch (e) { throw new Error(`[${nama}] ${(e as Error).message}`) } }
 const hitung = (teks: string, pola: RegExp) => (teks.match(pola) ?? []).length
@@ -78,6 +81,8 @@ const out = await build({
       "export { NeuroFascicularReflexDeck } from './src/domains/body-exposure/ui/NeuroFascicularReflexDeck.tsx'",
       "export { CoronaryTerritoryPanel } from './src/domains/body-exposure/ui/CoronaryTerritoryPanel.tsx'",
       "export { ReferredPainDermatomeStudio } from './src/domains/body-exposure/ui/ReferredPainDermatomeStudio.tsx'",
+      "export { SystemPhysiologyExplorer } from './src/domains/body-exposure/ui/system-physiology/SystemPhysiologyExplorer.tsx'",
+      "export { Segmented, CouplingBadge } from './src/domains/body-exposure/ui/atlas-stage/StagePieces.tsx'",
     ].join('\n'),
     resolveDir: process.cwd(), loader: 'ts',
   },
@@ -220,4 +225,57 @@ gagal('teks-nilai-slider-batas-digit', () => {
   assert.equal(sliderValueText(1.5, 7 as unknown as string), '1.5', 'satuan bukan string diabaikan')
 })
 
-console.log('atlas deck a11y: 5 decks, every tab — all controls named, one pressed per choice group, charts described, slider values carry units, fixed colour pairs >= 4.5:1')
+// ── Body systems (tab Fisiologi): indeks 11 sistem + kartu setiap sistem, diaudit dan dihitung terhadap rencana mesin ──
+const tanpa = () => {}
+const penjelajah = (systemId: string | null) => html(m.SystemPhysiologyExplorer, { systemId, onSystem: tanpa, onSimulate: tanpa })
+const KATALOG = defaultPhysiologyCatalog()
+gagal('sistem-indeks-sebelas-tombol-bernama', () => {
+  const k = penjelajah(null)
+  bersih(k)
+  assert.equal(hitung(k, /<button\b/g), 11)
+  for (const sistem of KATALOG.systems) assert.ok(k.includes(`>${sistem.label}</span>`), `baris ${sistem.label}`)
+  assert.ok(k.includes('No sourced mechanism yet'), 'sistem tanpa sumber tampil sebagai celah')
+  assert.ok(k.includes('Context only'), 'jembatan kontekstual dinyatakan')
+})
+gagal('sistem-setiap-kartu-bersih-dan-sesuai-rencana', () => {
+  for (const sistem of KATALOG.systems) {
+    const plan = planSystemPhysiology(sistem.id, KATALOG)
+    assert.equal(plan.ok, true, sistem.id)
+    if (!plan.ok) continue
+    const v = plan.view
+    const k = penjelajah(sistem.id)
+    bersih(k)
+    assert.ok(k.includes('← All body systems'), `${sistem.id}: jalan kembali`)
+    const sitasi = v.mechanisms.reduce((n, mech) => n + mech.citations.length, 0)
+    assert.equal(hitung(k, /<a\b/g), sitasi, `${sistem.id}: satu tautan per sumber`)
+    assert.equal(hitung(k, /<a\b[^>]*target="_blank" rel="noopener noreferrer"/g), sitasi, `${sistem.id}: tautan keluar aman`)
+    for (const mech of v.mechanisms) for (const c of mech.citations) assert.ok(k.includes(`href="${c.url}"`), `${sistem.id}: ${c.url}`)
+    assert.equal(hitung(k, /<details\b/g), v.mechanisms.length + v.organGaps.length + (v.loops.length > 0 ? 1 : 0), `${sistem.id}: pengungkapan`)
+    assert.equal(hitung(k, /<summary\b/g), hitung(k, /<details\b/g), `${sistem.id}: setiap pengungkapan punya ringkasan`)
+    const simulasi = simulationsFor(sistem.id)
+    for (const s of simulasi) assert.ok(k.includes(`>${s.label}</button>`), `${sistem.id}: tombol ${s.label}`)
+    assert.equal(k.includes('No sourced mechanism for this system'), v.mechanisms.length === 0, `${sistem.id}: catatan celah hanya bila kosong`)
+    assert.doesNotMatch(k, /undefined|NaN|\[object Object\]/, `${sistem.id}: tidak ada nilai bocor`)
+  }
+})
+gagal('sistem-asing-gagal-tertutup-dengan-jalan-kembali', () => {
+  const k = penjelajah('kidney')
+  bersih(k)
+  assert.match(k, /role="alert"/)
+  assert.ok(k.includes('not in the atlas'))
+  assert.ok(!k.includes('<article'), 'tidak ada kartu untuk sistem yang tidak ada')
+  assert.ok(k.includes('← All body systems'))
+})
+gagal('segmen-label-terlihat-termuat-dalam-nama', () => {
+  const k = html(m.Segmented, { label: 'View', value: 'a', onChange: tanpa, options: [{ id: 'a', label: 'Body Systems', short: 'Systems' }, { id: 'b', label: 'Neuro Reflexes' }] })
+  bersih(k)
+  assert.match(k, /<button[^>]*aria-pressed="true"[^>]*aria-label="Body Systems"[^>]*>Systems<\/button>/)
+  assert.match(k, /<button(?![^>]*aria-label)[^>]*aria-pressed="false"[^>]*>Neuro Reflexes<\/button>/, 'berpasangan: tanpa label pendek, teks itu sendiri namanya')
+})
+gagal('lencana-kopling-tombol-hapus-cukup-besar', () => {
+  const k = html(m.CouplingBadge, { prefix: 'Coupled to:', name: 'Kidney', layer: 'Organs', onClear: tanpa })
+  bersih(k)
+  assert.match(k, /<button[^>]*min-height:36px;min-width:44px[^>]*>Clear<\/button>/)
+})
+
+console.log('atlas deck a11y: 5 decks, every tab, 11 body-system cards — all controls named, one pressed per choice group, charts described, slider values carry units, fixed colour pairs >= 4.5:1')

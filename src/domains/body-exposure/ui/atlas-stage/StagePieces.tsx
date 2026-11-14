@@ -22,7 +22,11 @@ export function Note({ color, children }: { color: string; children: ReactNode }
   )
 }
 
-export interface SegmentOption<T extends string> { id: T; label: string }
+/**
+ * `short` is what fits on the button; `label` stays the accessible name and must contain the short text
+ * (WCAG 2.5.3, label in name). Four options share ~80 px each on a phone, so a long label alone gets clipped.
+ */
+export interface SegmentOption<T extends string> { id: T; label: string; short?: string }
 
 export function Segmented<T extends string>({ label, value, options, onChange }: { label: string; value: T; options: readonly SegmentOption<T>[]; onChange: (id: T) => void }) {
   return (
@@ -34,14 +38,32 @@ export function Segmented<T extends string>({ label, value, options, onChange }:
             key={option.id}
             type="button"
             aria-pressed={active}
+            aria-label={option.short ? option.label : undefined}
+            title={option.short ? option.label : undefined}
             onClick={() => onChange(option.id)}
             className="as-focus as-fade"
-            style={{ flex: 1, minHeight: TOUCH - 4, padding: '0 6px', border: 'none', borderRadius: 11, background: active ? TONE.active : 'transparent', color: active ? TONE.onActive : TONE.dim, fontSize: 12, fontWeight: 800, cursor: 'pointer' }}
+            style={{ flex: 1, minWidth: 0, minHeight: TOUCH - 4, padding: '0 6px', border: 'none', borderRadius: 11, background: active ? TONE.active : 'transparent', color: active ? TONE.onActive : TONE.dim, fontSize: 12, lineHeight: 1.2, fontWeight: 800, cursor: 'pointer' }}
           >
-            {option.label}
+            {option.short ?? option.label}
           </button>
         )
       })}
+    </div>
+  )
+}
+
+/** The bar that says which picked structure a stage is coupled to, with a way to clear it. */
+export function CouplingBadge({ prefix, name, layer, onClear, children }: { prefix: string; name: string; layer: string; onClear: () => void; children?: ReactNode }) {
+  return (
+    <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '4px 8px', padding: '4px 4px 4px 12px', borderRadius: 12, background: 'rgba(0, 191, 99, 0.08)', border: '1px solid rgba(0, 191, 99, 0.25)', color: TONE.liveText, fontSize: 12, fontWeight: 600 }}>
+      <span aria-hidden style={{ width: 6, height: 6, borderRadius: '50%', background: TONE.live, flex: 'none' }} />
+      <span style={{ flex: '1 1 auto', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+        {prefix} <b>{name}</b> ({layer})
+      </span>
+      {children}
+      <button type="button" onClick={onClear} className="as-focus as-hover as-fade" style={{ flex: 'none', minHeight: 36, minWidth: 44, padding: '0 10px', border: 'none', borderRadius: 10, background: 'transparent', color: TONE.dim, fontSize: 12, fontWeight: 700, textDecoration: 'underline', cursor: 'pointer' }}>
+        Clear
+      </button>
     </div>
   )
 }
