@@ -4,7 +4,7 @@
  * Pure inline styles to preserve zero Tailwind bundle overhead.
  */
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import {
   CRANIAL_NERVES,
   BRAINSTEM_REFLEX_ARCS,
@@ -18,11 +18,24 @@ import { OculomotorLesionLab } from './OculomotorLesionLab'
 
 export interface NeuroFascicularReflexDeckProps {
   readonly initialTab?: 'nerves' | 'reflexes' | 'syndromes'
+  readonly initialNerveId?: string
 }
 
-export function NeuroFascicularReflexDeck({ initialTab = 'nerves' }: NeuroFascicularReflexDeckProps = {}) {
+export function NeuroFascicularReflexDeck({ initialTab = 'nerves', initialNerveId = 'cn-3' }: NeuroFascicularReflexDeckProps = {}) {
   const [activeTab, setActiveTab] = useState<'nerves' | 'reflexes' | 'syndromes'>(initialTab)
-  const [selectedNerveId, setSelectedNerveId] = useState<string>('cn-3')
+  const [selectedNerveId, setSelectedNerveId] = useState<string>(initialNerveId)
+
+  useEffect(() => {
+    if (initialTab) {
+      setActiveTab(initialTab)
+    }
+  }, [initialTab])
+
+  useEffect(() => {
+    if (initialNerveId) {
+      setSelectedNerveId(initialNerveId)
+    }
+  }, [initialNerveId])
   const [selectedReflexId, setSelectedReflexId] = useState<string>('pupillary-light-reflex')
   const [stimulusSide, setStimulusSide] = useState<'left' | 'right'>('right')
   const [afferentIntact, setAfferentIntact] = useState<boolean>(true)

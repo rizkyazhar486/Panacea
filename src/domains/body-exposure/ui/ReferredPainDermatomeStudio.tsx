@@ -5,7 +5,7 @@
 // The two accent TEXT colours are theme-aware utility pairs that the stylesheet already ships (no new CSS):
 // a single fixed colour cannot reach 4.5:1 on both a light page and the dark atlas stage, where this studio is also shown.
 
-import React, { useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import {
   DERMATOME_CONVERGENCE_SOURCE,
   DERMATOME_SPATIAL_ANCHORS,
@@ -30,12 +30,22 @@ const ORGAN_OPTIONS: readonly { key: VisceralOrganKey; label: string; badge: str
   { key: 'colon-distal-sigmoid', label: 'Distal Colon / Sigmoid', badge: 'L1–L2, S2–S4' },
 ]
 
-export function ReferredPainDermatomeStudio(): React.ReactElement {
-  const [selectedOrgan, setSelectedOrgan] = useState<VisceralOrganKey>('heart-myocardium')
+export interface ReferredPainDermatomeStudioProps {
+  readonly initialOrgan?: VisceralOrganKey
+}
+
+export function ReferredPainDermatomeStudio({ initialOrgan = 'heart-myocardium' }: ReferredPainDermatomeStudioProps = {}): React.ReactElement {
+  const [selectedOrgan, setSelectedOrgan] = useState<VisceralOrganKey>(initialOrgan)
   const [projectionView, setProjectionView] = useState<'anterior' | 'posterior'>('anterior')
   const [centralSensitizationCoeff, setCentralSensitizationCoeff] = useState<number>(0.35)
   const [baseNociceptiveStimulus, setBaseNociceptiveStimulus] = useState<number>(0.8)
   const [selectedSegmentDetail, setSelectedSegmentDetail] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (initialOrgan) {
+      setSelectedOrgan(initialOrgan)
+    }
+  }, [initialOrgan])
 
   const organRow = useMemo(() => {
     return VISCERAL_REFERRED_PAIN_TABLE[selectedOrgan]

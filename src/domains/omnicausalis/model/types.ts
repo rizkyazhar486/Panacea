@@ -162,3 +162,30 @@ export interface LongevityExposomeSummary {
   readonly exposomeOxidativeBurdenIndex: number; readonly longevityRecoveryScore: number;
 }
 export type InteractionGrammarStage = 'see' | 'ask' | 'zoom' | 'why' | 'what_if' | 'act';
+
+export interface OmnicausalisMultiscaleCouplingInput {
+  readonly bioEmuOpenProbability: number;
+  readonly mitoOxPhosAtpFluxIndex: number;
+  readonly mitophagyActive: boolean;
+  readonly remopReceptorOccupancy: number;
+  readonly sepsisSofaTotalScore: number;
+  readonly cgmTimeInRangePct: number;
+  readonly footStrikeClassification: 'forefoot_strike' | 'midfoot_strike' | 'rearfoot_strike';
+  readonly bioAgeDeltaYears: number;
+  readonly exposomeOxidativeBurdenIndex: number;
+  readonly recordedDeviceChannelsCount: number;
+  readonly predictionVsObservedResidualPct: number;
+}
+
+export interface OmnicausalisMultiscaleCouplingSummary {
+  readonly myocardialBioenergeticReservePct: number;
+  readonly coupledHemodynamicStabilityIndex: number;
+  readonly vascularHyporeactivityRisk: boolean;
+  readonly systemicAllostaticLoadIndex: number;
+  readonly parameterIdentifiabilityVerified: boolean;
+  readonly realityGapScore: number;
+  readonly isolatedFromCanonicalHistory: true;
+  readonly requiresHumanPhysicianSignoff: true;
+  readonly counterfactualBranchSummary: string;
+}
+

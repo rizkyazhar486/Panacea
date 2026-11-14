@@ -35,6 +35,12 @@ import { regionFrameById } from '../engine/atlas-stage/regionFraming'
 import type { SheetSnap } from '../engine/atlas-stage/sheetSnap'
 import { describeStructure } from '../engine/atlas-stage/structureInfo'
 import type { AtlasCameraCommand, AtlasViewerComponent } from '../engine/atlas-stage/viewerContract'
+import {
+  decksFor,
+  type ClinicalTool,
+  type PhysiologySystem,
+  type StructureCouplingContext,
+} from '../engine/atlasStageDecks'
 
 interface BodyExposureAtlasHomeProps {
   /** The 3D viewer, supplied by the composition root. */
@@ -42,9 +48,6 @@ interface BodyExposureAtlasHomeProps {
   /** Sends a camera command to that viewer. */
   sendCamera: (command: AtlasCameraCommand) => void
 }
-
-type PhysiologySystem = 'cardiopulmonary' | 'soft_tissue' | 'neuro'
-type ClinicalTool = 'vascular' | 'referred_pain' | 'neuro_localizer' | 'diagnostic_imaging'
 
 const STAGES: readonly { id: AtlasStage; label: string; short: string }[] = [
   { id: 'anatomy', label: '1. Anatomy', short: 'Anatomy' },
@@ -67,16 +70,7 @@ const CLINICAL: readonly { id: ClinicalTool; label: string }[] = [
 
 const layerSpec = (id: AtlasLayerId | null) => ATLAS_LAYERS.find((layer) => layer.id === id) ?? null
 
-/** Which simulation deck and clinical tool a structure opens first. Routing only; it claims nothing. */
-function decksFor(info: SelectedStructureInfo): { physiology: PhysiologySystem; clinical: ClinicalTool } {
-  const lower = `${info.cleanName} ${info.meshName}`.toLowerCase()
-  if (info.layerId === 'skeletal' || /bone|femur|tibia|vertebra|skull|rib/.test(lower)) {
-    return { physiology: 'soft_tissue', clinical: 'diagnostic_imaging' }
-  }
-  if (info.layerId === 'cardiovascular' || /heart|aorta|coronar|arter|vein/.test(lower)) return { physiology: 'cardiopulmonary', clinical: 'vascular' }
-  if (info.layerId === 'nervous' || /brain|nerve|cord|pons|medulla/.test(lower)) return { physiology: 'neuro', clinical: 'neuro_localizer' }
-  return { physiology: 'soft_tissue', clinical: 'referred_pain' }
-}
+export { decksFor, type StructureCouplingContext }
 
 export function BodyExposureAtlasHome({ Viewer, sendCamera }: BodyExposureAtlasHomeProps) {
   const { isDesktop } = useAdaptive()
@@ -87,6 +81,7 @@ export function BodyExposureAtlasHome({ Viewer, sendCamera }: BodyExposureAtlasH
   const mode: AtlasPlateMode = chosenMode ?? (isDesktop ? 'peeled' : 'focus')
   const [overrides, setOverrides] = useState<AtlasLayerOverrides>({})
   const [selectedStructure, setSelectedStructure] = useState<SelectedStructureInfo | null>(null)
+  const [couplingContext, setCouplingContext] = useState<StructureCouplingContext | null>(null)
   const [focusName, setFocusName] = useState<string | null>(null)
   const [regionId, setRegionId] = useState<string>('all')
   const [isSidePanelOpen, setIsSidePanelOpen] = useState(true)
@@ -104,10 +99,11 @@ export function BodyExposureAtlasHome({ Viewer, sendCamera }: BodyExposureAtlasH
 
   const selectStructure = useCallback((rawName: string, layer: AtlasLayerId | null) => {
     const info = describeStructure(rawName, layer)
-    const decks = decksFor(info)
+    const context = decksFor(info)
     setSelectedStructure(info)
-    setPhysiologySystem(decks.physiology)
-    setClinicalTool(decks.clinical)
+    setCouplingContext(context)
+    setPhysiologySystem(context.physiology)
+    setClinicalTool(context.clinical)
     setIsSidePanelOpen(true)
   }, [])
 
@@ -139,7 +135,9 @@ export function BodyExposureAtlasHome({ Viewer, sendCamera }: BodyExposureAtlasH
     setSelectedStructure((current) => {
       if (!current?.layerId) return current
       const after = planStageLayers({ depth: next, mode, overrides })
-      return after.ok && after.solid.includes(current.layerId) ? current : null
+      const keeps = after.ok && after.solid.includes(current.layerId)
+      if (!keeps) setCouplingContext(null)
+      return keeps ? current : null
     })
     setFocusName(null)
   }, [mode, overrides])
@@ -159,7 +157,7 @@ export function BodyExposureAtlasHome({ Viewer, sendCamera }: BodyExposureAtlasH
     setFocusName(selectedStructure.meshName)
     setRegionId('')
   }, [selectedStructure])
-  const clearSelection = useCallback(() => { setSelectedStructure(null); resetView() }, [resetView])
+  const clearSelection = useCallback(() => { setSelectedStructure(null); setCouplingContext(null); resetView() }, [resetView])
 
   const toggleLayer = useCallback((id: AtlasLayerId) => {
     setOverrides((current) => {
@@ -207,10 +205,54 @@ export function BodyExposureAtlasHome({ Viewer, sendCamera }: BodyExposureAtlasH
 
   const physiologyBody = (
     <>
+      {selectedStructure && (
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '8px 12px',
+          borderRadius: 12,
+          background: 'rgba(0, 191, 99, 0.08)',
+          border: '1px solid rgba(0, 191, 99, 0.25)',
+          color: '#00bf63',
+          fontSize: 11,
+          fontWeight: 600,
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
+            <span style={{ display: 'inline-block', width: 6, height: 6, borderRadius: '50%', background: '#00bf63', flexShrink: 0 }} />
+            <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              Coupled to: <b>{selectedStructure.cleanName}</b> ({selectedLayer?.short ?? 'Atlas'})
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={clearSelection}
+            style={{
+              border: 'none',
+              background: 'transparent',
+              color: '#8e8e93',
+              cursor: 'pointer',
+              fontSize: 10,
+              textDecoration: 'underline',
+              flexShrink: 0,
+              marginLeft: 8,
+            }}
+          >
+            Clear
+          </button>
+        </div>
+      )}
       <Segmented label="Physiology system" value={physiologySystem} options={PHYSIOLOGY} onChange={setPhysiologySystem} />
       {physiologySystem === 'cardiopulmonary' && <CardiopulmonaryCouplingDeck />}
-      {physiologySystem === 'soft_tissue' && <SoftTissueBiomechanicsDeck />}
-      {physiologySystem === 'neuro' && <NeuroFascicularReflexDeck initialTab="reflexes" />}
+      {physiologySystem === 'soft_tissue' && (
+        <SoftTissueBiomechanicsDeck
+          initialOrganId={couplingContext?.softTissueOrganId}
+          initialTab={couplingContext?.softTissueTab}
+        />
+      )}
+      {physiologySystem === 'neuro' && (
+        <NeuroFascicularReflexDeck initialTab="reflexes" initialNerveId={couplingContext?.neuroNerveId} />
+      )}
       <Note color={TONE.sim}>
         <b>Simulation Truth Class:</b> mechanistic_simulation_proxy · Deterministic ordinary differential equations with zero synthetic biomarkers. A simulation, not a reading from a body.
       </Note>
@@ -220,11 +262,63 @@ export function BodyExposureAtlasHome({ Viewer, sendCamera }: BodyExposureAtlasH
 
   const clinicalBody = (
     <>
+      {selectedStructure && (
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '8px 12px',
+          borderRadius: 12,
+          background: 'rgba(0, 191, 99, 0.08)',
+          border: '1px solid rgba(0, 191, 99, 0.25)',
+          color: '#00bf63',
+          fontSize: 11,
+          fontWeight: 600,
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
+            <span style={{ display: 'inline-block', width: 6, height: 6, borderRadius: '50%', background: '#00bf63', flexShrink: 0 }} />
+            <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              Clinical target: <b>{selectedStructure.cleanName}</b> ({selectedLayer?.short ?? 'Atlas'})
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={clearSelection}
+            style={{
+              border: 'none',
+              background: 'transparent',
+              color: '#8e8e93',
+              cursor: 'pointer',
+              fontSize: 10,
+              textDecoration: 'underline',
+              flexShrink: 0,
+              marginLeft: 8,
+            }}
+          >
+            Clear
+          </button>
+        </div>
+      )}
       <Segmented label="Clinical tool" value={clinicalTool} options={CLINICAL} onChange={setClinicalTool} />
-      {clinicalTool === 'vascular' && <CoronaryTerritoryPanel defaultOpen={true} />}
-      {clinicalTool === 'referred_pain' && <ReferredPainDermatomeStudio />}
-      {clinicalTool === 'neuro_localizer' && <NeuroFascicularReflexDeck initialTab="syndromes" />}
-      {clinicalTool === 'diagnostic_imaging' && <KaloLumenVolumetricStudio />}
+      {clinicalTool === 'vascular' && (
+        <CoronaryTerritoryPanel
+          defaultOpen={true}
+          initialSegment={couplingContext?.coronarySegment}
+        />
+      )}
+      {clinicalTool === 'referred_pain' && (
+        <ReferredPainDermatomeStudio
+          initialOrgan={couplingContext?.referredPainOrgan}
+        />
+      )}
+      {clinicalTool === 'neuro_localizer' && (
+        <NeuroFascicularReflexDeck initialTab="syndromes" initialNerveId={couplingContext?.neuroNerveId} />
+      )}
+      {clinicalTool === 'diagnostic_imaging' && (
+        <KaloLumenVolumetricStudio
+          initialPresetId={couplingContext?.imagingPresetId}
+        />
+      )}
       <Note color={TONE.gate}>
         <b>Clinical Gate:</b> Reference correlation for educational and mechanistic study. Does not constitute autonomous patient diagnosis or signed radiological report.
       </Note>

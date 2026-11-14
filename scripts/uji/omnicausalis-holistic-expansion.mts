@@ -5,7 +5,8 @@ import {
   computeDirectionalLightVector, createTruthEnvelope, evaluateBioEmuConformationalEnsemble,
   evaluateDeNovoBinderCandidate, evaluateKaloLumenReconstruction, evaluateLongevityEnergyBalance,
   evaluateLongevityNutritionAndExposome, evaluateMitochondrialAutophagyDynamics,
-  evaluateOneOsEncounterPayerHarmonization, evaluatePantheonMultiSpecialistConsensus,
+  evaluateOmnicausalisMultiscaleCoupling, evaluateOneOsEncounterPayerHarmonization,
+  evaluatePantheonMultiSpecialistConsensus,
   evaluateRemopReceptorOccupancy, evaluateSensoriumBiometricsAndGait, evaluateSepsisSafeguard,
   mapTextToVrmVisemeFrames, runProteinFighterArenaRound, translateUniversalDeviceEnvelope,
 } from '../../src/domains/omnicausalis-index.ts';
@@ -225,7 +226,49 @@ import {
   assert.ok(longevity.payload.longevityRecoveryScore > 80);
 }
 
-// 10. Purity & Determinism Guard
+// 10. Multiscale Omnicausalis Coupling & Reality Engine Identifiability Gate
+{
+  const identifiable = evaluateOmnicausalisMultiscaleCoupling({
+    bioEmuOpenProbability: 0.55,
+    mitoOxPhosAtpFluxIndex: 88,
+    mitophagyActive: false,
+    remopReceptorOccupancy: 0.45,
+    sepsisSofaTotalScore: 2,
+    cgmTimeInRangePct: 92,
+    footStrikeClassification: 'forefoot_strike',
+    bioAgeDeltaYears: -3.5,
+    exposomeOxidativeBurdenIndex: 18,
+    recordedDeviceChannelsCount: 4,
+    predictionVsObservedResidualPct: 6,
+  });
+  assert.equal(identifiable.truthClass, 'SIMULATED_EDUCATIONAL');
+  assert.equal(identifiable.payload.parameterIdentifiabilityVerified, true);
+  assert.equal(identifiable.payload.vascularHyporeactivityRisk, false);
+  assert.equal(identifiable.payload.isolatedFromCanonicalHistory, true);
+  assert.equal(identifiable.payload.requiresHumanPhysicianSignoff, true);
+  assert.equal(identifiable.payload.realityGapScore, 6);
+  assert.ok(identifiable.payload.myocardialBioenergeticReservePct > 80);
+
+  const hyporeactiveLocked = evaluateOmnicausalisMultiscaleCoupling({
+    bioEmuOpenProbability: 0.9,
+    mitoOxPhosAtpFluxIndex: 42,
+    mitophagyActive: true,
+    remopReceptorOccupancy: 0.78,
+    sepsisSofaTotalScore: 11,
+    cgmTimeInRangePct: 55,
+    footStrikeClassification: 'rearfoot_strike',
+    bioAgeDeltaYears: 6.0,
+    exposomeOxidativeBurdenIndex: 62,
+    recordedDeviceChannelsCount: 2,
+    predictionVsObservedResidualPct: 22,
+  });
+  assert.equal(hyporeactiveLocked.payload.parameterIdentifiabilityVerified, false);
+  assert.equal(hyporeactiveLocked.payload.vascularHyporeactivityRisk, true);
+  assert.equal(hyporeactiveLocked.payload.realityGapScore, 38);
+  assert.ok(hyporeactiveLocked.payload.counterfactualBranchSummary.includes('Calibration locked'));
+}
+
+// 11. Purity & Determinism Guard
 {
   const src = readFileSync(new URL('../../src/domains/omnicausalis/engine/omnicausalisEngine.ts', import.meta.url), 'utf8');
   for (const forbidden of ['window.', 'localStorage', 'sessionStorage', 'Date.now(', 'Math.random(']) {
@@ -233,4 +276,4 @@ import {
   }
 }
 
-console.log('omnicausalis: all 7 Transcendental Pillars (Quantum/Mitochondria, KaloLumen/UDT-OS, Sepsis/Pantheon, Zero-Loss EMR/One-OS Payer, Sensorium Gait/CGM, Nusantara Longevity/Exposome, Interaction Grammar) verified');
+console.log('omnicausalis: all 7 Transcendental Pillars + Multiscale Reality Engine Coupling verified');
