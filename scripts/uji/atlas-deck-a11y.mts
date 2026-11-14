@@ -14,7 +14,7 @@ import { renderToStaticMarkup } from 'react-dom/server'
 import { ORGAN_BIOMECHANICS_CATALOG, GI_PERISTALSIS_CATALOG } from '../../src/domains/body-exposure/engine/softTissueBiomechanicsEngine.ts'
 import { DECK_ACTIVE_FILL, sliderValueText } from '../../src/domains/body-exposure/ui/deck-kit/deckA11y.ts'
 import { defaultPhysiologyCatalog } from '../../src/domains/body-exposure/engine/system-physiology/physiologyCatalog.ts'
-import { planSystemPhysiology } from '../../src/domains/body-exposure/engine/system-physiology/systemPhysiology.ts'
+import { planSystemIndex, planSystemPhysiology } from '../../src/domains/body-exposure/engine/system-physiology/systemPhysiology.ts'
 import { simulationsFor } from '../../src/domains/body-exposure/engine/system-physiology/systemSimulations.ts'
 
 const gagal = (nama: string, f: () => void) => { try { f() } catch (e) { throw new Error(`[${nama}] ${(e as Error).message}`) } }
@@ -82,6 +82,7 @@ const out = await build({
       "export { CoronaryTerritoryPanel } from './src/domains/body-exposure/ui/CoronaryTerritoryPanel.tsx'",
       "export { ReferredPainDermatomeStudio } from './src/domains/body-exposure/ui/ReferredPainDermatomeStudio.tsx'",
       "export { SystemPhysiologyExplorer } from './src/domains/body-exposure/ui/system-physiology/SystemPhysiologyExplorer.tsx'",
+      "export { evidenceLine } from './src/domains/body-exposure/ui/system-physiology/SystemIndex.tsx'",
       "export { Segmented, CouplingBadge } from './src/domains/body-exposure/ui/atlas-stage/StagePieces.tsx'",
     ].join('\n'),
     resolveDir: process.cwd(), loader: 'ts',
@@ -234,8 +235,21 @@ gagal('sistem-indeks-sebelas-tombol-bernama', () => {
   bersih(k)
   assert.equal(hitung(k, /<button\b/g), 11)
   for (const sistem of KATALOG.systems) assert.ok(k.includes(`>${sistem.label}</span>`), `baris ${sistem.label}`)
-  assert.ok(k.includes('No sourced mechanism yet'), 'sistem tanpa sumber tampil sebagai celah')
-  assert.ok(k.includes('Context only'), 'jembatan kontekstual dinyatakan')
+  const indeks = planSystemIndex(KATALOG)
+  assert.equal(indeks.ok, true)
+  if (!indeks.ok) return
+  for (const row of indeks.rows) assert.ok(k.includes(`>${m.evidenceLine(row)}</span>`), `${row.id}: baris bukti dari rencana`)
+  assert.ok(k.includes('>Context only · 2 sourced mechanisms</span>'), 'jembatan kontekstual dinyatakan, mekanismenya sendiri tetap dihitung')
+})
+gagal('sistem-baris-bukti-setiap-cabang', () => {
+  const baris = (fidelity: string, mechanismCount: number, gapCount: number) => m.evidenceLine({ fidelity, mechanismCount, gapCount })
+  assert.equal(baris('direct', 0, 0), 'No sourced mechanism yet', 'tanpa sumber tampil sebagai celah, bukan nol')
+  assert.equal(baris('direct', 1, 0), '1 sourced mechanism')
+  assert.equal(baris('compound', 3, 7), '3 sourced mechanisms · 7 organs not yet sourced')
+  assert.equal(baris('direct', 0, 1), 'No sourced mechanism yet · 1 organ not yet sourced')
+  assert.equal(baris('contextual', 0, 0), 'Context only · no physiology model of its own yet')
+  assert.equal(baris('contextual', 2, 0), 'Context only · 2 sourced mechanisms', 'berpasangan: hanya jumlah mekanisme yang berbeda')
+  assert.equal(baris('contextual', 0, 2), 'Context only · No sourced mechanism yet · 2 organs not yet sourced', 'celah organ tidak disembunyikan pada sistem kontekstual')
 })
 gagal('sistem-setiap-kartu-bersih-dan-sesuai-rencana', () => {
   for (const sistem of KATALOG.systems) {

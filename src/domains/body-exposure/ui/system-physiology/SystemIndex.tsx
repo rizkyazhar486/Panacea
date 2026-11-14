@@ -7,11 +7,15 @@ import { TONE, eyebrow, paragraph } from '../atlas-stage/stageTokens'
 
 export const systemRowId = (id: BodySystemId) => `system-row-${id}`
 
-/** One line under the label: how much of the system's physiology carries a source here. */
+/**
+ * One line under the label: how much of the system's physiology carries a source here. A contextual system has no
+ * whole-body physiology domain of its own, which the line says first; its own sourced mechanisms still count.
+ */
 export function evidenceLine(row: Pick<SystemIndexRow, 'fidelity' | 'mechanismCount' | 'gapCount'>): string {
-  if (row.fidelity === 'contextual') return 'Context only · no physiology model of its own yet'
   const sourced = row.mechanismCount === 0 ? 'No sourced mechanism yet' : `${row.mechanismCount} sourced mechanism${row.mechanismCount === 1 ? '' : 's'}`
-  return row.gapCount === 0 ? sourced : `${sourced} · ${row.gapCount} organ${row.gapCount === 1 ? '' : 's'} not yet sourced`
+  const line = row.gapCount === 0 ? sourced : `${sourced} · ${row.gapCount} organ${row.gapCount === 1 ? '' : 's'} not yet sourced`
+  if (row.fidelity !== 'contextual') return line
+  return row.mechanismCount === 0 && row.gapCount === 0 ? 'Context only · no physiology model of its own yet' : `Context only · ${line}`
 }
 
 export function SystemIndex({ rows, onOpen }: { rows: readonly SystemIndexRow[]; onOpen: (id: BodySystemId) => void }) {
