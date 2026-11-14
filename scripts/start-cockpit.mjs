@@ -1,3 +1,4 @@
+import { runPanaceaMedWave160ImaginativeSingularityMaster } from '../src/core/panaceamedImaginativeSingularityOs.mjs';
 import { runPanaceaMedWave140DataPipelineMaster } from '../src/core/panaceamedDataPipelineEdgeCloudEngine.mjs';
 import { runPanaceaMedWave140ShenzhenTcmMasterOs } from '../src/core/panaceamedShenzhenTcmProactiveLifecycleOs.mjs';
 import { runPanaceaMedWave120EmbodiedRoboticMasterOs } from '../src/core/panaceamedEmbodiedRoboticKinematicsOs.mjs';
@@ -49,6 +50,13 @@ const server = http.createServer((req, res) => {
     const shenzhenTcm = runPanaceaMedWave140ShenzhenTcmMasterOs();
     res.writeHead(200, { 'content-type': 'application/json; charset=utf-8' });
     res.end(JSON.stringify(shenzhenTcm, null, 2));
+    return;
+  }
+
+  if (req.method === 'GET' && urlPath === '/api/v6/imaginative/chronofs') {
+    const imaginative = runPanaceaMedWave160ImaginativeSingularityMaster();
+    res.writeHead(200, { 'content-type': 'application/json; charset=utf-8' });
+    res.end(JSON.stringify(imaginative, null, 2));
     return;
   }
 
