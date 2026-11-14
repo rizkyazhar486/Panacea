@@ -71,6 +71,8 @@ export interface SystemIndexRow {
   role: string
   fidelity: BodyPhysiologyBridgeFidelity
   mechanismCount: number
+  /** The sourced mechanisms of this system, in catalog order (what its self-check goes through). */
+  mechanismIds: readonly string[]
   gapCount: number
   sourced: boolean
 }
@@ -183,15 +185,16 @@ export function planSystemIndex(catalog: SystemPhysiologyCatalog): SystemIndexPl
   const rows = catalog.systems.map((system) => {
     const entry = catalog.bridge.find((item) => item.atlasSystemId === system.id)!
     const primary = catalog.domains.find((domain) => domain.id === entry.physiologySystemIds[0])!
-    const mechanismCount = catalog.mechanisms.filter((mechanism) => mechanism.systems.includes(system.id)).length
+    const mechanismIds = catalog.mechanisms.filter((mechanism) => mechanism.systems.includes(system.id)).map((mechanism) => mechanism.id)
     return {
       id: system.id,
       label: system.label,
       role: primary.primaryRole,
       fidelity: entry.fidelity,
-      mechanismCount,
+      mechanismCount: mechanismIds.length,
+      mechanismIds,
       gapCount: catalog.gaps.filter((gap) => gap.system === system.id).length,
-      sourced: mechanismCount > 0,
+      sourced: mechanismIds.length > 0,
     }
   })
   return { ok: true, rows }
