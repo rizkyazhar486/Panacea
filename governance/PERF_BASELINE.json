@@ -1,0 +1,72 @@
+{
+  "_catatan": "Ratchet performa F2 (scripts/qa/perf-ratchet.mjs, dipakai perf-audit.mjs bila PERF_BASELINE diset). Nilai = MAKS median dari dua run CI main: 43489708796 (d7d8aee) dan 43529922257 (f8d9685), build produksi, N=5, mobile CPU 4x. cls dibulatkan ke atas 0,001 dari log (log mencetak 3 desimal). Toleransi: bytesJs x1,03; requests +3; cls +0,02. LCP dan TBT TIDAK digerbang karena berubah besar antar-run tanpa perubahan kode (mis. TBT desktop chatbot 441 vs 109 ms); keduanya tetap dilaporkan terhadap anggaran Web Vitals. Menurunkan baseline boleh; menaikkannya wajib disertai alasan dan bukti run CI.",
+  "sumber": {
+    "runCi": [
+      43489708796,
+      43529922257
+    ],
+    "sampelPerHalaman": 5
+  },
+  "halaman": {
+    "mobile-390x844|landing-anonim": {
+      "bytesJs": 257927,
+      "requests": 33,
+      "cls": 0.093
+    },
+    "mobile-390x844|beranda-pasien": {
+      "bytesJs": 506795,
+      "requests": 73,
+      "cls": 0.128
+    },
+    "mobile-390x844|harian": {
+      "bytesJs": 263254,
+      "requests": 41,
+      "cls": 0
+    },
+    "mobile-390x844|chatbot": {
+      "bytesJs": 280145,
+      "requests": 47,
+      "cls": 0
+    },
+    "mobile-390x844|clinical-hub": {
+      "bytesJs": 535438,
+      "requests": 63,
+      "cls": 0
+    },
+    "mobile-390x844|health-data": {
+      "bytesJs": 392457,
+      "requests": 54,
+      "cls": 0
+    },
+    "desktop-1440x900|landing-anonim": {
+      "bytesJs": 257927,
+      "requests": 33,
+      "cls": 0.006
+    },
+    "desktop-1440x900|beranda-pasien": {
+      "bytesJs": 506795,
+      "requests": 79,
+      "cls": 0.074
+    },
+    "desktop-1440x900|harian": {
+      "bytesJs": 263254,
+      "requests": 41,
+      "cls": 0
+    },
+    "desktop-1440x900|chatbot": {
+      "bytesJs": 280145,
+      "requests": 47,
+      "cls": 0
+    },
+    "desktop-1440x900|clinical-hub": {
+      "bytesJs": 713161,
+      "requests": 75,
+      "cls": 0
+    },
+    "desktop-1440x900|health-data": {
+      "bytesJs": 392457,
+      "requests": 54,
+      "cls": 0
+    }
+  }
+}
