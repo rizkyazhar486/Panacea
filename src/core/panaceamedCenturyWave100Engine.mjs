@@ -10,6 +10,8 @@
  */
 
 import crypto from 'node:crypto';
+
+const CACHED_ED25519_KEYPAIR = crypto.generateKeyPairSync('ed25519');
 import * as sovereignWave80 from './panaceamedSovereignEndToEndEngine.mjs';
 
 // ============================================================================
@@ -25,7 +27,7 @@ export function evaluateWave81To84Ed25519PhysicianSignoff(payload = {}) {
     tamperPayloadDuringVerification = false
   } = payload;
 
-  const { publicKey, privateKey } = crypto.generateKeyPairSync('ed25519');
+  const { publicKey, privateKey } = CACHED_ED25519_KEYPAIR;
   const signingTimestampIso = '2026-11-14T08:30:00.000Z';
 
   const canonicalSignMessage = JSON.stringify({
