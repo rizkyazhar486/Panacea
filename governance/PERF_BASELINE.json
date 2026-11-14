@@ -1,0 +1,55 @@
+{
+  "_catatan": "Gerbang ratchet performa F2 (scripts/qa/perf-ratchet.mjs, dipakai perf-audit.mjs dengan PERF_BASELINE di CI job perf-audit). Mengukur median byte JS (encodedBodySize, build produksi lewat vite preview tanpa kompresi) dan jumlah request yang benar-benar dimuat tiap halaman x viewport setelah settle 2,5 dtk. Diukur lokal pada main 732c10440 (VITE_API_URL=http://127.0.0.1:18790 npx vite build), N=5 x 2 run: byte JS identik di 20 sampel per halaman (deterministik terhadap build), request bervariasi paling banyak 1 (chatbot desktop 46/47). Batas byte = terukur x 1,03 (dibulatkan ke bawah); request = terukur + 2. Ratchet: turunkan batas saat terukur jauh di bawahnya; jangan naikkan tanpa alasan tertulis di PR. TBT/LCP/CLS TIDAK digerbang (waktu runner berderau; TBT mobile masih melebihi 200 ms di keenam halaman) sehingga gerbang ini bukan klaim anggaran Web Vitals terpenuhi.",
+  "toleransiByte": 0.03,
+  "toleransiRequest": 2,
+  "batas": {
+    "mobile-390x844/landing-anonim": {
+      "bytesJs": 257917,
+      "requests": 33
+    },
+    "mobile-390x844/beranda-pasien": {
+      "bytesJs": 505481,
+      "requests": 73
+    },
+    "mobile-390x844/harian": {
+      "bytesJs": 262749,
+      "requests": 41
+    },
+    "mobile-390x844/chatbot": {
+      "bytesJs": 279638,
+      "requests": 47
+    },
+    "mobile-390x844/clinical-hub": {
+      "bytesJs": 534133,
+      "requests": 63
+    },
+    "mobile-390x844/health-data": {
+      "bytesJs": 389266,
+      "requests": 54
+    },
+    "desktop-1440x900/landing-anonim": {
+      "bytesJs": 257917,
+      "requests": 33
+    },
+    "desktop-1440x900/beranda-pasien": {
+      "bytesJs": 505481,
+      "requests": 79
+    },
+    "desktop-1440x900/harian": {
+      "bytesJs": 262749,
+      "requests": 41
+    },
+    "desktop-1440x900/chatbot": {
+      "bytesJs": 279638,
+      "requests": 46
+    },
+    "desktop-1440x900/clinical-hub": {
+      "bytesJs": 711849,
+      "requests": 75
+    },
+    "desktop-1440x900/health-data": {
+      "bytesJs": 389266,
+      "requests": 54
+    }
+  }
+}

@@ -4,11 +4,13 @@
 // LCP/CLS/tugas panjang dikumpulkan dengan PerformanceObserver sejak dokumen mulai; TBT = jumlah (durasi - 50 ms) tugas panjang setelah FCP (proksi lab untuk INP);
 // ukuran = encodedBodySize sumber daya (tanpa kompresi di server preview, jadi sama dengan ukuran berkas). Acuan anggaran = ambang "baik" Web Vitals
 // (scripts/qa/perf-stats.mjs). BATAS: runner CI bukan perangkat pengguna dan tidak ada data lapangan (RUM); angka ini bukti lab, bukan klaim pengalaman pengguna.
-// Mode: LAPORAN (tanpa baseline) — gagal hanya bila sebuah halaman tidak dapat diukur sama sekali. Ratchet dari nilai terukur CI adalah langkah berikutnya.
+// Mode: tanpa PERF_BASELINE = LAPORAN (gagal hanya bila halaman tak terukur). Dengan PERF_BASELINE (CI) = GERBANG ratchet byte JS + jumlah request per
+// halaman x viewport (scripts/qa/perf-ratchet.mjs); TBT/LCP/CLS tetap laporan karena waktu di runner berderau.
 //
 // Jalankan: server API dan `vite preview` (build produksi) aktif, lalu
 //   PLAYWRIGHT_MODULE=<path>/playwright/index.js CHROME=<path chrome> QA_OUT=<json> QA_URL=http://localhost:5191/ node scripts/qa/perf-audit.mjs
-import { writeFileSync } from 'node:fs'
+import { readFileSync, writeFileSync } from 'node:fs'
+import { bandingkanPerf } from './perf-ratchet.mjs'
 import { ANGGARAN, agregat, cumulativeLayoutShift, statusAnggaran, totalBlockingTime } from './perf-stats.mjs'
 import { enoughPerfEvidence, minimumPerfSamples, perfSampleProblem } from './perf-sample-coverage.mjs'
 
@@ -87,7 +89,20 @@ const ringkas = { dihasilkan: new Date().toISOString(), app: APP, sampelPerHalam
   metodologi: 'build produksi; cache dingin per sampel; median dan terburuk; mobile CPU 4x; jaringan tidak diperlambat; LCP/CLS/longtask via PerformanceObserver; TBT setelah FCP; bukan data lapangan',
   ringkasanAnggaran: { lulus: 0, melebihi: 0, takTerukur: 0 }, hasil }
 for (const r of hasil) for (const s of Object.values(r.anggaran)) { if (s === 'lulus') ringkas.ringkasanAnggaran.lulus++; else if (s === 'melebihi') ringkas.ringkasanAnggaran.melebihi++; else ringkas.ringkasanAnggaran.takTerukur++ }
+let gerbang = null
+if (process.env.PERF_BASELINE) {
+  let baseline = null
+  try { baseline = JSON.parse(readFileSync(process.env.PERF_BASELINE, 'utf8')) } catch (e) { console.error(`perf-audit: baseline tidak terbaca: ${e.message}`) }
+  gerbang = bandingkanPerf(hasil, baseline)
+  ringkas.gerbang = { baseline: process.env.PERF_BASELINE, ...gerbang }
+}
 writeFileSync(process.env.QA_OUT || 'perf-evidence.json', JSON.stringify(ringkas, null, 2))
 for (const r of hasil) console.log(`${r.viewport} ${r.halaman.padEnd(15)} n=${r.sampelSah} lcp=${r.agg.lcpMs.median?.toFixed(0) ?? '-'}ms cls=${r.agg.cls.median?.toFixed(3) ?? '-'} tbt=${r.agg.tbtMs.median?.toFixed(0) ?? '-'}ms js=${r.agg.bytesJs.median ?? '-'}B req=${r.agg.requests.median ?? '-'} [${r.anggaran.lcpMs}/${r.anggaran.cls}/${r.anggaran.tbtMs}]`)
 console.log(`perf-audit: ${hasil.length} pengukuran; anggaran lulus ${ringkas.ringkasanAnggaran.lulus}, melebihi ${ringkas.ringkasanAnggaran.melebihi}, tak terukur ${ringkas.ringkasanAnggaran.takTerukur}; halaman dengan sampel metrik lengkap kurang dari mayoritas: ${gagalUkur}`)
 if (gagalUkur > 0) { console.error(`perf-audit: ${gagalUkur} halaman tidak cukup sampel metrik lengkap`); process.exit(1) }
+if (gerbang) {
+  for (const t of gerbang.saranTurun) console.log(`perf-audit: ${t.kunci} ${t.metrik} ${t.terukur} di bawah baseline ${t.batas} — turunkan baseline (ratchet)`)
+  for (const p of gerbang.pelanggaran) console.error(`perf-audit GAGAL: ${p.kunci} ${p.jenis}${p.metrik ? ` ${p.metrik}` : ''}${p.terukur !== undefined ? ` ${p.terukur} > ${p.batas}` : ''}${p.pesan ? ` (${p.pesan})` : ''}`)
+  if (!gerbang.ok) process.exit(1)
+  console.log(`perf-audit: gerbang ratchet lulus (${hasil.length} halaman x viewport)`)
+}
