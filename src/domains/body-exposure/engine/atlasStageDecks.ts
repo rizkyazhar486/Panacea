@@ -8,6 +8,7 @@
  * - Nervous structures -> Neuro Reflexes & Syndromic Deficit Localizer
  * - Visceral organs -> Soft Tissue Biomechanics & Referred Pain Dermatomes (C1–S5)
  * - Skeletal & Pulmonary structures -> Specialized Diagnostic Imaging (MPR CT/MRI presets)
+ * - Anything else -> null: no deck models it, so none is claimed (see atlas-stage/pickRoute.ts)
  */
 
 import type { SelectedStructureInfo } from './atlas-stage/structureInfo.ts'
@@ -31,9 +32,10 @@ export interface StructureCouplingContext {
 
 /**
  * Which simulation deck and clinical tool a structure opens first, and its specific targeted parameters.
- * Routing only; it claims nothing.
+ * Routing only; it claims nothing. Null when no deck models the structure: a muscle, lymph node or skin region
+ * must not borrow another organ's target (it used to fall back to the heart's referred-pain map).
  */
-export function decksFor(info: SelectedStructureInfo): StructureCouplingContext {
+export function decksFor(info: SelectedStructureInfo): StructureCouplingContext | null {
   const lower = `${info.cleanName} ${info.meshName}`.toLowerCase()
 
   // 1. Cardiovascular / Heart / Great Vessels / Coronaries
@@ -191,10 +193,5 @@ export function decksFor(info: SelectedStructureInfo): StructureCouplingContext 
     }
   }
 
-  // Default fallback
-  return {
-    physiology: 'soft_tissue',
-    clinical: 'referred_pain',
-    referredPainOrgan: 'heart-myocardium',
-  }
+  return null
 }

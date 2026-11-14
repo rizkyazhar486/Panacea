@@ -291,5 +291,16 @@ gagal('lencana-kopling-tombol-hapus-cukup-besar', () => {
   bersih(k)
   assert.match(k, /<button[^>]*min-height:36px;min-width:44px[^>]*>Clear<\/button>/)
 })
+gagal('lencana-kopling-hijau-hanya-bila-terkopel', () => {
+  const hijau = /rgba\(0, ?191, ?99/
+  const terkopel = html(m.CouplingBadge, { prefix: 'Clinical target:', name: 'Liver', layer: 'Organs', onClear: tanpa })
+  assert.match(terkopel, /data-coupled="true"/)
+  assert.match(terkopel, hijau, 'terkopel: nada hijau')
+  const tidak = html(m.CouplingBadge, { prefix: 'No clinical tool for:', name: 'Abductor hallucis', layer: 'Muscles', onClear: tanpa, coupled: false })
+  bersih(tidak)
+  assert.match(tidak, /data-coupled="false"/)
+  assert.doesNotMatch(tidak, hijau, 'berpasangan: tanpa kopling tidak memakai nada hijau')
+  assert.match(tidak, /<button[^>]*min-height:36px;min-width:44px[^>]*>Clear<\/button>/, 'tombol hapus tetap target sentuh')
+})
 
 console.log('atlas deck a11y: 5 decks, every tab, 11 body-system cards — all controls named, one pressed per choice group, charts described, slider values carry units, fixed colour pairs >= 4.5:1')
