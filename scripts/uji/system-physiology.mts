@@ -19,7 +19,7 @@ import {
   type OrganRelationshipLike,
   type PhysiologyMechanism,
 } from '../../src/domains/body-exposure/engine/system-physiology/physiologySources.ts'
-import { defaultPhysiologyCatalog } from '../../src/domains/body-exposure/engine/system-physiology/physiologyCatalog.ts'
+import { DOMAIN_PHYSIOLOGY, defaultPhysiologyCatalog } from '../../src/domains/body-exposure/engine/system-physiology/physiologyCatalog.ts'
 import {
   checkCatalog,
   planSystemIndex,
@@ -219,19 +219,19 @@ gagal('katalog_bawaan_semua_sitasi_terverifikasi_ledger', () => {
       assert.equal(citation.url, kanonik)
     }
   }
-  assert.equal(jumlah, 27, 'jumlah sitasi yang ditampilkan (terukur: 16 mekanisme, 27 sitasi)')
+  assert.equal(jumlah, 46, 'jumlah sitasi yang ditampilkan (terukur: 24 mekanisme, 46 sitasi; 11 dari empat kopling fisiologi, 8 dari fisiologi muskuloskeletal dan indra)')
 })
 gagal('katalog_bawaan_jumlah_terukur', () => {
   // Diukur dari data saat mesin ini dibuat. Menambah fisiologi bersumber menaikkan angka ini — ubah secara sadar.
-  assert.equal(katalog.mechanisms.length, 16)
+  assert.equal(katalog.mechanisms.length, 24)
   assert.equal(katalog.gaps.length, 17)
   const index = planSystemIndex(katalog)
   assert.equal(index.ok, true)
   if (!index.ok) return
   assert.deepEqual(index.rows.map((row) => [row.id, row.mechanismCount, row.gapCount, row.sourced]), [
-    ['cardiovascular', 1, 0, true], ['nervous', 1, 0, true], ['respiratory', 3, 1, true], ['digestive', 3, 7, true],
-    ['urinary', 2, 2, true], ['endocrine', 4, 2, true], ['reproductive', 1, 3, true], ['lymphatic-immune', 1, 2, true],
-    ['musculoskeletal', 0, 0, false], ['sensory-ent', 0, 0, false], ['integumentary-surface', 1, 0, true],
+    ['cardiovascular', 4, 0, true], ['nervous', 2, 0, true], ['respiratory', 5, 1, true], ['digestive', 3, 7, true],
+    ['urinary', 3, 2, true], ['endocrine', 5, 2, true], ['reproductive', 1, 3, true], ['lymphatic-immune', 1, 2, true],
+    ['musculoskeletal', 2, 0, true], ['sensory-ent', 2, 0, true], ['integumentary-surface', 1, 0, true],
   ])
 })
 gagal('kopling_dari_os_lewat_jembatan_dalam_urutan_atlas', () => {
@@ -270,8 +270,11 @@ gagal('kopling_tidak_pernah_lewat_jembatan_kontekstual', () => {
 gagal('jembatan_kontekstual_tidak_mengklaim_kopling', () => {
   const indra = tampilan('sensory-ent')
   assert.equal(indra.fidelity, 'contextual')
-  assert.deepEqual([indra.couplings, indra.loops, indra.mechanisms], [[], [], []])
-  assert.equal(indra.sourced, false)
+  assert.deepEqual([indra.couplings, indra.loops], [[], []])
+  // Mekanismenya hanya miliknya sendiri (bersumber untuk sistem indra), tidak diwarisi dari domain saraf yang dijembatani.
+  assert.deepEqual(indra.mechanisms.map((m) => m.id), ['retinal-phototransduction', 'inner-ear-hair-cell-mechanotransduction'])
+  for (const m of indra.mechanisms) assert.ok(m.systems.includes('sensory-ent'), `${m.id} milik sistem indra`)
+  assert.ok(!indra.mechanisms.some((m) => m.id === 'arterial-baroreflex' || m.id === 'cerebral-perfusion-pressure'), 'mekanisme saraf tidak ikut lewat jembatan')
   const saraf = tampilan('nervous')
   assert.ok(saraf.couplings.length > 0 && saraf.loops.length > 0, 'berpasangan: domain yang sama lewat jembatan langsung punya kopling')
 })
@@ -281,16 +284,49 @@ gagal('mekanisme_bersama_muncul_di_kedua_sistem', () => {
   assert.deepEqual(baro('cardiovascular')!.citations.map((c) => c.id), ['NBK538172', '12228049'])
   assert.equal(baro('cardiovascular')!.summary.at(-2), 'When arterial pressure rises: baroreceptor stretch increases, afferent firing increases, sympathetic outflow decreases, vagal outflow increases, heart rate decreases, contractility decreases, arteriolar tone decreases, venous tone decreases.')
 })
+gagal('kopling_fisiologi_tampil_di_setiap_sistem_yang_digabungkannya', () => {
+  const ids = (id: BodySystemId) => tampilan(id).mechanisms.map((m) => m.id)
+  assert.deepEqual(ids('cardiovascular'), ['arterial-baroreflex', 'pressure-flow-chain', 'cerebral-perfusion-pressure', 'fick-oxygen-mass-balance'])
+  assert.deepEqual(ids('nervous'), ['arterial-baroreflex', 'cerebral-perfusion-pressure'])
+  assert.deepEqual(ids('respiratory').slice(-2), ['acid-base-bicarbonate-buffer', 'fick-oxygen-mass-balance'])
+  assert.deepEqual(ids('urinary').slice(-1), ['acid-base-bicarbonate-buffer'])
+  const sumber = (id: string) => katalog.mechanisms.find((m) => m.id === id)!.citations.map((c) => c.id)
+  assert.deepEqual(sumber('pressure-flow-chain'), ['NBK556075', 'NBK470455', 'NBK538226', 'NBK537271'])
+  assert.deepEqual(sumber('cerebral-perfusion-pressure'), ['NBK537271', 'NBK482119'])
+  assert.deepEqual(sumber('acid-base-bicarbonate-buffer'), ['NBK308', 'NBK493167', 'NBK536919'])
+  assert.deepEqual(sumber('fick-oxygen-mass-balance'), ['NBK606091', 'NBK493219'])
+  // Klaim tetap kata demi kata dari modul sumber; judul ditampilkan bila modul menyertakannya.
+  assert.equal(katalog.mechanisms.find((m) => m.id === 'pressure-flow-chain')!.citations[0].note,
+    'Physiology, Systemic Vascular Resistance: Systemic vascular resistance relates the mean arterial-to-venous pressure drop to cardiac output.')
+  for (const m of katalog.mechanisms.filter((x) => x.origin.includes('/physiology/'))) assert.deepEqual(m.summary.length > 0, m.id === 'arterial-baroreflex', `${m.id}: ringkasan hanya dari data modul`)
+})
 gagal('celah_organ_parsial_bila_sebagian_bersumber', () => {
   const urinarius = tampilan('urinary')
   assert.deepEqual(urinarius.organGaps.map((g) => [g.subject, g.partial]), [['Kidney', true], ['Urinary bladder', false]])
-  assert.deepEqual(urinarius.mechanisms.map((m: PhysiologyMechanism) => m.id), ['renal-autoregulation-context', 'kidney-glomerulus-filtration'])
+  assert.deepEqual(urinarius.mechanisms.map((m: PhysiologyMechanism) => m.id), ['renal-autoregulation-context', 'kidney-glomerulus-filtration', 'acid-base-bicarbonate-buffer'])
 })
-gagal('sistem_tanpa_sumber_tetap_terencana_dengan_jujur', () => {
-  const muskulo = tampilan('musculoskeletal')
-  assert.equal(muskulo.sourced, false)
-  assert.deepEqual(muskulo.mechanisms, [])
-  assert.ok(muskulo.domains[0].role.length > 0 && muskulo.domains[0].equation.length > 0, 'peran dan relasi ajar tetap tampil dari OS')
+gagal('fisiologi_domain_terbaca_utuh_kata_demi_kata', () => {
+  // Setiap entri data/education terbaca tanpa ditolak, dari berkasnya sendiri, dengan ringkasan dan sumber persis datanya.
+  const entri = DOMAIN_PHYSIOLOGY.flatMap(({ origin, entries }) => entries.map((entry) => ({ origin, entry })))
+  assert.equal(entri.length, 4)
+  for (const { origin, entry } of entri) {
+    const m = katalog.mechanisms.find((x) => x.id === entry.id)
+    assert.ok(m, `${entry.id} tidak terbaca`)
+    assert.equal(m.origin, origin)
+    assert.match(origin, /^src\/domains\/body-exposure\/data\/education\/[a-z]+Physiology\.ts$/)
+    assert.ok(readFileSync(new URL(`../../${origin}`, import.meta.url), 'utf8').includes(`id: '${entry.id}'`), `${entry.id}: berkas asal yang tercatat memuat entri ini`)
+    assert.deepEqual(m.summary, entry.summary, `${entry.id}: ringkasan kata demi kata`)
+    assert.ok(m.summary.length >= 4, `${entry.id}: langkah-langkahnya ditulis`)
+    assert.deepEqual(m.citations.map((c) => `PMID ${c.id}`), entry.references.map((r) => r.reference))
+    assert.deepEqual(m.citations.map((c) => c.note), entry.references.map((r) => r.note))
+    assert.deepEqual(m.systems, entry.systems)
+  }
+  const ids = (id: BodySystemId) => tampilan(id).mechanisms.map((m) => m.id)
+  assert.deepEqual(ids('musculoskeletal'), ['skeletal-muscle-excitation-contraction-coupling', 'bone-remodelling-cycle'])
+  assert.deepEqual(ids('endocrine').slice(-1), ['bone-remodelling-cycle'], 'pengatur hormonal remodeling tulang → tampil juga di endokrin')
+  const tulang = (id: BodySystemId) => tampilan(id).mechanisms.find((m) => m.id === 'bone-remodelling-cycle')
+  assert.ok(tulang('musculoskeletal') === tulang('endocrine'), 'objek yang sama, bukan salinan')
+  assert.deepEqual(katalog.mechanisms.find((m) => m.id === 'bone-remodelling-cycle')!.citations.map((c) => c.id), ['29368538', '17308163'])
 })
 
 // ── perencana: gagal-tertutup ──
@@ -308,6 +344,19 @@ const minimal = (): SystemPhysiologyCatalog => ({
   mechanisms: [{ id: 'm', label: 'M', systems: ['urinary'], organ: 'kidney', summary: [], citations: [{ kind: 'pubmed', id: '1', url: 'u', note: 'n' }], boundary: BATAS, origin: 'o' }],
   gaps: [{ id: 'g1', subject: 'Kidney', system: 'urinary', boundary: BATAS, origin: 'o' }, { id: 'g2', subject: 'Bladder', system: 'urinary', boundary: BATAS, origin: 'o' }],
   rejected: [],
+})
+gagal('sistem_tanpa_sumber_tetap_terencana_dengan_jujur', () => {
+  // Katalog sungguhan kini tidak punya sistem tanpa sumber, jadi aturan ini diuji pada katalog sintetis:
+  // sistem tanpa mekanisme tetap terencana, tidak bersumber, dan tetap menampilkan peran serta relasi ajar dari OS.
+  const plan = planSystemPhysiology('respiratory', minimal())
+  assert.equal(plan.ok, true)
+  if (!plan.ok) return
+  assert.equal(plan.view.sourced, false)
+  assert.deepEqual(plan.view.mechanisms, [])
+  assert.deepEqual([plan.view.domains[0].role, plan.view.domains[0].equation], ['Exchange gas.', 'e'], 'peran dan relasi ajar tetap tampil dari OS')
+  const berpasangan = planSystemPhysiology('urinary', minimal())
+  assert.ok(berpasangan.ok && berpasangan.view.sourced && berpasangan.view.mechanisms.length === 1, 'berpasangan: sistem dengan mekanisme bersumber')
+  for (const id of SISTEM) assert.ok(tampilan(id).mechanisms.length > 0, `${id}: setiap sistem atlas kini punya setidaknya satu mekanisme bersumber`)
 })
 gagal('perencana_menerima_katalog_minimal', () => {
   const plan = planSystemPhysiology('urinary', minimal())
