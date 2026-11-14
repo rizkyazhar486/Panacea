@@ -46,7 +46,9 @@ import { BODY_SYSTEM_SOURCE_WAVE, type BodySystemId } from '../data/bodySystems'
 import type { StageSimulation } from '../engine/system-physiology/systemSimulations'
 
 // Every body system's physiology, with the text of its sources: loaded only when the Systems view opens.
-const SystemPhysiologyExplorer = lazy(() => import('./system-physiology/SystemPhysiologyExplorer'))
+// Module top level stays free of side effects (pure lazy, no eager Map) so importers of the domain barrel can drop this
+// screen; otherwise Rollup bundles the whole atlas with Body3D on Clinical (scripts/qa/body-exposure-barrel-weight.test.mjs).
+const SystemPhysiologyExplorer = /* @__PURE__ */ lazy(() => import('./system-physiology/SystemPhysiologyExplorer'))
 
 interface BodyExposureAtlasHomeProps {
   /** The 3D viewer, supplied by the composition root. */
@@ -81,7 +83,7 @@ const CLINICAL: readonly SegmentOption<ClinicalTool>[] = [
   { id: 'neuro_localizer', label: 'Syndromic Localizer', short: 'Localizer' },
   { id: 'diagnostic_imaging', label: 'Diagnostic Imaging', short: 'Imaging' },
 ]
-const SYSTEM_LABEL = new Map<BodySystemId, string>(BODY_SYSTEM_SOURCE_WAVE.map((system) => [system.id, system.label]))
+const systemLabel = (id: BodySystemId) => BODY_SYSTEM_SOURCE_WAVE.find((system) => system.id === id)?.label
 
 const layerSpec = (id: AtlasLayerId | null) => ATLAS_LAYERS.find((layer) => layer.id === id) ?? null
 
@@ -244,7 +246,7 @@ export function BodyExposureAtlasHome({ Viewer, sendCamera }: BodyExposureAtlasH
               className="as-focus as-hover as-fade"
               style={{ flex: 'none', minHeight: 36, padding: '0 10px', border: `1px solid ${TONE.line}`, borderRadius: 10, background: TONE.raised, color: TONE.text, fontSize: 12, fontWeight: 700, cursor: 'pointer' }}
             >
-              {SYSTEM_LABEL.get(id)} system ›
+              {systemLabel(id)} system ›
             </button>
           ))}
         </CouplingBadge>
