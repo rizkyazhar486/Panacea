@@ -92,3 +92,31 @@ await withServer('production', async base => {
   assert.equal((await fetch(base + '/api/auth/me', { signal: AbortSignal.timeout(5000) })).status, 401)
   console.log('authSessionHttp: production dev-login bypass rejected')
 })
+await withServer('development', async base => {
+  // A logout must never be refused by the tight auth limiter (30 per 15 min): a 429 would leave the token valid while
+  // the app already shows the person signed out. Exhaust the limiter, then check both sides of the rule.
+  const post = (path: string, body: unknown, headers: Record<string, string> = {}) => fetch(base + path, { method: 'POST',
+    headers: { 'content-type': 'application/json', ...headers }, body: JSON.stringify(body), signal: AbortSignal.timeout(5000) })
+  const get = (path: string, headers: Record<string, string>) => fetch(base + path, { headers, signal: AbortSignal.timeout(5000) })
+  const first = await post('/api/auth/dev-login', { email: 'limiter-fixture@localhost.test', name: 'Synthetic limiter fixture', role: 'pasien' })
+  assert.equal(first.status, 200, 'fixture login succeeds')
+  const bearer = { authorization: `Bearer ${(await first.json() as { token: string }).token}` }
+  assert.equal(first.headers.get('ratelimit-policy'), '30;w=900', 'a credential attempt is counted by the auth limiter')
+  let remaining = Number(first.headers.get('ratelimit-remaining'))
+  assert.ok(Number.isInteger(remaining) && remaining > 0 && remaining < 30, `auth limiter budget is reported (${first.headers.get('ratelimit-remaining')})`)
+  for (let spent = 0; remaining > 0 && spent < 30; spent++) {
+    const r = await get('/api/auth/me', bearer)
+    assert.equal(r.status, 200, 'spending the auth budget on a valid session')
+    remaining = Number(r.headers.get('ratelimit-remaining'))
+  }
+  assert.equal(remaining, 0, 'the auth budget is spent')
+  const refused = await post('/api/auth/dev-login', { email: 'limiter-second@localhost.test', name: 'Synthetic limiter fixture', role: 'pasien' })
+  assert.equal(refused.status, 429, 'paired: a credential attempt is still refused once the auth budget is spent')
+  assert.equal((await get('/api/clinical', bearer)).status, 200, 'token valid before logout')
+  const out = await post('/api/auth/logout', {}, bearer)
+  assert.equal(out.status, 200, 'logout is accepted although the auth budget is spent')
+  assert.deepEqual(await out.json(), { ok: true })
+  assert.notEqual(out.headers.get('ratelimit-policy'), '30;w=900', 'logout is not counted by the auth limiter')
+  assert.equal((await get('/api/clinical', bearer)).status, 401, 'the logout revoked the token')
+  console.log('authSessionHttp: logout revokes with the auth limiter exhausted; credential attempts stay limited')
+})

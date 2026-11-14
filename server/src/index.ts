@@ -268,6 +268,9 @@ const globalLimiter = rateLimit({
 })
 const authLimiter = rateLimit({
   windowMs: 15 * 60_000, max: 30, standardHeaders: true, legacyHeaders: false,
+  // Ending a session must always be possible: a logout refused with 429 would leave the token valid while the app
+  // already shows the person signed out. Logout is not a credential attempt; the global limiter still caps it.
+  skip: (req) => req.method === 'POST' && req.baseUrl === '/api/auth' && req.path === '/logout',
   message: { error: 'rate_limited' },
 })
 app.use('/api', globalLimiter)
