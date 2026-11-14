@@ -10,6 +10,11 @@ on:
       - 'scripts/qa/perf-sample-coverage.mjs'
       - 'scripts/qa/perf-sample-coverage.test.mjs'
       - 'scripts/qa/perf-stats.mjs'
+      - 'scripts/qa/perf-ratchet.mjs'
+      - 'governance/PERF_BASELINE.json'
+      - 'src/lib/**'
+      - 'vite.config.ts'
+      - 'package-lock.json'
       - 'scripts/qa/kontras-wcag.mjs'
       - 'scripts/qa/kontras-ukur.mjs'
       - 'scripts/qa/kontras-ukur.fixture.mjs'
@@ -98,7 +103,7 @@ jobs:
             ${{ runner.temp }}/daily-quote-layout-evidence.json
             ${{ runner.temp }}/theme-shots
   perf-audit:
-    # Audit performa terukur pada BUILD PRODUKSI (laporan, bukan gerbang): metodologi dan batas di scripts/qa/perf-audit.mjs. Job terpisah agar tidak memperlambat ux-audit.
+    # Audit performa terukur pada BUILD PRODUKSI: GERBANG ratchet byte JS + request per rute (governance/PERF_BASELINE.json); TBT/LCP/CLS laporan: metodologi dan batas di scripts/qa/perf-audit.mjs. Job terpisah agar tidak memperlambat ux-audit.
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
@@ -129,7 +134,7 @@ jobs:
             if curl -fsS http://127.0.0.1:18790/api/health >/dev/null && curl -fsS http://127.0.0.1:5191/ >/dev/null; then break; fi
             sleep 1
           done
-          QA_URL=http://localhost:5191/ node scripts/qa/perf-audit.mjs
+          PERF_BASELINE=governance/PERF_BASELINE.json QA_URL=http://localhost:5191/ node scripts/qa/perf-audit.mjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
