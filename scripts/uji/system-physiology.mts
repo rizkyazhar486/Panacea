@@ -27,6 +27,7 @@ import {
   type SystemPhysiologyCatalog,
 } from '../../src/domains/body-exposure/engine/system-physiology/systemPhysiology.ts'
 import type { BodySystemId } from '../../src/domains/body-exposure/data/bodySystems.ts'
+import { SYSTEM_SIMULATIONS, simulationsFor } from '../../src/domains/body-exposure/engine/system-physiology/systemSimulations.ts'
 
 const gagal = (nama: string, f: () => void) => { try { f() } catch (e) { throw new Error(`[${nama}] ${(e as Error).message}`) } }
 const BATAS = 'Educational reference only; no person-level value, diagnosis or treatment is inferred here.'
@@ -353,6 +354,31 @@ gagal('perencana_tidak_mengubah_katalog_dan_deterministik', () => {
   const b = planSystemPhysiology('urinary', c)
   assert.deepEqual(a, b)
   assert.equal(JSON.stringify(c), sebelum)
+})
+
+// ── simulasi panggung per sistem ──
+gagal('simulasi_setiap_sistem_terdaftar_dan_valid', () => {
+  assert.deepEqual(Object.keys(SYSTEM_SIMULATIONS).sort(), [...SISTEM].sort(), 'setiap sistem atlas punya entri, termasuk yang kosong')
+  const tabSah = new Set(['palpation', 'diaphragm_excursion', 'peristalsis'])
+  for (const [id, daftar] of Object.entries(SYSTEM_SIMULATIONS)) {
+    assert.equal(new Set(daftar.map((s) => s.id)).size, daftar.length, `${id}: id unik`)
+    for (const s of daftar) {
+      assert.ok(['cardiopulmonary', 'soft_tissue', 'neuro'].includes(s.deck), `${id}/${s.id}: dek dikenal`)
+      assert.ok(s.label.trim().length > 0, `${id}/${s.id}: berlabel`)
+      if (s.softTissueTab !== undefined) {
+        assert.equal(s.deck, 'soft_tissue', `${id}/${s.id}: tab jaringan lunak hanya untuk dek jaringan lunak`)
+        assert.ok(tabSah.has(s.softTissueTab), `${id}/${s.id}: tab dikenal`)
+      }
+    }
+  }
+  // Terukur: lima sistem punya dek; enam tidak, dan kartunya berkata begitu.
+  assert.deepEqual(SISTEM.filter((id) => SYSTEM_SIMULATIONS[id].length > 0), ['cardiovascular', 'nervous', 'respiratory', 'digestive', 'sensory-ent'])
+  assert.deepEqual(SYSTEM_SIMULATIONS.respiratory.map((s) => [s.deck, s.softTissueTab]), [['cardiopulmonary', undefined], ['soft_tissue', 'diaphragm_excursion']])
+})
+gagal('simulasi_id_asing_tanpa_tebakan', () => {
+  for (const buruk of ['kidney', 'toString', '__proto__', 'constructor', '', null, undefined, 3]) assert.deepEqual(simulationsFor(buruk), [], String(buruk))
+  assert.equal(simulationsFor('digestive').length, 1, 'berpasangan: sistem atlas diterima')
+  assert.equal(simulationsFor('digestive'), SYSTEM_SIMULATIONS.digestive, 'daftar yang sama, bukan salinan')
 })
 
 console.log(`system physiology: ${katalog.mechanisms.length} sourced mechanisms + ${katalog.gaps.length} organ placeholders across 11 systems, 0 sources rejected, every surfaced citation ledger-verified; planner fails closed`)
