@@ -16,5 +16,5 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "24.x"
-      - name: Execute Full 90/90 Omnicausalis Verification Suite
+      - name: Execute Full 110/110 Omnicausalis Verification Suite
         run: node --test scripts/uji/omnicausalis-full-suite.test.mjs
