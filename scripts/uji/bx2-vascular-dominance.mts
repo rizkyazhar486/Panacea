@@ -8,7 +8,10 @@ import {
   mapCoronaryToAHA17,
 } from '../../src/domains/body-exposure/engine/vascularTerritoryEngine.ts'
 
-test('BX-2 1. Golden case: right, left, and codominant AHA-17 territories match cited table and partition segments 1..17', () => {
+// Dipindah dari bx2-vascular-territory.test.mjs, yang tidak dijalankan runner mana pun (uji hanya menjalankan .mts) dan mengunci kolom
+// dominansi kiri/ko-dominan tanpa sumber (berlabel 'abstract' padahal rekaman PubMed Cerqueira 2002 tidak punya abstrak).
+
+test('BX-2 1. Golden case: the sourced default AHA assignment (right-dominant anatomy) partitions segments 1..17', () => {
   const rcaRight = mapCoronaryToAHA17('RCA', 'right')
   assert.strictEqual(rcaRight.ok, true)
   assert.strictEqual(rcaRight.artery, 'RCA')
@@ -18,49 +21,34 @@ test('BX-2 1. Golden case: right, left, and codominant AHA-17 territories match 
   assert.strictEqual(rcaRight.label, ATLAS_REFERENCE_LABEL)
   assert.deepStrictEqual(rcaRight.segments, [3, 4, 9, 10, 15])
   assert.strictEqual(rcaRight.coverageFraction, 5 / 17)
+  assert.strictEqual(rcaRight.source.verifiedFrom, 'reference-table')
+  assert.match(rcaRight.source.citation, /PMC6932424/)
+  assert.match(rcaRight.source.citation, /no PubMed abstract/)
 
-  const lcxRight = mapCoronaryToAHA17('LCX', 'right')
-  assert.strictEqual(lcxRight.ok, true)
-  assert.deepStrictEqual(lcxRight.segments, [5, 6, 11, 12, 16])
-
-  const ladRight = mapCoronaryToAHA17('LAD', 'right')
-  assert.strictEqual(ladRight.ok, true)
-  assert.deepStrictEqual(ladRight.segments, [1, 2, 7, 8, 13, 14, 17])
-
-  for (const dominance of ['right', 'left', 'codominant']) {
-    const combined = [
-      ...mapCoronaryToAHA17('LAD', dominance).segments,
-      ...mapCoronaryToAHA17('RCA', dominance).segments,
-      ...mapCoronaryToAHA17('LCX', dominance).segments,
-    ].sort((a, b) => a - b)
-    assert.deepStrictEqual(
-      combined,
-      [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17],
-    )
-  }
+  assert.deepStrictEqual(mapCoronaryToAHA17('LCX', 'right').segments, [5, 6, 11, 12, 16])
+  assert.deepStrictEqual(mapCoronaryToAHA17('LAD', 'right').segments, [1, 2, 7, 8, 13, 14, 17])
+  const combined = ['LAD', 'RCA', 'LCX'].flatMap((a) => mapCoronaryToAHA17(a, 'right').segments).sort((a, b) => a - b)
+  assert.deepStrictEqual(combined, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17])
 })
 
-test('BX-2 2. Paired test: changing only dominance from right to left or unknown shifts inferior PDA segments without choosing a variant on unknown', () => {
-  const goldenRight = mapCoronaryToAHA17('RCA', 'right')
-  const pairedLeft = mapCoronaryToAHA17('RCA', 'left')
-  const pairedUnknown = mapCoronaryToAHA17('RCA', 'unknown')
-
-  assert.strictEqual(goldenRight.ok, true)
-  assert.strictEqual(pairedLeft.ok, true)
-  assert.strictEqual(pairedUnknown.ok, true)
-
-  assert.deepStrictEqual(goldenRight.segments, [3, 4, 9, 10, 15])
-  assert.deepStrictEqual(pairedLeft.segments, [3, 9])
-
-  assert.strictEqual(pairedUnknown.chosenVariant, null)
-  assert.strictEqual(pairedUnknown.dominanceVariant, 'unknown')
-  assert.deepStrictEqual(pairedUnknown.segments, [])
-  assert.strictEqual(pairedUnknown.coverageFraction, 0)
-  assert.deepStrictEqual(pairedUnknown.allVariants, {
-    right: [3, 4, 9, 10, 15],
-    left: [3, 9],
-    codominant: [3, 4, 9, 10],
-  })
+test('BX-2 2. Paired: changing only dominance to left or co-dominant refuses as unsourced; unknown shows the sourced column and no invented ones', () => {
+  for (const dominance of ['left', 'codominant'] as const) {
+    for (const artery of ['LAD', 'RCA', 'LCX']) {
+      const r = mapCoronaryToAHA17(artery, dominance)
+      assert.strictEqual(r.ok, false, `${artery}/${dominance}`)
+      assert.strictEqual(r.reason, 'source-not-verified')
+      assert.deepStrictEqual(r.segments, [], 'no segments are guessed')
+      assert.strictEqual(r.chosenVariant, null)
+      assert.match(r.detail, /Ortiz-Pérez 2008/)
+    }
+  }
+  const unknown = mapCoronaryToAHA17('RCA', 'unknown')
+  assert.strictEqual(unknown.ok, true)
+  assert.strictEqual(unknown.chosenVariant, null)
+  assert.deepStrictEqual(unknown.segments, [])
+  assert.strictEqual(unknown.coverageFraction, 0)
+  assert.deepStrictEqual(unknown.allVariants, { right: [3, 4, 9, 10, 15], left: null, codominant: null })
+  assert.ok(unknown.ok && unknown.limitations.some((l) => /not shown: no source table/.test(l)))
 })
 
 test('BX-2 3. Boundary +-epsilon: evaluateAHA17PerfusionBurden accepts exact [0, 1] bounds and rejects -epsilon and 1+epsilon', () => {
@@ -138,7 +126,7 @@ test('BX-2 4. Invalid inputs: NaN, Infinity, unknown artery/dominance, out-of-ra
 test('BX-2 5. No-hit and unverified source table: disjoint deficits return 0 hits and unverified table returns source-not-verified', () => {
   const noHit = evaluateAHA17PerfusionBurden({
     artery: 'RCA',
-    dominance: 'left',
+    dominance: 'right',
     segmentDeficits: { 1: 1, 2: 0.5, 17: 1 },
   })
   assert.strictEqual(noHit.ok, true)
@@ -162,3 +150,10 @@ test('BX-2 5. No-hit and unverified source table: disjoint deficits return 0 hit
   assert.strictEqual(unverifiedRes.ok, false)
   assert.strictEqual(unverifiedRes.reason, 'source-not-verified')
 })
+
+test('BX-2 6. Perfusion burden refuses an unsourced dominance instead of computing on invented columns', () => {
+  const r = evaluateAHA17PerfusionBurden({ artery: 'LCX', dominance: 'left', segmentDeficits: { 4: 1, 10: 1, 15: 1 } })
+  assert.strictEqual(r.ok, false)
+  assert.strictEqual(r.reason, 'source-not-verified')
+})
+
