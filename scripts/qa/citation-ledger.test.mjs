@@ -219,7 +219,7 @@ test('audit: entri ledger yang tidak dikutip siapa pun ditolak', () => {
 })
 
 // Plafon utang: jumlah pengenal yang belum diverifikasi. HANYA BOLEH DITURUNKAN, seiring verifikasi berjalan.
-const DEBT_CEILING = 260
+const DEBT_CEILING = 250
 
 test('repo nyata: ledger sah, setiap sitasi terdaftar dan terikat, utang tidak melebihi plafon', () => {
   const root = fileURLToPath(new URL('../..', import.meta.url))
@@ -229,6 +229,6 @@ test('repo nyata: ledger sah, setiap sitasi terdaftar dan terikat, utang tidak m
   assert.deepEqual(validateLedger(ledger, { today }).map((v) => v.message), [])
   const result = auditCitations({ sources: readSources(root), ledger, debt })
   assert.deepEqual(result.violations.map((v) => v.message), [])
-  assert.ok(ledger.entries.length >= 78, `ledger shrank to ${ledger.entries.length} verified works`)
+  assert.ok(ledger.entries.length >= 88, `ledger shrank to ${ledger.entries.length} verified works`)
   assert.ok(debt.identifiers.length <= DEBT_CEILING, `unverified citations grew to ${debt.identifiers.length}, ceiling is ${DEBT_CEILING}`)
 })
