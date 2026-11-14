@@ -2164,3 +2164,189 @@ test('170. [WAVE 140 MASTER GATE 6C: DETERMINISTIC SHA-256 MASTER SEAL & SUB-25M
   assert.equal(run1.shenzhenTcmMasterSha256Seal, run2.shenzhenTcmMasterSha256Seal);
   assert.ok(run1.executionDurationMs < 25);
 });
+
+
+// === WAVE 121 TO WAVE 140 PANACEAMED DATA PIPELINE SPEC v0.1 EXPANSION (TESTS 151-170) ===
+import * as dataPipelineEngine from '../../src/core/panaceamedDataPipelineEdgeCloudEngine.mjs';
+
+test('151. [WAVE 121 RAWSTREAM 1A: CANONICAL SOURCE & 11 METRIC_TYPE UNIT NORMALIZATION]', () => {
+  const res = dataPipelineEngine.evaluateWave121To124RawStreamEdgeVault();
+  assert.equal(res.rawStreamRecord.validSource, true);
+  assert.equal(res.rawStreamRecord.unitMatchesCanonical, true);
+  assert.equal(Object.keys(dataPipelineEngine.RAW_METRIC_TYPES_AND_UNITS).length, 11);
+});
+
+test('152. [WAVE 122 RAWSTREAM 1B: 90-DAY ROLLING SQLITE RETENTION WINDOW & NOISE ARTIFACT FILTERING]', () => {
+  const res = dataPipelineEngine.evaluateWave121To124RawStreamEdgeVault();
+  assert.equal(res.edgeStoragePolicy.retentionDaysLimit, 90);
+  assert.equal(res.edgeStoragePolicy.expiredPurgedCount, 1);
+  assert.equal(res.edgeStoragePolicy.cleanGoodSampleCount, 3);
+  assert.equal(res.edgeStoragePolicy.qualityCoverageRatio, 0.75);
+});
+
+test('153. [WAVE 123 RAWSTREAM 1C: STRICT EXFILTRATION GUARD (RAW DATA NEVER LEAVES DEVICE)]', () => {
+  const res = dataPipelineEngine.evaluateWave121To124RawStreamEdgeVault({ attemptedCloudSyncOfRawStream: true });
+  assert.equal(res.privacyExfiltrationGuard.rawSyncToCloudPermitted, false);
+  assert.equal(res.privacyExfiltrationGuard.exfiltrationInterceptStatus, 'BLOCKED_RAW_STREAM_NEVER_LEAVES_DEVICE');
+  assert.equal(res.privacyExfiltrationGuard.thirdPartySdksInSensorPath, 0);
+});
+
+test('154. [WAVE 124 RAWSTREAM 1D: GRANULAR LOCATION (GPS) CONSENT ISOLATION]', () => {
+  const res = dataPipelineEngine.evaluateWave121To124RawStreamEdgeVault({
+    source: 'GPS',
+    metric_type: 'LOCATION',
+    unit: 'latlon'
+  });
+  assert.equal(res.edgeStoragePolicy.metricConsentGranted, false);
+  assert.equal(res.edgeStoragePolicy.cleanGoodSampleCount, 0);
+});
+
+test('155. [WAVE 125 DERIVEDSGNAL 2A: 30-DAY PERSONAL BASELINE Z-SCORE & MULTI-PARAMETER ILLNESS_SCORE FUSION]', () => {
+  const res = dataPipelineEngine.evaluateWave125To128DerivedSignalsAndPanaceaScore();
+  const illness = res.derivedSignals.find((s) => s.signal_type === 'ILLNESS_SCORE');
+  assert.equal(res.baselineWindowDays, 30);
+  assert.ok(illness.z_score > 2.4);
+  assert.deepEqual(illness.inputs, ['HR', 'HRV_RMSSD', 'TEMP', 'SPO2', 'SLEEP_STAGE']);
+});
+
+test('156. [WAVE 126 DERIVEDSGNAL 2B: JAN-2026 CHINA/FDA CUFFLESS-BP CV_RISK_TREND (TREND OVER SNAPSHOT)]', () => {
+  const res = dataPipelineEngine.evaluateWave125To128DerivedSignalsAndPanaceaScore();
+  const cv = res.derivedSignals.find((s) => s.signal_type === 'CV_RISK_TREND');
+  assert.ok(cv.z_score > 2.0);
+  assert.ok(cv.trend_slope > 1.5);
+  assert.equal(cv.reportingPosture, 'TREND_DIRECTION_ONLY_NEVER_AUTONOMOUS_DIAGNOSIS');
+});
+
+test('157. [WAVE 127 DERIVEDSGNAL 2C: RECOVERY_INDEX (7D ROLLING HRV) & CGM GLUCOSE_VARIABILITY (CV% + TIR)]', () => {
+  const res = dataPipelineEngine.evaluateWave125To128DerivedSignalsAndPanaceaScore();
+  const rec = res.derivedSignals.find((s) => s.signal_type === 'RECOVERY_INDEX');
+  const glu = res.derivedSignals.find((s) => s.signal_type === 'GLUCOSE_VARIABILITY');
+  assert.ok(rec.value > 60 && rec.value < 75);
+  assert.ok(glu.cgmMetrics.cgmCvPct < 20);
+  assert.equal(glu.cgmMetrics.timeInRangePct, 88.5);
+});
+
+test('158. [WAVE 128 DERIVEDSGNAL 2D: SINGLE-SCORE UX (DAILY PANACEA_SCORE + ONE PRIMARY RECOMMENDATION)]', () => {
+  const res = dataPipelineEngine.evaluateWave125To128DerivedSignalsAndPanaceaScore();
+  assert.equal(res.derivedSignals.length, 6);
+  assert.ok(res.singleScoreUx.panaceaScore > 40 && res.singleScoreUx.panaceaScore < 85);
+  assert.ok(res.singleScoreUx.primarySingleRecommendation.includes('baseline 30 hari'));
+  assert.equal(res.singleScoreUx.deepDetailBehindTapAvailable, true);
+});
+
+test('159. [WAVE 129 TIERSTATE 3A: RUITANG GREEN -> YELLOW TRANSITION (Z >= 2.0 SUSTAINED >= 2H)]', () => {
+  const res = dataPipelineEngine.evaluateWave129To132RuitangTierStateMachine({
+    currentTier: 'GREEN',
+    z_score: 2.35,
+    sustainedDurationMin: 135
+  });
+  assert.equal(res.stateMachineTransition.nextTier, 'YELLOW');
+  assert.equal(res.stateMachineTransition.activeEscalationTarget, 'SELF_CARE');
+  assert.equal(res.stateMachineTransition.transitionReason, 'RUITANG_Z_GTE_2_SUSTAINED_2H');
+});
+
+test('160. [WAVE 130 TIERSTATE 3B: YELLOW -> RED SUSTAINED 24H FAMILY NOTIFICATION ESCALATION]', () => {
+  const res = dataPipelineEngine.evaluateWave129To132RuitangTierStateMachine({
+    currentTier: 'YELLOW',
+    z_score: 2.4,
+    sustainedDurationMin: 1450,
+    criticalThresholdCrossed: false,
+    minutesSinceFamilyNotified: 30
+  });
+  assert.equal(res.stateMachineTransition.nextTier, 'RED');
+  assert.equal(res.stateMachineTransition.activeEscalationTarget, 'FAMILY_NOTIFY');
+  assert.equal(res.stateMachineTransition.immediateCloudPushRequired, true);
+});
+
+test('161. [WAVE 131 TIERSTATE 3C: RED CRITICAL / POST-2H UNRESOLVED -> CLINICIAN ESCALATION (<= 60 MIN SLA)]', () => {
+  const res = dataPipelineEngine.evaluateWave129To132RuitangTierStateMachine({
+    currentTier: 'YELLOW',
+    z_score: 3.8,
+    sustainedDurationMin: 1500,
+    criticalThresholdCrossed: false,
+    minutesSinceFamilyNotified: 130
+  });
+  assert.equal(res.stateMachineTransition.nextTier, 'RED');
+  assert.equal(res.stateMachineTransition.activeEscalationTarget, 'CLINICIAN_ESCALATE');
+  assert.equal(res.stateMachineTransition.clinicalUrgencySlaMinutes, 60);
+});
+
+test('162. [WAVE 132 TIERSTATE 3D: DE-ESCALATION (RED -> YELLOW & YELLOW -> GREEN WHEN Z < 1.5 FOR 6H)]', () => {
+  const redToYellow = dataPipelineEngine.evaluateWave129To132RuitangTierStateMachine({
+    currentTier: 'RED',
+    z_score: 1.2,
+    sustainedDurationMin: 370
+  });
+  const yellowToGreen = dataPipelineEngine.evaluateWave129To132RuitangTierStateMachine({
+    currentTier: 'YELLOW',
+    z_score: 1.1,
+    sustainedDurationMin: 380
+  });
+  assert.equal(redToYellow.stateMachineTransition.nextTier, 'YELLOW');
+  assert.equal(yellowToGreen.stateMachineTransition.nextTier, 'GREEN');
+});
+
+test('163. [WAVE 133 PROTOCOL BINDING 4A: T2DM-01, HTN-02 & CKD-03 ORDERED ESCALATION PATHS]', () => {
+  const htnYellow = dataPipelineEngine.evaluateWave133To136ProtocolBindingAndEdgeCloudSplit({
+    protocol_id: 'HTN-02',
+    tier: 'YELLOW'
+  });
+  assert.equal(htnYellow.clinicalProtocolBinding.signal_type, 'CV_RISK_TREND');
+  assert.equal(htnYellow.clinicalProtocolBinding.action_type, 'SELF_CARE');
+  assert.deepEqual(htnYellow.clinicalProtocolBinding.escalation_path, [
+    'EDUCATION', 'SELF_CARE', 'FAMILY_NOTIFY', 'CLINICIAN_ESCALATE'
+  ]);
+});
+
+test('164. [WAVE 134 PROTOCOL BINDING 4B: RED TIER CLINICIAN_ESCALATE BINDING FOR T2DM-01 & CKD-03]', () => {
+  const t2dmRed = dataPipelineEngine.evaluateWave133To136ProtocolBindingAndEdgeCloudSplit({
+    protocol_id: 'T2DM-01',
+    tier: 'RED'
+  });
+  assert.equal(t2dmRed.clinicalProtocolBinding.action_type, 'CLINICIAN_ESCALATE');
+  assert.equal(t2dmRed.drPaiEdgeCloudSplit.immediateRedCloudPush, true);
+});
+
+test('165. [WAVE 135 EDGE/CLOUD SPLIT 4C: DR. PAI OFFLINE EDGE CAPABILITY & 4-HOUR WIFI BATCH SYNC]', () => {
+  const res = dataPipelineEngine.evaluateWave133To136ProtocolBindingAndEdgeCloudSplit({
+    wifiConnected: true,
+    hoursSinceLastDerivedBatchSync: 4.5
+  });
+  assert.equal(res.drPaiEdgeCloudSplit.offlineCapableForGreenYellowAndPanaceaScore, true);
+  assert.equal(res.drPaiEdgeCloudSplit.shouldRunDerivedBatchSync, true);
+});
+
+test('166. [WAVE 136 COMPLIANCE 4D: HUMAN-IN-THE-LOOP EDUCATION/TRIAGE & HALLUCINATION GATE]', () => {
+  const res = dataPipelineEngine.evaluateWave133To136ProtocolBindingAndEdgeCloudSplit();
+  assert.equal(res.regulatoryAndAiSafetyPosture.aiRolePosture, 'EDUCATION_AND_TRIAGE_NEVER_AUTONOMOUS_DIAGNOSIS');
+  assert.equal(res.regulatoryAndAiSafetyPosture.clinicianOversightRequiredForRedAdjacent, true);
+  assert.equal(res.regulatoryAndAiSafetyPosture.hallucinationGatePassed, true);
+});
+
+test('167. [WAVE 137 PIPELINE MASTER 5A: OBJECT.FREEZE IMMUTABILITY ACROSS ALL PIPELINE ENTITIES]', () => {
+  const master = dataPipelineEngine.runPanaceaMedWave140DataPipelineMaster();
+  assert.equal(Object.isFrozen(master), true);
+  assert.equal(Object.isFrozen(master.wave124RawVault), true);
+  assert.equal(Object.isFrozen(master.wave128Derived), true);
+  assert.equal(Object.isFrozen(master.wave132TierState), true);
+});
+
+test('168. [WAVE 138 PIPELINE MASTER 5B: LIVE COCKPIT /api/v5/pipeline/panacea-score WIRING]', () => {
+  const daemonText = nodeFs.readFileSync(nodePath.resolve('scripts/start-cockpit.mjs'), 'utf8');
+  assert.ok(daemonText.includes('/api/v5/pipeline/panacea-score'));
+});
+
+test('169. [WAVE 139 PIPELINE MASTER 5C: UNIFIED WAVES 21-140 METADATA & 170-TEST TARGET VERIFICATION]', () => {
+  const master = dataPipelineEngine.runPanaceaMedWave140DataPipelineMaster();
+  assert.equal(master.totalWavesUnified, 140);
+  assert.equal(master.totalTestSuitesTarget, 170);
+  assert.equal(master.pipelineSpecVersion, 'PANACEAMED_DATA_PIPELINE_SPEC_V0_1_WAVE_140');
+});
+
+test('170. [WAVE 140 PIPELINE MASTER 5D: DETERMINISTIC SHA-256 PIPELINE SEAL & SUB-25MS RUNTIME]', () => {
+  const run1 = dataPipelineEngine.runPanaceaMedWave140DataPipelineMaster();
+  const run2 = dataPipelineEngine.runPanaceaMedWave140DataPipelineMaster();
+  assert.equal(run1.pipelineSha256Seal.length, 64);
+  assert.equal(run1.pipelineSha256Seal, run2.pipelineSha256Seal);
+  assert.ok(run1.executionDurationMs < 25);
+});
