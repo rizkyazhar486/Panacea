@@ -12,12 +12,24 @@ import {
   evaluateWave201To210LaypersonEverydayHealthHelper,
   evaluateWave211To220FamilyGrowthAndWorkdayErgonomics,
   evaluateWave221To230ClinicianWorkAutomator,
-  runHolisticAutoExpansionAndSmoothOsGovernor
+  runHolisticAutoExpansionAndSmoothOsGovernor,
+  bridgeShenzhenWhoopToQWatchProAndInterpretAi,
+  orchestrateAllConnectedBluetoothWearables
 } from '../src/core/index.mjs';
 
 const mode = (process.argv[2] || 'status').toLowerCase();
 
-if (mode === 'awam') {
+if (mode === 'bluetooth' || mode === 'whoop' || mode === 'qwatch') {
+  const bridge = bridgeShenzhenWhoopToQWatchProAndInterpretAi();
+  const mesh = orchestrateAllConnectedBluetoothWearables();
+  const m = bridge.qWatchProProcessedMetrics;
+  console.log('=== UNIVERSAL BLUETOOTH WEARABLE HUB (SHENZHEN WHOOP <-> QWATCH PRO <-> PANACEAMED AI) ===');
+  console.log('• Total Wearable Terdukung :', mesh.totalSupportedWearableFamilies, 'Keluarga Perangkat BLE');
+  console.log('• Topologi Jembatan Aktif  :', `${bridge.bluetoothTopology.peripheralSensor} -> ${bridge.bluetoothTopology.wristAggregatorBridge} -> ${bridge.bluetoothTopology.primaryOsHost}`);
+  console.log('• Skor Pemulihan & Strain  :', `Recovery ${m.autonomicRecoveryPct}% (${m.ruitangTier}) | Strain ${m.whoopEquivalentDayStrain0to21}/21 | HRV RMSSD ${m.hrvRmssdMs} ms | PWV ${m.fusedPwvMps} m/s`);
+  console.log('• Panduan AI Pengguna Awam :', bridge.aiHealthInterpretation.plainLanguageCustomerSummary);
+  console.log('• Interpretasi AI Klinisi  :', bridge.aiHealthInterpretation.clinicianTechnicalSummary);
+} else if (mode === 'awam') {
   const res = evaluateWave201To210LaypersonEverydayHealthHelper();
   const fam = evaluateWave211To220FamilyGrowthAndWorkdayErgonomics();
   console.log('=== PANDUAN KESEHATAN HARIAN ORANG AWAM & KELUARGA ===');
