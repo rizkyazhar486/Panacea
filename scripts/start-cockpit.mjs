@@ -1,3 +1,4 @@
+import { evaluateSmartClinicalOmniboxAndCdss, runProductionDeploymentReadinessAndSmokeTest } from "../src/core/panaceamedPublicProductionReadyOs.mjs";
 /**
  * @file scripts/start-cockpit.mjs
  * @description PanaceaMed Wave 200 Live Interactive Cockpit & SSE Server Daemon
@@ -37,6 +38,8 @@ export function createCockpitServer() {
     if (req.method === 'GET' && urlPath === '/api/v5/shenzhen/tcm-proactive') return sendJson(runPanaceaMedWave140ShenzhenTcmMasterOs());
     if (req.method === 'GET' && urlPath === '/api/v5/pipeline/panacea-score') return sendJson(runPanaceaMedWave140DataPipelineMaster());
     if (req.method === 'GET' && urlPath === '/api/v6/imaginative/chronofs') return sendJson(runPanaceaMedWave160ImaginativeSingularityMaster());
+    if (req.method === 'GET' && urlPath === '/api/v8/production/readiness') return sendJson(runProductionDeploymentReadinessAndSmokeTest());
+    if (req.method === 'GET' && urlPath === '/api/v8/clinical/omnibox') return sendJson(evaluateSmartClinicalOmniboxAndCdss());
     if (req.method === 'GET' && urlPath === '/api/v7/vault/sqlite-status') return sendJson(runPanaceaMedWave200BicentennialMasterOs());
 
     const fallback = handleNextGenEdgeHttpGateway({ method: req.method, url: req.url });

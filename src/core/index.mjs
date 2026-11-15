@@ -17,3 +17,4 @@ export {
 export {
   runPanaceaMedSovereignEndToEndOrchestrator as runOmnicausalisSingularityMasterEngine
 } from './panaceamedSovereignEndToEndEngine.mjs';
+export * from './panaceamedPublicProductionReadyOs.mjs';
