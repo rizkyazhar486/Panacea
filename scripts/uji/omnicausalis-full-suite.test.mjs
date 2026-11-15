@@ -3645,3 +3645,39 @@ test('381. [WAVE 600 MASTER OS 1D: DETERMINISTIC SHA-256 SEAL, IMMUTABILITY & SU
   assert.equal(r1.wave600Sha256Seal, r2.wave600Sha256Seal);
   assert.ok(r1.executionDurationMs < 45);
 });
+
+
+// === WAVE 601 TO WAVE 650 NEURO-HORMONAL VITALITY BIO-SCROLLING & UHD 5K 4D VISCERAL MIRROR ===
+import * as vitalityUhdOs from '../../src/core/panaceamedNeuroHormonalVitalityScrollOs.mjs';
+
+test('382. [WAVE 601 NEURO-HORMONAL 1A: 4 HORMONAL PATHWAYS (DOPAMINE, OXYTOCIN, SEROTONIN, ENDORPHIN) & RPE DELTA]', () => {
+  const loop = vitalityUhdOs.evaluateNeuroHormonalEngagementLoop();
+  assert.equal(loop.pathwayCount, 4);
+  assert.equal(loop.variableRatioBonusTriggered, true);
+  assert.ok(loop.hormonalScores.compositeHormonalHookIndex >= 85);
+  assert.equal(loop.vitalityFeedCards.length, 4);
+});
+
+test('383. [WAVE 620 UHD 5K 4D MIRROR 1B: 5120x2880 RETINA XDR SPEC & VISCERAL BIO-CORRELATION UNIFORMS]', () => {
+  const mirror = vitalityUhdOs.evaluateUhd5k4dVisceralBioMirror();
+  assert.equal(mirror.renderSpec.horizontalPixels, 5120);
+  assert.equal(mirror.renderSpec.verticalPixels, 2880);
+  assert.equal(mirror.renderSpec.targetFrameRateFps, 120);
+  assert.equal(mirror.correlatedWithDailyLife, true);
+});
+
+test('384. [WAVE 635 COCKPIT & CLI 1C: VITALITY BIO-SCROLLING FEED DOM & UHD 5K 4D CONTROLS]', () => {
+  const html = centuryUi.renderInteractiveWave95CockpitHtml();
+  assert.ok(html.includes('id="vitality-bioscroll-feed"'));
+  assert.ok(html.includes('id="btn-next-vitality-card"'));
+  assert.ok(html.includes('UHD_5K_5120x2880'));
+});
+
+test('385. [WAVE 650 MASTER OS 1D: 650 WAVES UNIFIED, OBJECT.FREEZE IMMUTABILITY & DETERMINISTIC SHA-256 SEAL]', () => {
+  const r1 = vitalityUhdOs.runPanaceaMedWave650NeuroHormonalUhd5kMasterOs();
+  const r2 = vitalityUhdOs.runPanaceaMedWave650NeuroHormonalUhd5kMasterOs();
+  assert.equal(r1.totalWavesUnified, 650);
+  assert.equal(Object.isFrozen(r1), true);
+  assert.equal(r1.wave650Sha256Seal, r2.wave650Sha256Seal);
+  assert.ok(r1.executionDurationMs < 45);
+});

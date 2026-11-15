@@ -471,7 +471,21 @@ export function renderInteractiveWave95CockpitHtml(snapshot = {}) {
       </div>
     </div>
 
-    <canvas id="webgpu-canvas" width="880" height="255"></canvas>
+    
+    <div id="vitality-bioscroll-feed" class="control-box" style="border-color:rgba(232,121,249,0.58);background:linear-gradient(135deg,rgba(15,23,62,0.9),rgba(76,29,149,0.72))">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span style="font-size:0.73rem;color:#e879f9;font-weight:800">VITALITY BIO-SCROLLING FEED (UHD 5K 4D)</span>
+        <span class="badge" id="streak-hormone-badge">🔥 14-Day Streak · Hook 94.8%</span>
+      </div>
+      <div id="bioscroll-card-view" style="font-size:0.75rem;color:#f8fafc;padding:4px 0">
+        <strong>[Dopamine + Serotonin Loop]:</strong> HRV Anda +20.2% di atas baseline 30 hari! Kanvas UHD 5K 4D menampilkan elastisitas arteri muda (PWV 6.12 m/s).
+      </div>
+      <div class="grid-2">
+        <button class="btn" id="btn-next-vitality-card" onclick="const cards=['<strong>[1/4 Dopamine Surprise]:</strong> Lonjakan kesiapan +20.2%! Minum 250 mL air sekarang untuk mengunci bonus pemulihan harian.','<strong>[2/4 Oxytocin Family Sync]:</strong> 4/4 anggota keluarga Anda berada di Zona HIJAU stabil hari ini.','<strong>[3/4 Serotonin 10-Yr Mastery]:</strong> Proyeksi ChronoFS: usia biologis Anda 4.0 tahun lebih muda dari rata-rata.','<strong>[4/4 Endorphin Vagal 0.1Hz]:</strong> Sinkronisasi 25 wearable aktif; ikuti napas 6 siklus/menit di kanvas UHD 5K 4D.'];window._vcIdx=((window._vcIdx||0)+1)%cards.length;document.getElementById('bioscroll-card-view').innerHTML=cards[window._vcIdx];">Swipe Kartu Vitality Berikutnya →</button>
+        <button class="btn" id="btn-uhd5k-boost" onclick="const c=document.getElementById('webgpu-canvas');if(c){c.setAttribute('data-resolution','UHD_5K_5120x2880');}document.getElementById('work-helper-output').innerHTML='<strong>[UHD 5K 4D Visceral Bio-Mirror Aktif]:</strong> Resolusi 5120x2880 P3 HDR10 menyinkronkan denyut 25 perangkat wearable langsung ke partikel hemodinamik 4D.';">Mode Visual UHD 5K 4D</button>
+      </div>
+    </div>
+    <canvas id="webgpu-canvas" data-resolution="UHD_5K_5120x2880" width="880" height="255"></canvas>
 
     <div class="control-box">
       <label for="peel-slider">5-Stage Anatomical Layer Peel: <strong id="peel-label">Stage 3 — Neurovascular</strong></label>

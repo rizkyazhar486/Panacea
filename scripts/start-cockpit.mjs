@@ -1,3 +1,4 @@
+import { runPanaceaMedWave650NeuroHormonalUhd5kMasterOs } from '../src/core/panaceamedNeuroHormonalVitalityScrollOs.mjs';
 import { runPanaceaMedWave600DailyWearableMasterOs } from '../src/core/panaceamedTwentyFiveWearablesDailyLifeOs.mjs';
 import { runPanaceaMedWave550VisaMastercardAndMultiDeviceMasterOs } from '../src/core/panaceamedVisaMastercardTokenQrAndMultiDeviceOs.mjs';
 import { runPanaceaMedWave500FluidChameleonMasterOs } from '../src/core/panaceamedFluidChameleonCamouflageOs.mjs';
@@ -62,6 +63,12 @@ export function createCockpitServer() {
     const fluid = runPanaceaMedWave500FluidChameleonMasterOs();
     res.writeHead(200, { 'content-type': 'application/json; charset=utf-8' });
     res.end(JSON.stringify(fluid, null, 2));
+    return;
+  }
+  if (urlPath === '/api/v18/vitality/bioscroll') {
+    const vit = runPanaceaMedWave650NeuroHormonalUhd5kMasterOs();
+    res.writeHead(200, { 'content-type': 'application/json; charset=utf-8' });
+    res.end(JSON.stringify(vit, null, 2));
     return;
   }
   if (urlPath === '/api/v17/wearables/daily-25') {
