@@ -20,6 +20,8 @@ import * as m_13 from './panaceamedShenzhenTcmProactiveLifecycleOs.mjs';
 import * as m_14 from './panaceamedSovereignEndToEndEngine.mjs';
 import * as m_15 from './panaceamedSqliteVaultAndComplianceOs.mjs';
 import * as m_16 from './panaceamedUniversalHumanityOs.mjs';
+import * as m_17 from './panaceamedPlanetary5BillionSimulationOs.mjs';
+import * as m_18 from './panaceamedAstralAmethystPublicOrchestratorOs.mjs';
 
 const EXTRA_CONTRACT_DEFAULTS = Object.freeze({
   "safeChildParacetamolDoseMg": 210,
@@ -198,3 +200,11 @@ export const evaluateWave211To220FamilyGrowthAndWorkdayErgonomics = m_16.evaluat
 export const evaluateWave221To230ClinicianWorkAutomator = m_16.evaluateWave221To230ClinicianWorkAutomator;
 export const evaluateWave231To240AdaptiveLiteracyChameleon = m_16.evaluateWave231To240AdaptiveLiteracyChameleon;
 export const runPanaceaMedWave250UniversalHumanityMasterOs = m_16.runPanaceaMedWave250UniversalHumanityMasterOs;
+export const SEVEN_KNOWLEDGE_STRATA = m_17.SEVEN_KNOWLEDGE_STRATA;
+export const evaluatePlanetary5BillionUserSimulation = m_17.evaluatePlanetary5BillionUserSimulation;
+export const evaluateTwelveSubspecialtyClinicalDepthMatrix = m_17.evaluateTwelveSubspecialtyClinicalDepthMatrix;
+export const runPanaceaMedWave320PlanetarySubspecialtyMasterOs = m_17.runPanaceaMedWave320PlanetarySubspecialtyMasterOs;
+export const ASTRAL_AMETHYST_DESIGN_TOKENS = m_18.ASTRAL_AMETHYST_DESIGN_TOKENS;
+export const PUBLIC_EXTERNAL_USER_ARCHETYPES = m_18.PUBLIC_EXTERNAL_USER_ARCHETYPES;
+export const orchestratePublicHumanSession = m_18.orchestratePublicHumanSession;
+export const runPanaceaMedWave350AstralPublicMasterOs = m_18.runPanaceaMedWave350AstralPublicMasterOs;

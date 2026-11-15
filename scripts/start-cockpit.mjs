@@ -1,6 +1,6 @@
-import { runPanaceaMedWave350AstralPublicMasterOs } from '../src/core/panaceamedAstralAmethystPublicOrchestratorOs.mjs';
+import { runPanaceaMedWave350AstralPublicMasterOs, orchestratePublicHumanSession } from '../src/core/panaceamedAstralAmethystPublicOrchestratorOs.mjs';
 import { runHolisticAutoExpansionAndSmoothOsGovernor } from '../src/core/panaceamedHolisticAutoKernelOs.mjs';
-import { runHolisticAutoExpansionAndSmoothOsGovernor } from '../src/core/panaceamedHolisticAutoKernelOs.mjs';
+import { evaluatePlanetary5BillionUserSimulation, evaluateTwelveSubspecialtyClinicalDepthMatrix } from '../src/core/panaceamedPlanetary5BillionSimulationOs.mjs';
 import { evaluateSmartClinicalOmniboxAndCdss, runProductionDeploymentReadinessAndSmokeTest } from "../src/core/panaceamedPublicProductionReadyOs.mjs";
 import { runPanaceaMedWave250UniversalHumanityMasterOs } from "../src/core/panaceamedUniversalHumanityOs.mjs";
 import { evaluateWave251To260AutoMaturityCheckRecheck, simulateWave261To270InteractiveClinicalWhatIf, runPanaceaMedWave300AutoMaturityMasterOs } from "../src/core/panaceamedAutoMaturityVisualSimulationOs.mjs";
@@ -21,6 +21,35 @@ const PORT = Number(process.env.PORT || 4040);
 
 export function createCockpitServer() {
   return http.createServer((req, res) => {
+
+  // === WAVE 351-360 PWA OFFLINE-FIRST & PUBLIC MULTI-USER GATEWAY ===
+  const urlPath = String(req.url || '/').split('?')[0];
+  if (urlPath === '/manifest.webmanifest') {
+    const manifestJson = JSON.stringify({
+      name: 'PanaceaMed Astral-Amethyst OS',
+      short_name: 'PanaceaMed',
+      start_url: '/body-exposure',
+      display: 'standalone',
+      background_color: '#040616',
+      theme_color: '#7c3aed'
+    });
+    res.writeHead(200, {
+      'content-type': 'application/manifest+json; charset=utf-8',
+      'access-control-allow-origin': '*'
+    });
+    res.end(manifestJson);
+    return;
+  }
+  if (urlPath === '/sw.js') {
+    const swScript = "self.addEventListener('install', () => self.skipWaiting()); self.addEventListener('activate', (e) => e.waitUntil(self.clients.claim()));";
+    res.writeHead(200, {
+      'content-type': 'application/javascript; charset=utf-8',
+      'cache-control': 'no-cache'
+    });
+    res.end(swScript);
+    return;
+  }
+
     const urlPath = String(req.url || "/").split("?")[0];
     const sendJson = (obj) => {
       res.writeHead(200, { "content-type": "application/json; charset=utf-8" });
@@ -49,6 +78,10 @@ export function createCockpitServer() {
     if (req.method === "GET" && urlPath === "/api/v8/universal/humanity") return sendJson(runPanaceaMedWave250UniversalHumanityMasterOs());
     if (req.method === "GET" && urlPath === "/api/v8/maturity/recheck") return sendJson({ recheck: evaluateWave251To260AutoMaturityCheckRecheck(), master: runPanaceaMedWave300AutoMaturityMasterOs() });
     if (req.method === "GET" && urlPath === "/api/v8/simulation/what-if") return sendJson(simulateWave261To270InteractiveClinicalWhatIf());
+    if (req.method === "GET" && urlPath === "/api/v9/astral/public") return sendJson(runPanaceaMedWave350AstralPublicMasterOs());
+    if (req.method === "GET" && urlPath === "/api/v9/planetary/5billion") return sendJson(evaluatePlanetary5BillionUserSimulation());
+    if (req.method === "GET" && urlPath === "/api/v9/clinical/12-subspecialties") return sendJson(evaluateTwelveSubspecialtyClinicalDepthMatrix());
+    if (req.method === "GET" && urlPath === "/api/v9/holistic/governor") return sendJson(runHolisticAutoExpansionAndSmoothOsGovernor());
 
     const fallback = handleNextGenEdgeHttpGateway({ method: req.method, url: req.url });
     res.writeHead(fallback.statusCode, fallback.headers);

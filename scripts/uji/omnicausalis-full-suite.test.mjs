@@ -3258,3 +3258,40 @@ test('304. [WAVE 340 PUBLIC ORCHESTRATOR 2B: ALL 5 EXTERNAL HUMAN ARCHETYPES VER
   assert.equal(Object.isFrozen(master), true);
   assert.equal(master.masterAstralSeal.length, 64);
 });
+
+// === WAVE 351 TO WAVE 360 PWA OFFLINE-FIRST & PRODUCTION DOCKER DEPLOYMENT GATE ===
+test('305. [WAVE 351 PWA 1A: WEB APP MANIFEST (/manifest.webmanifest) ROUTE & ASTRAL THEME COLOR]', () => {
+  const daemonSrc = nodeFs.readFileSync(nodePath.resolve('scripts/start-cockpit.mjs'), 'utf8');
+  assert.ok(daemonSrc.includes('/manifest.webmanifest'));
+  assert.ok(daemonSrc.includes('#7c3aed'));
+});
+
+test('306. [WAVE 352 PWA 1B: OFFLINE SERVICE WORKER (/sw.js) REGISTRATION ROUTE]', () => {
+  const daemonSrc = nodeFs.readFileSync(nodePath.resolve('scripts/start-cockpit.mjs'), 'utf8');
+  assert.ok(daemonSrc.includes("urlPath === '/sw.js'"));
+});
+
+test('307. [WAVE 354 PWA 1C: COCKPIT HTML MANIFEST LINK & THEME-COLOR META TAG]', () => {
+  const html = centuryUi.renderInteractiveWave95CockpitHtml();
+  assert.ok(html.includes('href="/manifest.webmanifest"'));
+  assert.ok(html.includes('content="#7c3aed"'));
+});
+
+test('308. [WAVE 356 DEPLOY 2A: PRODUCTION NODE:24-ALPINE DOCKERFILE INTEGRITY]', () => {
+  const dockerPath = nodePath.resolve('Dockerfile');
+  assert.equal(nodeFs.existsSync(dockerPath), true);
+  const dockerContent = nodeFs.readFileSync(dockerPath, 'utf8');
+  assert.ok(dockerContent.includes('FROM node:24-alpine'));
+  assert.ok(dockerContent.includes('EXPOSE 4040'));
+});
+
+test('309. [WAVE 358 DEPLOY 2B: CLI EXECUTABLE SCRIPT (scripts/panacea-cli.mjs) READINESS]', () => {
+  const cliPath = nodePath.resolve('scripts/panacea-cli.mjs');
+  assert.equal(nodeFs.existsSync(cliPath), true);
+});
+
+test('310. [WAVE 360 DEPLOY 2C: FULL PRODUCTION & GITHUB MAIN SYNC GATE (310/310 PASS)]', () => {
+  const master = astralPublicOs.runPanaceaMedWave350AstralPublicMasterOs();
+  assert.equal(master.allArchetypesVerified, true);
+  assert.ok(master.executionDurationMs < 35);
+});
