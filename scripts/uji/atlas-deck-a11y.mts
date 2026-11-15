@@ -11,6 +11,7 @@ import { resolve } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
+import { audit } from './support/markupAudit.mts'
 import { ORGAN_BIOMECHANICS_CATALOG, GI_PERISTALSIS_CATALOG } from '../../src/domains/body-exposure/engine/softTissueBiomechanicsEngine.ts'
 import { DECK_ACTIVE_FILL, sliderValueText } from '../../src/domains/body-exposure/ui/deck-kit/deckA11y.ts'
 import { defaultPhysiologyCatalog } from '../../src/domains/body-exposure/engine/system-physiology/physiologyCatalog.ts'
@@ -21,34 +22,7 @@ import { newRecallLog, planRecallDeck, recordRecall, serializeRecallLog, type Re
 const gagal = (nama: string, f: () => void) => { try { f() } catch (e) { throw new Error(`[${nama}] ${(e as Error).message}`) } }
 const hitung = (teks: string, pola: RegExp) => (teks.match(pola) ?? []).length
 
-// ── audit markup: murni, diuji sendiri di bawah sebelum dipercaya ──
-interface Temuan { aturan: 'kontrol-tanpa-nama' | 'tombol-tanpa-nama' | 'grafik-tanpa-alternatif'; html: string }
-function audit(html: string): Temuan[] {
-  const temuan: Temuan[] = []
-  const labelUntuk = new Set([...html.matchAll(/<label\b[^>]*\bfor="([^"]+)"/g)].map((m) => m[1]))
-  const dibungkus: Array<[number, number]> = []
-  for (const m of html.matchAll(/<label\b[^>]*>([\s\S]*?)<\/label>/g)) {
-    if (m[1].replace(/<[^>]+>/g, '').trim()) dibungkus.push([m.index, m.index + m[0].length])
-  }
-  for (const m of html.matchAll(/<(input|select|textarea)\b([^>]*)>/g)) {
-    const a = m[2]
-    if (/\btype="hidden"/.test(a)) continue
-    const id = a.match(/\bid="([^"]+)"/)?.[1]
-    const bernama = /\baria-label="[^"]*[^"\s][^"]*"/.test(a) || /\baria-labelledby="[^"]+"/.test(a)
-      || (id !== undefined && labelUntuk.has(id)) || dibungkus.some(([awal, akhir]) => m.index > awal && m.index < akhir)
-    if (!bernama) temuan.push({ aturan: 'kontrol-tanpa-nama', html: m[0].slice(0, 110) })
-  }
-  for (const m of html.matchAll(/<button\b([^>]*)>([\s\S]*?)<\/button>/g)) {
-    const bernama = /\baria-label="[^"]*[^"\s][^"]*"/.test(m[1]) || m[2].replace(/<[^>]+>/g, '').trim().length > 0
-    if (!bernama) temuan.push({ aturan: 'tombol-tanpa-nama', html: m[0].slice(0, 110) })
-  }
-  for (const m of html.matchAll(/<svg\b([^>]*)>/g)) {
-    const a = m[1]
-    const baik = /\baria-hidden="true"/.test(a) || (/\brole="img"/.test(a) && /\baria-label="[^"]*[^"\s][^"]*"/.test(a))
-    if (!baik) temuan.push({ aturan: 'grafik-tanpa-alternatif', html: m[0].slice(0, 110) })
-  }
-  return temuan
-}
+// ── audit markup: murni, diuji sendiri di bawah sebelum dipercaya (didefinisikan di support/markupAudit.mts) ──
 const bersih = (html: string) => assert.deepEqual(audit(html), [], 'pelanggaran aksesibilitas')
 
 // Audit itu sendiri diuji berpasangan: tiap aturan menolak kasusnya dan menerima kembarannya yang hanya beda di kondisi itu.
