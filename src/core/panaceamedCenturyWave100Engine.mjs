@@ -362,7 +362,7 @@ export function renderInteractiveWave95CockpitHtml(snapshot = {}) {
     </div>
     <div id="daily-25-wearables-timeline" class="control-box" style="border-color:rgba(16,185,129,0.45)">
       <div style="font-size:0.74rem;color:#10b981;font-weight:700">24-Hour Daily Companion (25 Wearables Fused):</div>
-      <select id="daily-slot-selector" onchange="const v=this.value;const out=document.getElementById('work-helper-output');if(out){out.innerHTML='<strong>[Jadwal Harian Aktif — '+v+']:</strong> Data gabungan 25 perangkat (Whoop Shenzhen, qWatch Pro, Oura Ring, CGM, Tensi BLE, & Sleep Radar Wi-Fi) telah diolah menjadi panduan harian siap pakai.';}">
+      <select id="daily-slot-selector" onchange="const v=this.value;const out=document.getElementById('work-helper-output');if(out){out.textContent='[Jadwal Harian Aktif — '+v+']: Data gabungan 25 perangkat (Whoop Shenzhen, qWatch Pro, Oura Ring, CGM, Tensi BLE, & Sleep Radar Wi-Fi) telah diolah menjadi panduan harian siap pakai.';}">
         <option value="06:00_MORNING_READINESS" selected>06:00 Pagi — Kesiapan Bangun & Pemulihan Tidur (91%)</option>
         <option value="09:00_WORKDAY_ERGONOMICS">09:00 Kerja — Postur Leher, Mata 20-20-20 & Hidrasi</option>
         <option value="12:30_METABOLIC_MEAL_COACH">12:30 Siang — Panduan Makan & CGM Gula Darah</option>
