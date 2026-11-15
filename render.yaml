@@ -11,7 +11,7 @@ services:
     rootDir: server
     buildCommand: npm install && node ../scripts/medstudy/fetch-opus55-clinical-dataset.mjs --optional
     startCommand: npm start
-    healthCheckPath: /api/health
+    healthCheckPath: /healthz
     autoDeploy: true
     envVars:
       - key: NODE_VERSION

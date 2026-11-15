@@ -112,3 +112,62 @@ test('FHIR references are explicit and typed rather than inferred from local IDs
     /Device reference/,
   )
 })
+
+
+test('FHIR publication fails closed when clinical-support consent is missing, denied, expired or revoked', () => {
+  const evaluatedAt = '2026-09-19T08:02:00.000Z'
+  const denied = { ...accepted, consent: { ...accepted.consent, granted: false } }
+  const wrongPurpose = { ...accepted, consent: { ...accepted.consent, purposes: ['personal-visualization'] } }
+  const expired = { ...accepted, consent: { ...accepted.consent, expiresAt: '2026-09-19T08:02:00.000Z' } }
+  const revoked = { ...accepted, consent: { ...accepted.consent, revokedAt: '2026-09-19T08:01:30.000Z' } }
+
+  for (const event of [denied, wrongPurpose, { ...accepted, consent: undefined }]) {
+    assert.throws(
+      () => buildAcceptedVisitFhirObservation(event, refs, evaluatedAt),
+      /active_clinical_support_consent/,
+    )
+  }
+  assert.throws(
+    () => buildAcceptedVisitFhirObservation(expired, refs, evaluatedAt),
+    /consent_expired/,
+  )
+  assert.throws(
+    () => buildAcceptedVisitFhirObservation(revoked, refs, evaluatedAt),
+    /consent_revoked/,
+  )
+})
+
+test('FHIR publication accepts consent that is active for clinical support at evaluation time', () => {
+  const event = {
+    ...accepted,
+    consent: {
+      ...accepted.consent,
+      expiresAt: '2026-09-19T09:00:00.000Z',
+    },
+  }
+  const observation = buildAcceptedVisitFhirObservation(
+    event,
+    refs,
+    '2026-09-19T08:02:00.000Z',
+  )
+  assert.equal(observation.status, 'final')
+})
+
+test('FHIR publication rejects malformed or not-yet-effective consent timestamps', () => {
+  const malformed = {
+    ...accepted,
+    consent: { ...accepted.consent, grantedAt: 'not-a-timestamp' },
+  }
+  const futureGrant = {
+    ...accepted,
+    consent: { ...accepted.consent, grantedAt: '2026-09-19T08:03:00.000Z' },
+  }
+  assert.throws(
+    () => buildAcceptedVisitFhirObservation(malformed, refs, '2026-09-19T08:02:00.000Z'),
+    /valid ISO timestamp/,
+  )
+  assert.throws(
+    () => buildAcceptedVisitFhirObservation(futureGrant, refs, '2026-09-19T08:02:00.000Z'),
+    /consent_not_yet_effective/,
+  )
+})

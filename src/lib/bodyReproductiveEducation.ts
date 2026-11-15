@@ -43,7 +43,7 @@ export const REPRODUCTIVE_EDUCATION_NODES: readonly ReproductiveEducationNode[] 
     label: 'Hypothalamic-pituitary-gonadal axis',
     kind: 'physiology',
     evidenceState: 'literature-backed',
-    evidence: [{ kind: 'pubmed', id: '32027812', url: 'https://pubmed.ncbi.nlm.nih.gov/32027812/', note: 'Review describes neuroendocrine control of reproductive function through the hypothalamic-pituitary-gonadal axis.' }],
+    evidence: [{ kind: 'pubmed', id: '29524268', url: 'https://pubmed.ncbi.nlm.nih.gov/29524268/', note: 'Review describes how hormones of the hypothalamic-pituitary-gonadal axis regulate reproduction, with control at the brain and pituitary and sex-steroid feedback.' }],
     boundary: 'Educational physiology only; no person-level fertility, ovulation, spermatogenesis, hormone concentration, cycle phase, sexual function, pregnancy state, or reproductive capacity is inferred.',
   },
   {
@@ -51,7 +51,10 @@ export const REPRODUCTIVE_EDUCATION_NODES: readonly ReproductiveEducationNode[] 
     label: 'Endometriosis inflammatory context',
     kind: 'pathophysiology',
     evidenceState: 'literature-backed',
-    evidence: [{ kind: 'pubmed', id: '37163911', url: 'https://pubmed.ncbi.nlm.nih.gov/37163911/', note: 'Review summarizes inflammatory, endocrine, immune, and tissue-remodeling mechanisms implicated in endometriosis.' }],
+    evidence: [
+      { kind: 'pubmed', id: '22819144', url: 'https://pubmed.ncbi.nlm.nih.gov/22819144/', note: 'Review of the pathogenesis and pathophysiology of endometriosis, described as an inflammatory, estrogen-dependent condition.' },
+      { kind: 'pubmed', id: '36375827', url: 'https://pubmed.ncbi.nlm.nih.gov/36375827/', note: 'Review discusses genetic, hormonal, and immunologic factors proposed to lead to endometriosis.' },
+    ],
     boundary: 'Mechanism education only; does not diagnose endometriosis, localize lesions, infer stage, pain cause, fertility impact, malignancy, or individual inflammatory state.',
   },
   {
@@ -59,7 +62,7 @@ export const REPRODUCTIVE_EDUCATION_NODES: readonly ReproductiveEducationNode[] 
     label: 'GnRH signaling pharmacology context',
     kind: 'pharmacology',
     evidenceState: 'literature-backed',
-    evidence: [{ kind: 'pubmed', id: '35107214', url: 'https://pubmed.ncbi.nlm.nih.gov/35107214/', note: 'Review discusses GnRH agonist and antagonist pharmacology in reproductive endocrine contexts.' }],
+    evidence: [{ kind: 'pubmed', id: '15991015', url: 'https://pubmed.ncbi.nlm.nih.gov/15991015/', note: 'Review contrasts GnRH agonists, which desensitise and down-regulate pituitary GnRH receptors after an initial flare, with antagonists, which compete with endogenous GnRH for pituitary binding sites.' }],
     boundary: 'Mechanism education only; no drug selection, dose, route, timing, indication, contraindication, fertility treatment, contraception plan, monitoring, or patient-specific therapy is generated.',
   },
   {

@@ -51,6 +51,7 @@ export const ENDOCRINE_EDUCATION_NODES: readonly EndocrineEducationNode[] = [
     evidenceState: 'literature-backed',
     evidence: [
       { kind: 'pubmed', id: '29764284', url: 'https://pubmed.ncbi.nlm.nih.gov/29764284/', note: 'Review describes glucocorticoid negative feedback and rhythmic regulation of the hypothalamic-pituitary-adrenal axis.' },
+      // PMID 8701079: Melmed et al. 1996, IGF-I receptor signalling in the somatotroph.
       { kind: 'pubmed', id: '8701079', url: 'https://pubmed.ncbi.nlm.nih.gov/8701079/', note: 'Review describes IGF-I feedback regulation of pituitary growth-hormone secretion and receptor signaling.' },
     ],
     boundary: 'Educational physiology only; no person-level hormone concentration, axis gain, receptor sensitivity, circadian phase, stimulation-test result, or endocrine reserve is inferred.',

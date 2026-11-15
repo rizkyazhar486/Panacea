@@ -51,6 +51,7 @@ export const RESPIRATORY_EDUCATION_NODES: readonly RespiratoryEducationNode[] = 
     kind: 'physiology',
     evidenceState: 'literature-backed',
     evidence: [
+      // PMID 37816345: Petersson & Glenny 2023, Gas Exchange in the Lung.
       { kind: 'pubmed', id: '37816345', url: 'https://pubmed.ncbi.nlm.nih.gov/37816345/', note: 'Review of tidal ventilation, alveolar gas exchange, V/Q relationships, shunt, dead space, and diffusion limitation.' },
       { kind: 'pubmed', id: '37467769', url: 'https://pubmed.ncbi.nlm.nih.gov/37467769/', note: 'Review of respiratory mechanics, airway resistance, compliance, pressures, and respiratory-muscle work.' },
     ],
@@ -73,6 +74,7 @@ export const RESPIRATORY_EDUCATION_NODES: readonly RespiratoryEducationNode[] = 
     kind: 'pharmacology',
     evidenceState: 'literature-backed',
     evidence: [
+      // PMID 27713285: Barisione et al. 2010, Beta-Adrenergic Agonists.
       { kind: 'pubmed', id: '27713285', url: 'https://pubmed.ncbi.nlm.nih.gov/27713285/', note: 'Review of β2-adrenoceptor signaling and control of airway smooth-muscle tone.' },
       { kind: 'pubmed', id: '28950943', url: 'https://pubmed.ncbi.nlm.nih.gov/28950943/', note: 'Review of β2-adrenoceptor function, bronchodilation, and mechanisms that can blunt response in asthma.' },
     ],

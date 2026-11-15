@@ -95,7 +95,7 @@ export function PerfusionChainPanel() {
           </div>
         )}
       </div>
-      <p className="mt-2 text-[11px] text-neutral-500">Relations: CO = HR × (EDV − ESV); MAP = CO × SVR / 80 + CVP; CPP = MAP − ICP; sources: NCBI Bookshelf NBK470455, NBK556075, NBK538226, NBK537271.</p>
+      <p className="mt-2 text-[11px] text-neutral-500">Relations: CO = HR × (EDV − ESV); MAP = CO × SVR / 80 + CVP; CPP = MAP − ICP; sources (StatPearls, NCBI Bookshelf): King &amp; Lowery, Physiology, Cardiac Output (NBK470455); Trammel &amp; Sapra, Physiology, Systemic Vascular Resistance (NBK556075); DeMers &amp; Wachs, Physiology, Mean Arterial Pressure (NBK538226); Mount &amp; Das, Cerebral Perfusion Pressure (NBK537271).</p>
     </details>
   )
 }

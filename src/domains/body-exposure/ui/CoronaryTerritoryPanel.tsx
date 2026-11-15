@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
   AHA17_LIMITATIONS, AHA17_RINGS, AHA17_SOURCES, DOMINANCE_PREVALENCE, branchForSegment, territoryForArtery,
   type CoronaryBranch, type SegmentInfo,
@@ -21,12 +21,22 @@ const BRANCH_STYLE: Record<CoronaryBranch, string> = {
 
 export interface CoronaryTerritoryPanelProps {
   readonly defaultOpen?: boolean
+  readonly initialSegment?: number | null
 }
 
-export function CoronaryTerritoryPanel({ defaultOpen = false }: CoronaryTerritoryPanelProps = {}) {
+export function CoronaryTerritoryPanel({ defaultOpen = false, initialSegment = null }: CoronaryTerritoryPanelProps = {}) {
   const [filter, setFilter] = useState<Filter>('ALL')
-  const [selected, setSelected] = useState<number | null>(null)
+  const [selected, setSelected] = useState<number | null>(initialSegment)
   const [isOpen, setIsOpen] = useState<boolean>(defaultOpen)
+
+  useEffect(() => {
+    if (initialSegment !== undefined) {
+      setSelected(initialSegment)
+      if (initialSegment !== null) {
+        setIsOpen(true)
+      }
+    }
+  }, [initialSegment])
 
   const bySegment = useMemo(() => {
     const map = new Map<number, SegmentInfo>()

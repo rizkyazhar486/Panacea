@@ -68,12 +68,12 @@ export function Settings() {
   const S = simple
 
   /* ═══════════════════════════════════════════════════════════════
-     1) FONT-SIZE ROOT → semua unit rem di Tailwind ikut berubah
+     1) TIPOGRAFI AKAR. Ukuran huruf TIDAK ditulis di sini: satu-satunya penulis adalah lib/theme
+        (setTextScale/setSimpleMode, dipanggil tombol di bawah dan saat boot). Dulu efek ini menulis
+        angka sendiri lalu mengosongkannya saat pengguna keluar, sehingga skala pilihan hilang sampai muat ulang.
      ═══════════════════════════════════════════════════════════════ */
   useEffect(() => {
     const root = document.documentElement
-    const map: Record<TextScale, string> = { sm: '14px', md: '16px', lg: '18px' }
-    root.style.fontSize = simple ? '18px' : map[scale]
     root.style.lineHeight = simple ? '1.75' : ''
     
     // Menggunakan setProperty agar aman dari error TypeScript
@@ -82,13 +82,12 @@ export function Settings() {
     root.style.textRendering = 'optimizeLegibility'
     
     return () => {
-      root.style.fontSize = ''
       root.style.lineHeight = ''
       root.style.removeProperty('-webkit-font-smoothing')
       root.style.removeProperty('-moz-osx-font-smoothing')
       root.style.textRendering = ''
     }
-  }, [scale, simple])
+  }, [simple])
 
   /* ═══════════════════════════════════════════════════════════════
      2) REDUCED MOTION — matikan semua transisi & animasi

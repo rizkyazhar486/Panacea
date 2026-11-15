@@ -76,7 +76,16 @@ export function setTextScale(scale: TextScale) {
   } catch {
     /* ignore */
   }
-  document.documentElement.style.fontSize = SCALE_PX[scale]
+  terapkanUkuranHuruf(scale) // skala yang DIMINTA, bukan yang terbaca dari penyimpanan (bisa menolak menulis)
+}
+
+/**
+ * Ukuran huruf akar. Mode sederhana menyerahkannya ke CSS (`.simple-mode { font-size: 19px }`); selain itu skala pilihan.
+ * Sebelumnya skala selalu menulis `font-size` sebaris pada <html> saat boot dan MENGALAHKAN aturan kelas itu, sehingga
+ * mode sederhana hanya terasa setelah pengguna membuka Settings; kini keduanya mengikuti satu keputusan ini.
+ */
+function terapkanUkuranHuruf(scale: TextScale = getTextScale()) {
+  document.documentElement.style.fontSize = getSimpleMode() ? '' : SCALE_PX[scale]
 }
 
 // ── Reduced motion ─────────────────────────────────────────────────────────
@@ -115,6 +124,7 @@ export function setSimpleMode(on: boolean) {
     /* ignore */
   }
   document.documentElement.classList.toggle('simple-mode', on)
+  terapkanUkuranHuruf()
 }
 
 // Apply every saved appearance preference before first paint.

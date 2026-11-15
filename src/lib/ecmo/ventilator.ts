@@ -6,7 +6,7 @@
 // Nilai ini mengisi `va` di mesin CO2 yang sama, sehingga istirahat paru menaikkan PaCO2
 // kecuali sweep dinaikkan — arah yang dinyatakan ELSO VV 2021 (CO2 dikelola lewat sirkuit).
 //
-// Pemeriksaan "rest settings" memakai angka yang tercetak di ELSO VV 2021 (teks penuh, PMC8315725):
+// Pemeriksaan "rest settings" memakai angka yang tercetak di ELSO VV 2021 (Tonna dkk.; teks penuh, PMC8315725):
 // plateau ≤ 25 cmH2O atau tekanan inspirasi ≤ 15 cmH2O di atas PEEP, dengan PEEP ≥ 10 cmH2O.
 // ΔP tidak diberi ambang: Amato 2015 melaporkan asosiasi kontinu (RR 1,41 per ≈7 cmH2O), bukan batas.
 // PEEP → pirau/rekrutmen dan tekanan intratoraks → aliran balik vena BELUM dimodelkan.

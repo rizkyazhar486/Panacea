@@ -51,6 +51,29 @@ test('menolak_input_tidak_valid', () => {
   assert.equal(viewPose('oblique', C, SZ, 30, 1), null)
 })
 
+// Regresi: nama tampilan dicari sebagai properti objek, jadi nama warisan Object ('constructor', 'toString',
+// '__proto__', ...) dulu lolos pemeriksaan lalu MELEMPAR TypeError — padahal kontraknya "tidak valid -> null".
+// Perintah kamera 'frame' datang lewat event window, sehingga jalur ini bisa dicapai dari luar komponen.
+test('menolak_nama_tampilan_warisan_objek_tanpa_melempar', () => {
+  for (const nama of ['constructor', 'toString', 'hasOwnProperty', '__proto__', 'valueOf', 'isPrototypeOf']) {
+    assert.doesNotThrow(() => viewPose(nama, C, SZ, 30, 1), nama)
+    assert.equal(viewPose(nama, C, SZ, 30, 1), null, nama)
+  }
+})
+
+test('menolak_tampilan_dan_kotak_yang_bukan_bentuknya_tanpa_melempar', () => {
+  for (const buruk of [42, null, undefined, {}, ['anterior'], true]) assert.equal(viewPose(buruk, C, SZ, 30, 1), null, `view ${String(buruk)}`)
+  for (const buruk of [null, undefined, 'abc', 5, { length: 3 }, { 0: 0, 1: 1, 2: 2, length: 3 }]) {
+    assert.equal(viewPose('anterior', buruk, SZ, 30, 1), null, `center ${String(buruk)}`)
+    assert.equal(viewPose('anterior', C, buruk, 30, 1), null, `size ${String(buruk)}`)
+  }
+})
+
+test('berpasangan_nama_sah_tetap_diterima_setelah_pemeriksaan_diperketat', () => {
+  for (const v of ANATOMICAL_VIEWS) assert.ok(viewPose(v, C, SZ, 30, 1), v)
+  assert.deepEqual(viewPose('anterior', C, SZ, 30, 1).target, C)
+})
+
 test('framing rejects nonfinite aspect and invalid margins before camera assignment', () => {
   for (const aspect of [NaN, Infinity, -Infinity]) {
     assert.equal(viewPose('anterior', C, SZ, 30, aspect), null)

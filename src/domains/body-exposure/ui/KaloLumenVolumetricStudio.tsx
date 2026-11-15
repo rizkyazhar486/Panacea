@@ -2,7 +2,7 @@
 // KaloLumen 3-Layer DICOM Volumetric Raymarching & Multi-Planar Reconstruction (MPR) Studio
 // Dual-projection responsive UI built with scoped inline styles to protect bundle budget
 
-import React, { useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import {
   DIAGNOSTIC_CT_PRESETS,
   computeDirectionalLightVector,
@@ -17,8 +17,18 @@ import {
   type MultiPlanarViewMode,
 } from '../engine/kaloLumenDicomEngine.ts'
 
-export function KaloLumenVolumetricStudio(): React.ReactElement {
-  const [selectedPresetId, setSelectedPresetId] = useState<DiagnosticCtWindowPresetId>('MEDIASTINUM_SOFT_TISSUE')
+export interface KaloLumenVolumetricStudioProps {
+  readonly initialPresetId?: DiagnosticCtWindowPresetId
+}
+
+export function KaloLumenVolumetricStudio({ initialPresetId = 'MEDIASTINUM_SOFT_TISSUE' }: KaloLumenVolumetricStudioProps = {}): React.ReactElement {
+  const [selectedPresetId, setSelectedPresetId] = useState<DiagnosticCtWindowPresetId>(initialPresetId)
+
+  useEffect(() => {
+    if (initialPresetId) {
+      setSelectedPresetId(initialPresetId)
+    }
+  }, [initialPresetId])
   const [viewMode, setViewMode] = useState<MultiPlanarViewMode>('VOLUMETRIC_3D')
   const [azimuth, setAzimuth] = useState<number>(45)
   const [elevation, setElevation] = useState<number>(30)
@@ -96,13 +106,16 @@ export function KaloLumenVolumetricStudio(): React.ReactElement {
                 border: '1px solid rgba(56, 189, 248, 0.25)',
               }}
             >
-              Pillar II · KaloLumen Raymarching
+              Diagnostic Imaging · 3D MPR Studio
             </span>
-            <span style={{ fontSize: '11px', color: '#64748b' }}>Client-Side DICOM Volumetric &amp; MPR Engine</span>
+            <span style={{ fontSize: '11px', color: '#64748b' }}>Client-Side DICOM Volumetric Raymarching &amp; Multi-Planar Reconstruction</span>
           </div>
           <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#ffffff', margin: '0.35rem 0 0 0' }}>
-            KaloLumen 3-Layer Volumetric &amp; Diagnostic CT Studio
+            Diagnostic Imaging &amp; Volumetric CT/MRI MPR Studio
           </h2>
+          <p style={{ margin: '0.25rem 0 0 0', fontSize: '11px', color: '#94a3b8', lineHeight: 1.4, maxWidth: '640px' }}>
+            Interactive cross-sectional radiology workstation simulating Hounsfield Unit (HU) attenuation, 3-layer tissue penetration, and orthogonal multi-planar reconstruction (Axial, Coronal, Sagittal).
+          </p>
         </div>
         <div
           style={{
@@ -442,3 +455,6 @@ export function KaloLumenVolumetricStudio(): React.ReactElement {
     </div>
   )
 }
+
+export { KaloLumenVolumetricStudio as DiagnosticImagingVolumetricStudio }
+

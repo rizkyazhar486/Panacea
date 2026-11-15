@@ -45,6 +45,7 @@ export const DIGESTIVE_EDUCATION_NODES: readonly DigestiveEducationNode[] = [
     evidenceState: 'literature-backed',
     evidence: [
       { kind: 'pubmed', id: '32152479', url: 'https://pubmed.ncbi.nlm.nih.gov/32152479/', note: 'Review describes enteric sensory transduction, neural circuits, and coordination of gastrointestinal motility.' },
+      // PMID 22392290: Furness 2012, the enteric nervous system and neurogastroenterology.
       { kind: 'pubmed', id: '22392290', url: 'https://pubmed.ncbi.nlm.nih.gov/22392290/', note: 'Review describes enteric and central neural integration in control of gastrointestinal musculature and digestive function.' },
     ],
     boundary: 'Educational physiology only; no person-level transit time, pressure, motility index, secretion rate, absorption, microbiome state, autonomic tone, or gastrointestinal function is inferred.',

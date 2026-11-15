@@ -4,7 +4,7 @@
  * Pure inline styles to preserve zero Tailwind bundle overhead.
  */
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import {
   CRANIAL_NERVES,
   BRAINSTEM_REFLEX_ARCS,
@@ -13,14 +13,29 @@ import {
   evaluateNeurologicalSyndrome,
   type CranialNerveProfile,
 } from '../engine/neuroFascicularTractographyEngine'
+import { DECK_ACTIVE_FILL } from './deck-kit/deckA11y'
+import { OculomotorLesionLab } from './OculomotorLesionLab'
 
 export interface NeuroFascicularReflexDeckProps {
   readonly initialTab?: 'nerves' | 'reflexes' | 'syndromes'
+  readonly initialNerveId?: string
 }
 
-export function NeuroFascicularReflexDeck({ initialTab = 'nerves' }: NeuroFascicularReflexDeckProps = {}) {
+export function NeuroFascicularReflexDeck({ initialTab = 'nerves', initialNerveId = 'cn-3' }: NeuroFascicularReflexDeckProps = {}) {
   const [activeTab, setActiveTab] = useState<'nerves' | 'reflexes' | 'syndromes'>(initialTab)
-  const [selectedNerveId, setSelectedNerveId] = useState<string>('cn-3')
+  const [selectedNerveId, setSelectedNerveId] = useState<string>(initialNerveId)
+
+  useEffect(() => {
+    if (initialTab) {
+      setActiveTab(initialTab)
+    }
+  }, [initialTab])
+
+  useEffect(() => {
+    if (initialNerveId) {
+      setSelectedNerveId(initialNerveId)
+    }
+  }, [initialNerveId])
   const [selectedReflexId, setSelectedReflexId] = useState<string>('pupillary-light-reflex')
   const [stimulusSide, setStimulusSide] = useState<'left' | 'right'>('right')
   const [afferentIntact, setAfferentIntact] = useState<boolean>(true)
@@ -79,14 +94,15 @@ export function NeuroFascicularReflexDeck({ initialTab = 'nerves' }: NeuroFascic
         </div>
 
         {/* Tab Switcher */}
-        <div style={{ display: 'flex', gap: '0.35rem', background: 'rgba(0,0,0,0.3)', padding: '0.25rem', borderRadius: '0.5rem', border: '1px solid rgba(255,255,255,0.06)' }}>
+        <div role="group" aria-label="Neuro view" style={{ display: 'flex', flexWrap: 'wrap', maxWidth: '100%', gap: '0.35rem', background: 'rgba(0,0,0,0.3)', padding: '0.25rem', borderRadius: '0.5rem', border: '1px solid rgba(255,255,255,0.06)' }}>
           {(['nerves', 'reflexes', 'syndromes'] as const).map((tab) => (
             <button
               key={tab}
               type="button"
+              aria-pressed={activeTab === tab}
               onClick={() => setActiveTab(tab)}
               style={{
-                background: activeTab === tab ? '#0284c7' : 'transparent',
+                background: activeTab === tab ? DECK_ACTIVE_FILL : 'transparent',
                 color: activeTab === tab ? '#ffffff' : '#94a3b8',
                 border: 'none',
                 padding: '0.35rem 0.75rem',
@@ -118,6 +134,7 @@ export function NeuroFascicularReflexDeck({ initialTab = 'nerves' }: NeuroFascic
                   <button
                     key={n.id}
                     type="button"
+                    aria-pressed={isSelected}
                     onClick={() => setSelectedNerveId(n.id)}
                     style={{
                       display: 'flex',
@@ -134,7 +151,7 @@ export function NeuroFascicularReflexDeck({ initialTab = 'nerves' }: NeuroFascic
                     }}
                   >
                     <span style={{ fontSize: '0.75rem', fontWeight: 900 }}>{n.roman}</span>
-                    <span style={{ fontSize: '0.625rem', color: isSelected ? '#bae6fd' : '#94a3b8', textAlign: 'center', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '60px' }}>
+                    <span style={{ fontSize: '0.625rem', color: isSelected ? 'inherit' : '#94a3b8', textAlign: 'center', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '60px' }}>
                       {n.name.split(' ')[0]}
                     </span>
                   </button>
@@ -178,6 +195,14 @@ export function NeuroFascicularReflexDeck({ initialTab = 'nerves' }: NeuroFascic
                 <span style={{ color: '#38bdf8', fontSize: '0.65rem', textTransform: 'uppercase', fontWeight: 800, display: 'block' }}>Clinical Bedside Maneuver</span>
                 <span style={{ color: '#f1f5f9', fontWeight: 600 }}>{activeNerve.clinicalTest}</span>
               </div>
+              {['cn-3', 'cn-4', 'cn-6'].includes(activeNerve.id) && (
+                <div style={{ marginTop: '0.5rem' }}>
+                  <div style={{ fontSize: '0.65rem', fontWeight: 800, textTransform: 'uppercase', color: '#a78bfa', marginBottom: '0.4rem', letterSpacing: '0.08em' }}>
+                    Interactive 9-Cardinal Gaze Motility Simulator
+                  </div>
+                  <OculomotorLesionLab />
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -192,6 +217,7 @@ export function NeuroFascicularReflexDeck({ initialTab = 'nerves' }: NeuroFascic
               <button
                 key={r.id}
                 type="button"
+                aria-pressed={selectedReflexId === r.id}
                 onClick={() => setSelectedReflexId(r.id)}
                 style={{
                   background: selectedReflexId === r.id ? 'rgba(56, 189, 248, 0.2)' : 'rgba(255,255,255,0.03)',
@@ -215,16 +241,17 @@ export function NeuroFascicularReflexDeck({ initialTab = 'nerves' }: NeuroFascic
               <div style={{ fontSize: '0.75rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#94a3b8', marginBottom: '0.5rem' }}>
                 Stimulus & Pathway Lesion Sandbox
               </div>
-              <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.75rem' }}>
+              <div role="group" aria-label="Stimulus side" style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.75rem' }}>
                 <button
                   type="button"
+                  aria-pressed={stimulusSide === 'right'}
                   onClick={() => setStimulusSide('right')}
                   style={{
                     flex: 1,
                     padding: '0.35rem',
                     borderRadius: '0.375rem',
                     border: stimulusSide === 'right' ? '1px solid #38bdf8' : '1px solid rgba(255,255,255,0.1)',
-                    background: stimulusSide === 'right' ? '#0284c7' : 'transparent',
+                    background: stimulusSide === 'right' ? DECK_ACTIVE_FILL : 'transparent',
                     color: '#fff',
                     fontSize: '0.75rem',
                     fontWeight: 700,
@@ -235,13 +262,14 @@ export function NeuroFascicularReflexDeck({ initialTab = 'nerves' }: NeuroFascic
                 </button>
                 <button
                   type="button"
+                  aria-pressed={stimulusSide === 'left'}
                   onClick={() => setStimulusSide('left')}
                   style={{
                     flex: 1,
                     padding: '0.35rem',
                     borderRadius: '0.375rem',
                     border: stimulusSide === 'left' ? '1px solid #38bdf8' : '1px solid rgba(255,255,255,0.1)',
-                    background: stimulusSide === 'left' ? '#0284c7' : 'transparent',
+                    background: stimulusSide === 'left' ? DECK_ACTIVE_FILL : 'transparent',
                     color: '#fff',
                     fontSize: '0.75rem',
                     fontWeight: 700,
@@ -314,6 +342,7 @@ export function NeuroFascicularReflexDeck({ initialTab = 'nerves' }: NeuroFascic
               <button
                 key={s.id}
                 type="button"
+                aria-pressed={selectedSyndromeId === s.id}
                 onClick={() => setSelectedSyndromeId(s.id)}
                 style={{
                   background: selectedSyndromeId === s.id ? 'rgba(56, 189, 248, 0.2)' : 'rgba(255,255,255,0.03)',

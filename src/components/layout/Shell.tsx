@@ -176,6 +176,7 @@ const KATALOG: Nav[] = [
   { to: '/body-exposure/fetal-dataset', label: 'Fetal Segmentation Dataset', icon: IconActivity, roles: ['pasien', 'dokter', 'owner'], group: 'Your Body' },
   { to: '/radiology', label: 'Radiology Viewer', icon: IconSearch, roles: ['pasien', 'dokter'], group: 'Health' },
   { to: '/emergency', label: 'Emergency Card & SOS', icon: IconShield, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
+  { to: '/simple', label: 'Simple Screen', icon: IconShield, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
   { to: '/education', label: 'Education', icon: IconBook, roles: ['pasien'], group: 'Content' },
   { to: '/recovery', label: 'Recovery', icon: IconMoon, roles: ['pasien', 'dokter'], group: 'Health' },
   { to: '/latihan', label: 'Training', icon: IconRun, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },

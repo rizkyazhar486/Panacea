@@ -462,6 +462,8 @@ export type CoronaryArtery = CoronaryBranch | 'LCA'
 export type Dominance = 'right' | 'left' | 'codominant' | 'unknown'
 
 export const AHA17_SEGMENT_COUNT = 17
+// Segment assignment: Cerqueira et al. 2002 (AHA statement, PMID 11815441) as tabulated in Rinta-Kiikka et al. 2014
+// (PMID 25201553, PMC6932424); cross-checked against Malkasian et al. 2020 (PMID 32072257, PMC7416454).
 export const AHA17_SOURCES = Object.freeze({
   assignment: Object.freeze({ pmid: '25201553', pmcid: 'PMC6932424', originalPmid: '11815441' }),
   crossCheck: Object.freeze({ pmid: '32072257', pmcid: 'PMC7416454' }),

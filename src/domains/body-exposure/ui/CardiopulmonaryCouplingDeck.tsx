@@ -5,6 +5,7 @@ import {
   type CardiopulmonaryInput,
   type CardiopulmonaryScenario,
 } from '../engine/cardiopulmonaryCouplingEngine';
+import { sliderValueText } from './deck-kit/deckA11y';
 
 const SCENARIOS: ReadonlyArray<{ id: CardiopulmonaryScenario; label: string; badge: string }> = [
   { id: 'normative_rest', label: 'Resting Baseline', badge: 'Normal' },
@@ -60,7 +61,10 @@ export function CardiopulmonaryCouplingDeck() {
     const xVed = toSvgX(customParams.vedMl);
     const yZero = toSvgY(0);
 
-    return { coords, pathString, xV0, yV0, xPes, yPes, xVed, yZero };
+    // The same numbers the gauges below show, so a screen reader hears what the loop depicts.
+    const label = `Left ventricular pressure–volume loop: stroke volume ${simulation.strokeVolumeMl} mL, ejection fraction ${simulation.ejectionFractionPct}%, end-systolic pressure ${simulation.endSystolicPressureMmHg} mmHg`;
+
+    return { coords, pathString, xV0, yV0, xPes, yPes, xVed, yZero, label };
   }, [simulation, customParams]);
 
   return (
@@ -120,13 +124,14 @@ export function CardiopulmonaryCouplingDeck() {
       {/* Scenario Presets */}
       <div style={{ marginTop: '12px' }}>
         <div style={{ fontSize: '12px', fontWeight: 600, color: '#d4d4d4', marginBottom: '6px' }}>Clinical Scenarios</div>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+        <div role="group" aria-label="Clinical scenarios" style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
           {SCENARIOS.map((sc) => {
             const active = selectedScenario === sc.id;
             return (
               <button
                 key={sc.id}
                 type="button"
+                aria-pressed={active}
                 onClick={() => handleScenarioChange(sc.id)}
                 style={{
                   borderRadius: '8px',
@@ -184,6 +189,8 @@ export function CardiopulmonaryCouplingDeck() {
                 max="4.5"
                 step="0.05"
                 value={customParams.eesMmHgPerMl}
+                aria-label="Inotropy Ees (Elastance)"
+                aria-valuetext={sliderValueText(customParams.eesMmHgPerMl, 'mmHg/mL')}
                 onChange={(e) => updateParam('eesMmHgPerMl', parseFloat(e.target.value))}
                 style={{ width: '100%', marginTop: '4px', cursor: 'pointer', accentColor: '#22d3ee' }}
               />
@@ -201,6 +208,8 @@ export function CardiopulmonaryCouplingDeck() {
                 max="240"
                 step="5"
                 value={customParams.vedMl}
+                aria-label="End-Diastolic Volume (Ved)"
+                aria-valuetext={sliderValueText(customParams.vedMl, 'mL')}
                 onChange={(e) => {
                   const newVed = parseInt(e.target.value, 10);
                   if (newVed > customParams.vesMl) updateParam('vedMl', newVed);
@@ -221,6 +230,8 @@ export function CardiopulmonaryCouplingDeck() {
                 max="180"
                 step="5"
                 value={customParams.vesMl}
+                aria-label="End-Systolic Volume (Ves)"
+                aria-valuetext={sliderValueText(customParams.vesMl, 'mL')}
                 onChange={(e) => {
                   const newVes = parseInt(e.target.value, 10);
                   if (newVes < customParams.vedMl) updateParam('vesMl', newVes);
@@ -241,6 +252,8 @@ export function CardiopulmonaryCouplingDeck() {
                 max="160"
                 step="1"
                 value={customParams.hrBpm}
+                aria-label="Heart Rate (HR)"
+                aria-valuetext={sliderValueText(customParams.hrBpm, 'bpm')}
                 onChange={(e) => updateParam('hrBpm', parseInt(e.target.value, 10))}
                 style={{ width: '100%', marginTop: '4px', cursor: 'pointer', accentColor: '#22d3ee' }}
               />
@@ -281,6 +294,8 @@ export function CardiopulmonaryCouplingDeck() {
                 max="36"
                 step="1"
                 value={customParams.rrBpm}
+                aria-label="Respiratory Rate (RR)"
+                aria-valuetext={sliderValueText(customParams.rrBpm, 'breaths per minute')}
                 onChange={(e) => updateParam('rrBpm', parseInt(e.target.value, 10))}
                 style={{ width: '100%', marginTop: '4px', cursor: 'pointer', accentColor: '#2dd4bf' }}
               />
@@ -298,6 +313,8 @@ export function CardiopulmonaryCouplingDeck() {
                 max="1400"
                 step="25"
                 value={customParams.tidalVolumeMl}
+                aria-label="Tidal Volume (VT)"
+                aria-valuetext={sliderValueText(customParams.tidalVolumeMl, 'mL')}
                 onChange={(e) => updateParam('tidalVolumeMl', parseInt(e.target.value, 10))}
                 style={{ width: '100%', marginTop: '4px', cursor: 'pointer', accentColor: '#2dd4bf' }}
               />
@@ -323,7 +340,7 @@ export function CardiopulmonaryCouplingDeck() {
             </div>
 
             {svgData ? (
-              <svg viewBox="0 0 320 220" style={{ width: '100%', height: '192px', userSelect: 'none' }}>
+              <svg viewBox="0 0 320 220" role="img" aria-label={svgData.label} style={{ width: '100%', height: '192px', userSelect: 'none' }}>
                 {/* Grid Lines */}
                 <line x1="35" y1="30" x2="35" y2="195" stroke="#374151" strokeWidth="1" />
                 <line x1="35" y1="195" x2="300" y2="195" stroke="#374151" strokeWidth="1" />

@@ -21,7 +21,8 @@ export interface AtlasLiteratureSource {
   readonly publication: string
   readonly year: number
   readonly pmidOrDoi: string
-  readonly url: string
+  /** Absent for print textbooks: they are cited by ISBN and have no open online copy to link to. */
+  readonly url?: string
   readonly quantitativeLaw: string
   readonly equation: string
 }
@@ -159,7 +160,6 @@ export const ATLAS_LITERATURE_SOURCES: readonly AtlasLiteratureSource[] = [
     publication: 'Elsevier',
     year: 2021,
     pmidOrDoi: 'ISBN: 978-0323597128',
-    url: 'https://www.ncbi.nlm.nih.gov/books/NBK537171/',
     quantitativeLaw: 'Whole-body cardiac output partitioning & Starling transcapillary balance',
     equation: 'CO = HR × SV; Jv = Kf × [(Pc − Pi) − σ(πc − πi)]',
   },
@@ -170,7 +170,6 @@ export const ATLAS_LITERATURE_SOURCES: readonly AtlasLiteratureSource[] = [
     publication: 'Elsevier',
     year: 2017,
     pmidOrDoi: 'ISBN: 978-1455743773',
-    url: 'https://www.ncbi.nlm.nih.gov/books/NBK541062/',
     quantitativeLaw: 'Hemodynamic Poiseuille conductance & Nernst/Goldman-Hodgkin-Katz electrophysiology',
     equation: 'Q = ΔP / R; Vm = (RT/F) ln((P_K[K+]o + P_Na[Na+]o + P_Cl[Cl-]i) / (P_K[K+]i + P_Na[Na+]i + P_Cl[Cl-]o))',
   },
@@ -181,7 +180,6 @@ export const ATLAS_LITERATURE_SOURCES: readonly AtlasLiteratureSource[] = [
     publication: 'Elsevier',
     year: 2020,
     pmidOrDoi: 'ISBN: 978-0702077050',
-    url: 'https://www.ncbi.nlm.nih.gov/books/NBK554569/',
     quantitativeLaw: 'Hierarchical anatomical continuity from gross somatic planes to histological laminae',
     equation: 'Whole body (1.7 m) → Organ system (10⁻¹ m) → Histological unit (10⁻⁴ m)',
   },
@@ -192,18 +190,18 @@ export const ATLAS_LITERATURE_SOURCES: readonly AtlasLiteratureSource[] = [
     publication: 'J Physiol. 1919;52(6):409-415',
     year: 1919,
     pmidOrDoi: 'PMID: 16993405 · DOI: 10.1113/jphysiol.1919.sp001839',
-    url: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC1402719/',
+    url: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC1402716/',
     quantitativeLaw: 'Krogh-Erlang radial oxygen diffusion cylinder in microvascular tissue beds',
     equation: 'PO2(R) = Pcap − (M / 4K) × [R² ln((R/Rc)²) − (R² − Rc²)]',
   },
   {
     id: 'weibel-west-morphometry',
-    authors: 'Weibel ER; West JB, Luks AM',
-    title: 'Morphometry of the Human Lung & West’s Respiratory Physiology (11th ed.)',
-    publication: 'Academic Press / Wolters Kluwer',
+    authors: 'Weibel ER, Gomez DM; West JB, Luks AM',
+    title: 'Architecture of the human lung & West’s Respiratory Physiology (11th ed.)',
+    publication: 'Science. 1962;137(3530):577-585 · Wolters Kluwer 2021',
     year: 2021,
-    pmidOrDoi: 'PMID: 13999517 · PMC6269087',
-    url: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC6269087/',
+    pmidOrDoi: 'PMID: 14005590 · DOI: 10.1126/science.137.3530.577',
+    url: 'https://pubmed.ncbi.nlm.nih.gov/14005590/',
     quantitativeLaw: 'Fick diffusive flux across ultrathin blood-tissue barriers',
     equation: 'V_gas = (A / T) × D × (P1 − P2)',
   },
@@ -225,7 +223,7 @@ export const ATLAS_LITERATURE_SOURCES: readonly AtlasLiteratureSource[] = [
     publication: 'Nature 1961;191:144-148 · W.W. Norton 2022 · Science 2022;375:eabi6983',
     year: 2022,
     pmidOrDoi: 'PMID: 13771349 · PMID: 35271311',
-    url: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC9295688/',
+    url: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC9119736/',
     quantitativeLaw: 'Proton-motive force (Δp) driving F₁F₀-ATP synthase rotary catalysis',
     equation: 'Δp = ΔΨm − (2.303 RT / F) ΔpH ≈ 180–220 mV',
   },

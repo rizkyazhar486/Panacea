@@ -467,8 +467,8 @@ export function FiveStageVisualAtlas({
       >
         <summary className="flex min-h-[44px] cursor-pointer items-center justify-between gap-2 text-xs font-black text-cyan-100">
           <span>Textbook &amp; peer-reviewed journal sources · governing multiscale equations</span>
-          <span className="text-[9px] font-bold uppercase tracking-[.14em] text-white/45">
-            {ATLAS_LITERATURE_SOURCES.length} verified references
+          <span className="shrink-0 whitespace-nowrap text-[9px] font-bold uppercase tracking-[.14em] text-white/45">
+            {ATLAS_LITERATURE_SOURCES.length} references
           </span>
         </summary>
         <div className="mt-3 space-y-2.5 border-t border-white/[.07] pt-3 text-[11px] leading-relaxed text-white/65">
@@ -493,14 +493,18 @@ export function FiveStageVisualAtlas({
                 <div className="mt-1 rounded bg-white/[.04] px-2 py-1 font-mono text-[9px] text-cyan-100">
                   {source.equation}
                 </div>
-                <a
-                  href={source.url}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="mt-1.5 inline-flex min-h-[44px] items-center text-[10px] font-bold text-cyan-200 underline"
-                >
-                  Open source reference ({source.id})
-                </a>
+                {source.url ? (
+                  <a
+                    href={source.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="mt-1.5 inline-flex min-h-[44px] items-center text-[10px] font-bold text-cyan-200 underline"
+                  >
+                    Open source reference ({source.id})
+                  </a>
+                ) : (
+                  <p className="mt-1.5 text-[10px] font-bold text-white/55">Print textbook — cited by ISBN, no online copy linked.</p>
+                )}
               </div>
             ))}
           </div>

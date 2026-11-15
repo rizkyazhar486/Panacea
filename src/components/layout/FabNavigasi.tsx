@@ -88,8 +88,10 @@ export function FabNavigasi({ onCari, onKembali, tersembunyi = false }: {
   const lokasi = useLocation()
   const navigasi = useNavigate()
   const sembunyikanDiBodyExplorer = lokasi.pathname.startsWith('/body-explorer')
-  const sembunyikanDiBodyExposure = lokasi.pathname === '/fitness-hub'
-    && new URLSearchParams(lokasi.search).get('view') === 'body-exposure'
+  // Atlas 3D (/body-exposure) adalah panggung spasial seperti Body Explorer: tombol melayang menutupi
+  // lembar inspektur dan tab tahapnya di ponsel (terukur di 390x844), jadi ikut disembunyikan di sana.
+  const sembunyikanDiBodyExposure = lokasi.pathname === '/body-exposure'
+    || (lokasi.pathname === '/fitness-hub' && new URLSearchParams(lokasi.search).get('view') === 'body-exposure')
 
   const [prefs, setPrefs] = useState<AssistivePreferences>(loadAssistivePreferences)
   const [pos, setPos] = useState<AssistivePosition>(() => {

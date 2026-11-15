@@ -10,6 +10,7 @@ import { RelWidgetRumah } from '../components/RelWidgetRumah'
 import { SuperPageLauncher } from '../components/SuperPageLauncher'
 import { PanaceaImageSlider } from '../components/PanaceaImageSlider'
 import { ThinkingOrb } from '../components/ThinkingOrb'
+import { SimpleModeInvite } from '../domains/simple-mode'
 import { PanaceaZoneNav } from '../components/PanaceaZoneNav'
 import { Fold, FoldGroup } from '../shared/ui/Fold'
 
@@ -62,6 +63,7 @@ export function HomeSocialWorkspace() {
       </div>
       {activeKey === 'home' ? (
         <div className="panacea-human-home">
+          <SimpleModeInvite />
           {/* Balanced 2-Column Bento Grid on Desktop */}
           <div className="grid grid-cols-1 items-stretch gap-6 lg:grid-cols-12">
             {/* Left Column (7 cols): Telemetry Brief */}

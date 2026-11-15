@@ -31,15 +31,19 @@ export interface FickOxygenExtractionResult {
 }
 
 export const FICK_OXYGEN_EXTRACTION_EVIDENCE = [
+  // NBK606091: Basnet & Rout, "Calculating FICK Cardiac Output and Input" (StatPearls).
   {
     id: 'ncbi-fick-2024',
     reference: 'NCBI Bookshelf NBK606091',
     role: 'Supports the steady-state Fick mass-balance relationship between cardiac output, oxygen consumption, and arterial-minus-venous oxygen content.',
   },
+  // NBK493219: Hoecker, Schweiger, Llauget & Hendrix, "Partial Pressure of Oxygen" (StatPearls). Its abstract supports
+  // the role below; the Fick formula and the mixed- versus central-venous distinction were not found there and the
+  // full text could not be re-checked, so they are no longer attributed to it.
   {
     id: 'ncbi-po2-2026',
     reference: 'NCBI Bookshelf NBK493219',
-    role: 'Supports systemic VO2 = CO × (CaO2 − CvO2) and the distinction between mixed venous and central venous oxygen content.',
+    role: 'Review of oxygen partial pressure, oxygen content and haemoglobin saturation, and of the balance between oxygen delivery (DO2) and consumption (VO2).',
   },
 ] as const
 

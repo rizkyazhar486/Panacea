@@ -18,20 +18,25 @@ export interface AcidBaseCouplingResult {
 }
 
 export const ACID_BASE_COUPLING_EVIDENCE = [
+  // NBK308: Centor 1990, "Serum Total Carbon Dioxide", Clinical Methods (3rd ed.). Checked against its PubMed
+  // record (PMID 21250150). The abstract supports the total-CO2/bicarbonate relation below; the chapter's own
+  // statement of the 6.1 and 0.03 constants could not be re-checked against the full text, so it is not claimed.
   {
     id: 'ncbi-clinical-methods-total-co2',
     reference: 'NCBI Bookshelf NBK308',
-    role: 'Supports Henderson-Hasselbalch pH = 6.1 + log10(HCO3- / (0.03 × pCO2)) and identifies 6.1 and 0.03 as the conventional blood-buffer constants used in this form.',
+    role: 'Clinical Methods chapter (Centor): serum total CO2 is mostly bicarbonate (about 95%) and is measured as its estimate.',
   },
+  // NBK493167: Krishnaprasadh & Sharma, "Hypocarbia" (StatPearls).
   {
     id: 'statpearls-hypocarbia-2026',
     reference: 'NCBI Bookshelf NBK493167',
     role: 'Supports PaCO2 as the respiratory component and bicarbonate as the metabolic/renal component of the bicarbonate buffer system.',
   },
+  // NBK536919: Castro & Zubair, "Arterial Blood Gas Analysis: Fundamentals, Interpretation, and Clinical Utility" (StatPearls).
   {
     id: 'statpearls-abg-2026',
     reference: 'NCBI Bookshelf NBK536919',
-    role: 'Supports the distinction between calculated blood-gas bicarbonate and chemistry total CO2; they are related but not silently interchangeable.',
+    role: 'Blood-gas analysers calculate bicarbonate from measured pH and PaCO2 with a form of the Henderson-Hasselbalch equation, while serum chemistry measures total CO2; the two are related but not silently interchangeable.',
   },
 ] as const
 

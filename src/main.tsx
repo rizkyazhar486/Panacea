@@ -209,6 +209,7 @@ createRoot(document.getElementById('root')!).render(
           <Suspense fallback={<PageLoader />}>
             <Routes>
               <Route path="/" element={<Home />} />
+              <Route path="/simple" element={<SimpleHome />} />
               <Route path="/chatbot" element={<Chatbot />} />
               <Route path="/emr" element={<EMR />} />
               <Route path="/planning" element={<Planning />} />

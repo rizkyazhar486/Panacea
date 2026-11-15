@@ -1,4 +1,6 @@
-import { BODY_SYSTEM_SOURCE_WAVE, type BodySystemId } from './bodySystemSourceWave'
+// Straight from the data module: going through lib/bodySystemSourceWave would pull the whole generated body
+// index into every bundle that only needs this bridge.
+import { BODY_SYSTEM_SOURCE_WAVE, type BodySystemId } from '../domains/body-exposure/data/bodySystems.ts'
 import type { WholeBodySystemId } from './wholeBodyPhysiologyOS'
 
 export type BodyPhysiologyBridgeFidelity = 'direct' | 'compound' | 'contextual'

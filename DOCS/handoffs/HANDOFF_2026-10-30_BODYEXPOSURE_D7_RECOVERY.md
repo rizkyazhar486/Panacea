@@ -1,6 +1,14 @@
-# Handoff — updated 2026-10-31 (Claude Opus 5.5 integrator session)
+# Handoff — updated 2026-11-14 (Claude Opus 5.5 integrator session)
 
 Written from repository evidence only. States are labelled: IMPLEMENTED / LOCALLY TESTED / CI VERIFIED / MERGED / INDEPENDENTLY REVIEWED. Nothing here is clinically validated. Several Claude sessions work in parallel and pick tasks from this file: before starting a task, re-check `git log origin/main` and open PRs for it (two sessions built the same Mongo fix on 2026-10-31; #2948 was closed as a duplicate of #2944).
+
+## Update 2026-11-14 (verified this session; older sections below are the 2026-10-31 state)
+- Main `aed1d77c`. #2950 (`egress.mongo` counters), #2952 (live smoke names a suspended Render service; wake/smoke/provenance tests now run in Validate) and #2953 (female MTP-plane heuristic: pure module, unit tests, pinned sensitivity; Blender rig report byte-identical) are merged.
+- Production is back. `/api/health` 200, storage mode `mongo` (answers the `MONGODB_URI` question: it is set). `verify-deployed-sha.mjs`: frontend `aed1d77c` = main, backend `dd1a967d` equivalent (no server path changed since).
+- Bandwidth evidence from `/api/health` (since that process started, not a monthly total): Mongo slices 51 documents sent, 12,373 skipped (~15 KB); before #2944 every save resent all ~12,400 documents. ESPN polled 1,768 times with 0 request-body bytes (responses are inbound, not billed). Largest HTTP route by count is `/healthz` (4,654 calls, ~9 KB). The monthly total is only on the Render dashboard.
+- 2026-11-13: `Vercel Prebuilt Production` attempt 1 was blocked by `vercel-release-gate.mjs` with `MISSING_WORKFLOW` for Stabilization although that run (43490400097) had succeeded 14 min earlier; the same gate passed locally and in attempt 2, which deployed. Cause of the transient miss not identified; if it recurs, inspect the GitHub workflow-runs listing the gate reads. The scheduled Production browser check failed only because the frontend was stale at that moment.
+- Still waiting on the owner: permission to close the red PRs built on the pre-revert tip; the 12 MB health-webhook limit (one 413 from a valid token on 2026-10-29).
+- T-D7-05 open items now: toe-constraint jump gating; keep the pre-landmark GLB hash in `rig_chain_female.sh` (needs a full female chain run to produce the value).
 
 ## Main
 `origin/main` = `7f4e8e90` (#2947) when this update was written.

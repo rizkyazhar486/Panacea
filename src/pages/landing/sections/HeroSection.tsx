@@ -1,5 +1,5 @@
+import { lazy, Suspense } from 'react'
 import { Reveal } from '../../../components/Reveal'
-import { InteractiveAura } from '../../../components/InteractiveAura'
 import { BatasKlaimKesehatan } from '../../../components/BatasKlaimKesehatan'
 import { scrollToSection } from './LandingHeader'
 import {
@@ -11,6 +11,9 @@ import {
 } from '../../../components/icons'
 import { IconArrowRight } from '../landingSvgs'
 import { STATS } from '../landingData'
+
+// Decorative canvas: loaded after the hero renders so it stays out of the initial JS budget.
+const InteractiveAura = lazy(() => import('../../../components/InteractiveAura').then((m) => ({ default: m.InteractiveAura })))
 
 interface HeroSectionProps {
   onMasuk: () => void
@@ -30,7 +33,9 @@ export function HeroSection({ onMasuk }: HeroSectionProps) {
           className="absolute inset-0 h-full w-full object-cover"
         />
         <div className="hero-video-scrim absolute inset-0" />
-        <InteractiveAura />
+        <Suspense fallback={null}>
+          <InteractiveAura />
+        </Suspense>
         <div className="orb absolute -left-20 top-10 h-72 w-72 rounded-full bg-brand/20 blur-3xl" />
         <div
           className="orb absolute right-0 top-40 h-80 w-80 rounded-full bg-emerald-400/15 blur-3xl"

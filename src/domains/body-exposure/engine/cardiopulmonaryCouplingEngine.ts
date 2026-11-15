@@ -97,8 +97,8 @@ export const CARDIOPULMONARY_DISCLAIMER =
 
 export const CARDIOPULMONARY_PROVENANCE = Object.freeze({
   primaryCitation:
-    'Sunagawa K, Maughan WL, Burkhoff D, Sagawa K. Left ventricular interaction with arterial load. Am J Physiol. 1983;245(5):H773-H780.',
-  pmid: '6638198',
+    'Sunagawa K, Maughan WL, Burkhoff D, Sagawa K. Left ventricular interaction with arterial load studied in isolated canine ventricle. Am J Physiol. 1983;245(5 Pt 1):H773-H780.',
+  pmid: '6638199',
   physiologicalBasis: 'Frank-Starling law, Suga-Sagawa elastance, Laplace tension, West lung zones, Fick principle',
   formVerified: true as const,
 });
