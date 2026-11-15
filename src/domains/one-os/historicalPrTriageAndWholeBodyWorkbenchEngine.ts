@@ -1,7 +1,7 @@
 import { sha256Hex } from "../../shared/kernel/sha256.ts";
-import { evaluateCardiopulmonaryCouplingDeck, type CardiopulmonaryCouplingInput } from "../body-exposure/engine/cardiopulmonaryCouplingEngine.ts";
-import { simulatePink1ParkinMitophagyAndProtonMotiveForce, mapVisceralOrganToReferredPainDermatome, bindAuthorizedPatientBiometricToOrganOverlay } from "../body-exposure/engine/tenMergedPillarsUnifiedWorkbenchEngine.ts";
-import { getDeepSystemSpecById } from "../body-exposure/engine/bodyExposureTotalMultiscaleAtlasEngine.ts";
+import { evaluateCardiopulmonaryCouplingDeck, type CardiopulmonaryCouplingInput } from "../body-exposure/index.ts";
+import { simulatePink1ParkinMitophagyAndProtonMotiveForce, mapVisceralOrganToReferredPainDermatome, bindAuthorizedPatientBiometricToOrganOverlay } from "../body-exposure/index.ts";
+import { getDeepSystemSpecById } from "../body-exposure/index.ts";
 import { type CanonicalBodySystemId } from "../body-exposure/engine/singleProjectileUhdBodyExposureEngine.ts";
 
 export interface HistoricalPrTriageRecord {

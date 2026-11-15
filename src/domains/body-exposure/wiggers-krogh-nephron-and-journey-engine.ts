@@ -1,5 +1,5 @@
 import { computeHemodynamics } from "./omnicausalis-multiscale-bridge.ts";
-import { scheduleFsrsRetrievalReview } from "../prometheus/argon-edu-complete-suite.ts";
+import { scheduleFsrsRetrievalReview } from "../prometheus/index.ts";
 
 // Poiseuille idealized laminar flow: Q = (pi * deltaP * r^4) / (8 * mu * L)
 export function computePoiseuilleLaminarFlowMlPerSec(p: {

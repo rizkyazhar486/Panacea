@@ -4,9 +4,9 @@
  * untuk menyajikan seluruh kapabilitas PanaceaMed Omnicausalis ke peramban web.
  */
 
-import { hydrateUnifiedBodyExposureCockpitState } from "../body-exposure/ui/bodyExposureUnifiedCockpitHydrator.ts";
-import { evaluateOtorhinolaryngologyAudiometryAndVestibular } from "../clinical-operations/specialty/otorhinolaryngologyAudiometryAndVestibularEngine.ts";
-import { evaluateSleSledai2kAndAnifrolumabEligibility } from "../clinical-operations/specialty/rheumatologyLupusSledai2kAndBiologicsEngine.ts";
+import { hydrateUnifiedBodyExposureCockpitState } from "../../domains/body-exposure/ui/bodyExposureUnifiedCockpitHydrator.ts";
+import { evaluateOtorhinolaryngologyAudiometryAndVestibular } from "../../domains/clinical-operations/specialty/otorhinolaryngologyAudiometryAndVestibularEngine.ts";
+import { evaluateSleSledai2kAndAnifrolumabEligibility } from "../../domains/clinical-operations/specialty/rheumatologyLupusSledai2kAndBiologicsEngine.ts";
 
 export interface SimulatedHttpRequest {
   readonly method: "GET" | "POST";

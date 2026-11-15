@@ -1,4 +1,4 @@
-import { evaluateCardiopulmonaryCouplingDeck } from "../../body-exposure/engine/cardiopulmonaryCouplingEngine.ts";
+import { evaluateCardiopulmonaryCouplingDeck } from "../../body-exposure/index.ts";
 
 export interface VerifiedFma3DViewportContext {
   readonly fmaId: string;

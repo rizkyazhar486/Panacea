@@ -5,10 +5,10 @@ import {
   executeTrack4WearablesSensoriumAnd3DBiomechanics,
   evaluateCardiopulmonaryCouplingDeck,
   buildClinicalReviewPacketForH3Signoff
-} from "../body-exposure/index.ts";
-import { executeOnePanaceaClinicalOsWorkflow } from "../clinical-operations/model/clinicalOneOsAndDicomWebOrchestrator.ts";
-import { evaluateSepsis2026GuidelineCompliance } from "../clinical-operations/model/sepsisOneHourBundleCds.ts";
-import { computeYourBodyHealthspanPortfolio, matchReclubAndClassPassSessionsToBiology } from "../personal-health/engine/yourBodyHealthspanAndReclubPassEngine.ts";
+} from "../../domains/body-exposure/index.ts";
+import { executeOnePanaceaClinicalOsWorkflow } from "../../domains/clinical-operations/model/clinicalOneOsAndDicomWebOrchestrator.ts";
+import { evaluateSepsis2026GuidelineCompliance } from "../../domains/clinical-operations/model/sepsisOneHourBundleCds.ts";
+import { computeYourBodyHealthspanPortfolio, matchReclubAndClassPassSessionsToBiology } from "../../domains/personal-health/engine/yourBodyHealthspanAndReclubPassEngine.ts";
 import { type SupportedLocale } from "../../locales/bodyExposureLocales.ts";
 
 export interface PlanetaryExposomeInput {
