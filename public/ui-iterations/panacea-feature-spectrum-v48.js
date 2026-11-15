@@ -162,8 +162,18 @@
     }
   }
 
+  // A label or query can hold a bare "%" ("Battery 98%", "?q=100%"), which is not a valid escape. The URIError it
+  // threw stopped each paint at the first such link (on Home, 33 of 83 links painted), so such text is matched as written.
+  function decodeIdentity(text) {
+    try {
+      return decodeURIComponent(text)
+    } catch {
+      return text
+    }
+  }
+
   function choosePalette(identity) {
-    const source = decodeURIComponent(String(identity || '')).replace(/[?&#/_-]+/g, ' ')
+    const source = decodeIdentity(String(identity || '')).replace(/[?&#/_-]+/g, ' ')
     for (const rule of GROUP_RULES) {
       if (rule.test.test(source)) return rule.palette
     }
