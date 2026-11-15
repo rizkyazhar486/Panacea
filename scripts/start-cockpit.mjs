@@ -1,3 +1,7 @@
+import { runPanaceaMedWave600DailyWearableMasterOs } from '../src/core/panaceamedTwentyFiveWearablesDailyLifeOs.mjs';
+import { runPanaceaMedWave550VisaMastercardAndMultiDeviceMasterOs } from '../src/core/panaceamedVisaMastercardTokenQrAndMultiDeviceOs.mjs';
+import { runPanaceaMedWave500FluidChameleonMasterOs } from '../src/core/panaceamedFluidChameleonCamouflageOs.mjs';
+import { runPanaceaMedWave450UniversalDeviceAndAiMasterOs } from '../src/core/panaceamedUniversalBleWifiImitationOs.mjs';
 import { runPanaceaMedWave350AstralPublicMasterOs, orchestratePublicHumanSession } from '../src/core/panaceamedAstralAmethystPublicOrchestratorOs.mjs';
 import {
   bridgeShenzhenWhoopToQWatchProAndInterpretAi,
@@ -46,6 +50,33 @@ export function createCockpitServer() {
     res.end(manifestJson);
     return;
   }
+  
+  // === WAVE 450-550 GUARANTEED ROUTES (/api/v14, /api/v15, /api/v16) ===
+  if (urlPath === '/api/v14/devices/bridge') {
+    const bridge = runPanaceaMedWave450UniversalDeviceAndAiMasterOs();
+    res.writeHead(200, { 'content-type': 'application/json; charset=utf-8' });
+    res.end(JSON.stringify(bridge, null, 2));
+    return;
+  }
+  if (urlPath === '/api/v15/chameleon/fluid') {
+    const fluid = runPanaceaMedWave500FluidChameleonMasterOs();
+    res.writeHead(200, { 'content-type': 'application/json; charset=utf-8' });
+    res.end(JSON.stringify(fluid, null, 2));
+    return;
+  }
+  if (urlPath === '/api/v17/wearables/daily-25') {
+    const w25 = runPanaceaMedWave600DailyWearableMasterOs();
+    res.writeHead(200, { 'content-type': 'application/json; charset=utf-8' });
+    res.end(JSON.stringify(w25, null, 2));
+    return;
+  }
+  if (urlPath === '/api/v16/emv/token-pass') {
+    const emv = runPanaceaMedWave550VisaMastercardAndMultiDeviceMasterOs();
+    res.writeHead(200, { 'content-type': 'application/json; charset=utf-8' });
+    res.end(JSON.stringify(emv, null, 2));
+    return;
+  }
+
   if (urlPath === '/sw.js') {
     const swScript = "self.addEventListener('install', () => self.skipWaiting()); self.addEventListener('activate', (e) => e.waitUntil(self.clients.claim()));";
     res.writeHead(200, {
