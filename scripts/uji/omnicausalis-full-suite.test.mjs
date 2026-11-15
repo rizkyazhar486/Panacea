@@ -3216,3 +3216,45 @@ test("281. [WAVE 300 GRAND TERCENTENARY MILESTONE: 300/300 TOTAL SUITE COMPLETIO
   assert.equal(master.releaseMilestone, "PANACEAMED_TERCENTENARY_AUTO_MATURITY_VISUAL_SIM_OS_WAVE_300");
   assert.equal(master.totalWavesUnified, 300);
 });
+
+
+// === WAVE 321 TO WAVE 350 ASTRAL-AMETHYST UI/UX & PUBLIC MULTI-USER ORCHESTRATOR ===
+import * as astralPublicOs from '../../src/core/panaceamedAstralAmethystPublicOrchestratorOs.mjs';
+import * as centuryUi from '../../src/core/panaceamedCenturyWave100Engine.mjs';
+
+test('301. [WAVE 321 ASTRAL-AMETHYST UI 1A: SPACE GROTESK / PLUS JAKARTA SANS / JETBRAINS MONO TYPOGRAPHY & PALETTE]', () => {
+  const tokens = astralPublicOs.ASTRAL_AMETHYST_DESIGN_TOKENS;
+  assert.ok(tokens.typography.headingFontFamily.includes('Space Grotesk'));
+  assert.ok(tokens.typography.bodyFontFamily.includes('Plus Jakarta Sans'));
+  assert.ok(tokens.colorPalette.heroGradientCss.includes('#2563EB'));
+  assert.ok(tokens.colorPalette.heroGradientCss.includes('#7C3AED'));
+});
+
+test('302. [WAVE 325 ASTRAL-AMETHYST UI 1B: STARFIELD CANVAS & PUBLIC MULTI-USER FORM IN COCKPIT HTML]', () => {
+  const html = centuryUi.renderInteractiveWave95CockpitHtml();
+  assert.ok(html.includes('id="astral-starfield-canvas"'));
+  assert.ok(html.includes('id="public-archetype-selector"'));
+  assert.ok(html.includes('id="btn-run-public-orchestrator"'));
+  assert.ok(html.includes('--amethyst-purple: #7c3aed'));
+});
+
+test('303. [WAVE 330 PUBLIC ORCHESTRATOR 2A: EXTERNAL LAYPERSON (BUDI, 34Y) CUSTOM SESSION ORCHESTRATION]', () => {
+  const session = astralPublicOs.orchestratePublicHumanSession({
+    archetypeId: 'PUBLIC_01_AWAM_PEKERJA',
+    userName: 'Budi Santoso',
+    systolicMmHg: 148,
+    fastingGlucoseMgDl: 142
+  });
+  assert.equal(session.userSessionProfile.userName, 'Budi Santoso');
+  assert.equal(session.userSessionProfile.ruitangTier, 'YELLOW');
+  assert.equal(session.publicTrustGuarantees.dualPassRecheckZeroError, true);
+  assert.equal(session.publicTrustGuarantees.rawStreamLeavesDevice, false);
+});
+
+test('304. [WAVE 340 PUBLIC ORCHESTRATOR 2B: ALL 5 EXTERNAL HUMAN ARCHETYPES VERIFIED FOR PUBLIC USE]', () => {
+  const master = astralPublicOs.runPanaceaMedWave350AstralPublicMasterOs();
+  assert.equal(master.publicArchetypesCount, 5);
+  assert.equal(master.allArchetypesVerified, true);
+  assert.equal(Object.isFrozen(master), true);
+  assert.equal(master.masterAstralSeal.length, 64);
+});

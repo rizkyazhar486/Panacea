@@ -1,3 +1,4 @@
+import { runPanaceaMedWave350AstralPublicMasterOs } from '../src/core/panaceamedAstralAmethystPublicOrchestratorOs.mjs';
 import { runHolisticAutoExpansionAndSmoothOsGovernor } from '../src/core/panaceamedHolisticAutoKernelOs.mjs';
 import { runHolisticAutoExpansionAndSmoothOsGovernor } from '../src/core/panaceamedHolisticAutoKernelOs.mjs';
 import { evaluateSmartClinicalOmniboxAndCdss, runProductionDeploymentReadinessAndSmokeTest } from "../src/core/panaceamedPublicProductionReadyOs.mjs";
