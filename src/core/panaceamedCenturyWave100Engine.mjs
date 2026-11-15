@@ -341,6 +341,25 @@ export function renderInteractiveWave95CockpitHtml(snapshot = {}) {
       accent-color: var(--nebula-violet);
     }
     .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+    .vitality-feed {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      padding-bottom: 4px;
+    }
+    .vitality-card {
+      min-width: 245px;
+      scroll-snap-align: start;
+      background: linear-gradient(135deg, rgba(15, 23, 62, 0.88) 0%, rgba(76, 29, 149, 0.56) 100%);
+      border: 1px solid rgba(192, 132, 252, 0.45);
+      border-radius: 12px;
+      padding: 9px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-size: 0.74rem;
+    }
   </style>
 </head>
 <body>
@@ -410,11 +429,17 @@ export function renderInteractiveWave95CockpitHtml(snapshot = {}) {
       <div id="whoop-qwatch-bridge-status" style="font-size:0.72rem;color:var(--emerald-star)">TERHUBUNG: Whoop Shenzhen → qWatch Pro → PanaceaMed AI (Recovery 84% | Strain 11.4/21)</div>
     </div>
 
-    <h2>2. Astral Single-Score & Ruitang Tier</h2>
-    <div class="score-hero">
-      <div style="font-size:0.7rem;letter-spacing:0.08em;color:#c084fc">PANACEA ASTRAL HEALTH SCORE</div>
+    <h2>2. Astral Single-Score & Ruitang Tier (Zero Overwhelm UX)</h2>
+    <div class="score-hero" id="single-score-zero-overwhelm-hero">
+      <div style="font-size:0.7rem;letter-spacing:0.08em;color:#c084fc">PANACEA ASTRAL HEALTH SCORE (0–100)</div>
       <div class="score-val" id="panacea-score-display">${panaceaScore}</div>
-      <div id="single-rec-display" style="font-size:0.75rem;color:var(--text-celestial-muted)">Tren otonom stabil terhadap baseline 30 hari Anda.</div>
+      <div id="single-rec-display" style="font-size:0.75rem;color:var(--text-celestial-muted)">Tren otonom stabil terhadap baseline 30 hari Anda — 1 aksi harian siap dilakukan.</div>
+      <button class="btn" id="btn-progressive-disclosure-1tap" style="margin-top:6px;width:100%" onclick="const d=document.getElementById('progressive-disclosure-drawer');if(d){d.style.display=d.style.display==='none'?'block':'none';}">1-Tap Progressive Disclosure: 12 Subspesialis, Kurva Lab &amp; SOAP/SBAR</button>
+      <div id="progressive-disclosure-drawer" style="display:none;margin-top:6px;text-align:left;font-size:0.71rem;color:#cbd5e1;border-top:1px solid rgba(168,85,247,0.35);padding-top:6px">
+        <div>• <strong>12 Subspesialis:</strong> Kardiologi, Nefrologi, Endokrin, Pulmonologi, Neurologi, Hepatologi, Imunologi, Pediatri, Geriatri, THT-KL, Oftalmologi, Hiperbarik.</div>
+        <div>• <strong>Kurva Lab 7 Hari:</strong> eGFR 96 mL/min | HbA1c 5.3% | hs-CRP 0.7 mg/L | PWV 6.08 m/s.</div>
+        <div>• <strong>Draf SOAP/SBAR:</strong> Siap ditinjau &amp; ditandatangani dokter (Ed25519).</div>
+      </div>
     </div>
     <div class="control-box">
       <select id="tier-selector">
@@ -481,11 +506,46 @@ export function renderInteractiveWave95CockpitHtml(snapshot = {}) {
         <strong>[Dopamine + Serotonin Loop]:</strong> HRV Anda +20.2% di atas baseline 30 hari! Kanvas UHD 5K 4D menampilkan elastisitas arteri muda (PWV 6.12 m/s).
       </div>
       <div class="grid-2">
-        <button class="btn" id="btn-next-vitality-card" onclick="const cards=['<strong>[1/4 Dopamine Surprise]:</strong> Lonjakan kesiapan +20.2%! Minum 250 mL air sekarang untuk mengunci bonus pemulihan harian.','<strong>[2/4 Oxytocin Family Sync]:</strong> 4/4 anggota keluarga Anda berada di Zona HIJAU stabil hari ini.','<strong>[3/4 Serotonin 10-Yr Mastery]:</strong> Proyeksi ChronoFS: usia biologis Anda 4.0 tahun lebih muda dari rata-rata.','<strong>[4/4 Endorphin Vagal 0.1Hz]:</strong> Sinkronisasi 25 wearable aktif; ikuti napas 6 siklus/menit di kanvas UHD 5K 4D.'];window._vcIdx=((window._vcIdx||0)+1)%cards.length;document.getElementById('bioscroll-card-view').innerHTML=cards[window._vcIdx];">Swipe Kartu Vitality Berikutnya →</button>
-        <button class="btn" id="btn-uhd5k-boost" onclick="const c=document.getElementById('webgpu-canvas');if(c){c.setAttribute('data-resolution','UHD_5K_5120x2880');}document.getElementById('work-helper-output').innerHTML='<strong>[UHD 5K 4D Visceral Bio-Mirror Aktif]:</strong> Resolusi 5120x2880 P3 HDR10 menyinkronkan denyut 25 perangkat wearable langsung ke partikel hemodinamik 4D.';">Mode Visual UHD 5K 4D</button>
+        <button class="btn" id="btn-next-vitality-card" onclick="const cards=['[1/4 Dopamine Surprise]: Lonjakan kesiapan +20.2%! Minum 250 mL air sekarang untuk mengunci bonus pemulihan harian.','[2/4 Oxytocin Family Sync]: 4/4 anggota keluarga Anda berada di Zona HIJAU stabil hari ini.','[3/4 Serotonin 10-Yr Mastery]: Proyeksi ChronoFS: usia biologis Anda 4.0 tahun lebih muda dari rata-rata.','[4/4 Endorphin Vagal 0.1Hz]: Sinkronisasi 25 wearable aktif; ikuti napas 6 siklus/menit di kanvas UHD 5K 4D.'];window._vcIdx=((window._vcIdx||0)+1)%cards.length;document.getElementById('bioscroll-card-view').textContent=cards[window._vcIdx];">Swipe Kartu Vitality Berikutnya →</button>
+        <button class="btn" id="btn-uhd5k-boost" onclick="const c=document.getElementById('webgpu-canvas');if(c){c.setAttribute('data-resolution','UHD_5K_5120x2880');}document.getElementById('work-helper-output').textContent='[UHD 5K 4D Visceral Bio-Mirror Aktif]: Resolusi 5120x2880 P3 HDR10 menyinkronkan denyut 25 perangkat wearable langsung ke partikel hemodinamik 4D.';">Mode Visual UHD 5K 4D</button>
       </div>
     </div>
-    <canvas id="webgpu-canvas" data-resolution="UHD_5K_5120x2880" width="880" height="255"></canvas>
+    <canvas id="webgpu-canvas" data-resolution="UHD_5K_5120x2880" data-uhd-resolution="5120x2880" data-shader="PBR_SUBSURFACE_SCATTERING_5K" width="880" height="255"></canvas>
+
+    <div class="control-box" id="visceral-bio-mirror-controls" style="border-color:rgba(56,189,248,0.48)">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span style="font-size:0.74rem;font-weight:700;color:#38bdf8">UHD 5K 4D Visceral Bio-Mirroring (Korelasi Hidup &amp; Pemulihan Real-Time):</span>
+        <span class="badge" id="biomirror-visceral-status">RECOVERY · 432Hz BioSymphony</span>
+      </div>
+      <div class="grid-2">
+        <button class="btn" id="btn-trigger-stress-spike" style="background:linear-gradient(135deg,#e11d48,#f59e0b)">Simulasi Stres / Kurang Tidur / Gula Naik</button>
+        <button class="btn" id="btn-trigger-healing-recovery" style="background:linear-gradient(135deg,#0284c7,#10b981)">Simulasi Pemulihan (Hidrasi &amp; Napas 0.1 Hz)</button>
+      </div>
+    </div>
+
+    <div class="control-box" id="vitality-scrolling-container" style="border-color:rgba(192,132,252,0.52)">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span style="font-size:0.74rem;font-weight:700;color:#e879f9">Interactive Vitality Scrolling Cards (Hormonal Engagement Loop):</span>
+        <span class="badge">3 Kartu Utama · Snap-Scroll</span>
+      </div>
+      <div class="vitality-feed" id="vitality-scrolling-feed">
+        <div class="vitality-card" id="vitality-card-1-wearables">
+          <div style="color:#38bdf8;font-weight:700">Kartu 1 · Status Live Wearable &amp; Kesiapan</div>
+          <div class="badge" id="vcard1-metric">25 BLE/Wi-Fi Aktif · Skor 88.6</div>
+          <div style="color:#cbd5e1">Ring, Watch, Band, CGM, Tensi BLE &amp; Timbangan sinkron real-time.</div>
+        </div>
+        <div class="vitality-card" id="vitality-card-2-chronofs-4d">
+          <div style="color:#c084fc;font-weight:700">Kartu 2 · Perbandingan Tubuh 4D (+10 Thn)</div>
+          <div class="badge" id="vcard2-metric">ChronoFS: -4.0 Tahun Lebih Muda</div>
+          <div style="color:#cbd5e1">Usia Biologis Hari Ini 30.8 thn vs Proyeksi +10 Thn (PWV 6.08 m/s).</div>
+        </div>
+        <div class="vitality-card" id="vitality-card-3-emv-qr-action">
+          <div style="color:#10b981;font-weight:700">Kartu 3 · Kartu Identitas Dinamis &amp; 1-Klik</div>
+          <div class="badge" id="vcard3-metric">2D QR EMVCo + 1D Code-128</div>
+          <div style="color:#cbd5e1">Panduan P3K/Obat Awam &amp; Draf Otomatis SOAP/SBAR Dokter.</div>
+        </div>
+      </div>
+    </div>
 
     <div class="control-box">
       <label for="peel-slider">5-Stage Anatomical Layer Peel: <strong id="peel-label">Stage 3 — Neurovascular</strong></label>
@@ -566,8 +626,14 @@ export function renderInteractiveWave95CockpitHtml(snapshot = {}) {
 
     let phase = 0;
     let currentPwv = 6.19;
+    let bioMirrorMode = 'HEALING_RECOVERY';
     let cursorCurr = [440, 130];
     let cursorPred = [440, 130];
+    const hemodynamicParticles = Array.from({ length: 42 }, (_, i) => ({
+      offset: i * 21,
+      lane: (i % 3) - 1,
+      radius: 1.8 + (i % 3) * 0.55
+    }));
 
     const archetypePresets = {
       PUBLIC_01_AWAM_PEKERJA: { name: 'Budi Santoso (34 thn)', weight: 72, sys: 146, glu: 138, tier: 'LAYPERSON_AWAM' },
@@ -665,6 +731,26 @@ export function renderInteractiveWave95CockpitHtml(snapshot = {}) {
       evaluatePublicUserInBrowser();
     });
 
+    const btnStress = document.getElementById('btn-trigger-stress-spike');
+    const btnHeal = document.getElementById('btn-trigger-healing-recovery');
+    const bioStatus = document.getElementById('biomirror-visceral-status');
+    if (btnStress) {
+      btnStress.addEventListener('click', () => {
+        bioMirrorMode = 'STRESS_OVERLOAD';
+        currentPwv = 8.24;
+        if (bioStatus) bioStatus.textContent = 'STRESS ALERT · Ketegangan Vaskular Tinggi (PWV 8.24 m/s)';
+        document.getElementById('single-rec-display').textContent = 'Terdeteksi stres kerja / kurang tidur: Ambil napas vagal 0.1 Hz (6 napas/menit) & minum 250 mL air.';
+      });
+    }
+    if (btnHeal) {
+      btnHeal.addEventListener('click', () => {
+        bioMirrorMode = 'HEALING_RECOVERY';
+        currentPwv = 6.08;
+        if (bioStatus) bioStatus.textContent = 'RECOVERY · Cahaya Biru-Zamrud & Harmoni 432Hz Aktif';
+        document.getElementById('single-rec-display').textContent = 'Pemulihan otonom tercapai: Ketegangan arteri mereda (PWV 6.08 m/s) dengan harmoni BioSymphony 432 Hz.';
+      });
+    }
+
     function initWebAudio() {
       const AudioContextClass = window.AudioContext || window.webkitAudioContext;
       const aCtx = new AudioContextClass();
@@ -697,9 +783,15 @@ export function renderInteractiveWave95CockpitHtml(snapshot = {}) {
       const stage = Number(document.getElementById('peel-slider').value || 3);
 
       const grad = ctx.createLinearGradient(100, 0, 780, 255);
-      grad.addColorStop(0, '#38bdf8');
-      grad.addColorStop(0.5, '#8b5cf6');
-      grad.addColorStop(1, '#e879f9');
+      if (bioMirrorMode === 'STRESS_OVERLOAD') {
+        grad.addColorStop(0, '#f43f5e');
+        grad.addColorStop(0.5, '#f59e0b');
+        grad.addColorStop(1, '#fb7185');
+      } else {
+        grad.addColorStop(0, '#38bdf8');
+        grad.addColorStop(0.5, '#10b981');
+        grad.addColorStop(1, '#a855f7');
+      }
 
       ctx.strokeStyle = grad;
       ctx.lineWidth = 2.0;
@@ -707,6 +799,16 @@ export function renderInteractiveWave95CockpitHtml(snapshot = {}) {
         ctx.beginPath();
         ctx.arc(440, 115, 32 + r * 18 + Math.sin(phase * 0.08) * 2.5, 0, Math.PI * 2);
         ctx.stroke();
+      }
+
+      // UHD 5K 4D Hemodynamic Blood Flow Particles
+      for (const p of hemodynamicParticles) {
+        const px = 30 + ((p.offset + phase * (currentPwv * 0.42)) % 820);
+        const py = 215 + p.lane * 8 - Math.sin((px + phase) * 0.045) * 18;
+        ctx.fillStyle = bioMirrorMode === 'STRESS_OVERLOAD' ? 'rgba(244, 63, 94, 0.88)' : 'rgba(16, 185, 129, 0.88)';
+        ctx.beginPath();
+        ctx.arc(px, py, p.radius, 0, Math.PI * 2);
+        ctx.fill();
       }
 
       // Flash-Hogan Minimum-Jerk Vector
