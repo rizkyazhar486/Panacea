@@ -1,3 +1,4 @@
+import { evaluateSmartClinicalOmniboxAndCdss, runProductionDeploymentReadinessAndSmokeTest } from "../src/core/panaceamedPublicProductionReadyOs.mjs";
 import { runPanaceaMedWave200BicentennialMasterOs } from '../src/core/panaceamedSqliteVaultAndComplianceOs.mjs';
 import { runPanaceaMedWave160ImaginativeSingularityMaster } from '../src/core/panaceamedImaginativeSingularityOs.mjs';
 import { runPanaceaMedWave140DataPipelineMaster } from '../src/core/panaceamedDataPipelineEdgeCloudEngine.mjs';
@@ -51,6 +52,20 @@ const server = http.createServer((req, res) => {
     const shenzhenTcm = runPanaceaMedWave140ShenzhenTcmMasterOs();
     res.writeHead(200, { 'content-type': 'application/json; charset=utf-8' });
     res.end(JSON.stringify(shenzhenTcm, null, 2));
+    return;
+  }
+
+  if (req.method === 'GET' && urlPath === '/api/v8/production/readiness') {
+    const readiness = runProductionDeploymentReadinessAndSmokeTest();
+    res.writeHead(200, { 'content-type': 'application/json; charset=utf-8' });
+    res.end(JSON.stringify(readiness, null, 2));
+    return;
+  }
+
+  if (req.method === 'GET' && urlPath === '/api/v8/clinical/omnibox') {
+    const omnibox = evaluateSmartClinicalOmniboxAndCdss();
+    res.writeHead(200, { 'content-type': 'application/json; charset=utf-8' });
+    res.end(JSON.stringify(omnibox, null, 2));
     return;
   }
 

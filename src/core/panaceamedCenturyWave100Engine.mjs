@@ -299,7 +299,19 @@ export function renderInteractiveWave95CockpitHtml(snapshot = {}) {
 
   <!-- KOLOM TENGAH: 4D WEBGPU VIEWPORT, 5-STAGE PEEL & CURSOR MINIMUM-JERK -->
   <main class="panel" data-surface="body-exposure-webgpu-cockpit" data-clinically-reviewed="false" data-peel-stages="5">
-    <h1>PanaceaMed 4D WebGPU Body Exposure Cockpit (Wave 180 Singularity)</h1>
+    <h1>PanaceaMed 4D Body Exposure & Smart Clinical Omnibox (Public Production Ready)</h1>
+    <div class="control-box" id="smart-omnibox-bar" data-under-3-clicks="true">
+      <label for="clinical-omnibox-input"><strong>Smart Clinical Omnibox (1-Baris Keluhan + Obat &rarr; SOAP + CDSS + 3D):</strong></label>
+      <input id="clinical-omnibox-input" type="text" value="Nyeri dada menjalar ke lengan kiri | resep: clopidogrel 75mg, carbamazepine 200mg" style="width:100%;padding:7px;border-radius:7px;background:#0f172a;color:#fff;border:1px solid var(--border);font-size:0.82rem;" />
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px;">
+        <span id="drug-traffic-light" class="badge" style="color:#f43f5e">ALERT OBAT: MERAH (CYP2C19 PM & HLA-B*15:02 — Ganti ke Ticagrelor / Levetiracetam)</span>
+        <button class="btn" id="btn-focus-zanatomy" type="button">1-Klik Fokus 3D Z-Anatomy & Edukasi Pasien</button>
+        <button class="btn btn-amber" id="btn-export-fhir-pdf" type="button">1-Klik Ekspor SATUSEHAT FHIR R4 / Cetak PDF</button>
+      </div>
+    </div>
+    <div id="public-consent-banner" role="region" aria-label="Informed Consent & Penafian Medis Publik" style="font-size:0.74rem;color:#cbd5e1;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.3);border-radius:8px;padding:6px 10px;">
+      <strong>Informed Consent & Disclaimer Medis Publik (UU Kesehatan 17/2023 & UU PDP 27/2022):</strong> Luaran AI berstatus draf pendukung keputusan klinis (<code>clinicallyReviewed: false</code>) dan wajib diverifikasi dokter berwenang. Mode Offline-First & Zero-Crash Error Boundary Aktif.
+    </div>
     <canvas id="webgpu-canvas" width="880" height="360"></canvas>
 
     <div class="control-box">

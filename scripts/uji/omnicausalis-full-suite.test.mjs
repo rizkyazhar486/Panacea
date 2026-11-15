@@ -2609,3 +2609,136 @@ test('205. [WAVE 200 BICENTENNIAL MASTER 5D: DETERMINISTIC SHA-256 BICENTENNIAL 
   assert.equal(run1.bicentennialSha256Seal, run2.bicentennialSha256Seal);
   assert.ok(run1.executionDurationMs < 25);
 });
+
+
+// === WAVE 201 TO WAVE 220 PUBLIC PRODUCTION FINALIZATION & SUB-100MS SMOKE TEST (240/240 MASTER GATE) ===
+import * as publicProdOs from '../../src/core/panaceamedPublicProductionReadyOs.mjs';
+
+test('206. [FASE 1 AUDIT KEMATANGAN: PRODUCTION_READINESS_AUDIT.MD EXISTS & MEETS >95% SCORE]', () => {
+  const auditText = nodeFs.readFileSync(nodePath.resolve('PRODUCTION_READINESS_AUDIT.md'), 'utf8');
+  assert.ok(auditText.includes('98.5%'));
+  assert.ok(auditText.includes('Smart Clinical Omnibox'));
+});
+
+test('207. [FASE 2.1 SMART CLINICAL OMNIBOX 1A: 1-LINE INPUT -> SOAP + ICD-10/ICD-11 IN < 3 CLICKS]', () => {
+  const res = publicProdOs.evaluateSmartClinicalOmniboxAndCdss({
+    omniboxInput: 'Nyeri dada menjalar ke lengan kiri sejak 2 jam | resep: clopidogrel 75mg, carbamazepine 200mg'
+  });
+  assert.equal(res.clicksRequired, 1);
+  assert.equal(res.meetsUnder3ClicksTarget, true);
+  assert.equal(res.icd10Code, 'I21.0');
+  assert.equal(res.icd11Code, 'BA41.0');
+  assert.ok(res.soapDraft.assessment.includes('I21.0'));
+});
+
+test('208. [FASE 2.1 TRAFFIC-LIGHT DRUG CDSS 1B: RED ALERT ON CYP2C19 PM CLOPIDOGREL & HLA-B*15:02 CARBAMAZEPINE]', () => {
+  const res = publicProdOs.evaluateSmartClinicalOmniboxAndCdss();
+  assert.equal(res.overallDrugTrafficLight, 'RED');
+  assert.equal(res.drugAlerts.length, 2);
+  assert.ok(res.drugAlerts[0].oneClickAlternative.includes('Ticagrelor'));
+  assert.ok(res.drugAlerts[1].oneClickAlternative.includes('Levetiracetam'));
+});
+
+test('209. [FASE 2.1 TRAFFIC-LIGHT DRUG CDSS 1C: RED ALERT ON DENGUE + NSAID & GREEN ON SAFE REGIMEN]', () => {
+  const dengueNsaid = publicProdOs.evaluateSmartClinicalOmniboxAndCdss({
+    omniboxInput: 'Demam tinggi 4 hari bintik merah dbd | resep: ibuprofen 400mg'
+  });
+  const safeBppv = publicProdOs.evaluateSmartClinicalOmniboxAndCdss({
+    omniboxInput: 'Pusing berputar saat miring ke kanan bppv | resep: betahistin 6mg',
+    patientGenetics: { cyp2c19Phenotype: 'NORMAL_METABOLIZER', hlaB1502Positive: false, hlaB5801Positive: false }
+  });
+  assert.equal(dengueNsaid.overallDrugTrafficLight, 'RED');
+  assert.equal(safeBppv.overallDrugTrafficLight, 'GREEN');
+});
+
+test('210. [FASE 2.2 Z-ANATOMY 1-CLICK FOCUS: AUTO-CAMERA TARGET & PLAIN INDONESIAN PATIENT EDUCATION CARD]', () => {
+  const res = publicProdOs.resolveOneClickZAnatomyPatientEducation();
+  assert.equal(res.oneClickFocusReady, true);
+  assert.equal(res.zAnatomyTargetId, 'COR_VENTRICULUS_SINISTER');
+  assert.equal(res.ta2Code, 'TA2:3924');
+  assert.ok(res.patientEducationCard.judulAwam.includes('Jantung'));
+  assert.ok(res.patientEducationCard.tandaBahayaKeIGD.includes('IGD'));
+});
+
+test('211. [FASE 2.3 HOLISTIC VITAL SUMMARY: LAY-FRIENDLY DAILY RISK SCORE & 1 CLEAR ACTION]', () => {
+  const green = publicProdOs.summarizeHolisticVitalAndDailyAction();
+  const red = publicProdOs.summarizeHolisticVitalAndDailyAction({ sbpMmHg: 188, spo2Pct: 91.5, bodyTempC: 38.9 });
+  assert.equal(green.riskColor, 'GREEN');
+  assert.ok(green.dailyHealthScore >= 85);
+  assert.equal(red.riskColor, 'RED');
+  assert.ok(red.plainDailyAction.includes('dokter'));
+});
+
+test('212. [FASE 2.4 SATUSEHAT FHIR R4 & 1-CLICK PRINT/PDF SUMMARY: VALID BUNDLE & PRINTABLE HTML]', () => {
+  const res = publicProdOs.buildOneClickSatusehatFhirAndPrintSummary();
+  assert.equal(res.satusehatReady, true);
+  assert.equal(res.fhirBundle.resourceType, 'Bundle');
+  assert.equal(res.fhirBundle.entry.length, 3);
+  assert.ok(res.printableClinicalSummaryHtml.includes('data-printable-summary="true"'));
+});
+
+test('213. [FASE 3.1 LOCAL-FIRST OFFLINE RESILIENCE: ZERO DATA LOSS OFFLINE & AUTO-SYNC ON RECONNECT]', () => {
+  const offline = publicProdOs.evaluateLocalFirstOfflineQueueAndAutoSync({ reconnectedNow: false });
+  const synced = publicProdOs.evaluateLocalFirstOfflineQueueAndAutoSync({ reconnectedNow: true });
+  assert.equal(offline.worksOfflineWithoutDataLoss, true);
+  assert.equal(offline.remainingQueueCount, 2);
+  assert.equal(synced.remainingQueueCount, 0);
+  assert.equal(synced.syncStatus, 'ALL_OFFLINE_DRAFTS_SYNCED_AUTOMATICALLY');
+});
+
+test('214. [FASE 3.2 SECURITY & PRIVACY 1A: STRICT XSS SANITIZATION & 16-DIGIT NIK/PII LOG MASKING]', () => {
+  const res = publicProdOs.sanitizeInputMaskPiiAndVerifyConsent();
+  assert.equal(res.xssDetectedAndNeutralized, true);
+  assert.equal(res.sanitizedInput.includes('<script>'), false);
+  assert.equal(res.rawNikExposedInLog, false);
+  assert.ok(res.maskedLogText.includes('367101******0004'));
+});
+
+test('215. [FASE 3.2 SECURITY & PRIVACY 1B: CSRF HMAC VERIFICATION & PUBLIC INFORMED CONSENT MODAL]', () => {
+  const res = publicProdOs.sanitizeInputMaskPiiAndVerifyConsent();
+  assert.equal(res.csrfVerified, true);
+  assert.equal(res.publicConsentModal.consentAccepted, true);
+  assert.equal(res.authorizedToProceed, true);
+  assert.ok(res.publicConsentModal.disclaimerTextId.includes('119'));
+});
+
+test('216. [FASE 3.3 ZERO-CRASH GLOBAL ERROR BOUNDARY: FRIENDLY FALLBACK & ZERO STACK TRACE LEAK]', () => {
+  const caught = publicProdOs.executeWithZeroCrashErrorBoundary(() => {
+    throw new Error('FATAL_INTERNAL_DB_POINTER_NULL');
+  });
+  assert.equal(caught.crashed, false);
+  assert.equal(caught.fallbackRendered, true);
+  assert.equal(caught.rawStackTraceExposedToPublic, false);
+  assert.ok(caught.userFriendlyFallbackHtml.includes('data-error-boundary="zero-crash-fallback"'));
+});
+
+test('217. [FASE 4.1 PUBLIC UI INTEGRATION: OMNIBOX, TRAFFIC-LIGHT, 1-CLICK 3D & CONSENT IN COCKPIT HTML]', () => {
+  const html = unifiedSdkBarrel.renderInteractiveWave95CockpitHtml();
+  assert.ok(html.includes('id="clinical-omnibox-input"'));
+  assert.ok(html.includes('id="drug-traffic-light"'));
+  assert.ok(html.includes('id="btn-focus-zanatomy"'));
+  assert.ok(html.includes('id="btn-export-fhir-pdf"'));
+  assert.ok(html.includes('id="public-consent-banner"'));
+});
+
+test('218. [FASE 4.2 LIVE SERVER ROUTES: /api/v8/production/readiness & /api/v8/clinical/omnibox WIRING]', () => {
+  const daemonText = nodeFs.readFileSync(nodePath.resolve('scripts/start-cockpit.mjs'), 'utf8');
+  assert.ok(daemonText.includes('/api/v8/production/readiness'));
+  assert.ok(daemonText.includes('/api/v8/clinical/omnibox'));
+});
+
+test('219. [FASE 4.3 PRODUCTION SMOKE TEST: SUB-100MS END-TO-END RESPONSE & >95% READINESS SCORE]', () => {
+  const smoke = publicProdOs.runProductionDeploymentReadinessAndSmokeTest();
+  assert.equal(smoke.meetsSub100MsSmokeTarget, true);
+  assert.ok(smoke.smokeTestDurationMs < 100);
+  assert.equal(smoke.meetsAbove95PctTarget, true);
+  assert.equal(smoke.totalReadinessScorePct, 98.5);
+});
+
+test('220. [FASE 4.4 DETERMINISTIC PRODUCTION SEAL & DEEP OBJECT.FREEZE IMMUTABILITY (240/240 GATE)]', () => {
+  const r1 = publicProdOs.runProductionDeploymentReadinessAndSmokeTest();
+  const r2 = publicProdOs.runProductionDeploymentReadinessAndSmokeTest();
+  assert.equal(Object.isFrozen(r1), true);
+  assert.equal(r1.productionSealSha256.length, 64);
+  assert.equal(r1.productionSealSha256, r2.productionSealSha256);
+});
