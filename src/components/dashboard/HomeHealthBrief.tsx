@@ -1,10 +1,23 @@
-import { useEffect, useMemo, useState } from 'react'
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
 import { Link } from 'react-router-dom'
 import { useStore } from '../../lib/store'
 import { getVitals } from '../../lib/healthVitals'
+import { deretMetrik } from '../../lib/riwayatVitals'
 import { IconHeart, IconMoon, IconPlus, IconRun } from '../icons'
 import '../../styles/home-human-interface.css'
 import { BatasKlaimKesehatan } from '../BatasKlaimKesehatan'
+import { glanceMetric, type GlanceMetricId } from '../../domains/personal-health/engine/glance/glanceMetrics.ts'
+import type { DayValue } from '../../domains/personal-health/engine/glance/metricInsight.ts'
+import { POSITION_SHORT } from '../../domains/personal-health/engine/glance/insightText.ts'
+import { localDayOf, weekGlance } from '../../domains/personal-health/engine/glance/weekGlance.ts'
+import { MicroTrend } from '../../domains/personal-health/ui/glance/MicroTrend.tsx'
+import { useDarkClass } from '../../domains/personal-health/ui/glance/useDarkClass.ts'
+
+// The chart, the window's numbers and every day as a table load only when a tile is opened.
+const MetricInsightSheet = lazy(() => import('../../domains/personal-health/ui/glance/MetricInsightSheet.tsx'))
+
+const tileButton: CSSProperties = { font: 'inherit', textAlign: 'left', cursor: 'pointer', width: '100%' }
+const chipStyle: CSSProperties = { display: 'block', marginTop: 5, fontSize: 10, fontWeight: 750, letterSpacing: '.01em', opacity: 0.72, whiteSpace: 'nowrap' }
 
 function num(value: number | undefined, digits = 0) {
   if (typeof value !== 'number' || !Number.isFinite(value)) return '—'
@@ -13,10 +26,10 @@ function num(value: number | undefined, digits = 0) {
 
 type Instrument = {
   key: string
+  metric: GlanceMetricId
   label: string
   value: string
   unit?: string
-  to: string
   icon: typeof IconRun
 }
 
@@ -72,11 +85,35 @@ export function HomeHealthBrief() {
   )
 
   const instruments: Instrument[] = [
-    { key: 'steps', label: 'Steps', value: num(steps), to: '/tubuh?t=gerak', icon: IconRun },
-    { key: 'sleep', label: 'Sleep', value: num(sleep, 1), unit: 'h', to: '/tubuh?t=tidur', icon: IconMoon },
-    { key: 'heart', label: 'Rest HR', value: num(restingHr), unit: 'bpm', to: '/tubuh?t=jantung', icon: IconHeart },
-    { key: 'vo2', label: 'VO₂max', value: num(vo2max, 1), to: '/latihan?t=lab', icon: IconRun },
+    { key: 'steps', metric: 'steps', label: 'Steps', value: num(steps), icon: IconRun },
+    { key: 'sleep', metric: 'sleepH', label: 'Sleep', value: num(sleep, 1), unit: 'h', icon: IconMoon },
+    { key: 'heart', metric: 'restingHr', label: 'Rest HR', value: num(restingHr), unit: 'bpm', icon: IconHeart },
+    { key: 'vo2', metric: 'vo2max', label: 'VO₂max', value: num(vo2max, 1), icon: IconRun },
   ]
+
+  // Recorded daily history per signal (oldest first), re-read whenever health data changes.
+  const today = useMemo(() => localDayOf(new Date()), [refresh])
+  const series = useMemo(() => Object.fromEntries(instruments.map(({ metric }) => [
+    metric, deretMetrik(metric, 120).map((day) => ({ date: day.tanggal, value: day.nilai })),
+  ])) as Record<GlanceMetricId, DayValue[]>, [refresh]) // eslint-disable-line react-hooks/exhaustive-deps
+  const glance = useMemo(() => Object.fromEntries(instruments.map(({ metric }) => [metric, weekGlance(metric, series[metric], today)])) as
+    Record<GlanceMetricId, ReturnType<typeof weekGlance>>, [series, today]) // eslint-disable-line react-hooks/exhaustive-deps
+  const dark = useDarkClass()
+
+  // One sheet at a time; closing it returns focus to the tile that opened it.
+  const [open, setOpen] = useState<GlanceMetricId | null>(null)
+  const opener = useRef<HTMLElement | null>(null)
+  const openSheet = (metric: GlanceMetricId, from: HTMLElement) => { opener.current = from; setOpen(metric) }
+  const closeSheet = useCallback(() => {
+    setOpen(null)
+    const target = opener.current
+    if (target) requestAnimationFrame(() => target.focus())
+  }, [])
+  const describe = (instrument: Instrument) => {
+    const position = glance[instrument.metric]?.position
+    const reading = `${instrument.label} ${instrument.value}${instrument.unit && instrument.value !== '—' ? ` ${instrument.unit}` : ''}`
+    return `${reading}${position ? `, ${POSITION_SHORT[position].replace(/^[^A-Za-z]+/, '').toLowerCase()}` : ''}. Open its history.`
+  }
 
   const primary = instruments[0]
   const availableCount = instruments.filter((instrument) => instrument.value !== '—').length
@@ -102,10 +139,12 @@ export function HomeHealthBrief() {
       </div>
 
       <div className="panacea-instrument-rail flex-1">
-        <Link
-          to={primary.to}
+        <button
+          type="button"
+          onClick={(event) => openSheet(primary.metric, event.currentTarget)}
           className="panacea-signal-ring h-full"
-          aria-label={`${primary.label} ${primary.value}. ${availableCount} of ${instruments.length} health signals currently available.`}
+          style={tileButton}
+          aria-label={`${describe(primary)} ${availableCount} of ${instruments.length} health signals currently available.`}
         >
           <svg viewBox="0 0 120 120" aria-hidden="true">
             <circle className="panacea-signal-ring-track" cx="60" cy="60" r="48" />
@@ -128,26 +167,45 @@ export function HomeHealthBrief() {
             <span className="panacea-signal-ring-kicker">{primary.label}</span>
             <span className="panacea-signal-ring-value">{primary.value}</span>
             <span className="panacea-signal-ring-meta">{availableCount}/{instruments.length} signals</span>
+            {glance.steps?.position && <span style={{ ...chipStyle, marginTop: 3 }}>{POSITION_SHORT[glance.steps.position]}</span>}
           </span>
-        </Link>
+          {glance.steps?.stats && (
+            <span aria-hidden="true" style={{ position: 'absolute', left: 14, right: 14, bottom: 12 }}>
+              <MicroTrend metric={glance.steps.metric} points={glance.steps.points} dark={dark} height={22} />
+            </span>
+          )}
+        </button>
 
         <div className="panacea-instrument-grid h-full">
-          {instruments.slice(1).map(({ key, label, value, unit, to, icon: Icon }) => (
-            <Link
-              key={key}
-              to={to}
-              className="panacea-instrument-mini h-full"
-              aria-label={`${label} ${value}${unit ? ` ${unit}` : ''}`}
-            >
-              <span className="panacea-instrument-mini-main">
-                <span className="panacea-instrument-mini-label"><Icon size={13} />{label}</span>
-                <span className="panacea-instrument-mini-value">
-                  <span>{value}</span>
-                  {unit ? <span className="panacea-instrument-unit">{unit}</span> : null}
+          {instruments.slice(1).map((instrument) => {
+            const { key, metric, label, value, unit, icon: Icon } = instrument
+            const week = glance[metric]
+            const spec = glanceMetric(metric)
+            return (
+              <button
+                key={key}
+                type="button"
+                onClick={(event) => openSheet(metric, event.currentTarget)}
+                className="panacea-instrument-mini h-full"
+                style={tileButton}
+                aria-label={describe(instrument)}
+              >
+                <span className="panacea-instrument-mini-main" style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
+                  <span className="panacea-instrument-mini-label"><Icon size={13} />{label}</span>
+                  <span className="panacea-instrument-mini-value">
+                    <span>{value}</span>
+                    {unit ? <span className="panacea-instrument-unit">{unit}</span> : null}
+                  </span>
+                  {week && spec && week.stats && (
+                    <span aria-hidden="true" style={{ display: 'block', marginTop: 7 }}>
+                      <MicroTrend metric={spec} points={week.points} dark={dark} />
+                    </span>
+                  )}
+                  {week?.position && <span aria-hidden="true" style={chipStyle}>{POSITION_SHORT[week.position]}</span>}
                 </span>
-              </span>
-            </Link>
-          ))}
+              </button>
+            )
+          })}
 
           <Link to="/harian" className="panacea-instrument-checkin h-full" aria-label="Log today">
             <IconPlus size={17} />
@@ -155,6 +213,17 @@ export function HomeHealthBrief() {
           </Link>
         </div>
       </div>
+      {open && (
+        <Suspense fallback={null}>
+          <MetricInsightSheet
+            metricId={open}
+            series={series[open]}
+            today={today}
+            onClose={closeSheet}
+            boundary={<BatasKlaimKesehatan permukaan="wellness.home-brief" />}
+          />
+        </Suspense>
+      )}
     </section>
   )
 }
