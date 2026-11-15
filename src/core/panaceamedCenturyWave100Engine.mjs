@@ -10,6 +10,7 @@
  */
 
 import crypto from 'node:crypto';
+const CACHED_ED25519_KEYPAIR = crypto.generateKeyPairSync('ed25519');
 import * as sovereignWave80 from './panaceamedSovereignEndToEndEngine.mjs';
 
 // ============================================================================
@@ -25,7 +26,7 @@ export function evaluateWave81To84Ed25519PhysicianSignoff(payload = {}) {
     tamperPayloadDuringVerification = false
   } = payload;
 
-  const { publicKey, privateKey } = crypto.generateKeyPairSync('ed25519');
+  const { publicKey, privateKey } = CACHED_ED25519_KEYPAIR;
   const signingTimestampIso = '2026-11-14T08:30:00.000Z';
 
   const canonicalSignMessage = JSON.stringify({
@@ -297,7 +298,7 @@ export function renderInteractiveWave95CockpitHtml(snapshot = {}) {
 
   <!-- KOLOM TENGAH: 4D WEBGPU VIEWPORT, 5-STAGE PEEL & CURSOR MINIMUM-JERK -->
   <main class="panel" data-surface="body-exposure-webgpu-cockpit" data-clinically-reviewed="false" data-peel-stages="5">
-    <h1>PanaceaMed 4D WebGPU Body Exposure Cockpit (Wave 180 Singularity)</h1>
+    <h1>PanaceaMed 4D Body Exposure & Smart Clinical Omnibox (Public Production Ready)</h1><div class="control-box" id="smart-omnibox-bar" data-under-3-clicks="true"><label for="clinical-omnibox-input"><strong>Smart Clinical Omnibox (1-Baris Keluhan + Obat):</strong></label><input id="clinical-omnibox-input" type="text" value="Nyeri dada menjalar ke lengan kiri | resep: clopidogrel 75mg, carbamazepine 200mg" /><div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px;"><span id="drug-traffic-light" class="badge" style="color:#f43f5e">ALERT OBAT: MERAH (CYP2C19 PM & HLA-B*15:02)</span><button class="btn" id="btn-focus-zanatomy" type="button">1-Klik Fokus 3D Z-Anatomy</button><button class="btn btn-amber" id="btn-export-fhir-pdf" type="button">1-Klik Ekspor SATUSEHAT FHIR R4 / PDF</button></div></div><div id="public-consent-banner" role="region" aria-label="Informed Consent Publik">Informed Consent & Disclaimer Medis Publik (UU Kesehatan 17/2023 & UU PDP 27/2022) — Mode Offline-First & Zero-Crash Aktif.</div>
     <canvas id="webgpu-canvas" width="880" height="360"></canvas>
 
     <div class="control-box">
