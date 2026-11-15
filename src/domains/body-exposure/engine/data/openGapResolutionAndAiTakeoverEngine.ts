@@ -5,7 +5,7 @@ import { evaluateHraFemaleV15AdmissionGate } from "./hraFemaleAdmissionAndHonest
 
 // GAP 1 RESOLUTION: Verify HRA Female v1.5 directly from repository manifest, mesh audit & CREDITS.txt
 export function verifyAndAdmitHraFemaleV15FromRepoArtifacts() {
-  const regPath = path.join(process.cwd(), "data/source-registry/anatomy/hra-female-v1.5.json");
+  const regPath = path.join(process.cwd(), "data/anatomy-assets/hra-female-v1.5.json");
   const meshPath = path.join(process.cwd(), "data/anatomy-assets/hra-female-mesh-quality.json");
   const creditsPath = path.join(process.cwd(), "CREDITS.txt");
 

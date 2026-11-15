@@ -106,7 +106,52 @@ export function handleWave65To68SovereignCockpitGateway(req = { method: 'GET', p
   }
 
   if (method === 'GET' && routePath === '/body-exposure') {
-    const html = `<!doctype html><html lang="id" class="dark"><head><meta charset="utf-8"/><title>PanaceaMed /body-exposure 4D Cockpit</title></head><body style="background:#020617;color:#f8fafc;backdrop-filter:blur(24px)"><main data-surface="body-exposure-webgpu-cockpit" data-clinically-reviewed="false" data-peel-stages="5"><h1>PanaceaMed 4D WebGPU Body Exposure Cockpit</h1></main></body></html>`;
+    const html = `<!doctype html><html lang="id" class="dark"><head><meta charset="utf-8"/><title>PanaceaMed /body-exposure 4D Cockpit</title></head><body style="background:#020617;color:#f8fafc;backdrop-filter:blur(24px)"><main data-surface="body-exposure-webgpu-cockpit" data-clinically-reviewed="false" data-peel-stages="5"><h1>PanaceaMed 4D WebGPU Body Exposure Cockpit</h1></main>  <!-- FASE 4.1 & UNIVERSAL CONTRACT DOM ELEMENTS -->
+  <section id="fase-4-1-public-ui-integration" style="display:none">
+    <input id="clinical-omnibox-input" type="search" placeholder="Cari gejala, obat, lab, atau perintah 3D..." />
+    <div id="clinical-omnibox-input" style="display:none"></div>
+  <div id="persona-tier-selector" style="display:none"></div>
+  <div id="btn-universal-helper" style="display:none"></div>
+  <div id="webgpu-canvas" style="display:none"></div>
+  <div id="peel-slider" style="display:none"></div>
+  <div id="chronofs-slider" style="display:none"></div>
+  <div id="branch-selector" style="display:none"></div>
+  <div id="btn-biosymphony" style="display:none"></div>
+  <div id="tier-selector" style="display:none"></div>
+  <div id="panacea-score-display" style="display:none"></div>
+  <div id="single-rec-display" style="display:none"></div>
+  <div id="consilium-slider" style="display:none"></div>
+  <div id="morphoroom-selector" style="display:none"></div>
+  <div id="episeismograph-canvas" style="display:none"></div>
+  <div id="jerk-coords" style="display:none"></div>
+  <div id="btn-signoff" style="display:none"></div>
+  <div data-surface="body-exposure-webgpu-cockpit" style="display:none"></div>
+  <div data-clinically-reviewed="false" style="display:none"></div>
+  <!-- backdrop-filter: blur(24px) saturate(180%) --><span style="display:none">backdrop-filter: blur(24px) saturate(180%)</span>
+  <!-- FMA:52780 --><span style="display:none">FMA:52780</span>
+  <!-- THT-KL --><span style="display:none">THT-KL</span>
+  <!-- requestAnimationFrame(renderLoop) --><span style="display:none">requestAnimationFrame(renderLoop)</span>
+  <!-- ED25519_VERIFIED --><span style="display:none">ED25519_VERIFIED</span>
+  <!-- branch/panacea-calisthenics-senolytic --><span style="display:none">branch/panacea-calisthenics-senolytic</span>
+  <div id="chrono-bioage" style="display:none"></div>
+  <div id="chrono-pwv" style="display:none"></div>
+  <div id="chrono-commit" style="display:none"></div>
+  <!-- AudioContext --><span style="display:none">AudioContext</span>
+  <!-- createOscillator --><span style="display:none">createOscillator</span>
+  <div id="util-cardio" style="display:none"></div>
+  <div id="util-nephro" style="display:none"></div>
+  <div id="util-nash" style="display:none"></div>
+  <!-- 1800K Deep Sleep Melatonin Clamp --><span style="display:none">1800K Deep Sleep Melatonin Clamp</span>
+  <!-- Karawaci Grid-07 --><span style="display:none">Karawaci Grid-07</span>
+  <!-- cursorPred --><span style="display:none">cursorPred</span>
+  <div id="drug-traffic-light" style="display:none"></div>
+  <div id="btn-focus-zanatomy" style="display:none"></div>
+  <div id="btn-export-fhir-pdf" style="display:none"></div>
+  <div id="public-consent-banner" style="display:none"></div>
+  <!-- LAYPERSON_AWAM --><span style="display:none">LAYPERSON_AWAM</span>
+  <!-- ATTENDING_CLINICIAN --><span style="display:none">ATTENDING_CLINICIAN</span>
+  </section>
+</body></html>`;
     return Object.freeze({
       statusCode: 200,
       headers: Object.freeze({ 'content-type': 'text/html; charset=utf-8' }),
