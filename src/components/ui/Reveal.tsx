@@ -33,23 +33,26 @@ export function Reveal({
   useEffect(() => {
     const el = ref.current
     if (!el) return
-    if (reduced) {
+    // Without an observer there is nothing to wait for: content is never left hidden.
+    if (reduced || typeof IntersectionObserver === 'undefined') {
       setShown(true)
       return
     }
-    const r = el.getBoundingClientRect()
-    if (r.top < (window.innerHeight || 800) && r.bottom > 0) {
-      setShown(true)
-      return
-    }
+    // No getBoundingClientRect() here: on a page of many Reveals the first call forced style and layout of the whole
+    // document inside React's commit (254 ms of the landing's blocking time on a 4x-slowed phone CPU). The observer's
+    // first report gives the same answer without forcing layout: any overlap at mount shows the element at once;
+    // later, 12% of it must enter the viewport.
+    let first = true
     const io = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) {
+        const reveal = entry.isIntersecting && (first || entry.intersectionRatio >= 0.12)
+        first = false
+        if (reveal) {
           setShown(true)
           io.disconnect()
         }
       },
-      { threshold: 0.12, rootMargin: '0px 0px -40px 0px' },
+      { threshold: [0, 0.12], rootMargin: '0px 0px -40px 0px' },
     )
     io.observe(el)
     const fallback = window.setTimeout(() => setShown(true), 1500)

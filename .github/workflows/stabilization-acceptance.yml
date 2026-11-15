@@ -490,6 +490,14 @@ jobs:
           path: artifacts/animated-number
           if-no-files-found: ignore
 
+      - name: Reveal motion (actual component; no layout read on mount, fallback, reduced motion)
+        timeout-minutes: 5
+        run: node scripts/qa/reveal-smoke.mjs
+
+      - name: Landing in-page jumps re-align once deferred blocks have rendered
+        timeout-minutes: 5
+        run: node scripts/qa/landing-align-smoke.mjs
+
       - name: BMI calculation availability (synthetic client, 390x844)
         timeout-minutes: 5
         env:
