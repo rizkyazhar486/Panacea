@@ -146,6 +146,12 @@ export function runHolisticAutoExpansionAndSmoothOsGovernor(payload = {}) {
       domain: 'GERIATRICS_AND_HOME_ROBOTICS',
       laypersonGuidance: 'Latihan berdiri dari kursi 10 kali sehari dan cukup protein membantu menjaga kekuatan otot kaki lansia agar tidak mudah jatuh di kamar mandi.',
       clinicianProtocol: 'Evaluasi SARC-F score, kecepatan jalan < 0.8 m/s, suplementasi Vitamin D3 + Leucine, dan aktivasi sensor lantai MorphoRoom.'
+    }),
+    Object.freeze({
+      expansionId: 'AUTO_EXP_03_SHENZHEN_WHOOP_QWATCH_BLE_AI_BRIDGE',
+      domain: 'UNIVERSAL_BLUETOOTH_WEARABLE_AND_AI_INTERPRETER',
+      laypersonGuidance: 'Semua jam pintar dan gelang kesehatan Bluetooth (termasuk Whoop Shenzhen & qWatch Pro) otomatis terhubung 1-klik dan diterjemahkan menjadi Skor Pemulihan & panduan harian.',
+      clinicianProtocol: 'Transduksi biner IEEE-11073 GATT (0x180D/0x2A37 RR-interval, 0x1822 SpO2, 0xFF01 PPG) ke HRV RMSSD, PTT-PWV, dan HL7 FHIR R4 Observation Bundle.'
     })
   ]);
 

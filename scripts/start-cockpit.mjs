@@ -1,4 +1,13 @@
+import { runPanaceaMedWave600DailyWearableMasterOs } from '../src/core/panaceamedTwentyFiveWearablesDailyLifeOs.mjs';
+import { runPanaceaMedWave550VisaMastercardAndMultiDeviceMasterOs } from '../src/core/panaceamedVisaMastercardTokenQrAndMultiDeviceOs.mjs';
+import { runPanaceaMedWave500FluidChameleonMasterOs } from '../src/core/panaceamedFluidChameleonCamouflageOs.mjs';
+import { runPanaceaMedWave450UniversalDeviceAndAiMasterOs } from '../src/core/panaceamedUniversalBleWifiImitationOs.mjs';
 import { runPanaceaMedWave350AstralPublicMasterOs, orchestratePublicHumanSession } from '../src/core/panaceamedAstralAmethystPublicOrchestratorOs.mjs';
+import {
+  bridgeShenzhenWhoopToQWatchProAndInterpretAi,
+  orchestrateAllConnectedBluetoothWearables,
+  runPanaceaMedWave400QuadricentennialMasterOs
+} from '../src/core/panaceamedUniversalBleWearableBridgeOs.mjs';
 import { runHolisticAutoExpansionAndSmoothOsGovernor } from '../src/core/panaceamedHolisticAutoKernelOs.mjs';
 import { evaluatePlanetary5BillionUserSimulation, evaluateTwelveSubspecialtyClinicalDepthMatrix } from '../src/core/panaceamedPlanetary5BillionSimulationOs.mjs';
 import { evaluateSmartClinicalOmniboxAndCdss, runProductionDeploymentReadinessAndSmokeTest } from "../src/core/panaceamedPublicProductionReadyOs.mjs";
@@ -9,7 +18,8 @@ import { evaluateWave251To260AutoMaturityCheckRecheck, simulateWave261To270Inter
  * @description PanaceaMed Wave 300 Live Interactive Cockpit, Visual Simulator & Auto-Maturity Recheck Daemon
  */
 import http from "node:http";
-import { handleNextGenEdgeHttpGateway, runPanaceaMedNextGenTandemOrchestrator } from "../src/core/panaceamedNextGenHydrogenSpine.mjs";
+import { runPanaceaMedNextGenTandemOrchestrator } from "../src/core/panaceamedNextGenHydrogenSpine.mjs";
+import { handleWave65To68SovereignCockpitGateway } from "../src/core/panaceamedSovereignEndToEndEngine.mjs";
 import { renderInteractiveWave95CockpitHtml, evaluateWave85To88SseStreamAndBiofeedback, runOmnicausalisCenturyWave100Master } from "../src/core/panaceamedCenturyWave100Engine.mjs";
 import { runPanaceaMedWave120EmbodiedRoboticMasterOs } from "../src/core/panaceamedEmbodiedRoboticKinematicsOs.mjs";
 import { runPanaceaMedWave140ShenzhenTcmMasterOs } from "../src/core/panaceamedShenzhenTcmProactiveLifecycleOs.mjs";
@@ -40,6 +50,33 @@ export function createCockpitServer() {
     res.end(manifestJson);
     return;
   }
+  
+  // === WAVE 450-550 GUARANTEED ROUTES (/api/v14, /api/v15, /api/v16) ===
+  if (urlPath === '/api/v14/devices/bridge') {
+    const bridge = runPanaceaMedWave450UniversalDeviceAndAiMasterOs();
+    res.writeHead(200, { 'content-type': 'application/json; charset=utf-8' });
+    res.end(JSON.stringify(bridge, null, 2));
+    return;
+  }
+  if (urlPath === '/api/v15/chameleon/fluid') {
+    const fluid = runPanaceaMedWave500FluidChameleonMasterOs();
+    res.writeHead(200, { 'content-type': 'application/json; charset=utf-8' });
+    res.end(JSON.stringify(fluid, null, 2));
+    return;
+  }
+  if (urlPath === '/api/v17/wearables/daily-25') {
+    const w25 = runPanaceaMedWave600DailyWearableMasterOs();
+    res.writeHead(200, { 'content-type': 'application/json; charset=utf-8' });
+    res.end(JSON.stringify(w25, null, 2));
+    return;
+  }
+  if (urlPath === '/api/v16/emv/token-pass') {
+    const emv = runPanaceaMedWave550VisaMastercardAndMultiDeviceMasterOs();
+    res.writeHead(200, { 'content-type': 'application/json; charset=utf-8' });
+    res.end(JSON.stringify(emv, null, 2));
+    return;
+  }
+
   if (urlPath === '/sw.js') {
     const swScript = "self.addEventListener('install', () => self.skipWaiting()); self.addEventListener('activate', (e) => e.waitUntil(self.clients.claim()));";
     res.writeHead(200, {
@@ -50,7 +87,6 @@ export function createCockpitServer() {
     return;
   }
 
-    const urlPath = String(req.url || "/").split("?")[0];
     const sendJson = (obj) => {
       res.writeHead(200, { "content-type": "application/json; charset=utf-8" });
       res.end(JSON.stringify(obj, null, 2));
@@ -82,8 +118,11 @@ export function createCockpitServer() {
     if (req.method === "GET" && urlPath === "/api/v9/planetary/5billion") return sendJson(evaluatePlanetary5BillionUserSimulation());
     if (req.method === "GET" && urlPath === "/api/v9/clinical/12-subspecialties") return sendJson(evaluateTwelveSubspecialtyClinicalDepthMatrix());
     if (req.method === "GET" && urlPath === "/api/v9/holistic/governor") return sendJson(runHolisticAutoExpansionAndSmoothOsGovernor());
+    if (req.method === "GET" && urlPath === "/api/v10/wearables/bluetooth-bridge") return sendJson(orchestrateAllConnectedBluetoothWearables());
+    if (req.method === "GET" && urlPath === "/api/v10/wearables/whoop-qwatch") return sendJson(bridgeShenzhenWhoopToQWatchProAndInterpretAi());
+    if (req.method === "GET" && urlPath === "/api/v10/os/quadricentennial") return sendJson(runPanaceaMedWave400QuadricentennialMasterOs());
 
-    const fallback = handleNextGenEdgeHttpGateway({ method: req.method, url: req.url });
+    const fallback = handleWave65To68SovereignCockpitGateway({ method: req.method, url: req.url });
     res.writeHead(fallback.statusCode, fallback.headers);
     res.end(fallback.body);
   });

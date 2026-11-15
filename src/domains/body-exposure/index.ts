@@ -118,6 +118,7 @@ export const loadDiagnosticImagingVolumetricStudio = () =>
   import("./ui/KaloLumenVolumetricStudio.tsx").then((module) => ({ default: module.DiagnosticImagingVolumetricStudio }));
 export {
   BodyExposureAtlasHome,
+  DiagnosticImagingVolumetricStudio,
   PRIMARY_VIEWPORT_CONTROLS,
   createInitialAtlasHomeState,
   pickStructureInCanonicalScene,

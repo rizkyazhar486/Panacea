@@ -125,7 +125,7 @@ export const RUJUKAN_HEMODINAMIK = {
 // perbedaan preload, afterload dan kontraktilitas bisa dikenali sekilas -- dan
 // ketiganya menggeser lingkarnya dengan cara yang sama sekali berbeda.
 //
-// Model elastans berubah-waktu (Suga-Sagawa): bilik diperlakukan sebagai pegas
+// Model elastans berubah-waktu (Suga H, Sagawa K. Circ Res 1974; PMID 4841253): bilik diperlakukan sebagai pegas
 // yang kekakuannya naik-turun sepanjang siklus.
 //
 //   P(V, t) = e(t) * Ees * (V - V0) + (1 - e(t)) * Ped(V)

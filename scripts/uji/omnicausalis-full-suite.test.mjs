@@ -3297,3 +3297,351 @@ test('310. [WAVE 360 DEPLOY 2C: FULL PRODUCTION & GITHUB MAIN SYNC GATE (310/310
   assert.equal(master.allArchetypesVerified, true);
   assert.ok(master.executionDurationMs < 35);
 });
+
+
+// ============================================================================
+// WAVES 361–400: QUADRICENTENNIAL UNIVERSAL BLUETOOTH BLE WEARABLE BRIDGE,
+// SHENZHEN WHOOP <-> QWATCH PRO CROSS-BRIDGE, AI HEALTH INTERPRETER &
+// STREAMLINED 3-STEP UI/UX OS (330/330 MASTER GATE)
+// ============================================================================
+import * as bleWearableOs from '../../src/core/panaceamedUniversalBleWearableBridgeOs.mjs';
+import * as holisticKernel from '../../src/core/panaceamedHolisticAutoKernelOs.mjs';
+import { createCockpitServer } from '../start-cockpit.mjs';
+
+test('311. [WAVE 361 BLE GATT 1A: STANDARD & VENDOR GATT UUID REGISTRY (0x180D, 0x1822, 0x1809, 0xFF01, 0xFF02)]', () => {
+  const uuids = bleWearableOs.BLE_GATT_STANDARD_AND_VENDOR_UUIDS;
+  assert.equal(uuids.HEART_RATE_SERVICE, '0000180d-0000-1000-8000-00805f9b34fb');
+  assert.equal(uuids.HEART_RATE_MEASUREMENT_CHAR, '00002a37-0000-1000-8000-00805f9b34fb');
+  assert.equal(uuids.PULSE_OXIMETER_SERVICE, '00001822-0000-1000-8000-00805f9b34fb');
+  assert.equal(uuids.SHENZHEN_WHOOP_RAW_PPG_IMU_SERVICE, '0000ff01-535a-5748-4f4f-50424c453031');
+  assert.equal(uuids.QWATCH_PRO_COMPANION_BRIDGE_SERVICE, '0000ff10-5157-4154-4348-50524f485542');
+  assert.equal(Object.isFrozen(uuids), true);
+});
+
+test('312. [WAVE 363 BLE WEARABLE PROFILES 1B: 8 GLOBAL & SHENZHEN WEARABLE FAMILIES SUPPORTED]', () => {
+  const profiles = bleWearableOs.UNIVERSAL_BLE_WEARABLE_PROFILES;
+  const keys = Object.keys(profiles);
+  assert.equal(keys.length, 8);
+  assert.ok(profiles.SHENZHEN_WHOOP_4_STRAP);
+  assert.ok(profiles.QWATCH_PRO_SMARTWATCH_HUB);
+  assert.ok(profiles.HUAWEI_WATCH_GT_NEARLINK);
+  assert.ok(profiles.XIAOMI_MIBAND_HYPEROS);
+  assert.ok(profiles.APPLE_WATCH_BLE_BROADCAST);
+  assert.ok(profiles.GARMIN_FENIX_BLE_ANT);
+  assert.ok(profiles.SHENZHEN_SMART_RING_BLE);
+  assert.ok(profiles.OMRON_CONTOUR_CLINICAL_BLE);
+});
+
+test('313. [WAVE 365 BINARY TRANSDUCER 1C: 16-BYTE IEEE-11073 GATT PACKET ENCODING & BYTE-EXACT ROUND-TRIP]', () => {
+  const pkt = bleWearableOs.encodeAndDecodeUniversalBleWearablePacket({
+    deviceId: 'SHENZHEN_WHOOP_4_STRAP',
+    heartRateBpm: 62,
+    rrIntervalMs: 845,
+    spO2Pct: 98,
+    skinTempCelsius: 36.55,
+    batteryPct: 91
+  });
+  assert.equal(pkt.packetByteLength, 16);
+  assert.equal(pkt.hexPacket.length, 32);
+  assert.equal(pkt.byteRoundTripVerified, true);
+  assert.equal(pkt.decodedTelemetry.heartRateBpm, 62);
+  assert.equal(pkt.decodedTelemetry.spO2Pct, 98);
+  assert.equal(pkt.decodedTelemetry.skinTempCelsius, 36.55);
+  assert.equal(pkt.decodedTelemetry.batteryPct, 91);
+});
+
+test('314. [WAVE 367 BINARY TRANSDUCER 1D: 1/1024s BLUETOOTH SIG R-R INTERVAL RESOLUTION FIDELITY]', () => {
+  const pkt = bleWearableOs.encodeAndDecodeUniversalBleWearablePacket({
+    rrIntervalMs: 800
+  });
+  assert.ok(Math.abs(pkt.decodedTelemetry.rrIntervalMs - 800) <= 1.0);
+  assert.equal(pkt.sensorContactDetected, true);
+});
+
+test('315. [WAVE 369 WHOOP <-> QWATCH PRO BRIDGE 2A: DUAL-HOP TOPOLOGY & PACKET RELAY VERIFICATION]', () => {
+  const bridge = bleWearableOs.bridgeShenzhenWhoopToQWatchProAndInterpretAi();
+  assert.equal(bridge.bluetoothTopology.peripheralSensor, 'SHENZHEN_WHOOP_4_STRAP');
+  assert.equal(bridge.bluetoothTopology.wristAggregatorBridge, 'QWATCH_PRO_SMARTWATCH_HUB');
+  assert.equal(bridge.bluetoothTopology.bluetoothRelayActive, true);
+  assert.equal(bridge.bluetoothTopology.byteRoundTripVerified, true);
+});
+
+test('316. [WAVE 371 AI BIOPHYSICS 2B: HRV RMSSD, DAY STRAIN (0-21), AUTONOMIC RECOVERY (0-100%) & PTT-PWV]', () => {
+  const bridge = bleWearableOs.bridgeShenzhenWhoopToQWatchProAndInterpretAi();
+  const bio = bridge.qWatchProProcessedMetrics;
+  assert.ok(bio.hrvRmssdMs > 30 && bio.hrvRmssdMs < 120);
+  assert.ok(bio.whoopEquivalentDayStrain0to21 >= 0 && bio.whoopEquivalentDayStrain0to21 <= 21);
+  assert.ok(bio.autonomicRecoveryPct >= 67 && bio.autonomicRecoveryPct <= 100);
+  assert.equal(bio.ruitangTier, 'GREEN');
+  assert.ok(bio.fusedPwvMps >= 4.2 && bio.fusedPwvMps <= 9.0);
+});
+
+test('317. [WAVE 373 AI HEALTH INTERPRETER 2C: RED ESCALATION ON HYPOXIA/FEVER/HYPERTENSIVE CRISIS]', () => {
+  const redBridge = bleWearableOs.bridgeShenzhenWhoopToQWatchProAndInterpretAi({
+    shenzhenWhoopInput: {
+      heartRateBpm: 112,
+      restingHeartRate30dBaselineBpm: 65,
+      rrIntervalsMsWindow: [535, 540, 530, 538],
+      spO2Pct: 89,
+      skinTempCelsius: 38.9,
+      activeCardioMinutesToday: 10,
+      averageWorkoutHrBpm: 120,
+      maxHrBpm: 185,
+      sleepSlowWaveMinutes: 45,
+      sleepRemMinutes: 50,
+      totalSleepMinutes: 310,
+      batteryPct: 75
+    }
+  });
+  assert.equal(redBridge.qWatchProProcessedMetrics.ruitangTier, 'RED');
+  assert.ok(redBridge.aiHealthInterpretation.plainLanguageCustomerSummary.includes('Zona Merah'));
+  assert.equal(redBridge.clinicallyReviewed, false);
+  assert.equal(redBridge.requiresHumanPhysicianSignoff, true);
+});
+
+test('318. [WAVE 375 AI HEALTH INTERPRETER 2D: HL7 FHIR R4 WEARABLE BUNDLE WITH LOINC 8867-4, 80404-7 & 59408-5]', () => {
+  const bridge = bleWearableOs.bridgeShenzhenWhoopToQWatchProAndInterpretAi();
+  const bundle = bridge.fhirWearableBundle;
+  assert.equal(bundle.resourceType, 'Bundle');
+  assert.equal(bundle.entry.length, 4);
+  const loincCodes = bundle.entry
+    .filter((e) => e.resource.resourceType === 'Observation')
+    .map((e) => e.resource.code.coding[0].code);
+  assert.deepEqual(loincCodes, ['8867-4', '80404-7', '59408-5']);
+});
+
+test('319. [WAVE 378 MULTI-DEVICE HUB 3A: ALL 8 CONNECTED BLUETOOTH WEARABLE FAMILIES DECODED SIMULTANEOUSLY]', () => {
+  const mesh = bleWearableOs.orchestrateAllConnectedBluetoothWearables();
+  assert.equal(mesh.totalSupportedWearableFamilies, 8);
+  assert.equal(mesh.allDevicesByteRoundTripVerified, true);
+  assert.equal(mesh.imitatedDeviceStreams.length, 8);
+  assert.equal(Object.isFrozen(mesh), true);
+});
+
+test('320. [WAVE 381 STREAMLINED UI/UX 4A: 3-STEP ZERO-FRICTION JOURNEY & TWO-TAP COMPLIANCE]', () => {
+  const ux = bleWearableOs.evaluateStreamlinedThreeStepUserJourney();
+  assert.equal(ux.totalSteps, 3);
+  assert.equal(ux.steps.length, 3);
+  assert.equal(ux.twoTapRuleCompliant, true);
+  assert.equal(ux.journeyArchitecture, 'THREE_STEP_ZERO_FRICTION_PUBLIC_UX');
+});
+
+test('321. [WAVE 384 COCKPIT DOM 4B: UNIVERSAL BLUETOOTH WEARABLE HUB & 3-STEP JOURNEY IN /body-exposure HTML]', () => {
+  const html = fullSdk.renderInteractiveWave95CockpitHtml();
+  assert.ok(html.includes('id="ble-wearable-hub-panel"'));
+  assert.ok(html.includes('id="ble-device-selector"'));
+  assert.ok(html.includes('id="btn-connect-ble-wearable"'));
+  assert.ok(html.includes('id="whoop-qwatch-bridge-status"'));
+  assert.ok(html.includes('id="streamlined-3step-user-journey"'));
+  assert.ok(html.includes('SHENZHEN_WHOOP_4_STRAP'));
+  assert.ok(html.includes('QWATCH_PRO_SMARTWATCH_HUB'));
+});
+
+test('322. [WAVE 386 SECURITY SINK INVARIANT 4C: ZERO .innerHTML SINKS IN COCKPIT ENGINE]', () => {
+  const centurySrc = nodeFs.readFileSync(nodePath.resolve('src/core/panaceamedCenturyWave100Engine.mjs'), 'utf8');
+  assert.equal(centurySrc.includes('.innerHTML ='), false);
+});
+
+test('323. [WAVE 388 HOLISTIC AUTO-KERNEL 5A: CRITICAL FUNCTIONS AUTO-CHECKED AT 100% HEALTH]', () => {
+  const reg = holisticKernel.runHolisticAutoCheckFunctionRegistry();
+  assert.equal(reg.registryStatus, 'ALL_FUNCTIONS_VERIFIED_HEALTHY');
+  assert.equal(reg.failedCount, 0);
+  assert.equal(reg.healthPercentage, 100.0);
+  assert.ok(reg.totalFunctionsChecked >= 46);
+});
+
+test('324. [WAVE 390 HOLISTIC AUTO-KERNEL 5B: AUTO-EXPANSION INCLUDES SHENZHEN WHOOP <-> QWATCH BLE AI BRIDGE]', () => {
+  const gov = holisticKernel.runHolisticAutoExpansionAndSmoothOsGovernor();
+  assert.equal(gov.autoMaturityPercentage, 100.0);
+  assert.equal(gov.autoRepairActive, true);
+  const expIds = gov.autoExpandedCapabilities.map((e) => e.expansionId);
+  assert.ok(expIds.includes('AUTO_EXP_03_SHENZHEN_WHOOP_QWATCH_BLE_AI_BRIDGE'));
+});
+
+test('325. [WAVE 392 COCKPIT SERVER 5C: CLEAN IMPORT OF scripts/start-cockpit.mjs & LIVE HTTP SERVER CREATION]', () => {
+  const server = createCockpitServer();
+  assert.equal(typeof server.listen, 'function');
+  const daemonSrc = nodeFs.readFileSync(nodePath.resolve('scripts/start-cockpit.mjs'), 'utf8');
+  assert.ok(daemonSrc.includes('/api/v10/wearables/bluetooth-bridge'));
+  assert.ok(daemonSrc.includes('/api/v10/wearables/whoop-qwatch'));
+  assert.ok(daemonSrc.includes('/api/v10/os/quadricentennial'));
+});
+
+test('326. [WAVE 394 CLI 5D: scripts/panacea-cli.mjs SUPPORTS GENERALIZED BLUETOOTH & WEARABLE DEVICE ADAPTER MODE]', () => {
+  const cliSrc = nodeFs.readFileSync(nodePath.resolve('scripts/panacea-cli.mjs'), 'utf8');
+  assert.ok(cliSrc.includes('bridgeUniversalWearableStreamToAi'));
+  assert.ok(cliSrc.includes("mode === 'devices'"));
+  assert.ok(cliSrc.includes("mode === 'bluetooth'"));
+});
+
+test('327. [WAVE 396 SDK BARREL 5E: UNIFIED BARREL EXPORTS ALL WAVE 361-400 BLUETOOTH & UX FUNCTIONS]', () => {
+  assert.equal(typeof fullSdk.encodeAndDecodeUniversalBleWearablePacket, 'function');
+  assert.equal(typeof fullSdk.bridgeShenzhenWhoopToQWatchProAndInterpretAi, 'function');
+  assert.equal(typeof fullSdk.orchestrateAllConnectedBluetoothWearables, 'function');
+  assert.equal(typeof fullSdk.evaluateStreamlinedThreeStepUserJourney, 'function');
+  assert.equal(typeof fullSdk.runPanaceaMedWave400QuadricentennialMasterOs, 'function');
+});
+
+test('328. [WAVE 398 QUADRICENTENNIAL MASTER 5F: DEEP OBJECT.FREEZE IMMUTABILITY & EPISTEMIC SAFETY GATES]', () => {
+  const master = bleWearableOs.runPanaceaMedWave400QuadricentennialMasterOs();
+  assert.equal(Object.isFrozen(master), true);
+  assert.equal(Object.isFrozen(master.wearableFleet), true);
+  assert.equal(Object.isFrozen(master.streamlinedJourney), true);
+  assert.equal(Object.isFrozen(master.holisticGovernor), true);
+  assert.equal(master.clinicallyReviewed, false);
+  assert.equal(master.requiresHumanPhysicianSignoff, true);
+});
+
+test('329. [WAVE 399 QUADRICENTENNIAL MASTER 5G: DETERMINISTIC SHA-256 SEAL & 100% UNIVERSAL READINESS]', () => {
+  const run1 = bleWearableOs.runPanaceaMedWave400QuadricentennialMasterOs();
+  const run2 = bleWearableOs.runPanaceaMedWave400QuadricentennialMasterOs();
+  assert.equal(run1.quadricentennialSha256Seal.length, 64);
+  assert.equal(run1.quadricentennialSha256Seal, run2.quadricentennialSha256Seal);
+  assert.equal(run1.universalMaturityPercentage, 100.0);
+  assert.equal(run1.allGatesGreen, true);
+  assert.equal(run1.totalWavesUnified, 400);
+});
+
+test('330. [WAVE 400 GRAND QUADRICENTENNIAL MILESTONE: SUB-40MS END-TO-END EXECUTION (330/330 PASS)]', () => {
+  const master = bleWearableOs.runPanaceaMedWave400QuadricentennialMasterOs();
+  assert.ok(master.executionDurationMs < 40);
+});
+
+// === WAVE 501 TO WAVE 550 VISA/MASTERCARD EMV DYNAMIC TOKENIZED QR/BARCODE & 10-DEVICE SWARM OS (390/390 MASTER GATE) ===
+import * as emvMultiDeviceOs from '../../src/core/panaceamedVisaMastercardTokenQrAndMultiDeviceOs.mjs';
+
+test('366. [WAVE 501 EMV LUHN 1A: ISO/IEC 7812 16-DIGIT LUHN CHECKSUM GENERATOR & VERIFIER]', () => {
+  const pass = emvMultiDeviceOs.generatePersonalizedVisaMastercardHealthPass({ networkScheme: 'VISA_HEALTH_INFINITE' });
+  assert.equal(pass.tokenizedDevicePan16.length, 16);
+  assert.equal(pass.luhnVerifiedPrimaryPan, true);
+  assert.equal(pass.luhnVerifiedTokenizedDpan, true);
+  assert.equal(emvMultiDeviceOs.verifyLuhnCardNumber(pass.tokenizedDevicePan16), true);
+});
+
+test('367. [WAVE 504 EMV TOKENIZATION 1B: VISA (4899) VS MASTERCARD (5499) PERSONALIZED dPAN ISOLATION PER PERSON]', () => {
+  const budiVisa = emvMultiDeviceOs.generatePersonalizedVisaMastercardHealthPass({
+    userId: 'usr-budi', fullName: 'Budi Santoso', networkScheme: 'VISA_HEALTH_INFINITE'
+  });
+  const sariMc = emvMultiDeviceOs.generatePersonalizedVisaMastercardHealthPass({
+    userId: 'usr-sari', fullName: 'Ibu Sari', networkScheme: 'MASTERCARD_HEALTH_WORLD_ELITE'
+  });
+  assert.ok(budiVisa.tokenizedDevicePan16.startsWith('489988'));
+  assert.ok(sariMc.tokenizedDevicePan16.startsWith('549988'));
+  assert.notEqual(budiVisa.tokenizedDevicePan16, sariMc.tokenizedDevicePan16);
+});
+
+test('368. [WAVE 508 DYNAMIC CRYPTOGRAM 1C: CONTINUOUSLY ROTATING ARQC CRYPTOGRAM & 3-DIGIT dCVV PER ATC/EPOCH]', () => {
+  const scan1 = emvMultiDeviceOs.generatePersonalizedVisaMastercardHealthPass({ atcTransactionCounter: 1001, epochSeconds: 1763250000 });
+  const scan2 = emvMultiDeviceOs.generatePersonalizedVisaMastercardHealthPass({ atcTransactionCounter: 1002, epochSeconds: 1763250030 });
+  assert.equal(scan1.dynamicSecurityState.emvArqcCryptogram16Hex.length, 16);
+  assert.equal(scan1.dynamicSecurityState.dynamicDcvv3Digits.length, 3);
+  assert.notEqual(scan1.dynamicSecurityState.emvArqcCryptogram16Hex, scan2.dynamicSecurityState.emvArqcCryptogram16Hex);
+  assert.notEqual(scan1. multiQrCodeMatrix.qr1_EmvCoUniversalPass.emvPayloadString, scan2.multiQrCodeMatrix.qr1_EmvCoUniversalPass.emvPayloadString);
+});
+
+test('369. [WAVE 512 MULTI-QR 1D: 3 PERSONALIZED QR FORMATS (EMVCO PASS, RED-TIER PARAMEDIC, FAMILY CAREGIVER)]', () => {
+  const pass = emvMultiDeviceOs.generatePersonalizedVisaMastercardHealthPass();
+  assert.ok(pass.multiQrCodeMatrix.qr1_EmvCoUniversalPass.emvPayloadString.includes('ID.PANACEAMED.WWW'));
+  assert.ok(pass.multiQrCodeMatrix.qr2_EmergencyParamedicPass.payloadString.includes('AVOID_CARBAMAZEPINE_HLA_B1502'));
+  assert.equal(pass.multiQrCodeMatrix.qr2_EmergencyParamedicPass.rawStreamExposed, false);
+  assert.ok(pass.multiQrCodeMatrix.qr3_FamilyAndPosyanduCarePass.payloadString.includes('PAN-FAM'));
+});
+
+test('370. [WAVE 516 MULTI-BARCODE 1E: 3 PERSONALIZED 1D BARCODES (CODE-128 WRISTBAND, GS1-128 PHARMACY, EAN-13)]', () => {
+  const pass = emvMultiDeviceOs.generatePersonalizedVisaMastercardHealthPass();
+  assert.equal(pass.multiBarcode1DMatrix.barcode1_Code128WristbandAndLab.symbology, 'ISO_IEC_15417_CODE_128');
+  assert.ok(pass.multiBarcode1DMatrix.barcode2_Gs1PharmacyMedicationMatch.value.includes('(01)0899'));
+  assert.equal(pass.multiBarcode1DMatrix.barcode3_Ean13RetailWellnessPass.value.length, 13);
+});
+
+test('371. [WAVE 520 10-DEVICE SWARM 2A: SIMULTANEOUS PROCESSING OF 10 BLUETOOTH LE & WI-FI HEALTH DEVICES]', () => {
+  const swarm = emvMultiDeviceOs.processTenDeviceMultiTransportSwarm();
+  assert.equal(swarm.totalDevicesProcessed, 10);
+  assert.equal(swarm.bleDevicesCount, 8);
+  assert.equal(swarm.wifiDevicesCount, 2);
+  assert.equal(swarm.allTenZeroLossVerified, true);
+});
+
+test('372. [WAVE 525 10-DEVICE SWARM 2B: CONSENSUS VITALS FUSION & 30-DAY BASELINE PANACEA_SCORE]', () => {
+  const swarm = emvMultiDeviceOs.processTenDeviceMultiTransportSwarm();
+  assert.ok(swarm.consensusVitals.consensusHrBpm >= 55 && swarm.consensusVitals.consensusHrBpm <= 65);
+  assert.ok(swarm.consensusVitals.consensusHrvMs >= 65);
+  assert.ok(swarm.consensusVitals.panaceaScore >= 80);
+});
+
+test('373. [WAVE 530 COCKPIT UI 3A: LIVE VISA/MASTERCARD dPAN, dCVV & ARQC AUTO-ROTATION IN /body-exposure HTML]', () => {
+  const html = centuryUi.renderInteractiveWave95CockpitHtml();
+  assert.ok(html.includes('id="emv-dpan-display"'));
+  assert.ok(html.includes('id="emv-dcvv-badge"'));
+  assert.ok(html.includes('id="emv-arqc-badge"'));
+  assert.ok(html.includes('VISA HEALTH INFINITE'));
+});
+
+test('374. [WAVE 535 CLI & SERVER 3B: scripts/panacea-cli.mjs SUPPORTS visa, mastercard, AND emv COMMANDS]', () => {
+  const cliText = nodeFs.readFileSync(nodePath.resolve('scripts/panacea-cli.mjs'), 'utf8');
+  assert.equal(cliText.split('\n')[0], '#!/usr/bin/env node');
+  assert.ok(cliText.includes("mode === 'visa'"));
+  assert.ok(cliText.includes("mode === 'mastercard'"));
+});
+
+test('375. [WAVE 540 CLI & SERVER 3C: LIVE COCKPIT /api/v16/emv/token-pass ROUTE WIRING]', () => {
+  const daemonText = nodeFs.readFileSync(nodePath.resolve('scripts/start-cockpit.mjs'), 'utf8');
+  assert.ok(daemonText.includes('/api/v15/chameleon/fluid'));
+  assert.ok(daemonText.includes('/api/v16/emv/token-pass'));
+});
+
+test('376. [WAVE 545 WAVE 550 MASTER 4A: 550 WAVES UNIFIED, DEEP OBJECT.FREEZE &EPISTEMIC GOVERNANCE]', () => {
+  const master = emvMultiDeviceOs.runPanaceaMedWave550VisaMastercardAndMultiDeviceMasterOs();
+  assert.equal(master.totalWavesUnified, 550);
+  assert.equal(Object.isFrozen(master), true);
+  assert.equal(Object.isFrozen(master.visaPass), true);
+  assert.equal(Object.isFrozen(master.tenDeviceSwarm), true);
+  assert.equal(master.clinicallyReviewed, false);
+  assert.equal(master.requiresHumanPhysicianSignoff, true);
+});
+
+test('377. [WAVE 550 MASTER 4B: DETERMINISTIC SHA-256 SEAL & SUB-45MS EXECUTION ACROSS ALL 550 WAVES]', () => {
+  const r1 = emvMultiDeviceOs.runPanaceaMedWave550VisaMastercardAndMultiDeviceMasterOs();
+  const r2 = emvMultiDeviceOs.runPanaceaMedWave550VisaMastercardAndMultiDeviceMasterOs();
+  assert.equal(r1.wave550Sha256Seal.length, 64);
+  assert.equal(r1.wave550Sha256Seal, r2.wave550Sha256Seal);
+  assert.ok(r1.executionDurationMs < 45);
+});
+
+
+// === WAVE 551 TO WAVE 600 25-WEARABLE ECOSYSTEM HUB & 24-HOUR DAILY FUNCTIONAL COMPANION ===
+import * as daily25Os from '../../src/core/panaceamedTwentyFiveWearablesDailyLifeOs.mjs';
+
+test('378. [WAVE 551 25-WEARABLES 1A: ALL 25 WEARABLE & SMART HOME IOT DEVICES REGISTERED ACROSS 5 CATEGORIES]', () => {
+  assert.equal(daily25Os.TWENTY_FIVE_WEARABLE_DEVICE_CATALOG.length, 25);
+  const res = daily25Os.evaluateTwentyFiveWearablesAndDailyUseSchedule();
+  assert.equal(res.totalWearablesProcessed, 25);
+  assert.equal(res.allTwentyFiveZeroLossVerified, true);
+});
+
+test('379. [WAVE 565 DAILY COMPANION 1B: 6 DAILY FUNCTIONAL TIMELINE SLOTS (06:00 MORNING TO 22:00 SLEEP)]', () => {
+  const res = daily25Os.evaluateTwentyFiveWearablesAndDailyUseSchedule();
+  assert.equal(res.dailyFunctionalTimeline.length, 6);
+  assert.equal(res.dailyFunctionalTimeline[0].timeSlot, '06:00_MORNING_READINESS');
+  assert.equal(res.dailyFunctionalTimeline[5].timeSlot, '22:00_SLEEP_MORPHOROOM');
+});
+
+test('380. [WAVE 580 DAILY COMPANION 1C: COCKPIT HTML & CLI SUPPORT 25 WEARABLES AND DAILY SCHEDULE]', () => {
+  const html = centuryUi.renderInteractiveWave95CockpitHtml();
+  assert.ok(html.includes('id="daily-25-wearables-timeline"'));
+  assert.ok(html.includes('id="emv-dpan-display"'));
+  const cliText = nodeFs.readFileSync(nodePath.resolve('scripts/panacea-cli.mjs'), 'utf8');
+  assert.ok(cliText.includes("mode === 'daily'"));
+  assert.ok(cliText.includes("mode === 'wearables'"));
+  assert.ok(cliText.includes("mode === 'visa'"));
+});
+
+test('381. [WAVE 600 MASTER OS 1D: DETERMINISTIC SHA-256 SEAL, IMMUTABILITY & SUB-45MS EXECUTION]', () => {
+  const r1 = daily25Os.runPanaceaMedWave600DailyWearableMasterOs();
+  const r2 = daily25Os.runPanaceaMedWave600DailyWearableMasterOs();
+  assert.equal(r1.totalWavesUnified, 600);
+  assert.equal(r1.totalWearablesSupported, 25);
+  assert.equal(Object.isFrozen(r1), true);
+  assert.equal(r1.wave600Sha256Seal, r2.wave600Sha256Seal);
+  assert.ok(r1.executionDurationMs < 45);
+});

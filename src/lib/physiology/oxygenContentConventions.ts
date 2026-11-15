@@ -54,14 +54,14 @@ export const OXYGEN_CONTENT_CONVENTIONS: readonly OxygenContentConvention[] = Ob
   }),
   Object.freeze({
     id: 'elso-vv-2021-verbatim',
-    label: 'ELSO VV 2021 formula as printed',
+    label: 'ELSO VV ECMO 2021 guideline (Tonna JE, Abrams D, Brodie D, et al.) formula as printed',
     executable: false,
     hbWorkingUnit: 'g/dL',
     outputUnit: 'mL O2/dL',
     hufnerMlO2PerGHb: 1.39,
     dissolvedMlO2PerDlPerMmHg: 0.0034,
     evidence: Object.freeze([
-      // Tonna et al. 2021, ELSO VV ECMO guideline
+      // Tonna JE, Abrams D, Brodie D, et al. Management of Adult Patients Supported with Venovenous Extracorporeal Membrane Oxygenation (VV ECMO) guideline
       Object.freeze({ id: 'elso-vv-2021', kind: 'pmid', reference: '33965970 / PMCID PMC8315725' }),
     ]),
     sourcePrintedHbUnit: 'g/L',

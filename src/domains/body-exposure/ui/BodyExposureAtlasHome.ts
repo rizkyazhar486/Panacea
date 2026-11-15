@@ -167,3 +167,13 @@ export function BodyExposureAtlasHome(props?: { readonly locale?: SupportedLocal
     semanticZoom: zoom
   };
 }
+
+export function DiagnosticImagingVolumetricStudio() {
+  return {
+    componentName: "DiagnosticImagingVolumetricStudio" as const,
+    alias: "KaloLumenVolumetricStudio" as const,
+    badge: "Diagnostic Imaging · 3D MPR Studio",
+    title: "Diagnostic Imaging & Volumetric CT/MRI MPR Studio",
+    hounsfieldAttenuationSupported: true
+  };
+}
