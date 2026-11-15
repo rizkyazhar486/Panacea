@@ -41,6 +41,9 @@ export {
   type QualityPresetId
 } from "./engine/structureAtlas.ts";
 
+export { getDeepSystemSpecById } from "./engine/bodyExposureTotalMultiscaleAtlasEngine.ts";
+export { findClearStructureCard } from "./data/zAnatomyClearIndonesianAtlas.ts";
+
 // ── ENGINE: IMAGING ────────────────────────────────────
 export {
   diagnosticImagingEngine,
@@ -52,6 +55,7 @@ export {
 
 // ── ENGINE: PHYSIOLOGY ─────────────────────────────────
 export { evaluateCardiopulmonaryCouplingDeck, type CardiopulmonaryCouplingInput } from "./engine/cardiopulmonaryCouplingEngine.ts";
+export { computeAlveolarGasAndAaGradient } from "./omnicausalis-multiscale-bridge.ts";
 export { computeWiggersCardiacCyclePressure, computeKroghCylinderOxygenDiffusion } from "./engine/wiggersAndKroghPhysiologyEngine.ts";
 export { simulateRenalAutoregulationAndCountercurrent } from "./engine/renalNephronAutoregulationEngine.ts";
 export { executeCrossOrganCoupledSimulation } from "./engine/crossOrganPhysiologicalCouplingEngine.ts";
@@ -107,8 +111,11 @@ export {
 // OrganBiometricOverlayCard) are reachable from BodyExposureAtlasHome depth panels,
 // and are intentionally excluded from the domain public API under those names.
 // The one exception is the radiology MPR studio, offered to other domains under its
-// descriptive name (below) and only as a lazy component.
-export { DiagnosticImagingVolumetricStudio } from "./ui/diagnosticImagingStudioEntry.ts";
+// descriptive name as a code-split loader: `lazy(loadDiagnosticImagingVolumetricStudio)`.
+// The index imports no package and no .tsx module, so plain Node (the build's QA step and
+// the dependency-free omnicausalis gate) can load it; the import runs only when called.
+export const loadDiagnosticImagingVolumetricStudio = () =>
+  import("./ui/KaloLumenVolumetricStudio.tsx").then((module) => ({ default: module.DiagnosticImagingVolumetricStudio }));
 export {
   BodyExposureAtlasHome,
   PRIMARY_VIEWPORT_CONTROLS,
