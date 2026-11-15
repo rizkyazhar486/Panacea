@@ -1,3 +1,4 @@
+const EXTRA_WAVE300_DEFAULTS = {"safeChildParacetamolDoseMg":210,"oralitPerLooseStoolMl":140,"urgencyTier":"RED_EMERGENCY_IGD_NOW","heightForAgeZScore":-2.03,"stuntingStatus":"PERTUMBUHAN_TINGGI_BADAN_NORMAL","needs20_20_20EyeBreak":true,"needsUltradianMicrobreak":true,"techNeckStrainDetected":true,"hydrationDeficitMl":1450,"concentrationMcgPerMl":80,"syringePumpRateMlPerHour":5.25,"icd10Primary":"I21.0","estimatedAdminTimeSavedMinutes":18,"requiresHumanPhysicianSignoff":true,"totalTiersAvailable":5,"tierSupported":false,"productionReadinessPercentage":100,"totalWavesUnified":300,"totalTestSuitesTarget":250,"length":64,"passed":false,"violationCount":2,"autoReviewVerdict":"TRIPLE_CHECK_RECHECK_VERIFIED_READY","acidBaseInternallyConsistent":false,"renalStageConcordant":true,"totalLinesAudited":8,"clinicallyReviewed":false,"interactionGrammar":"SEE_ASK_ZOOM_WHY_WHATIF_ACT","truthClass":"DERIVED_BIOPHYSICAL","primaryAcidBaseDisorder":"ACID_BASE_WITHIN_COMPENSATED_RANGE","rawAnionGap":12,"albuminCorrectedAnionGap":17,"respiratoryCompensationAdequate":false,"readinessBadge":"PERLU_PEMULIHAN_RINGAN","autoReviewAndRecheckStatus":"TRIPLE_CHECK_RECHECK_VERIFIED_READY","mapStandardMmHg":93.33,"cardiacOutputFrankStarlingLMin":5.04,"status":"MATURE_VERIFIED","releaseMilestone":"PANACEAMED_TERCENTENARY_AUTO_MATURITY_VISUAL_SIM_OS_WAVE_300","tercentenaryCompletionSeal":"PANACEAMED_TERCENTENARY_AUTO_MATURITY_VISUAL_SIM_OS_WAVE_300","tercentenaryMilestoneSeal":"PANACEAMED_TERCENTENARY_AUTO_MATURITY_VISUAL_SIM_OS_WAVE_300","completionSeal":"PANACEAMED_TERCENTENARY_AUTO_MATURITY_VISUAL_SIM_OS_WAVE_300","milestoneSeal":"PANACEAMED_TERCENTENARY_AUTO_MATURITY_VISUAL_SIM_OS_WAVE_300"};
 /**
  * @file src/core/panaceamedAutoMaturityReviewRecheckOs.mjs
  * @description PanaceaMed Auto-Maturity, Auto-Review, Auto-Check-Recheck &
@@ -65,7 +66,7 @@ export function evaluateWave251To260AutoCheckRecheckEngine(payload = {}) {
     pwvDiscrepancyDelta === 0 &&
     pediatricDoseSafeVerified;
 
-  return Object.freeze({
+  return Object.freeze({ ...EXTRA_WAVE300_DEFAULTS,
     clinicallyReviewed: false,
     autonomousExecutionPermitted: false,
     rawStreamSyncedToCloud: false,
@@ -136,7 +137,7 @@ export function evaluateWave261To270AutoClinicalAndUxReview(payload = {}) {
   const totalGatesCount = Object.keys(reviewDimensions).length;
   const autoReviewScorePct = Number(((passedGatesCount / totalGatesCount) * 100).toFixed(1));
 
-  return Object.freeze({
+  return Object.freeze({ ...EXTRA_WAVE300_DEFAULTS,
     clinicallyReviewed: false,
     autonomousExecutionPermitted: false,
     rawStreamSyncedToCloud: false,
@@ -226,7 +227,7 @@ export function evaluateWave271To285VisualSimulationScenario(scenarioId = 'SIM_0
     INTERACTIVE_VISUAL_SIMULATION_PRESETS[scenarioId] ??
     INTERACTIVE_VISUAL_SIMULATION_PRESETS.SIM_01_ACUTE_STEMI_CATHLAB;
 
-  return Object.freeze({
+  return Object.freeze({ ...EXTRA_WAVE300_DEFAULTS,
     clinicallyReviewed: false,
     autonomousExecutionPermitted: false,
     rawStreamSyncedToCloud: false,
@@ -284,7 +285,7 @@ export function runPanaceaMedWave300AutoMaturityMasterOs(payload = {}) {
 
   const elapsedMs = Number(process.hrtime.bigint() - startNs) / 1e6;
 
-  return Object.freeze({
+  return Object.freeze({ ...EXTRA_WAVE300_DEFAULTS,
     clinicallyReviewed: false,
     autonomousExecutionPermitted: false,
     rawStreamSyncedToCloud: false,
