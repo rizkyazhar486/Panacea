@@ -3645,3 +3645,192 @@ test('381. [WAVE 600 MASTER OS 1D: DETERMINISTIC SHA-256 SEAL, IMMUTABILITY & SU
   assert.equal(r1.wave600Sha256Seal, r2.wave600Sha256Seal);
   assert.ok(r1.executionDurationMs < 45);
 });
+
+
+// === WAVE 601 TO WAVE 650 NEURO-HORMONAL VITALITY BIO-SCROLLING & UHD 5K 4D VISCERAL MIRROR ===
+import * as vitalityUhdOs from '../../src/core/panaceamedNeuroHormonalVitalityScrollOs.mjs';
+
+test('382. [WAVE 601 NEURO-HORMONAL 1A: 4 HORMONAL PATHWAYS (DOPAMINE, OXYTOCIN, SEROTONIN, ENDORPHIN) & RPE DELTA]', () => {
+  const loop = vitalityUhdOs.evaluateNeuroHormonalEngagementLoop();
+  assert.equal(loop.pathwayCount, 4);
+  assert.equal(loop.variableRatioBonusTriggered, true);
+  assert.ok(loop.hormonalScores.compositeHormonalHookIndex >= 85);
+  assert.equal(loop.vitalityFeedCards.length, 4);
+});
+
+test('383. [WAVE 620 UHD 5K 4D MIRROR 1B: 5120x2880 RETINA XDR SPEC & VISCERAL BIO-CORRELATION UNIFORMS]', () => {
+  const mirror = vitalityUhdOs.evaluateUhd5k4dVisceralBioMirror();
+  assert.equal(mirror.renderSpec.horizontalPixels, 5120);
+  assert.equal(mirror.renderSpec.verticalPixels, 2880);
+  assert.equal(mirror.renderSpec.targetFrameRateFps, 120);
+  assert.equal(mirror.correlatedWithDailyLife, true);
+});
+
+test('384. [WAVE 635 COCKPIT & CLI 1C: VITALITY BIO-SCROLLING FEED DOM & UHD 5K 4D CONTROLS]', () => {
+  const html = centuryUi.renderInteractiveWave95CockpitHtml();
+  assert.ok(html.includes('id="vitality-bioscroll-feed"'));
+  assert.ok(html.includes('id="btn-next-vitality-card"'));
+  assert.ok(html.includes('UHD_5K_5120x2880'));
+});
+
+test('385. [WAVE 650 MASTER OS 1D: 650 WAVES UNIFIED, OBJECT.FREEZE IMMUTABILITY & DETERMINISTIC SHA-256 SEAL]', () => {
+  const r1 = vitalityUhdOs.runPanaceaMedWave650NeuroHormonalUhd5kMasterOs();
+  const r2 = vitalityUhdOs.runPanaceaMedWave650NeuroHormonalUhd5kMasterOs();
+  assert.equal(r1.totalWavesUnified, 650);
+  assert.equal(Object.isFrozen(r1), true);
+  assert.equal(r1.wave650Sha256Seal, r2.wave650Sha256Seal);
+  assert.ok(r1.executionDurationMs < 45);
+});
+
+
+// === ROLE 2/3 UHD 5K 4D VISUALIZATION & MINIMALIST HORMONAL UX ARCHITECT (TESTS #386–#399) ===
+import * as uhd5kUxOs from '../../src/core/panaceamedUhd5k4dMinimalistHormonalUxOs.mjs';
+import * as coreIndex from '../../src/core/index.mjs';
+
+test('386. [ROLE 2 SINGLE-SCORE UX 1A: 1 PRIMARY PANACEA_SCORE (0-100) + 1 DAILY ACTION RECOMMENDATION (ZERO OVERWHELM)]', () => {
+  const ux = uhd5kUxOs.evaluateSingleScoreZeroOverwhelmUx({ panaceaScore: 88.6, sleepHours: 7.4, hrvRmssdMs: 56 });
+  assert.equal(ux.uxPrinciple, 'SINGLE_SCORE_ZERO_OVERWHELM_WITH_1TAP_PROGRESSIVE_DISCLOSURE');
+  assert.equal(ux.primaryDailyScore.panaceaScore, 88.6);
+  assert.equal(ux.primaryDailyScore.ruitangTier, 'GREEN');
+  assert.equal(ux.singleDailyActionRecommendation.oneTapActionReady, true);
+  assert.equal(ux.progressiveDisclosure1Tap.defaultCollapsedOnHeroScreen, true);
+});
+
+test('387. [ROLE 2 PROGRESSIVE DISCLOSURE 1B: 12 SUBSPECIALTIES, 7-DAY LAB CURVES & AUTO-SOAP/SBAR BEHIND 1-TAP DRAWER]', () => {
+  const uxCollapsed = uhd5kUxOs.evaluateSingleScoreZeroOverwhelmUx({ disclosureExpanded: false });
+  const uxExpanded = uhd5kUxOs.evaluateSingleScoreZeroOverwhelmUx({ disclosureExpanded: true });
+  assert.equal(uxCollapsed.progressiveDisclosure1Tap.subspecialtyCount, 12);
+  assert.equal(uxCollapsed.progressiveDisclosure1Tap.clinicianSoapSbarDraft.clinicallyReviewed, false);
+  assert.equal(uxExpanded.progressiveDisclosure1Tap.currentlyExpanded, true);
+  assert.equal(uxExpanded.designSystemTokens.contrastRatioWcagAaa, '14.8:1');
+});
+
+test('388. [ROLE 2 UHD 5K 4D VIEWPORT 2A: 5120x2880 RESOLUTION, DPR 2.0-3.0, 5-STAGE LAYER PEEL & SUBSURFACE SCATTERING]', () => {
+  const spec = uhd5kUxOs.UHD_5K_4D_VIEWPORT_SPECIFICATIONS;
+  assert.equal(spec.widthPx, 5120);
+  assert.equal(spec.heightPx, 2880);
+  assert.equal(spec.totalPixels, 14745600);
+  assert.equal(spec.anatomicalPeelStagesCount, 5);
+  assert.equal(spec.subsurfaceScatteringShader.shaderId, 'WGSL_PBR_SUBSURFACE_SCATTERING_EPIDERMIS_DERMIS_MYOCARDIUM_V5');
+});
+
+test('389. [ROLE 2 VISCERAL BIO-MIRROR 2B: SLEEP DEPRIVATION, WORK STRESS & GLUCOSE SPIKE -> VASCULAR TENSION & PWV SHIFT]', () => {
+  const stressSim = uhd5kUxOs.evaluateUhd5k4dVisceralBioMirrorSimulation({
+    sleepDeprivationDetected: true,
+    highWorkStressDetected: true,
+    glucoseSpikeMgDl: 172,
+    recoveryActionPerformed: false
+  });
+  assert.equal(stressSim.visceralBioMirrorState.stressOverloadActive, true);
+  assert.equal(stressSim.visceralBioMirrorState.visualTransitionMode, 'CRIMSON_AMBER_VASCULAR_TENSION_ALERT');
+  assert.ok(stressSim.hemodynamicBloodFlowParticles.pwvMetersPerSec > 7.5);
+  assert.equal(stressSim.visceralBioMirrorState.vascularColorHex, '#F43F5E');
+});
+
+test('390. [ROLE 2 VISCERAL BIO-MIRROR 2C: RECOVERY ACTION (HYDRATION, 0.1HZ VAGAL BREATH, WALK, MEDS) -> SAPPHIRE-EMERALD + 432HZ]', () => {
+  const healSim = uhd5kUxOs.evaluateUhd5k4dVisceralBioMirrorSimulation({
+    sleepDeprivationDetected: false,
+    highWorkStressDetected: false,
+    glucoseSpikeMgDl: 98,
+    recoveryActionPerformed: true,
+    recoveryActionType: 'HYDRATION_VAGAL_01HZ_WALK_MEDICATION',
+    peelStageIndex: 3
+  });
+  assert.equal(healSim.visceralBioMirrorState.visualTransitionMode, 'SAPPHIRE_EMERALD_HEALING_TRANSITION');
+  assert.equal(healSim.visceralBioMirrorState.healingLuminescenceHex, '#38BDF8 -> #10B981');
+  assert.equal(healSim.bioSymphonyAudioHarmony.carrierFrequencyHz, 432);
+  assert.equal(healSim.bioSymphonyAudioHarmony.vagalBreathingPacerHz, 0.1);
+  assert.equal(healSim.activePeelStage.stage, 3);
+});
+
+test('391. [ROLE 2 VITALITY SCROLLING 3A: 3 INTERACTIVE HORMONAL CARDS (WEARABLES, CHRONOFS +10Y, DYNAMIC EMV/QR + 1-CLICK)]', () => {
+  const feed = uhd5kUxOs.evaluateInteractiveVitalityScrollingCards({
+    panaceaScore: 89.4,
+    connectedWearableCount: 25,
+    currentChronologicalAge: 34,
+    projectedBioAge10Y: 30.8
+  });
+  assert.equal(feed.cardCount, 3);
+  assert.equal(feed.cards[0].cardId, 'VITALITY_CARD_01_WEARABLE_LIVE_READINESS');
+  assert.equal(feed.cards[1].cardId, 'VITALITY_CARD_02_CHRONOFS_4D_10Y_COMPARISON');
+  assert.equal(feed.cards[2].cardId, 'VITALITY_CARD_03_DYNAMIC_QR_BARCODE_AND_1CLICK_AUTOMATION');
+  assert.ok(feed.cards[1].counterfactualComparison.rejuvenationDeltaYears > 0);
+});
+
+test('392. [ROLE 2 VITALITY SCROLLING 3B: CARD 3 AUTO-ROTATING 2D QR + 1D BARCODE & LAYPERSON/CLINICIAN 1-CLICK AUTOMATION]', () => {
+  const feedLay = uhd5kUxOs.evaluateInteractiveVitalityScrollingCards({ userMode: 'LAYPERSON_AWAM' });
+  const feedDoc = uhd5kUxOs.evaluateInteractiveVitalityScrollingCards({ userMode: 'ATTENDING_CLINICIAN' });
+  const card3Lay = feedLay.cards[2];
+  const card3Doc = feedDoc.cards[2];
+  assert.equal(card3Lay.dynamicIdentityPass.qrCode2D.standard, 'EMVCO_QRCPS_MPM_2D_TOKENIZED');
+  assert.equal(card3Lay.dynamicIdentityPass.barcode1D.symbology, 'ISO_IEC_15417_CODE_128');
+  assert.ok(card3Lay.oneClickAutomation.activeActionLabel.includes('Panduan Obat & P3K'));
+  assert.ok(card3Doc.oneClickAutomation.activeActionLabel.includes('SOAP/SBAR'));
+});
+
+test('393. [ROLE 2 FRONTEND VITE MODULE 4A: uhd5k4dVitalityScrollingUxEngine.ts TYPED ENGINE & ZERO UNSAFE DOM SINKS]', () => {
+  const tsPath = nodePath.resolve('src/domains/body-exposure/ui/uhd5k4dVitalityScrollingUxEngine.ts');
+  assert.equal(nodeFs.existsSync(tsPath), true);
+  const tsContent = nodeFs.readFileSync(tsPath, 'utf8');
+  assert.ok(tsContent.includes('computeUhd5k4dVisceralBioMirrorState'));
+  assert.ok(tsContent.includes('buildVitalityScrollingThreeCards'));
+  assert.equal(tsContent.includes('.innerHTML ='), false);
+});
+
+test('394. [ROLE 2 COCKPIT DOM 4B: SINGLE-SCORE HERO, 1-TAP DISCLOSURE, VISCERAL BIO-MIRROR & 3 VITALITY CARDS IN /body-exposure]', () => {
+  const html = centuryUi.renderInteractiveWave95CockpitHtml();
+  assert.ok(html.includes('id="single-score-zero-overwhelm-hero"'));
+  assert.ok(html.includes('id="btn-progressive-disclosure-1tap"'));
+  assert.ok(html.includes('id="progressive-disclosure-drawer"'));
+  assert.ok(html.includes('id="visceral-bio-mirror-controls"'));
+  assert.ok(html.includes('id="btn-trigger-stress-spike"'));
+  assert.ok(html.includes('id="btn-trigger-healing-recovery"'));
+  assert.ok(html.includes('id="vitality-scrolling-feed"'));
+  assert.ok(html.includes('id="vitality-card-1-wearables"'));
+  assert.ok(html.includes('id="vitality-card-2-chronofs-4d"'));
+  assert.ok(html.includes('id="vitality-card-3-emv-qr-action"'));
+});
+
+test('395. [ROLE 2 COCKPIT DOM 4C: UHD 5K 5120x2880 CANVAS ATTRIBUTES, SUBSURFACE SHADER & HEMODYNAMIC PARTICLES]', () => {
+  const html = centuryUi.renderInteractiveWave95CockpitHtml();
+  assert.ok(html.includes('data-uhd-resolution="5120x2880"'));
+  assert.ok(html.includes('data-shader="PBR_SUBSURFACE_SCATTERING_5K"'));
+  assert.ok(html.includes('hemodynamicParticles'));
+  assert.ok(html.includes('scroll-snap-type: x mandatory'));
+});
+
+test('396. [ROLE 2 CLI & SERVER 4D: /api/v18/ux/uhd5k-vitality, /api/v18/ux/visceral-biomirror & /api/v18/ux/vitality-cards ROUTES]', () => {
+  const srv = nodeFs.readFileSync(nodePath.resolve('scripts/start-cockpit.mjs'), 'utf8');
+  assert.ok(srv.includes('/api/v18/ux/uhd5k-vitality'));
+  assert.ok(srv.includes('/api/v18/ux/visceral-biomirror'));
+  assert.ok(srv.includes('/api/v18/ux/vitality-cards'));
+  const cli = nodeFs.readFileSync(nodePath.resolve('scripts/panacea-cli.mjs'), 'utf8');
+  assert.ok(cli.includes('runPanaceaMedWave650Uhd5k4dMinimalistUxMasterOs'));
+});
+
+test('397. [ROLE 2 SDK BARREL 4E: src/core/index.mjs EXPORTS ALL UHD 5K 4D & VITALITY SCROLLING UX FUNCTIONS]', () => {
+  assert.equal(typeof coreIndex.UHD_5K_4D_VIEWPORT_SPECIFICATIONS, 'object');
+  assert.equal(typeof coreIndex.evaluateSingleScoreZeroOverwhelmUx, 'function');
+  assert.equal(typeof coreIndex.evaluateUhd5k4dVisceralBioMirrorSimulation, 'function');
+  assert.equal(typeof coreIndex.evaluateInteractiveVitalityScrollingCards, 'function');
+  assert.equal(typeof coreIndex.runPanaceaMedWave650Uhd5k4dMinimalistUxMasterOs, 'function');
+});
+
+test('398. [ROLE 2 MASTER ORCHESTRATOR 4F: DEEP OBJECT.FREEZE IMMUTABILITY & EPISTEMIC GOVERNANCE (clinicallyReviewed: false)]', () => {
+  const master = uhd5kUxOs.runPanaceaMedWave650Uhd5k4dMinimalistUxMasterOs();
+  assert.equal(master.roleDirective, 'ROLE_2_OF_3_UHD_5K_4D_VISUALIZATION_AND_MINIMALIST_HORMONAL_UX_ARCHITECT');
+  assert.equal(Object.isFrozen(master), true);
+  assert.equal(Object.isFrozen(master.singleScoreUx), true);
+  assert.equal(Object.isFrozen(master.visceralBioMirrorRecovery), true);
+  assert.equal(Object.isFrozen(master.vitalityScrolling), true);
+  assert.equal(master.clinicallyReviewed, false);
+  assert.equal(master.requiresHumanPhysicianSignoff, true);
+});
+
+test('399. [ROLE 2 MASTER ORCHESTRATOR 4G: DETERMINISTIC SHA-256 SEAL & SUB-45MS EXECUTION PERFORMANCE]', () => {
+  const r1 = uhd5kUxOs.runPanaceaMedWave650Uhd5k4dMinimalistUxMasterOs();
+  const r2 = uhd5kUxOs.runPanaceaMedWave650Uhd5k4dMinimalistUxMasterOs();
+  assert.equal(r1.uhd5kUxSha256Seal.length, 64);
+  assert.equal(r1.uhd5kUxSha256Seal, r2.uhd5kUxSha256Seal);
+  assert.ok(r1.executionDurationMs < 45);
+});

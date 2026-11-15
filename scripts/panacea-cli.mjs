@@ -34,10 +34,23 @@ import {
 import { runPanaceaMedWave500FluidChameleonMasterOs } from '../src/core/panaceamedFluidChameleonCamouflageOs.mjs';
 import { runPanaceaMedWave550VisaMastercardAndMultiDeviceMasterOs } from '../src/core/panaceamedVisaMastercardTokenQrAndMultiDeviceOs.mjs';
 import { runPanaceaMedWave600DailyWearableMasterOs } from '../src/core/panaceamedTwentyFiveWearablesDailyLifeOs.mjs';
+import { runPanaceaMedWave650NeuroHormonalUhd5kMasterOs } from '../src/core/panaceamedNeuroHormonalVitalityScrollOs.mjs';
+import { runPanaceaMedWave650Uhd5k4dMinimalistUxMasterOs } from '../src/core/panaceamedUhd5k4dMinimalistHormonalUxOs.mjs';
 
 const mode = (process.argv[2] || 'daily').toLowerCase();
 
-if (mode === 'visa' || mode === 'mastercard' || mode === 'emv') {
+if (mode === 'vitality' || mode === 'bioscroll' || mode === 'uhd5k' || mode === 'ux') {
+  const v = runPanaceaMedWave650NeuroHormonalUhd5kMasterOs();
+  const ux = runPanaceaMedWave650Uhd5k4dMinimalistUxMasterOs();
+  console.log('=== PANACEAMED NEURO-HORMONAL VITALITY BIO-SCROLLING & UHD 5K 4D MIRROR ===');
+  console.log('• Resolusi Kanvas 4D         :', v.uhd5kMirror.renderSpec.resolutionLabel, '@', v.uhd5kMirror.renderSpec.targetFrameRateFps, 'FPS');
+  console.log('• Single-Score Hero (0-100)  :', ux.singleScoreUx.primaryDailyScore.panaceaScore + '/100 |', ux.singleScoreUx.singleDailyActionRecommendation.actionHeadline);
+  console.log('• Visceral Bio-Mirroring     : Stress PWV =', ux.visceralBioMirrorStress.hemodynamicBloodFlowParticles.pwvMetersPerSec, 'm/s -> Recovery PWV =', ux.visceralBioMirrorRecovery.hemodynamicBloodFlowParticles.pwvMetersPerSec, 'm/s (432 Hz BioSymphony)');
+  console.log('• Indeks Keterikatan Hormon  :', v.hormonalLoop.hormonalScores.compositeHormonalHookIndex + '/100 (Dopamin =', v.hormonalLoop.hormonalScores.dopamineDriveScore, '| Oksitosin =', v.hormonalLoop.hormonalScores.oxytocinResonanceScore, '| Serotonin =', v.hormonalLoop.hormonalScores.serotoninMasteryScore + ')');
+  for (const c of ux.vitalityScrolling.cards) {
+    console.log(`  [${c.cardId}] ${c.title} -> ${c.primaryMetric} (${c.secondaryDetail})`);
+  }
+} else if (mode === 'visa' || mode === 'mastercard' || mode === 'emv') {
   const emv = runPanaceaMedWave550VisaMastercardAndMultiDeviceMasterOs();
   console.log('=== PANACEAMED DYNAMIC TOKENIZED HEALTH ID (QR & MULTI-BARCODE) ===');
   console.log('• Pemegang Kartu (Kelas A)   :', emv.visaPass.cardholderName, '| Token dPAN:', emv.visaPass.formattedDpan, '(Luhn Valid =', emv.visaPass.luhnVerifiedTokenizedDpan + ')');

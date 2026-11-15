@@ -2,9 +2,17 @@
  * Mesin Pemetaan Teritori Vaskular Koroner AHA 17-Segmen (BX-2).
  *
  * Memetakan arteri koroner epikardial utama (LAD, RCA, LCX) ke segmen
- * ventrikel kiri model 17-segmen AHA berdasarkan varian dominansi koroner
- * (kanan, kiri, ko-dominan). Jika dominansi tidak diketahui ('unknown'),
- * seluruh varian dikembalikan tanpa memilih satu varian secara sepihak.
+ * ventrikel kiri model 17-segmen AHA. Hanya penetapan AHA baku (anatomi dominan
+ * kanan) yang bersumber: dibaca dari teks penuh ulasan Rinta-Kiikka dkk. 2014
+ * (PMID 25201553 / PMC6932424) yang menabulasikan Cerqueira dkk. 2002 (PMID 11815441).
+ * Rekaman PubMed Cerqueira 2002 TIDAK punya abstrak dan teks penuhnya tidak dibaca.
+ *
+ * Kolom dominansi kiri dan ko-dominan bernilai null: tidak ada tabel segmen per
+ * dominansi yang dibaca. Versi sebelumnya memuat kolom itu berlabel
+ * verifiedFrom 'abstract' + tableVerified true, padahal sumbernya tak punya abstrak;
+ * angka tanpa sumber tidak ditampilkan (kosong lebih baik daripada salah).
+ * Ortiz-Pérez dkk. 2008 (PMID 19356440, abstrak) hanya mendukung secara kualitatif
+ * bahwa dinding inferior dapat milik LCX pada anatomi dominan kiri/ko-dominan.
  *
  * Catatan keselamatan klinis:
  * - Hanya referensi anatomi atlas populasi, bukan anatomi spesifik pasien.
@@ -25,10 +33,11 @@ export interface VascularTerritorySource {
   readonly tableVerified: boolean;
 }
 
+/** null = tidak ada tabel bersumber untuk varian itu (bukan "tanpa segmen"). */
 export interface CoronaryDominanceColumns {
   readonly right: readonly number[];
-  readonly left: readonly number[];
-  readonly codominant: readonly number[];
+  readonly left: readonly number[] | null;
+  readonly codominant: readonly number[] | null;
 }
 
 export interface CoronaryTerritoryTableRow {
@@ -43,22 +52,22 @@ export type CoronaryTerritoryTable = Readonly<Record<string, CoronaryTerritoryTa
 
 export const AHA17_CORONARY_TERRITORY_SOURCE: VascularTerritorySource = Object.freeze({
   citation:
-    'Cerqueira MD, Weissman NJ, Dilsizian V, et al. Standardized myocardial segmentation and nomenclature for tomographic imaging of the heart. Circulation. 2002;105(4):539-542.',
-  section: 'AHA 17-Segment Model Figure 5 & Coronary Dominance Territory Assignment (segments 1-17)',
-  verifiedFrom: 'abstract',
+    'Cerqueira MD, et al. Circulation. 2002;105(4):539-542 (PMID 11815441; no PubMed abstract, full text not read), as tabulated in Rinta-Kiikka I, et al. Ann Noninvasive Electrocardiol. 2014 (PMID 25201553, PMC6932424, full text read).',
+  section: 'Default AHA assignment (right-dominant anatomy): RCA 3,4,9,10,15; LCX 5,6,11,12,16; LAD 1,2,7,8,13,14,17. Left and co-dominant columns: no source table read.',
+  verifiedFrom: 'reference-table',
   tableVerified: true,
 });
 
 export const AHA17_TERRITORY_LIMITATIONS: readonly string[] = Object.freeze([
   'Atlas reference mapping represents population-level epicardial coronary distribution, not patient-specific coronary angiography.',
-  'Inferior and inferoseptal segments (4, 10, 15) vary with posterior descending artery (PDA) origin across right, left, and co-dominant anatomy.',
+  'Left- and co-dominant segment columns are not shown: no source table for them was read.',
+  'Ortiz-Pérez et al. 2008 (PMID 19356440, abstract): enhancement extending to the inferior wall was 100% specific for a dominant or co-dominant LCX occlusion, so inferior segments (4, 10, 15) may belong to the LCX in those anatomies.',
   'Not a diagnostic conclusion, revascularization target, or treatment recommendation.',
 ]);
 
 /**
- * Tabel teritori koroner 17-segmen AHA berdasarkan dominansi anatomi.
- * Setiap kolom dominansi ('right', 'left', 'codominant') membentuk partisi
- * tepat atas segmen 1..17 di seluruh tiga arteri koroner utama (LAD, RCA, LCX).
+ * Tabel teritori koroner 17-segmen AHA. Kolom 'right' (penetapan AHA baku) membentuk partisi
+ * tepat atas segmen 1..17 di LAD, RCA, LCX; kolom 'left' dan 'codominant' null (tanpa sumber).
  */
 export const AHA17_CORONARY_TERRITORY_TABLE: CoronaryTerritoryTable = Object.freeze({
   LAD: Object.freeze({
@@ -66,8 +75,8 @@ export const AHA17_CORONARY_TERRITORY_TABLE: CoronaryTerritoryTable = Object.fre
     arteryLabel: 'Left anterior descending artery (LAD)',
     variants: Object.freeze({
       right: Object.freeze([1, 2, 7, 8, 13, 14, 17]),
-      left: Object.freeze([1, 2, 7, 8, 13, 14, 17]),
-      codominant: Object.freeze([1, 2, 7, 8, 13, 14, 17]),
+      left: null,
+      codominant: null,
     }),
     variableSegments: Object.freeze([]),
     source: AHA17_CORONARY_TERRITORY_SOURCE,
@@ -77,8 +86,8 @@ export const AHA17_CORONARY_TERRITORY_TABLE: CoronaryTerritoryTable = Object.fre
     arteryLabel: 'Right coronary artery (RCA)',
     variants: Object.freeze({
       right: Object.freeze([3, 4, 9, 10, 15]),
-      left: Object.freeze([3, 9]),
-      codominant: Object.freeze([3, 4, 9, 10]),
+      left: null,
+      codominant: null,
     }),
     variableSegments: Object.freeze([4, 10, 15]),
     source: AHA17_CORONARY_TERRITORY_SOURCE,
@@ -88,8 +97,8 @@ export const AHA17_CORONARY_TERRITORY_TABLE: CoronaryTerritoryTable = Object.fre
     arteryLabel: 'Left circumflex artery (LCX)',
     variants: Object.freeze({
       right: Object.freeze([5, 6, 11, 12, 16]),
-      left: Object.freeze([4, 5, 6, 10, 11, 12, 15, 16]),
-      codominant: Object.freeze([5, 6, 11, 12, 15, 16]),
+      left: null,
+      codominant: null,
     }),
     variableSegments: Object.freeze([4, 10, 15]),
     source: AHA17_CORONARY_TERRITORY_SOURCE,
@@ -229,14 +238,14 @@ export function mapCoronaryToAHA17(
 
   const allVariants: CoronaryDominanceColumns = Object.freeze({
     right: Object.freeze([...row.variants.right]),
-    left: Object.freeze([...row.variants.left]),
-    codominant: Object.freeze([...row.variants.codominant]),
+    left: row.variants.left === null ? null : Object.freeze([...row.variants.left]),
+    codominant: row.variants.codominant === null ? null : Object.freeze([...row.variants.codominant]),
   });
 
   if (
     !isValidSegmentArray(allVariants.right) ||
-    !isValidSegmentArray(allVariants.left) ||
-    !isValidSegmentArray(allVariants.codominant)
+    (allVariants.left !== null && !isValidSegmentArray(allVariants.left)) ||
+    (allVariants.codominant !== null && !isValidSegmentArray(allVariants.codominant))
   ) {
     return Object.freeze({
       ok: false,
@@ -271,6 +280,20 @@ export function mapCoronaryToAHA17(
   }
 
   const chosenSegments = allVariants[dominance];
+  if (chosenSegments === null) {
+    return Object.freeze({
+      ok: false,
+      reason: 'source-not-verified',
+      detail: `No sourced ${dominance}-dominance segment table for "${normArtery}". Only the default AHA assignment (right-dominant anatomy) is sourced; inferior segments 4, 10 and 15 may belong to the LCX in left- or co-dominant anatomy (Ortiz-Pérez 2008, abstract).`,
+      artery: normArtery,
+      dominanceVariant: dominance,
+      chosenVariant: null,
+      segments: Object.freeze([]),
+      allVariants,
+      truthClass: 'reference',
+      label: ATLAS_REFERENCE_LABEL,
+    });
+  }
   return Object.freeze({
     ok: true,
     artery: row.artery,
