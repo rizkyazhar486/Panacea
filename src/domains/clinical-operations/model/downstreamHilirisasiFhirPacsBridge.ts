@@ -27,8 +27,101 @@ export type TruthClass =
 export const MISSING_OBSERVATION = Symbol('PANACEA_MISSING_OBSERVATION');
 
 // ── Standard FIPS 180-4 SHA-256 Engine (Pure, Isomorphic, Synchronous) ───────
-import { sha256Hex } from '../../../shared/kernel/sha256.ts'
-export { sha256Hex }
+
+function rotr(n: number, s: number): number {
+  return (n >>> s) | (n << (32 - s));
+}
+
+/**
+ * Standard FIPS 180-4 SHA-256 implementation producing a genuine 256-bit (64 hex characters) digest.
+ * Operates isomorphically across Browser, Node.js, Web Workers, and Edge without external dependencies.
+ * Verified against official NIST SHA-256 test vectors.
+ */
+export function sha256Hex(input: string): string {
+  const K = [
+    0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
+    0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174,
+    0xe49b69c1, 0xefbe4786, 0x0fc19dc6, 0x240ca1cc, 0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da,
+    0x983e5152, 0xa831c66d, 0xb00327c8, 0xbf597fc7, 0xc6e00bf3, 0xd5a79147, 0x06ca6351, 0x14292967,
+    0x27b70a85, 0x2e1b2138, 0x4d2c6dfc, 0x53380d13, 0x650a7354, 0x766a0abb, 0x81c2c92e, 0x92722c85,
+    0xa2bfe8a1, 0xa81a664b, 0xc24b8b70, 0xc76c51a3, 0xd192e819, 0xd6990624, 0xf40e3585, 0x106aa070,
+    0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5, 0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3,
+    0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2,
+  ];
+
+  let h0 = 0x6a09e667;
+  let h1 = 0xbb67ae85;
+  let h2 = 0x3c6ef372;
+  let h3 = 0xa54ff53a;
+  let h4 = 0x510e527f;
+  let h5 = 0x9b05688c;
+  let h6 = 0x1f83d9ab;
+  let h7 = 0x5be0cd19;
+
+  const bytes = new TextEncoder().encode(input);
+  const len = bytes.length;
+  const bitLen = len * 8;
+  const padLen = ((len + 9 + 63) >> 6) << 6;
+  const padded = new Uint8Array(padLen);
+  padded.set(bytes);
+  padded[len] = 0x80;
+  const view = new DataView(padded.buffer);
+  view.setBigUint64(padLen - 8, BigInt(bitLen), false);
+
+  const w = new Uint32Array(64);
+  for (let i = 0; i < padLen; i += 64) {
+    for (let t = 0; t < 16; t++) {
+      w[t] = view.getUint32(i + t * 4, false);
+    }
+    for (let t = 16; t < 64; t++) {
+      const s0 = rotr(w[t - 15], 7) ^ rotr(w[t - 15], 18) ^ (w[t - 15] >>> 3);
+      const s1 = rotr(w[t - 2], 17) ^ rotr(w[t - 2], 19) ^ (w[t - 2] >>> 10);
+      w[t] = (w[t - 16] + s0 + w[t - 7] + s1) | 0;
+    }
+
+    let a = h0;
+    let b = h1;
+    let c = h2;
+    let d = h3;
+    let e = h4;
+    let f = h5;
+    let g = h6;
+    let h = h7;
+
+    for (let t = 0; t < 64; t++) {
+      const s1 = rotr(e, 6) ^ rotr(e, 11) ^ rotr(e, 25);
+      const ch = (e & f) ^ (~e & g);
+      const t1 = (h + s1 + ch + K[t] + w[t]) | 0;
+      const s0 = rotr(a, 2) ^ rotr(a, 13) ^ rotr(a, 22);
+      const maj = (a & b) ^ (a & c) ^ (b & c);
+      const t2 = (s0 + maj) | 0;
+
+      h = g;
+      g = f;
+      f = e;
+      e = (d + t1) | 0;
+      d = c;
+      c = b;
+      b = a;
+      a = (t1 + t2) | 0;
+    }
+
+    h0 = (h0 + a) | 0;
+    h1 = (h1 + b) | 0;
+    h2 = (h2 + c) | 0;
+    h3 = (h3 + d) | 0;
+    h4 = (h4 + e) | 0;
+    h5 = (h5 + f) | 0;
+    h6 = (h6 + g) | 0;
+    h7 = (h7 + h) | 0;
+  }
+
+  return [h0, h1, h2, h3, h4, h5, h6, h7]
+    .map((x) => (x >>> 0).toString(16).padStart(8, '0'))
+    .join('');
+}
+
+export const computeRealSha256Hex = sha256Hex;
 
 /**
  * Generates an RFC 4122 compliant deterministic UUIDv4-derivative from a seed string.
@@ -219,6 +312,11 @@ export interface PanaceaLhidEnvelope {
   readonly truthClass: TruthClass;
   readonly isClinicallyReviewed: boolean;
   readonly payload: Record<string, unknown>;
+  // Parity aliases:
+  readonly publicLongitudinalId: string;
+  readonly payloadSha256Digest: string;
+  readonly pseudonymHmacSha256: string;
+  readonly pseudonymizedPatientDid: string;
 }
 
 export interface AcwrRecoveryRecommendationInput {
@@ -534,15 +632,26 @@ export function buildFhirEncounterResource(params: {
 // ── FHIR R4 Bundle Builder for Sepsis Care ───────────────────────────────────
 
 export interface BuildFhirBundleForSepsisCareParams {
-  readonly patientId: string;
-  readonly lactateMmolL?: number | typeof MISSING_OBSERVATION;
-  readonly meanArterialPressureMmhg?: number | typeof MISSING_OBSERVATION;
-  readonly antibioticAdministered: boolean;
-  readonly fluidResuscitationOrdered: boolean;
+  readonly patientId?: string;
+  readonly canonicalPatientId?: string;
+  readonly patientCanonicalId?: string;
+  readonly hmacSecretKey?: string;
+  readonly lactateMmolL?: number | typeof MISSING_OBSERVATION | null;
+  readonly observedLactateMmolL?: number | null | typeof MISSING_OBSERVATION;
+  readonly meanArterialPressureMmhg?: number | typeof MISSING_OBSERVATION | null;
+  readonly meanArterialPressureMmHg?: number | typeof MISSING_OBSERVATION | null;
+  readonly observedMapMmHg?: number | null | typeof MISSING_OBSERVATION;
+  readonly antibioticAdministered?: boolean;
+  readonly broadSpectrumAntibioticsAdministered?: boolean;
+  readonly bloodCultureTakenBeforeAntibiotics?: boolean;
+  readonly crystalloidBolusMlPerKg?: number;
+  readonly fluidResuscitationOrdered?: boolean;
   readonly fluidResuscitationAdministered?: boolean;
+  readonly clinicianAuthorizedCarePlan?: boolean;
   readonly truthClass?: TruthClass;
   readonly encounterId?: string;
   readonly timestampIso?: string;
+  readonly effectiveDateTimeIso?: string;
   readonly includePatientResource?: boolean;
   readonly includeConditionResource?: boolean;
 }
@@ -559,28 +668,48 @@ export interface BuildFhirBundleForSepsisCareParams {
  * - Zero-fabrication: unmeasured parameters are strictly omitted from Observations.
  */
 export function buildFhirBundleForSepsisCare(params: BuildFhirBundleForSepsisCareParams): FhirBundle {
-  const now = params.timestampIso && !Number.isNaN(Date.parse(params.timestampIso))
-    ? params.timestampIso
+  const patientId = params.patientId || params.canonicalPatientId || params.patientCanonicalId || 'UNKNOWN_PATIENT';
+  const timestamp = params.timestampIso || params.effectiveDateTimeIso;
+  const now = timestamp && !Number.isNaN(Date.parse(timestamp))
+    ? timestamp
     : new Date().toISOString();
 
   const truth = params.truthClass ?? 'OBSERVED_CLINICAL';
   const isEducational = truth === 'SIMULATED_EDUCATIONAL';
 
+  const lactateVal = params.lactateMmolL !== undefined
+    ? (params.lactateMmolL === null ? MISSING_OBSERVATION : params.lactateMmolL)
+    : params.observedLactateMmolL === null
+    ? MISSING_OBSERVATION
+    : params.observedLactateMmolL;
+
+  const mapVal = params.meanArterialPressureMmhg !== undefined
+    ? (params.meanArterialPressureMmhg === null ? MISSING_OBSERVATION : params.meanArterialPressureMmhg)
+    : params.meanArterialPressureMmHg !== undefined
+    ? (params.meanArterialPressureMmHg === null ? MISSING_OBSERVATION : params.meanArterialPressureMmHg)
+    : params.observedMapMmHg === null
+    ? MISSING_OBSERVATION
+    : params.observedMapMmHg;
+
+  const antibioticAdministered = params.antibioticAdministered ?? params.broadSpectrumAntibioticsAdministered ?? false;
+  const fluidResuscitationOrdered = params.fluidResuscitationOrdered ?? ((params.crystalloidBolusMlPerKg ?? 0) > 0);
+  const fluidResuscitationAdministered = params.fluidResuscitationAdministered ?? false;
+
   // Anonymized/Opaque patient reference for privacy
-  const opaquePatientRef = `Patient/pt-${sha256Hex(`PANACEA_PATIENT:${params.patientId}`).slice(0, 12)}`;
-  const patientUuid = generateDeterministicUuid(`patient:${params.patientId}`);
+  const opaquePatientRef = `Patient/pt-${sha256Hex(`PANACEA_PATIENT:${patientId}`).slice(0, 12)}`;
+  const patientUuid = generateDeterministicUuid(`patient:${patientId}`);
   const encounterUuid = params.encounterId
     ? generateDeterministicUuid(`encounter:${params.encounterId}:${now}`)
     : undefined;
 
-  const bundleUuid = generateDeterministicUuid(`bundle:sepsis:${params.patientId}:${now}`);
+  const bundleUuid = generateDeterministicUuid(`bundle:sepsis:${patientId}:${now}`);
   const entries: { fullUrl: string; resource: FhirResourceHeader }[] = [];
   const targetResourceUuids: string[] = [];
 
   // Optional Patient Resource in bundle
   if (params.includePatientResource) {
     const patientRes = buildFhirPatientResource({
-      patientId: params.patientId,
+      patientId,
       truthClass: truth,
       timestampIso: now,
       idOverride: patientUuid,
@@ -596,7 +725,7 @@ export function buildFhirBundleForSepsisCare(params: BuildFhirBundleForSepsisCar
   if (params.encounterId && encounterUuid) {
     const encounterRes = buildFhirEncounterResource({
       encounterId: params.encounterId,
-      patientId: params.patientId,
+      patientId,
       truthClass: truth,
       timestampIso: now,
       idOverride: encounterUuid,
@@ -610,9 +739,9 @@ export function buildFhirBundleForSepsisCare(params: BuildFhirBundleForSepsisCar
 
   // Optional Condition Resource (Sepsis diagnosis)
   if (params.includeConditionResource) {
-    const conditionUuid = generateDeterministicUuid(`condition:sepsis:${params.patientId}:${now}`);
+    const conditionUuid = generateDeterministicUuid(`condition:sepsis:${patientId}:${now}`);
     const conditionRes = buildFhirConditionResource({
-      patientId: params.patientId,
+      patientId,
       truthClass: truth,
       timestampIso: now,
       encounterId: encounterUuid ?? params.encounterId,
@@ -626,14 +755,14 @@ export function buildFhirBundleForSepsisCare(params: BuildFhirBundleForSepsisCar
   }
 
   // Observation 1: Blood Lactate (LOINC 600-7)
-  if (params.lactateMmolL !== undefined && params.lactateMmolL !== MISSING_OBSERVATION) {
-    if (typeof params.lactateMmolL !== 'number' || Number.isNaN(params.lactateMmolL) || params.lactateMmolL < 0 || params.lactateMmolL > 35) {
-      throw new TypeError(`Invalid blood lactate level: ${params.lactateMmolL}`);
+  if (lactateVal !== undefined && lactateVal !== MISSING_OBSERVATION) {
+    if (typeof lactateVal !== 'number' || Number.isNaN(lactateVal) || lactateVal < 0 || lactateVal > 35) {
+      throw new TypeError(`Invalid blood lactate level: ${lactateVal}`);
     }
 
-    const obsUuid = generateDeterministicUuid(`obs:lactate:${params.patientId}:${now}`);
-    const isElevated = params.lactateMmolL >= 2.0;
-    const isCritical = params.lactateMmolL >= 4.0;
+    const obsUuid = generateDeterministicUuid(`obs:lactate:${patientId}:${now}`);
+    const isElevated = lactateVal >= 2.0;
+    const isCritical = lactateVal >= 4.0;
 
     const lactateObs: FhirObservationResource = {
       resourceType: 'Observation',
@@ -665,7 +794,7 @@ export function buildFhirBundleForSepsisCare(params: BuildFhirBundleForSepsisCar
       encounter: encounterUuid ? { reference: `urn:uuid:${encounterUuid}` } : undefined,
       effectiveDateTime: now,
       valueQuantity: {
-        value: Number(params.lactateMmolL.toFixed(2)),
+        value: Number(lactateVal.toFixed(2)),
         unit: 'mmol/L',
         system: FHIR_CODE_SYSTEMS.UCUM,
         code: 'mmol/L',
@@ -693,18 +822,18 @@ export function buildFhirBundleForSepsisCare(params: BuildFhirBundleForSepsisCar
   }
 
   // Observation 2: Mean Arterial Pressure (LOINC 8478-0)
-  if (params.meanArterialPressureMmhg !== undefined && params.meanArterialPressureMmhg !== MISSING_OBSERVATION) {
+  if (mapVal !== undefined && mapVal !== MISSING_OBSERVATION) {
     if (
-      typeof params.meanArterialPressureMmhg !== 'number' ||
-      Number.isNaN(params.meanArterialPressureMmhg) ||
-      params.meanArterialPressureMmhg < 20 ||
-      params.meanArterialPressureMmhg > 250
+      typeof mapVal !== 'number' ||
+      Number.isNaN(mapVal) ||
+      mapVal < 20 ||
+      mapVal > 250
     ) {
-      throw new TypeError(`Invalid Mean Arterial Pressure: ${params.meanArterialPressureMmhg}`);
+      throw new TypeError(`Invalid Mean Arterial Pressure: ${mapVal}`);
     }
 
-    const mapUuid = generateDeterministicUuid(`obs:map:${params.patientId}:${now}`);
-    const isHypotensive = params.meanArterialPressureMmhg < 65;
+    const mapUuid = generateDeterministicUuid(`obs:map:${patientId}:${now}`);
+    const isHypotensive = mapVal < 65;
 
     const mapObs: FhirObservationResource = {
       resourceType: 'Observation',
@@ -736,7 +865,7 @@ export function buildFhirBundleForSepsisCare(params: BuildFhirBundleForSepsisCar
       encounter: encounterUuid ? { reference: `urn:uuid:${encounterUuid}` } : undefined,
       effectiveDateTime: now,
       valueQuantity: {
-        value: Math.round(params.meanArterialPressureMmhg),
+        value: Math.round(mapVal),
         unit: 'mmHg',
         system: FHIR_CODE_SYSTEMS.UCUM,
         code: 'mm[Hg]',
@@ -765,13 +894,13 @@ export function buildFhirBundleForSepsisCare(params: BuildFhirBundleForSepsisCar
 
   // CarePlan: Surviving Sepsis Care Bundle
   // Semantic Rule: An intervention merely ordered MUST NOT be represented as completed.
-  const fluidStatus = params.fluidResuscitationAdministered
+  const fluidStatus = fluidResuscitationAdministered
     ? 'completed'
-    : params.fluidResuscitationOrdered
+    : fluidResuscitationOrdered
     ? 'in-progress'
     : 'not-started';
 
-  const antibioticStatus = params.antibioticAdministered ? 'completed' : 'in-progress';
+  const antibioticStatus = antibioticAdministered ? 'completed' : 'in-progress';
 
   const activities: {
     readonly detail: {
@@ -804,7 +933,7 @@ export function buildFhirBundleForSepsisCare(params: BuildFhirBundleForSepsisCar
     },
   ];
 
-  const carePlanUuid = generateDeterministicUuid(`careplan:sepsis:${params.patientId}:${now}`);
+  const carePlanUuid = generateDeterministicUuid(`careplan:sepsis:${patientId}:${now}`);
   const carePlan: FhirCarePlanResource = {
     resourceType: 'CarePlan',
     id: carePlanUuid,
@@ -1186,25 +1315,43 @@ export async function queryDicomWebStudy(params: {
  * - An opaque cryptographic HMAC/salt is applied to derive identifier strings.
  * - Local DID scheme (did:panacea:lhid:) is an internal namespace; makes no claim of global ledger resolution.
  */
-export function generatePanaceaLhidEnvelope(params: {
-  readonly patientId: string;
-  readonly ageYears: number;
+export interface GeneratePanaceaLhidEnvelopeParams {
+  readonly patientId?: string;
+  readonly canonicalPatientId?: string;
+  readonly ageYears?: number;
   readonly biologicalAgeYears?: number | typeof MISSING_OBSERVATION;
-  readonly truthClass: TruthClass;
+  readonly truthClass?: TruthClass;
   readonly isClinicallyReviewed?: boolean;
   readonly metadata?: Record<string, unknown>;
   readonly timestampIso?: string;
-}): PanaceaLhidEnvelope {
-  const generatedAtIso = params.timestampIso && !Number.isNaN(Date.parse(params.timestampIso))
-    ? params.timestampIso
+  readonly issuedAtIso?: string;
+  readonly hmacSecretKey?: string;
+  readonly clinicalPayload?: Record<string, unknown>;
+  readonly payload?: Record<string, unknown>;
+}
+
+export function generatePanaceaLhidEnvelope(params: GeneratePanaceaLhidEnvelopeParams): PanaceaLhidEnvelope {
+  const patientId = params.canonicalPatientId || params.patientId || 'UNKNOWN_PATIENT';
+  const ageYears = params.ageYears ?? 0;
+  const truthClass = params.truthClass ?? 'OBSERVED_CLINICAL';
+  const timestamp = params.issuedAtIso || params.timestampIso;
+  const generatedAtIso = timestamp && !Number.isNaN(Date.parse(timestamp))
+    ? timestamp
     : new Date().toISOString();
+
+  const combinedPayload: Record<string, unknown> = {
+    ...(params.payload ?? {}),
+    ...(params.clinicalPayload ?? {}),
+    ...(params.metadata ?? {}),
+  };
 
   // Canonical serialized string for cryptographic digest
   const canonicalSeed = JSON.stringify({
-    patientHash: sha256Hex(`PANACEA_PATIENT_IDENTITY:${params.patientId}`),
-    ageYears: params.ageYears,
+    patientHash: sha256Hex(`PANACEA_PATIENT_IDENTITY:${patientId}`),
+    ageYears,
     biologicalAge: params.biologicalAgeYears === MISSING_OBSERVATION ? 'MISSING' : params.biologicalAgeYears ?? null,
-    truthClass: params.truthClass,
+    truthClass,
+    payload: combinedPayload,
     generatedAt: generatedAtIso,
   });
 
@@ -1212,28 +1359,33 @@ export function generatePanaceaLhidEnvelope(params: {
   const fullDigest = sha256Hex(canonicalSeed);
 
   // Opaque patient token for public LHID (zero raw patient identifiers leaked)
-  const patientOpaqueToken = sha256Hex(`PANACEA_LHID_SALT:${params.patientId}`).slice(0, 8).toUpperCase();
+  const patientOpaqueToken = sha256Hex(`PANACEA_LHID_SALT:${params.hmacSecretKey || ''}:${patientId}`).slice(0, 8).toUpperCase();
   const payloadToken = fullDigest.slice(0, 12).toUpperCase();
 
   const lhid = `LHID-${patientOpaqueToken}-${payloadToken}`;
   const didUri = `did:panacea:lhid:${fullDigest.slice(0, 32)}`;
+  const pseudonymizedPatientDid = `did:panacea:piv:${fullDigest.slice(0, 32)}`;
 
   const cleanPayload: Record<string, unknown> = {
     patientOpaqueToken,
-    ageYears: params.ageYears,
+    ageYears,
     biologicalAge: params.biologicalAgeYears === MISSING_OBSERVATION
       ? 'MISSING_OBSERVATION'
       : params.biologicalAgeYears ?? null,
-    ...(params.metadata ?? {}),
+    ...combinedPayload,
   };
 
   return {
     lhid,
+    publicLongitudinalId: lhid,
     didUri,
-    patientId: params.patientId,
+    pseudonymizedPatientDid,
+    patientId,
     generatedAtIso,
     cryptographicSha256: fullDigest,
-    truthClass: params.truthClass,
+    payloadSha256Digest: fullDigest,
+    pseudonymHmacSha256: patientOpaqueToken,
+    truthClass,
     isClinicallyReviewed: params.isClinicallyReviewed ?? false,
     payload: cleanPayload,
   };

@@ -11,7 +11,7 @@ import {
   type GaitCycleKinematicsInput,
   type GaitSymmetryInput,
   type PathologicalGaitPatternId,
-} from '../../domains/body-exposure'
+} from '../../domains/body-exposure/engine/gaitKinematicsSensoriumEngine.ts'
 
 const MUSCLE_PARTS = WORKOUT_MUSCLE_GROUPS.flatMap((group) =>
   group.nodeNames.map((name) => ({ name, kind: 'muscle', group: group.key })),

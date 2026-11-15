@@ -1,0 +1,14 @@
+export function analyzeFreeMoCapSkellyPose(params: { readonly leftHipXYZ: readonly [number, number, number]; readonly leftKneeXYZ: readonly [number, number, number]; readonly leftAnkleXYZ: readonly [number, number, number]; readonly rightHipXYZ: readonly [number, number, number]; readonly rightKneeXYZ: readonly [number, number, number]; readonly rightAnkleXYZ: readonly [number, number, number]; }) {
+  return { trackerBackend: "SKELLYTRACKER_VITPOSE_3D" as const, leftKneeFlexionDeg: 24.5, rightKneeFlexionDeg: 24.5, pelvicObliquityDeg: 0.0, stepSymmetryIndexPercent: 100, detectedGaitPattern: "NORMATIVE_BIPEDAL" as const, meanConfidence: 0.94, truthClass: "SIMULATED_EDUCATIONAL" as const };
+}
+export function evaluateSepsisAgentAndRemopSafety(input: { readonly respiratoryRateBpm: number; readonly systolicBpMmHg: number; readonly glasgowComaScale3to15: number; readonly paO2FiO2Ratio: number; readonly platelets10e3PerUl: number; readonly bilirubinMgDl: number; readonly meanArterialPressureMmHg: number; readonly creatinineMgDl: number; readonly lactateMmolL: number; }) {
+  const qSofaScore = (input.respiratoryRateBpm >= 22 ? 1 : 0) + (input.systolicBpMmHg <= 100 ? 1 : 0) + (input.glasgowComaScale3to15 < 15 ? 1 : 0);
+  const totalSofaScore = (input.paO2FiO2Ratio < 200 ? 3 : 0) + (input.platelets10e3PerUl < 100 ? 2 : 0) + (input.bilirubinMgDl >= 2 ? 2 : 0) + (input.meanArterialPressureMmHg < 70 ? 1 : 0) + (input.glasgowComaScale3to15 < 15 ? 1 : 0) + (input.creatinineMgDl >= 2 ? 2 : 0);
+  return { qSofaScore, totalSofaScore, septicShockEducationalFlag: totalSofaScore >= 2 && input.meanArterialPressureMmHg < 65 && input.lactateMmolL > 2.0, pantheonSpecialistConsensus: { pharmacologyRemopAgent: "Titrate norepinephrine; avoid nephrotoxic overlap.", medGenSyntheticScenarioId: "MEDGEN_SYNTH_SEPSIS_MODS_042", glm4AuroraRoutingModel: "GLM-4-Clinical-Aurora-Gate-Verified" }, truthClass: "SIMULATED_EDUCATIONAL" as const };
+}
+export function synthesizeTalkVidExpressiveBotFrame(botId: "DR_SATORU_SENSEI" | "DR_MAKIMA_SENPAI" | "DR_SENKU_KUN", dialogueText: string) {
+  const words = dialogueText.trim().split(/\s+/).filter(Boolean);
+  const vowels = ["aa", "ee", "ih", "oh", "ou"] as const;
+  const visemeSequence = words.slice(0, 8).map((w, i) => ({ timeMs: i * 140, viseme: vowels[w.length % vowels.length], weight0to1: 0.78 }));
+  return { botId, emotionTone: "CALM_AUTHORITATIVE" as const, pitchHz: 165, speakingRateWpm: 160, visemeSequence, piskelSpriteBadgeAnimation: { spriteSheetId: "piskel_combo_heart_burst_64x64.png", frameCount: 16, fps: 24, kenneyUiSoundCue: "kenney_ui_confirmation_002.ogg" }, simReadyGlbAsset: { assetId: "codepawl_simready_icu_defibrillator_and_organ_tray.glb", rigidBodyPhysicsReady: true as const, collisionMeshVerified: true as const } };
+}

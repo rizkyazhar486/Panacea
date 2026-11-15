@@ -7,7 +7,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { buangSubtree, penjagaMuatan } from '../../lib/gltfSesudahLepas'
 import { Prosa } from '../../components/ui/Prosa'
 import { FetalMriContext } from './FetalMriContext'
-import { FETAL_PARCEL_COLORS, parseFetalParcelDataset, visibleParcelTriangles, wholeLungOverlap, type FetalParcelDataset } from '../../domains/body-exposure'
+import { FETAL_PARCEL_COLORS, parseFetalParcelDataset, visibleParcelTriangles, wholeLungOverlap, type FetalParcelDataset } from '../../domains/body-exposure/engine/fetalParcelInspection.ts'
 import '../fetalParcelInspector.css'
 
 const BASE = `${import.meta.env.BASE_URL}bodyexposure/dataset-inspection/fetal-parcels/`
@@ -169,8 +169,32 @@ export function FetalParcelInspector() {
   }, [loaded, visible, isolate, selected, section, cut, opacity])
 
   return <main className="fetal-parcel-inspector">
-    <header><Link to="/body-exposure/canonical">← Body Exposure atlas</Link><h1>Fetal segmentation dataset</h1>
+    <header>
+      <nav aria-label="Atlas breadcrumbs" style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 11, marginBottom: 8, flexWrap: 'wrap' }}>
+        <Link to="/body-exposure" style={{ color: '#00BF63', textDecoration: 'none', fontWeight: 700 }}>
+          ← Whole-Body Atlas Home
+        </Link>
+        <span style={{ color: '#64748b' }}>·</span>
+        <Link to="/body-exposure/canonical" style={{ color: '#94a3b8', textDecoration: 'none' }}>
+          Adult Canonical Atlas
+        </Link>
+      </nav>
+      <h1>Fetal segmentation dataset</h1>
       <p>KCL population-average MRI · nine numeric regions · anatomical identities unresolved · clinical review pending.</p>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, margin: '8px 0' }}>
+        <span style={{ fontSize: '10px', fontWeight: 800, padding: '3px 8px', borderRadius: 6, background: 'rgba(56,189,248,0.12)', color: '#38bdf8', border: '1px solid rgba(56,189,248,0.25)' }}>
+          21–38 WEEKS GA POPULATION AVERAGE
+        </span>
+        <span style={{ fontSize: '10px', fontWeight: 800, padding: '3px 8px', borderRadius: 6, background: 'rgba(168,85,247,0.12)', color: '#c084fc', border: '1px solid rgba(168,85,247,0.25)' }}>
+          KCL T2-WEIGHTED MRI (3D NUMERIC VOXELS)
+        </span>
+        <span style={{ fontSize: '10px', fontWeight: 800, padding: '3px 8px', borderRadius: 6, background: 'rgba(16,185,129,0.12)', color: '#34d399', border: '1px solid rgba(16,185,129,0.25)' }}>
+          TRUTH CLASS: ATLAS_REFERENCE_LABEL
+        </span>
+        <span style={{ fontSize: '10px', fontWeight: 800, padding: '3px 8px', borderRadius: 6, background: 'rgba(245,158,11,0.12)', color: '#fbbf24', border: '1px solid rgba(245,158,11,0.25)' }}>
+          CLINICAL REVIEW PENDING · UNRESOLVED LABELS
+        </span>
+      </div>
       <Prosa kelas="fpi-note">Colours distinguish source labels. Display cuts and transparency change the view only. No named lobes are added to the canonical atlas.</Prosa>
     </header>
     {error && <p role="alert">{error}</p>}
@@ -193,7 +217,7 @@ export function FetalParcelInspector() {
         </div>)}</div>
         {region && <article aria-label="Selected region evidence"><h2>Region {region.source_label}</h2>
           {(() => {
-            const nonBg = Object.entries(region.organ_label_overlap_voxels)
+            const nonBg = (Object.entries(region.organ_label_overlap_voxels) as [string, number][])
               .filter(([lbl]) => lbl !== '0')
               .sort((a, b) => b[1] - a[1])
             const topMatch = nonBg[0]
@@ -208,7 +232,7 @@ export function FetalParcelInspector() {
           <dl><dt>Voxel volume</dt><dd>{region.voxel_volume_mm3.toFixed(2)} mm³</dd><dt>Surface volume</dt><dd>{region.surface_volume_mm3.toFixed(2)} mm³</dd>
             <dt>Discretization difference</dt><dd>{(region.mesh_volume_relative_error * 100).toFixed(2)}%</dd><dt>Connected components</dt><dd>{region.components}</dd><dt>Triangles</dt><dd>{region.triangles.toLocaleString()}</dd>
             <dt>Boundary / nonmanifold edges</dt><dd>{region.boundary_edges} / {region.nonmanifold_edges}</dd><dt>Older lung-mask overlap</dt><dd>{(wholeLungOverlap(region) * 100).toFixed(2)}%</dd></dl>
-          <h3>Source mask correspondence</h3><table><thead><tr><th>Older organ label</th><th>Shared voxels</th></tr></thead><tbody>{Object.entries(region.organ_label_overlap_voxels).sort((a,b) => b[1]-a[1]).map(([label, count]) => <tr key={label}><td>{organLabels[label] ?? `Label ${label}`}</td><td>{count.toLocaleString()}</td></tr>)}</tbody></table>
+          <h3>Source mask correspondence</h3><table><thead><tr><th>Older organ label</th><th>Shared voxels</th></tr></thead><tbody>{(Object.entries(region.organ_label_overlap_voxels) as [string, number][]).sort((a,b) => b[1]-a[1]).map(([label, count]) => <tr key={label}><td>{organLabels[label] ?? `Label ${label}`}</td><td>{count.toLocaleString()}</td></tr>)}</tbody></table>
           <p className="fpi-note">Overlap and measured volume differences describe dataset correspondence and mesh extraction. They do not establish anatomical identity or a clinical tolerance.</p>
         </article>}
       </section>

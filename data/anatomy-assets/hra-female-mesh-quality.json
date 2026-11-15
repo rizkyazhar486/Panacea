@@ -1,0 +1,14 @@
+{
+  "sourceId": "HUBMAP_HRA_FEMALE_UNITED_V1_5",
+  "auditedOnIso": "2026-11-03T23:32:00.000Z",
+  "nonManifoldEdgeCount": 0,
+  "degenerateFaceCount": 0,
+  "metricBoundsMeters": {
+    "widthX": 0.48,
+    "heightY": 1.66,
+    "depthZ": 0.27
+  },
+  "externalGenitalSurfaceNodesVerified": true,
+  "coordinateSpaceIsolationVerified": true,
+  "admissionStatus": "ADMITTED_SEPARATE_FEMALE_REFERENCE_SPACE"
+}

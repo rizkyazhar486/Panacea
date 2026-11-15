@@ -1,0 +1,904 @@
+{
+  "generatedOn": "2026-11-04",
+  "totalVerifiedItems": 127,
+  "checklist101": {
+    "A_fmaIdentityAndHonestGapCoverage": true,
+    "B_anatomyProvenanceAndCredits": true,
+    "C_goldenValuesCitedSources": true,
+    "D_frontierClaimsVerdictLabeled": true,
+    "E_engineFailClosedContracts": true,
+    "F_singleSourceEnFirstLocales": true,
+    "G_cssHeadroomOver2000BytesAndDeterministicQa": true
+  },
+  "items": [
+    {
+      "id": "F-01",
+      "track": "FIX",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "F-02",
+      "track": "FIX",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "F-03",
+      "track": "FIX",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "F-04",
+      "track": "FIX",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "F-05",
+      "track": "FIX",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "F-06",
+      "track": "FIX",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "F-07",
+      "track": "FIX",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "F-08",
+      "track": "FIX",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "F-09",
+      "track": "FIX",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "F-10",
+      "track": "FIX",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "F-11",
+      "track": "FIX",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "F-12",
+      "track": "FIX",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "F-13",
+      "track": "FIX",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "F-14",
+      "track": "FIX",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "F-15",
+      "track": "FIX",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "F-16",
+      "track": "FIX",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "F-17",
+      "track": "FIX",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "F-18",
+      "track": "FIX",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "F-19",
+      "track": "FIX",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "F-20",
+      "track": "FIX",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "F-21",
+      "track": "FIX",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "F-22",
+      "track": "FIX",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "F-23",
+      "track": "FIX",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "F-24",
+      "track": "FIX",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "F-25",
+      "track": "FIX",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "S-01",
+      "track": "SOLVE",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "S-02",
+      "track": "SOLVE",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "S-03",
+      "track": "SOLVE",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "S-04",
+      "track": "SOLVE",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "S-05",
+      "track": "SOLVE",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "S-06",
+      "track": "SOLVE",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "S-07",
+      "track": "SOLVE",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "S-08",
+      "track": "SOLVE",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "S-09",
+      "track": "SOLVE",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "S-10",
+      "track": "SOLVE",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "S-11",
+      "track": "SOLVE",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "S-12",
+      "track": "SOLVE",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "S-13",
+      "track": "SOLVE",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "S-14",
+      "track": "SOLVE",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "S-15",
+      "track": "SOLVE",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "S-16",
+      "track": "SOLVE",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "S-17",
+      "track": "SOLVE",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "S-18",
+      "track": "SOLVE",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "S-19",
+      "track": "SOLVE",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "S-20",
+      "track": "SOLVE",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "T-01",
+      "track": "TEMUKAN",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "T-02",
+      "track": "TEMUKAN",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "T-03",
+      "track": "TEMUKAN",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "T-04",
+      "track": "TEMUKAN",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "T-05",
+      "track": "TEMUKAN",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "T-06",
+      "track": "TEMUKAN",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "T-07",
+      "track": "TEMUKAN",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "T-08",
+      "track": "TEMUKAN",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "T-09",
+      "track": "TEMUKAN",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "T-10",
+      "track": "TEMUKAN",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "T-11",
+      "track": "TEMUKAN",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "T-12",
+      "track": "TEMUKAN",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "T-13",
+      "track": "TEMUKAN",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "T-14",
+      "track": "TEMUKAN",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "T-15",
+      "track": "TEMUKAN",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "T-16",
+      "track": "TEMUKAN",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "T-17",
+      "track": "TEMUKAN",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "T-18",
+      "track": "TEMUKAN",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "T-19",
+      "track": "TEMUKAN",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "T-20",
+      "track": "TEMUKAN",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "T-21",
+      "track": "TEMUKAN",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "T-22",
+      "track": "TEMUKAN",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "T-23",
+      "track": "TEMUKAN",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "T-24",
+      "track": "TEMUKAN",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "T-25",
+      "track": "TEMUKAN",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "K-01",
+      "track": "KEMBANGKAN",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "K-02",
+      "track": "KEMBANGKAN",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "K-03",
+      "track": "KEMBANGKAN",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "K-04",
+      "track": "KEMBANGKAN",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "K-05",
+      "track": "KEMBANGKAN",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "K-06",
+      "track": "KEMBANGKAN",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "K-07",
+      "track": "KEMBANGKAN",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "K-08",
+      "track": "KEMBANGKAN",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "K-09",
+      "track": "KEMBANGKAN",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "K-10",
+      "track": "KEMBANGKAN",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "K-11",
+      "track": "KEMBANGKAN",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "K-12",
+      "track": "KEMBANGKAN",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "K-13",
+      "track": "KEMBANGKAN",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "K-14",
+      "track": "KEMBANGKAN",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "K-15",
+      "track": "KEMBANGKAN",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "K-16",
+      "track": "KEMBANGKAN",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "K-17",
+      "track": "KEMBANGKAN",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "K-18",
+      "track": "KEMBANGKAN",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "K-19",
+      "track": "KEMBANGKAN",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "K-20",
+      "track": "KEMBANGKAN",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "E-01",
+      "track": "EXPANSI",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "E-02",
+      "track": "EXPANSI",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "E-03",
+      "track": "EXPANSI",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "E-04",
+      "track": "EXPANSI",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "E-05",
+      "track": "EXPANSI",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "E-06",
+      "track": "EXPANSI",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "E-07",
+      "track": "EXPANSI",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "E-08",
+      "track": "EXPANSI",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "E-09",
+      "track": "EXPANSI",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "E-10",
+      "track": "EXPANSI",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "E-11",
+      "track": "EXPANSI",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "E-12",
+      "track": "EXPANSI",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "E-13",
+      "track": "EXPANSI",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "E-14",
+      "track": "EXPANSI",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "E-15",
+      "track": "EXPANSI",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "V-01",
+      "track": "INNOVATE",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "V-02",
+      "track": "INNOVATE",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "V-03",
+      "track": "INNOVATE",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "V-04",
+      "track": "INNOVATE",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "V-05",
+      "track": "INNOVATE",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "V-06",
+      "track": "INNOVATE",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "V-07",
+      "track": "INNOVATE",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "V-08",
+      "track": "INNOVATE",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "V-09",
+      "track": "INNOVATE",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "V-10",
+      "track": "INNOVATE",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "G-01",
+      "track": "INVENT",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "G-02",
+      "track": "INVENT",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "G-03",
+      "track": "INVENT",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "G-04",
+      "track": "INVENT",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "G-05",
+      "track": "INVENT",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "G-06",
+      "track": "INVENT",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "G-07",
+      "track": "INVENT",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "G-08",
+      "track": "INVENT",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "G-09",
+      "track": "INVENT",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "G-10",
+      "track": "INVENT",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "G-11",
+      "track": "INVENT",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    },
+    {
+      "id": "G-12",
+      "track": "INVENT",
+      "status": "VERIFIED_IN_REPO",
+      "effort": "S",
+      "evidence": "scripts/uji/omnicausalis-full-suite.test.mjs"
+    }
+  ]
+}

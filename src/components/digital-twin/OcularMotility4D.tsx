@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import { HraResolvedAnatomyViewer } from './HraResolvedAnatomyViewer'
 import { HraContextBridge } from './HraContextBridge'
 import { OcularGazeSimulator } from './OcularGazeSimulator'
-import { OculomotorLesionLab } from '../../domains/body-exposure'
+import { OculomotorLesionLab } from '../../domains/body-exposure/ui/OculomotorLesionLab.tsx'
 
 type GazeKey = 'primary' | 'right' | 'left' | 'up' | 'down' | 'up-right' | 'up-left' | 'down-right' | 'down-left'
 type Muscle = { label: string; term: string; ontology: string; nerve: string; principal: string; secondary: string }

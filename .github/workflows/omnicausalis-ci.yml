@@ -1,0 +1,20 @@
+name: PanaceaMed Omnicausalis Zero-Fail CI/CD (Node.js v24)
+
+on:
+  push:
+    branches: [ main, "argon/**" ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  omnicausalis-zero-fail-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      - name: Setup Node.js v24
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24.x"
+      - name: Execute Full 110/110 Omnicausalis Verification Suite
+        run: node --test scripts/uji/omnicausalis-full-suite.test.mjs

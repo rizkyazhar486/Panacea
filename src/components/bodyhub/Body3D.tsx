@@ -3,18 +3,11 @@ import * as THREE from 'three'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
-import {
-  tissueShading,
-  applyBakedAoToLayer,
-  firstPickableIndex,
-  stepTween,
-  viewPose,
-  type CameraPose,
-  type CameraTween,
-  type PickCandidate,
-  type RegionFrame,
-  type Vec3,
-} from '../../domains/body-exposure'
+import { tissueShading } from '../../domains/body-exposure/engine/tissueShading.ts'
+import { applyBakedAoToLayer } from '../../domains/body-exposure/adapters/bakedAoLayer.ts'
+import { stepTween, viewPose, type CameraPose, type CameraTween, type Vec3 } from '../../domains/body-exposure/engine/cameraViews.ts'
+import { firstPickableIndex, type PickCandidate } from '../../domains/body-exposure/engine/atlas-stage/pickPolicy.ts'
+import type { RegionFrame } from '../../domains/body-exposure/engine/atlas-stage/regionFraming.ts'
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js'
 import { keburaman, geserBuka, KEDALAMAN, type KunciLapisan } from '../../lib/dissection'
 import {
@@ -794,7 +787,7 @@ export function Body3D({
             runtimeRootLifecycle.publish(def.file, clone)
             scene.add(clone)
             // AO dihitung dari geometri sumber (sidecar); gagal/tak cocok = tampil tanpa AO.
-            void applyBakedAoToLayer(def.key, clone).then((dipasang) => {
+            void applyBakedAoToLayer(def.key, clone).then((dipasang: boolean) => {
               if (dipasang && groupsRef.current[def.key] === clone) requestRenderRef.current()
             })
             setFailedLayers((s) => { const n = new Set(s); n.delete(def.key); return n })

@@ -7,3 +7,6 @@ export function namaBagianAtlas(mentah: string): string {
   else if (/\.r$/i.test(n)) n = `${n.slice(0, -2)} (right)`
   return n.charAt(0).toUpperCase() + n.slice(1)
 }
+
+export const atlasRegionNames = namaBagianAtlas
+

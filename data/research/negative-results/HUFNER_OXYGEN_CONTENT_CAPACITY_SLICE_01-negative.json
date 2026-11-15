@@ -1,0 +1,6 @@
+{
+  "sliceId": "HUFNER_OXYGEN_CONTENT_CAPACITY_SLICE_01",
+  "preregSha256": "bfe8e0debb5a1e1887e0fe4bd67c2c570ececd9e160d0715a92ea8af693b8803",
+  "observedMetricValue": 12.5,
+  "verdict": "NOT-SUPPORTED"
+}

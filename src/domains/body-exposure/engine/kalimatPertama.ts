@@ -11,3 +11,6 @@ export function kalimatPertama(teks: string): string {
   if (kalimat.length <= 220) return kalimat
   return `${kalimat.slice(0, 219)}…`
 }
+
+export const firstSentence = kalimatPertama
+
