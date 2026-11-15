@@ -18,7 +18,12 @@ export function evidenceLine(row: Pick<SystemIndexRow, 'fidelity' | 'mechanismCo
   return row.mechanismCount === 0 && row.gapCount === 0 ? 'Context only · no physiology model of its own yet' : `Context only · ${line}`
 }
 
-export function SystemIndex({ rows, onOpen }: { rows: readonly SystemIndexRow[]; onOpen: (id: BodySystemId) => void }) {
+/** The row's self-check reminder, or null when nothing of this system is due. */
+export function dueLabel(due: number | undefined): string | null {
+  return due !== undefined && Number.isInteger(due) && due > 0 ? `${due} to review` : null
+}
+
+export function SystemIndex({ rows, onOpen, due = new Map() }: { rows: readonly SystemIndexRow[]; onOpen: (id: BodySystemId) => void; due?: ReadonlyMap<BodySystemId, number> }) {
   return (
     <section aria-labelledby="system-index-title" style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
       <div>
@@ -26,27 +31,31 @@ export function SystemIndex({ rows, onOpen }: { rows: readonly SystemIndexRow[];
         <p style={paragraph}>What each organ system does, how it works with the others, and the sources behind it.</p>
       </div>
       <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 6 }}>
-        {rows.map((row) => (
-          <li key={row.id}>
-            <button
-              id={systemRowId(row.id)}
-              type="button"
-              onClick={() => onOpen(row.id)}
-              className="as-focus as-hover as-fade"
-              style={{
-                width: '100%', minHeight: 56, padding: '9px 12px', display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) auto', alignItems: 'center', gap: 10,
-                border: `1px solid ${TONE.line}`, borderRadius: 14, background: TONE.raised, color: TONE.text, textAlign: 'left', cursor: 'pointer',
-              }}
-            >
-              <span style={{ minWidth: 0 }}>
-                <span style={{ display: 'block', fontSize: 14, fontWeight: 800 }}>{row.label}</span>
-                <span style={{ display: 'block', marginTop: 2, fontSize: 12, lineHeight: 1.4, color: TONE.dim, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{row.role}</span>
-                <span style={{ display: 'block', marginTop: 3, fontSize: 11, fontWeight: 700, color: row.sourced ? TONE.liveText : TONE.faint }}>{evidenceLine(row)}</span>
-              </span>
-              <span aria-hidden style={{ color: TONE.faint, fontSize: 18, lineHeight: 1 }}>›</span>
-            </button>
-          </li>
-        ))}
+        {rows.map((row) => {
+          const review = dueLabel(due.get(row.id))
+          return (
+            <li key={row.id}>
+              <button
+                id={systemRowId(row.id)}
+                type="button"
+                onClick={() => onOpen(row.id)}
+                className="as-focus as-hover as-fade"
+                style={{
+                  width: '100%', minHeight: 56, padding: '9px 12px', display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) auto', alignItems: 'center', gap: 10,
+                  border: `1px solid ${TONE.line}`, borderRadius: 14, background: TONE.raised, color: TONE.text, textAlign: 'left', cursor: 'pointer',
+                }}
+              >
+                <span style={{ minWidth: 0 }}>
+                  <span style={{ display: 'block', fontSize: 14, fontWeight: 800 }}>{row.label}</span>
+                  <span style={{ display: 'block', marginTop: 2, fontSize: 12, lineHeight: 1.4, color: TONE.dim, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{row.role}</span>
+                  <span style={{ display: 'block', marginTop: 3, fontSize: 11, fontWeight: 700, color: row.sourced ? TONE.liveText : TONE.faint }}>{evidenceLine(row)}</span>
+                  {review && <span style={{ display: 'block', marginTop: 3, fontSize: 11, fontWeight: 800, color: TONE.sim }}>Self-check · {review}</span>}
+                </span>
+                <span aria-hidden style={{ color: TONE.faint, fontSize: 18, lineHeight: 1 }}>›</span>
+              </button>
+            </li>
+          )
+        })}
       </ul>
     </section>
   )

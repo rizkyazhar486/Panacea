@@ -6,9 +6,12 @@ import type { ReactNode } from 'react'
 import type { BodySystemId } from '../../data/bodySystems'
 import type { SystemPhysiologyView } from '../../engine/system-physiology/systemPhysiology'
 import type { StageSimulation } from '../../engine/system-physiology/systemSimulations'
-import type { PhysiologyCitation, PhysiologyMechanism } from '../../engine/system-physiology/physiologySources'
+import type { PhysiologyMechanism } from '../../engine/system-physiology/physiologySources'
 import { Note, Tag } from '../atlas-stage/StagePieces'
 import { TONE, TOUCH, eyebrow, paragraph, primaryButton, subtleButton } from '../atlas-stage/stageTokens'
+import { MechanismBody } from './MechanismBody'
+import { persistenceLine, selfCheckAction, selfCheckStatus, type RecallPersistence } from './SelfCheck'
+import type { RecallDeckPlan } from '../../../prometheus-learning/index.ts'
 
 const FIDELITY_LABEL: Record<SystemPhysiologyView['fidelity'], string> = {
   direct: 'Direct physiology',
@@ -28,12 +31,7 @@ function Section({ title, color = TONE.ref, children }: { title: string; color?:
   )
 }
 
-export function citationLabel(citation: PhysiologyCitation): string {
-  return citation.kind === 'pubmed' ? `PubMed ${citation.id}` : `NCBI Bookshelf ${citation.id}`
-}
-
 function Mechanism({ mechanism, labels, current }: { mechanism: PhysiologyMechanism; labels: ReadonlyMap<BodySystemId, string>; current: BodySystemId }) {
-  const sharedWith = mechanism.systems.filter((id) => id !== current).map((id) => labels.get(id) ?? id)
   return (
     <details style={disclosure}>
       <summary className="as-focus" style={summaryRow}>
@@ -44,24 +42,20 @@ function Mechanism({ mechanism, labels, current }: { mechanism: PhysiologyMechan
         <span style={{ flex: 'none', color: TONE.liveText, fontSize: 11, fontWeight: 800 }}>{mechanism.citations.length} source{mechanism.citations.length === 1 ? '' : 's'}</span>
       </summary>
       <div style={{ padding: '0 12px 12px', display: 'flex', flexDirection: 'column', gap: 8 }}>
-        {sharedWith.length > 0 && <div style={{ fontSize: 11, fontWeight: 700, color: TONE.ref }}>Shared with {sharedWith.join(', ')}</div>}
-        {mechanism.summary.length > 0 && (
-          <ul style={{ margin: 0, paddingLeft: 18, display: 'flex', flexDirection: 'column', gap: 4, fontSize: 12.5, lineHeight: 1.5, color: TONE.dim }}>
-            {mechanism.summary.map((line) => <li key={line}>{line}</li>)}
-          </ul>
-        )}
-        <ul aria-label={`Sources for ${mechanism.label}`} style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 6 }}>
-          {mechanism.citations.map((citation) => (
-            <li key={`${citation.kind}-${citation.id}`} style={{ fontSize: 12, lineHeight: 1.45, color: TONE.dim }}>
-              <a href={citation.url} target="_blank" rel="noopener noreferrer" className="as-focus" style={{ color: TONE.ref, fontWeight: 800 }}>{citationLabel(citation)}</a>
-              <span> — {citation.note}</span>
-            </li>
-          ))}
-        </ul>
-        <Note color={TONE.ref}>{mechanism.boundary}</Note>
+        <MechanismBody mechanism={mechanism} labels={labels} current={current} />
       </div>
     </details>
   )
+}
+
+/** Where this system's self-check stands, from the explorer. */
+export interface SelfCheckEntry {
+  plan: RecallDeckPlan
+  day: number | null
+  persistence: RecallPersistence
+  /** Why ratings saved earlier could not be read back, when that happened. */
+  notice: string | null
+  onStart: () => void
 }
 
 export interface SystemCardProps {
@@ -71,9 +65,14 @@ export interface SystemCardProps {
   onBack: () => void
   onSystem: (id: BodySystemId) => void
   onSimulate: (simulation: StageSimulation) => void
+  /** Absent, or ignored for a system without sourced mechanisms: there is nothing to recall. */
+  selfCheck?: SelfCheckEntry
 }
 
-export function SystemCard({ view, simulations, labels, onBack, onSystem, onSimulate }: SystemCardProps) {
+export const selfCheckStartId = (id: BodySystemId) => `self-check-start-${id}`
+
+export function SystemCard({ view, simulations, labels, onBack, onSystem, onSimulate, selfCheck }: SystemCardProps) {
+  const action = selfCheck ? selfCheckAction(selfCheck.plan) : null
   const titleId = `system-card-${view.id}`
   return (
     <article aria-labelledby={titleId} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
@@ -138,6 +137,19 @@ export function SystemCard({ view, simulations, labels, onBack, onSystem, onSimu
           view.mechanisms.map((mechanism) => <Mechanism key={mechanism.id} mechanism={mechanism} labels={labels} current={view.id} />)
         )}
       </Section>
+
+      {selfCheck && view.mechanisms.length > 0 && (
+        <Section title="Self-check" color={TONE.liveText}>
+          <p style={{ ...paragraph, margin: 0, color: TONE.text }}>{selfCheckStatus(selfCheck.plan, selfCheck.day)}</p>
+          {action && (
+            <button id={selfCheckStartId(view.id)} type="button" onClick={selfCheck.onStart} className="as-focus as-hover as-fade" style={{ ...subtleButton, width: '100%', color: TONE.liveText }}>
+              {action}
+            </button>
+          )}
+          {selfCheck.notice && <Note color={TONE.sim}>{selfCheck.notice}</Note>}
+          <div style={{ fontSize: 11.5, lineHeight: 1.45, color: TONE.faint }}>{persistenceLine(selfCheck.persistence)}</div>
+        </Section>
+      )}
 
       {view.organGaps.length > 0 && (
         <Section title={`Not yet sourced · ${view.organGaps.length}`} color={TONE.faint}>

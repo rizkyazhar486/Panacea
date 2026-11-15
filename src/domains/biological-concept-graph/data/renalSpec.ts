@@ -16,7 +16,9 @@ const KIDNEY3D: VisualizationBinding = { representation: 'anatomical_3d', assetK
 
 const OS = ['ref:openstax-ap2e-renal'], GUYTON = ['ref:guyton-renal-14e'], BOTH = ['ref:openstax-ap2e-renal', 'ref:guyton-renal-14e']
 
-const n = (x: Omit<ConceptNode, 'learningObjectives'> & { learningObjectives?: readonly string[] }): ConceptNode => ({ learningObjectives: [], ...x })
+// Pure: builds a node and touches nothing else. Without the annotation Rollup keeps the whole spec (the spread reads its
+// argument) in every bundle that imports this domain's index, used or not.
+const n = /* @__NO_SIDE_EFFECTS__ */ (x: Omit<ConceptNode, 'learningObjectives'> & { learningObjectives?: readonly string[] }): ConceptNode => ({ learningObjectives: [], ...x })
 
 const NODES: ConceptNode[] = [
   n({ id: 'pcg:human_body', label: 'Human body', scale: 'whole_body', parentId: null, definition: 'The whole organism, root of the anatomical hierarchy.', referenceIds: OS, visualization: { representation: 'anatomical_3d', assetKey: 'adult_male.surface', spatialPrecision: 'organ_level' } }),
