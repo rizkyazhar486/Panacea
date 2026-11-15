@@ -5,6 +5,9 @@ import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.j
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { tissueShading } from '../../domains/body-exposure/engine/tissueShading.ts'
 import { applyBakedAoToLayer } from '../../domains/body-exposure/adapters/bakedAoLayer.ts'
+import { stepTween, viewPose, type CameraPose, type CameraTween, type Vec3 } from '../../domains/body-exposure/engine/cameraViews.ts'
+import { firstPickableIndex, type PickCandidate } from '../../domains/body-exposure/engine/atlas-stage/pickPolicy.ts'
+import type { RegionFrame } from '../../domains/body-exposure/engine/atlas-stage/regionFraming.ts'
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js'
 import { keburaman, geserBuka, KEDALAMAN, type KunciLapisan } from '../../lib/dissection'
 import {

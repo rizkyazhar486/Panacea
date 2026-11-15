@@ -77,3 +77,5 @@ export * from "./clinical-operations/specialty/otorhinolaryngologyAudiometryAndV
 export * from "./clinical-operations/specialty/rheumatologyLupusSledai2kAndBiologicsEngine.ts";
 export * from "./personal-health/engine/hyperbaricDivePhysiologyAndBarotraumaEngine.ts";
 export * from "./one-os/omnicausalisHttpGatewayAndLiveCockpitServer.ts";
+export * from './omnicausalis/model/types.ts';
+export * from './omnicausalis/engine/omnicausalisEngine.ts';

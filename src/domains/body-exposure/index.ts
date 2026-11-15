@@ -105,7 +105,10 @@ export {
 // @internal studio decks (KaloLumenVolumetricStudio, ReferredPainDermatomeStudio,
 // CardiopulmonaryCouplingDeck, SoftTissueBiomechanicsDeck, FiveStageVisualAtlas,
 // OrganBiometricOverlayCard) are reachable from BodyExposureAtlasHome depth panels,
-// and are intentionally excluded from the domain public API.
+// and are intentionally excluded from the domain public API under those names.
+// The one exception is the radiology MPR studio, offered to other domains under its
+// descriptive name (below) and only as a lazy component.
+export { DiagnosticImagingVolumetricStudio } from "./ui/diagnosticImagingStudioEntry.ts";
 export {
   BodyExposureAtlasHome,
   PRIMARY_VIEWPORT_CONTROLS,

@@ -6,7 +6,10 @@
 
 import { useMemo } from 'react'
 import { Body3D, CT_WINDOWS, MOTION_OFF, type AnatomyLayer } from '../components/bodyhub/Body3D'
-import { BodyExposureAtlasHome, type AtlasCameraCommand, type AtlasViewerProps } from '../domains/body-exposure'
+// The stage component is React (.tsx); the domain index stays importable from plain Node, so it is reached here
+// directly, as src/app may (only domain-to-domain imports must go through an index).
+import { BodyExposureAtlasHome } from '../domains/body-exposure/ui/BodyExposureAtlasHome.tsx'
+import type { AtlasCameraCommand, AtlasViewerProps } from '../domains/body-exposure/engine/atlas-stage/viewerContract.ts'
 
 /** The stage fills the box the home gives it; these utilities already exist in the compiled CSS. */
 const STAGE_CLASS = 'relative h-full w-full overflow-hidden'

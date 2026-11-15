@@ -47,6 +47,11 @@ test("Body-Exposure Public API Surface: grouped headers, zero duplicate exports,
     assert.equal(Object.prototype.hasOwnProperty.call(bxApi, studio), false, studio + " must remain @internal");
   }
 
+  // The radiology MPR studio is offered only as a lazy component: the build runs these QA tests in plain Node
+  // before Vite, and Node cannot load a .tsx module, so the index must never re-export one statically.
+  assert.doesNotMatch(indexText, /from\s+["'][^"']+\.tsx["']/, "index.ts must not re-export a .tsx module");
+  assert.equal(bxApi.DiagnosticImagingVolumetricStudio?.$$typeof, Symbol.for("react.lazy"));
+
   // Verify canonical exports exist
   assert.equal(typeof bxApi.BodyExposureAtlasHome, "function");
   assert.equal(typeof bxApi.evaluateAHA17PerfusionBurden, "function");
