@@ -139,7 +139,10 @@ export function evaluateWave201To210LaypersonEverydayHealthHelper(payload = {}) 
       safeChildParacetamolDoseMg,
       oralitPerLooseStoolMl,
       firstAidStepByStep: Object.freeze(firstAidStepByStep)
-    })
+    }),
+    truthClass: 'DERIVED_BIOPHYSICAL',
+    clinicallyReviewed: false,
+    requiresHumanPhysicianSignoff: true
   });
 }
 
@@ -214,7 +217,10 @@ export function evaluateWave211To220FamilyGrowthAndWorkdayErgonomics(payload = {
         needsUltradianMicrobreak && techNeckStrainDetected
           ? 'Anda telah bekerja 95 menit nonstop dengan kemiringan leher 32°: istirahatkan mata 20 detik menatap jauh (6 meter), tegakkan bahu, dan minum 250 mL air putih.'
           : 'Postur dan ritme fokus kerja optimal.'
-    })
+    }),
+    truthClass: 'DERIVED_BIOPHYSICAL',
+    clinicallyReviewed: false,
+    requiresHumanPhysicianSignoff: true
   });
 }
 
@@ -277,6 +283,8 @@ export function evaluateWave221To230ClinicianWorkAutomator(payload = {}) {
       estimatedAdminTimeSavedMinutes: 18
     }),
     familyPlainBriefing,
+    truthClass: 'DERIVED_BIOPHYSICAL',
+    clinicallyReviewed: false,
     requiresHumanPhysicianSignoff: true
   });
 }
@@ -313,7 +321,10 @@ export function evaluateWave231To240AdaptiveLiteracyChameleon(payload = {}) {
     tierSupported: HUMAN_LITERACY_TIERS.includes(requestedTier),
     totalTiersAvailable: HUMAN_LITERACY_TIERS.length,
     selectedExplanation,
-    allTierExplanations: explanationsByTier
+    allTierExplanations: explanationsByTier,
+    truthClass: 'DERIVED_BIOPHYSICAL',
+    clinicallyReviewed: false,
+    requiresHumanPhysicianSignoff: true
   });
 }
 
@@ -370,6 +381,9 @@ export function runPanaceaMedWave250UniversalHumanityMasterOs(payload = {}) {
     wave220FamilyWork,
     wave230ClinicianAuto,
     wave240Chameleon,
+    truthClass: 'DERIVED_BIOPHYSICAL',
+    clinicallyReviewed: false,
+    requiresHumanPhysicianSignoff: true,
     universalSha256Seal
   });
 }
