@@ -1,6 +1,7 @@
 import { Wordmark } from '../../../components/Logo'
 import { IconShield, IconSun, IconMoon } from '../../../components/icons'
 import type { Theme } from '../../../lib/theme'
+import { alignWhenScrollStops } from '../components/alignWhenScrollStops'
 
 interface LandingHeaderProps {
   theme: Theme
@@ -9,7 +10,11 @@ interface LandingHeaderProps {
 }
 
 export function scrollToSection(id: string) {
-  document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
+  const target = document.getElementById(id)
+  if (!target) return
+  target.scrollIntoView({ behavior: 'smooth' })
+  // The blocks this scroll passes render on the way and can change height: re-align once it stops.
+  alignWhenScrollStops(target)
 }
 
 export function LandingHeader({ theme, onToggleTheme, onMasuk }: LandingHeaderProps) {

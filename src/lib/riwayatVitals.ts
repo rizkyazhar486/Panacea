@@ -1,4 +1,4 @@
-import { getVitals, type Vitals } from './healthVitals'
+import type { Vitals } from './healthVitals'
 import { allowsPersonalHealthStorageScope, type PersonalHealthStorageScope } from '../shared/kernel/personalHealthStorageScope.ts'
 import { readPersonalHealthStorageScope } from '../domains/personal-health/index.ts'
 
@@ -39,7 +39,7 @@ import { readPersonalHealthStorageScope } from '../domains/personal-health/index
 const KUNCI = 'pmd_riwayat_vitals_v1'
 const MAKS_HARI = 180
 
-/** Satu hari, satu potret. Nilai terakhir pada hari itu yang disimpan. */
+/** Satu hari: bacaan yang tiba pada hari itu, nilai terakhir per sinyal. Sinyal yang tidak tiba hari itu tidak ada di baris ini. */
 export interface HariVitals {
   tanggal: string
   nilai: Record<string, number>
@@ -104,7 +104,14 @@ export function ambilRiwayat(): HariVitals[] {
 }
 
 /**
- * Catat potret hari ini.
+ * Catat bacaan yang baru tiba ke baris hari ini.
+ *
+ * `v` adalah nilai yang tiba pada satu penyaluran, BUKAN potret gabungan:
+ * potret gabungan membawa nilai terakhir setiap sinyal, sehingga pada hari
+ * yang hanya menyalurkan sebagian sinyal, sinyal lain tercatat ulang seolah
+ * diukur lagi (satu bacaan tekanan darah menjadi "14 bacaan terakhir", rentang
+ * pribadi menyempit oleh salinan). Bacaan hari ini yang sudah ada tetap ada;
+ * sinyal yang sama diganti oleh nilai yang lebih baru.
  *
  * SATU BARIS PER HARI, bukan satu baris per penyaluran data. Jam tangan
  * menyalurkan data berkali-kali sehari, dan menyimpan tiap penyaluran akan
@@ -115,7 +122,7 @@ export function ambilRiwayat(): HariVitals[] {
  * Dipanggil dari mergeVitals, sehingga tidak ada jalan masuk data yang lolos
  * tanpa tercatat.
  */
-export function catatRiwayat(v: Vitals = getVitals()): void {
+export function catatRiwayat(v: Vitals): void {
   const scope = readPersonalHealthStorageScope()
   // The deferred mergeVitals callback carries its original owner, not the new session.
   if (!allowsPersonalHealthStorageScope(scope) || !matchesHistoryOwner(v, scope)) return
@@ -127,8 +134,10 @@ export function catatRiwayat(v: Vitals = getVitals()): void {
   if (!Object.keys(angka).length) return
 
   const hariIni = kunciTanggalLokal()
-  const riwayat = ambilRiwayat().filter((h) => h.tanggal !== hariIni)
-  riwayat.push({ tanggal: hariIni, nilai: angka })
+  const sebelumnya = ambilRiwayat()
+  const barisHariIni = sebelumnya.find((h) => h.tanggal === hariIni)
+  const riwayat = sebelumnya.filter((h) => h.tanggal !== hariIni)
+  riwayat.push({ tanggal: hariIni, nilai: { ...(barisHariIni?.nilai ?? {}), ...angka } })
   riwayat.sort((a, b) => (a.tanggal < b.tanggal ? -1 : 1))
 
   const penuh = riwayat.slice(-MAKS_HARI)

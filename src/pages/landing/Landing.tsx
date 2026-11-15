@@ -16,6 +16,7 @@ import {
   LandingCtaSection,
   LandingFooter,
 } from './sections'
+import { RenderWhenNear } from './components/RenderWhenNear'
 
 // Re-export VideoSaatTerlihat for consumers & historical contracts
 export { VideoSaatTerlihat }
@@ -100,31 +101,33 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
       <HeroSection onMasuk={onMasuk} />
 
       {/* ── [3] SCROLL-CINEMATIC OVERTURE & BRAND FILMS ───────────── */}
+      {/* Everything below the hero starts off-screen: each block renders when it nears the viewport.
+          Estimates are the blocks' measured heights at 390 px (phone) and 1440 px (desktop). */}
       <ScrollCinematicStyles />
-      <ScrollCinematic />
-      <BrandFilmsSection />
+      <RenderWhenNear phone={1144} desktop={1117}><ScrollCinematic /></RenderWhenNear>
+      <RenderWhenNear phone={539} desktop={410}><BrandFilmsSection /></RenderWhenNear>
 
       {/* ── [4] KAPABILITAS PLATFORM (BENTO GRID) ─────────────────── */}
-      <FeaturesSection onMasuk={onMasuk} />
+      <RenderWhenNear phone={3373} desktop={1696}><FeaturesSection onMasuk={onMasuk} /></RenderWhenNear>
 
       {/* ── [5] PROFIL PENGGUNA & TATA KELOLA PERAN ───────────────── */}
-      <RolesSection onMasuk={onMasuk} />
+      <RenderWhenNear phone={2136} desktop={978}><RolesSection onMasuk={onMasuk} /></RenderWhenNear>
 
       {/* ── [6] TARIF & LAYANAN BERLANGGANAN ──────────────────────── */}
-      <PricingSection onMasuk={onMasuk} promo={promo} />
+      <RenderWhenNear phone={3273} desktop={1816}><PricingSection onMasuk={onMasuk} promo={promo} /></RenderWhenNear>
 
       {/* ── [7] INTELIJEN & WAWASAN TERKINI ───────────────────────── */}
-      <NewsSection />
+      <RenderWhenNear phone={3056} desktop={1582}><NewsSection /></RenderWhenNear>
 
       {/* ── [8] EKSPEDISI SAINS & LONGEVITY ODYSSEY ───────────────── */}
-      <ScienceOdysseySection />
+      <RenderWhenNear phone={1984} desktop={1661}><ScienceOdysseySection /></RenderWhenNear>
 
       {/* ── [9] TATA KELOLA INSTITUSIONAL & KONTAK ────────────────── */}
-      <GovernanceSection />
+      <RenderWhenNear phone={1154} desktop={517}><GovernanceSection /></RenderWhenNear>
 
       {/* ── [10] CALL TO ACTION & FOOTER ──────────────────────────── */}
-      <LandingCtaSection onMasuk={onMasuk} />
-      <LandingFooter />
+      <RenderWhenNear phone={664} desktop={520}><LandingCtaSection onMasuk={onMasuk} /></RenderWhenNear>
+      <RenderWhenNear phone={970} desktop={362}><LandingFooter /></RenderWhenNear>
     </div>
   )
 }

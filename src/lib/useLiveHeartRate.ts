@@ -22,6 +22,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useVitals } from './useVitals'
+import { parseHeartRateMeasurement as parseGattHeartRate } from '../domains/devices/index.ts'
 
 export type HrSource = 'ble' | 'device' | 'manual' | 'none'
 export type BleStatus = 'idle' | 'connecting' | 'connected' | 'unsupported' | 'error'
@@ -51,11 +52,13 @@ export interface LiveHeartRate {
 const HR_SERVICE = 'heart_rate'
 const HR_CHAR = 'heart_rate_measurement'
 
-/** Parse a GATT Heart Rate Measurement value (spec 0x2A37). */
+/**
+ * Parse a GATT Heart Rate Measurement value (spec 0x2A37) with the devices domain parser — the one place the
+ * layout is read. 0 when the packet is not a reading (malformed, or a rate of 0 sent while off the skin).
+ */
 export function parseHeartRateMeasurement(dv: DataView): number {
-  const flags = dv.getUint8(0)
-  // Bit 0 selects the bpm width: 0 = uint8, 1 = uint16 little-endian.
-  return flags & 0x1 ? dv.getUint16(1, true) : dv.getUint8(1)
+  const parsed = parseGattHeartRate(new Uint8Array(dv.buffer, dv.byteOffset, dv.byteLength))
+  return parsed.ok ? parsed.reading.bpm : 0
 }
 
 export function useLiveHeartRate(): LiveHeartRate {

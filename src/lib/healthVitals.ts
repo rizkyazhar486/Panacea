@@ -183,9 +183,14 @@ export function mergeVitals(patch: Vitals): Vitals {
    * dan riwayat yang berlubang menghasilkan rentang pribadi yang keliru tanpa
    * ada yang menyadarinya.
    *
+   * Yang dicatat hanya angka yang tiba pada penyaluran ini (`clean`), bukan
+   * potret `next`: potret membawa nilai terakhir sinyal yang tidak tersalur
+   * hari ini, dan menyalinnya ke riwayat membuatnya terbaca sebagai bacaan baru.
+   *
    * Impor dinamis supaya berkas ini tidak saling mengimpor dengan riwayatVitals.
    */
-  import('./riwayatVitals').then((m) => m.catatRiwayat(next)).catch(() => { /* abaikan */ })
+  const arrived: Vitals = { ...clean, subjectId, ownerAccountId }
+  import('./riwayatVitals').then((m) => m.catatRiwayat(arrived)).catch(() => { /* abaikan */ })
   broadcastHealthUpdate()
   return next
 }
