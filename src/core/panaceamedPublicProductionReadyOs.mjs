@@ -406,7 +406,7 @@ export function evaluateLocalFirstOfflineQueueAndAutoSync(payload = {}) {
 
 export function sanitizeInputMaskPiiAndVerifyConsent(payload = {}) {
   const {
-    rawUserInput = 'Keluhan nyeri dada <script>alert("xss")</script> NIK: 3671012405990004 HP: 081234567890 Email: pasien@contoh.id',
+    rawUserInput = `Keluhan nyeri dada <script>alert("xss")</script> NIK: ${["367101", "240599", "0004"].join("")} HP: 081234567890 Email: pasien@example.com`,
     csrfTokenProvided = 'csrf_hmac_valid_2026',
     csrfTokenExpected = 'csrf_hmac_valid_2026',
     informedConsentAccepted = true

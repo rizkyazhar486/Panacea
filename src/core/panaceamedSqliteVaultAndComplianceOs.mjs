@@ -193,7 +193,7 @@ export function evaluateWave181To185SqliteEncryptedEdgeVault(payload = {}) {
 
 export function evaluateWave186To190PrivacyExportAndCryptoShredding(payload = {}) {
   const {
-    rawIdentityEmail = 'kelvin.elim@panaceamed.id',
+    rawIdentityEmail = 'kelvin.elim@example.com',
     organizationSalt = 'panaceamed-sovereign-salt-2026',
     exportTarget = 'CLOUD_SYNC_EXPORT', // atau 'ON_DEVICE_LOCAL_EXPORT'
     executeRightToErasureShredding = true

@@ -1,3 +1,4 @@
+import { runPanaceaMedWave250UniversalHumanityMasterOs } from '../src/core/panaceamedUniversalHumanityOs.mjs';
 import { evaluateSmartClinicalOmniboxAndCdss, runProductionDeploymentReadinessAndSmokeTest } from "../src/core/panaceamedPublicProductionReadyOs.mjs";
 import { runPanaceaMedWave200BicentennialMasterOs } from '../src/core/panaceamedSqliteVaultAndComplianceOs.mjs';
 import { runPanaceaMedWave160ImaginativeSingularityMaster } from '../src/core/panaceamedImaginativeSingularityOs.mjs';
@@ -66,6 +67,13 @@ const server = http.createServer((req, res) => {
     const omnibox = evaluateSmartClinicalOmniboxAndCdss();
     res.writeHead(200, { 'content-type': 'application/json; charset=utf-8' });
     res.end(JSON.stringify(omnibox, null, 2));
+    return;
+  }
+
+  if (req.method === 'GET' && urlPath === '/api/v8/universal/humanity') {
+    const universal = runPanaceaMedWave250UniversalHumanityMasterOs();
+    res.writeHead(200, { 'content-type': 'application/json; charset=utf-8' });
+    res.end(JSON.stringify(universal, null, 2));
     return;
   }
 
