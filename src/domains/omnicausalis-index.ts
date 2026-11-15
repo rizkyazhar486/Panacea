@@ -37,7 +37,6 @@ export * from "./personal-health/engine/gpsPaceCalorieAndFoodAiEngine.ts";
 export * from "./personal-health/engine/yourBodyHealthspanAndReclubPassEngine.ts";
 export * from "./personal-health/engine/correctSportsScienceAcwrEngine.ts";
 export * from "./clinical-operations/model/downstreamHilirisasiFhirPacsBridge.ts";
-export * from "./clinical-operations/model/fhirR4SepsisCareBundle.ts";
 export * from "./clinical-operations/model/sepsisOneHourBundleCds.ts";
 export * from "./clinical-operations/model/clinicalOneOsAndDicomWebOrchestrator.ts";
 export * from "./clinical-operations/model/longitudinalPersistenceInvariantsEngine.ts";

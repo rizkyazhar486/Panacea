@@ -10,7 +10,9 @@ import {
 } from '../../lib/wholeBodyPhysiologyOS'
 import { PHYSIOLOGY_DEEP_DIVES } from '../../lib/physiologyDeepDives'
 import { humanPhysiologyCoverageSnapshot } from '../../lib/humanPhysiologyCoverage'
-import { CardiopulmonaryCouplingDeck, SoftTissueBiomechanicsDeck, NeuroFascicularReflexDeck } from '../../domains/body-exposure'
+import { CardiopulmonaryCouplingDeck } from '../../domains/body-exposure/ui/CardiopulmonaryCouplingDeck.tsx'
+import { SoftTissueBiomechanicsDeck } from '../../domains/body-exposure/ui/SoftTissueBiomechanicsDeck.tsx'
+import { NeuroFascicularReflexDeck } from '../../domains/body-exposure/ui/NeuroFascicularReflexDeck.tsx'
 
 const SIGNAL_LABELS = {
   oxygenDemand: 'O₂ demand',

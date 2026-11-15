@@ -36,7 +36,7 @@ const PusatGizi = lazy(() => import('./pages/bodyhub/PusatGizi').then((m) => ({ 
 const ClinicalScores = lazy(() => import('./pages/ClinicalScores').then((m) => ({ default: m.ClinicalScores })))
 const Translator = lazy(() => import('./pages/clinical/Translator').then((m) => ({ default: m.Translator })))
 const BodyExplorer = lazy(() => import('./pages/bodyhub/BodyExplorer').then((m) => ({ default: m.BodyExplorer })))
-const BodyExposureAtlasHome = lazy(() => import('./domains/body-exposure').then((m) => ({ default: m.BodyExposureAtlasHome })))
+const BodyExposureAtlasHome = lazy(() => import('./domains/body-exposure/ui/BodyExposureAtlasHome.tsx').then((m) => ({ default: m.BodyExposureAtlasHome })))
 const CanonicalBody = lazy(() => import('./pages/bodyhub/CanonicalBody').then((m) => ({ default: m.CanonicalBody })))
 const FetalParcelInspector = lazy(() => import('./pages/bodyhub/FetalParcelInspector').then((m) => ({ default: m.FetalParcelInspector })))
 const Radiology = lazy(() => import('./pages/Radiology').then((m) => ({ default: m.Radiology })))

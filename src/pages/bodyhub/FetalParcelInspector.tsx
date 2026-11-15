@@ -7,7 +7,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { buangSubtree, penjagaMuatan } from '../../lib/gltfSesudahLepas'
 import { Prosa } from '../../components/ui/Prosa'
 import { FetalMriContext } from './FetalMriContext'
-import { FETAL_PARCEL_COLORS, parseFetalParcelDataset, visibleParcelTriangles, wholeLungOverlap, type FetalParcelDataset } from '../../domains/body-exposure'
+import { FETAL_PARCEL_COLORS, parseFetalParcelDataset, visibleParcelTriangles, wholeLungOverlap, type FetalParcelDataset } from '../../domains/body-exposure/engine/fetalParcelInspection.ts'
 import '../fetalParcelInspector.css'
 
 const BASE = `${import.meta.env.BASE_URL}bodyexposure/dataset-inspection/fetal-parcels/`
@@ -193,7 +193,7 @@ export function FetalParcelInspector() {
         </div>)}</div>
         {region && <article aria-label="Selected region evidence"><h2>Region {region.source_label}</h2>
           {(() => {
-            const nonBg = Object.entries(region.organ_label_overlap_voxels)
+            const nonBg = (Object.entries(region.organ_label_overlap_voxels) as [string, number][])
               .filter(([lbl]) => lbl !== '0')
               .sort((a, b) => b[1] - a[1])
             const topMatch = nonBg[0]
@@ -208,7 +208,7 @@ export function FetalParcelInspector() {
           <dl><dt>Voxel volume</dt><dd>{region.voxel_volume_mm3.toFixed(2)} mm³</dd><dt>Surface volume</dt><dd>{region.surface_volume_mm3.toFixed(2)} mm³</dd>
             <dt>Discretization difference</dt><dd>{(region.mesh_volume_relative_error * 100).toFixed(2)}%</dd><dt>Connected components</dt><dd>{region.components}</dd><dt>Triangles</dt><dd>{region.triangles.toLocaleString()}</dd>
             <dt>Boundary / nonmanifold edges</dt><dd>{region.boundary_edges} / {region.nonmanifold_edges}</dd><dt>Older lung-mask overlap</dt><dd>{(wholeLungOverlap(region) * 100).toFixed(2)}%</dd></dl>
-          <h3>Source mask correspondence</h3><table><thead><tr><th>Older organ label</th><th>Shared voxels</th></tr></thead><tbody>{Object.entries(region.organ_label_overlap_voxels).sort((a,b) => b[1]-a[1]).map(([label, count]) => <tr key={label}><td>{organLabels[label] ?? `Label ${label}`}</td><td>{count.toLocaleString()}</td></tr>)}</tbody></table>
+          <h3>Source mask correspondence</h3><table><thead><tr><th>Older organ label</th><th>Shared voxels</th></tr></thead><tbody>{(Object.entries(region.organ_label_overlap_voxels) as [string, number][]).sort((a,b) => b[1]-a[1]).map(([label, count]) => <tr key={label}><td>{organLabels[label] ?? `Label ${label}`}</td><td>{count.toLocaleString()}</td></tr>)}</tbody></table>
           <p className="fpi-note">Overlap and measured volume differences describe dataset correspondence and mesh extraction. They do not establish anatomical identity or a clinical tolerance.</p>
         </article>}
       </section>

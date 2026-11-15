@@ -7,7 +7,7 @@ import {
   lebarJendela, levelJendela, kelasDalamJendela, cakupanKelas, keabuan,
 } from '../../lib/pencitraanVolumetrik'
 import { KALOLUMEN, YANG_BELUM_DIMILIKI_PANACEA } from '../../lib/rujukanKaloLumen'
-import { KaloLumenVolumetricStudio } from '../../domains/body-exposure'
+import { KaloLumenVolumetricStudio } from '../../domains/body-exposure/ui/KaloLumenVolumetricStudio.tsx'
 import { VolumeDicomBagian } from './VolumeDicomBagian'
 
 // Panel teknologi pencitraan volumetrik untuk Body Exposure.

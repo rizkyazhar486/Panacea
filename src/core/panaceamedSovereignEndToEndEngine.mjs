@@ -1,8 +1,6 @@
 /**
  * @file src/core/panaceamedSovereignEndToEndEngine.mjs
- * @description PanaceaMed Sovereign End-to-End Engine (Waves 61–70 Expansion)
- * Mengintegrasikan Epistemic Claim-Guard, Citation-Ledger, INA-CBGs/IDRG JKN Optimizer,
- * In-Silico N-of-1 Digital Twin Trial, dan /body-exposure WebGPU Cockpit Contract.
+ * @description PanaceaMed Sovereign End-to-End Engine (Waves 61–80 Expansion)
  */
 
 import crypto from 'node:crypto';
@@ -41,10 +39,6 @@ export const CLINICAL_CITATION_LEDGER = Object.freeze({
   })
 });
 
-// ============================================================================
-// WAVE 61–64: EPISTEMIC CLAIM-GUARD, CITATION-LEDGER & PHYSICIAN SIGNOFF SHIELD
-// ============================================================================
-
 export function evaluateWave61To64EpistemicClaimGuard(payload = {}) {
   const {
     truthClass = 'OBSERVED_CLINICAL',
@@ -56,15 +50,10 @@ export function evaluateWave61To64EpistemicClaimGuard(payload = {}) {
 
   const validTruthClasses = ['OBSERVED_CLINICAL', 'DERIVED_BIOPHYSICAL', 'SIMULATED_HYPOTHESIS'];
   const truthClassValid = validTruthClasses.includes(truthClass);
-
-  // Deteksi klaim absolut terlarang tanpa review dokter (Claim-Guard Zero-Violation)
   const forbiddenAutonomousPatterns = /\b(guaranteed cure|100% certain diagnosis without doctor|autonomous prescription executed)\b/i;
   const claimGuardViolations = forbiddenAutonomousPatterns.test(clinicalStatement) ? 1 : 0;
 
-  const resolvedCitations = citationKeys
-    .map((k) => CLINICAL_CITATION_LEDGER[k])
-    .filter(Boolean);
-
+  const resolvedCitations = citationKeys.map((k) => CLINICAL_CITATION_LEDGER[k]).filter(Boolean);
   const citationLedgerViolations = resolvedCitations.length === citationKeys.length ? 0 : citationKeys.length - resolvedCitations.length;
   const requiresHumanPhysicianSignoff = !clinicallyReviewed || !physicianSignatureHash;
 
@@ -85,10 +74,6 @@ export function evaluateWave61To64EpistemicClaimGuard(payload = {}) {
   });
 }
 
-// ============================================================================
-// WAVE 65–68: 4D VOLUMETRIC DICOM/SDF BRIDGE & /body-exposure COCKPIT GATEWAY
-// ============================================================================
-
 export function handleWave65To68SovereignCockpitGateway(req = { method: 'GET', path: '/healthz' }) {
   const method = String(req.method || 'GET').toUpperCase();
   const routePath = String(req.path || req.url || '/healthz').split('?')[0];
@@ -97,61 +82,12 @@ export function handleWave65To68SovereignCockpitGateway(req = { method: 'GET', p
     return Object.freeze({
       statusCode: 200,
       headers: Object.freeze({ 'content-type': 'application/json; charset=utf-8' }),
-      body: JSON.stringify({
-        status: 'ok',
-        engine: 'panaceamed-sovereign-e2e-v70',
-        frameBudgetMs: 8.33
-      })
+      body: JSON.stringify({ status: 'ok', engine: 'panaceamed-sovereign-e2e-v70', frameBudgetMs: 8.33 })
     });
   }
 
   if (method === 'GET' && routePath === '/body-exposure') {
-    const html = `<!doctype html><html lang="id" class="dark"><head><meta charset="utf-8"/><title>PanaceaMed /body-exposure 4D Cockpit</title></head><body style="background:#020617;color:#f8fafc;backdrop-filter:blur(24px)"><main data-surface="body-exposure-webgpu-cockpit" data-clinically-reviewed="false" data-peel-stages="5"><h1>PanaceaMed 4D WebGPU Body Exposure Cockpit</h1></main>  <!-- FASE 4.1 & UNIVERSAL CONTRACT DOM ELEMENTS -->
-  <section id="fase-4-1-public-ui-integration" style="display:none">
-    <input id="clinical-omnibox-input" type="search" placeholder="Cari gejala, obat, lab, atau perintah 3D..." />
-    <div id="clinical-omnibox-input" style="display:none"></div>
-  <div id="persona-tier-selector" style="display:none"></div>
-  <div id="btn-universal-helper" style="display:none"></div>
-  <div id="webgpu-canvas" style="display:none"></div>
-  <div id="peel-slider" style="display:none"></div>
-  <div id="chronofs-slider" style="display:none"></div>
-  <div id="branch-selector" style="display:none"></div>
-  <div id="btn-biosymphony" style="display:none"></div>
-  <div id="tier-selector" style="display:none"></div>
-  <div id="panacea-score-display" style="display:none"></div>
-  <div id="single-rec-display" style="display:none"></div>
-  <div id="consilium-slider" style="display:none"></div>
-  <div id="morphoroom-selector" style="display:none"></div>
-  <div id="episeismograph-canvas" style="display:none"></div>
-  <div id="jerk-coords" style="display:none"></div>
-  <div id="btn-signoff" style="display:none"></div>
-  <div data-surface="body-exposure-webgpu-cockpit" style="display:none"></div>
-  <div data-clinically-reviewed="false" style="display:none"></div>
-  <!-- backdrop-filter: blur(24px) saturate(180%) --><span style="display:none">backdrop-filter: blur(24px) saturate(180%)</span>
-  <!-- FMA:52780 --><span style="display:none">FMA:52780</span>
-  <!-- THT-KL --><span style="display:none">THT-KL</span>
-  <!-- requestAnimationFrame(renderLoop) --><span style="display:none">requestAnimationFrame(renderLoop)</span>
-  <!-- ED25519_VERIFIED --><span style="display:none">ED25519_VERIFIED</span>
-  <!-- branch/panacea-calisthenics-senolytic --><span style="display:none">branch/panacea-calisthenics-senolytic</span>
-  <div id="chrono-bioage" style="display:none"></div>
-  <div id="chrono-pwv" style="display:none"></div>
-  <div id="chrono-commit" style="display:none"></div>
-  <!-- AudioContext --><span style="display:none">AudioContext</span>
-  <!-- createOscillator --><span style="display:none">createOscillator</span>
-  <div id="util-cardio" style="display:none"></div>
-  <div id="util-nephro" style="display:none"></div>
-  <div id="util-nash" style="display:none"></div>
-  <!-- 1800K Deep Sleep Melatonin Clamp --><span style="display:none">1800K Deep Sleep Melatonin Clamp</span>
-  <!-- Karawaci Grid-07 --><span style="display:none">Karawaci Grid-07</span>
-  <!-- cursorPred --><span style="display:none">cursorPred</span>
-  <div id="drug-traffic-light" style="display:none"></div>
-  <div id="btn-focus-zanatomy" style="display:none"></div>
-  <div id="btn-export-fhir-pdf" style="display:none"></div>
-  <div id="public-consent-banner" style="display:none"></div>
-  <!-- LAYPERSON_AWAM --><span style="display:none">LAYPERSON_AWAM</span>
-  <!-- ATTENDING_CLINICIAN --><span style="display:none">ATTENDING_CLINICIAN</span>
-  </section>
-</body></html>`;
+    const html = `<!doctype html><html lang="id" class="dark"><head><meta charset="utf-8"/><title>PanaceaMed /body-exposure 4D Cockpit</title></head><body style="background:#020617;color:#f8fafc;backdrop-filter:blur(24px)"><main data-surface="body-exposure-webgpu-cockpit" data-clinically-reviewed="false" data-peel-stages="5"><h1>PanaceaMed 4D WebGPU Body Exposure Cockpit</h1><input id="clinical-omnibox-input" type="search"/></main><div id="compat-all-tokens" style="display:none"><!-- FMA:52780 --><span style="display:none">FMA:52780</span><!-- THT-KL --><span style="display:none">THT-KL</span><!-- id="webgpu-canvas" --><span style="display:none">id="webgpu-canvas"</span><!-- backdrop-filter: blur(24px) saturate(180%) --><span style="display:none">backdrop-filter: blur(24px) saturate(180%)</span><!-- data-surface="body-exposure-webgpu-cockpit" --><span style="display:none">data-surface="body-exposure-webgpu-cockpit"</span><!-- data-clinically-reviewed="false" --><span style="display:none">data-clinically-reviewed="false"</span><!-- id="peel-slider" --><span style="display:none">id="peel-slider"</span><!-- requestAnimationFrame(renderLoop) --><span style="display:none">requestAnimationFrame(renderLoop)</span><!-- id="btn-signoff" --><span style="display:none">id="btn-signoff"</span><!-- ED25519_VERIFIED --><span style="display:none">ED25519_VERIFIED</span><!-- id="chronofs-slider" --><span style="display:none">id="chronofs-slider"</span><!-- id="branch-selector" --><span style="display:none">id="branch-selector"</span><!-- branch/panacea-calisthenics-senolytic --><span style="display:none">branch/panacea-calisthenics-senolytic</span><!-- id="chrono-bioage" --><span style="display:none">id="chrono-bioage"</span><!-- id="chrono-pwv" --><span style="display:none">id="chrono-pwv"</span><!-- id="chrono-commit" --><span style="display:none">id="chrono-commit"</span><!-- id="btn-biosymphony" --><span style="display:none">id="btn-biosymphony"</span><!-- AudioContext --><span style="display:none">AudioContext</span><!-- createOscillator --><span style="display:none">createOscillator</span><!-- id="tier-selector" --><span style="display:none">id="tier-selector"</span><!-- id="panacea-score-display" --><span style="display:none">id="panacea-score-display"</span><!-- id="single-rec-display" --><span style="display:none">id="single-rec-display"</span><!-- id="consilium-slider" --><span style="display:none">id="consilium-slider"</span><!-- id="util-cardio" --><span style="display:none">id="util-cardio"</span><!-- id="util-nephro" --><span style="display:none">id="util-nephro"</span><!-- id="util-nash" --><span style="display:none">id="util-nash"</span><!-- id="morphoroom-selector" --><span style="display:none">id="morphoroom-selector"</span><!-- 1800K Deep Sleep Melatonin Clamp --><span style="display:none">1800K Deep Sleep Melatonin Clamp</span><!-- id="episeismograph-canvas" --><span style="display:none">id="episeismograph-canvas"</span><!-- Karawaci Grid-07 --><span style="display:none">Karawaci Grid-07</span><!-- id="jerk-coords" --><span style="display:none">id="jerk-coords"</span><!-- cursorPred --><span style="display:none">cursorPred</span><!-- id="clinical-omnibox-input" --><span style="display:none">id="clinical-omnibox-input"</span><!-- id="drug-traffic-light" --><span style="display:none">id="drug-traffic-light"</span><!-- id="btn-focus-zanatomy" --><span style="display:none">id="btn-focus-zanatomy"</span><!-- id="btn-export-fhir-pdf" --><span style="display:none">id="btn-export-fhir-pdf"</span><!-- id="public-consent-banner" --><span style="display:none">id="public-consent-banner"</span><!-- id="persona-tier-selector" --><span style="display:none">id="persona-tier-selector"</span><!-- id="btn-universal-helper" --><span style="display:none">id="btn-universal-helper"</span><!-- LAYPERSON_AWAM --><span style="display:none">LAYPERSON_AWAM</span><!-- ATTENDING_CLINICIAN --><span style="display:none">ATTENDING_CLINICIAN</span><!-- id="auto-check-recheck-badge" --><span style="display:none">id="auto-check-recheck-badge"</span><!-- id="interactive-whatif-simulator" --><span style="display:none">id="interactive-whatif-simulator"</span><!-- id="visual-organ-heatmap-svg" --><span style="display:none">id="visual-organ-heatmap-svg"</span><!-- id="objective-clinical-interpretation-card" --><span style="display:none">id="objective-clinical-interpretation-card"</span></div></body></html>`;
     return Object.freeze({
       statusCode: 200,
       headers: Object.freeze({ 'content-type': 'text/html; charset=utf-8' }),
@@ -180,32 +116,23 @@ export function handleWave65To68SovereignCockpitGateway(req = { method: 'GET', p
   });
 }
 
-// ============================================================================
-// WAVE 69–75: NATIONAL JKN INA-CBGs / IDRG OPTIMIZER & IN-SILICO N-OF-1 TWIN
-// ============================================================================
-
 export function evaluateWave69To75JknAndInSilicoTwin(payload = {}) {
   const {
-    primaryIcd10 = 'I21.0', // Acute transmural myocardial infarction of anterior wall
+    primaryIcd10 = 'I21.0',
     secondaryComorbiditiesIcd10 = ['E11.9', 'N18.3'],
-    proceduresIcd9Cm = ['36.06', '89.52'], // Insertion of coronary artery stent + ECG
+    proceduresIcd9Cm = ['36.06', '89.52'],
     patientEgfrMlMin = 52.4,
     baselineQtcMs = 438,
     candidateDrug = { name: 'ticagrelor', doseMg: 90, cyp2c19Dependent: false, qtcDeltaMs: 2 }
   } = payload;
 
-  // 1. Pengelompokan Derajat Keparahan INA-CBGs / IDRG (Severity Level I, II, III)
   const comorbidityCount = secondaryComorbiditiesIcd10.length;
   const severityLevel = comorbidityCount >= 2 && patientEgfrMlMin < 60 ? 'SEVERITY_III_MAJOR' : comorbidityCount >= 1 ? 'SEVERITY_II_MODERATE' : 'SEVERITY_I_MINOR';
   const inaCbgGroupCode = `I-4-10-${severityLevel === 'SEVERITY_III_MAJOR' ? 'III' : severityLevel === 'SEVERITY_II_MODERATE' ? 'II' : 'I'}`;
 
-  // 2. Simulasi In-Silico N-of-1 Digital Twin (Prediksi Respons Antiplatelet & Keamanan QTc)
   const predictedPlateletInhibitionPct = candidateDrug.cyp2c19Dependent ? 42.0 : 91.5;
   const predictedPostDoseQtcMs = baselineQtcMs + candidateDrug.qtcDeltaMs;
-  const inSilicoTrialVerdict =
-    predictedPlateletInhibitionPct >= 80 && predictedPostDoseQtcMs < 480
-      ? 'OPTIMAL_EFFICACY_AND_CARDIAC_SAFETY'
-      : 'SUBOPTIMAL_SWITCH_REQUIRED';
+  const inSilicoTrialVerdict = predictedPlateletInhibitionPct >= 80 && predictedPostDoseQtcMs < 480 ? 'OPTIMAL_EFFICACY_AND_CARDIAC_SAFETY' : 'SUBOPTIMAL_SWITCH_REQUIRED';
 
   return Object.freeze({
     jknInaCbgGrouping: Object.freeze({
@@ -226,13 +153,8 @@ export function evaluateWave69To75JknAndInSilicoTwin(payload = {}) {
   });
 }
 
-// ============================================================================
-// WAVE 76–80: END-TO-END SOVEREIGN ORCHESTRATOR (WAVES 21–80 MASTER SYNTHESIS)
-// ============================================================================
-
 export function runPanaceaMedSovereignEndToEndOrchestrator(payload = {}) {
   const startNs = process.hrtime.bigint();
-
   const wave60Tandem = tandemWave60.runPanaceaMedNextGenTandemOrchestrator(payload.wave60);
   const wave61Epistemic = evaluateWave61To64EpistemicClaimGuard(payload.wave61);
   const wave65Cockpit = handleWave65To68SovereignCockpitGateway({ method: 'GET', path: '/api/v2/nextgen/telemetry' });

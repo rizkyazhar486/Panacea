@@ -1,4 +1,11 @@
 import * as kalolumenModule from "../../kalolumen-dicom-3dcg-and-medmlx-engine.ts";
+import {
+  DIAGNOSTIC_CT_PRESETS,
+  classifyHounsfieldLayer,
+  evaluateHounsfieldTransferFunction,
+  computeMprSliceCoordinates,
+  createDefaultKaloLumenState,
+} from "../kaloLumenDicomEngine.ts";
 
 export interface DiagnosticImagingState {
   readonly modality: "CT" | "MRI";
@@ -21,10 +28,15 @@ export function createDefaultImagingState(): DiagnosticImagingState {
 export const diagnosticImagingEngine = {
   ...kalolumenModule,
   createDefaultImagingState,
+  presets: DIAGNOSTIC_CT_PRESETS,
+  classifyLayer: classifyHounsfieldLayer,
+  evaluateTransferFunction: evaluateHounsfieldTransferFunction,
+  computeMprSlice: computeMprSliceCoordinates,
+  createDefaultState: createDefaultKaloLumenState,
   reconstructPhotorealistic3DCGFromDicomFolder: (kalolumenModule as any).reconstructPhotorealistic3DCGFromDicomFolder ?? (() => ({ status: "reconstructed" })),
   updateIndependentLayerCrossSection: (kalolumenModule as any).updateIndependentLayerCrossSection ?? (() => ({ status: "updated" })),
   updateDirectionalLightSource: (kalolumenModule as any).updateDirectionalLightSource ?? (() => ({ status: "lit" }))
 };
 
-export const createDefaultKaloLumenState = createDefaultImagingState;
+export { createDefaultKaloLumenState };
 export const kaloLumenDicomEngine = diagnosticImagingEngine;

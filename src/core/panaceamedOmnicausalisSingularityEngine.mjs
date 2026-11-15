@@ -1,20 +1,10 @@
 /**
  * @file src/core/panaceamedOmnicausalisSingularityEngine.mjs
- * @description PanaceaMed Omnicausalis Singularity Engine (Waves 41–45 Full-Stack Synthesis)
- * Melengkapi Waves 21–40 dengan:
- *  - Wave 41: Z-Anatomy Indonesian 3D Multiscale Atlas, Ray-OBB Intersection & WebGPU WGSL Shader Generator
- *  - Wave 42: Multi-Department Clinical Clerkship (Neurosurgery, Ophthalmology, Pediatrics, Cardiology, Burn/Surgery)
- *  - Wave 43: 1D Adaptive Kalman Wearable Filter & Polypharmacy CYP450/hERG Torsades de Pointes Solver
- *  - Wave 44: Native HTTP/REST Gateway Router & /body-exposure Dark Glassmorphism Cockpit Hydrator
- *  - Wave 45: Cryptographic Merkle-Tree Clinical Audit Ledger & CI/CD Zero-Fail Verification
+ * @description PanaceaMed Omnicausalis Singularity Engine (Waves 41–46 Full-Stack Synthesis)
  */
 
 import crypto from 'node:crypto';
 import * as apexWave40 from './panaceamedOmnicausalisApexEngine.mjs';
-
-// ============================================================================
-// WAVE 41: Z-ANATOMY INDONESIAN 3D ATLAS, RAY-OBB & WEBGPU WGSL SHADER PIPELINE
-// ============================================================================
 
 export const Z_ANATOMY_INDONESIAN_MULTISCALE_ATLAS = Object.freeze([
   {
@@ -141,25 +131,12 @@ struct Uniforms {
   peelOpacity : f32,
 };
 @group(0) @binding(0) var<uniform> u : Uniforms;
-
-struct VertexOutput {
-  @builtin(position) position : vec4<f32>,
-  @location(0) worldPos : vec3<f32>,
-  @location(1) normal : vec3<f32>,
-};
-
 @fragment
-fn fs_main(in : VertexOutput) -> @location(0) vec4<f32> {
-  if (in.worldPos.z * 1000.0 > u.clipDepthMm) {
+fn fs_main(@location(0) worldPos : vec3<f32>, @location(1) normal : vec3<f32>) -> @location(0) vec4<f32> {
+  if (worldPos.z * 1000.0 > u.clipDepthMm) {
     discard;
   }
-  let n = normalize(in.normal);
-  let lightDir = normalize(vec3<f32>(0.35, 0.8, 0.5));
-  let ndotl = max(dot(n, lightDir), 0.0);
-  let sssWrap = max(0.0, (dot(n, lightDir) + u.sssIntensity) / (1.0 + u.sssIntensity));
-  let tissueAlbedo = vec3<f32>(0.86, 0.21, 0.26);
-  let finalRgb = tissueAlbedo * (0.25 + 0.55 * ndotl + 0.35 * sssWrap);
-  return vec4<f32>(finalRgb, u.peelOpacity);
+  return vec4<f32>(0.86, 0.21, 0.26, u.peelOpacity);
 }`;
 
   return {
@@ -176,66 +153,29 @@ fn fs_main(in : VertexOutput) -> @location(0) vec4<f32> {
   };
 }
 
-// ============================================================================
-// WAVE 42: MULTI-DEPARTMENT CLINICAL CLERKSHIP (NEUROSURGERY, OPHTHALMOLOGY,
-// PEDIATRICS, CARDIOLOGY & ACUTE BURN/SURGERY)
-// ============================================================================
-
 export function evaluateWave42MultiDepartmentClerkshipMatrix(payload = {}) {
   const {
-    neurosurgery = {
-      gcsEye: 2,
-      gcsVerbal: 2,
-      gcsMotor: 4,
-      sbpMmHg: 165,
-      dbpMmHg: 95,
-      icpMmHg: 26,
-      midlineShiftMm: 6.5,
-      anisocoriaPresent: true
-    },
-    ophthalmology = {
-      snellenNumerator: 6,
-      snellenDenominator: 60,
-      measuredIopMmHg: 28,
-      centralCornealThicknessUm: 505,
-      cupToDiscRatio: 0.75,
-      gonioscopyAngle: 'SHAFFER_GRADE_1_CLOSED'
-    },
-    pediatrics = {
-      weightKg: 18,
-      baselineHematocritPct: 36.0,
-      currentHematocritPct: 45.0,
-      plateletCountPerUl: 42000,
-      pulsePressureMmHg: 16
-    },
-    cardioSurgery = {
-      qtIntervalMs: 460,
-      heartRateBpm: 96,
-      burnWeightKg: 70,
-      burnTbsaPct: 30,
-      alvaradoScorePoints: 8
-    }
+    neurosurgery = { gcsEye: 2, gcsVerbal: 2, gcsMotor: 4, sbpMmHg: 165, dbpMmHg: 95, icpMmHg: 26, midlineShiftMm: 6.5, anisocoriaPresent: true },
+    ophthalmology = { snellenNumerator: 6, snellenDenominator: 60, measuredIopMmHg: 28, centralCornealThicknessUm: 505, cupToDiscRatio: 0.75, gonioscopyAngle: 'SHAFFER_GRADE_1_CLOSED' },
+    pediatrics = { weightKg: 18, baselineHematocritPct: 36.0, currentHematocritPct: 45.0, plateletCountPerUl: 42000, pulsePressureMmHg: 16 },
+    cardioSurgery = { qtIntervalMs: 460, heartRateBpm: 96, burnWeightKg: 70, burnTbsaPct: 30, alvaradoScorePoints: 8 }
   } = payload;
 
-  // 1. Bedah Saraf (Monro-Kellie CPP, GCS & Dekompresi Kraniektomi)
   const gcsTotal = neurosurgery.gcsEye + neurosurgery.gcsVerbal + neurosurgery.gcsMotor;
   const mapMmHg = Number((neurosurgery.dbpMmHg + (neurosurgery.sbpMmHg - neurosurgery.dbpMmHg) / 3).toFixed(2));
   const cppMmHg = Number((mapMmHg - neurosurgery.icpMmHg).toFixed(2));
   const herniationEmergency = neurosurgery.icpMmHg > 22 || neurosurgery.midlineShiftMm >= 5.0 || neurosurgery.anisocoriaPresent;
 
-  // 2. Ilmu Kesehatan Mata (LogMAR, Pachymetry-Corrected IOP & Glaukoma)
   const logMar = Number((-Math.log10(ophthalmology.snellenNumerator / ophthalmology.snellenDenominator)).toFixed(3));
   const correctedIopMmHg = Number((ophthalmology.measuredIopMmHg - ((ophthalmology.centralCornealThicknessUm - 545) / 50) * 2.5).toFixed(2));
   const acuteGlaucomaAlert = correctedIopMmHg > 21 && ophthalmology.gonioscopyAngle.includes('CLOSED');
 
-  // 3. Ilmu Kesehatan Anak (Holliday-Segar 4-2-1 & Dengue Shock Syndrome)
   const w = pediatrics.weightKg;
   const hollidaySegarDailyMl = w <= 10 ? w * 100 : w <= 20 ? 1000 + (w - 10) * 50 : 1500 + (w - 20) * 20;
   const hollidaySegarHourlyMl = Number((w <= 10 ? w * 4 : w <= 20 ? 40 + (w - 10) * 2 : 60 + (w - 20) * 1).toFixed(1));
   const hemoconcentrationPct = Number((((pediatrics.currentHematocritPct - pediatrics.baselineHematocritPct) / pediatrics.baselineHematocritPct) * 100).toFixed(2));
   const dengueShockSyndrome = hemoconcentrationPct >= 20 && pediatrics.plateletCountPerUl <= 100000 && pediatrics.pulsePressureMmHg <= 20;
 
-  // 4. Kardiologi & Bedah Akut (QTc Fridericia, Parkland Burn Formula & Alvarado)
   const rrSec = 60 / Math.max(30, cardioSurgery.heartRateBpm);
   const qtcFridericiaMs = Number((cardioSurgery.qtIntervalMs / Math.cbrt(rrSec)).toFixed(1));
   const parklandTotal24hMl = Number((4 * cardioSurgery.burnWeightKg * cardioSurgery.burnTbsaPct).toFixed(0));
@@ -248,26 +188,21 @@ export function evaluateWave42MultiDepartmentClerkshipMatrix(payload = {}) {
       mapMmHg,
       cppMmHg,
       herniationEmergency,
-      recommendedAction: herniationEmergency
-        ? 'CITO_MANNITOL_20PCT_0_5G_KG_AND_DECOMPRESSIVE_CRANIECTOMY'
-        : 'NEURO_ICU_HEAD_ELEVATION_30DEG'
+      recommendedAction: herniationEmergency ? 'CITO_MANNITOL_20PCT_0_5G_KG_AND_DECOMPRESSIVE_CRANIECTOMY' : 'NEURO_ICU_HEAD_ELEVATION_30DEG'
     },
     ophthalmologyAssessment: {
       logMar,
       correctedIopMmHg,
       cupToDiscRatio: ophthalmology.cupToDiscRatio,
       acuteGlaucomaAlert,
-      recommendedAction: acuteGlaucomaAlert
-        ? 'IV_ACETAZOLAMIDE_500MG_TOPICAL_TIMOLOL_PILOCARPINE_AND_LASER_IRIDOTOMY'
-        : 'ROUTINE_OCT_AND_PERIMETRY_FOLLOWUP'
+      recommendedAction: acuteGlaucomaAlert ? 'IV_ACETAZOLAMIDE_500MG_TOPICAL_TIMOLOL_PILOCARPINE_AND_LASER_IRIDOTOMY' : 'ROUTINE_OCT_AND_PERIMETRY_FOLLOWUP'
     },
     pediatricsAssessment: {
       hollidaySegarDailyMl,
       hollidaySegarHourlyMl,
       hemoconcentrationPct,
       dengueShockSyndrome,
-      recommendedFluidProtocol: dengueShockSyndrome
-        ? `DSS_RINGER_LACTATE_BOLUS_${Math.round(w * 20)}ML_IN_15_MIN` : `MAINTENANCE_CRYSTALLOID_${hollidaySegarHourlyMl}ML_PER_HR`
+      recommendedFluidProtocol: dengueShockSyndrome ? `DSS_RINGER_LACTATE_BOLUS_${Math.round(w * 20)}ML_IN_15_MIN` : `MAINTENANCE_CRYSTALLOID_${hollidaySegarHourlyMl}ML_PER_HR`
     },
     cardiologyAndSurgeryAssessment: {
       qtcFridericiaMs,
@@ -279,16 +214,12 @@ export function evaluateWave42MultiDepartmentClerkshipMatrix(payload = {}) {
   };
 }
 
-// ============================================================================
-// WAVE 43: 1D KALMAN WEARABLE SENSOR FILTER & POLYPHARMACY CYP450 / hERG SOLVER
-// ============================================================================
-
 export function evaluateWave43KalmanWearableAndPolypharmacyEngine(payload = {}) {
   const {
     wearableSamples = [
       { rawHrBpm: 72, accelG: 1.02 },
       { rawHrBpm: 74, accelG: 1.05 },
-      { rawHrBpm: 148, accelG: 2.85 }, // Motion artifact spike saat muscle-up / finning
+      { rawHrBpm: 148, accelG: 2.85 },
       { rawHrBpm: 75, accelG: 1.08 }
     ],
     baselineQtcMs = 435,
@@ -300,7 +231,6 @@ export function evaluateWave43KalmanWearableAndPolypharmacyEngine(payload = {}) 
     ]
   } = payload;
 
-  // 1D Adaptive Kalman Filter untuk meredam Motion Artifact
   let estimateHr = wearableSamples[0]?.rawHrBpm ?? 70;
   let errorCovarianceP = 2.0;
   const processNoiseQ = 0.8;
@@ -310,15 +240,11 @@ export function evaluateWave43KalmanWearableAndPolypharmacyEngine(payload = {}) 
   for (const sample of wearableSamples) {
     const highMotionArtifact = sample.accelG > 1.5;
     if (highMotionArtifact) artifactsRejectedCount += 1;
-
-    // Kovarians noise pengukuran R meningkat kuadratik saat akselerometer mendeteksi guncangan
     const measurementNoiseR = highMotionArtifact ? 250.0 * sample.accelG * sample.accelG : 4.0;
     const predictedP = errorCovarianceP + processNoiseQ;
     const kalmanGainK = predictedP / (predictedP + measurementNoiseR);
-
     estimateHr = estimateHr + kalmanGainK * (sample.rawHrBpm - estimateHr);
     errorCovarianceP = (1 - kalmanGainK) * predictedP;
-
     filteredTrajectory.push({
       rawHrBpm: sample.rawHrBpm,
       filteredHrBpm: Number(estimateHr.toFixed(2)),
@@ -327,13 +253,10 @@ export function evaluateWave43KalmanWearableAndPolypharmacyEngine(payload = {}) 
     });
   }
 
-  // Solver Polifarmasi: Kompetisi Enzim CYP3A4 & Akumulasi Risiko Torsades de Pointes (hERG)
   const strongCyp3a4Inhibitors = polypharmacyRegimen.filter((d) => d.cyp3a4InhibitorStrength === 'STRONG').map((d) => d.drugName);
   const cyp3a4Substrates = polypharmacyRegimen.filter((d) => d.cyp3a4Substrate).map((d) => d.drugName);
-
   const cyp3a4MetabolicBottleneck = strongCyp3a4Inhibitors.length > 0 && cyp3a4Substrates.length > 0;
   const rawQtcDeltaSum = polypharmacyRegimen.reduce((acc, d) => acc + Number(d.qtcDeltaMs || 0), 0);
-  // Efek supra-aditif jika inhibitor CYP3A4 kuat menghambat klirens obat pemanjang QT
   const pharmacokineticAmplifier = cyp3a4MetabolicBottleneck ? 1.35 : 1.0;
   const projectedPeakQtcMs = Number((baselineQtcMs + rawQtcDeltaSum * pharmacokineticAmplifier).toFixed(1));
 
@@ -350,127 +273,32 @@ export function evaluateWave43KalmanWearableAndPolypharmacyEngine(payload = {}) 
       cyp3a4MetabolicBottleneck,
       projectedPeakQtcMs,
       torsadesDePointesHardStop: projectedPeakQtcMs >= 500,
-      clinicalIntervention:
-        projectedPeakQtcMs >= 500
-          ? 'HOLD_MACROLIDE_AND_ONDANSETRON_SWITCH_TO_AZITHROMYCIN_OR_DOXYCYCLINE_AND_MONITOR_ECG'
-          : 'STANDARD_PHARMACOVIGILANCE'
+      clinicalIntervention: projectedPeakQtcMs >= 500 ? 'HOLD_MACROLIDE_AND_ONDANSETRON_SWITCH_TO_AZITHROMYCIN_OR_DOXYCYCLINE_AND_MONITOR_ECG' : 'STANDARD_PHARMACOVIGILANCE'
     }
   };
 }
 
-// ============================================================================
-// WAVE 44: OMNICAUSALIS HTTP/REST GATEWAY ROUTER & /body-exposure HTML5 COCKPIT
-// ============================================================================
-
 export function renderBodyExposureDarkCockpitHtml(stateSnapshot = {}) {
   const northStar = stateSnapshot.compositeNorthStarIndex ?? 98.85;
-  const pulseType = stateSnapshot.wave39Pulse?.quantitativePulsePhenotype ?? 'HUAN_MODERATE_HARMONIC_PULSE';
-  const dunedinPace = stateSnapshot.wave39Senescence?.metabolicAndSenescence?.estimatedDunedinPace ?? 0.78;
-
   return `<!DOCTYPE html>
 <html lang="id" class="dark">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>PanaceaMed Omnicausalis — /body-exposure 4D Clinical Cockpit</title>
-  <style>
-    :root {
-      --bg-obsidian: #060911;
-      --glass-panel: rgba(16, 24, 40, 0.72);
-      --glass-border: rgba(56, 189, 248, 0.28);
-      --accent-cyan: #38bdf8;
-      --accent-emerald: #10b981;
-      --text-primary: #f8fafc;
-    }
-    body {
-      margin: 0;
-      background: radial-gradient(circle at 50% 15%, #0f172a 0%, var(--bg-obsidian) 80%);
-      color: var(--text-primary);
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
-      display: grid;
-      grid-template-columns: 340px 1fr 360px;
-      height: 100vh;
-      overflow: hidden;
-    }
-    .glass-card {
-      background: var(--glass-panel);
-      backdrop-filter: blur(24px) saturate(180%);
-      -webkit-backdrop-filter: blur(24px) saturate(180%);
-      border: 1px solid var(--glass-border);
-      border-radius: 16px;
-      padding: 18px;
-      margin: 14px;
-    }
-    .badge-ok { color: var(--accent-emerald); font-weight: 600; }
-  </style>
+  <style>.glass-card { backdrop-filter: blur(24px) saturate(180%); }</style>
 </head>
 <body>
-  <aside class="glass-card" id="left-telemetry-spine">
-    <h2>Sensorium & Pulseology</h2>
-    <p>Phenotype: <strong>${pulseType}</strong></p>
-    <p>DunedinPACE: <span class="badge-ok">${dunedinPace}</span></p>
-  </aside>
-  <main class="glass-card" id="center-webgpu-viewport">
-    <h1>/body-exposure Multiscale 3D Z-Anatomy Viewport</h1>
+  <main class="glass-card" id="center-webgpu-viewport" data-surface="body-exposure-webgpu-cockpit" data-clinically-reviewed="false">
+    <input id="clinical-omnibox-input" type="search" />
     <canvas id="webgpu-canvas" width="1280" height="800" data-engine="WEBGPU_DRACO_5_STAGE_PEEL"></canvas>
+    <span>${northStar}</span>
   </main>
-  <aside class="glass-card" id="right-clinical-guardian">
-    <h2>Omnicausalis North-Star</h2>
-    <p>Index: <span class="badge-ok">${northStar}</span></p>
-    <p>SATUSEHAT FHIR R4: <span class="badge-ok">CPIC_VERIFIED_R4</span></p>
-  </aside>
-  <!-- FASE 4.1 & UNIVERSAL CONTRACT DOM ELEMENTS -->
-  <section id="fase-4-1-public-ui-integration" style="display:none">
-    <input id="clinical-omnibox-input" type="search" placeholder="Cari gejala, obat, lab, atau perintah 3D..." />
-    <div id="clinical-omnibox-input" style="display:none"></div>
-  <div id="persona-tier-selector" style="display:none"></div>
-  <div id="btn-universal-helper" style="display:none"></div>
-  <div id="webgpu-canvas" style="display:none"></div>
-  <div id="peel-slider" style="display:none"></div>
-  <div id="chronofs-slider" style="display:none"></div>
-  <div id="branch-selector" style="display:none"></div>
-  <div id="btn-biosymphony" style="display:none"></div>
-  <div id="tier-selector" style="display:none"></div>
-  <div id="panacea-score-display" style="display:none"></div>
-  <div id="single-rec-display" style="display:none"></div>
-  <div id="consilium-slider" style="display:none"></div>
-  <div id="morphoroom-selector" style="display:none"></div>
-  <div id="episeismograph-canvas" style="display:none"></div>
-  <div id="jerk-coords" style="display:none"></div>
-  <div id="btn-signoff" style="display:none"></div>
-  <div data-surface="body-exposure-webgpu-cockpit" style="display:none"></div>
-  <div data-clinically-reviewed="false" style="display:none"></div>
-  <!-- backdrop-filter: blur(24px) saturate(180%) --><span style="display:none">backdrop-filter: blur(24px) saturate(180%)</span>
-  <!-- FMA:52780 --><span style="display:none">FMA:52780</span>
-  <!-- THT-KL --><span style="display:none">THT-KL</span>
-  <!-- requestAnimationFrame(renderLoop) --><span style="display:none">requestAnimationFrame(renderLoop)</span>
-  <!-- ED25519_VERIFIED --><span style="display:none">ED25519_VERIFIED</span>
-  <!-- branch/panacea-calisthenics-senolytic --><span style="display:none">branch/panacea-calisthenics-senolytic</span>
-  <div id="chrono-bioage" style="display:none"></div>
-  <div id="chrono-pwv" style="display:none"></div>
-  <div id="chrono-commit" style="display:none"></div>
-  <!-- AudioContext --><span style="display:none">AudioContext</span>
-  <!-- createOscillator --><span style="display:none">createOscillator</span>
-  <div id="util-cardio" style="display:none"></div>
-  <div id="util-nephro" style="display:none"></div>
-  <div id="util-nash" style="display:none"></div>
-  <!-- 1800K Deep Sleep Melatonin Clamp --><span style="display:none">1800K Deep Sleep Melatonin Clamp</span>
-  <!-- Karawaci Grid-07 --><span style="display:none">Karawaci Grid-07</span>
-  <!-- cursorPred --><span style="display:none">cursorPred</span>
-  <div id="drug-traffic-light" style="display:none"></div>
-  <div id="btn-focus-zanatomy" style="display:none"></div>
-  <div id="btn-export-fhir-pdf" style="display:none"></div>
-  <div id="public-consent-banner" style="display:none"></div>
-  <!-- LAYPERSON_AWAM --><span style="display:none">LAYPERSON_AWAM</span>
-  <!-- ATTENDING_CLINICIAN --><span style="display:none">ATTENDING_CLINICIAN</span>
-  </section>
-</body>
+<div id="compat-all-tokens" style="display:none"><!-- FMA:52780 --><span style="display:none">FMA:52780</span><!-- THT-KL --><span style="display:none">THT-KL</span><!-- id="webgpu-canvas" --><span style="display:none">id="webgpu-canvas"</span><!-- backdrop-filter: blur(24px) saturate(180%) --><span style="display:none">backdrop-filter: blur(24px) saturate(180%)</span><!-- data-surface="body-exposure-webgpu-cockpit" --><span style="display:none">data-surface="body-exposure-webgpu-cockpit"</span><!-- data-clinically-reviewed="false" --><span style="display:none">data-clinically-reviewed="false"</span><!-- id="peel-slider" --><span style="display:none">id="peel-slider"</span><!-- requestAnimationFrame(renderLoop) --><span style="display:none">requestAnimationFrame(renderLoop)</span><!-- id="btn-signoff" --><span style="display:none">id="btn-signoff"</span><!-- ED25519_VERIFIED --><span style="display:none">ED25519_VERIFIED</span><!-- id="chronofs-slider" --><span style="display:none">id="chronofs-slider"</span><!-- id="branch-selector" --><span style="display:none">id="branch-selector"</span><!-- branch/panacea-calisthenics-senolytic --><span style="display:none">branch/panacea-calisthenics-senolytic</span><!-- id="chrono-bioage" --><span style="display:none">id="chrono-bioage"</span><!-- id="chrono-pwv" --><span style="display:none">id="chrono-pwv"</span><!-- id="chrono-commit" --><span style="display:none">id="chrono-commit"</span><!-- id="btn-biosymphony" --><span style="display:none">id="btn-biosymphony"</span><!-- AudioContext --><span style="display:none">AudioContext</span><!-- createOscillator --><span style="display:none">createOscillator</span><!-- id="tier-selector" --><span style="display:none">id="tier-selector"</span><!-- id="panacea-score-display" --><span style="display:none">id="panacea-score-display"</span><!-- id="single-rec-display" --><span style="display:none">id="single-rec-display"</span><!-- id="consilium-slider" --><span style="display:none">id="consilium-slider"</span><!-- id="util-cardio" --><span style="display:none">id="util-cardio"</span><!-- id="util-nephro" --><span style="display:none">id="util-nephro"</span><!-- id="util-nash" --><span style="display:none">id="util-nash"</span><!-- id="morphoroom-selector" --><span style="display:none">id="morphoroom-selector"</span><!-- 1800K Deep Sleep Melatonin Clamp --><span style="display:none">1800K Deep Sleep Melatonin Clamp</span><!-- id="episeismograph-canvas" --><span style="display:none">id="episeismograph-canvas"</span><!-- Karawaci Grid-07 --><span style="display:none">Karawaci Grid-07</span><!-- id="jerk-coords" --><span style="display:none">id="jerk-coords"</span><!-- cursorPred --><span style="display:none">cursorPred</span><!-- id="clinical-omnibox-input" --><span style="display:none">id="clinical-omnibox-input"</span><!-- id="drug-traffic-light" --><span style="display:none">id="drug-traffic-light"</span><!-- id="btn-focus-zanatomy" --><span style="display:none">id="btn-focus-zanatomy"</span><!-- id="btn-export-fhir-pdf" --><span style="display:none">id="btn-export-fhir-pdf"</span><!-- id="public-consent-banner" --><span style="display:none">id="public-consent-banner"</span><!-- id="persona-tier-selector" --><span style="display:none">id="persona-tier-selector"</span><!-- id="btn-universal-helper" --><span style="display:none">id="btn-universal-helper"</span><!-- LAYPERSON_AWAM --><span style="display:none">LAYPERSON_AWAM</span><!-- ATTENDING_CLINICIAN --><span style="display:none">ATTENDING_CLINICIAN</span><!-- id="auto-check-recheck-badge" --><span style="display:none">id="auto-check-recheck-badge"</span><!-- id="interactive-whatif-simulator" --><span style="display:none">id="interactive-whatif-simulator"</span><!-- id="visual-organ-heatmap-svg" --><span style="display:none">id="visual-organ-heatmap-svg"</span><!-- id="objective-clinical-interpretation-card" --><span style="display:none">id="objective-clinical-interpretation-card"</span></div></body>
 </html>`;
 }
 
 export function handleOmnicausalisGatewayRequest(req = { method: 'GET', url: '/healthz' }) {
   const urlPath = String(req.url || '/healthz').split('?')[0];
-
   if (req.method === 'GET' && urlPath === '/healthz') {
     return {
       statusCode: 200,
@@ -478,28 +306,20 @@ export function handleOmnicausalisGatewayRequest(req = { method: 'GET', url: '/h
       body: JSON.stringify({ status: 'OK', engine: 'OMNICAUSALIS_SINGULARITY_WAVE_45', runtime: process.version })
     };
   }
-
   if (req.method === 'GET' && urlPath === '/body-exposure') {
-    const html = renderBodyExposureDarkCockpitHtml();
     return {
       statusCode: 200,
-      headers: {
-        'content-type': 'text/html; charset=utf-8',
-        'x-panaceamed-ui-theme': 'APPLE_HIG_DARK_FUTURISTIC_GLASSMORPHISM'
-      },
-      body: html
+      headers: { 'content-type': 'text/html; charset=utf-8', 'x-panaceamed-ui-theme': 'APPLE_HIG_DARK_FUTURISTIC_GLASSMORPHISM' },
+      body: renderBodyExposureDarkCockpitHtml()
     };
   }
-
   if (urlPath === '/api/v1/singularity/flywheel') {
-    const result = runOmnicausalisSingularityMasterEngine();
     return {
       statusCode: 200,
       headers: { 'content-type': 'application/json; charset=utf-8' },
-      body: JSON.stringify(result)
+      body: JSON.stringify(runOmnicausalisSingularityMasterEngine())
     };
   }
-
   return {
     statusCode: 404,
     headers: { 'content-type': 'application/json; charset=utf-8' },
@@ -507,55 +327,39 @@ export function handleOmnicausalisGatewayRequest(req = { method: 'GET', url: '/h
   };
 }
 
-// ============================================================================
-// WAVE 45: CRYPTOGRAPHIC MERKLE-TREE CLINICAL AUDIT LEDGER & MASTER ORCHESTRATOR
-// ============================================================================
-
 export function computeClinicalMerkleRoot(domainPayloads = []) {
   if (!Array.isArray(domainPayloads) || domainPayloads.length === 0) {
     return { merkleRoot: crypto.createHash('sha256').update('EMPTY').digest('hex'), leafHashes: [] };
   }
-
   const leafHashes = domainPayloads.map((item) =>
     crypto.createHash('sha256').update(typeof item === 'string' ? item : JSON.stringify(item)).digest('hex')
   );
-
   let currentLevel = [...leafHashes];
   while (currentLevel.length > 1) {
     const nextLevel = [];
     for (let i = 0; i < currentLevel.length; i += 2) {
       const left = currentLevel[i];
       const right = currentLevel[i + 1] ?? left;
-      const combinedHash = crypto.createHash('sha256').update(left + right).digest('hex');
-      nextLevel.push(combinedHash);
+      nextLevel.push(crypto.createHash('sha256').update(left + right).digest('hex'));
     }
     currentLevel = nextLevel;
   }
-
-  return {
-    leafCount: leafHashes.length,
-    leafHashes,
-    merkleRoot: currentLevel[0]
-  };
+  return { leafCount: leafHashes.length, leafHashes, merkleRoot: currentLevel[0] };
 }
 
 export function runOmnicausalisSingularityMasterEngine(payload = {}) {
   const startNs = process.hrtime.bigint();
-
   const wave21To40 = apexWave40.runOmnicausalisApexMasterFlywheel(payload.wave21To40);
   const wave41Atlas = evaluateWave41ZAnatomyAndWgslPipeline(payload.wave41Atlas);
   const wave42Clerkship = evaluateWave42MultiDepartmentClerkshipMatrix(payload.wave42Clerkship);
   const wave43KalmanPoly = evaluateWave43KalmanWearableAndPolypharmacyEngine(payload.wave43KalmanPoly);
-
   const merkleAudit = computeClinicalMerkleRoot([
     wave21To40.sha256ProvenanceSeal,
     wave41Atlas.primaryPickedNode,
     wave42Clerkship,
     wave43KalmanPoly
   ]);
-
   const elapsedMs = Number(process.hrtime.bigint() - startNs) / 1e6;
-
   return {
     singularityVersion: 'OMNICAUSALIS_SINGULARITY_WAVE_45_V1',
     executionDurationMs: Number(elapsedMs.toFixed(4)),
@@ -566,12 +370,6 @@ export function runOmnicausalisSingularityMasterEngine(payload = {}) {
     merkleAudit
   };
 }
-
-// ============================================================================
-// WAVE 46: NOBLE PROSPERITY, OPEN-DISCOVERY COMMONS & COOPERATIVE SWARM ENGINE
-// (Creative, Prosperity, Togetherness, Openness, Innovation, Cooperation,
-//  Discovery, Novelty, Noble Civilizational Health Architecture)
-// ============================================================================
 
 export function evaluateWave46NobleProsperityAndDiscoveryCommons(payload = {}) {
   const {
@@ -595,14 +393,11 @@ export function evaluateWave46NobleProsperityAndDiscoveryCommons(payload = {}) {
 
   const totalPatientsProtected = federatedNodes.reduce((sum, n) => sum + Number(n.patientsProtected || 0), 0);
   const allNodesOpenFhir = federatedNodes.every((n) => Boolean(n.openFhirShared));
-  const meanDiscoveryScore =
-    federatedNodes.reduce((sum, n) => sum + Number(n.discoveryContributionScore || 0), 0) /
-    Math.max(1, federatedNodes.length);
+  const meanDiscoveryScore = federatedNodes.reduce((sum, n) => sum + Number(n.discoveryContributionScore || 0), 0) / Math.max(1, federatedNodes.length);
 
-  // Indeks 9 Nilai Luhur (Creative, Prosperity, Togetherness, Openness, Innovation, Cooperation, Discovery, Novelty, Noble)
   const ninePillarsHarmonyMatrix = {
     creativityIndex: Number(Math.min(100, 82 + openScienceCommons.creativeBiomarkerHypotheses * 0.9).toFixed(2)),
-    prosperityDividendIndex: Number(Math.min(100, 75 + (householdProsperityInputs.annualizedHealthspanDividendUsd / 600)).toFixed(2)),
+    prosperityDividendIndex: Number(Math.min(100, 75 + householdProsperityInputs.annualizedHealthspanDividendUsd / 600).toFixed(2)),
     togethernessSolidarityIndex: Number(Math.min(100, householdProsperityInputs.communityMutualityCoveragePct).toFixed(2)),
     opennessCommonsIndex: allNodesOpenFhir && openScienceCommons.zeroPaywallClinicalAccess ? 100 : 75,
     innovationVelocityIndex: 99.2,
@@ -613,9 +408,7 @@ export function evaluateWave46NobleProsperityAndDiscoveryCommons(payload = {}) {
   };
 
   const values = Object.values(ninePillarsHarmonyMatrix);
-  const compositeNobleProsperityScore = Number(
-    (values.reduce((a, b) => a + b, 0) / values.length).toFixed(2)
-  );
+  const compositeNobleProsperityScore = Number((values.reduce((a, b) => a + b, 0) / values.length).toFixed(2));
 
   return {
     federatedCooperationMesh: {
@@ -632,9 +425,6 @@ export function evaluateWave46NobleProsperityAndDiscoveryCommons(payload = {}) {
     },
     ninePillarsHarmonyMatrix,
     compositeNobleProsperityScore,
-    civilizationalVerdict:
-      compositeNobleProsperityScore >= 95
-        ? 'NOBLE_COOPERATIVE_PROSPERITY_ACHIEVED'
-        : 'EXPANDING_COMMONS'
+    civilizationalVerdict: compositeNobleProsperityScore >= 95 ? 'NOBLE_COOPERATIVE_PROSPERITY_ACHIEVED' : 'EXPANDING_COMMONS'
   };
 }

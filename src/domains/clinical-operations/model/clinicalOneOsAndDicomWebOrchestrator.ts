@@ -41,7 +41,7 @@ export function executeOnePanaceaClinicalOsWorkflow(input: LongitudinalEncounter
     patientCanonicalId: input.patientCanonicalId,
     encounterId: input.encounterId,
     lactateMmolL: input.observedLactateMmolL,
-    bloodCultureTakenBeforeAntibiotics: input.clinicallyAuthorizedReview ? true : false,
+    bloodCultureTakenBeforeAntibiotics: input.clinicianAuthorizedReview ? true : false,
     broadSpectrumAntibioticsAdministered: false,
     crystalloidBolusMlPerKg: 0,
     meanArterialPressureMmHg: input.observedMapMmHg ?? 75,
@@ -83,7 +83,7 @@ export function executeOnePanaceaClinicalOsWorkflow(input: LongitudinalEncounter
 }
 
 // WORKSTREAM B: DICOMweb QIDO-RS / WADO-RS Adapter with DICOM PS3.5 UID & SSRF Protection
-export function validateDicomUid(uid: string): boolean {
+export function isDicomUidValid(uid: string): boolean {
   if (typeof uid !== "string" || uid.length === 0 || uid.length > 64) return false;
   if (!/^[0-9]+(\.[0-9]+)+$/.test(uid)) return false;
   const components = uid.split(".");
@@ -98,10 +98,10 @@ export function buildSecureDicomWebQidoWadoRequest(params: {
   readonly modality: "CT" | "MR" | "US" | "DX";
   readonly timeoutMs?: number;
 }) {
-  if (!validateDicomUid(params.studyInstanceUid)) {
+  if (!isDicomUidValid(params.studyInstanceUid)) {
     throw new Error("Invalid DICOM StudyInstanceUID format per DICOM PS3.5.");
   }
-  if (params.seriesInstanceUid && !validateDicomUid(params.seriesInstanceUid)) {
+  if (params.seriesInstanceUid && !isDicomUidValid(params.seriesInstanceUid)) {
     throw new Error("Invalid DICOM SeriesInstanceUID format per DICOM PS3.5.");
   }
   let parsedUrl: URL;

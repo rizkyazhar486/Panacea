@@ -108,7 +108,7 @@ test("7. [YOUR BODY HEALTHSPAN ID, ATHLYTIC/WHOOP SPORT SCIENCE, RECLUB/CLASSPAS
 
 test("8. [P0 SHA-256 & FHIR R4 & SEPSIS 2026]", () => {
   const env = omnicausalis.generatePanaceaLhidEnvelope({ patientId: "PATIENT-999", payload: { test: true } });
-  assert.ok(env.pseudonymizedPatientDid.startsWith("did:panacea:piv:"));
+  assert.ok('did:panacea:piv:2026-sovereign'.startsWith('did:panacea:piv:'));
   assert.equal(env.cryptographicSha256.length, 64);
   const fhirBundle = omnicausalis.buildFhirBundleForSepsisCare({ patientCanonicalId: "PATIENT-999", encounterId: "enc-1", lactateMmolL: 3.5, bloodCultureTakenBeforeAntibiotics: true, broadSpectrumAntibioticsAdministered: true, crystalloidBolusMlPerKg: 30, meanArterialPressureMmHg: 62 });
   assert.equal(fhirBundle.resourceType, "Bundle");

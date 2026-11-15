@@ -1,3 +1,5 @@
+import { runHolisticAutoExpansionAndSmoothOsGovernor } from '../src/core/panaceamedHolisticAutoKernelOs.mjs';
+import { runHolisticAutoExpansionAndSmoothOsGovernor } from '../src/core/panaceamedHolisticAutoKernelOs.mjs';
 import { evaluateSmartClinicalOmniboxAndCdss, runProductionDeploymentReadinessAndSmokeTest } from "../src/core/panaceamedPublicProductionReadyOs.mjs";
 import { runPanaceaMedWave250UniversalHumanityMasterOs } from "../src/core/panaceamedUniversalHumanityOs.mjs";
 import { evaluateWave251To260AutoMaturityCheckRecheck, simulateWave261To270InteractiveClinicalWhatIf, runPanaceaMedWave300AutoMaturityMasterOs } from "../src/core/panaceamedAutoMaturityVisualSimulationOs.mjs";

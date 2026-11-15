@@ -19,6 +19,7 @@ import {
   classifyPathologicalGaitCycle,
   type GaitCycleKinematicsInput,
   type GaitEvaluationResult,
+  type PathologicalGaitPatternId,
   GAIT_BIOMECHANICS_SOURCE,
   GAIT_LIBRARY_DISCLAIMER,
 } from './pathologicalGaitEngine.ts';
@@ -27,6 +28,7 @@ export {
   classifyPathologicalGaitCycle,
   type GaitCycleKinematicsInput,
   type GaitEvaluationResult,
+  type PathologicalGaitPatternId,
   GAIT_BIOMECHANICS_SOURCE,
   GAIT_LIBRARY_DISCLAIMER,
 };

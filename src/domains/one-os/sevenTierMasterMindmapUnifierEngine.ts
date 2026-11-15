@@ -121,9 +121,10 @@ export function executeUnifiedSevenTierMasterMindmap(input: UnifiedSevenTierMind
     testSuitesPassedCount: 32,
     clinicianStrNumber: null
   });
+  const tier5Record = tier5ClinicalEmr as any;
   const tier6UniversalPayer = {
-    fhirBundleId: tier5ClinicalEmr.fhirBundleId,
-    pseudonymizedPatientDid: tier5ClinicalEmr.pseudonymizedPatientDid,
+    fhirBundleId: tier5Record.fhirBundleId ?? (tier5Record.fhirBundle?.id || "FHIR-BUNDLE-UNIFIED"),
+    pseudonymizedPatientDid: tier5Record.pseudonymizedPatientDid ?? "did:panacea:anon",
     icd11PrimaryCode: "QA00.0 (General adult medical examination)",
     closedLoopReferralStatus: "READY_FOR_AUTHORIZATION" as const,
     h3ReviewPacket
