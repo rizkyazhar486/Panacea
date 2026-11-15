@@ -111,7 +111,7 @@ export {
 // OrganBiometricOverlayCard) are reachable from BodyExposureAtlasHome depth panels,
 // and are intentionally excluded from the domain public API under those names.
 // The one exception is the radiology MPR studio, offered to other domains under its
-// descriptive name as a code-split loader: `lazy(loadDiagnosticImagingVolumetricStudio)`.
+// descriptive name as a code-split loader (below), for React's lazy().
 // The index imports no package and no .tsx module, so plain Node (the build's QA step and
 // the dependency-free omnicausalis gate) can load it; the import runs only when called.
 export const loadDiagnosticImagingVolumetricStudio = () =>
