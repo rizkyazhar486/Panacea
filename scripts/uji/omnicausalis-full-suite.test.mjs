@@ -297,6 +297,8 @@ test("19. [WAVE 10 ALL 11 BODY SYSTEM CALCULATORS & 7-PAGE INFLOW/OUTFLOW WORKFL
 
 test("20. [P0 SECURITY & OWASP ASVS 5.0: HTTPONLY SESSION, CSRF HMAC, BOLA/IDOR & PROMPT INJECTION GUARD]", () => {
   const sess = omnicausalis.createHardenedSessionEnvelope({
+    // No key is built into the engine any more (a key in a public repo lets anyone mint CSRF tokens).
+    secretKey: "uji-only-csrf-hmac-key",
     actorUserId: "dr-kelvin",
     actorRole: "CLINICIAN",
     authorizedPatientIds: ["PT-101", "PT-102"]

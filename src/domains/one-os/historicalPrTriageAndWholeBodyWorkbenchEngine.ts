@@ -1,4 +1,4 @@
-import crypto from "node:crypto";
+import { sha256Hex } from "../../shared/kernel/sha256.ts";
 import { evaluateCardiopulmonaryCouplingDeck, type CardiopulmonaryCouplingInput } from "../body-exposure/engine/cardiopulmonaryCouplingEngine.ts";
 import { simulatePink1ParkinMitophagyAndProtonMotiveForce, mapVisceralOrganToReferredPainDermatome, bindAuthorizedPatientBiometricToOrganOverlay } from "../body-exposure/engine/tenMergedPillarsUnifiedWorkbenchEngine.ts";
 import { getDeepSystemSpecById } from "../body-exposure/engine/bodyExposureTotalMultiscaleAtlasEngine.ts";
@@ -38,7 +38,7 @@ export function ingestStructuredOcrClinicalDocument(params: {
     throw new RangeError("ocrConfidence0to1 must be within [0, 1].");
   }
   const requiresHumanClinicianConfirmation = params.ocrConfidence0to1 < 0.92;
-  const contentHash = crypto.createHash("sha256").update(JSON.stringify(params.rawExtractedTokens)).digest("hex");
+  const contentHash = sha256Hex(JSON.stringify(params.rawExtractedTokens));
   return {
     documentId: params.documentId,
     patientCanonicalId: params.patientCanonicalId,
