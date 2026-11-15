@@ -6,7 +6,7 @@
 //   - pasangan warna yang dulu gagal kontras (diukur axe-core 4.10.2 di peramban) kini >= 4.5:1.
 // Baseline terukur sebelum perbaikan: 18 node `label` kritis + 18 node `color-contrast` serius.
 import assert from 'node:assert/strict'
-import { writeFileSync, mkdirSync } from 'node:fs'
+import { readFileSync, writeFileSync, mkdirSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { createElement } from 'react'
@@ -14,8 +14,9 @@ import { renderToStaticMarkup } from 'react-dom/server'
 import { ORGAN_BIOMECHANICS_CATALOG, GI_PERISTALSIS_CATALOG } from '../../src/domains/body-exposure/engine/softTissueBiomechanicsEngine.ts'
 import { DECK_ACTIVE_FILL, sliderValueText } from '../../src/domains/body-exposure/ui/deck-kit/deckA11y.ts'
 import { defaultPhysiologyCatalog } from '../../src/domains/body-exposure/engine/system-physiology/physiologyCatalog.ts'
-import { planSystemPhysiology } from '../../src/domains/body-exposure/engine/system-physiology/systemPhysiology.ts'
+import { planSystemIndex, planSystemPhysiology } from '../../src/domains/body-exposure/engine/system-physiology/systemPhysiology.ts'
 import { simulationsFor } from '../../src/domains/body-exposure/engine/system-physiology/systemSimulations.ts'
+import { newRecallLog, planRecallDeck, recordRecall, serializeRecallLog, type RecallLog } from '../../src/domains/prometheus-learning/index.ts'
 
 const gagal = (nama: string, f: () => void) => { try { f() } catch (e) { throw new Error(`[${nama}] ${(e as Error).message}`) } }
 const hitung = (teks: string, pola: RegExp) => (teks.match(pola) ?? []).length
@@ -81,7 +82,10 @@ const out = await build({
       "export { NeuroFascicularReflexDeck } from './src/domains/body-exposure/ui/NeuroFascicularReflexDeck.tsx'",
       "export { CoronaryTerritoryPanel } from './src/domains/body-exposure/ui/CoronaryTerritoryPanel.tsx'",
       "export { ReferredPainDermatomeStudio } from './src/domains/body-exposure/ui/ReferredPainDermatomeStudio.tsx'",
-      "export { SystemPhysiologyExplorer } from './src/domains/body-exposure/ui/system-physiology/SystemPhysiologyExplorer.tsx'",
+      "export { SystemPhysiologyExplorer, PHYSIOLOGY_RECALL_KEY } from './src/domains/body-exposure/ui/system-physiology/SystemPhysiologyExplorer.tsx'",
+      "export { evidenceLine, dueLabel } from './src/domains/body-exposure/ui/system-physiology/SystemIndex.tsx'",
+      "export { SystemCard } from './src/domains/body-exposure/ui/system-physiology/SystemCard.tsx'",
+      "export { SelfCheck, selfCheckStatus, selfCheckAction, selfCheckSummary, persistenceLine, relativeDay, LEITNER_NOTE } from './src/domains/body-exposure/ui/system-physiology/SelfCheck.tsx'",
       "export { Segmented, CouplingBadge } from './src/domains/body-exposure/ui/atlas-stage/StagePieces.tsx'",
     ].join('\n'),
     resolveDir: process.cwd(), loader: 'ts',
@@ -227,15 +231,37 @@ gagal('teks-nilai-slider-batas-digit', () => {
 
 // ── Body systems (tab Fisiologi): indeks 11 sistem + kartu setiap sistem, diaudit dan dihitung terhadap rencana mesin ──
 const tanpa = () => {}
-const penjelajah = (systemId: string | null) => html(m.SystemPhysiologyExplorer, { systemId, onSystem: tanpa, onSimulate: tanpa })
+// Penyimpanan & hari disuntikkan: render tidak bergantung pada localStorage Node atau jam mesin.
+const tokoMemori = (awal: string | null = null) => {
+  let isi = awal
+  return { load: () => ({ ok: true as const, raw: isi }), save: (raw: string) => { isi = raw; return { ok: true as const } }, isi: () => isi }
+}
+const tokoTerblokir = { load: () => ({ ok: false as const, reason: 'unavailable' as const }), save: () => ({ ok: false as const, reason: 'unavailable' as const }) }
+const HARI = 20_000
+const penjelajah = (systemId: string | null, opsi: { toko?: unknown; hari?: number | null } = {}) => html(m.SystemPhysiologyExplorer, {
+  systemId, onSystem: tanpa, onSimulate: tanpa, recallStore: opsi.toko ?? tokoMemori(), today: () => (opsi.hari === undefined ? HARI : opsi.hari),
+})
 const KATALOG = defaultPhysiologyCatalog()
 gagal('sistem-indeks-sebelas-tombol-bernama', () => {
   const k = penjelajah(null)
   bersih(k)
   assert.equal(hitung(k, /<button\b/g), 11)
   for (const sistem of KATALOG.systems) assert.ok(k.includes(`>${sistem.label}</span>`), `baris ${sistem.label}`)
-  assert.ok(k.includes('No sourced mechanism yet'), 'sistem tanpa sumber tampil sebagai celah')
-  assert.ok(k.includes('Context only'), 'jembatan kontekstual dinyatakan')
+  const indeks = planSystemIndex(KATALOG)
+  assert.equal(indeks.ok, true)
+  if (!indeks.ok) return
+  for (const row of indeks.rows) assert.ok(k.includes(`>${m.evidenceLine(row)}</span>`), `${row.id}: baris bukti dari rencana`)
+  assert.ok(k.includes('>Context only · 2 sourced mechanisms</span>'), 'jembatan kontekstual dinyatakan, mekanismenya sendiri tetap dihitung')
+})
+gagal('sistem-baris-bukti-setiap-cabang', () => {
+  const baris = (fidelity: string, mechanismCount: number, gapCount: number) => m.evidenceLine({ fidelity, mechanismCount, gapCount })
+  assert.equal(baris('direct', 0, 0), 'No sourced mechanism yet', 'tanpa sumber tampil sebagai celah, bukan nol')
+  assert.equal(baris('direct', 1, 0), '1 sourced mechanism')
+  assert.equal(baris('compound', 3, 7), '3 sourced mechanisms · 7 organs not yet sourced')
+  assert.equal(baris('direct', 0, 1), 'No sourced mechanism yet · 1 organ not yet sourced')
+  assert.equal(baris('contextual', 0, 0), 'Context only · no physiology model of its own yet')
+  assert.equal(baris('contextual', 2, 0), 'Context only · 2 sourced mechanisms', 'berpasangan: hanya jumlah mekanisme yang berbeda')
+  assert.equal(baris('contextual', 0, 2), 'Context only · No sourced mechanism yet · 2 organs not yet sourced', 'celah organ tidak disembunyikan pada sistem kontekstual')
 })
 gagal('sistem-setiap-kartu-bersih-dan-sesuai-rencana', () => {
   for (const sistem of KATALOG.systems) {
@@ -255,8 +281,125 @@ gagal('sistem-setiap-kartu-bersih-dan-sesuai-rencana', () => {
     const simulasi = simulationsFor(sistem.id)
     for (const s of simulasi) assert.ok(k.includes(`>${s.label}</button>`), `${sistem.id}: tombol ${s.label}`)
     assert.equal(k.includes('No sourced mechanism for this system'), v.mechanisms.length === 0, `${sistem.id}: catatan celah hanya bila kosong`)
+    const mulai = `Start self-check · ${v.mechanisms.length}`
+    assert.equal(k.includes(`id="self-check-start-${sistem.id}"`) && k.includes(`>${mulai}</button>`), v.mechanisms.length > 0, `${sistem.id}: latihan mengingat atas setiap mekanisme bersumber`)
     assert.doesNotMatch(k, /undefined|NaN|\[object Object\]/, `${sistem.id}: tidak ada nilai bocor`)
   }
+})
+// ── Self-check (latihan mengingat) di kartu sistem: teks dari rencana, jawaban tersembunyi sampai diminta ──
+const CV = (() => { const p = planSystemPhysiology('cardiovascular', KATALOG); assert.ok(p.ok); return p.ok ? p.view : (null as never) })()
+const CV_IDS = CV.mechanisms.map((mech) => mech.id)
+const TUNGGAL = CV.mechanisms.find((mech) => mech.systems.length === 1)!.id
+const KENAL = new Set(KATALOG.mechanisms.map((mech) => mech.id))
+/** Log dari serangkaian penilaian [id, ingat?, hari]. */
+const log = (...langkah: [string, boolean, number][]) => langkah.reduce<RecallLog>((acc, [itemId, recalled, day]) => {
+  const r = recordRecall(acc, KENAL, { itemId, recalled, day }); assert.ok(r.ok, `${itemId}@${day}`); return r.ok ? r.log : acc
+}, newRecallLog())
+const lain = CV_IDS.filter((id) => id !== TUNGGAL)
+gagal('latihan-teks-status-setiap-cabang', () => {
+  assert.equal(CV_IDS.length, 4, 'kardiovaskular: empat mekanisme bersumber')
+  const baru = planRecallDeck(newRecallLog(), CV_IDS, HARI)
+  assert.equal(m.selfCheckStatus(baru, HARI), 'Recall each of the 4 sourced mechanisms from memory, then check it against its sources.')
+  assert.equal(m.selfCheckStatus(planRecallDeck(newRecallLog(), [TUNGGAL], HARI), HARI), 'Recall each of the 1 sourced mechanism from memory, then check it against its sources.', 'tunggal')
+  const sebagian = planRecallDeck(log([TUNGGAL, true, HARI - 1], [lain[0], true, HARI - 2], [lain[0], true, HARI - 1]), CV_IDS, HARI)
+  assert.equal(m.selfCheckStatus(sebagian, HARI), 'Studied 2 of 4 · 1 due today')
+  const selesai = planRecallDeck(log(...CV_IDS.flatMap((id) => [[id, true, HARI - 2], [id, true, HARI - 1]] as [string, boolean, number][])), CV_IDS, HARI)
+  assert.equal(m.selfCheckStatus(selesai, HARI), 'Studied 4 of 4 · next review tomorrow')
+  const lusa = planRecallDeck(log(...CV_IDS.flatMap((id) => [[id, true, HARI - 3], [id, true, HARI - 2], [id, true, HARI - 1]] as [string, boolean, number][])), CV_IDS, HARI)
+  assert.equal(m.selfCheckStatus(lusa, HARI), 'Studied 4 of 4 · next review in 3 days', 'kotak 2 = 4 hari dari h-1')
+  const takBisa = 'Self-check is unavailable: this device did not give a usable date.'
+  assert.equal(m.selfCheckStatus(planRecallDeck(newRecallLog(), CV_IDS, -1), null), takBisa)
+  assert.equal(m.selfCheckStatus(baru, null), takBisa, 'berpasangan: rencana sah tanpa hari tetap tidak tersedia')
+})
+gagal('latihan-label-tombol-hanya-bila-ada-antrean', () => {
+  assert.equal(m.selfCheckAction(planRecallDeck(newRecallLog(), CV_IDS, HARI)), 'Start self-check · 4')
+  assert.equal(m.selfCheckAction(planRecallDeck(log([TUNGGAL, true, HARI - 1], [lain[0], true, HARI - 2], [lain[0], true, HARI - 1]), CV_IDS, HARI)), 'Continue self-check · 3')
+  assert.equal(m.selfCheckAction(planRecallDeck(log(...CV_IDS.map((id) => [id, true, HARI] as [string, boolean, number])), CV_IDS, HARI)), null, 'semua sudah dinilai hari ini: tidak ada yang dimulai')
+  assert.equal(m.selfCheckAction({ ok: false, reason: 'bad_day' }), null)
+  assert.equal(m.relativeDay(1), 'tomorrow'); assert.equal(m.relativeDay(2), 'in 2 days'); assert.equal(m.relativeDay(0), 'today')
+  assert.equal(m.persistenceLine('device'), 'Your ratings stay in this browser only.')
+  assert.equal(m.persistenceLine('visit-only'), 'This browser cannot keep your ratings, so they last only until you leave this page.')
+})
+gagal('latihan-pengingat-indeks-hanya-bilangan-positif', () => {
+  assert.equal(m.dueLabel(2), '2 to review'); assert.equal(m.dueLabel(1), '1 to review')
+  for (const buruk of [undefined, 0, -1, 1.5, Number.NaN]) assert.equal(m.dueLabel(buruk), null, String(buruk))
+})
+gagal('latihan-kartu-membaca-penyimpanan-dan-hari', () => {
+  const baru = penjelajah('cardiovascular')
+  bersih(baru)
+  assert.ok(baru.includes('>Self-check</h5>') && baru.includes('>Start self-check · 4</button>'))
+  assert.ok(baru.includes('Your ratings stay in this browser only.'))
+  const tersimpan = serializeRecallLog(log([TUNGGAL, true, HARI - 1], [lain[0], true, HARI - 2], [lain[0], true, HARI - 1]))
+  const lanjut = penjelajah('cardiovascular', { toko: tokoMemori(tersimpan) })
+  bersih(lanjut)
+  assert.ok(lanjut.includes('>Studied 2 of 4 · 1 due today</p>') && lanjut.includes('>Continue self-check · 3</button>'), 'progres yang tersimpan terbaca')
+  const terblokir = penjelajah('cardiovascular', { toko: tokoTerblokir })
+  assert.ok(terblokir.includes('This browser cannot keep your ratings') && terblokir.includes('>Start self-check · 4</button>'), 'tanpa penyimpanan: latihan tetap jalan, dan berkata begitu')
+  const rusak = penjelajah('cardiovascular', { toko: tokoMemori('{"schemaVersion":"1.0.0","entries":{"x":{"box":9}}}') })
+  assert.ok(rusak.includes('could not be read, so the self-check starts fresh') && rusak.includes('>Start self-check · 4</button>'), 'tersimpan rusak: mulai baru dan berkata begitu, bukan menebak')
+  assert.ok(!baru.includes('could not be read'), 'berpasangan: penyimpanan kosong tidak memunculkan catatan itu')
+  const tanpaHari = penjelajah('cardiovascular', { hari: null })
+  assert.ok(tanpaHari.includes('Self-check is unavailable: this device did not give a usable date.'))
+  assert.ok(!tanpaHari.includes('id="self-check-start-cardiovascular"'), 'tanpa hari yang sah tidak ada tombol mulai')
+})
+gagal('latihan-indeks-menandai-sistem-yang-jatuh-tempo-saja', () => {
+  const tersimpan = serializeRecallLog(log([TUNGGAL, false, HARI - 1]))
+  const k = penjelajah(null, { toko: tokoMemori(tersimpan) })
+  bersih(k)
+  assert.equal(hitung(k, /Self-check · 1 to review/g), 1, 'satu sistem, satu pengingat')
+  assert.match(k, /Cardiovascular<\/span>(?:(?!<\/button>)[\s\S])*Self-check · 1 to review/, 'pada baris kardiovaskular')
+  assert.equal(hitung(k, /<button\b/g), 11, 'pengingat bukan tombol tambahan')
+  assert.equal(hitung(penjelajah(null, { toko: tokoMemori(serializeRecallLog(log([TUNGGAL, false, HARI]))) }), /to review/g), 0, 'berpasangan: dinilai hari ini = belum jatuh tempo')
+})
+gagal('latihan-kartu-tanpa-mekanisme-tanpa-latihan', () => {
+  const kosong = html(m.SystemCard, {
+    view: { ...CV, mechanisms: [] }, simulations: [], labels: new Map(), onBack: tanpa, onSystem: tanpa, onSimulate: tanpa,
+    selfCheck: { plan: planRecallDeck(newRecallLog(), [], HARI), day: HARI, persistence: 'device', notice: null, onStart: tanpa },
+  })
+  assert.ok(!kosong.includes('Self-check'), 'tidak ada yang bisa diingat: tidak ada bagian latihan')
+  const ada = html(m.SystemCard, {
+    view: CV, simulations: [], labels: new Map(), onBack: tanpa, onSystem: tanpa, onSimulate: tanpa,
+    selfCheck: { plan: planRecallDeck(newRecallLog(), CV_IDS, HARI), day: HARI, persistence: 'device', notice: null, onStart: tanpa },
+  })
+  assert.ok(ada.includes('>Self-check</h5>'), 'berpasangan: dengan mekanisme, bagian latihan tampil')
+})
+gagal('latihan-sumber-tersembunyi-sampai-diminta', () => {
+  const butir = CV.mechanisms.slice(0, 2)
+  const k = html(m.SelfCheck, { systemId: 'cardiovascular', systemLabel: 'Cardiovascular', items: butir, labels: new Map(), onRate: () => 'kept', onClose: tanpa, nextReview: null })
+  bersih(k)
+  assert.ok(k.includes('Self-check · 1 of 2') && k.includes(`>${butir[0].label}`), 'butir pertama dari antrean')
+  assert.ok(k.includes('>Show what the sources say</button>') && k.includes('>← Cardiovascular</button>'))
+  for (const c of butir[0].citations) assert.ok(!k.includes(c.url), 'sumber belum ditampilkan sebelum pelajar mencoba')
+  for (const baris of butir[0].summary) assert.ok(!k.includes(baris), 'pernyataan sumber belum ditampilkan')
+  assert.ok(!k.includes('Did you recall it?'), 'penilaian baru ada setelah jawaban dibuka')
+  const kartu = penjelajah('cardiovascular')
+  assert.ok(butir[0].citations.every((c) => kartu.includes(c.url)), 'berpasangan: di kartu sistem sumbernya memang ada')
+})
+gagal('latihan-ringkasan-sesi-kosong-tidak-membagi-nol', () => {
+  const k = html(m.SelfCheck, { systemId: 'cardiovascular', systemLabel: 'Cardiovascular', items: [], labels: new Map(), onRate: () => 'kept', onClose: tanpa, nextReview: 'tomorrow' })
+  bersih(k)
+  assert.ok(k.includes('>You recalled 0 of 0.</h4>') && k.includes('Next review: tomorrow.') && k.includes(m.LEITNER_NOTE), 'hitungan, bukan persentase dari nol')
+  assert.doesNotMatch(k, /NaN|undefined|Infinity/)
+})
+gagal('latihan-ringkasan-menghitung-yang-tercatat-saja', () => {
+  const r = (recalled: boolean, outcome: string) => ({ recalled, outcome })
+  assert.deepEqual(m.selfCheckSummary([r(true, 'kept'), r(false, 'kept'), r(true, 'kept'), r(false, 'kept')]), { recalled: 2, recorded: 4, refused: 0, visitOnly: false })
+  assert.deepEqual(m.selfCheckSummary([r(true, 'kept'), r(true, 'refused'), r(false, 'refused')]), { recalled: 1, recorded: 1, refused: 2, visitOnly: false }, 'yang ditolak tidak dihitung sebagai ingat')
+  assert.deepEqual(m.selfCheckSummary([r(true, 'visit-only'), r(false, 'kept')]), { recalled: 1, recorded: 2, refused: 0, visitOnly: true })
+  assert.deepEqual(m.selfCheckSummary([]), { recalled: 0, recorded: 0, refused: 0, visitOnly: false })
+})
+// Terukur di peramban (Vite dev, StrictMode): onRate dipanggil DI DALAM updater setResults — React menjalankan updater dua kali,
+// penilaian kedua ditolak (already_rated_today), dan ringkasan berkata "You recalled 0 of 0 · 4 ratings were not recorded"
+// padahal keempatnya tersimpan; plus peringatan "Cannot update a component while rendering a different component".
+gagal('latihan-penilaian-dicatat-di-event-bukan-di-updater', () => {
+  const sumber = readFileSync(new URL('../../src/domains/body-exposure/ui/system-physiology/SelfCheck.tsx', import.meta.url), 'utf8')
+  const diUpdater = /set[A-Z]\w*\(\s*\([^)]*\)\s*=>[^\n]*onRate\(/
+  assert.match("setResults((prev) => [...prev, { recalled, outcome: onRate(item.id, recalled) }])", diUpdater, 'pola bug memang terdeteksi')
+  assert.doesNotMatch(sumber, diUpdater, 'onRate tidak dipanggil di dalam updater state')
+  assert.match(sumber, /const outcome = onRate\(item\.id, recalled\)\n\s*setResults\(\(prev\) => \[\.\.\.prev, \{ recalled, outcome \}\]\)/)
+})
+gagal('latihan-kunci-penyimpanan-berversi', () => {
+  assert.equal(m.PHYSIOLOGY_RECALL_KEY, 'panacea.atlas.physiology-recall.v1')
 })
 gagal('sistem-asing-gagal-tertutup-dengan-jalan-kembali', () => {
   const k = penjelajah('kidney')
@@ -277,5 +420,16 @@ gagal('lencana-kopling-tombol-hapus-cukup-besar', () => {
   bersih(k)
   assert.match(k, /<button[^>]*min-height:36px;min-width:44px[^>]*>Clear<\/button>/)
 })
+gagal('lencana-kopling-hijau-hanya-bila-terkopel', () => {
+  const hijau = /rgba\(0, ?191, ?99/
+  const terkopel = html(m.CouplingBadge, { prefix: 'Clinical target:', name: 'Liver', layer: 'Organs', onClear: tanpa })
+  assert.match(terkopel, /data-coupled="true"/)
+  assert.match(terkopel, hijau, 'terkopel: nada hijau')
+  const tidak = html(m.CouplingBadge, { prefix: 'No clinical tool for:', name: 'Abductor hallucis', layer: 'Muscles', onClear: tanpa, coupled: false })
+  bersih(tidak)
+  assert.match(tidak, /data-coupled="false"/)
+  assert.doesNotMatch(tidak, hijau, 'berpasangan: tanpa kopling tidak memakai nada hijau')
+  assert.match(tidak, /<button[^>]*min-height:36px;min-width:44px[^>]*>Clear<\/button>/, 'tombol hapus tetap target sentuh')
+})
 
-console.log('atlas deck a11y: 5 decks, every tab, 11 body-system cards — all controls named, one pressed per choice group, charts described, slider values carry units, fixed colour pairs >= 4.5:1')
+console.log('atlas deck a11y: 5 decks, every tab, 11 body-system cards with their self-check — all controls named, one pressed per choice group, charts described, slider values carry units, fixed colour pairs >= 4.5:1')

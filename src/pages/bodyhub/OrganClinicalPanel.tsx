@@ -4,7 +4,9 @@ import { api, type PubmedArticle } from '../../lib/api'
 import { penjelasanOrgan, type KelainanBawaan } from '../../lib/organExplain'
 import type { AnatomyLayer } from '../../components/Body3D'
 import { OrganBiometricOverlayCard } from '../../domains/body-exposure/ui/OrganBiometricOverlayCard'
-import { CardiopulmonaryCouplingDeck, SoftTissueBiomechanicsDeck, NeuroFascicularReflexDeck } from '../../domains/body-exposure'
+import { CardiopulmonaryCouplingDeck } from '../../domains/body-exposure/ui/CardiopulmonaryCouplingDeck.tsx'
+import { SoftTissueBiomechanicsDeck } from '../../domains/body-exposure/ui/SoftTissueBiomechanicsDeck.tsx'
+import { NeuroFascicularReflexDeck } from '../../domains/body-exposure/ui/NeuroFascicularReflexDeck.tsx'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Isi klinis satu organ, terbuka SEKETIKA saat organnya diketuk di figur 3D.

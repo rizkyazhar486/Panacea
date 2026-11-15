@@ -106,12 +106,20 @@ try {
       await masuk(page).click({ timeout: 60000 })
       await page.getByPlaceholder('nama@email.com').waitFor({ timeout: 30000 })
     }
+    // The shell clears the local session at once and sends POST /api/auth/logout without waiting for it, so a check of
+    // server-side revocation must wait for the server's answer; otherwise it races the request (CI: 200 !== 401).
     const logout = async (page) => {
+      const answered = page.waitForResponse((r) => r.request().method() === 'POST' && new URL(r.url()).pathname === '/api/auth/logout', { timeout: 60000 })
+      answered.catch(() => {}) // a failed click is reported by the click itself, not as an unhandled rejection
       await page.evaluate(() => window.scrollTo(0, 0))
       const direct = page.getByRole('button', { name: 'Log out', exact: true })
-      if (await direct.first().isVisible().catch(() => false)) { await direct.first().click(); return }
-      await page.getByRole('button', { name: 'Menu akun dan keluar' }).click()
-      await page.getByRole('button', { name: 'Log out' }).click()
+      if (await direct.first().isVisible().catch(() => false)) await direct.first().click()
+      else {
+        await page.getByRole('button', { name: 'Menu akun dan keluar' }).click()
+        await page.getByRole('button', { name: 'Log out' }).click()
+      }
+      const response = await answered
+      assert.equal(response.status(), 200, `the server must accept the logout request (HTTP ${response.status()})`)
     }
     const masuk = (page) => page.getByRole('button', { name: /^Masuk( \/ Daftar Gratis)?$/ }).first()
     const overflowX = (page) => page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)

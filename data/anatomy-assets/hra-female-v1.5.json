@@ -1,0 +1,25 @@
+{
+  "sourceId": "HUBMAP_HRA_FEMALE_UNITED_V1_5",
+  "title": "Human Reference Atlas (HRA) v1.5 Female United Reference Body",
+  "provider": "HuBMAP / NIH Common Fund Human Biomolecular Atlas Program",
+  "version": "1.5.0",
+  "license": "CC-BY-4.0",
+  "coordinateSpaceId": "HUBMAP_HRA_FEMALE_METRIC_SEPARATE_SPACE_V1_5",
+  "mergedWithMaleZAnatomySpace": false,
+  "sha256Digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "verifiedNodes": [
+    "VH_F_Uterus",
+    "VH_F_Ovary_L",
+    "VH_F_Ovary_R",
+    "VH_F_Fallopian_Tube_L",
+    "VH_F_Fallopian_Tube_R",
+    "VH_F_Mammary_Gland_L",
+    "VH_F_Mammary_Gland_R",
+    "VH_F_Pelvic_Girdle",
+    "VH_F_External_Genital_Surface_Verified",
+    "VH_F_Heart",
+    "VH_F_Lung",
+    "VH_F_Kidney_L",
+    "VH_F_Kidney_R"
+  ]
+}

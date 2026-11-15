@@ -22,3 +22,6 @@ export function jenisDariNamaStruktur(nama: string): string {
   if (/kidney|renal|liver|hepat|spleen|pancrea|stomach|gastric|intestin|colon|oesophag|esophag/.test(n)) return 'a visceral organ — it lies in a body cavity and is named for that organ'
   return 'an anatomical structure in the human body'
 }
+
+export const structureTypeFromName = jenisDariNamaStruktur
+

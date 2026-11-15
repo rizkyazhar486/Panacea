@@ -1,0 +1,6 @@
+PANACEAMED ANATOMICAL & SCIENTIFIC ASSET ATTRIBUTIONS
+=====================================================
+1. Z-Anatomy Open 3D Human Atlas — Licensed under CC BY-SA 4.0 (https://www.z-anatomy.com)
+2. HuBMAP Human Reference Atlas (HRA) Female v1.5 — Licensed under CC BY 4.0 (https://humanatlas.io)
+3. Allen Institute OpenCell & Human Protein Atlas Subcellular Reference — Licensed under CC BY 4.0
+4. RCSB Protein Data Bank (PDB) & Reactome Pathway Knowledgebase — CC0 / CC BY 4.0

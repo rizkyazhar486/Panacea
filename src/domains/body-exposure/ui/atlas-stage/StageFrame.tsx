@@ -43,9 +43,22 @@ export function WideStage({ plate, depth, viewer, search, rail, regionChips, ref
       <style>{STAGE_CSS}</style>
       <div className={STAGE_ROOT_CLASS} style={{ ...rootFrame, minHeight: 620, maxHeight: 940, display: 'grid', gridTemplateRows: 'auto minmax(0, 1fr)' }}>
         <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 12, padding: '10px 16px', borderBottom: `1px solid ${TONE.line}`, background: TONE.panelSolid }}>
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, minWidth: 0 }}>
-            <span style={{ ...eyebrow, fontSize: 12, color: TONE.liveText }}>{title}</span>
-            <span style={{ fontSize: 12, color: TONE.faint }}>{caption}</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 0, flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+              <span style={{ ...eyebrow, fontSize: 12, color: TONE.liveText }}>{title}</span>
+              <span style={{ fontSize: 12, color: TONE.faint }}>{caption}</span>
+            </div>
+            <nav aria-label="Atlas modules" style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11 }}>
+              <a href="#/body-exposure/canonical" style={{ color: TONE.dim, textDecoration: 'none', padding: '2px 8px', borderRadius: 6, border: `1px solid ${TONE.line}`, background: 'rgba(255,255,255,0.02)' }}>
+                Canonical 3D
+              </a>
+              <a href="#/body-exposure/fetal-dataset" style={{ color: TONE.dim, textDecoration: 'none', padding: '2px 8px', borderRadius: 6, border: `1px solid ${TONE.line}`, background: 'rgba(255,255,255,0.02)' }}>
+                Fetal Dataset
+              </a>
+              <a href="#/radiology" style={{ color: TONE.dim, textDecoration: 'none', padding: '2px 8px', borderRadius: 6, border: `1px solid ${TONE.line}`, background: 'rgba(255,255,255,0.02)' }}>
+                Radiology MPR
+              </a>
+            </nav>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             {tabs}

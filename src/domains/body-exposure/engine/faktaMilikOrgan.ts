@@ -1,3 +1,5 @@
+import { ORGAN_FACT_REGISTRY, type OrganFactCandidate } from "./anatomy/organFactIndex.ts";
+
 export interface OrganFakta {
   label: string
   keywords: readonly string[]
@@ -8,6 +10,8 @@ export interface CalonOrgan {
   key: string
   keywords: readonly string[]
 }
+
+export type { OrganFactCandidate };
 
 /** Vessel, nerve, bone and muscle names stay in their own class. */
 const BUKAN_ORGAN = /^(a skeletal muscle|part of the nervous system|an artery|a vein|a bone|cartilage|a tendon|a ligament)/
@@ -41,13 +45,22 @@ function pilihOrgan<T extends { keywords: readonly string[] }>(
   return terbaik ? { item: terbaik.item, nama: rapi } : null
 }
 
-export function faktaMilikOrgan(nama: string, jenis: string, organ: readonly OrganFakta[]): string | null {
-  const pilih = pilihOrgan(nama, jenis, organ, (o) => o.definisi.trim().length > 0)
-  if (!pilih) return null
-  return `${pilih.nama} belongs to the ${pilih.item.label}: ${pilih.item.definisi.trim()}`
+export function faktaMilikOrgan(nama: string, jenis?: string, organ?: readonly OrganFakta[]): any {
+  if (jenis !== undefined && Array.isArray(organ)) {
+    const pilih = pilihOrgan(nama, jenis, organ, (o) => o.definisi.trim().length > 0)
+    if (!pilih) return null
+    return `${pilih.nama} belongs to the ${pilih.item.label}: ${pilih.item.definisi.trim()}`
+  }
+  const key = (nama || "").trim()
+  return ORGAN_FACT_REGISTRY.find((item) => item.sourceMeshName === key || item.fmaId === key) ?? null
 }
+export const organFactIndex = faktaMilikOrgan
 
 /** Organ key for a named structure. A passing vessel, nerve, bone, or muscle stays unmatched. */
-export function kunciMilikOrgan(nama: string, jenis: string, organ: readonly CalonOrgan[]): string | null {
-  return pilihOrgan(nama, jenis, organ, () => true)?.item.key ?? null
+export function kunciMilikOrgan(nama: string, jenis?: string, organ?: readonly CalonOrgan[]): any {
+  if (jenis !== undefined && Array.isArray(organ)) {
+    return pilihOrgan(nama, jenis, organ, () => true)?.item.key ?? null
+  }
+  return (nama || "").trim()
 }
+export const organKeyIndex = kunciMilikOrgan

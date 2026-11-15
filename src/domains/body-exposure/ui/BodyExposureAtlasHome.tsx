@@ -34,6 +34,7 @@ import { planStageLayers, plateShows, type AtlasLayerId, type AtlasLayerOverride
 import { regionFrameById } from '../engine/atlas-stage/regionFraming'
 import type { SheetSnap } from '../engine/atlas-stage/sheetSnap'
 import { describeStructure } from '../engine/atlas-stage/structureInfo'
+import { routePick } from '../engine/atlas-stage/pickRoute'
 import type { AtlasCameraCommand, AtlasViewerComponent } from '../engine/atlas-stage/viewerContract'
 import {
   decksFor,
@@ -42,7 +43,6 @@ import {
   type StructureCouplingContext,
 } from '../engine/atlasStageDecks'
 import { BODY_SYSTEM_SOURCE_WAVE, type BodySystemId } from '../data/bodySystems'
-import { systemsForStructure } from '../engine/system-physiology/structureSystem'
 import type { StageSimulation } from '../engine/system-physiology/systemSimulations'
 
 // Every body system's physiology, with the text of its sources: loaded only when the Systems view opens.
@@ -104,6 +104,8 @@ export function BodyExposureAtlasHome({ Viewer, sendCamera }: BodyExposureAtlasH
   // The Physiology stage opens on the body systems; picking a structure routes to its simulation deck instead.
   const [physiologyView, setPhysiologyView] = useState<PhysiologyView>('systems')
   const [systemFocus, setSystemFocus] = useState<BodySystemId | null>(null)
+  /** A self-check is a focus mode: while one runs, the stage's own next-step button steps aside. */
+  const [selfCheckOpen, setSelfCheckOpen] = useState(false)
   const [clinicalTool, setClinicalTool] = useState<ClinicalTool>('vascular')
 
   const plan = useMemo(() => planStageLayers({ depth, mode, overrides }), [depth, mode, overrides])
@@ -114,15 +116,15 @@ export function BodyExposureAtlasHome({ Viewer, sendCamera }: BodyExposureAtlasH
   const focusKeywords = useMemo(() => (focusName ? [focusName.toLowerCase()] : []), [focusName])
   const homeFrame = useMemo(() => { const frame = regionFrameById('all'); return frame.ok ? frame.frame : null }, [])
 
+  // A pick opens the deck that models the structure; without one, its body-system card, and no clinical target.
   const selectStructure = useCallback((rawName: string, layer: AtlasLayerId | null) => {
     const info = describeStructure(rawName, layer)
-    const context = decksFor(info)
-    const systems = systemsForStructure(info.cleanName, info.layerId)
+    const route = routePick(info)
     setSelectedStructure(info)
-    setCouplingContext(context)
-    setPhysiologyView(context.physiology)
-    setSystemFocus(systems.ok ? systems.systems[0] ?? null : null)
-    setClinicalTool(context.clinical)
+    setCouplingContext(route.couplingContext)
+    setPhysiologyView(route.physiologyView)
+    setSystemFocus(route.systemFocus)
+    if (route.clinicalTool) setClinicalTool(route.clinicalTool)
     setIsSidePanelOpen(true)
   }, [])
 
@@ -178,12 +180,9 @@ export function BodyExposureAtlasHome({ Viewer, sendCamera }: BodyExposureAtlasH
   }, [selectedStructure])
   const clearSelection = useCallback(() => { setSelectedStructure(null); setCouplingContext(null); setSystemFocus(null); resetView() }, [resetView])
 
-  // The systems a picked structure belongs to (none when the atlas does not map it, two for the pancreas).
-  const pickedSystems = useMemo(() => {
-    if (!selectedStructure) return []
-    const result = systemsForStructure(selectedStructure.cleanName, selectedStructure.layerId)
-    return result.ok ? result.systems : []
-  }, [selectedStructure])
+  // How the picked structure is coupled, for the badges: the same pure route the pick applied.
+  const pickRoute = useMemo(() => (selectedStructure ? routePick(selectedStructure) : null), [selectedStructure])
+  const pickedSystems = pickRoute?.systems ?? []
   const openSystem = useCallback((id: BodySystemId | null) => { setSystemFocus(id); setPhysiologyView('systems') }, [])
   // A system card's "Simulate" hands its tab to the deck through the same context a structure pick uses.
   const simulate = useCallback((simulation: StageSimulation) => {
@@ -238,7 +237,7 @@ export function BodyExposureAtlasHome({ Viewer, sendCamera }: BodyExposureAtlasH
   const physiologyBody = (
     <>
       {selectedStructure && (
-        <CouplingBadge prefix="Coupled to:" name={selectedStructure.cleanName} layer={selectedLayer?.short ?? 'Atlas'} onClear={clearSelection}>
+        <CouplingBadge prefix={pickRoute?.basis === 'unmapped' ? 'Not yet mapped:' : 'Coupled to:'} coupled={pickRoute?.basis !== 'unmapped'} name={selectedStructure.cleanName} layer={selectedLayer?.short ?? 'Atlas'} onClear={clearSelection}>
           {pickedSystems.map((id) => (
             <button
               key={id}
@@ -255,7 +254,7 @@ export function BodyExposureAtlasHome({ Viewer, sendCamera }: BodyExposureAtlasH
       <Segmented label="Physiology view" value={physiologyView} options={PHYSIOLOGY} onChange={setPhysiologyView} />
       {physiologyView === 'systems' && (
         <Suspense fallback={<Note color={TONE.ref}>Loading body systems…</Note>}>
-          <SystemPhysiologyExplorer systemId={systemFocus} onSystem={openSystem} onSimulate={simulate} />
+          <SystemPhysiologyExplorer systemId={systemFocus} onSystem={openSystem} onSimulate={simulate} onSessionChange={setSelfCheckOpen} />
         </Suspense>
       )}
       {physiologyView === 'cardiopulmonary' && <CardiopulmonaryCouplingDeck />}
@@ -273,14 +272,16 @@ export function BodyExposureAtlasHome({ Viewer, sendCamera }: BodyExposureAtlasH
           <b>Simulation Truth Class:</b> mechanistic_simulation_proxy · Deterministic ordinary differential equations with zero synthetic biomarkers. A simulation, not a reading from a body.
         </Note>
       )}
-      <button type="button" onClick={() => openStage('clinical')} className="as-focus as-fade" style={primaryButton}>Advance to Stage 3: Clinical Relevance →</button>
+      {!(physiologyView === 'systems' && selfCheckOpen) && (
+        <button type="button" onClick={() => openStage('clinical')} className="as-focus as-fade" style={primaryButton}>Advance to Stage 3: Clinical Relevance →</button>
+      )}
     </>
   )
 
   const clinicalBody = (
     <>
       {selectedStructure && (
-        <CouplingBadge prefix="Clinical target:" name={selectedStructure.cleanName} layer={selectedLayer?.short ?? 'Atlas'} onClear={clearSelection} />
+        <CouplingBadge prefix={pickRoute?.basis === 'deck' ? 'Clinical target:' : 'No clinical tool for:'} coupled={pickRoute?.basis === 'deck'} name={selectedStructure.cleanName} layer={selectedLayer?.short ?? 'Atlas'} onClear={clearSelection} />
       )}
       <Segmented label="Clinical tool" value={clinicalTool} options={CLINICAL} onChange={setClinicalTool} />
       {clinicalTool === 'vascular' && (

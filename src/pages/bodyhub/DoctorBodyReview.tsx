@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useStore } from '../../lib/store'
 import { Prosa } from '../../components/Prosa'
-import { STRUCTURE_REVIEW_CHECKLIST, buildReviewRecord, recordApproves, reviewReadiness, type ReviewDecision, type StructureMethod, type StructureReviewRecord } from '../../domains/body-exposure'
+import { STRUCTURE_REVIEW_CHECKLIST, buildReviewRecord, recordApproves, reviewReadiness, type ReviewDecision, type StructureMethod, type StructureReviewRecord } from '../../domains/body-exposure/engine/structureReview.ts'
 
 const BASE = `${import.meta.env.BASE_URL}bodyexposure/`
 const PAGE = 40
