@@ -1,4 +1,10 @@
 import { runPanaceaMedWave650NeuroHormonalUhd5kMasterOs } from '../src/core/panaceamedNeuroHormonalVitalityScrollOs.mjs';
+import {
+  evaluateSingleScoreZeroOverwhelmUx,
+  evaluateUhd5k4dVisceralBioMirrorSimulation,
+  evaluateInteractiveVitalityScrollingCards,
+  runPanaceaMedWave650Uhd5k4dMinimalistUxMasterOs
+} from '../src/core/panaceamedUhd5k4dMinimalistHormonalUxOs.mjs';
 import { runPanaceaMedWave600DailyWearableMasterOs } from '../src/core/panaceamedTwentyFiveWearablesDailyLifeOs.mjs';
 import { runPanaceaMedWave550VisaMastercardAndMultiDeviceMasterOs } from '../src/core/panaceamedVisaMastercardTokenQrAndMultiDeviceOs.mjs';
 import { runPanaceaMedWave500FluidChameleonMasterOs } from '../src/core/panaceamedFluidChameleonCamouflageOs.mjs';
@@ -128,6 +134,12 @@ export function createCockpitServer() {
     if (req.method === "GET" && urlPath === "/api/v10/wearables/bluetooth-bridge") return sendJson(orchestrateAllConnectedBluetoothWearables());
     if (req.method === "GET" && urlPath === "/api/v10/wearables/whoop-qwatch") return sendJson(bridgeShenzhenWhoopToQWatchProAndInterpretAi());
     if (req.method === "GET" && urlPath === "/api/v10/os/quadricentennial") return sendJson(runPanaceaMedWave400QuadricentennialMasterOs());
+    if (req.method === "GET" && urlPath === "/api/v18/ux/uhd5k-vitality") return sendJson(runPanaceaMedWave650Uhd5k4dMinimalistUxMasterOs());
+    if (req.method === "GET" && urlPath === "/api/v18/ux/visceral-biomirror") return sendJson(evaluateUhd5k4dVisceralBioMirrorSimulation());
+    if (req.method === "GET" && urlPath === "/api/v18/ux/vitality-cards") return sendJson({
+      singleScoreHero: evaluateSingleScoreZeroOverwhelmUx(),
+      vitalityCards: evaluateInteractiveVitalityScrollingCards()
+    });
 
     const fallback = handleWave65To68SovereignCockpitGateway({ method: req.method, url: req.url });
     res.writeHead(fallback.statusCode, fallback.headers);
