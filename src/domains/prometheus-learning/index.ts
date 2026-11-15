@@ -1,6 +1,8 @@
 export * from './model/types.ts'
 export * from './engine/catalog.ts'
 export * from './engine/progress.ts'
+export * from './engine/recall.ts'
+export * from './adapters/recallStore.ts'
 export * from './engine/links.ts'
 export { CARDIOVASCULAR_CATALOG } from './data/cardiovascularCatalog.ts'
 export * from './engine/caseMachine.ts'

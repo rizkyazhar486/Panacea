@@ -233,6 +233,11 @@ gagal('katalog_bawaan_jumlah_terukur', () => {
     ['urinary', 3, 2, true], ['endocrine', 5, 2, true], ['reproductive', 1, 3, true], ['lymphatic-immune', 1, 2, true],
     ['musculoskeletal', 2, 0, true], ['sensory-ent', 2, 0, true], ['integumentary-surface', 1, 0, true],
   ])
+  // Dek latihan mengingat sebuah baris indeks = mekanisme kartu sistem yang sama, dalam urutan yang sama.
+  for (const row of index.rows) {
+    assert.deepEqual(row.mechanismIds, tampilan(row.id).mechanisms.map((mech) => mech.id), `${row.id}: dek indeks = mekanisme kartu`)
+    assert.equal(row.mechanismIds.length, row.mechanismCount, `${row.id}: jumlah sesuai dek`)
+  }
 })
 gagal('kopling_dari_os_lewat_jembatan_dalam_urutan_atlas', () => {
   // OS: kardiovaskular berkopling ke respiratory, renal, nervous, endocrine, musculoskeletal → urutan atlas.
