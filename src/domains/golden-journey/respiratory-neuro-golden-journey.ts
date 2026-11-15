@@ -1,4 +1,4 @@
-import { computeAlveolarGasAndAaGradient } from "../body-exposure/omnicausalis-multiscale-bridge.ts";
+import { computeAlveolarGasAndAaGradient } from "../body-exposure/index.ts";
 import { localizeNeurologicalPathwayLesion, type NeuroTractType, type NeuroLesionLevel } from "./multisystem-golden-journey.ts";
 export function executeRespiratoryBx4Journey(fiO2: number, paCO2: number, measuredPaO2: number, age: number) {
   const ag = computeAlveolarGasAndAaGradient({ fiO2Fraction: fiO2, paCO2MmHg: paCO2, measuredPaO2MmHg: measuredPaO2, patientAgeYears: age });

@@ -1,4 +1,4 @@
-import crypto from "node:crypto";
+import { sha256Hex } from "../../../shared/kernel/sha256.ts";
 
 export interface HistoricalDeviceMetadata {
   readonly deviceId: string;
@@ -85,7 +85,7 @@ export function translateHistoricalSphygmomanometerRecord(params: {
   const auditTrail: HashChainedAuditEvent[] = [];
   let prevHash = "0000000000000000000000000000000000000000000000000000000000000000";
   steps.forEach((stepDesc, idx) => {
-    const h = crypto.createHash("sha256").update(prevHash + "::" + stepDesc).digest("hex");
+    const h = sha256Hex(prevHash + "::" + stepDesc);
     auditTrail.push({ stepIndex: idx + 1, stepName: stepDesc, previousHash: prevHash, eventHash: h });
     prevHash = h;
   });

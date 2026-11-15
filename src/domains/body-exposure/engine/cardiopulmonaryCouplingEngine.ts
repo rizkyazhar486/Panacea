@@ -353,7 +353,8 @@ export function evaluateCardiopulmonaryCoupling(
   const efPct = Number(((sv / vedMl) * 100).toFixed(2));
   const cardiacOutputLMin = Number(((hrBpm * sv) / 1000).toFixed(3));
 
-  // End-systolic pressure via Suga-Sagawa: Pes = Ees * (Ves - V0)
+  // End-systolic pressure via Suga-Sagawa: Pes = Ees * (Ves - V0). Suga H, Sagawa K. Instantaneous pressure-volume
+  // relationships and their ratio in the excised, supported canine left ventricle. Circ Res. 1974;35(1):117-126. PMID: 4841253.
   const pes = Number((eesMmHgPerMl * (vesMl - v0Ml)).toFixed(2));
 
   // End-diastolic pressure via exponential EDPVR curve: Ped = P0 * (exp(beta * Ved) - 1)

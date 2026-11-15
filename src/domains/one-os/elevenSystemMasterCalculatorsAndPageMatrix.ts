@@ -1,7 +1,7 @@
 import { DEFAULT_OXYGEN_CONTENT_CONVENTION, oxygenContentMlDl } from "../../lib/physiology/oxygenContentConventions.ts";
 import { COMPLETE_11_SYSTEM_CANONICAL_ASSET_REGISTRY, type CanonicalBodySystemId } from "../body-exposure/engine/singleProjectileUhdBodyExposureEngine.ts";
-import { executeCrossOrganCoupledSimulation } from "../body-exposure/engine/crossOrganPhysiologicalCouplingEngine.ts";
-import { simulateHepatobiliaryPancreaticPostprandialDynamics } from "../body-exposure/engine/hepatobiliaryPancreaticAndLaparoscopicEngine.ts";
+import { executeCrossOrganCoupledSimulation } from "../body-exposure/index.ts";
+import { simulateHepatobiliaryPancreaticPostprandialDynamics } from "../body-exposure/index.ts";
 
 export type PanaceaMasterPageId =
   | "PAGE_1_BODY_EXPOSURE_UHD"

@@ -12,6 +12,13 @@ function rotr(n: number, s: number): number {
  * Verified against official NIST SHA-256 test vectors.
  */
 export function sha256Hex(input: string): string {
+  return toHex(sha256Bytes(new TextEncoder().encode(input)));
+}
+
+const toHex = (bytes: Uint8Array): string => Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('');
+
+/** SHA-256 of raw bytes, as 32 bytes. */
+export function sha256Bytes(bytes: Uint8Array): Uint8Array {
   const K = [
     0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
     0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174,
@@ -32,7 +39,6 @@ export function sha256Hex(input: string): string {
   let h6 = 0x1f83d9ab;
   let h7 = 0x5be0cd19;
 
-  const bytes = new TextEncoder().encode(input);
   const len = bytes.length;
   const bitLen = len * 8;
   const padLen = ((len + 9 + 63) >> 6) << 6;
@@ -90,7 +96,35 @@ export function sha256Hex(input: string): string {
     h7 = (h7 + h) | 0;
   }
 
-  return [h0, h1, h2, h3, h4, h5, h6, h7]
-    .map((x) => (x >>> 0).toString(16).padStart(8, '0'))
-    .join('');
+  const digest = new Uint8Array(32);
+  const out = new DataView(digest.buffer);
+  [h0, h1, h2, h3, h4, h5, h6, h7].forEach((word, i) => out.setUint32(i * 4, word >>> 0, false));
+  return digest;
+}
+
+const BLOCK_BYTES = 64;
+
+/**
+ * HMAC-SHA-256 (RFC 2104; test vectors in RFC 4231) as lowercase hex. A string key or message is taken as UTF-8.
+ * A key longer than the 64-byte block is hashed first, as the RFC requires.
+ */
+export function hmacSha256Hex(key: string | Uint8Array, message: string | Uint8Array): string {
+  const asBytes = (value: string | Uint8Array, name: string): Uint8Array => {
+    if (typeof value === 'string') return new TextEncoder().encode(value);
+    if (value instanceof Uint8Array) return value;
+    throw new TypeError(`hmacSha256Hex: ${name} must be a string or Uint8Array`);
+  };
+  let k = asBytes(key, 'key');
+  const m = asBytes(message, 'message');
+  if (k.length > BLOCK_BYTES) k = sha256Bytes(k);
+  const inner = new Uint8Array(BLOCK_BYTES + m.length);
+  const outer = new Uint8Array(BLOCK_BYTES + 32);
+  for (let i = 0; i < BLOCK_BYTES; i++) {
+    const byte = k[i] ?? 0;
+    inner[i] = byte ^ 0x36;
+    outer[i] = byte ^ 0x5c;
+  }
+  inner.set(m, BLOCK_BYTES);
+  outer.set(sha256Bytes(inner), BLOCK_BYTES);
+  return toHex(sha256Bytes(outer));
 }

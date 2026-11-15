@@ -1,6 +1,12 @@
-import crypto from "node:crypto";
-import fs from "node:fs";
-import path from "node:path";
+import { sha256Hex } from "../../shared/kernel/sha256.ts";
+import { nodeHost, type NodeHost } from "../../shared/kernel/nodeHost.ts";
+
+// Preregistration and reproduction read and write the repository's research ledger, so they run under Node only.
+function researchHost(): NodeHost {
+  const host = nodeHost();
+  if (!host) throw new Error("Frontier preregistration and reproduction need the repository file system (run under Node).");
+  return host;
+}
 
 export type FrontierVerdict = "SUPPORTED" | "NOT-SUPPORTED" | "INCONCLUSIVE" | "hypothesis — not yet tested";
 
@@ -41,9 +47,10 @@ export function preregisterFrontierHypothesis(input: {
     deterministicSeed: input.deterministicSeed,
     registeredOnIso
   });
-  const preregSha256 = crypto.createHash("sha256").update(corePayload).digest("hex");
+  const preregSha256 = sha256Hex(corePayload);
   const record: PreregistrationRecord = { ...input, registeredOnIso, preregSha256 };
-  const filePath = path.join(process.cwd(), "data/research/prereg", input.sliceId + ".json");
+  const { fs, path, cwd } = researchHost();
+  const filePath = path.join(cwd(), "data/research/prereg", input.sliceId + ".json");
   fs.mkdirSync(path.dirname(filePath), { recursive: true });
   fs.writeFileSync(filePath, JSON.stringify(record, null, 2), "utf8");
   return record;
@@ -59,7 +66,8 @@ export function reproduceFrontierSlice(params: {
   readonly verdict: "SUPPORTED" | "NOT-SUPPORTED" | "INCONCLUSIVE";
   readonly uiBadgeLabel: string;
 } {
-  const filePath = path.join(process.cwd(), "data/research/prereg", params.sliceId + ".json");
+  const { fs, path, cwd } = researchHost();
+  const filePath = path.join(cwd(), "data/research/prereg", params.sliceId + ".json");
   if (!fs.existsSync(filePath)) {
     throw new Error("Rejected: cannot run reproduction without an existing preregistration file for " + params.sliceId);
   }
@@ -78,7 +86,7 @@ export function reproduceFrontierSlice(params: {
     params.observedMetricValue <= prereg.quantitativePrediction.expectedMax;
   const verdict = withinBounds ? ("SUPPORTED" as const) : ("NOT-SUPPORTED" as const);
   if (verdict === "NOT-SUPPORTED") {
-    const negPath = path.join(process.cwd(), "data/research/negative-results", params.sliceId + "-negative.json");
+    const negPath = path.join(cwd(), "data/research/negative-results", params.sliceId + "-negative.json");
     fs.mkdirSync(path.dirname(negPath), { recursive: true });
     fs.writeFileSync(negPath, JSON.stringify({ sliceId: params.sliceId, preregSha256: prereg.preregSha256, observedMetricValue: params.observedMetricValue, verdict }, null, 2), "utf8");
   }

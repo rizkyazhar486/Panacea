@@ -45,7 +45,7 @@ export * from "./body-exposure/data/zAnatomyClearIndonesianAtlas.ts";
 export * from "./body-exposure/index.ts";
 export * from "../locales/bodyExposureLocales.ts";
 
-export * from "./one-os/sevenTierMasterMindmapUnifierEngine.ts";
+export * from "../features/omnicausalis/sevenTierMasterMindmapUnifierEngine.ts";
 
 export * from "./medstudyhub/engine/goldenJourneyPhase2ConstructMasteryEngine.ts";
 export * from "./governance/frontierDiscoveryGateEngine.ts";
@@ -76,4 +76,6 @@ export * from "./medstudyhub/data/indonesianClinicalClerkshipCaseBank.ts";
 export * from "./clinical-operations/specialty/otorhinolaryngologyAudiometryAndVestibularEngine.ts";
 export * from "./clinical-operations/specialty/rheumatologyLupusSledai2kAndBiologicsEngine.ts";
 export * from "./personal-health/engine/hyperbaricDivePhysiologyAndBarotraumaEngine.ts";
-export * from "./one-os/omnicausalisHttpGatewayAndLiveCockpitServer.ts";
+export * from "../features/omnicausalis/omnicausalisHttpGatewayAndLiveCockpitServer.ts";
+export * from './omnicausalis/model/types.ts';
+export * from './omnicausalis/engine/omnicausalisEngine.ts';

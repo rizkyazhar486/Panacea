@@ -47,6 +47,13 @@ test("Body-Exposure Public API Surface: grouped headers, zero duplicate exports,
     assert.equal(Object.prototype.hasOwnProperty.call(bxApi, studio), false, studio + " must remain @internal");
   }
 
+  // The radiology MPR studio is offered only as a loader: the build runs these QA tests in plain Node before Vite,
+  // and the omnicausalis gate runs without node_modules, so the index must not import a .tsx module or a package.
+  assert.doesNotMatch(indexText, /from\s+["'][^"']+\.tsx["']/, "index.ts must not re-export a .tsx module");
+  assert.doesNotMatch(indexText, /from\s+["'](?![./])[^"']+["']/, "index.ts must not import a package");
+  assert.equal(typeof bxApi.loadDiagnosticImagingVolumetricStudio, "function");
+  assert.equal(Object.prototype.hasOwnProperty.call(bxApi, "DiagnosticImagingVolumetricStudio"), false);
+
   // Verify canonical exports exist
   assert.equal(typeof bxApi.BodyExposureAtlasHome, "function");
   assert.equal(typeof bxApi.evaluateAHA17PerfusionBurden, "function");

@@ -1,4 +1,4 @@
-import crypto from "node:crypto";
+import { sha256Hex } from "../../../shared/kernel/sha256.ts";
 
 export type EducationDepthMode = "PUBLIC_EVERYDAY" | "SCHOOL" | "MEDICAL_STUDENT" | "MEDICAL_PROFESSIONAL" | "SPECIALIST" | "PROFESSOR_RESEARCH";
 
@@ -36,7 +36,7 @@ export function projectDiseaseConceptByDepthMode(
   };
 
   const svgMarkup = "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 320 120\"><rect width=\"320\" height=\"120\" rx=\"12\" fill=\"#020617\"/><path d=\"M20 60 L90 60 L105 35 L120 95 L138 20 L155 75 L175 42 L205 42 L230 60 L300 60\" stroke=\"#38bdf8\" stroke-width=\"3\" fill=\"none\"/><text x=\"20\" y=\"24\" fill=\"#94a3b8\" font-size=\"11\">" + conceptId + " · " + depthMode + "</text></svg>";
-  const sha256Hash = crypto.createHash("sha256").update(svgMarkup).digest("hex");
+  const sha256Hash = sha256Hex(svgMarkup);
 
   return {
     conceptId,

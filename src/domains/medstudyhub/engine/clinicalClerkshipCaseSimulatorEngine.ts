@@ -4,7 +4,7 @@
  * yang menghubungkan anatomi 3D Z-Anatomy, pemeriksaan klinis, dan FSRS v4 algorithm.
  */
 
-import { findClearStructureCard } from "../../body-exposure/data/zAnatomyClearIndonesianAtlas.ts";
+import { findClearStructureCard } from "../../body-exposure/index.ts";
 
 export type ClerkshipDepartmentCode = "THT_KL" | "KARDIOLOGI" | "BEDAH_UMUM" | "NEUROLOGI" | "PENYAKIT_DALAM";
 

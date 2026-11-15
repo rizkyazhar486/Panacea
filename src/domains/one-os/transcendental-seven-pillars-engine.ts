@@ -1,4 +1,4 @@
-import { sanitizeTelemetryValue } from "../governance/universal-crash-shield.ts";
+import { sanitizeTelemetryValue } from "../governance/index.ts";
 
 // ============================================================================
 // PILAR I: SUBCELLULAR MITOCHONDRIA (ΔΨm) & AUTOPHAGY KINETICS (AMPK/mTOR & LC3-II)

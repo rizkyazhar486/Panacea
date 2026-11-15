@@ -1,5 +1,5 @@
-import { computeWiggersCardiacCyclePressure } from "../../body-exposure/engine/wiggersAndKroghPhysiologyEngine.ts";
-import { simulateRenalAutoregulationAndCountercurrent } from "../../body-exposure/engine/renalNephronAutoregulationEngine.ts";
+import { computeWiggersCardiacCyclePressure } from "../../body-exposure/index.ts";
+import { simulateRenalAutoregulationAndCountercurrent } from "../../body-exposure/index.ts";
 import { scheduleFsrsRetrievalReview } from "../argon-edu-complete-suite.ts";
 
 export interface SavedLearnerJourneyState {

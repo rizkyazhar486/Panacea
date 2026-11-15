@@ -1,4 +1,4 @@
-import crypto from "node:crypto";
+import { sha256Hex } from "../../../shared/kernel/sha256.ts";
 
 export interface SepsisCareBundleInput {
   readonly patientCanonicalId: string;
@@ -13,10 +13,10 @@ export interface SepsisCareBundleInput {
 
 export function buildFhirBundleForSepsisCare(input: SepsisCareBundleInput) {
   const timestamp = input.timestampIso || new Date().toISOString();
-  const patientUuid = "urn:uuid:" + crypto.randomUUID();
-  const encounterUuid = "urn:uuid:" + crypto.randomUUID();
-  const obsLactateUuid = "urn:uuid:" + crypto.randomUUID();
-  const carePlanUuid = "urn:uuid:" + crypto.randomUUID();
+  const patientUuid = "urn:uuid:" + globalThis.crypto.randomUUID();
+  const encounterUuid = "urn:uuid:" + globalThis.crypto.randomUUID();
+  const obsLactateUuid = "urn:uuid:" + globalThis.crypto.randomUUID();
+  const carePlanUuid = "urn:uuid:" + globalThis.crypto.randomUUID();
 
   const entries: Array<Record<string, unknown>> = [];
 
@@ -26,7 +26,7 @@ export function buildFhirBundleForSepsisCare(input: SepsisCareBundleInput) {
     resource: {
       resourceType: "Patient",
       id: patientUuid.replace("urn:uuid:", ""),
-      identifier: [{ system: "https://panaceamed.id/fhir/sid", value: "anon-" + crypto.createHash("sha256").update(input.patientCanonicalId).digest("hex").substring(0, 16) }],
+      identifier: [{ system: "https://panaceamed.id/fhir/sid", value: "anon-" + sha256Hex(input.patientCanonicalId).substring(0, 16) }],
       active: true
     }
   });
@@ -84,7 +84,7 @@ export function buildFhirBundleForSepsisCare(input: SepsisCareBundleInput) {
 
   return {
     resourceType: "Bundle" as const,
-    id: crypto.randomUUID(),
+    id: globalThis.crypto.randomUUID(),
     type: "collection" as const,
     timestamp,
     entry: entries,

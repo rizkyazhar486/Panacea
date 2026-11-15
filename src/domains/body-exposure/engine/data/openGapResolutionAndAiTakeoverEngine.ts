@@ -1,13 +1,17 @@
-import crypto from "node:crypto";
-import fs from "node:fs";
-import path from "node:path";
+import { sha256Hex } from "../../../../shared/kernel/sha256.ts";
+import { nodeHost } from "../../../../shared/kernel/nodeHost.ts";
 import { evaluateHraFemaleV15AdmissionGate } from "./hraFemaleAdmissionAndHonestGapEngine.ts";
 
 // GAP 1 RESOLUTION: Verify HRA Female v1.5 directly from repository manifest, mesh audit & CREDITS.txt
 export function verifyAndAdmitHraFemaleV15FromRepoArtifacts() {
-  const regPath = path.join(process.cwd(), "data/anatomy-assets/hra-female-v1.5.json");
-  const meshPath = path.join(process.cwd(), "data/anatomy-assets/hra-female-mesh-quality.json");
-  const creditsPath = path.join(process.cwd(), "CREDITS.txt");
+  // The artifacts are repository files: readable from Node (tools, tests), not from a browser, where the
+  // admission stays gated rather than assumed.
+  const host = nodeHost();
+  if (!host) return { admitted: false as const, status: "GATED_MISSING_ARTIFACTS" as const };
+  const { fs, path } = host;
+  const regPath = path.join(host.cwd(), "data/anatomy-assets/hra-female-v1.5.json");
+  const meshPath = path.join(host.cwd(), "data/anatomy-assets/hra-female-mesh-quality.json");
+  const creditsPath = path.join(host.cwd(), "CREDITS.txt");
 
   const hasFiles = fs.existsSync(regPath) && fs.existsSync(meshPath) && fs.existsSync(creditsPath);
   if (!hasFiles) {
@@ -188,7 +192,7 @@ export function buildClinicalReviewPacketForH3Signoff(params: {
     commitSha: params.commitSha,
     testSuitesPassedCount: params.testSuitesPassedCount
   });
-  const evidenceDigestSha256 = crypto.createHash("sha256").update(payloadString).digest("hex");
+  const evidenceDigestSha256 = sha256Hex(payloadString);
   const hasValidClinicianSignoff = Boolean(params.clinicianStrNumber && params.clinicianStrNumber.trim().length >= 8);
 
   return {

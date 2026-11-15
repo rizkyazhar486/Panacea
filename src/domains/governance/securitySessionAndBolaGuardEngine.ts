@@ -1,4 +1,5 @@
-import crypto from "node:crypto";
+import { hmacSha256Hex } from "../../shared/kernel/sha256.ts";
+import { nodeHost } from "../../shared/kernel/nodeHost.ts";
 
 export interface HardenedSessionConfig {
   readonly sessionId: string;
@@ -19,9 +20,12 @@ export function createHardenedSessionEnvelope(params: {
   readonly ttlSeconds?: number;
 }): HardenedSessionConfig {
   if (!params.actorUserId) throw new Error("actorUserId is required for session creation.");
-  const sessionId = "sess_" + crypto.randomUUID();
-  const secret = params.secretKey || process.env.PANACEA_CSRF_SECRET || "panacea-asvs5-csrf-hmac-key-2026";
-  const csrfHmacToken = crypto.createHmac("sha256", secret).update(sessionId + "::" + params.actorUserId).digest("hex");
+  // The HMAC key comes from the caller or the server's environment, never from this file: a key written in a
+  // public repository would let anyone mint a valid CSRF token. Without one the session is refused.
+  const secret = params.secretKey || nodeHost()?.env.PANACEA_CSRF_SECRET;
+  if (!secret) throw new Error("A CSRF HMAC secret is required (secretKey or PANACEA_CSRF_SECRET); none is built in.");
+  const sessionId = "sess_" + globalThis.crypto.randomUUID();
+  const csrfHmacToken = hmacSha256Hex(secret, sessionId + "::" + params.actorUserId);
   const ttlMs = (params.ttlSeconds ?? 3600) * 1000;
 
   return {

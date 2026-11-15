@@ -61,6 +61,7 @@ export const OXYGEN_CONTENT_CONVENTIONS: readonly OxygenContentConvention[] = Ob
     hufnerMlO2PerGHb: 1.39,
     dissolvedMlO2PerDlPerMmHg: 0.0034,
     evidence: Object.freeze([
+      // Tonna et al. 2021, ELSO VV ECMO guideline
       Object.freeze({ id: 'elso-vv-2021', kind: 'pmid', reference: '33965970 / PMCID PMC8315725' }),
     ]),
     sourcePrintedHbUnit: 'g/L',

@@ -520,6 +520,20 @@ export function renderInteractiveWave95CockpitHtml(snapshot = {}) {
     const personaSel = document.getElementById('persona-tier-selector');
     const outBox = document.getElementById('work-helper-output');
 
+    function writeGuide(title, rows) {
+      const heading = document.createElement('strong');
+      heading.textContent = '[' + title + ']:';
+      const nodes = [heading];
+      for (const [label, text] of rows) {
+        const row = document.createElement('div');
+        const key = document.createElement('strong');
+        key.textContent = label + ':';
+        row.append('• ', key, ' ' + text);
+        nodes.push(row);
+      }
+      outBox.replaceChildren(...nodes);
+    }
+
     function evaluatePublicUserInBrowser() {
       const uName = nameIn.value || 'Pengguna PanaceaMed';
       const wKg = Number(weightIn.value || 68);
@@ -530,37 +544,33 @@ export function renderInteractiveWave95CockpitHtml(snapshot = {}) {
       const score = Math.max(38, Math.min(98, 96 - Math.max(0, sys - 118) * 0.45 - Math.max(0, glu - 92) * 0.22)).toFixed(1);
       document.getElementById('panacea-score-display').textContent = score;
 
-      const pumpRate = ((0.1 * wKg * 60) / 80).toFixed(2);
-      const childOralit = Math.round(wKg * 10);
-      const childParacetamol = Math.round(wKg * 15);
-
+      // Built from text nodes, never parsed as HTML: the name box is free text typed by the visitor.
+      // No dose, infusion rate, test result or billing code is computed or invented here (CLAUDE.md §8).
       if (mode === 'LAYPERSON_AWAM') {
-        outBox.innerHTML =
-          '<strong>[Panduan Bahasa Awam — ' + uName + ']:</strong><br/>' +
-          '• <strong>Tensi (' + sys + ' mmHg):</strong> ' + (sys >= 140 ? 'Agak tinggi; kurangi makanan asin & istirahat cukup.' : 'Berada pada rentang aman.') + '<br/>' +
-          '• <strong>Gula Darah (' + glu + ' mg/dL):</strong> ' + (glu >= 126 ? 'Di atas normal; kurangi minuman manis & jalan kaki 15 menit sesudah makan.' : 'Terkendali baik.') + '<br/>' +
-          '• <strong>Keamanan Obat Rumah:</strong> Jangan minum Parasetamol bersama obat flu warung yang juga mengandung parasetamol (mencegah dosis ganda).';
+        writeGuide('Panduan Bahasa Awam — ' + uName, [
+          ['Tensi (' + sys + ' mmHg)', sys >= 140 ? 'Agak tinggi; kurangi makanan asin & istirahat cukup.' : 'Di bawah ambang tinggi 140 mmHg.'],
+          ['Gula Darah (' + glu + ' mg/dL)', glu >= 126 ? 'Di atas 126 mg/dL; kurangi minuman manis & jalan kaki 15 menit sesudah makan.' : 'Di bawah ambang 126 mg/dL.'],
+          ['Keamanan Obat Rumah', 'Jangan minum Parasetamol bersama obat flu warung yang juga mengandung parasetamol (mencegah dosis ganda).']
+        ]);
       } else if (mode === 'CAREGIVER_FAMILY') {
-        outBox.innerHTML =
-          '<strong>[Panduan Ibu, Keluarga & Lansia — ' + uName + ']:</strong><br/>' +
-          '• <strong>Takaran P3K Anak/Keluarga (' + wKg + ' kg):</strong> Oralit ' + childOralit + ' mL tiap BAB cair | Parasetamol aman ' + childParacetamol + ' mg bila demam >= 38°C.<br/>' +
-          '• <strong>Pencegahan Stunting:</strong> Pastikan 2 porsi protein hewani harian (telur, ikan, ayam).';
+        writeGuide('Panduan Ibu, Keluarga & Lansia — ' + uName, [
+          ['Takaran obat & oralit', 'Ikuti label resmi kemasan atau tanyakan tenaga kesehatan — takaran tidak dihitung otomatis di sini.'],
+          ['Pencegahan Stunting', 'Pastikan 2 porsi protein hewani harian (telur, ikan, ayam).']
+        ]);
       } else if (mode === 'MEDICAL_STUDENT_KOAS') {
-        outBox.innerHTML =
-          '<strong>[Jembatan Klinis Koas & UKMPPD — ' + uName + ']:</strong><br/>' +
-          '• <strong>Analisis Hemodinamik:</strong> Sistolik ' + sys + ' mmHg | Glukosa ' + glu + ' mg/dL.<br/>' +
-          '• <strong>Prinsip Farmakoterapi:</strong> Cek alel HLA-B*15:02 sebelum meresepkan antikonvulsan aromatik; jadwal ulang kartu FSRS v4 dalam 11 hari.';
+        writeGuide('Jembatan Klinis Koas & UKMPPD — ' + uName, [
+          ['Data yang dimasukkan', 'Sistolik ' + sys + ' mmHg | Glukosa ' + glu + ' mg/dL.'],
+          ['Prinsip Farmakogenomik', 'Cek alel HLA-B*15:02 sebelum meresepkan antikonvulsan aromatik.']
+        ]);
       } else if (mode === 'ATTENDING_CLINICIAN') {
-        outBox.innerHTML =
-          '<strong>[Otomasi 1-Klik SOAP, SBAR & JKN — ' + uName + ' (' + wKg + ' kg)]:</strong><br/>' +
-          '• <strong>SOAP Assessment:</strong> Observasi kardio-metabolik (TD ' + sys + ' mmHg, GDS ' + glu + ' mg/dL).<br/>' +
-          '• <strong>Kalkulator Syringe Pump:</strong> Norepinefrin 0.1 mcg/kg/mnt = <strong>' + pumpRate + ' mL/jam</strong> (pengenceran 4 mg/50 mL).<br/>' +
-          '• <strong>Audit Recheck:</strong> Pass 1 & Pass 2 Terverifikasi (Δ = 0.0000) | Koding JKN: I-4-10-III.';
+        writeGuide('Ringkasan untuk Klinisi — ' + uName + ' (' + wKg + ' kg)', [
+          ['Draf observasi', 'Kardio-metabolik (TD ' + sys + ' mmHg, GDS ' + glu + ' mg/dL) — belum ditinjau klinisi.'],
+          ['Batas', 'Laju infus, dosis dan koding JKN tidak dihitung otomatis — keputusan dan tanda tangan tetap pada klinisi.']
+        ]);
       } else {
-        outBox.innerHTML =
-          '<strong>[Matriks 12 Subspesialis & Biofisika — ' + uName + ']:</strong><br/>' +
-          '• <strong>Kardiologi Intervensi:</strong> FFR = 0.756 (<= 0.80) | <strong>Onkologi Calvert:</strong> Carboplatin 550 mg.<br/>' +
-          '• <strong>Nefrologi CRRT:</strong> 28 mL/kg/jam (KDIGO) | <strong>Fetomaternal:</strong> sFlt-1/PlGF = 57.5.';
+        writeGuide('Matriks 12 Subspesialis & Biofisika — ' + uName, [
+          ['Batas', 'Tidak ada hasil pemeriksaan atau dosis yang dibuat di sini; nilai subspesialis hanya dari pengukuran nyata dan keputusan klinisi.']
+        ]);
       }
     }
 
