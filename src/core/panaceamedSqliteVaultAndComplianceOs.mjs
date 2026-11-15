@@ -82,7 +82,7 @@ export function evaluateWave181To185SqliteEncryptedEdgeVault(payload = {}) { con
     remainingRawCount, remainingDerivedCount, indefiniteDerivedRetentionVerified: remainingDerivedCount === 2,
     rolling90DayRawPurgeVerified: remainingRawCount === 1, decryptedSampleVerified }); }
 export function evaluateWave186To190PrivacyExportAndCryptoShredding(payload = {}) { const {
-    rawIdentityEmail = 'kelvin.elim@panaceamed.id', organizationSalt = 'panaceamed-sovereign-salt-2026',
+    rawIdentityEmail = 'kelvin.elim@example.com', organizationSalt = 'panaceamed-sovereign-salt-2026',
     exportTarget = 'CLOUD_SYNC_EXPORT', // atau 'ON_DEVICE_LOCAL_EXPORT'
     executeRightToErasureShredding = true } = payload;
   const pseudonymousUserId =

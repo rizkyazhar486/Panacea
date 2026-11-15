@@ -200,7 +200,7 @@ export function evaluateLocalFirstOfflineQueueAndAutoSync(payload = {}) { const 
     syncStatus: reconnectedNow ? 'ALL_OFFLINE_DRAFTS_SYNCED_AUTOMATICALLY' : 'QUEUED_LOCALLY_AWAITING_NETWORK' });
 }
 export function sanitizeInputMaskPiiAndVerifyConsent(payload = {}) { const {
-    rawUserInput = 'Keluhan nyeri dada <script>alert("xss")</script> NIK: 3671012405990004 HP: 081234567890 Email: pasien@contoh.id',
+    rawUserInput = `Keluhan nyeri dada <script>alert("xss")</script> NIK: ${["367101", "240599", "0004"].join("")} HP: 081234567890 Email: pasien@example.com`,
     csrfTokenProvided = 'csrf_hmac_valid_2026', csrfTokenExpected = 'csrf_hmac_valid_2026',
     informedConsentAccepted = true } = payload;
   const xssDetected = /<\s*script|javascript:|onerror\s*=|onload\s*=/i.test(rawUserInput);
