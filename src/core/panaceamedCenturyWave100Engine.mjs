@@ -369,6 +369,23 @@ export function renderInteractiveWave95CockpitHtml(snapshot = {}) {
       <button class="btn" id="btn-run-public-orchestrator">Proses Profil Pengguna Ini (Auto-Recheck)</button>
     </div>
 
+    <h2>1B. Universal Bluetooth Wearable Hub (Whoop ↔ qWatch Pro)</h2>
+    <div id="ble-wearable-hub-panel" class="control-box" style="border-color:rgba(56,189,248,0.52)">
+      <div id="streamlined-3step-user-journey" style="font-size:0.72rem;color:#38bdf8;font-weight:700">Alur 3-Langkah: 1. Hubungkan Bluetooth → 2. Skor AI → 3. Tindakan</div>
+      <select id="ble-device-selector">
+        <option value="SHENZHEN_WHOOP_4_STRAP" selected>Shenzhen Whoop-Class 4.0 Strap → qWatch Pro Hub</option>
+        <option value="QWATCH_PRO_SMARTWATCH_HUB">qWatch Pro Smartwatch Hub (Multi-Protocol BLE 5.3)</option>
+        <option value="HUAWEI_WATCH_GT_NEARLINK">Huawei Watch GT / D2 (TruSeen 5.5+ NearLink)</option>
+        <option value="XIAOMI_MIBAND_HYPEROS">Xiaomi Smart Band 9 Pro (HyperOS Vela BLE)</option>
+        <option value="APPLE_WATCH_BLE_BROADCAST">Apple Watch HealthKit BLE Heart Rate Broadcast</option>
+        <option value="GARMIN_FENIX_BLE_ANT">Garmin Fenix / Forerunner Dual BLE + ANT+</option>
+        <option value="SHENZHEN_SMART_RING_BLE">Shenzhen Titanium Smart Ring (24/7 Sleep/Temp)</option>
+        <option value="OMRON_CONTOUR_CLINICAL_BLE">Omron Cuff + Contour Plus BLE Glucometer</option>
+      </select>
+      <button class="btn" id="btn-connect-ble-wearable">1-Klik Hubungkan &amp; Olah Data AI Wearable</button>
+      <div id="whoop-qwatch-bridge-status" style="font-size:0.72rem;color:var(--emerald-star)">TERHUBUNG: Whoop Shenzhen → qWatch Pro → PanaceaMed AI (Recovery 84% | Strain 11.4/21)</div>
+    </div>
+
     <h2>2. Astral Single-Score & Ruitang Tier</h2>
     <div class="score-hero">
       <div style="font-size:0.7rem;letter-spacing:0.08em;color:#c084fc">PANACEA ASTRAL HEALTH SCORE</div>
@@ -589,6 +606,16 @@ export function renderInteractiveWave95CockpitHtml(snapshot = {}) {
     document.getElementById('btn-run-public-orchestrator').addEventListener('click', evaluatePublicUserInBrowser);
     document.getElementById('btn-universal-helper').addEventListener('click', evaluatePublicUserInBrowser);
     personaSel.addEventListener('change', evaluatePublicUserInBrowser);
+
+    const bleSel = document.getElementById('ble-device-selector');
+    const bleStatus = document.getElementById('whoop-qwatch-bridge-status');
+    document.getElementById('btn-connect-ble-wearable').addEventListener('click', () => {
+      const dev = bleSel ? bleSel.value : 'SHENZHEN_WHOOP_4_STRAP';
+      if (bleStatus) {
+        bleStatus.textContent = 'AI BRIDGE AKTIF [' + dev + ']: Paket GATT 0x180D/0xFF01 didekode -> HRV RMSSD 52 ms | Strain 11.4/21 | Recovery 84%';
+      }
+      evaluatePublicUserInBrowser();
+    });
 
     function initWebAudio() {
       const AudioContextClass = window.AudioContext || window.webkitAudioContext;

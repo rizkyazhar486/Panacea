@@ -22,6 +22,7 @@ import * as m_15 from './panaceamedSqliteVaultAndComplianceOs.mjs';
 import * as m_16 from './panaceamedUniversalHumanityOs.mjs';
 import * as m_17 from './panaceamedPlanetary5BillionSimulationOs.mjs';
 import * as m_18 from './panaceamedAstralAmethystPublicOrchestratorOs.mjs';
+import * as m_19 from './panaceamedUniversalBleWearableBridgeOs.mjs';
 
 const EXTRA_CONTRACT_DEFAULTS = Object.freeze({
   "safeChildParacetamolDoseMg": 210,
@@ -208,3 +209,10 @@ export const ASTRAL_AMETHYST_DESIGN_TOKENS = m_18.ASTRAL_AMETHYST_DESIGN_TOKENS;
 export const PUBLIC_EXTERNAL_USER_ARCHETYPES = m_18.PUBLIC_EXTERNAL_USER_ARCHETYPES;
 export const orchestratePublicHumanSession = m_18.orchestratePublicHumanSession;
 export const runPanaceaMedWave350AstralPublicMasterOs = m_18.runPanaceaMedWave350AstralPublicMasterOs;
+export const BLE_GATT_STANDARD_AND_VENDOR_UUIDS = m_19.BLE_GATT_STANDARD_AND_VENDOR_UUIDS;
+export const UNIVERSAL_BLE_WEARABLE_PROFILES = m_19.UNIVERSAL_BLE_WEARABLE_PROFILES;
+export const encodeAndDecodeUniversalBleWearablePacket = m_19.encodeAndDecodeUniversalBleWearablePacket;
+export const bridgeShenzhenWhoopToQWatchProAndInterpretAi = m_19.bridgeShenzhenWhoopToQWatchProAndInterpretAi;
+export const orchestrateAllConnectedBluetoothWearables = m_19.orchestrateAllConnectedBluetoothWearables;
+export const evaluateStreamlinedThreeStepUserJourney = m_19.evaluateStreamlinedThreeStepUserJourney;
+export const runPanaceaMedWave400QuadricentennialMasterOs = m_19.runPanaceaMedWave400QuadricentennialMasterOs;
