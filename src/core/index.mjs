@@ -30,6 +30,7 @@ import * as m_23 from './panaceamedUniversalBleWifiImitationOs.mjs';
 import * as m_24 from './panaceamedUniversalHumanityOs.mjs';
 import * as m_25 from './panaceamedVisaMastercardTokenQrAndMultiDeviceOs.mjs';
 import * as m_26 from './panaceamedUhd5k4dMinimalistHormonalUxOs.mjs';
+import * as m_27 from './panaceamedUniversalPublic100ReadinessOs.mjs';
 
 export const ASTRAL_AMETHYST_DESIGN_TOKENS = m_0.ASTRAL_AMETHYST_DESIGN_TOKENS;
 export const PUBLIC_EXTERNAL_USER_ARCHETYPES = m_0.PUBLIC_EXTERNAL_USER_ARCHETYPES;
@@ -186,3 +187,8 @@ export const evaluateSingleScoreZeroOverwhelmUx = m_26.evaluateSingleScoreZeroOv
 export const evaluateUhd5k4dVisceralBioMirrorSimulation = m_26.evaluateUhd5k4dVisceralBioMirrorSimulation;
 export const evaluateInteractiveVitalityScrollingCards = m_26.evaluateInteractiveVitalityScrollingCards;
 export const runPanaceaMedWave650Uhd5k4dMinimalistUxMasterOs = m_26.runPanaceaMedWave650Uhd5k4dMinimalistUxMasterOs;
+export const PUBLIC_MULTILINGUAL_AND_NUSANTARA_DICTIONARY = m_27.PUBLIC_MULTILINGUAL_AND_NUSANTARA_DICTIONARY;
+export const evaluateUniversalPublicEverydayTriageAndGuide = m_27.evaluateUniversalPublicEverydayTriageAndGuide;
+export const evaluateHouseholdAndCommunityPublicHealthCompanion = m_27.evaluateHouseholdAndCommunityPublicHealthCompanion;
+export const evaluateFiveDimension100PercentPublicReadiness = m_27.evaluateFiveDimension100PercentPublicReadiness;
+export const runPanaceaMedWave700UniversalPublic100ReadinessMasterOs = m_27.runPanaceaMedWave700UniversalPublic100ReadinessMasterOs;
