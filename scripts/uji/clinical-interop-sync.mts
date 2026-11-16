@@ -55,7 +55,7 @@ import {
     },
     account: {
       id: 'acc-doc-1',
-      email: 'dokter@panaceamed.id',
+      email: 'dokter@example.invalid',
       name: 'dr. Uji',
       role: 'dokter',
       loggedAt: '2026-11-16T05:00:00.000Z',

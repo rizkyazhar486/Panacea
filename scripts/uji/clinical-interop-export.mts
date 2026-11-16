@@ -33,7 +33,7 @@ const dummyPatient: Patient = {
 
 const dummyAccount: Account = {
   id: 'acc-dokter-001',
-  email: 'dokter@panaceamed.id',
+  email: 'dokter@example.invalid',
   name: 'dr. Rizky Muhammad, Sp.PD',
   role: 'dokter',
   str: '31.1.1.100.1.23.999888',
