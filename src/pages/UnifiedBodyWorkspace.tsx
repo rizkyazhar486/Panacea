@@ -23,6 +23,9 @@ const HealthProfile = lazy(() => import('./bodyhub/HealthProfile').then((m) => (
 const VitaPulse = lazy(() => import('./bodyhub/VitaPulse').then((m) => ({ default: m.VitaPulse })))
 const Longevity = lazy(() => import('./bodyhub/Longevity').then((m) => ({ default: m.Longevity })))
 const DataLab = lazy(() => import('./bodyhub/DataLab').then((m) => ({ default: m.DataLab })))
+const UniversalCompactBodyCockpit = lazy(() =>
+  import('../components/bodyhub/UniversalCompactBodyCockpit').then((m) => ({ default: m.UniversalCompactBodyCockpit })),
+)
 
 type BodyView = 'body' | 'body-exposure' | 'body-tools' | 'character' | 'training' | 'ranked' | 'workout' | 'recovery' | 'numbers' | 'nutrition' | 'health-data' | 'labs' | 'longevity' | 'vitapulse'
 type View = { key: BodyView; label: string; short: string; component: ComponentType; childTab?: string; description: string }
@@ -225,6 +228,11 @@ export function UnifiedBodyWorkspace() {
       </section>
 
       <section role="tabpanel" aria-label={active.label} className="min-w-0 space-y-3">
+        {activeKey === 'body' && (
+          <Suspense fallback={<div className="p-4 text-xs text-white/50">Loading cockpit…</div>}>
+            <UniversalCompactBodyCockpit />
+          </Suspense>
+        )}
         {['body', 'training', 'ranked', 'recovery', 'nutrition', 'health-data'].includes(activeKey) && (
           <YourBodyDailyStrip activeKey={activeKey} />
         )}
@@ -272,7 +280,7 @@ function YourBodyDailyStrip({ activeKey }: { readonly activeKey: BodyView }) {
     : activeKey === 'ranked' ? { title: '90-Day League Evidence', detail: `Tracked signals: RHR ${rhr ?? '—'} · HRV ${hrv ?? '—'} · Sleep ${sleep ?? '—'} h`, to: '/fitness-hub?view=training', cta: 'Log Training' }
     : activeKey === 'recovery' ? { title: 'Autonomic Recovery Focus', detail: `HRV ${hrv ?? '—'} ms · Sleep ${sleep ?? '—'} h · Slow 0.1 Hz vagal pacing & wearable fusion ready`, to: '/body-exposure', cta: 'Open EMV & Local Hub' }
     : activeKey === 'nutrition' ? { title: 'Daily Fluid & Energy Context', detail: weight != null ? `Recorded Weight ${weight.toFixed(1)} kg · Baseline fluid ~${Math.round(weight * 30)} mL/day` : 'Enter weight on Body tab for fluid target', to: '/fitness-hub?view=body', cta: 'Update Body' }
-    : { title: 'Multi-Device Canonical Sync', detail: `Active channels: ${[rhr, hrv, sleep, steps, weight].filter((x) => x != null).length}/5 baseline signals populated`, to: '/body-exposure', cta: '25 Wearable Hub & QR' }
+    : { title: 'Devices', detail: `${[rhr, hrv, sleep, steps, weight].filter((x) => x != null).length}/5 signals`, to: '/body-exposure', cta: 'Open hub' }
 
   return (
     <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 10, padding: '10px 14px', borderRadius: 16, border: '1px solid rgba(0, 191, 99, 0.28)', background: 'rgba(6, 12, 16, 0.85)', color: '#eef4ff' }}>

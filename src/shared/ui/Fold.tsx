@@ -29,9 +29,11 @@ export interface FoldProps {
   defaultOpen?: boolean
   /** Nama grup eksklusif: hanya 1 lipatan yang terbuka dalam satu nama grup. */
   name?: string
+  /** Callback saat status terbuka/tertutup berubah. */
+  onToggle?: (open: boolean) => void
 }
 
-export function Fold({ label, subtitle, children, className = '', defaultOpen = false, name: directName }: FoldProps) {
+export function Fold({ label, subtitle, children, className = '', defaultOpen = false, name: directName, onToggle }: FoldProps) {
   const groupName = useContext(FoldGroupContext)
   const name = directName ?? groupName
 
@@ -48,6 +50,7 @@ export function Fold({ label, subtitle, children, className = '', defaultOpen = 
       open={forced || defaultOpen || undefined}
       onToggle={(e) => {
         const target = e.currentTarget
+        onToggle?.(target.open)
         if (target.open && name && typeof document !== 'undefined') {
           document.querySelectorAll<HTMLDetailsElement>(`details[name="${name}"]`).forEach((d) => {
             if (d !== target && d.open) {
