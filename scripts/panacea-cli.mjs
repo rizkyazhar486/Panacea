@@ -36,10 +36,23 @@ import { runPanaceaMedWave550VisaMastercardAndMultiDeviceMasterOs } from '../src
 import { runPanaceaMedWave600DailyWearableMasterOs } from '../src/core/panaceamedTwentyFiveWearablesDailyLifeOs.mjs';
 import { runPanaceaMedWave650NeuroHormonalUhd5kMasterOs } from '../src/core/panaceamedNeuroHormonalVitalityScrollOs.mjs';
 import { runPanaceaMedWave650Uhd5k4dMinimalistUxMasterOs } from '../src/core/panaceamedUhd5k4dMinimalistHormonalUxOs.mjs';
+import { runPanaceaMedWave700UniversalPublic100ReadinessMasterOs } from '../src/core/panaceamedUniversalPublic100ReadinessOs.mjs';
 
 const mode = (process.argv[2] || 'daily').toLowerCase();
 
-if (mode === 'vitality' || mode === 'bioscroll' || mode === 'uhd5k' || mode === 'ux') {
+if (mode === 'publik' || mode === 'masyarakat' || mode === '100' || mode === 'triage') {
+  const pub = runPanaceaMedWave700UniversalPublic100ReadinessMasterOs();
+  console.log('=== PANACEAMED WAVE 700 — 100% KELAYAKAN MASYARAKAT UMUM & PENDAMPING HARIAN ===');
+  console.log('• Skor Kesiapan Publik 5 Dimensi :', pub.publicReadinessPercentage + '% (Status:', pub.readiness100.generalPublicUsabilityStatus + ')');
+  console.log('• Triase Cepat Warga (Tanpa Alat):', pub.publicTriage.triageHeader);
+  for (const step of pub.publicTriage.threeSimpleStepsForCitizen) {
+    console.log(' ', step);
+  }
+  console.log('• Lingkaran Keluarga & Komunitas :');
+  for (const c of pub.householdCompanion.householdCircles) {
+    console.log(`  [${c.roleLabel}] ${c.statusBadge} -> ${c.dailyPracticalAction}`);
+  }
+} else if (mode === 'vitality' || mode === 'bioscroll' || mode === 'uhd5k' || mode === 'ux') {
   const v = runPanaceaMedWave650NeuroHormonalUhd5kMasterOs();
   const ux = runPanaceaMedWave650Uhd5k4dMinimalistUxMasterOs();
   console.log('=== PANACEAMED NEURO-HORMONAL VITALITY BIO-SCROLLING & UHD 5K 4D MIRROR ===');
@@ -108,6 +121,7 @@ if (mode === 'vitality' || mode === 'bioscroll' || mode === 'uhd5k' || mode === 
   console.log('• Populasi:', rep.planetary5B.totalSimulatedUsersString, '| Subspesialis:', rep.totalSubspecialtiesValidated, 'Bidang');
 } else {
   const status = runHolisticAutoExpansionAndSmoothOsGovernor();
-  console.log('=== STATUS KEMATANGAN PANACEAMED OS (WAVE 600) ===');
-  console.log('• Kematangan OS:', status.autoMaturityPercentage + '% | Kesehatan Fungsi:', status.autoCheckFunctionHealthPercentage + '%');
+  const pub = runPanaceaMedWave700UniversalPublic100ReadinessMasterOs();
+  console.log('=== STATUS KEMATANGAN PANACEAMED OS (WAVE 700 — 100% PUBLIC READY) ===');
+  console.log('• Kematangan OS:', status.autoMaturityPercentage + '% | Kelayakan Masyarakat Umum:', pub.publicReadinessPercentage + '% | Kesehatan Fungsi:', status.autoCheckFunctionHealthPercentage + '%');
 }
