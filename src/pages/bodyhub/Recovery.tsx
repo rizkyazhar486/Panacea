@@ -222,7 +222,7 @@ function MeditationCard() {
       <div className="flex gap-2 overflow-x-auto pb-1">
         {MEDITATION_SCRIPTS.map((s) => (
           <button key={s.key} onClick={() => { setScriptKey(s.key); setStepIdx(0) }}
-            className={`shrink-0 rounded-full px-3 py-2 text-xs font-bold transition ${scriptKey === s.key ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600'}`}>
+            className={`inline-flex min-h-[44px] shrink-0 items-center rounded-full px-3 py-2 text-xs font-bold transition ${scriptKey === s.key ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600'}`}>
             {s.emoji} {s.label}
           </button>
         ))}
@@ -234,8 +234,8 @@ function MeditationCard() {
         </div>
         <p className="mt-2 text-sm leading-relaxed text-ink">{script.steps[stepIdx]}</p>
         <div className="mt-3 flex gap-2">
-          <button onClick={() => setStepIdx((i) => Math.max(0, i - 1))} disabled={stepIdx === 0} className="flex-1 rounded-xl border border-neutral-200 py-2 text-xs font-bold text-neutral-600 disabled:opacity-40">← Previous</button>
-          <button onClick={() => setStepIdx((i) => Math.min(script.steps.length - 1, i + 1))} disabled={stepIdx === script.steps.length - 1} className="flex-1 rounded-xl bg-brand py-2 text-xs font-bold text-white disabled:opacity-40">Next →</button>
+          <button onClick={() => setStepIdx((i) => Math.max(0, i - 1))} disabled={stepIdx === 0} className="min-h-[44px] flex-1 rounded-xl border border-neutral-200 py-2 text-xs font-bold text-neutral-600 disabled:opacity-40">← Previous</button>
+          <button onClick={() => setStepIdx((i) => Math.min(script.steps.length - 1, i + 1))} disabled={stepIdx === script.steps.length - 1} className="min-h-[44px] flex-1 rounded-xl bg-brand py-2 text-xs font-bold text-white disabled:opacity-40">Next →</button>
         </div>
       </div>
 
@@ -243,14 +243,14 @@ function MeditationCard() {
       <div className="mt-2 flex gap-2">
         {([['rain', '🌧️ Rain'], ['ocean', '🌊 Ocean'], ['tone', '🎵 Calming Tone']] as const).map(([k, l]) => (
           <button key={k} onClick={() => (playing === k ? stop() : play(k, volume))}
-            className={`flex-1 rounded-xl py-2.5 text-xs font-bold transition ${playing === k ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600'}`}>
+            className={`min-h-[44px] flex-1 rounded-xl py-2.5 text-xs font-bold transition ${playing === k ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600'}`}>
             {playing === k ? '⏸ ' : ''}{l}
           </button>
         ))}
       </div>
       <div className="mt-2 flex items-center gap-2">
         <span className="text-[10px] font-bold uppercase text-neutral-500">Volume</span>
-        <input type="range" min={0} max={0.5} step={0.01} value={volume} onChange={(e) => changeVolume(+e.target.value)} className="flex-1 accent-brand" />
+        <input type="range" min={0} max={0.5} step={0.01} value={volume} onChange={(e) => changeVolume(+e.target.value)} aria-label="Ambient sound volume" style={{ height: 44 }} className="min-h-[44px] flex-1 accent-brand" />
       </div>
       <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">Background sound is generated directly on your device (Web Audio API) — it works fully offline, without depending on a third-party music service that may not always be reachable.</Prosa>
     </Card>

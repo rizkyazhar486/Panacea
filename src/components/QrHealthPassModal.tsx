@@ -18,15 +18,7 @@ import {
   verifyTotpCode,
   type RememberedProfile,
 } from '../domains/identity/webAuthnTotp'
-import {
-  adoptAllDeviceLocalBuckets,
-  exportFullLocalVault,
-  restoreFullLocalVault,
-} from '../domains/identity/localRecovery'
-import {
-  discoverConnectedDevices,
-  type ConnectedDeviceRecord,
-} from '../domains/devices/index.ts'
+import type { ConnectedDeviceRecord } from '../domains/devices/index.ts'
 import { OWNER_EMAIL, useOptionalStore } from '../lib/store'
 import type { Role } from '../lib/types'
 
@@ -105,9 +97,11 @@ export function QrHealthPassModal({
   const streamRef = useRef<MediaStream | null>(null)
 
   useEffect(() => {
-    if (!open || !account) return
-    void discoverConnectedDevices({ ownerEmail: account.email }).then(setDevices)
-  }, [open, account, busy])
+    if (!open || !account || tab !== 'recovery') return
+    void import('../domains/devices/index.ts').then((m) =>
+      m.discoverConnectedDevices({ ownerEmail: account.email }).then(setDevices),
+    )
+  }, [open, account, tab, busy])
 
   useEffect(() => {
     if (!open) return
@@ -315,7 +309,7 @@ export function QrHealthPassModal({
       onClose()
       return
     }
-    // Match an active device Health Pass EMV QR or Code-128 wristband belonging to a remembered account
+    // Match an active device Health Pass QR or Code-128 wristband belonging to a remembered account
     for (const candidate of remembered) {
       const derived = deriveTokenizedEmvPass({
         accountId: `local:${encodeURIComponent(candidate.email)}`,
@@ -345,8 +339,12 @@ export function QrHealthPassModal({
     setStatus('Unrecognized QR/Barcode token. Generate a Pairing QR while signed in to pair another tab or device.')
   }
 
-  const handleManualRecovery = () => {
+  const handleManualRecovery = async () => {
     if (!account) return
+    const [{ adoptAllDeviceLocalBuckets }, { discoverConnectedDevices }] = await Promise.all([
+      import('../domains/identity/localRecovery'),
+      import('../domains/devices/index.ts'),
+    ])
     const summary = adoptAllDeviceLocalBuckets(account, {
       patient,
       patientVitals: patient ? store?.state.vitals[patient.id] : undefined,
@@ -360,13 +358,17 @@ export function QrHealthPassModal({
 
   const handleReconnectAllDevices = async () => {
     setBusy(true)
-    const mod = await import('../domains/devices/adapters/quickConnectSession')
+    const [mod, devMod] = await Promise.all([
+      import('../domains/devices/adapters/quickConnectSession'),
+      import('../domains/devices/index.ts'),
+    ])
     await mod.triggerQuickWearableConnect((st) => setStatus(st.message))
-    if (account) void discoverConnectedDevices({ ownerEmail: account.email }).then(setDevices)
+    if (account) void devMod.discoverConnectedDevices({ ownerEmail: account.email }).then(setDevices)
     setBusy(false)
   }
 
-  const handleDownloadBackup = () => {
+  const handleDownloadBackup = async () => {
+    const { exportFullLocalVault } = await import('../domains/identity/localRecovery')
     const vault = exportFullLocalVault(account)
     if (!vault) return
     const blob = new Blob([JSON.stringify(vault, null, 2)], { type: 'application/json' })
@@ -414,8 +416,8 @@ export function QrHealthPassModal({
         >
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
             <div>
-              <div style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#00BF63' }}>
-                {account ? 'Next-Gen Identity & EMV Pass' : 'Passwordless Instant Access'}
+              <div style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--teks-ok)' }}>
+                {account ? 'Identity Pass & Local Vault' : 'Passwordless Instant Access'}
               </div>
               <h3 style={{ margin: '2px 0 0', fontSize: 17, fontWeight: 800 }}>
                 {account ? 'QR Pass, Passkey & Data Vault' : 'Authenticator, Passkey & QR'}
@@ -426,7 +428,7 @@ export function QrHealthPassModal({
               onClick={onClose}
               aria-label="Close modal"
               className="rounded-xl border border-black/10 px-3 py-1.5 text-xs font-bold dark:border-white/15"
-              style={{ minHeight: 38 }}
+              style={{ minHeight: 44, minWidth: 44 }}
             >
               ✕
             </button>
@@ -452,13 +454,13 @@ export function QrHealthPassModal({
                 onClick={() => setTab(item.id as QrModalInitialTab)}
                 style={{
                   flex: 1,
-                  minHeight: 40,
+                  minHeight: 44,
                   borderRadius: 12,
                   fontSize: 11,
                   fontWeight: 800,
                   border: tab === item.id ? '1px solid #00BF63' : '1px solid rgba(148,163,184,0.28)',
                   background: tab === item.id ? 'rgba(0, 191, 99, 0.14)' : 'transparent',
-                  color: tab === item.id ? '#00BF63' : 'inherit',
+                  color: tab === item.id ? 'var(--teks-ok)' : 'inherit',
                   cursor: 'pointer',
                 }}
               >
@@ -472,7 +474,7 @@ export function QrHealthPassModal({
             <div style={{ marginTop: 14, display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'center' }}>
               <div style={{ display: 'flex', gap: 6, width: '100%' }}>
                 {([
-                  { id: 'universal', label: 'EMV QR' },
+                  { id: 'universal', label: 'Identity QR' },
                   { id: 'emergency', label: 'Emergency QR' },
                   { id: 'pairing', label: 'Pairing Login QR' },
                 ] as const).map((m) => (
@@ -482,7 +484,7 @@ export function QrHealthPassModal({
                     onClick={() => setQrMode(m.id)}
                     style={{
                       flex: 1,
-                      minHeight: 36,
+                      minHeight: 44,
                       borderRadius: 10,
                       fontSize: 11,
                       fontWeight: 700,
@@ -499,7 +501,7 @@ export function QrHealthPassModal({
 
               <QrSvgBox payload={activeQrPayload} label={`${qrMode} QR Pass`} />
               <div style={{ fontSize: 11, opacity: 0.78, textAlign: 'center' }}>
-                {account.name} · {emv.tokenizedDevicePanMasked} · Rotates in {emv.secondsRemaining}s
+                {account.name} · Local Token {emv.tokenizedDevicePanMasked} · Rotates in {emv.secondsRemaining}s
               </div>
 
               <BarcodeSvgBox value={emv.payloads.wristbandCode128} />
@@ -512,9 +514,10 @@ export function QrHealthPassModal({
                     const txt = qrMode === 'pairing' ? pairingPayload : activeQrPayload
                     void navigator.clipboard?.writeText(txt).then(() => setStatus('QR/Pairing code copied!'))
                   }}
+                  style={{ minHeight: 44 }}
                   className="w-full rounded-xl border border-black/10 py-2.5 text-xs font-bold dark:border-white/15"
                 >
-                  📋 Copy {qrMode === 'pairing' ? 'Pairing Token' : 'EMV Payload'}
+                  📋 Copy {qrMode === 'pairing' ? 'Pairing Token' : 'Identity QR Payload'}
                 </button>
                 <button
                   type="button"
@@ -529,6 +532,7 @@ export function QrHealthPassModal({
                       .then(() => setStatus('Written to NFC Health Tag! Ready for tap handoff.'))
                       .catch(() => setStatus('NFC tap cancelled or tag unavailable.'))
                   }}
+                  style={{ minHeight: 44 }}
                   className="w-full rounded-xl border border-black/10 py-2.5 text-xs font-bold dark:border-white/15"
                 >
                   📡 NFC Tap Handoff
@@ -552,7 +556,7 @@ export function QrHealthPassModal({
                   onClick={() => void handleEnrollPasskey()}
                   style={{
                     width: '100%',
-                    minHeight: 42,
+                    minHeight: 44,
                     borderRadius: 12,
                     border: 'none',
                     background: '#00BF63',
@@ -569,7 +573,7 @@ export function QrHealthPassModal({
                     {boundPasskeys.map((pk) => (
                       <div key={pk.credentialIdB64} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 11 }}>
                         <span>✓ Passkey · {pk.createdAt.slice(0, 10)}</span>
-                        <button type="button" onClick={() => removePasskey(pk.credentialIdB64)} style={{ color: '#e11d48', fontWeight: 700, background: 'none', border: 'none', cursor: 'pointer' }}>
+                        <button type="button" onClick={() => removePasskey(pk.credentialIdB64)} style={{ minHeight: 44, minWidth: 44, color: 'var(--teks-bad)', fontWeight: 700, background: 'none', border: 'none', cursor: 'pointer' }}>
                           Remove
                         </button>
                       </div>
@@ -582,14 +586,14 @@ export function QrHealthPassModal({
                 <div style={{ fontSize: 12, fontWeight: 800 }}>6-Digit Authenticator App (TOTP)</div>
                 {activeTotp ? (
                   <div style={{ marginTop: 6, display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 11 }}>
-                    <span style={{ color: '#00BF63', fontWeight: 700 }}>● Active since {activeTotp.enabledAt.slice(0, 10)}</span>
+                    <span style={{ color: 'var(--teks-ok)', fontWeight: 700 }}>● Active since {activeTotp.enabledAt.slice(0, 10)}</span>
                     <button
                       type="button"
                       onClick={() => {
                         removeTotpEnrollment(account.email)
                         setStatus('Authenticator removed from this device.')
                       }}
-                      style={{ color: '#e11d48', fontWeight: 700, background: 'none', border: 'none', cursor: 'pointer' }}
+                      style={{ minHeight: 44, minWidth: 44, color: 'var(--teks-bad)', fontWeight: 700, background: 'none', border: 'none', cursor: 'pointer' }}
                     >
                       Disable
                     </button>
@@ -609,7 +613,7 @@ export function QrHealthPassModal({
                       type="button"
                       disabled={busy}
                       onClick={() => void handleConfirmTotp()}
-                      style={{ width: '100%', minHeight: 40, borderRadius: 12, border: 'none', background: '#00BF63', color: '#04130b', fontSize: 12, fontWeight: 800, cursor: 'pointer' }}
+                      style={{ width: '100%', minHeight: 44, borderRadius: 12, border: 'none', background: '#00BF63', color: '#04130b', fontSize: 12, fontWeight: 800, cursor: 'pointer' }}
                     >
                       Verify &amp; Activate Authenticator
                     </button>
@@ -618,6 +622,7 @@ export function QrHealthPassModal({
                   <button
                     type="button"
                     onClick={handleStartTotp}
+                    style={{ minHeight: 44 }}
                     className="mt-2 w-full rounded-xl border border-black/15 py-2 text-xs font-bold dark:border-white/20"
                   >
                     Configure Google / Apple Authenticator
@@ -649,7 +654,7 @@ export function QrHealthPassModal({
                   type="button"
                   disabled={busy}
                   onClick={() => void handleReconnectAllDevices()}
-                  style={{ marginTop: 8, width: '100%', minHeight: 38, borderRadius: 10, border: '1px solid #00BF63', background: 'rgba(0,191,99,0.12)', color: '#00BF63', fontSize: 11, fontWeight: 800, cursor: 'pointer' }}
+                  style={{ marginTop: 8, width: '100%', minHeight: 44, borderRadius: 10, border: '1px solid #00BF63', background: 'rgba(0,191,99,0.12)', color: 'var(--teks-ok)', fontSize: 11, fontWeight: 800, cursor: 'pointer' }}
                 >
                   ⚡ Auto-Connect / Reconnect Paired BLE Wearable
                 </button>
@@ -657,7 +662,7 @@ export function QrHealthPassModal({
 
               <button
                 type="button"
-                onClick={handleManualRecovery}
+                onClick={() => void handleManualRecovery()}
                 style={{ width: '100%', minHeight: 44, borderRadius: 12, border: 'none', background: '#00BF63', color: '#04130b', fontSize: 12, fontWeight: 800, cursor: 'pointer' }}
               >
                 ♻️ Recover All Datas, Logs &amp; Devices
@@ -666,12 +671,13 @@ export function QrHealthPassModal({
               <div style={{ display: 'flex', gap: 8 }}>
                 <button
                   type="button"
-                  onClick={handleDownloadBackup}
+                  onClick={() => void handleDownloadBackup()}
+                  style={{ minHeight: 44 }}
                   className="w-full rounded-xl border border-black/15 py-2 text-xs font-bold dark:border-white/20"
                 >
                   💾 Export Vault JSON
                 </button>
-                <label className="w-full cursor-pointer rounded-xl border border-black/15 py-2 text-center text-xs font-bold dark:border-white/20">
+                <label style={{ minHeight: 44, display: 'flex', alignItems: 'center', justifyContent: 'center' }} className="w-full cursor-pointer rounded-xl border border-black/15 py-2 text-center text-xs font-bold dark:border-white/20">
                   📥 Restore JSON
                   <input
                     type="file"
@@ -680,8 +686,11 @@ export function QrHealthPassModal({
                     onChange={(e) => {
                       const file = e.target.files?.[0]
                       if (!file) return
-                      void file.text().then((txt) => {
-                        const res = restoreFullLocalVault(txt, account)
+                      void Promise.all([
+                        file.text(),
+                        import('../domains/identity/localRecovery'),
+                      ]).then(([txt, mod]) => {
+                        const res = mod.restoreFullLocalVault(txt, account)
                         setStatus(res.message)
                       })
                     }}
@@ -741,7 +750,7 @@ export function QrHealthPassModal({
                   type="button"
                   disabled={busy}
                   onClick={() => void handleTotpSignIn()}
-                  style={{ width: '100%', minHeight: 42, borderRadius: 12, border: 'none', background: '#00BF63', color: '#04130b', fontSize: 12, fontWeight: 800, cursor: 'pointer' }}
+                  style={{ width: '100%', minHeight: 44, borderRadius: 12, border: 'none', background: '#00BF63', color: '#04130b', fontSize: 12, fontWeight: 800, cursor: 'pointer' }}
                 >
                   Verify 6-Digit Code &amp; Sign In
                 </button>
@@ -755,7 +764,7 @@ export function QrHealthPassModal({
                 <button
                   type="button"
                   onClick={() => (camActive ? stopCamera() : void startScanner())}
-                  style={{ flex: 1, minHeight: 42, borderRadius: 12, border: 'none', background: '#00BF63', color: '#04130b', fontSize: 12, fontWeight: 800, cursor: 'pointer' }}
+                  style={{ flex: 1, minHeight: 44, borderRadius: 12, border: 'none', background: '#00BF63', color: '#04130b', fontSize: 12, fontWeight: 800, cursor: 'pointer' }}
                 >
                   {camActive ? '⏹ Stop Camera' : '📷 Open QR / Barcode Camera'}
                 </button>
@@ -775,6 +784,7 @@ export function QrHealthPassModal({
               <button
                 type="button"
                 onClick={() => handleQrLogin()}
+                style={{ minHeight: 44 }}
                 className="w-full rounded-xl border border-black/15 py-2.5 text-xs font-bold dark:border-white/20"
               >
                 Pair &amp; Sign In with QR / Barcode →
@@ -783,7 +793,7 @@ export function QrHealthPassModal({
           )}
 
           {status && (
-            <div style={{ marginTop: 12, fontSize: 11, fontWeight: 700, color: status.includes('Invalid') || status.includes('incorrect') || status.includes('Unrecognized') || status.includes('No ') ? '#e11d48' : '#00BF63' }}>
+            <div style={{ marginTop: 12, fontSize: 11, fontWeight: 700, color: status.includes('Invalid') || status.includes('incorrect') || status.includes('Unrecognized') || status.includes('No ') ? 'var(--teks-bad)' : 'var(--teks-ok)' }}>
               {status}
             </div>
           )}
