@@ -350,16 +350,22 @@ export function ClinicalHub() {
             <p className="mt-1 text-xs text-white/70">
               EMR: {emrCount ? '1 chart initialized' : 'None yet'} · HR {vitals.heartRate ?? vitals.restingHr ?? '—'} · SpO2 {vitals.spo2Pct ?? '—'}% · BP {vitals.systolic && vitals.diastolic ? `${vitals.systolic}/${vitals.diastolic}` : '—'}.
             </p>
-            <div className="mt-2 flex flex-wrap gap-2">
-              <button type="button" onClick={handleCopySoap} className="min-h-[36px] rounded-full border border-white/15 px-3 text-[11px] font-black text-emerald-300 hover:text-white">
-                {interopFeedback === 'soap' ? '✓ SOAP Copied' : 'Copy SOAP'}
-              </button>
-              <button type="button" onClick={handleCopySbar} className="min-h-[36px] rounded-full border border-white/15 px-3 text-[11px] font-black text-white/80 hover:text-white">
-                {interopFeedback === 'sbar' ? '✓ SBAR Copied' : 'Copy SBAR'}
-              </button>
-              <button type="button" onClick={handleDownloadSoapSbar} className="min-h-[36px] rounded-full border border-white/15 px-3 text-[11px] font-black text-white/80 hover:text-white">
-                {interopFeedback === 'summary-dl' ? '✓ Downloaded' : 'Export .txt'}
-              </button>
+            <div className="mt-1 flex flex-wrap gap-3">
+              {[
+                { label: interopFeedback === 'soap' ? '✓ SOAP Copied' : 'Copy SOAP', onClick: handleCopySoap, cls: 'text-emerald-300' },
+                { label: interopFeedback === 'sbar' ? '✓ SBAR Copied' : 'Copy SBAR', onClick: handleCopySbar, cls: 'text-white/75' },
+                { label: interopFeedback === 'summary-dl' ? '✓ Downloaded' : 'Export .txt', onClick: handleDownloadSoapSbar, cls: 'text-white/75' },
+              ].map((btn) => (
+                <button
+                  key={btn.label}
+                  type="button"
+                  onClick={btn.onClick}
+                  style={{ minHeight: 40, padding: '4px 12px', borderRadius: 999, border: '1px solid rgba(255,255,255,0.16)' }}
+                  className={`inline-flex items-center text-xs font-black ${btn.cls} hover:text-white`}
+                >
+                  {btn.label}
+                </button>
+              ))}
             </div>
             <div className="mt-1 flex flex-wrap gap-3">
               <Link to="/emr" className="inline-flex min-h-[44px] items-center text-xs font-black text-emerald-300 hover:text-white">Open AI-EMR →</Link>
@@ -379,16 +385,23 @@ export function ClinicalHub() {
           <div className="border-l-2 border-cyan-400 pl-3">
             <div className="text-[10px] font-black uppercase tracking-[.12em] text-cyan-300">SATUSEHAT FHIR R4 &amp; Radar</div>
             <p className="mt-1 text-xs text-white/70">MRN: {activePatient?.mrn || '—'} · Permenkes 24/2022 bundle ({fhirBundle.entry.length} entries, draft unverified).</p>
-            <div className="mt-2 flex flex-wrap gap-2">
-              <button type="button" id="btn-export-fhir-pdf" onClick={handleDownloadFhir} className="min-h-[36px] rounded-full border border-white/15 px-3 text-[11px] font-black text-cyan-300 hover:text-white">
-                {interopFeedback === 'fhir-dl' ? '✓ FHIR Saved' : 'Export FHIR R4'}
-              </button>
-              <button type="button" onClick={handleCopyFhir} className="min-h-[36px] rounded-full border border-white/15 px-3 text-[11px] font-black text-white/80 hover:text-white">
-                {interopFeedback === 'fhir-copy' ? '✓ Copied' : 'Copy JSON'}
-              </button>
-              <button type="button" onClick={printClinicalReport} className="min-h-[36px] rounded-full border border-white/15 px-3 text-[11px] font-black text-white/80 hover:text-white">
-                Print
-              </button>
+            <div className="mt-1 flex flex-wrap gap-3">
+              {[
+                { id: 'btn-export-fhir-pdf', label: interopFeedback === 'fhir-dl' ? '✓ FHIR Saved' : 'Export FHIR R4', onClick: handleDownloadFhir, cls: 'text-cyan-300' },
+                { label: interopFeedback === 'fhir-copy' ? '✓ Copied' : 'Copy JSON', onClick: handleCopyFhir, cls: 'text-white/75' },
+                { label: 'Print', onClick: printClinicalReport, cls: 'text-white/75' },
+              ].map((btn) => (
+                <button
+                  key={btn.label}
+                  id={btn.id}
+                  type="button"
+                  onClick={btn.onClick}
+                  style={{ minHeight: 40, padding: '4px 12px', borderRadius: 999, border: '1px solid rgba(255,255,255,0.16)' }}
+                  className={`inline-flex items-center text-xs font-black ${btn.cls} hover:text-white`}
+                >
+                  {btn.label}
+                </button>
+              ))}
             </div>
             <div className="mt-1 flex flex-wrap gap-3">
               <Link to="/visit-os" className="inline-flex min-h-[44px] items-center text-xs font-black text-cyan-300 hover:text-white">Open Visit OS →</Link>
