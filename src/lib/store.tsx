@@ -559,6 +559,9 @@ export function StoreProvider({ children, visibilityDocument }: { children: Reac
     const acc = state.account
     if (!acc) return
     rememberAccountProfile(acc)
+    // Pemulihan otomatis saat boot hanya untuk akun pemilik. Akun lain tidak disalin otomatis dari cache
+    // perangkat (data kesehatan lintas akun di perangkat bersama); mereka memulihkan lewat impor eksplisit.
+    if (!acc.isOwner) return
     const patient = state.patients.find((p) => p.id === state.activePatientId) ?? null
     const patientVitals = patient ? state.vitals[patient.id] : undefined
     const sleepLogs = state.sleepLogs
