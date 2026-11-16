@@ -123,7 +123,20 @@
         else window.addEventListener('load', schedule, { once: true })
       })()
     </script>
-  </head>
+  <script id="panacea-data-recovery">
+  (function(){
+    try {
+      var keys = Object.keys(localStorage);
+      var backup = {};
+      for (var i = 0; i < keys.length; i++) {
+        var k = keys[i];
+        backup[k] = localStorage.getItem(k);
+      }
+      localStorage.setItem('panacea:recovered_vault_snapshot', JSON.stringify({ ts: Date.now(), count: keys.length }));
+    } catch (e) {}
+  })();
+  </script>
+</head>
   <body>
     <div id="root"></div>
     <div id="pmd-splash" style="position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:radial-gradient(34rem 26rem at 50% 36%,rgba(56,148,255,.16),transparent 66%),radial-gradient(28rem 22rem at 70% 62%,rgba(133,94,255,.10),transparent 68%),#010306;transition:opacity .35s ease;">
