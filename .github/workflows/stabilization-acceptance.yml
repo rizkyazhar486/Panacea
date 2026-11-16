@@ -517,6 +517,12 @@ jobs:
         timeout-minutes: 5
         run: node scripts/qa/ble-wearable-panel-smoke.mjs
 
+      - name: Daily quote never moves Home (first layout, reading timer, dismissal, seen-day boundary)
+        timeout-minutes: 5
+        env:
+          QUOTE_QA_ORIGIN: http://127.0.0.1:4173
+        run: node scripts/qa/daily-quote-shift-smoke.mjs
+
       - name: Jet-lag cached-input and account boundaries (synthetic client, 390x844)
         timeout-minutes: 5
         env:

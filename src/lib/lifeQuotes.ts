@@ -48,7 +48,7 @@ export function kutipanHariIni(tanggal: Date = new Date()): LifeQuote {
   return KUTIPAN_HIDUP[hariKe % KUTIPAN_HIDUP.length]
 }
 
-// Berapa lama spanduknya pantas menutupi halaman.
+// Berapa lama sampai kutipan hari ini pantas dicatat sudah dibaca (lihat DailyQuoteBanner).
 //
 // Komentar di DailyQuoteBanner selalu menjanjikan spanduk ini menyingkir
 // "setelah waktu baca yang wajar", tetapi pengatur waktunya tidak pernah ada:
