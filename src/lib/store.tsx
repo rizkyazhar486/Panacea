@@ -308,9 +308,8 @@ function saveSession(account: Account) {
 function clearSession() {
   try { localStorage.removeItem(SESSION_KEY) } catch { /* ignore */ }
 }
-// Returns the remembered account if the session is still within 7 days, or
-// automatically adopts the active user session when the user is already onboarded
-// or has saved health/wearable profiles without forcing an unwanted re-login.
+// Returns the remembered account if the session is still within 7 days, else
+// clears it (auto-logout) and returns null.
 function loadSession(): Account | null {
   try {
     const raw = localStorage.getItem(SESSION_KEY)
@@ -324,39 +323,10 @@ function loadSession(): Account | null {
         return normalized
       }
     }
-    // Auto-reconciliation fallback: if user already has completed onboarding,
-    // or has health profile / biometric telemetry / workout logs in localStorage,
-    // adopt seamlessly into their active account without forcing a re-login.
-    const hpRaw = localStorage.getItem('pmd_health_profile')
-    const bcRaw = localStorage.getItem('pm_bodycomp_v1')
-    const onboarded = localStorage.getItem('panacea_onboarded_v1') === '1'
-    if (hpRaw || bcRaw || onboarded) {
-      let pmdProf: Record<string, unknown> = {}
-      try { pmdProf = JSON.parse(localStorage.getItem('pmd_profile') || '{}') } catch { /* ignore */ }
-      const email = typeof pmdProf?.email === 'string' && pmdProf.email.includes('@')
-        ? pmdProf.email.trim().toLowerCase()
-        : OWNER_EMAIL.trim().toLowerCase()
-      const isOwner = email === OWNER_EMAIL.trim().toLowerCase()
-      const targetRole: Role = (typeof pmdProf?.role === 'string' && ['owner', 'dokter', 'pasien', 'perawat', 'admin'].includes(pmdProf.role))
-        ? (pmdProf.role as Role)
-        : (isOwner ? 'owner' : 'pasien')
-      const targetName = typeof pmdProf?.name === 'string' && pmdProf.name.trim()
-        ? pmdProf.name.trim()
-        : (isOwner ? 'Dr. Rizky Muhammad Asrizal' : email.split('@')[0])
-      const fallbackAccount: Account = {
-        id: `local:${encodeURIComponent(email)}`,
-        email,
-        name: targetName,
-        role: targetRole,
-        isOwner,
-        isSubscriber: isOwner || targetRole === 'owner',
-        loggedAt: new Date().toISOString(),
-        patientId: `self-u-local%3A${encodeURIComponent(email)}`,
-        consentAt: new Date().toISOString(),
-      }
-      saveSession(fallbackAccount)
-      return fallbackAccount
-    }
+    // An expired or malformed session is cleared. Credential-less auto-resume
+    // lives only in resolveAutoResumeAccount (bootVitals), which never mints
+    // owner/clinical roles from forgeable localStorage (fail closed).
+    if (raw) clearSession()
     return null
   } catch { return null }
 }
