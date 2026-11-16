@@ -5,6 +5,12 @@ import {
   evaluateInteractiveVitalityScrollingCards,
   runPanaceaMedWave650Uhd5k4dMinimalistUxMasterOs
 } from '../src/core/panaceamedUhd5k4dMinimalistHormonalUxOs.mjs';
+import {
+  evaluateUniversalPublicEverydayTriageAndGuide,
+  evaluateHouseholdAndCommunityPublicHealthCompanion,
+  evaluateFiveDimension100PercentPublicReadiness,
+  runPanaceaMedWave700UniversalPublic100ReadinessMasterOs
+} from '../src/core/panaceamedUniversalPublic100ReadinessOs.mjs';
 import { runPanaceaMedWave600DailyWearableMasterOs } from '../src/core/panaceamedTwentyFiveWearablesDailyLifeOs.mjs';
 import { runPanaceaMedWave550VisaMastercardAndMultiDeviceMasterOs } from '../src/core/panaceamedVisaMastercardTokenQrAndMultiDeviceOs.mjs';
 import { runPanaceaMedWave500FluidChameleonMasterOs } from '../src/core/panaceamedFluidChameleonCamouflageOs.mjs';
@@ -139,6 +145,12 @@ export function createCockpitServer() {
     if (req.method === "GET" && urlPath === "/api/v18/ux/vitality-cards") return sendJson({
       singleScoreHero: evaluateSingleScoreZeroOverwhelmUx(),
       vitalityCards: evaluateInteractiveVitalityScrollingCards()
+    });
+    if (req.method === "GET" && urlPath === "/api/v19/public/readiness-100") return sendJson(runPanaceaMedWave700UniversalPublic100ReadinessMasterOs());
+    if (req.method === "GET" && urlPath === "/api/v19/public/everyday-triage") return sendJson({
+      triage: evaluateUniversalPublicEverydayTriageAndGuide(),
+      household: evaluateHouseholdAndCommunityPublicHealthCompanion(),
+      readiness100: evaluateFiveDimension100PercentPublicReadiness()
     });
 
     const fallback = handleWave65To68SovereignCockpitGateway({ method: req.method, url: req.url });
