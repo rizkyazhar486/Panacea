@@ -3,6 +3,7 @@ import { loadBluetoothWearablePanel, recordConnectedDevice, type WearableSavePat
 import { loadBodyExposureLocalHub } from '../../domains/body-exposure'
 import { lazy, Suspense, useEffect, useRef, useState } from 'react'
 import { Fold } from '../../shared/ui/Fold'
+import { WhenOpened } from '../../shared/ui/WhenOpened'
 import { Prosa } from '../../components/Prosa'
 import { KolomAngka } from '../../components/KolomAngka'
 import { simpanTeks } from '../../lib/unduh'
@@ -476,9 +477,11 @@ export function HealthProfile() {
       <Fold label="Sync">
       {backendEnabled && <AutoSyncCard />}
       <SyncDiagnosticsCard />
-      <Suspense fallback={null}>
-        <BodyExposureLocalHub initialTab="emv_pass" compact />
-      </Suspense>
+      <WhenOpened>
+        <Suspense fallback={null}>
+          <BodyExposureLocalHub initialTab="emv_pass" compact />
+        </Suspense>
+      </WhenOpened>
 
       {p.lastDeviceSyncAt && <DeviceSyncSummary profile={p} />}
       </Fold>
