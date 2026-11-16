@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { lazy, Suspense, useRef, useState } from 'react'
 import { Prosa } from '../../components/Prosa'
 import { Card, SectionTitle, Badge } from '../../components/ui'
 import { IconChartUp, IconActivity } from '../../components/icons'
@@ -6,11 +6,15 @@ import { FraudThresholdLab } from '../../components/finance/FraudThresholdLab'
 import { analyzeCsv, type AnalysisResult, type ColumnStats } from '../../lib/dataAnalyzer'
 import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 
-// Data Lab keeps the existing health-device CSV workflow and adds a separate,
-// explicitly non-clinical finance analytics mode. Files remain browser-local.
+const CompactHumanAnalyzer = lazy(() =>
+  import('../../components/CompactHumanAnalyzer').then((m) => ({ default: m.CompactHumanAnalyzer })),
+)
+
+// Data Lab consolidates live multi-domain whole-human analysis, the local CSV
+// device parser, and the separate non-clinical finance analytics mode in one hub.
 
 const TONE_META: Record<ColumnStats['tone'], { label: string; badge: 'brand' | 'low' | 'critical' | 'neutral'; color: string }> = {
-  good: { label: 'Looking good', badge: 'brand', color: '#00BF63' },
+  good: { label: 'Looking good', badge: 'brand', color: '#047857' },
   watch: { label: 'Worth watching', badge: 'low', color: '#f59e0b' },
   alert: { label: 'Needs attention', badge: 'critical', color: '#ef4444' },
   neutral: { label: 'Info', badge: 'neutral', color: '#94a3b8' },
@@ -18,10 +22,10 @@ const TONE_META: Record<ColumnStats['tone'], { label: string; badge: 'brand' | '
 
 const MAX_BYTES = 25 * 1024 * 1024
 
-type LabMode = 'health' | 'fraud'
+type LabMode = 'unified' | 'health' | 'fraud'
 
 export function DataLab() {
-  const [mode, setMode] = useState<LabMode>('health')
+  const [mode, setMode] = useState<LabMode>('unified')
   const [result, setResult] = useState<AnalysisResult | null>(null)
   const [err, setErr] = useState('')
   const [fileName, setFileName] = useState('')
@@ -42,19 +46,24 @@ export function DataLab() {
   }
 
   return (
-    <div className="mx-auto max-w-2xl space-y-5 pb-24">
-      <Card className="!p-2">
-        <div role="tablist" aria-label="Data Lab workspace" className="grid grid-cols-2 gap-2">
+    <div className="mx-auto max-w-3xl space-y-5 pb-24">
+      <Card className="!p-3 space-y-2">
+        <div role="tablist" aria-label="Data Lab workspace" className="grid grid-cols-3 gap-2">
+          <ModeButton active={mode === 'unified'} onClick={() => setMode('unified')} label="Smart Analyzer" />
           <ModeButton active={mode === 'health'} onClick={() => setMode('health')} label="Health CSV" />
           <ModeButton active={mode === 'fraud'} onClick={() => setMode('fraud')} label="Fraud analytics" />
         </div>
+        <BatasKlaimKesehatan permukaan="lab.data-lab" />
       </Card>
 
-      {mode === 'fraud' ? <FraudThresholdLab /> : (
+      {mode === 'unified' ? (
+        <Suspense fallback={<div role="status" className="py-8 text-center text-xs font-semibold text-neutral-500">Loading Compact Whole-Human Analyzer…</div>}>
+          <CompactHumanAnalyzer />
+        </Suspense>
+      ) : mode === 'fraud' ? <FraudThresholdLab /> : (
         <>
           <Card className="!p-5">
             <SectionTitle icon={<IconChartUp size={20} />} title="Data Lab" subtitle="Unggah ekspor dari jam tangan / CGM / timbangan / tensimeter — diubah menjadi kesimpulan yang gamblang" />
-            <BatasKlaimKesehatan permukaan="lab.data-lab" />
             <Prosa kelas="mt-2 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">Ekspor berkas CSV dari perangkat atau aplikasi kesehatan Anda (pemantau glukosa, jam tangan, timbangan pintar, tensimeter), lalu jatuhkan di sini. Panaceamed mengenali kolomnya dan mengolahnya menjadi apa artinya bagi Anda — tidak ada yang keluar dari perangkat Anda.</Prosa>
             <button onClick={() => fileRef.current?.click()}
               className="mt-4 flex min-h-11 w-full items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-brand/40 bg-brand-50 py-8 text-sm font-bold text-brand-dark dark:bg-white/5">
@@ -89,7 +98,7 @@ export function DataLab() {
                     <Stat label="Avg" value={fmt(c.mean)} />
                     <Stat label="Min" value={fmt(c.min)} />
                     <Stat label="Max" value={fmt(c.max)} />
-                    <Stat label="Trend" value={`${c.trend >= 0 ? '+' : ''}${c.trend.toFixed(0)}%`} color={Math.abs(c.trend) < 3 ? undefined : c.trend > 0 ? '#f59e0b' : '#00BF63'} />
+                    <Stat label="Trend" value={`${c.trend >= 0 ? '+' : ''}${c.trend.toFixed(0)}%`} color={Math.abs(c.trend) < 3 ? undefined : c.trend > 0 ? 'var(--teks-warn)' : 'var(--teks-ok)'} />
                   </div>
 
                   <div className="mt-3 rounded-xl p-3" style={{ background: TONE_META[c.tone].color + '14' }}>
@@ -133,7 +142,8 @@ function ModeButton({ active, onClick, label }: { active: boolean; onClick: () =
       role="tab"
       aria-selected={active}
       onClick={onClick}
-      className={`min-h-11 rounded-xl px-3 text-sm font-bold transition ${active ? 'bg-brand text-white' : 'bg-neutral-50 text-neutral-600 dark:bg-white/5 dark:text-neutral-300'}`}
+      style={active ? { background: '#047857', color: '#ffffff' } : undefined}
+      className={`min-h-11 rounded-xl px-3 text-sm font-bold transition ${active ? '' : 'bg-neutral-50 text-neutral-600 dark:bg-white/5 dark:text-neutral-300'}`}
     >
       {label}
     </button>
