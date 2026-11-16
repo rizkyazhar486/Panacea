@@ -513,6 +513,10 @@ jobs:
           path: artifacts/bmi-availability
           if-no-files-found: ignore
 
+      - name: Bluetooth heart-rate panel (actual component, standard-profile fake device, controlled clock)
+        timeout-minutes: 5
+        run: node scripts/qa/ble-wearable-panel-smoke.mjs
+
       - name: Jet-lag cached-input and account boundaries (synthetic client, 390x844)
         timeout-minutes: 5
         env:
