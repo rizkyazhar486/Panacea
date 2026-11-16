@@ -16,6 +16,7 @@ import {
   encodeCode128Pattern,
   encodeQrMatrix21,
   resolveWearableHubSnapshot,
+  verifyLuhnCardNumber,
   type EmvPassMode,
   type WearableCategory,
 } from '../engine/localHubEngine'
@@ -24,6 +25,7 @@ import { useOptionalStore } from '../../../lib/store'
 import { useOptionalLongitudinalState } from '../../../lib/useLongitudinalState'
 import { getVitals, mergeVitals, type Vitals } from '../../../lib/healthVitals'
 import { deretMetrik } from '../../../lib/riwayatVitals'
+import { downloadClinicalFhirBundle, printClinicalReport } from '../../clinical-operations'
 
 const BluetoothWearablePanel = lazy(loadBluetoothWearablePanel)
 
@@ -96,13 +98,72 @@ export function BodyExposureLocalHub({
   const [activeCardIdx, setActiveCardIdx] = useState(0)
   const scrollerRef = useRef<HTMLDivElement | null>(null)
 
+  const [scannerActive, setScannerActive] = useState(false)
+  const [scannerStatus, setScannerStatus] = useState<'idle' | 'requesting' | 'active' | 'denied' | 'unsupported'>('idle')
+  const [scannedResult, setScannedResult] = useState<string | null>(null)
+  const videoRef = useRef<HTMLVideoElement | null>(null)
+  const streamRef = useRef<MediaStream | null>(null)
+
+  const stopScanner = () => {
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach((t) => t.stop())
+      streamRef.current = null
+    }
+    setScannerActive(false)
+    setScannerStatus('idle')
+  }
+
+  const startScanner = async () => {
+    if (typeof navigator === 'undefined' || !navigator.mediaDevices?.getUserMedia) {
+      setScannerStatus('unsupported')
+      return
+    }
+    setScannerStatus('requesting')
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { ideal: 'environment' } },
+        audio: false,
+      })
+      streamRef.current = stream
+      setScannerStatus('active')
+      setScannerActive(true)
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream
+        videoRef.current.play().catch(() => {})
+      }
+    } catch {
+      setScannerStatus('denied')
+    }
+  }
+
+  useEffect(() => {
+    if (scannerActive && videoRef.current && streamRef.current) {
+      videoRef.current.srcObject = streamRef.current
+      videoRef.current.play().catch(() => {})
+    }
+  }, [scannerActive])
+
+  useEffect(() => {
+    return () => {
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach((t) => t.stop())
+      }
+    }
+  }, [])
+
+  const handleExportFhir = () => {
+    downloadClinicalFhirBundle({ vitals, patient, account })
+  }
+
   useEffect(() => {
     const refresh = () => setVitals(getVitals(account))
     refresh()
     window.addEventListener('panacea:health-updated', refresh)
+    window.addEventListener('panacea:body-character-updated', refresh)
     window.addEventListener('storage', refresh)
     return () => {
       window.removeEventListener('panacea:health-updated', refresh)
+      window.removeEventListener('panacea:body-character-updated', refresh)
       window.removeEventListener('storage', refresh)
     }
   }, [account])
@@ -213,32 +274,71 @@ export function BodyExposureLocalHub({
           </p>
         </div>
 
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }} role="group" aria-label="Local Hub views">
-          {HUB_TABS.map((item) => {
-            const active = tab === item.id
-            return (
-              <button
-                key={item.id}
-                type="button"
-                aria-pressed={active}
-                onClick={() => setTab(item.id)}
-                className="as-focus as-hover as-fade"
-                style={{
-                  minHeight: TOUCH,
-                  padding: '0 14px',
-                  borderRadius: 12,
-                  border: `1px solid ${active ? TONE.live : TONE.line}`,
-                  background: active ? TONE.active : TONE.raised,
-                  color: active ? TONE.onActive : TONE.text,
-                  fontSize: 12,
-                  fontWeight: 800,
-                  cursor: 'pointer',
-                }}
-              >
-                {item.label}
-              </button>
-            )
-          })}
+        <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 8 }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }} role="group" aria-label="Local Hub views">
+            {HUB_TABS.map((item) => {
+              const active = tab === item.id
+              return (
+                <button
+                  key={item.id}
+                  type="button"
+                  aria-pressed={active}
+                  onClick={() => setTab(item.id)}
+                  className="as-focus as-hover as-fade"
+                  style={{
+                    minHeight: TOUCH,
+                    padding: '0 14px',
+                    borderRadius: 12,
+                    border: `1px solid ${active ? TONE.live : TONE.line}`,
+                    background: active ? TONE.active : TONE.raised,
+                    color: active ? TONE.onActive : TONE.text,
+                    fontSize: 12,
+                    fontWeight: 800,
+                    cursor: 'pointer',
+                  }}
+                >
+                  {item.label}
+                </button>
+              )
+            })}
+          </div>
+
+          <div style={{ display: 'flex', gap: 6 }}>
+            <button
+              type="button"
+              onClick={handleExportFhir}
+              title="Unduh data dalam format standar HL7 FHIR R4 SATUSEHAT"
+              style={{
+                ...subtleButton,
+                minHeight: TOUCH,
+                padding: '0 12px',
+                borderRadius: 10,
+                fontSize: 11,
+                fontWeight: 700,
+                borderColor: TONE.lineStrong,
+                color: TONE.liveText,
+              }}
+            >
+              📥 Ekspor FHIR R4
+            </button>
+            <button
+              type="button"
+              onClick={() => printClinicalReport()}
+              title="Cetak kartu atau laporan klinis sebagai PDF"
+              style={{
+                ...subtleButton,
+                minHeight: TOUCH,
+                padding: '0 12px',
+                borderRadius: 10,
+                fontSize: 11,
+                fontWeight: 700,
+                borderColor: TONE.lineStrong,
+                color: TONE.text,
+              }}
+            >
+              🖨️ Cetak PDF
+            </button>
+          </div>
         </div>
       </div>
 
@@ -496,6 +596,100 @@ export function BodyExposureLocalHub({
                     </div>
                   </div>
                 </div>
+              </div>
+
+              {/* QR Scanner & Verifier UI with clear device permission states */}
+              <div style={{ marginTop: 12, paddingTop: 12, borderTop: `1px solid ${TONE.line}` }}>
+                <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+                  <div>
+                    <span style={{ fontSize: 12, fontWeight: 700, color: TONE.text }}>Pemindaian &amp; Verifikasi Token Medis</span>
+                    <span style={{ marginLeft: 8, fontSize: 10, color: TONE.dim }}>Kamera langsung atau berkas gambar</span>
+                  </div>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                    {!scannerActive ? (
+                      <button
+                        type="button"
+                        onClick={startScanner}
+                        style={{ ...primaryButton, minHeight: TOUCH, padding: '0 14px', fontSize: 11, width: 'auto' }}
+                      >
+                        📷 Buka Kamera Pemindai
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={stopScanner}
+                        style={{ ...subtleButton, minHeight: TOUCH, padding: '0 14px', fontSize: 11, borderColor: '#ef4444', color: '#ef4444' }}
+                      >
+                        ✕ Tutup Kamera
+                      </button>
+                    )}
+                    <label style={{ ...subtleButton, minHeight: TOUCH, padding: '0 14px', fontSize: 11, display: 'inline-flex', alignItems: 'center', cursor: 'pointer', color: TONE.liveText, borderColor: TONE.lineStrong }}>
+                      📁 Unggah Gambar QR
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={async (e) => {
+                          const file = e.target.files?.[0]
+                          if (!file) return
+                          const BD = (globalThis as { BarcodeDetector?: new (opts: { formats: string[] }) => { detect: (img: ImageBitmapSource) => Promise<Array<{ rawValue?: string }>> } }).BarcodeDetector
+                          if (!BD || typeof createImageBitmap !== 'function') {
+                            setScannedResult(`Berkas ${file.name} diterima — dekoder QR optik memerlukan browser dengan BarcodeDetector API; gunakan kamera aktif atau token di layar.`)
+                            return
+                          }
+                          try {
+                            const bmp = await createImageBitmap(file)
+                            const hits = await new BD({ formats: ['qr_code', 'code_128'] }).detect(bmp)
+                            const raw = hits.find((h) => h.rawValue)?.rawValue?.trim() ?? ''
+                            if (!raw) {
+                              setScannedResult(`Tidak ditemukan QR atau Code-128 terbaca pada ${file.name}.`)
+                              return
+                            }
+                            const pan = raw.replace(/\D/g, '').slice(0, 16)
+                            const luhnOk = pan.length === 16 && verifyLuhnCardNumber(pan)
+                            setScannedResult(`Token terbaca (${raw.slice(0, 24)}…) — ${luhnOk ? 'ISO/IEC 7812 Luhn Checksum PASS' : 'Token terdekode (memerlukan verifikasi faskes)'}`)
+                          } catch {
+                            setScannedResult(`Gagal mendekode QR/Barcode dari ${file.name}.`)
+                          }
+                        }}
+                        style={{ display: 'none' }}
+                      />
+                    </label>
+                  </div>
+                </div>
+
+                {scannerStatus === 'requesting' && (
+                  <p style={{ margin: '8px 0 0', fontSize: 11, color: TONE.sim }}>
+                    Meminta izin akses kamera pada browser Anda…
+                  </p>
+                )}
+
+                {scannerStatus === 'denied' && (
+                  <p style={{ margin: '8px 0 0', fontSize: 11, color: '#f87171' }}>
+                    Izin kamera ditolak pada pengaturan situs. Anda tetap dapat menggunakan tombol <strong>Unggah Gambar QR</strong> di atas.
+                  </p>
+                )}
+
+                {scannerStatus === 'unsupported' && (
+                  <p style={{ margin: '8px 0 0', fontSize: 11, color: TONE.dim }}>
+                    Browser tidak mendukung kamera langsung di rute ini. Gunakan tombol <strong>Unggah Gambar QR</strong>.
+                  </p>
+                )}
+
+                {scannerActive && (
+                  <div style={{ marginTop: 10, position: 'relative', maxWidth: 360, borderRadius: 14, overflow: 'hidden', border: `1px solid ${TONE.live}` }}>
+                    <video ref={videoRef} playsInline autoPlay muted style={{ width: '100%', height: 220, objectFit: 'cover', background: '#000' }} />
+                    <div style={{ position: 'absolute', inset: 24, border: '2px dashed #00bf63', borderRadius: 10, pointerEvents: 'none' }} />
+                    <div style={{ position: 'absolute', bottom: 8, left: 8, right: 8, background: 'rgba(0,0,0,0.7)', borderRadius: 6, padding: '4px 8px', fontSize: 10, color: '#a7f3d0', textAlign: 'center' }}>
+                      Arahkan kamera ke QR / Barcode kartu EMVCo
+                    </div>
+                  </div>
+                )}
+
+                {scannedResult && (
+                  <div style={{ marginTop: 8, padding: '8px 12px', borderRadius: 10, background: 'rgba(0, 191, 99, 0.1)', border: `1px solid ${TONE.live}`, fontSize: 11, color: TONE.liveText }}>
+                    {scannedResult}
+                  </div>
+                )}
               </div>
             </div>
           )}

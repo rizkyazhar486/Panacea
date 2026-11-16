@@ -7,7 +7,7 @@ import { useVitals } from '../../lib/useVitals'
 import { useOptionalStore } from '../../lib/store'
 import { deretMetrik } from '../../lib/riwayatVitals'
 import { IconHeart, IconActivity, IconChartUp, IconMoon } from '../../components/icons'
-import { getHealthCache, pushBiometrics, mergeHealthCache } from '../../lib/profile'
+import { getHealthCache, pushBiometrics, mergeHealthCache, mergeDemoStored } from '../../lib/profile'
 import { mergeVitals } from '../../lib/healthVitals'
 import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 import {
@@ -164,9 +164,22 @@ export function BodyComposition() {
   // Hanya yang benar-benar diisi yang dibagikan: angka bawaan tidak boleh sampai ke profil bersama.
   useEffect(() => { pushBiometrics(biometrikUntukDibagikan(masukan)) }, [masukan])
   const u = (p: Partial<Record<KunciBody, unknown>>) => {
-    if (typeof p.w === 'number' && Number.isFinite(p.w) && p.w > 0) mergeVitals({ weightKg: p.w, source: 'Manual' })
-    if (typeof p.h === 'number' && Number.isFinite(p.h) && p.h > 0) mergeVitals({ heightCm: p.h, source: 'Manual' })
+    const patchVitals: Record<string, unknown> = {}
+    if (typeof p.w === 'number' && Number.isFinite(p.w) && p.w > 0) patchVitals.weightKg = p.w
+    if (typeof p.h === 'number' && Number.isFinite(p.h) && p.h > 0) patchVitals.heightCm = p.h
+    if (typeof p.rhr === 'number' && Number.isFinite(p.rhr) && p.rhr > 0) patchVitals.restingHr = p.rhr
+    if (typeof p.hrv === 'number' && Number.isFinite(p.hrv) && p.hrv > 0) patchVitals.hrvMs = p.hrv
+    if (typeof p.sleepH === 'number' && Number.isFinite(p.sleepH) && p.sleepH > 0) patchVitals.sleepH = p.sleepH
+    if (typeof p.smm === 'number' && Number.isFinite(p.smm) && p.smm > 0) patchVitals.skeletalMuscleKg = p.smm
+    if (Object.keys(patchVitals).length) mergeVitals({ ...patchVitals, source: 'Manual', measuredAt: new Date().toISOString() })
+    const demoPatch: { weightKg?: number; heightCm?: number; age?: number; sex?: 'M' | 'F' } = {}
+    if (typeof p.w === 'number' && Number.isFinite(p.w) && p.w > 0) demoPatch.weightKg = p.w
+    if (typeof p.h === 'number' && Number.isFinite(p.h) && p.h > 0) demoPatch.heightCm = p.h
+    if (typeof p.age === 'number' && Number.isFinite(p.age) && p.age > 0) demoPatch.age = p.age
+    if (p.g === 'M' || p.g === 'F') demoPatch.sex = p.g
+    if (Object.keys(demoPatch).length) mergeDemoStored(demoPatch, 'body-composition')
     setMasukan((x) => terapkan(x, p))
+    try { window.dispatchEvent(new Event('panacea:body-character-updated')) } catch { /* SSR/test */ }
   }
 
   function syncNow(silent = false) {

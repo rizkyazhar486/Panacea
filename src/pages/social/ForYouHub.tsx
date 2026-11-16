@@ -63,7 +63,22 @@ export function ForYouHub() {
   const store = useOptionalStore()
   const longitudinal = useOptionalLongitudinalState()
   const account = store?.account ?? null
-  const vitals = useMemo(() => getVitals(account), [account, longitudinal])
+  const [rev, setRev] = useState(0)
+  useEffect(() => {
+    const refresh = () => setRev((x) => x + 1)
+    window.addEventListener('panacea:health-updated', refresh)
+    window.addEventListener('panacea:body-character-updated', refresh)
+    window.addEventListener('storage', refresh)
+    return () => {
+      window.removeEventListener('panacea:health-updated', refresh)
+      window.removeEventListener('panacea:body-character-updated', refresh)
+      window.removeEventListener('storage', refresh)
+    }
+  }, [])
+  const vitals = useMemo(() => {
+    void rev
+    return getVitals(account)
+  }, [account, longitudinal, rev])
   const name = account?.name?.trim().split(/\s+/)[0] || 'You'
   const [score, setScore] = useState<number | null>(null)
   const [budget, setBudget] = useState('')
@@ -73,7 +88,7 @@ export function ForYouHub() {
 
   const triage = useMemo(() => {
     const pos = (v: unknown) => (typeof v === 'number' && Number.isFinite(v) && v > 0 ? v : null)
-    const rhr = pos(vitals.restingHr)
+    const rhr = pos(vitals.restingHr) ?? pos(vitals.heartRate)
     const sbp = pos(vitals.systolic)
     const spo2 = pos(vitals.spo2Pct)
     const sleep = pos(vitals.sleepH)

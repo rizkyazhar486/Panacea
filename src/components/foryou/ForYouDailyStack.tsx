@@ -41,9 +41,11 @@ export function ForYouDailyStack() {
   useEffect(() => {
     const bump = () => setRev((x) => x + 1)
     window.addEventListener('panacea:health-updated', bump)
+    window.addEventListener('panacea:body-character-updated', bump)
     window.addEventListener('storage', bump)
     return () => {
       window.removeEventListener('panacea:health-updated', bump)
+      window.removeEventListener('panacea:body-character-updated', bump)
       window.removeEventListener('storage', bump)
     }
   }, [])
@@ -61,6 +63,22 @@ export function ForYouDailyStack() {
     () => expanded ? FOR_YOU_WIDGET_CATALOG : FOR_YOU_WIDGET_CATALOG.slice(0, 4),
     [expanded],
   )
+
+  const triageColor = useMemo<'green' | 'yellow' | 'red'>(() => {
+    const sbp = Number(vitals.systolic)
+    const dbp = Number(vitals.diastolic)
+    const hr = Number(vitals.restingHr ?? vitals.heartRate)
+    const spo2 = Number(vitals.spo2Pct)
+    const sleep = Number(vitals.sleepH)
+
+    if ((sbp > 0 && sbp >= 160) || (dbp > 0 && dbp >= 100) || (hr > 0 && hr >= 120) || (spo2 > 0 && spo2 < 92)) {
+      return 'red'
+    }
+    if ((sbp > 0 && sbp >= 130) || (dbp > 0 && dbp >= 85) || (hr > 0 && hr >= 100) || (sleep > 0 && sleep < 6)) {
+      return 'yellow'
+    }
+    return 'green'
+  }, [vitals])
 
   return (
     <section aria-label="For You daily stack" className="border-t border-white/10 pt-4">
@@ -89,6 +107,85 @@ export function ForYouDailyStack() {
           <Link to="/emergency" style={{ color: '#fda4af' }} className="font-bold transition hover:text-white">
             Emergency 118/119 →
           </Link>
+        </div>
+      </div>
+
+      {/* 24-Hour Circadian Protocol & 3-Color Self-Triage */}
+      <div className="mb-3 rounded-[20px] border border-white/[.08] bg-white/[0.025] p-3 text-xs">
+        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/[.06] pb-2">
+          <div className="flex items-center gap-2">
+            <span
+              className={`h-2.5 w-2.5 rounded-full ${
+                triageColor === 'red'
+                  ? 'bg-rose-500 animate-pulse'
+                  : triageColor === 'yellow'
+                  ? 'bg-amber-400'
+                  : 'bg-emerald-400'
+              }`}
+            />
+            <span className="font-bold text-white tracking-wide">
+              {triageColor === 'red'
+                ? 'Triase: Perhatian Medis Diperlukan Segera'
+                : triageColor === 'yellow'
+                ? 'Triase: Perlu Penyesuaian Gaya Hidup & Istirahat'
+                : 'Triase: Kondisi Tubuh Stabil & Siap Beraktivitas'}
+            </span>
+          </div>
+          <div className="flex items-center gap-2">
+            <a
+              href="tel:119"
+              className="inline-flex min-h-[32px] items-center rounded-lg bg-rose-500/20 px-2.5 py-1 text-[10px] font-black text-rose-300 border border-rose-500/40 hover:bg-rose-500/30 transition"
+              title="Hubungi Sistem Penanggulangan Gawat Darurat Terpadu (SPGDT) 119"
+            >
+              🚨 Hubungi SPGDT 119
+            </a>
+            <Link
+              to="/emergency"
+              className="inline-flex min-h-[32px] items-center rounded-lg bg-white/10 px-2.5 py-1 text-[10px] font-black text-white/80 hover:text-white border border-white/15"
+            >
+              Protokol Darurat →
+            </Link>
+          </div>
+        </div>
+
+        <p className="mt-2 text-[11px] leading-relaxed text-white/70">
+          {triageColor === 'red'
+            ? 'Peringatan tanda vital memerlukan evaluasi medis langsung. Jika mengalami nyeri dada, sesak nafas berat, atau pusing mendadak, segera hubungi SPGDT 119 atau kunjungi IGD terdekat.'
+            : triageColor === 'yellow'
+            ? 'Tekanan darah atau denyut jantung berada di ambang batas atas atau durasi tidur kurang optimal. Prioritaskan hidrasi air mineral, istirahat cukup, dan hindari konsumsi kafein berlebih hari ini.'
+            : 'Seluruh parameter tanda vital berada dalam rentang normal harian. Ritme sirkadian tubuh terjaga baik untuk mendukung fokus dan latihan fisik.'}
+        </p>
+
+        {/* 4-Phase Circadian Timeline */}
+        <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="rounded-[14px] border border-white/[.05] bg-black/20 p-2.5">
+            <div className="text-[9px] font-black uppercase tracking-[.1em] text-amber-300">06:00–09:00 · Pagi</div>
+            <div className="mt-0.5 font-bold text-white text-[11px]">Kesiapan &amp; Sinar Matahari</div>
+            <p className="mt-1 text-[10px] text-white/50 leading-relaxed">
+              Hidrasi 500ml air, paparan cahaya alami 15 menit, cek skor kesiapan &amp; HRV.
+            </p>
+          </div>
+          <div className="rounded-[14px] border border-white/[.05] bg-black/20 p-2.5">
+            <div className="text-[9px] font-black uppercase tracking-[.1em] text-cyan-300">09:00–14:00 · Siang</div>
+            <div className="mt-0.5 font-bold text-white text-[11px]">Nutrisi &amp; Fokus Kerja</div>
+            <p className="mt-1 text-[10px] text-white/50 leading-relaxed">
+              Makanan padat nutrisi, jeda peregangan ergonomi tiap 60 menit, batas kafein pk 14:00.
+            </p>
+          </div>
+          <div className="rounded-[14px] border border-white/[.05] bg-black/20 p-2.5">
+            <div className="text-[9px] font-black uppercase tracking-[.1em] text-emerald-300">14:00–18:00 · Sore</div>
+            <div className="mt-0.5 font-bold text-white text-[11px]">Aktivitas &amp; Latihan</div>
+            <p className="mt-1 text-[10px] text-white/50 leading-relaxed">
+              Penuhi target langkah ({vitals.steps ? `${vitals.steps.toLocaleString()} / 8.000` : 'target 8.000'}), latihan kekuatan atau aerobik terukur.
+            </p>
+          </div>
+          <div className="rounded-[14px] border border-white/[.05] bg-black/20 p-2.5">
+            <div className="text-[9px] font-black uppercase tracking-[.1em] text-purple-300">18:00–22:00 · Malam</div>
+            <div className="mt-0.5 font-bold text-white text-[11px]">Pemulihan &amp; Tidur</div>
+            <p className="mt-1 text-[10px] text-white/50 leading-relaxed">
+              Redupkan layar, suhu kamar sejuk, target tidur restoratif 7–8 jam.
+            </p>
+          </div>
         </div>
       </div>
 

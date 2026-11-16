@@ -1,4 +1,4 @@
-import { lazy, Suspense, useLayoutEffect, useMemo, useRef, type ComponentType } from 'react'
+import { lazy, Suspense, useEffect, useLayoutEffect, useMemo, useRef, useState, type ComponentType } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { PanaceaZoneNav } from '../components/PanaceaZoneNav'
 import { OneShape } from '../components/OneShape'
@@ -245,7 +245,22 @@ export function UnifiedBodyWorkspace() {
 function YourBodyDailyStrip({ activeKey }: { readonly activeKey: BodyView }) {
   const store = useOptionalStore()
   const longitudinal = useOptionalLongitudinalState()
-  const vitals = useMemo(() => getVitals(store?.account ?? null), [store?.account, longitudinal])
+  const [rev, setRev] = useState(0)
+  useEffect(() => {
+    const bump = () => setRev((x) => x + 1)
+    window.addEventListener('panacea:health-updated', bump)
+    window.addEventListener('panacea:body-character-updated', bump)
+    window.addEventListener('storage', bump)
+    return () => {
+      window.removeEventListener('panacea:health-updated', bump)
+      window.removeEventListener('panacea:body-character-updated', bump)
+      window.removeEventListener('storage', bump)
+    }
+  }, [])
+  const vitals = useMemo(() => {
+    void rev
+    return getVitals(store?.account ?? null)
+  }, [store?.account, longitudinal, rev])
   const rhr = typeof vitals.restingHr === 'number' && vitals.restingHr > 0 ? Math.round(vitals.restingHr) : null
   const hrv = typeof vitals.hrvMs === 'number' && vitals.hrvMs > 0 ? Math.round(vitals.hrvMs) : null
   const sleep = typeof vitals.sleepH === 'number' && vitals.sleepH > 0 ? vitals.sleepH.toFixed(1) : null
