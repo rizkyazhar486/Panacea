@@ -225,7 +225,7 @@ export function UnifiedBodyWorkspace() {
       </section>
 
       <section role="tabpanel" aria-label={active.label} className="min-w-0 space-y-3">
-        {['training', 'ranked', 'recovery', 'nutrition', 'health-data'].includes(activeKey) && (
+        {['body', 'training', 'ranked', 'recovery', 'nutrition', 'health-data'].includes(activeKey) && (
           <YourBodyDailyStrip activeKey={activeKey} />
         )}
         {isExposure ? (

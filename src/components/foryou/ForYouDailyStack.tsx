@@ -1,6 +1,8 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { FOR_YOU_WIDGET_CATALOG, type ForYouWidgetDefinition } from '../../lib/forYouWidgetCatalog'
+import { getVitals, type Vitals } from '../../lib/healthVitals'
+import { useOptionalStore } from '../../lib/store'
 
 function sourceLabel(widget: ForYouWidgetDefinition) {
   if (widget.sourcePolicy === 'adapter-required') return 'connection required'
@@ -9,20 +11,52 @@ function sourceLabel(widget: ForYouWidgetDefinition) {
   return 'Panacea'
 }
 
-function widgetMetric(widget: ForYouWidgetDefinition) {
+function widgetMetric(widget: ForYouWidgetDefinition, vitals: Partial<Vitals>) {
   if (widget.kind === 'music') return 'Spotify · Apple Music'
-  if (widget.kind === 'sports') return 'Live'
+  if (widget.kind === 'sports') {
+    if (typeof vitals.steps === 'number' && vitals.steps > 0) return `${Math.round(vitals.steps).toLocaleString('en-US')} steps`
+    return 'Live'
+  }
   if (widget.kind === 'faith') return 'Today'
-  if (widget.kind === 'mental-wellbeing') return 'Private'
-  if (widget.kind === 'motivation') return '1 next action'
+  if (widget.kind === 'mental-wellbeing') {
+    if (typeof vitals.hrvMs === 'number' && vitals.hrvMs > 0) return `HRV ${Math.round(vitals.hrvMs)} ms`
+    return 'Private'
+  }
+  if (widget.kind === 'motivation') {
+    if (typeof vitals.sleepH === 'number' && vitals.sleepH > 0) return `Sleep ${vitals.sleepH.toFixed(1)}h`
+    return '1 next action'
+  }
   if (widget.kind === 'library') return 'Continue'
   if (widget.kind === 'stories') return 'Read'
   return 'Activity'
 }
 
 export function ForYouDailyStack() {
+  const store = useOptionalStore()
+  const account = store?.account ?? null
   const [infoId, setInfoId] = useState<string | null>(null)
   const [expanded, setExpanded] = useState(false)
+  const [rev, setRev] = useState(0)
+
+  useEffect(() => {
+    const bump = () => setRev((x) => x + 1)
+    window.addEventListener('panacea:health-updated', bump)
+    window.addEventListener('storage', bump)
+    return () => {
+      window.removeEventListener('panacea:health-updated', bump)
+      window.removeEventListener('storage', bump)
+    }
+  }, [])
+
+  const vitals = useMemo<Partial<Vitals>>(() => {
+    void rev
+    try {
+      return getVitals(account)
+    } catch {
+      return {}
+    }
+  }, [account, rev])
+
   const visibleWidgets = useMemo(
     () => expanded ? FOR_YOU_WIDGET_CATALOG : FOR_YOU_WIDGET_CATALOG.slice(0, 4),
     [expanded],
@@ -42,6 +76,22 @@ export function ForYouDailyStack() {
         </button>
       </div>
 
+      <div className="mb-3 flex flex-wrap items-center justify-between gap-2 rounded-[18px] border border-white/[.07] bg-white/[.022] px-3 py-2 text-[11px] text-white/75">
+        <span>
+          {vitals.restingHr || vitals.heartRate || vitals.hrvMs || vitals.sleepH || vitals.steps
+            ? `Live signals — HR ${vitals.restingHr ?? vitals.heartRate ?? '—'} · HRV ${vitals.hrvMs ?? '—'} ms · Sleep ${vitals.sleepH != null ? `${vitals.sleepH.toFixed(1)}h` : '—'}`
+            : 'No wearable readings recorded yet — connect a monitor in Body or enter Health Data.'}
+        </span>
+        <div className="flex items-center gap-3">
+          <Link to="/fitness?t=body-exposure" style={{ color: '#6ee7b7' }} className="font-bold transition hover:text-white">
+            Wearables →
+          </Link>
+          <Link to="/emergency" style={{ color: '#fda4af' }} className="font-bold transition hover:text-white">
+            Emergency 118/119 →
+          </Link>
+        </div>
+      </div>
+
       <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
         {visibleWidgets.map((widget) => {
           const body = (
@@ -53,7 +103,7 @@ export function ForYouDailyStack() {
 
               <div className="min-w-0">
                 <div className="truncate text-[9px] font-black uppercase tracking-[.12em] text-white/36">{widget.title}</div>
-                <div className="mt-1 truncate text-xl font-black tracking-[-.04em] text-white">{widgetMetric(widget)}</div>
+                <div className="mt-1 truncate text-xl font-black tracking-[-.04em] text-white">{widgetMetric(widget, vitals)}</div>
               </div>
             </div>
           )

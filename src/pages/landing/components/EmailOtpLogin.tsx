@@ -33,12 +33,13 @@ export function EmailOtpLogin({ role, name, str, email, setEmail, consentOk, onL
     if (!code.trim()) { setMsg('Harap masukkan kode dari email Anda.'); return }
     setBusy(true); setMsg('')
     try {
-      const a = await api.emailOtpVerify(email.trim(), code.trim(), name.trim() || 'Pengguna Panacea', role)
+      const cleanEmail = email.trim().toLowerCase()
+      const a = await api.emailOtpVerify(cleanEmail, code.trim(), name.trim() || cleanEmail.split('@')[0], role)
       onLogin({
         ...a,
+        id: a.id ?? (role === 'pasien' || role === 'dokter' ? `local:${encodeURIComponent(cleanEmail)}` : `acc-${role}-${encodeURIComponent(cleanEmail)}`),
         isOwner: a.email.toLowerCase() === OWNER_EMAIL,
         isSubscriber: role === 'owner',
-        sex: 'L',
         str: STR_ROLES.includes(role) ? str.trim() : undefined,
         strStatus: STR_ROLES.includes(role) ? 'pending' : 'none',
         consentAt: new Date().toISOString(),

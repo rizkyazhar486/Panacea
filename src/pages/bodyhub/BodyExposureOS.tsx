@@ -7,11 +7,13 @@ import { BodyExplorer } from './BodyExplorer'
 import { hitungScrollAgarTerlihat } from '../../lib/railViewport'
 import '../bodyExposureOS.css'
 import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
+import { loadBodyExposureLocalHub } from '../../domains/body-exposure'
 import { Fold } from '../../shared/ui/Fold'
 
 const UnifiedHumanSimulationProjector = lazy(() => import('./UnifiedHumanSimulationProjector'))
 const PanelKoplingMultiSkala = lazy(() => import('../../components/digital-twin/PanelKoplingMultiSkala'))
 const PanelUbiquitin = lazy(() => import('../../components/digital-twin/PanelUbiquitin'))
+const BodyExposureLocalHub = lazy(loadBodyExposureLocalHub)
 
 type ExposureMode = 'identity' | 'atlas' | 'localization' | 'physiology' | 'imaging' | 'endoscopy' | 'surgery' | 'molecular' | 'clinical'
 
@@ -222,6 +224,18 @@ export function BodyExposureOS() {
           />
         </Suspense>
       </div>
+
+      <details open style={{ borderColor: 'rgba(0, 191, 99, 0.28)' }} className="relative z-[2] mt-3 overflow-hidden rounded-[28px] border bg-black/35">
+        <summary className="flex min-h-[54px] cursor-pointer list-none items-center justify-between gap-3 px-4 text-xs font-black text-white/80 transition hover:text-white">
+          <span>Wearable Hub · Vitality · EMV QR Pass</span>
+          <span className="text-[9px] font-bold uppercase tracking-[.14em] text-white/35">25 BLE devices &amp; dynamic pass</span>
+        </summary>
+        <div className="border-t border-white/[.08] p-2 sm:p-3">
+          <Suspense fallback={<div className="grid min-h-32 place-items-center text-xs font-bold text-white/40">Loading wearable hub…</div>}>
+            <BodyExposureLocalHub />
+          </Suspense>
+        </div>
+      </details>
 
       <Fold label="Multiscale" className="relative z-[2] mt-3">
         <Suspense fallback={null}>
