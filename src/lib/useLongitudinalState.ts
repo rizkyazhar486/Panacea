@@ -252,3 +252,7 @@ export function useLongitudinalState(): LongitudinalSnapshot {
   if (!snapshot) throw new Error('useLongitudinalState must be used within LongitudinalStateProvider')
   return snapshot
 }
+
+export function useOptionalLongitudinalState(): LongitudinalSnapshot | null {
+  return useContext(Context)
+}

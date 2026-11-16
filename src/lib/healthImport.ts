@@ -465,11 +465,88 @@ export function parseInBodyCsv(text: string): ImportResult {
   return prune(out)
 }
 
+// FHIR R4 Collection Bundle parser.
+export function parseFhirBundle(text: string): ImportResult {
+  let bundle: Record<string, unknown>
+  try {
+    bundle = JSON.parse(text) as Record<string, unknown>
+  } catch {
+    return {}
+  }
+  if (!bundle || bundle.resourceType !== 'Bundle' || !Array.isArray(bundle.entry)) {
+    return {}
+  }
+
+  const out: ImportResult = { source: 'FHIR R4' }
+
+  for (const item of bundle.entry as Array<{ resource?: Record<string, unknown> }>) {
+    const res = item?.resource
+    if (!res || typeof res !== 'object') continue
+
+    if (res.resourceType === 'Observation') {
+      const vq = res.valueQuantity as { value?: number } | undefined
+      const val = typeof vq?.value === 'number' ? vq.value : (typeof res.valueInteger === 'number' ? res.valueInteger : undefined)
+      const codeObj = res.code as { coding?: Array<{ code?: string; system?: string; display?: string }>; text?: string } | undefined
+      const codings = Array.isArray(codeObj?.coding) ? codeObj!.coding : []
+      const codes = codings.map((c) => String(c?.code || '').trim())
+      const textCode = String(codeObj?.text || '').toLowerCase()
+
+      if (typeof val === 'number' && Number.isFinite(val)) {
+        if (codes.includes('80404-7') || codes.includes('hrvMs') || codes.includes('hrv') || textCode.includes('variability') || textCode.includes('rmssd') || textCode === 'hrv') {
+          out.hrvMs = val
+        } else if (codes.includes('8867-4') || codes.includes('heartRate') || (textCode.includes('heart rate') && !textCode.includes('variability'))) {
+          out.heartRate = val
+          out.restingHr = out.restingHr ?? val
+        } else if (codes.includes('2708-6') || codes.includes('59408-5') || codes.includes('spo2Pct') || textCode.includes('spo2') || textCode.includes('oxygen')) {
+          out.spo2Pct = val
+        } else if (codes.includes('8480-6') || codes.includes('systolic') || textCode.includes('systolic')) {
+          out.systolic = val
+        } else if (codes.includes('8462-4') || codes.includes('diastolic') || textCode.includes('diastolic')) {
+          out.diastolic = val
+        } else if (codes.includes('8310-5') || codes.includes('bodyTempC') || textCode.includes('temp')) {
+          out.bodyTempC = val
+        } else if (codes.includes('9279-1') || codes.includes('respRate') || textCode.includes('respirat')) {
+          out.respRate = val
+        } else if (codes.includes('29463-7') || codes.includes('weightKg') || textCode.includes('weight') || textCode.includes('body mass')) {
+          out.weightKg = val
+        } else if (codes.includes('8302-2') || codes.includes('heightCm') || textCode.includes('height') || textCode.includes('body height')) {
+          out.heightCm = val
+        } else if (codes.includes('41982-0') || codes.includes('bodyFatPct') || textCode.includes('body fat')) {
+          out.bodyFatPct = val
+        } else if (codes.includes('39156-5') || codes.includes('bmi') || textCode.includes('body mass index')) {
+          out.bmi = val
+        } else if (codes.includes('89260-4') || codes.includes('vo2max') || textCode.includes('vo2')) {
+          out.vo2max = val
+        } else if (codes.includes('93832-4') || codes.includes('sleepH') || textCode.includes('sleep')) {
+          out.sleepH = val
+        } else if (codes.includes('55423-8') || codes.includes('steps') || textCode.includes('step')) {
+          out.steps = val
+        } else if (codes.includes('activeKcal') || textCode.includes('active energy')) {
+          out.activeKcal = val
+        } else if (codes.includes('skeletalMuscleKg') || textCode.includes('skeletal muscle')) {
+          out.skeletalMuscleKg = val
+        } else if (codes.includes('recoveryPct') || textCode.includes('recovery')) {
+          out.recoveryPct = val
+        }
+      }
+      if (typeof res.effectiveDateTime === 'string' && !out.measuredAt) {
+        out.measuredAt = res.effectiveDateTime
+      }
+    }
+  }
+
+  return prune(out)
+}
+
 // Dispatch by file name / content sniffing.
 export function parseHealthFile(name: string, text: string): ImportResult {
   const lower = name.toLowerCase()
   if (lower.endsWith('.xml') || text.includes('<HealthData')) return parseAppleHealth(text)
   if (lower.endsWith('.json') || /^\s*[[{]/.test(text)) {
+    if (text.includes('"Bundle"') || text.includes('"Observation"')) {
+      const fhir = parseFhirBundle(text)
+      if (Object.keys(fhir).filter((k) => k !== 'source').length) return fhir
+    }
     // Health Auto Export first — its metric-name-in-a-value shape is invisible
     // to the generic flattener, so trying the generic path first would return
     // an empty result and the file would be reported as unrecognizable.

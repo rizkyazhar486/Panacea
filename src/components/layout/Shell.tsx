@@ -865,6 +865,7 @@ export function Shell({ children }: { children: ReactNode }) {
                       {([
                         { r: 'pasien', label: 'Pasien', icon: '🩺' },
                         { r: 'dokter', label: 'Dokter', icon: '👨‍⚕️' },
+                        { r: 'admin', label: 'Faskes / Klinik', icon: '🏥' },
                         { r: 'verifikator', label: 'Verifikator', icon: '🔍' },
                         { r: 'kontributor', label: 'Kontributor', icon: '✍️' },
                       ] as const).map(({ r, label, icon }) => {

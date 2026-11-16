@@ -1,5 +1,5 @@
-import { lazy, Suspense, useLayoutEffect, useRef, type ComponentType } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { lazy, Suspense, useEffect, useLayoutEffect, useMemo, useRef, useState, type ComponentType } from 'react'
+import { Link, useSearchParams } from 'react-router-dom'
 import { PanaceaZoneNav } from '../components/PanaceaZoneNav'
 import { OneShape } from '../components/OneShape'
 import { SuperPageCapabilityRail } from '../components/SuperPageCapabilityRail'
@@ -7,6 +7,9 @@ import { PersonalBodyUnifiedSurface, PersonalBodySurfaceShown } from '../compone
 import { SurfaceDepthNavigator } from '../components/SurfaceDepthNavigator'
 import { hitungScrollAgarTerlihat } from '../lib/railViewport'
 import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
+import { useOptionalStore } from '../lib/store'
+import { useOptionalLongitudinalState } from '../lib/useLongitudinalState'
+import { getVitals } from '../lib/healthVitals'
 
 const BodyComposition = lazy(() => import('./bodyhub/BodyComposition').then((m) => ({ default: m.BodyComposition })))
 const BodyExposureOS = lazy(() => import('./bodyhub/BodyExposureOS').then((m) => ({ default: m.BodyExposureOS })))
@@ -221,7 +224,10 @@ export function UnifiedBodyWorkspace() {
         )}
       </section>
 
-      <section role="tabpanel" aria-label={active.label} className="min-w-0">
+      <section role="tabpanel" aria-label={active.label} className="min-w-0 space-y-3">
+        {['body', 'training', 'ranked', 'recovery', 'nutrition', 'health-data'].includes(activeKey) && (
+          <YourBodyDailyStrip activeKey={activeKey} />
+        )}
         {isExposure ? (
           <Suspense fallback={<Loader exposure />}><Active /></Suspense>
         ) : (
@@ -232,6 +238,51 @@ export function UnifiedBodyWorkspace() {
       </section>
 
       <SuperPageCapabilityRail domain="body" initialLimit={16} />
+    </div>
+  )
+}
+
+function YourBodyDailyStrip({ activeKey }: { readonly activeKey: BodyView }) {
+  const store = useOptionalStore()
+  const longitudinal = useOptionalLongitudinalState()
+  const [rev, setRev] = useState(0)
+  useEffect(() => {
+    const bump = () => setRev((x) => x + 1)
+    window.addEventListener('panacea:health-updated', bump)
+    window.addEventListener('panacea:body-character-updated', bump)
+    window.addEventListener('storage', bump)
+    return () => {
+      window.removeEventListener('panacea:health-updated', bump)
+      window.removeEventListener('panacea:body-character-updated', bump)
+      window.removeEventListener('storage', bump)
+    }
+  }, [])
+  const vitals = useMemo(() => {
+    void rev
+    return getVitals(store?.account ?? null)
+  }, [store?.account, longitudinal, rev])
+  const rhr = typeof vitals.restingHr === 'number' && vitals.restingHr > 0 ? Math.round(vitals.restingHr) : null
+  const hrv = typeof vitals.hrvMs === 'number' && vitals.hrvMs > 0 ? Math.round(vitals.hrvMs) : null
+  const sleep = typeof vitals.sleepH === 'number' && vitals.sleepH > 0 ? vitals.sleepH.toFixed(1) : null
+  const steps = typeof vitals.steps === 'number' && vitals.steps > 0 ? Math.round(vitals.steps) : null
+  const weight = typeof vitals.weightKg === 'number' && vitals.weightKg > 0 ? vitals.weightKg : null
+
+  const copy =
+    activeKey === 'training' ? { title: 'Daily Training Target', detail: `RHR ${rhr ?? '—'} bpm · HRV ${hrv ?? '—'} ms · Steps ${steps?.toLocaleString('en-US') ?? '—'}`, to: '/fitness-hub?view=health-data', cta: 'Sync Wearable' }
+    : activeKey === 'ranked' ? { title: '90-Day League Evidence', detail: `Tracked signals: RHR ${rhr ?? '—'} · HRV ${hrv ?? '—'} · Sleep ${sleep ?? '—'} h`, to: '/fitness-hub?view=training', cta: 'Log Training' }
+    : activeKey === 'recovery' ? { title: 'Autonomic Recovery Focus', detail: `HRV ${hrv ?? '—'} ms · Sleep ${sleep ?? '—'} h · Slow 0.1 Hz vagal pacing & wearable fusion ready`, to: '/body-exposure', cta: 'Open EMV & Local Hub' }
+    : activeKey === 'nutrition' ? { title: 'Daily Fluid & Energy Context', detail: weight != null ? `Recorded Weight ${weight.toFixed(1)} kg · Baseline fluid ~${Math.round(weight * 30)} mL/day` : 'Enter weight on Body tab for fluid target', to: '/fitness-hub?view=body', cta: 'Update Body' }
+    : { title: 'Multi-Device Canonical Sync', detail: `Active channels: ${[rhr, hrv, sleep, steps, weight].filter((x) => x != null).length}/5 baseline signals populated`, to: '/body-exposure', cta: '25 Wearable Hub & QR' }
+
+  return (
+    <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 10, padding: '10px 14px', borderRadius: 16, border: '1px solid rgba(0, 191, 99, 0.28)', background: 'rgba(6, 12, 16, 0.85)', color: '#eef4ff' }}>
+      <div style={{ minWidth: 0 }}>
+        <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#5ff2a7' }}>{copy.title}</div>
+        <div style={{ marginTop: 2, fontSize: 12, color: '#cbd5e1' }}>{copy.detail}</div>
+      </div>
+      <Link to={copy.to} style={{ minHeight: 38, display: 'inline-flex', alignItems: 'center', padding: '0 12px', borderRadius: 999, border: '1px solid rgba(0,191,99,0.45)', background: 'rgba(0,191,99,0.14)', color: '#5ff2a7', fontSize: 11, fontWeight: 800, textDecoration: 'none' }}>
+        {copy.cta} →
+      </Link>
     </div>
   )
 }

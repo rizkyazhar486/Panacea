@@ -277,3 +277,17 @@ export {
   type PantheonConsensusEvaluation,
 } from './model/pantheonClinicalConsensusEngine'
 
+export {
+  buildClinicalFhirBundle,
+  serializeClinicalFhirBundle,
+  generateSoapSbarSummary,
+  type ClinicalBundleOptions,
+  type SoapSbarSummary,
+} from './model/clinicalInterop'
+
+export {
+  downloadClinicalFhirBundle,
+  downloadSoapSbarReport,
+  printClinicalReport,
+} from './ui/clinicalInteropActions'
+

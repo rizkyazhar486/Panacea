@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { PanaceaZoneNav } from '../../components/PanaceaZoneNav'
 import { SuperPageCapabilityRail } from '../../components/SuperPageCapabilityRail'
@@ -12,6 +12,15 @@ import { SurfaceGuide } from '../../components/SurfaceGuide'
 import { MentalHealthClinicalResearchLab } from '../../components/MentalHealthClinicalResearchLab'
 import { Fold } from '../../shared/ui/Fold'
 import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
+import {
+  buildClinicalFhirBundle,
+  downloadClinicalFhirBundle,
+  downloadSoapSbarReport,
+  generateSoapSbarSummary,
+  printClinicalReport,
+  serializeClinicalFhirBundle,
+} from '../../domains/clinical-operations'
+import { getVitals } from '../../lib/healthVitals'
 
 export const GROUPS = [
   {
@@ -66,7 +75,7 @@ const REFERENCE_LINKS = [
 ] as const
 
 export function ClinicalHub() {
-  const { account } = useStore()
+  const { account, activePatient, state } = useStore()
   const [calculator, setCalculator] = useState<Calculator>('bmi')
   const [question, setQuestion] = useState('')
   const [weight, setWeight] = useState('')
@@ -76,6 +85,72 @@ export function ClinicalHub() {
   const [lab, setLab] = useState('')
   const [low, setLow] = useState('')
   const [high, setHigh] = useState('')
+  const [interopFeedback, setInteropFeedback] = useState<'soap' | 'sbar' | 'fhir-copy' | 'fhir-dl' | 'summary-dl' | null>(null)
+  const [rev, setRev] = useState(0)
+
+  useEffect(() => {
+    const refresh = () => setRev((x) => x + 1)
+    window.addEventListener('panacea:health-updated', refresh)
+    window.addEventListener('panacea:body-character-updated', refresh)
+    window.addEventListener('storage', refresh)
+    return () => {
+      window.removeEventListener('panacea:health-updated', refresh)
+      window.removeEventListener('panacea:body-character-updated', refresh)
+      window.removeEventListener('storage', refresh)
+    }
+  }, [])
+
+  const vitals = useMemo(() => {
+    void rev
+    const current = getVitals(account)
+    return {
+      ...current,
+      weightKg: Number(weight) > 0 ? Number(weight) : current.weightKg,
+      heightCm: Number(height) > 0 ? Number(height) : current.heightCm,
+      systolic: Number(sbp) > 0 ? Number(sbp) : current.systolic,
+      diastolic: Number(dbp) > 0 ? Number(dbp) : current.diastolic,
+    }
+  }, [account, weight, height, sbp, dbp, rev])
+
+  const emrCount = activePatient?.id && state.records[activePatient.id] ? 1 : 0
+  const { soapText, sbarText } = useMemo(
+    () => generateSoapSbarSummary({ patient: activePatient, vitals, account, emrCount }),
+    [activePatient, vitals, account, emrCount],
+  )
+  const fhirBundle = useMemo(
+    () => buildClinicalFhirBundle({ vitals, patient: activePatient, account, now: new Date() }),
+    [vitals, activePatient, account],
+  )
+
+  const flashFeedback = (kind: 'soap' | 'sbar' | 'fhir-copy' | 'fhir-dl' | 'summary-dl') => {
+    setInteropFeedback(kind)
+    setTimeout(() => setInteropFeedback((cur) => (cur === kind ? null : cur)), 2500)
+  }
+
+  const handleCopySoap = () => {
+    navigator.clipboard?.writeText(soapText)
+    flashFeedback('soap')
+  }
+
+  const handleCopySbar = () => {
+    navigator.clipboard?.writeText(sbarText)
+    flashFeedback('sbar')
+  }
+
+  const handleCopyFhir = () => {
+    navigator.clipboard?.writeText(serializeClinicalFhirBundle(fhirBundle))
+    flashFeedback('fhir-copy')
+  }
+
+  const handleDownloadSoapSbar = () => {
+    downloadSoapSbarReport({ vitals, patient: activePatient, account, emrCount })
+    flashFeedback('summary-dl')
+  }
+
+  const handleDownloadFhir = () => {
+    downloadClinicalFhirBundle({ vitals, patient: activePatient, account })
+    flashFeedback('fhir-dl')
+  }
 
   const bmi = useMemo(() => {
     const kg = Number(weight)
@@ -268,6 +343,72 @@ export function ClinicalHub() {
             <output aria-live="polite" className="mt-5 block text-3xl font-black tracking-[-.04em]">{labState}</output>
           </div>
         </section>
+
+        <div className="mt-6 grid gap-4 border-t border-white/10 pt-4 sm:grid-cols-3" aria-label="Clinician workflow and interoperability readiness" data-testid="physician-workbench-actions">
+          <div className="border-l-2 border-emerald-400 pl-3">
+            <div className="text-[10px] font-black uppercase tracking-[.12em] text-emerald-300">Auto-SOAP / SBAR &amp; Consilium</div>
+            <p className="mt-1 text-xs text-white/70">
+              EMR: {emrCount ? '1 chart initialized' : 'None yet'} · HR {vitals.heartRate ?? vitals.restingHr ?? '—'} · SpO2 {vitals.spo2Pct ?? '—'}% · BP {vitals.systolic && vitals.diastolic ? `${vitals.systolic}/${vitals.diastolic}` : '—'}.
+            </p>
+            <div className="mt-1 flex flex-wrap gap-3">
+              {[
+                { label: interopFeedback === 'soap' ? '✓ SOAP Copied' : 'Copy SOAP', onClick: handleCopySoap, cls: 'text-emerald-300' },
+                { label: interopFeedback === 'sbar' ? '✓ SBAR Copied' : 'Copy SBAR', onClick: handleCopySbar, cls: 'text-white/75' },
+                { label: interopFeedback === 'summary-dl' ? '✓ Downloaded' : 'Export .txt', onClick: handleDownloadSoapSbar, cls: 'text-white/75' },
+              ].map((btn) => (
+                <button
+                  key={btn.label}
+                  type="button"
+                  onClick={btn.onClick}
+                  style={{ minHeight: 40, padding: '4px 12px', borderRadius: 999, border: '1px solid rgba(255,255,255,0.16)' }}
+                  className={`inline-flex items-center text-xs font-black ${btn.cls} hover:text-white`}
+                >
+                  {btn.label}
+                </button>
+              ))}
+            </div>
+            <div className="mt-1 flex flex-wrap gap-3">
+              <Link to="/emr" className="inline-flex min-h-[44px] items-center text-xs font-black text-emerald-300 hover:text-white">Open AI-EMR →</Link>
+              <Link to="/clinical-calculators" className="inline-flex min-h-[44px] items-center text-xs font-black text-white/75 hover:text-white">Dose &amp; Scores →</Link>
+            </div>
+          </div>
+          <div className="border-l-2 border-amber-400 pl-3">
+            <div className="text-[10px] font-black uppercase tracking-[.12em] text-amber-300">Allergy &amp; Drug Safety Check</div>
+            <p className="mt-1 text-xs text-white/70">
+              Allergies: {activePatient?.allergies?.length ? activePatient.allergies.join(', ') : 'None recorded'} · Risk flags: {activePatient?.riskFlags?.length ?? 0}. CYP2C19 / HLA-B*15:02 screening available in Drug Check.
+            </p>
+            <div className="mt-1 flex flex-wrap gap-3">
+              <Link to="/rujukan?t=obat" className="inline-flex min-h-[44px] items-center text-xs font-black text-amber-300 hover:text-white">Drug Check →</Link>
+              <Link to="/emergency" className="inline-flex min-h-[44px] items-center text-xs font-black text-rose-300 hover:text-white">Emergency →</Link>
+            </div>
+          </div>
+          <div className="border-l-2 border-cyan-400 pl-3">
+            <div className="text-[10px] font-black uppercase tracking-[.12em] text-cyan-300">SATUSEHAT FHIR R4 &amp; Radar</div>
+            <p className="mt-1 text-xs text-white/70">MRN: {activePatient?.mrn || '—'} · Permenkes 24/2022 bundle ({fhirBundle.entry.length} entries, draft unverified).</p>
+            <div className="mt-1 flex flex-wrap gap-3">
+              {[
+                { id: 'btn-export-fhir-pdf', label: interopFeedback === 'fhir-dl' ? '✓ FHIR Saved' : 'Export FHIR R4', onClick: handleDownloadFhir, cls: 'text-cyan-300' },
+                { label: interopFeedback === 'fhir-copy' ? '✓ Copied' : 'Copy JSON', onClick: handleCopyFhir, cls: 'text-white/75' },
+                { label: 'Print', onClick: printClinicalReport, cls: 'text-white/75' },
+              ].map((btn) => (
+                <button
+                  key={btn.label}
+                  id={btn.id}
+                  type="button"
+                  onClick={btn.onClick}
+                  style={{ minHeight: 40, padding: '4px 12px', borderRadius: 999, border: '1px solid rgba(255,255,255,0.16)' }}
+                  className={`inline-flex items-center text-xs font-black ${btn.cls} hover:text-white`}
+                >
+                  {btn.label}
+                </button>
+              ))}
+            </div>
+            <div className="mt-1 flex flex-wrap gap-3">
+              <Link to="/visit-os" className="inline-flex min-h-[44px] items-center text-xs font-black text-cyan-300 hover:text-white">Open Visit OS →</Link>
+              <Link to="/surveillance" className="inline-flex min-h-[44px] items-center text-xs font-black text-white/75 hover:text-white">Community Radar →</Link>
+            </div>
+          </div>
+        </div>
         </Fold>
 
         <Fold label="Research">
