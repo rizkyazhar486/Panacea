@@ -40,3 +40,16 @@ export function cleanDeviceText(value: Uint8Array | string | null | undefined): 
   if (!cleaned) return null
   return [...cleaned].slice(0, DEVICE_TEXT_MAX).join('')
 }
+
+/**
+ * The name a reading is filed under: "manufacturer model" when the device reports them (once, if the model already
+ * starts with the manufacturer), else its advertised name. Never invented: unknown stays a generic label.
+ */
+export function deviceLabel(device: { name: string | null; manufacturer: string | null; model: string | null } | null): string {
+  if (!device) return 'Bluetooth device'
+  const { name, manufacturer, model } = device
+  if (manufacturer && model) {
+    return model.toLowerCase().startsWith(manufacturer.toLowerCase()) ? model : `${manufacturer} ${model}`
+  }
+  return model ?? name ?? manufacturer ?? 'Bluetooth device'
+}

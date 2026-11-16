@@ -1,5 +1,6 @@
 import { capturePersonalHealthOperation, readPersonalHealthFile, readPersonalHealthImage } from '../../domains/personal-health'
-import { useEffect, useRef, useState } from 'react'
+import { loadBluetoothWearablePanel, type WearableSavePatch } from '../../domains/devices'
+import { lazy, Suspense, useEffect, useRef, useState } from 'react'
 import { Fold } from '../../shared/ui/Fold'
 import { Prosa } from '../../components/Prosa'
 import { KolomAngka } from '../../components/KolomAngka'
@@ -15,6 +16,7 @@ import { useStore } from '../../lib/store'
 import { setDemo } from '../../lib/profile'
 import { parseHealthFile, type ImportResult } from '../../lib/healthImport'
 import { mergeVitals } from '../../lib/healthVitals'
+import { deretMetrik } from '../../lib/riwayatVitals'
 import { parseWorkouts, parseHrNotifications } from '../../lib/workoutImport'
 import { mergeWorkouts, mergeHrNotifications } from '../../lib/workoutStore'
 import { diagnose, type SyncDiagnosis } from '../../lib/syncDiagnostics'
@@ -63,6 +65,12 @@ const DEF: HealthProfile = {
   history: [],
 }
 const LKEY = 'pmd_health_profile'
+
+// The Bluetooth panel is React plus the radio code: loaded only when this page renders it.
+const BluetoothWearablePanel = lazy(loadBluetoothWearablePanel)
+
+/** A reading from the person's own Bluetooth band joins their health data like any other sync. */
+const saveBluetoothReading = (patch: WearableSavePatch) => { mergeVitals(patch) }
 
 export function HealthProfile() {
   const { account } = useStore()
@@ -291,6 +299,16 @@ export function HealthProfile() {
           </div>
         </div>
         {account && <div className="mt-2 text-[10px] text-neutral-500">Account: {account.email}</div>}
+      </Card>
+
+      <Card className="!p-5">
+        <SectionTitle icon={<IconHeart size={20} />} title="Bluetooth heart rate" subtitle="From your own strap or band" />
+        <div className="mt-2">
+          <Suspense fallback={null}>
+            <BluetoothWearablePanel onSave={saveBluetoothReading}
+              previousRmssd={deretMetrik('hrvRmssdMs', 90).map((t) => t.nilai)} />
+          </Suspense>
+        </div>
       </Card>
 
       <Fold label="Import">

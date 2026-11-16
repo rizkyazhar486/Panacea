@@ -94,10 +94,15 @@ export function hrvProgress(session: LiveSession, startedAtMs: number): HrvProgr
   return { fraction: Math.min(1, result.coveredMs / RMSSD_MIN_RECORDING_MS), intervals, result }
 }
 
+// A type alias (not an interface) so it fits the vitals store's open record of named numbers and strings.
+export type WearableVitalsPatch = { heartRate?: number; hrvRmssdMs?: number; source: string }
+/** A patch as saved: with the wall-clock time of the reading it carries. */
+export type WearableSavePatch = WearableVitalsPatch & { readonly measuredAt: string }
+
 /** What saving a session writes to the person's health data. HRV goes to its own RMSSD key, never to SDNN fields. */
 export function vitalsPatchFrom(latest: LiveSample | null, hrv: HrvRecordingResult | null, sourceLabel: string):
-  { heartRate?: number; hrvRmssdMs?: number; source: string } | null {
-  const patch: { heartRate?: number; hrvRmssdMs?: number; source: string } = { source: `Bluetooth · ${sourceLabel}` }
+  WearableVitalsPatch | null {
+  const patch: WearableVitalsPatch = { source: `Bluetooth · ${sourceLabel}` }
   if (latest && latest.bpm > 0) patch.heartRate = latest.bpm
   if (hrv?.ok) patch.hrvRmssdMs = Math.round(hrv.rmssdMs * 10) / 10
   return patch.heartRate === undefined && patch.hrvRmssdMs === undefined ? null : patch
