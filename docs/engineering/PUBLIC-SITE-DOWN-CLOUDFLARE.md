@@ -48,9 +48,10 @@ Aplikasi memakai `base: './'` dan HashRouter, jadi berjalan di hosting statis ma
 6. Tunggu pemeriksaan DNS di halaman Pages berhasil, lalu centang **Enforce HTTPS**. Setelah itu awan oranye boleh dinyalakan dengan SSL/TLS mode Full.
 7. Domain tanpa `www` (`panaceamed.id`): buat Redirect Rule Cloudflare ke `https://www.panaceamed.id/`.
 
-Alternatif bila ingin tetap di Cloudflare: Workers & Pages > Create > Pages > Connect to Git, build command
-`node scripts/bangun/home-stable-css.mjs && node scripts/bangun/write-frontend-build-info.mjs && npx vite build`,
-output `dist`, lalu tambahkan custom domain `www.panaceamed.id`. Jalur ini belum dicoba dari repo ini; gerbang tes tetap berjalan di GitHub Actions.
+Alternatif di Cloudflare Pages: `.github/workflows/cloudflare-pages.yml` sudah ada dan menerbitkan `dist` ke proyek Pages bernama `panaceamed` bila secret `CLOUDFLARE_API_TOKEN` (izin Cloudflare Pages: Edit) dan `CLOUDFLARE_ACCOUNT_ID` terisi.
+Per 2026-11-16 langkah publish itu gagal sebelum berjalan karena `cloudflare/pages-action` sudah tidak ada; perbaikannya ada di PR #3072 (belum digabung dan belum dicoba pada akun Anda).
+Urutannya: buat proyek Pages `panaceamed` di dashboard (Workers & Pages > Create > Pages), isi kedua secret, tunggu workflow berhasil, lalu tambahkan custom domain `www.panaceamed.id` di proyek itu setelah rekaman tunnel `www` dihapus.
+Jalur GitHub Pages di atas tidak butuh secret apa pun dan sudah punya alur kerja yang bekerja, jadi itu yang saya sarankan lebih dulu.
 
 ## Hal yang perlu dihindari
 
