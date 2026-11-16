@@ -2,7 +2,9 @@
  * Pure deterministic domain engine for PanaceaMed's 5 Athletic & Holistic
  * Recovery Modalities (HBOT, Whole-Body Cryotherapy, Red Light/PBM,
  * X-Tone Electromagnetic MMS, X-Cryo Localized Cryotherapy), pre/post
- * biomarker correlation, and Visa/EMV-style Luhn-verified session ledger.
+ * Local session parameter tracker, pre/post biomarker delta calculator, and
+ * non-financial session log helper (`clinicallyReviewed: false`).
+ * Not a clinical dosing engine and not a Visa/EMV payment clearinghouse.
  *
  * Evidence & clinical boundary:
  * - Reference dose ranges represent investigational / sports-physiology literature
@@ -209,7 +211,11 @@ export interface RecoveryCorrelationResult {
   readonly deltaRestingHr: number | null
   readonly deltaSpo2Pct: number | null
   readonly deltaLactateMmolL: number | null
+  readonly parameterSummary: string
+  readonly boundsStatus: 'within_reference_range' | 'caution_upper_bound'
+  /** @deprecated Display alias retained for compatibility; not a clinical dose prescription. */
   readonly computedDoseLabel: string
+  /** @deprecated Display alias retained for compatibility; use `boundsStatus`. */
   readonly doseCheckStatus: 'within_reference_range' | 'caution_upper_bound'
   readonly warnings: readonly string[]
   readonly summary: string
@@ -223,26 +229,26 @@ export function analyzePrePostRecovery(input: RecoveryCorrelationInput): Recover
 
   const [minDur, maxDur] = spec.referenceBounds.durationMin
   if (input.durationMin < minDur || input.durationMin > maxDur) {
-    warnings.push(`Duration ${input.durationMin} min sits outside standard protocol range (${minDur}–${maxDur} min).`)
+    warnings.push(`Duration ${input.durationMin} min sits outside reference range (${minDur}–${maxDur} min).`)
   }
   const [minP, maxP] = spec.referenceBounds.primaryRange
   if (input.primaryValue < minP || input.primaryValue > maxP) {
     warnings.push(`${spec.referenceBounds.primaryLabel} ${input.primaryValue} ${spec.referenceBounds.primaryUnit} sits outside reference bounds (${minP}–${maxP}).`)
   }
 
-  let computedDoseLabel = `${input.primaryValue} ${spec.referenceBounds.primaryUnit} · ${input.durationMin} min`
+  let parameterSummary = `${input.primaryValue} ${spec.referenceBounds.primaryUnit} · ${input.durationMin} min`
   if (input.modalityId === 'hbot') {
     const fio2Pct = input.secondaryValue ?? 100
     const po2 = computeHbotInspiredPo2MmHg(input.primaryValue, fio2Pct / 100)
-    computedDoseLabel = `${input.primaryValue} ATA · FiO₂ ${fio2Pct}% (~${po2} mmHg PiO₂) · ${input.durationMin} min`
+    parameterSummary = `${input.primaryValue} ATA · FiO₂ ${fio2Pct}% (~${po2} mmHg PiO₂) · ${input.durationMin} min`
   } else if (input.modalityId === 'red_light_pbm') {
     const fluence = computePbmFluenceJcm2(input.primaryValue, input.durationMin * 60)
-    computedDoseLabel = `${fluence} J/cm² @ ${input.primaryValue} mW/cm² (660/${input.secondaryValue ?? 850}nm) · ${input.durationMin} min`
-    if (fluence > 60) warnings.push(`Computed fluence ${fluence} J/cm² exceeds typical biphasic muscle window (4–40 J/cm²).`)
+    parameterSummary = `${fluence} J/cm² @ ${input.primaryValue} mW/cm² (660/${input.secondaryValue ?? 850}nm) · ${input.durationMin} min`
+    if (fluence > 60) warnings.push(`Calculated energy density ${fluence} J/cm² exceeds typical biphasic muscle range (4–40 J/cm²).`)
   } else if (input.modalityId === 'x_tone') {
-    computedDoseLabel = `${input.primaryValue} Hz · ${input.secondaryValue ?? 1.5} T · ${input.durationMin} min`
+    parameterSummary = `${input.primaryValue} Hz · ${input.secondaryValue ?? 1.5} T · ${input.durationMin} min`
   } else if (input.modalityId === 'x_cryo' && input.anatomicalSite) {
-    computedDoseLabel = `${input.anatomicalSite} · ${input.primaryValue} °C · ${input.durationMin} min`
+    parameterSummary = `${input.anatomicalSite} · ${input.primaryValue} °C · ${input.durationMin} min`
   }
 
   const diff = (a?: number | null, b?: number | null) =>
@@ -264,17 +270,20 @@ export function analyzePrePostRecovery(input: RecoveryCorrelationInput): Recover
   if (deltaSpo2Pct !== null) deltaParts.push(`ΔSpO₂ ${deltaSpo2Pct >= 0 ? '+' : ''}${deltaSpo2Pct}%`)
   if (deltaLactateMmolL !== null) deltaParts.push(`ΔLactate ${deltaLactateMmolL >= 0 ? '+' : ''}${deltaLactateMmolL} mmol/L`)
 
+  const boundsStatus = warnings.length > 0 ? 'caution_upper_bound' : 'within_reference_range'
   const summary = hasRecordedDelta
-    ? `${spec.shortName} logged (${computedDoseLabel}): ${deltaParts.join(' · ')}.${input.linkedWorkoutLabel ? ` Linked workout: ${input.linkedWorkoutLabel}.` : ''}`
-    : `${spec.shortName} protocol ready (${computedDoseLabel}). Record pre/post biometrics to quantify autonomic recovery deltas.`
+    ? `${spec.shortName} logged (${parameterSummary}): ${deltaParts.join(' · ')}.${input.linkedWorkoutLabel ? ` Linked workout: ${input.linkedWorkoutLabel}.` : ''}`
+    : `${spec.shortName} parameters within reference range (${parameterSummary}). Record pre/post biometrics to quantify recovery deltas.`
 
   return {
     deltaHrvMs,
     deltaRestingHr,
     deltaSpo2Pct,
     deltaLactateMmolL,
-    computedDoseLabel,
-    doseCheckStatus: warnings.length > 0 ? 'caution_upper_bound' : 'within_reference_range',
+    parameterSummary,
+    boundsStatus,
+    computedDoseLabel: parameterSummary,
+    doseCheckStatus: boundsStatus,
     warnings,
     summary,
     truthClass: hasRecordedDelta ? 'recorded_delta' : 'protocol_reference',
@@ -287,11 +296,16 @@ export interface RecoveryLedgerTransaction {
   readonly at: string
   readonly modalityId: RecoveryModalityId
   readonly modalityName: string
+  readonly parameterSummary: string
+  readonly sessionDigest: string
+  /** @deprecated Storage compatibility alias; self-logged parameter summary only. */
   readonly doseLabel: string
   readonly deltaSummary: string
   readonly linkedWorkout?: string
   readonly biometricSource?: string
+  /** @deprecated Storage compatibility alias; non-financial local session digest (not Visa/EMV). */
   readonly emvReceiptToken: string
+  /** @deprecated Internal check-digit invariant flag (non-payment). */
   readonly luhnCheckValid: boolean
   readonly pre: RecoveryBiomarkers
   readonly post: RecoveryBiomarkers
@@ -338,24 +352,28 @@ export function createRecoveryLedgerTransaction(
 ): RecoveryLedgerTransaction {
   const spec = HOLISTIC_RECOVERY_MODALITIES.find((m) => m.id === input.modalityId) ?? HOLISTIC_RECOVERY_MODALITIES[0]
   let h = 2166136261 >>> 0
-  const seed = `${accountId}|${input.modalityId}|${atIso}|${correlation.computedDoseLabel}`
+  const seed = `${accountId}|${input.modalityId}|${atIso}|${correlation.parameterSummary}`
   for (let i = 0; i < seed.length; i += 1) {
     h = Math.imul(h ^ seed.charCodeAt(i), 16777619) >>> 0
   }
-  const body15 = `529910${String(h % 1_000_000_000).padStart(9, '0')}`
-  const pan16 = `${body15}${luhnCheckDigit(body15)}`
+  // Private internal check-digit prefix (990010, non-card-network) for local record integrity.
+  const body15 = `990010${String(h % 1_000_000_000).padStart(9, '0')}`
+  const checkId16 = `${body15}${luhnCheckDigit(body15)}`
+  const sessionDigest = `LOG-${h.toString(16).toUpperCase().padStart(8, '0')}`
 
   return {
     id: `TRX-REC-${h.toString(16).toUpperCase().padStart(8, '0')}`,
     at: atIso,
     modalityId: input.modalityId,
     modalityName: spec.shortName,
-    doseLabel: correlation.computedDoseLabel,
+    parameterSummary: correlation.parameterSummary,
+    sessionDigest,
+    doseLabel: correlation.parameterSummary,
     deltaSummary: correlation.summary,
     linkedWorkout: input.linkedWorkoutLabel,
     biometricSource: biometricSource || undefined,
-    emvReceiptToken: `REC-${pan16.slice(0, 4)}-${pan16.slice(12)}`,
-    luhnCheckValid: verifyLuhnNumber(pan16),
+    emvReceiptToken: sessionDigest,
+    luhnCheckValid: verifyLuhnNumber(checkId16),
     pre: input.pre,
     post: input.post,
     clinicallyReviewed: false,

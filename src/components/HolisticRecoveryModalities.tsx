@@ -10,7 +10,7 @@ import {
   type RecoveryPerspective,
 } from '../domains/personal-health/engine/holisticRecoveryProtocol'
 import { appendRecoveryLedgerEntry, readRecoveryLedger } from '../domains/personal-health/adapters/recoveryLedgerStorage'
-import { readUnifiedLocalVitals } from '../domains/identity/localRecovery'
+import { readUnifiedLocalVitals } from '../domains/identity/bootVitals'
 import { useOptionalStore } from '../lib/store'
 import { mergeVitals } from '../lib/healthVitals'
 import { mergeHealthCache } from '../lib/profile'
@@ -150,7 +150,7 @@ export function HolisticRecoveryModalities() {
       mergeVitals(patch)
       mergeHealthCache(patch)
     }
-    setSavedNotice(`Verified ${tx.id} (${tx.emvReceiptToken}) recorded to Biometric Recovery Ledger.`)
+    setSavedNotice(`Saved draft session ${tx.id} (${tx.sessionDigest}) to local recovery log (clinically_reviewed=false).`)
   }
 
   return (
@@ -207,7 +207,7 @@ export function HolisticRecoveryModalities() {
           />
         </svg>
         <div style={{ flex: 1, minWidth: 180 }}>
-          <div style={{ fontSize: 11, fontWeight: 800, color: '#00BF63', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+          <div style={{ fontSize: 11, fontWeight: 800, color: 'var(--teks-ok)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
             Daily Readiness &amp; Activity Rings
           </div>
           <div style={{ marginTop: 2, fontSize: 15, fontWeight: 800 }}>
@@ -231,14 +231,15 @@ export function HolisticRecoveryModalities() {
             type="button"
             onClick={() => selectModality(m.id)}
             style={{
-              minHeight: 40,
+              minHeight: 44,
+              minWidth: 44,
               padding: '0 12px',
               borderRadius: 12,
               fontSize: 12,
               fontWeight: 800,
               border: modalityId === m.id ? '1px solid #00BF63' : '1px solid rgba(148,163,184,0.28)',
               background: modalityId === m.id ? 'rgba(0, 191, 99, 0.14)' : 'transparent',
-              color: modalityId === m.id ? '#00BF63' : 'inherit',
+              color: modalityId === m.id ? 'var(--teks-ok)' : 'inherit',
               cursor: 'pointer',
             }}
           >
@@ -247,14 +248,14 @@ export function HolisticRecoveryModalities() {
         ))}
       </div>
 
-      {/* Active Modality Spec & AI Physiology Perspectives */}
+      {/* Active Modality Spec & Reference Perspectives */}
       <div className="mt-4 rounded-2xl border border-black/10 p-4 dark:border-white/15">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div>
-            <div style={{ fontSize: 10, fontWeight: 800, color: '#00BF63', letterSpacing: '0.06em' }}>{spec.badge}</div>
+            <div style={{ fontSize: 10, fontWeight: 800, color: 'var(--teks-ok)', letterSpacing: '0.06em' }}>{spec.badge}</div>
             <h3 style={{ margin: '2px 0 0', fontSize: 16, fontWeight: 800 }}>{spec.title}</h3>
           </div>
-          <Badge tone={analysis.doseCheckStatus === 'within_reference_range' ? 'normal' : 'low'}>
+          <Badge tone={analysis.boundsStatus === 'within_reference_range' ? 'normal' : 'low'}>
             {spec.defaultDoseSummary}
           </Badge>
         </div>
@@ -273,7 +274,9 @@ export function HolisticRecoveryModalities() {
               aria-selected={perspective === p}
               onClick={() => setPerspective(p)}
               style={{
-                padding: '4px 10px',
+                minHeight: 44,
+                minWidth: 44,
+                padding: '6px 12px',
                 borderRadius: 999,
                 fontSize: 11,
                 fontWeight: 700,
@@ -292,7 +295,7 @@ export function HolisticRecoveryModalities() {
           {spec.perspectives[perspective]}
         </div>
 
-        {/* Dose Parameters */}
+        {/* Session Parameters */}
         <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3">
           <Field label={`${spec.referenceBounds.primaryLabel} (${spec.referenceBounds.primaryUnit})`}>
             <input
@@ -300,7 +303,10 @@ export function HolisticRecoveryModalities() {
               step={modalityId === 'hbot' || modalityId === 'x_tone' ? '0.1' : '1'}
               className={inputClass}
               value={primaryVal}
-              onChange={(e) => setPrimaryVal(Number(e.target.value))}
+              onChange={(e) => {
+                const v = Number(e.target.value)
+                if (Number.isFinite(v)) setPrimaryVal(v)
+              }}
             />
           </Field>
           <Field label="Duration (min)">
@@ -309,7 +315,10 @@ export function HolisticRecoveryModalities() {
               step="0.5"
               className={inputClass}
               value={durationMin}
-              onChange={(e) => setDurationMin(Number(e.target.value))}
+              onChange={(e) => {
+                const v = Number(e.target.value)
+                if (Number.isFinite(v)) setDurationMin(v)
+              }}
             />
           </Field>
           {spec.referenceBounds.secondaryLabel ? (
@@ -319,7 +328,10 @@ export function HolisticRecoveryModalities() {
                 step={modalityId === 'x_tone' ? '0.1' : '1'}
                 className={inputClass}
                 value={secondaryVal}
-                onChange={(e) => setSecondaryVal(Number(e.target.value))}
+                onChange={(e) => {
+                  const v = Number(e.target.value)
+                  if (Number.isFinite(v)) setSecondaryVal(v)
+                }}
               />
             </Field>
           ) : modalityId === 'x_cryo' ? (
@@ -329,8 +341,8 @@ export function HolisticRecoveryModalities() {
           ) : null}
         </div>
 
-        <div className="mt-2 text-xs font-bold" style={{ color: '#00BF63' }}>
-          Computed Dose: {analysis.computedDoseLabel}
+        <div className="mt-2 text-xs font-bold" style={{ color: 'var(--teks-ok)' }}>
+          Session Parameters (Reference Bounds Only): {analysis.parameterSummary}
         </div>
         {analysis.warnings.map((w, i) => (
           <div key={i} className="mt-1 text-xs font-semibold text-amber-600 dark:text-amber-400">
@@ -368,35 +380,35 @@ export function HolisticRecoveryModalities() {
 
           <p className="mt-2 text-xs text-neutral-600 dark:text-neutral-300">{analysis.summary}</p>
           <p className="mt-1 text-[11px] text-neutral-500">
-            Contraindications (clinician review required): {spec.contraindications.join(' · ')} · clinicians_reviewed=false
+            Contraindications (clinician review required): {spec.contraindications.join(' · ')} · clinically_reviewed=false
           </p>
 
           <div className="mt-3 flex flex-wrap items-center gap-3">
             <Button onClick={handleLogSession} data-testid="log-recovery-ledger-btn">
-              <IconHeart size={15} /> Log Session to Biometric Ledger
+              <IconHeart size={15} /> Log Unreviewed Draft Session
             </Button>
             {savedNotice && <span className="text-xs font-bold text-brand-dark dark:text-brand">{savedNotice}</span>}
           </div>
         </div>
       </div>
 
-      {/* Verified Visa/EMV Style Biometric Recovery Ledger */}
+      {/* Self-Recorded Local Recovery Session Log (non-clinical, non-payment draft) */}
       {ledger.length > 0 && (
         <div className="mt-4 space-y-2" data-testid="recovery-biometric-ledger">
           <div className="text-xs font-extrabold uppercase tracking-wider text-neutral-500">
-            Verified Biometric Recovery Ledger ({ledger.length})
+            Self-Recorded Recovery Log · Unreviewed Draft ({ledger.length})
           </div>
           {ledger.slice(0, 6).map((tx) => (
             <div key={tx.id} className="rounded-xl border border-black/10 p-3 text-xs dark:border-white/15">
               <div className="flex flex-wrap items-center justify-between gap-2 font-bold">
-                <span>{tx.modalityName} · {tx.doseLabel}</span>
-                <span style={{ fontFamily: 'monospace', color: '#00BF63' }}>
-                  {tx.emvReceiptToken} {tx.luhnCheckValid ? '✓ LUHN' : ''}
+                <span>{tx.modalityName} · {tx.parameterSummary ?? tx.doseLabel}</span>
+                <span style={{ fontFamily: 'monospace', color: 'var(--teks-ok)' }}>
+                  {tx.id}
                 </span>
               </div>
               <div className="mt-1 text-[11px] text-neutral-600 dark:text-neutral-300">{tx.deltaSummary}</div>
-              <div className="mt-1 text-[10px] text-neutral-400">
-                {tx.at.slice(0, 16).replace('T', ' ')} · Draft/Unreviewed (`clinicallyReviewed: false`)
+              <div className="mt-1 text-[10px] text-neutral-500 dark:text-neutral-400">
+                {tx.at.slice(0, 16).replace('T', ' ')} · Self-recorded draft (`clinically_reviewed=false`)
               </div>
             </div>
           ))}

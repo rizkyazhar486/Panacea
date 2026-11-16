@@ -43,7 +43,7 @@ type FilterCategory = 'all' | WearableCategory
 const HUB_TABS: readonly { readonly id: HubTab; readonly label: string }[] = [
   { id: 'vitality', label: 'Vitality Bio-Scrolling' },
   { id: 'wearables', label: '25 Wearable Hub' },
-  { id: 'emv_pass', label: 'EMV QR & Barcode' },
+  { id: 'emv_pass', label: 'Identity QR & Barcode' },
 ]
 
 function QrSvg({ payload }: { readonly payload: string }) {
@@ -51,7 +51,7 @@ function QrSvg({ payload }: { readonly payload: string }) {
   return (
     <svg
       role="img"
-      aria-label="EMV dynamic medical token QR matrix"
+      aria-label="Dynamic local health pass QR matrix"
       data-testid="emv-qr-svg"
       viewBox="0 0 23 23"
       style={{ width: 148, height: 148, borderRadius: 12, background: '#f8fafc', padding: 6, flex: 'none' }}
@@ -302,7 +302,7 @@ export function BodyExposureLocalHub({
         <div style={{ minWidth: 0 }}>
           <div style={{ ...eyebrow, color: TONE.liveText }}>PanaceaMed Body Exposure · Local Hub</div>
           <h3 style={{ margin: '4px 0 0', fontSize: compact ? 16 : 18, fontWeight: 800, color: TONE.text }}>
-            Vitality Bio-Scrolling, 25 Wearables &amp; Rotating EMV Pass
+            Vitality Bio-Scrolling, 25 Wearables &amp; Rotating Identity Pass
           </h3>
           <p style={{ margin: '4px 0 0', fontSize: 12, color: TONE.dim, lineHeight: 1.5 }}>
             Synchronized directly with your canonical PanaceaMed account and recorded wearable vitals — unrecorded metrics stay explicitly empty.
@@ -763,7 +763,7 @@ export function BodyExposureLocalHub({
                             }
                             const pan = raw.replace(/\D/g, '').slice(0, 16)
                             const luhnOk = pan.length === 16 && verifyLuhnCardNumber(pan)
-                            setScannedResult(`Token terbaca (${raw.slice(0, 24)}…) — ${luhnOk ? 'ISO/IEC 7812 Luhn Checksum PASS' : 'Token terdekode (memerlukan verifikasi faskes)'}`)
+                            setScannedResult(`Token decoded (${raw.slice(0, 24)}…) — ${luhnOk ? 'Internal checksum OK (requires facility check)' : 'Token decoded (requires facility check)'}`)
                           } catch {
                             setScannedResult(`Gagal mendekode QR/Barcode dari ${file.name}.`)
                           }
@@ -797,7 +797,7 @@ export function BodyExposureLocalHub({
                     <video ref={videoRef} playsInline autoPlay muted style={{ width: '100%', height: 220, objectFit: 'cover', background: '#000' }} />
                     <div style={{ position: 'absolute', inset: 24, border: '2px dashed #00bf63', borderRadius: 10, pointerEvents: 'none' }} />
                     <div style={{ position: 'absolute', bottom: 8, left: 8, right: 8, background: 'rgba(0,0,0,0.7)', borderRadius: 6, padding: '4px 8px', fontSize: 10, color: '#a7f3d0', textAlign: 'center' }}>
-                      Arahkan kamera ke QR / Barcode kartu EMVCo
+                      Point camera at your Panacea Identity QR or Code-128 pass
                     </div>
                   </div>
                 )}
