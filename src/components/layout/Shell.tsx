@@ -61,7 +61,6 @@ import { promptInstall } from '../../lib/pwa'
 import type { Role } from '../../lib/types'
 import { NAV_UNTUK_PENGATURAN } from '../../data/navPengaturan'
 import { ambilTersembunyi, saring, langgananFitur } from '../../lib/fiturTersembunyi'
-import { autoIsiDariPerangkat } from '../../lib/autoIsi'
 import { useCommandBar } from '../useCommandBar'
 import { SUPER_PAGES, activeSuperPageForLocation, navigationHierarchyForRoute } from '../../lib/superPages'
 import { judulRute } from '../../lib/judulRute'
@@ -466,7 +465,11 @@ export function Shell({ children }: { children: ReactNode }) {
     if (keadaanBilah === 'hidden') setUserMenuBuka(false)
   }, [keadaanBilah])
 
-  useEffect(() => { if (account) void autoIsiDariPerangkat() }, [account])
+  // autoIsi (+ parser workout) hanya dibutuhkan setelah login: dimuat dinamis agar tidak masuk bundle awal (bundle-budget jsGzip).
+  useEffect(() => {
+    if (!account) return
+    void import('../../lib/autoIsi').then((m) => m.autoIsiDariPerangkat())
+  }, [account])
 
   /* Ringkasan harian dititipkan ke server supaya aturan notifikasi dapat
      memakai data yang hanya ada di perangkat (gizi, umur hasil lab, puasa,
