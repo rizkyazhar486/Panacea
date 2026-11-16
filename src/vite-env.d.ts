@@ -1,5 +1,7 @@
 /// <reference types="vite/client" />
 
+declare module '*.mjs';
+
 declare module 'html2canvas-pro' {
   export interface Html2CanvasOptions {
     backgroundColor?: string | null

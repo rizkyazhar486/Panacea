@@ -4,6 +4,8 @@ import { Prosa } from '../../components/Prosa'
 import { KolomAngka } from '../../components/KolomAngka'
 import { Card, SectionTitle, Field, inputClass, Badge, Button } from '../../components/ui'
 import { useVitals } from '../../lib/useVitals'
+import { useOptionalStore } from '../../lib/store'
+import { deretMetrik } from '../../lib/riwayatVitals'
 import { IconHeart, IconActivity, IconChartUp, IconMoon } from '../../components/icons'
 import { getHealthCache, pushBiometrics, mergeHealthCache } from '../../lib/profile'
 import { mergeVitals } from '../../lib/healthVitals'
@@ -105,29 +107,44 @@ function BodyTypeGrid({ bmi, pbf, g }: { bmi: number; pbf: number; g: 'M' | 'F' 
 
 // Pull whatever the Health Profile has synced from Apple Health / WHOOP / etc.
 // and map it onto this page's fields, so the two don't silently disagree.
-function syncFromHealthProfile(cur: KeadaanMasukan): { next: KeadaanMasukan; changed: string[] } {
+function syncFromHealthProfile(
+  cur: KeadaanMasukan,
+  extra?: { readonly heightCm?: unknown; readonly weightKg?: unknown; readonly sex?: unknown; readonly dob?: string },
+): { next: KeadaanMasukan; changed: string[] } {
   const hc = getHealthCache() as Record<string, unknown>
-  const num = (k: string) => (typeof hc[k] === 'number' && (hc[k] as number) > 0 ? (hc[k] as number) : undefined)
-  const patch: Partial<Record<KunciBody, number>> = {}
+  const num = (v: unknown) => (typeof v === 'number' && Number.isFinite(v) && v > 0 ? v : undefined)
+  const patch: Partial<Record<KunciBody, number | string>> = {}
   const changed: string[] = []
-  const wKg = num('weightKg'); if (wKg) { patch.w = wKg; changed.push('Weight') }
-  const bf = num('bodyFatPct')
+  const wKg = num(hc.weightKg) ?? num(extra?.weightKg); if (wKg) { patch.w = wKg; changed.push('Weight') }
+  const hCm = num(hc.heightCm) ?? num(extra?.heightCm); if (hCm) { patch.h = hCm; changed.push('Height') }
+  if (!cur.diisi.has('age') && extra?.dob) {
+    const dobMs = Date.parse(extra.dob)
+    if (Number.isFinite(dobMs)) {
+      const yrs = Math.floor((Date.now() - dobMs) / (365.2425 * 86400_000))
+      if (yrs >= 5 && yrs <= 120) { patch.age = yrs; changed.push('Age') }
+    }
+  }
+  if (!cur.diisi.has('g')) {
+    const sx = hc.sex ?? extra?.sex
+    if (sx === 'M' || sx === 'L') { patch.g = 'M'; changed.push('Sex') }
+    else if (sx === 'F' || sx === 'P') { patch.g = 'F'; changed.push('Sex') }
+  }
+  const bf = num(hc.bodyFatPct)
   // Massa lemak dari persen lemak perangkat butuh berat yang nyata; tanpa berat, persen itu tidak dihitung.
   const beratNyata = wKg ?? (cur.diisi.has('w') ? cur.b.w : undefined)
   if (bf && beratNyata) { patch.bfm = +((beratNyata * bf) / 100).toFixed(1); changed.push('Body Fat') }
-  const smm = num('muscleMassKg'); if (smm) { patch.smm = smm; changed.push('Muscle Mass') }
-  const vo2 = num('vo2max'); if (vo2) { patch.vo2 = vo2; changed.push('VO₂max') }
-  const rhr = num('restingHr'); if (rhr) { patch.rhr = rhr; changed.push('Resting HR') }
-  const hrv = num('hrvMs'); if (hrv) { patch.hrv = hrv; changed.push('HRV') }
-  const sleepH = num('sleepH'); if (sleepH) { patch.sleepH = sleepH; changed.push('Sleep') }
+  const smm = num(hc.muscleMassKg); if (smm) { patch.smm = smm; changed.push('Muscle Mass') }
+  const vo2 = num(hc.vo2max); if (vo2) { patch.vo2 = vo2; changed.push('VO₂max') }
+  const rhr = num(hc.restingHr); if (rhr) { patch.rhr = rhr; changed.push('Resting HR') }
+  const hrv = num(hc.hrvMs); if (hrv) { patch.hrv = hrv; changed.push('HRV') }
+  const sleepH = num(hc.sleepH); if (sleepH) { patch.sleepH = sleepH; changed.push('Sleep') }
   return { next: terapkan(cur, patch), changed }
 }
 
 export function BodyComposition() {
-  // Sync BEFORE the first render (not in an effect) so the push-back effect
-  // below never has a chance to commit stale default values over real synced
-  // ones — that race is exactly what caused this page to silently disagree
-  // with Apple Health/WHOOP data in the first place.
+  const store = useOptionalStore()
+  const vital = useVitals()
+  const activePatient = store?.activePatient ?? null
   const [masukan, setMasukan] = useState<KeadaanMasukan>(() => {
     const initial = load()
     if (localStorage.getItem(KEY) == null) return syncFromHealthProfile(initial).next
@@ -136,7 +153,8 @@ export function BodyComposition() {
   const { b, diisi } = masukan
   const [syncNote, setSyncNote] = useState('')
   const [baruDisimpan, setBaruDisimpan] = useState<string | null>(null)
-  const vital = useVitals()
+  const [useInBodyBfm, setUseInBodyBfm] = useState(false)
+  const [quickOpen, setQuickOpen] = useState(false)
   // Hanya isian nyata yang disimpan; sebelum ada satu pun isian, tidak ada yang ditulis (halaman lain membaca kunci ini).
   useEffect(() => {
     try { if (diisi.size > 0 || localStorage.getItem(KEY) != null) localStorage.setItem(KEY, JSON.stringify(serialisasi(masukan))) } catch { /* ignore */ }
@@ -145,12 +163,21 @@ export function BodyComposition() {
   // so calculators elsewhere in the app don't drift from what's shown on this page.
   // Hanya yang benar-benar diisi yang dibagikan: angka bawaan tidak boleh sampai ke profil bersama.
   useEffect(() => { pushBiometrics(biometrikUntukDibagikan(masukan)) }, [masukan])
-  const u = (p: Partial<Record<KunciBody, unknown>>) => setMasukan((x) => terapkan(x, p))
+  const u = (p: Partial<Record<KunciBody, unknown>>) => {
+    if (typeof p.w === 'number' && Number.isFinite(p.w) && p.w > 0) mergeVitals({ weightKg: p.w, source: 'Manual' })
+    if (typeof p.h === 'number' && Number.isFinite(p.h) && p.h > 0) mergeVitals({ heightCm: p.h, source: 'Manual' })
+    setMasukan((x) => terapkan(x, p))
+  }
 
   function syncNow(silent = false) {
     setMasukan((cur) => {
-      const { next, changed } = syncFromHealthProfile(cur)
-      if (!silent) setSyncNote(changed.length ? `Synced from Health Profile: ${changed.join(', ')}.` : 'No new device data found in Health Profile.')
+      const { next, changed } = syncFromHealthProfile(cur, {
+        heightCm: vital.heightCm ?? activePatient?.heightCm,
+        weightKg: vital.weightKg ?? activePatient?.weightKg,
+        sex: activePatient?.sex,
+        dob: activePatient?.dob,
+      })
+      if (!silent) setSyncNote(changed.length ? `Synced from wearable & profile: ${changed.join(', ')}.` : 'No new device or profile fields found yet.')
       return changed.length ? next : cur
     })
   }
@@ -248,13 +275,26 @@ export function BodyComposition() {
   return (
     <div className="mx-auto max-w-3xl space-y-5 pb-24">
       {/* Score + bento header */}
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <Card className="!p-4 liquid-glass">
-          <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-500">Composition Score</div>
+          <div className="flex items-center justify-between gap-2">
+            <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-500">Composition Score</div>
+            {kurangSkor.length === 0 && (
+              <button type="button" onClick={() => setQuickOpen((x) => !x)}
+                style={{ minHeight: 32, padding: '0 10px', borderRadius: 999, border: '1px solid rgba(0,191,99,0.35)', fontSize: 10, fontWeight: 700, color: '#00bf63', background: 'transparent', cursor: 'pointer' }}>
+                {quickOpen ? 'Done' : 'Quick edit'}
+              </button>
+            )}
+          </div>
           {kurangSkor.length === 0 ? (
             <>
               <div className="text-4xl font-extrabold text-brand-dark">{d.score}<span className="text-sm font-medium text-neutral-500"> /100</span></div>
               <Badge tone={d.score >= 80 ? 'brand' : d.score >= 65 ? 'low' : 'critical'}>{d.score >= 80 ? 'Athletic' : d.score >= 65 ? 'Average' : 'Needs improvement'}</Badge>
+              <div className="mt-2 grid grid-cols-3 gap-2 text-[11px]">
+                <div><span className="text-neutral-500">BMI </span><b className="text-ink">{d.bmi.toFixed(1)}</b></div>
+                <div><span className="text-neutral-500">BMR </span><b className="text-ink">{d.basal} kcal</b></div>
+                <div><span className="text-neutral-500">Visceral </span><b className="text-ink">Lv {d.visceral}</b></div>
+              </div>
             </>
           ) : (
             <>
@@ -270,6 +310,57 @@ export function BodyComposition() {
             : <div><div className="text-xs font-bold text-neutral-500">Body Type</div><div className="text-2xl font-extrabold text-neutral-400">—</div><p className="mt-1 text-[11px] leading-snug text-neutral-500">Appears once the score has what it needs.</p></div>}
         </Card>
       </div>
+
+      {/* Quick Baseline 1-Klik Pill right in hero (zero route switch required) */}
+      {(kurangSkor.length > 0 || quickOpen) && (
+        <Card className="!p-4">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <div className="text-xs font-bold text-ink">Quick Baseline Setup (1-Click)</div>
+              <div className="text-[11px] text-neutral-500">Fill what you know here or sync wearable — Composition Score, BMI, BMR, Muscle Mass &amp; Body Type update live.</div>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <button type="button" onClick={() => syncNow(false)} className="min-h-[44px] rounded-full bg-brand px-3.5 py-2 text-xs font-bold text-ink active:scale-95">
+                ⌚ Sync Wearable
+              </button>
+              <button type="button" onClick={() => setUseInBodyBfm((v) => !v)}
+                style={{ minHeight: 44, padding: '0 12px', borderRadius: 999, border: '1px solid rgba(148,163,184,0.35)', fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>
+                {useInBodyBfm ? 'Use tape cm' : 'Have InBody Fat?'}
+              </button>
+            </div>
+          </div>
+          {syncNote && <p className="mt-2 rounded-xl bg-brand-50 px-3 py-2 text-[11px] font-semibold text-brand-dark">{syncNote}</p>}
+          <div className="mt-3 flex flex-wrap items-center gap-2" role="group" aria-label="Quick sex selection">
+            <span className="text-[11px] font-bold uppercase text-neutral-500">Sex:</span>
+            {(['M', 'F'] as const).map((sexVal) => {
+              const active = diisi.has('g') && b.g === sexVal
+              return (
+                <button key={sexVal} type="button" aria-pressed={active} onClick={() => u({ g: sexVal })}
+                  className={`min-h-[44px] rounded-full px-4 py-2 text-xs font-bold ${active ? 'bg-brand text-ink' : 'border border-black/10 text-neutral-600 dark:border-white/15 dark:text-neutral-300'}`}>
+                  {sexVal === 'M' ? 'Male' : 'Female'}
+                </button>
+              )
+            })}
+          </div>
+          <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3">
+            {num('Weight (kg)', 'w', 0.1)}
+            {num('Height (cm)', 'h')}
+            {num('Age', 'age')}
+            {useInBodyBfm ? (
+              <>
+                {num('Fat Mass InBody (kg)', 'bfm', 0.1)}
+                {num('SMM InBody (kg, opt.)', 'smm', 0.1)}
+              </>
+            ) : (
+              <>
+                {num('Waist (cm)', 'waist')}
+                {num('Neck (cm)', 'neck')}
+                {(!diisi.has('g') || b.g === 'F') && num('Hip (cm)', 'hip')}
+              </>
+            )}
+          </div>
+        </Card>
+      )}
 
       <Fold label="Measurements">
       {/* Inputs */}
@@ -326,6 +417,15 @@ export function BodyComposition() {
             : <b className="text-ink">BMR: — (enter {yangKurang(diisi, ['w', 'h', 'age', 'g']).join(', ')})</b>} (Mifflin-St Jeor) — baseline requirement before activity.
           Body fat is calculated using the US Navy method from body circumference measurements when InBody data is not provided.
         </div>
+        <BodyAnalysisTrendAndAction
+          ready={kurangSkor.length === 0}
+          bmi={d.bmi}
+          visceral={d.visceral}
+          smmRatio={b.w > 0 ? d.smm / b.w : 0}
+          whr={d.whr}
+          sex={b.g}
+          basal={d.basal}
+        />
       </Card>
       </Fold>
 
@@ -520,6 +620,72 @@ function ScaleMeasurements() {
       </div>
       <Prosa kelas="mt-3 text-[11px] leading-relaxed text-neutral-500">BIA devices measure electrical resistance and then ESTIMATE composition from it, so the result is affected by hydration, food, exercise and time of day. To make readings comparable, measure under the same conditions: in the morning, after urinating, before eating or drinking, and before exercise.</Prosa>
     </Card>
+  )
+}
+
+function BodyAnalysisTrendAndAction({
+  ready, bmi, visceral, smmRatio, whr, sex, basal,
+}: {
+  readonly ready: boolean
+  readonly bmi: number
+  readonly visceral: number
+  readonly smmRatio: number
+  readonly whr: number
+  readonly sex: 'M' | 'F'
+  readonly basal: number
+}) {
+  const weightSeries = useMemo(() => deretMetrik('weightKg', 90).slice(-14), [])
+  const fatSeries = useMemo(() => deretMetrik('bodyFatPct', 90).slice(-14), [])
+
+  const polyline = (rows: readonly { nilai: number }[]) => {
+    if (rows.length < 2) return ''
+    const vals = rows.map((r) => r.nilai)
+    const min = Math.min(...vals), max = Math.max(...vals)
+    const span = max - min || 1
+    return rows.map((r, i) => `${((i / (rows.length - 1)) * 180).toFixed(1)},${(34 - ((r.nilai - min) / span) * 26).toFixed(1)}`).join(' ')
+  }
+
+  const actions: string[] = []
+  if (ready) {
+    if (visceral >= 10) actions.push('Visceral fat >= 10: prioritize 150–210 min/week Zone-2 aerobic movement & cut refined sugars.')
+    if (smmRatio < (sex === 'M' ? 0.42 : 0.36)) actions.push('Muscle mass below optimal band: add 2–3x progressive resistance sessions/week & distribute protein across meals.')
+    if (whr > (sex === 'M' ? 0.9 : 0.85)) actions.push(`Waist-hip ratio (${whr.toFixed(2)}) elevated: track waist weekly under fasting morning conditions.`)
+    if (bmi < 18.5) actions.push(`BMI (${bmi.toFixed(1)}) underweight range: evaluate caloric surplus around BMR (${basal} kcal) with clinician/dietitian guidance.`)
+    if (!actions.length) actions.push('Body composition within healthy reference bounds — keep resistance + aerobic consistency and weekly morning measurements.')
+  }
+
+  return (
+    <div className="mt-3 space-y-2 rounded-xl border border-neutral-100 p-3 text-[11px]">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <span className="font-bold text-ink">Trend &amp; Action Plan</span>
+        <span className="text-neutral-500">Target BMI 18.5–24.9 · Visceral &lt;10 · {sex === 'M' ? 'WHR ≤0.90' : 'WHR ≤0.85'}</span>
+      </div>
+      {weightSeries.length >= 2 ? (
+        <div className="flex flex-wrap items-center gap-4">
+          <div>
+            <div className="text-[10px] font-bold text-neutral-500">Weight Trend ({weightSeries.length} logs)</div>
+            <svg viewBox="0 0 180 40" style={{ width: 180, height: 40 }} aria-label="Weight longitudinal trend">
+              <polyline fill="none" stroke="#00bf63" strokeWidth="2" points={polyline(weightSeries)} />
+            </svg>
+          </div>
+          {fatSeries.length >= 2 && (
+            <div>
+              <div className="text-[10px] font-bold text-neutral-500">Body Fat Trend ({fatSeries.length} logs)</div>
+              <svg viewBox="0 0 180 40" style={{ width: 180, height: 40 }} aria-label="Body fat longitudinal trend">
+                <polyline fill="none" stroke="#f59e0b" strokeWidth="2" points={polyline(fatSeries)} />
+              </svg>
+            </div>
+          )}
+        </div>
+      ) : (
+        <p className="text-neutral-500">Record or sync at least 2 measurements to plot your personal weight &amp; body-fat trend.</p>
+      )}
+      {ready && actions.length > 0 && (
+        <ul className="list-disc pl-4 space-y-1 text-neutral-600 dark:text-neutral-300">
+          {actions.map((a) => <li key={a}>{a}</li>)}
+        </ul>
+      )}
+    </div>
   )
 }
 

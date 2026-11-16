@@ -1,5 +1,6 @@
 import { capturePersonalHealthOperation, readPersonalHealthFile, readPersonalHealthImage } from '../../domains/personal-health'
 import { loadBluetoothWearablePanel, type WearableSavePatch } from '../../domains/devices'
+import { loadBodyExposureLocalHub } from '../../domains/body-exposure'
 import { lazy, Suspense, useEffect, useRef, useState } from 'react'
 import { Fold } from '../../shared/ui/Fold'
 import { Prosa } from '../../components/Prosa'
@@ -68,6 +69,7 @@ const LKEY = 'pmd_health_profile'
 
 // The Bluetooth panel is React plus the radio code: loaded only when this page renders it.
 const BluetoothWearablePanel = lazy(loadBluetoothWearablePanel)
+const BodyExposureLocalHub = lazy(loadBodyExposureLocalHub)
 
 /** A reading from the person's own Bluetooth band joins their health data like any other sync. */
 const saveBluetoothReading = (patch: WearableSavePatch) => { mergeVitals(patch) }
@@ -350,6 +352,9 @@ export function HealthProfile() {
       <Fold label="Sync">
       {backendEnabled && <AutoSyncCard />}
       <SyncDiagnosticsCard />
+      <Suspense fallback={null}>
+        <BodyExposureLocalHub initialTab="emv_pass" compact />
+      </Suspense>
 
       {p.lastDeviceSyncAt && <DeviceSyncSummary profile={p} />}
       </Fold>

@@ -1,5 +1,5 @@
 import { useMemo, useRef, useState } from 'react'
-import { useStore } from '../../lib/store'
+import { useStore, uid } from '../../lib/store'
 import { HealthSnapshot } from '../../components/HealthSnapshot'
 import { PostCard } from '../social/Feed'
 import { compressImage, readAsDataUrl } from '../../lib/upload'
@@ -36,7 +36,7 @@ export function Profile() {
 }
 
 function ProfileIsi({ account }: { account: NonNullable<ReturnType<typeof useStore>['account']> }) {
-  const { state, updateProfile, logout } = useStore()
+  const { state, activePatient, setActivePatient, addPatient, updateProfile, logout } = useStore()
   const doLogout = () => {
     if (backendEnabled) api.logout().catch(() => {})
     logout()
@@ -45,6 +45,11 @@ function ProfileIsi({ account }: { account: NonNullable<ReturnType<typeof useSto
   const [editing, setEditing] = useState(false)
   const [draft, setDraft] = useState<ProfileEdit>({})
   const [busy, setBusy] = useState(false)
+  const [familyOpen, setFamilyOpen] = useState(false)
+  const [famName, setFamName] = useState('')
+  const [famSex, setFamSex] = useState<'L' | 'P'>('L')
+  const [famDob, setFamDob] = useState('')
+  const [famAllergies, setFamAllergies] = useState('')
   const fileRef = useRef<HTMLInputElement>(null)
 
   const email = account.email
@@ -126,6 +131,98 @@ function ProfileIsi({ account }: { account: NonNullable<ReturnType<typeof useSto
       <PersonalBodyUnifiedSurface compact defaultFocus="identity" shareable cameraCapture />
 
       <HealthSnapshot className="mt-3" />
+
+      {/* Anggota Keluarga / Multi-Profil Nyata */}
+      <section aria-label="Anggota Keluarga & Multi-Profil Nyata" className="mt-3 rounded-2xl border border-black/10 p-4 dark:border-white/15">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <h2 className="text-sm font-black text-ink">Anggota Keluarga &amp; Multi-Profil Nyata</h2>
+            <p className="text-[11px] text-neutral-500">Profil terisolasi di bawah akun {account.email} ({state.patients.length} profil aktif).</p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setFamilyOpen((v) => !v)}
+            className="min-h-[44px] rounded-full bg-brand px-4 py-2 text-xs font-bold text-ink active:scale-95"
+          >
+            {familyOpen ? 'Tutup Form' : '+ Tambah Anggota Keluarga'}
+          </button>
+        </div>
+
+        <div className="mt-3 flex flex-wrap gap-2">
+          {state.patients.map((p) => {
+            const active = p.id === activePatient.id
+            return (
+              <button
+                key={p.id}
+                type="button"
+                aria-pressed={active}
+                onClick={() => setActivePatient(p.id)}
+                className={`min-h-[44px] rounded-xl border px-3 py-2 text-left text-xs font-bold transition ${
+                  active
+                    ? 'border-brand bg-brand-50 text-brand-dark'
+                    : 'border-black/10 text-neutral-600 dark:border-white/15 dark:text-neutral-300'
+                }`}
+              >
+                <div>{p.name}</div>
+                <div className="text-[10px] font-normal text-neutral-500">MRN {p.mrn || p.id.slice(0, 8)} {active ? '· Aktif' : ''}</div>
+              </button>
+            )
+          })}
+        </div>
+
+        {familyOpen && (
+          <form
+            onSubmit={(e) => {
+              e.preventDefault()
+              const cleanName = famName.trim()
+              if (cleanName.length < 2) return
+              const newId = uid()
+              addPatient({
+                id: newId,
+                name: cleanName,
+                sex: famSex,
+                dob: famDob || '1990-01-01',
+                mrn: `FAM-${newId.slice(-6).toUpperCase()}`,
+                heightCm: 0,
+                weightKg: 0,
+                allergies: famAllergies.split(',').map((s) => s.trim()).filter(Boolean),
+                chronicConditions: [],
+                riskFlags: [],
+                avatarColor: '#00BF63',
+              })
+              setFamName('')
+              setFamDob('')
+              setFamAllergies('')
+              setFamilyOpen(false)
+            }}
+            className="mt-3 grid gap-2 border-t border-black/10 pt-3 sm:grid-cols-2 dark:border-white/10"
+          >
+            <input
+              value={famName}
+              onChange={(e) => setFamName(e.target.value)}
+              placeholder="Nama lengkap anggota keluarga"
+              required
+              className="min-h-[44px] rounded-xl border border-black/10 px-3 text-xs outline-none dark:border-white/15 dark:bg-transparent"
+            />
+            <div className="flex gap-2">
+              <select value={famSex} onChange={(e) => setFamSex(e.target.value as 'L' | 'P')} aria-label="Jenis kelamin anggota keluarga" className="min-h-[44px] rounded-xl border border-black/10 px-2 text-xs dark:border-white/15 dark:bg-neutral-900">
+                <option value="L">Laki-laki</option>
+                <option value="P">Perempuan</option>
+              </select>
+              <input value={famDob} onChange={(e) => setFamDob(e.target.value)} type="date" aria-label="Tanggal lahir" className="min-h-[44px] flex-1 rounded-xl border border-black/10 px-2 text-xs dark:border-white/15 dark:bg-transparent" />
+            </div>
+            <input
+              value={famAllergies}
+              onChange={(e) => setFamAllergies(e.target.value)}
+              placeholder="Alergi tercatat (opsional, pisahkan koma)"
+              className="min-h-[44px] rounded-xl border border-black/10 px-3 text-xs outline-none sm:col-span-2 dark:border-white/15 dark:bg-transparent"
+            />
+            <button type="submit" className="min-h-[44px] rounded-xl bg-brand px-4 text-xs font-bold text-ink sm:col-span-2">
+              Simpan Profil Nyata
+            </button>
+          </form>
+        )}
+      </section>
 
       {/* Edit profile button */}
       <button onClick={openEdit} className="mt-3 flex min-h-[44px] w-full items-center justify-center rounded-xl bg-neutral-100 text-sm font-bold text-neutral-700">

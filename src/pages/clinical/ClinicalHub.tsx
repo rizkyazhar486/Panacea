@@ -66,7 +66,7 @@ const REFERENCE_LINKS = [
 ] as const
 
 export function ClinicalHub() {
-  const { account } = useStore()
+  const { account, activePatient, state } = useStore()
   const [calculator, setCalculator] = useState<Calculator>('bmi')
   const [question, setQuestion] = useState('')
   const [weight, setWeight] = useState('')
@@ -268,6 +268,33 @@ export function ClinicalHub() {
             <output aria-live="polite" className="mt-5 block text-3xl font-black tracking-[-.04em]">{labState}</output>
           </div>
         </section>
+
+        <div className="mt-6 grid gap-4 border-t border-white/10 pt-4 sm:grid-cols-3" aria-label="Clinician workflow and interoperability readiness">
+          <div className="border-l-2 border-emerald-400 pl-3">
+            <div className="text-[10px] font-black uppercase tracking-[.12em] text-emerald-300">Auto-SOAP / SBAR &amp; Consilium</div>
+            <p className="mt-1 text-xs text-white/70">Active EMR record: {activePatient?.id && state.records[activePatient.id] ? '1 chart initialized' : 'None yet'}. Draft notes stay unverified until signed.</p>
+            <div className="mt-1 flex flex-wrap gap-3">
+              <Link to="/emr" className="inline-flex min-h-[44px] items-center text-xs font-black text-emerald-300 hover:text-white">Open AI-EMR →</Link>
+              <Link to="/clinical-calculators" className="inline-flex min-h-[44px] items-center text-xs font-black text-white/75 hover:text-white">Dose &amp; Scores →</Link>
+            </div>
+          </div>
+          <div className="border-l-2 border-amber-400 pl-3">
+            <div className="text-[10px] font-black uppercase tracking-[.12em] text-amber-300">Allergy &amp; Drug Safety Check</div>
+            <p className="mt-1 text-xs text-white/70">Allergies: {activePatient?.allergies?.length ? activePatient.allergies.join(', ') : 'None recorded'} · Risk flags: {activePatient?.riskFlags?.length ?? 0}.</p>
+            <div className="mt-1 flex flex-wrap gap-3">
+              <Link to="/rujukan?t=obat" className="inline-flex min-h-[44px] items-center text-xs font-black text-amber-300 hover:text-white">Drug Check →</Link>
+              <Link to="/emergency" className="inline-flex min-h-[44px] items-center text-xs font-black text-rose-300 hover:text-white">Emergency →</Link>
+            </div>
+          </div>
+          <div className="border-l-2 border-cyan-400 pl-3">
+            <div className="text-[10px] font-black uppercase tracking-[.12em] text-cyan-300">SATUSEHAT FHIR R4 &amp; Radar</div>
+            <p className="mt-1 text-xs text-white/70">MRN: {activePatient?.mrn || '—'} · Community signal monitor &amp; Encounter/Observation bundle ready.</p>
+            <div className="mt-1 flex flex-wrap gap-3">
+              <Link to="/visit-os" className="inline-flex min-h-[44px] items-center text-xs font-black text-cyan-300 hover:text-white">Open Visit OS →</Link>
+              <Link to="/surveillance" className="inline-flex min-h-[44px] items-center text-xs font-black text-white/75 hover:text-white">Community Radar →</Link>
+            </div>
+          </div>
+        </div>
         </Fold>
 
         <Fold label="Research">

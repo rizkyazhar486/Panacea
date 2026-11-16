@@ -1373,3 +1373,7 @@ export function useStore(): Store {
   if (!ctx) throw new Error('useStore must be used within StoreProvider')
   return ctx
 }
+
+export function useOptionalStore(): Store | null {
+  return useContext(Ctx)
+}
