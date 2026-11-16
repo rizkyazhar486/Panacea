@@ -22,15 +22,11 @@ import {
   evaluateWave211To220FamilyGrowthAndWorkdayErgonomics,
   evaluateWave221To230ClinicianWorkAutomator,
   runHolisticAutoExpansionAndSmoothOsGovernor,
-  bridgeShenzhenWhoopToQWatchProAndInterpretAi,
+  interpretStandardBleHealthReadings,
   orchestrateAllConnectedBluetoothWearables
 } from '../src/core/index.mjs';
 import { runPanaceaMedWave320PlanetarySubspecialtyMasterOs } from '../src/core/panaceamedPlanetary5BillionSimulationOs.mjs';
 import { runPanaceaMedWave400SuperAppEcosystemMasterOs } from '../src/core/panaceamedSuperAppQrBarcodeEcosystemOs.mjs';
-import {
-  runPanaceaMedWave450UniversalDeviceAndAiMasterOs,
-  bridgeUniversalWearableStreamToAi
-} from '../src/core/panaceamedUniversalBleWifiImitationOs.mjs';
 import { runPanaceaMedWave500FluidChameleonMasterOs } from '../src/core/panaceamedFluidChameleonCamouflageOs.mjs';
 import { runPanaceaMedWave550VisaMastercardAndMultiDeviceMasterOs } from '../src/core/panaceamedVisaMastercardTokenQrAndMultiDeviceOs.mjs';
 import { runPanaceaMedWave600DailyWearableMasterOs } from '../src/core/panaceamedTwentyFiveWearablesDailyLifeOs.mjs';
@@ -80,20 +76,16 @@ if (mode === 'publik' || mode === 'masyarakat' || mode === '100' || mode === 'tr
   for (const slot of daily.wearable25Daily.dailyFunctionalTimeline) {
     console.log(`  [${slot.timeSlot}] ${slot.title}: ${slot.laypersonAction}`);
   }
-} else if (mode === 'bluetooth' || mode === 'whoop' || mode === 'qwatch' || mode === 'devices' || mode === 'wearable') {
-  const bridge = bridgeShenzhenWhoopToQWatchProAndInterpretAi();
+} else if (mode === 'bluetooth' || mode === 'devices' || mode === 'wearable') {
+  // Tanpa perangkat nyata tidak ada bacaan: CLI menampilkan status kosong, bukan vital karangan.
+  const bridge = interpretStandardBleHealthReadings();
   const mesh = orchestrateAllConnectedBluetoothWearables();
-  const dev = runPanaceaMedWave450UniversalDeviceAndAiMasterOs();
-  const universalStream = bridgeUniversalWearableStreamToAi();
-  const m = bridge.qWatchProProcessedMetrics;
-  const v = universalStream.fusedVitalsSummary || dev.deviceMeshAi.fusedVitalsSummary;
-  console.log('=== UNIVERSAL BLUETOOTH WEARABLE HUB (SHENZHEN WHOOP <-> QWATCH PRO <-> PANACEAMED AI) ===');
-  console.log('• Total Wearable Terdukung :', mesh.totalSupportedWearableFamilies, 'Keluarga Perangkat BLE');
-  console.log('• Topologi Jembatan Aktif  :', `${bridge.bluetoothTopology.peripheralSensor} -> ${bridge.bluetoothTopology.wristAggregatorBridge} -> ${bridge.bluetoothTopology.primaryOsHost}`);
-  console.log('• Skor Pemulihan & Strain  :', `Recovery ${m.autonomicRecoveryPct}% (${m.ruitangTier}) | Strain ${m.whoopEquivalentDayStrain0to21}/21 | HRV RMSSD ${m.hrvRmssdMs} ms | PWV ${m.fusedPwvMps} m/s`);
-  console.log('• Fusi Tanda Vital Real-Time :', `HR ${v.fusedHrBpm} bpm | HRV ${v.fusedHrvMs} ms | SpO2 ${v.fusedSpo2Pct}% | Panacea Score: ${v.panaceaScore}/100`);
-  console.log('• Panduan AI Pengguna Awam :', bridge.aiHealthInterpretation.plainLanguageCustomerSummary);
-  console.log('• Interpretasi AI Klinisi  :', bridge.aiHealthInterpretation.clinicianTechnicalSummary);
+  console.log('=== STANDARD BLUETOOTH HEALTH DEVICE ADAPTER (SIG GATT) ===');
+  console.log('• Standard profiles        :', mesh.totalSupportedWearableFamilies, '| with tested decoder:', mesh.profilesWithTestedDecoder);
+  console.log('• Connected devices        :', mesh.totalConnectedDevices, '| quality:', mesh.fleetQuality);
+  console.log('• Device route             :', bridge.deviceRoute.route);
+  console.log('• Summary                  :', bridge.aiHealthInterpretation.plainLanguageCustomerSummary);
+  console.log('• Clinician note           :', bridge.aiHealthInterpretation.clinicianTechnicalSummary);
 } else if (mode === 'bunglon' || mode === 'air' || mode === 'chameleon') {
   const fc = runPanaceaMedWave500FluidChameleonMasterOs();
   console.log('=== ADAPTIVE MULTI-PROTOCOL WEARABLE PARSER & FLUID FAILOVER ROUTER ===');

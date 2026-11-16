@@ -148,10 +148,10 @@ export function runHolisticAutoExpansionAndSmoothOsGovernor(payload = {}) {
       clinicianProtocol: 'Evaluasi SARC-F score, kecepatan jalan < 0.8 m/s, suplementasi Vitamin D3 + Leucine, dan aktivasi sensor lantai MorphoRoom.'
     }),
     Object.freeze({
-      expansionId: 'AUTO_EXP_03_SHENZHEN_WHOOP_QWATCH_BLE_AI_BRIDGE',
-      domain: 'UNIVERSAL_BLUETOOTH_WEARABLE_AND_AI_INTERPRETER',
-      laypersonGuidance: 'Semua jam pintar dan gelang kesehatan Bluetooth (termasuk Whoop Shenzhen & qWatch Pro) otomatis terhubung 1-klik dan diterjemahkan menjadi Skor Pemulihan & panduan harian.',
-      clinicianProtocol: 'Transduksi biner IEEE-11073 GATT (0x180D/0x2A37 RR-interval, 0x1822 SpO2, 0xFF01 PPG) ke HRV RMSSD, PTT-PWV, dan HL7 FHIR R4 Observation Bundle.'
+      expansionId: 'AUTO_EXP_03_STANDARD_BLE_GATT_HEALTH_ADAPTER',
+      domain: 'STANDARD_BLUETOOTH_HEALTH_DEVICE_ADAPTER',
+      laypersonGuidance: 'Standard Bluetooth health devices (heart rate sensor, thermometer, blood pressure cuff) can be read after pairing. Devices with a vendor protocol need their own app.',
+      clinicianProtocol: 'Decodes Bluetooth SIG GATT Heart Rate (0x2A37), Temperature (0x2A1C) and Blood Pressure (0x2A35) measurements; unsigned, preliminary FHIR Observations only for readings that pass format checks. No HRV, PWV or blood-pressure estimation.'
     })
   ]);
 

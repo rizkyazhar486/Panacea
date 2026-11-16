@@ -22,7 +22,7 @@ import { runPanaceaMedWave500FluidChameleonMasterOs } from '../src/core/panaceam
 import { runPanaceaMedWave450UniversalDeviceAndAiMasterOs } from '../src/core/panaceamedUniversalBleWifiImitationOs.mjs';
 import { runPanaceaMedWave350AstralPublicMasterOs, orchestratePublicHumanSession } from '../src/core/panaceamedAstralAmethystPublicOrchestratorOs.mjs';
 import {
-  bridgeShenzhenWhoopToQWatchProAndInterpretAi,
+  interpretStandardBleHealthReadings,
   orchestrateAllConnectedBluetoothWearables,
   runPanaceaMedWave400QuadricentennialMasterOs
 } from '../src/core/panaceamedUniversalBleWearableBridgeOs.mjs';
@@ -143,7 +143,7 @@ export function createCockpitServer() {
     if (req.method === "GET" && urlPath === "/api/v9/clinical/12-subspecialties") return sendJson(evaluateTwelveSubspecialtyClinicalDepthMatrix());
     if (req.method === "GET" && urlPath === "/api/v9/holistic/governor") return sendJson(runHolisticAutoExpansionAndSmoothOsGovernor());
     if (req.method === "GET" && urlPath === "/api/v10/wearables/bluetooth-bridge") return sendJson(orchestrateAllConnectedBluetoothWearables());
-    if (req.method === "GET" && urlPath === "/api/v10/wearables/whoop-qwatch") return sendJson(bridgeShenzhenWhoopToQWatchProAndInterpretAi());
+    if (req.method === "GET" && urlPath === "/api/v10/wearables/standard-ble") return sendJson(interpretStandardBleHealthReadings());
     if (req.method === "GET" && urlPath === "/api/v10/os/quadricentennial") return sendJson(runPanaceaMedWave400QuadricentennialMasterOs());
     if (req.method === "GET" && urlPath === "/api/v18/ux/uhd5k-vitality") return sendJson(runPanaceaMedWave650Uhd5k4dMinimalistUxMasterOs());
     if (req.method === "GET" && urlPath === "/api/v18/ux/visceral-biomirror") return sendJson(evaluateUhd5k4dVisceralBioMirrorSimulation());

@@ -3300,141 +3300,194 @@ test('310. [WAVE 360 DEPLOY 2C: FULL PRODUCTION & GITHUB MAIN SYNC GATE (310/310
 
 
 // ============================================================================
-// WAVES 361–400: QUADRICENTENNIAL UNIVERSAL BLUETOOTH BLE WEARABLE BRIDGE,
-// SHENZHEN WHOOP <-> QWATCH PRO CROSS-BRIDGE, AI HEALTH INTERPRETER &
-// STREAMLINED 3-STEP UI/UX OS (330/330 MASTER GATE)
+// WAVES 361–400: ADAPTER BLUETOOTH LE STANDAR (SIG GATT) — 330/330 MASTER GATE
+// Fixture byte mengikuti GATT Specification Supplement & white paper PHD Transcoding v16 (Bluetooth SIG).
+// Semua nilai sintetis; tidak ada UUID/merek vendor karangan.
 // ============================================================================
 import * as bleWearableOs from '../../src/core/panaceamedUniversalBleWearableBridgeOs.mjs';
 import * as holisticKernel from '../../src/core/panaceamedHolisticAutoKernelOs.mjs';
 import { createCockpitServer } from '../start-cockpit.mjs';
 
-test('311. [WAVE 361 BLE GATT 1A: STANDARD & VENDOR GATT UUID REGISTRY (0x180D, 0x1822, 0x1809, 0xFF01, 0xFF02)]', () => {
+const bleLe16 = (v) => [v & 0xff, (v >> 8) & 0xff];
+const BLE_HR = 0x2a37;
+const BLE_TEMP = 0x2a1c;
+const BLE_BP = 0x2a35;
+// 114/80/93 mmHg sebagai SFLOAT (0x0072 = 114, contoh emas PHD WP §2.2.2)
+const BLE_BP_BYTES = [0x00, ...bleLe16(0x0072), ...bleLe16(0x0050), ...bleLe16(0x005d)];
+// 36.4 °C sebagai FLOAT 0xFF00016C (contoh emas PHD WP §2.2.1)
+const BLE_TEMP_BYTES = [0x00, 0x6c, 0x01, 0x00, 0xff];
+
+test('311. [WAVE 361 BLE GATT 1A: REGISTRY HOLDS ONLY BLUETOOTH SIG 16-BIT NUMBERS, NO VENDOR UUIDS]', () => {
   const uuids = bleWearableOs.BLE_GATT_STANDARD_AND_VENDOR_UUIDS;
-  assert.equal(uuids.HEART_RATE_SERVICE, '0000180d-0000-1000-8000-00805f9b34fb');
-  assert.equal(uuids.HEART_RATE_MEASUREMENT_CHAR, '00002a37-0000-1000-8000-00805f9b34fb');
-  assert.equal(uuids.PULSE_OXIMETER_SERVICE, '00001822-0000-1000-8000-00805f9b34fb');
-  assert.equal(uuids.SHENZHEN_WHOOP_RAW_PPG_IMU_SERVICE, '0000ff01-535a-5748-4f4f-50424c453031');
-  assert.equal(uuids.QWATCH_PRO_COMPANION_BRIDGE_SERVICE, '0000ff10-5157-4154-4348-50524f485542');
+  assert.equal(uuids.HEART_RATE_SERVICE, 0x180d);
+  assert.equal(uuids.HEART_RATE_MEASUREMENT_CHAR, 0x2a37);
+  assert.equal(uuids.HEALTH_THERMOMETER_SERVICE, 0x1809);
+  assert.equal(uuids.BLOOD_PRESSURE_SERVICE, 0x1810);
+  assert.equal(uuids.PULSE_OXIMETER_SERVICE, 0x1822);
+  assert.equal(uuids.CONTINUOUS_GLUCOSE_MONITORING_SERVICE, 0x181f);
+  assert.equal(uuids.BODY_COMPOSITION_SERVICE, 0x181b);
+  assert.deepEqual(uuids.VENDOR_PROPRIETARY, []);
   assert.equal(Object.isFrozen(uuids), true);
+  assert.equal(Object.isFrozen(uuids.VENDOR_PROPRIETARY), true);
 });
 
-test('312. [WAVE 363 BLE WEARABLE PROFILES 1B: 8 GLOBAL & SHENZHEN WEARABLE FAMILIES SUPPORTED]', () => {
-  const profiles = bleWearableOs.UNIVERSAL_BLE_WEARABLE_PROFILES;
-  const keys = Object.keys(profiles);
-  assert.equal(keys.length, 8);
-  assert.ok(profiles.SHENZHEN_WHOOP_4_STRAP);
-  assert.ok(profiles.QWATCH_PRO_SMARTWATCH_HUB);
-  assert.ok(profiles.HUAWEI_WATCH_GT_NEARLINK);
-  assert.ok(profiles.XIAOMI_MIBAND_HYPEROS);
-  assert.ok(profiles.APPLE_WATCH_BLE_BROADCAST);
-  assert.ok(profiles.GARMIN_FENIX_BLE_ANT);
-  assert.ok(profiles.SHENZHEN_SMART_RING_BLE);
-  assert.ok(profiles.OMRON_CONTOUR_CLINICAL_BLE);
+test('312. [WAVE 363 BLE PROFILES 1B: 8 STANDARD-PROFILE FAMILIES, 3 WITH TESTED DECODERS, VENDOR = COMPANION APP]', () => {
+  const profiles = Object.values(bleWearableOs.UNIVERSAL_BLE_WEARABLE_PROFILES);
+  assert.equal(profiles.length, 8);
+  const count = (s) => profiles.filter((p) => p.decoderStatus === s).length;
+  assert.equal(count('DECODER_TESTED'), 3);
+  assert.equal(count('RECOGNIZED_NO_DECODER'), 4);
+  assert.equal(count('COMPANION_APP_ONLY'), 1);
+  const vendor = bleWearableOs.UNIVERSAL_BLE_WEARABLE_PROFILES.VENDOR_PROPRIETARY_WEARABLE;
+  assert.equal(vendor.serviceUuid16, null);
+  assert.equal(vendor.measurementCharUuid16, null);
 });
 
-test('313. [WAVE 365 BINARY TRANSDUCER 1C: 16-BYTE IEEE-11073 GATT PACKET ENCODING & BYTE-EXACT ROUND-TRIP]', () => {
-  const pkt = bleWearableOs.encodeAndDecodeUniversalBleWearablePacket({
-    deviceId: 'SHENZHEN_WHOOP_4_STRAP',
-    heartRateBpm: 62,
-    rrIntervalMs: 845,
-    spO2Pct: 98,
-    skinTempCelsius: 36.55,
-    batteryPct: 91
+test('313. [WAVE 365 DECODER 1C: HEART RATE 0x2A37 GOOD; MISSING / UNKNOWN / NOT-BYTES / TRUNCATED FAIL CLOSED]', () => {
+  const good = bleWearableOs.encodeAndDecodeUniversalBleWearablePacket({ characteristicUuid16: BLE_HR, bytes: [0x06, 72] });
+  assert.equal(good.q, 'GOOD');
+  assert.equal(good.reading.bpm, 72);
+  assert.equal(good.reading.contact, 'detected');
+  assert.equal(good.truthClass, 'OBSERVED_CLINICAL');
+  assert.equal(good.isSignedMedicalRecord, false);
+
+  const missing = bleWearableOs.encodeAndDecodeUniversalBleWearablePacket();
+  assert.equal(missing.q, 'MISSING');
+  assert.equal(missing.reason, 'INPUT_MISSING');
+  assert.equal(missing.reading, null);
+
+  const unknown = bleWearableOs.encodeAndDecodeUniversalBleWearablePacket({ characteristicUuid16: 0xff01, bytes: [0x06, 72] });
+  assert.equal(unknown.q, 'MISSING');
+  assert.equal(unknown.reason, 'NO_STANDARD_DECODER');
+
+  const notBytes = bleWearableOs.encodeAndDecodeUniversalBleWearablePacket({ characteristicUuid16: BLE_HR, bytes: [256] });
+  assert.equal(notBytes.q, 'NOISE');
+  assert.equal(notBytes.reason, 'NOT_BYTES');
+
+  // flag 0x01 (UINT16) dengan hanya satu oktet nilai → terpotong
+  const truncated = bleWearableOs.encodeAndDecodeUniversalBleWearablePacket({ characteristicUuid16: BLE_HR, bytes: [0x01, 72] });
+  assert.equal(truncated.q, 'NOISE');
+  assert.equal(truncated.reason, 'DECODER_REJECTED:truncated');
+  assert.equal(truncated.reading, null);
+});
+
+test('314. [WAVE 367 DECODER 1D: RR INTERVALS IN 1/1024 s; SENSOR CONTACT NOT DETECTED IS NOISE, NOT A VALUE]', () => {
+  // flags 0x19: UINT16 + Energy Expended + RR; RR 1024 → 1000 ms, 512 → 500 ms
+  const rr = bleWearableOs.encodeAndDecodeUniversalBleWearablePacket({
+    characteristicUuid16: BLE_HR, bytes: [0x19, ...bleLe16(75), ...bleLe16(123), ...bleLe16(1024), ...bleLe16(512)]
   });
-  assert.equal(pkt.packetByteLength, 16);
-  assert.equal(pkt.hexPacket.length, 32);
-  assert.equal(pkt.byteRoundTripVerified, true);
-  assert.equal(pkt.decodedTelemetry.heartRateBpm, 62);
-  assert.equal(pkt.decodedTelemetry.spO2Pct, 98);
-  assert.equal(pkt.decodedTelemetry.skinTempCelsius, 36.55);
-  assert.equal(pkt.decodedTelemetry.batteryPct, 91);
+  assert.equal(rr.q, 'GOOD');
+  assert.deepEqual(rr.reading.rrMs, [1000, 500]);
+  assert.equal(rr.reading.energyExpendedKj, 123);
+
+  // berpasangan: hanya bit 1 (kontak terdeteksi) yang berbeda
+  const offSkin = bleWearableOs.encodeAndDecodeUniversalBleWearablePacket({ characteristicUuid16: BLE_HR, bytes: [0x04, 72] });
+  assert.equal(offSkin.q, 'NOISE');
+  assert.equal(offSkin.reason, 'SENSOR_CONTACT_NOT_DETECTED');
+  const onSkin = bleWearableOs.encodeAndDecodeUniversalBleWearablePacket({ characteristicUuid16: BLE_HR, bytes: [0x06, 72] });
+  assert.equal(onSkin.q, 'GOOD');
 });
 
-test('314. [WAVE 367 BINARY TRANSDUCER 1D: 1/1024s BLUETOOTH SIG R-R INTERVAL RESOLUTION FIDELITY]', () => {
-  const pkt = bleWearableOs.encodeAndDecodeUniversalBleWearablePacket({
-    rrIntervalMs: 800
+test('315. [WAVE 369 DECODER 2A: TEMPERATURE 36.4 Cel AND BLOOD PRESSURE 114/80 mmHg GOLDEN BYTES]', () => {
+  const temp = bleWearableOs.encodeAndDecodeUniversalBleWearablePacket({ characteristicUuid16: BLE_TEMP, bytes: BLE_TEMP_BYTES });
+  assert.equal(temp.q, 'GOOD');
+  assert.equal(temp.reading.value, 36.4);
+  assert.equal(temp.reading.unit, 'Cel');
+
+  const bp = bleWearableOs.encodeAndDecodeUniversalBleWearablePacket({ characteristicUuid16: BLE_BP, bytes: BLE_BP_BYTES });
+  assert.equal(bp.q, 'GOOD');
+  assert.equal(bp.reading.systolic, 114);
+  assert.equal(bp.reading.diastolic, 80);
+  assert.equal(bp.reading.meanArterial, 93);
+  assert.equal(bp.reading.unit, 'mm[Hg]');
+});
+
+test('316. [WAVE 371 FHIR 2B: PRELIMINARY VITAL-SIGN OBSERVATIONS ONLY (LOINC 8867-4, 8310-5, 8480-6, 8462-4)]', () => {
+  const out = bleWearableOs.interpretStandardBleHealthReadings({
+    services: [0x180d, 0x1809, 0x1810],
+    readings: [
+      { characteristicUuid16: BLE_HR, bytes: [0x06, 72] },
+      { characteristicUuid16: BLE_TEMP, bytes: BLE_TEMP_BYTES },
+      { characteristicUuid16: BLE_BP, bytes: BLE_BP_BYTES }
+    ]
   });
-  assert.ok(Math.abs(pkt.decodedTelemetry.rrIntervalMs - 800) <= 1.0);
-  assert.equal(pkt.sensorContactDetected, true);
+  const entries = out.fhirWearableBundle.entry;
+  assert.equal(out.fhirWearableBundle.type, 'collection');
+  assert.deepEqual(entries.map((e) => e.resource.code.coding[0].code), ['8867-4', '8310-5', '8480-6', '8462-4']);
+  assert.ok(entries.every((e) => e.resource.status === 'preliminary'));
+  assert.deepEqual(entries.map((e) => e.resource.valueQuantity.value), [72, 36.4, 114, 80]);
+  assert.deepEqual(entries.map((e) => e.resource.valueQuantity.code), ['/min', 'Cel', 'mm[Hg]', 'mm[Hg]']);
+  // 80404-7 adalah SDNN, bukan RMSSD; HRV tidak dihitung adapter ini
+  assert.equal(JSON.stringify(out).includes('80404-7'), false);
+  assert.deepEqual(out.derivedSignals, { q: 'MISSING', reason: 'NOT_COMPUTED_BY_DEVICE_ADAPTER' });
+  assert.deepEqual(out.qualityCounts, { GOOD: 3, NOISE: 0, MISSING: 0 });
 });
 
-test('315. [WAVE 369 WHOOP <-> QWATCH PRO BRIDGE 2A: DUAL-HOP TOPOLOGY & PACKET RELAY VERIFICATION]', () => {
-  const bridge = bleWearableOs.bridgeShenzhenWhoopToQWatchProAndInterpretAi();
-  assert.equal(bridge.bluetoothTopology.peripheralSensor, 'SHENZHEN_WHOOP_4_STRAP');
-  assert.equal(bridge.bluetoothTopology.wristAggregatorBridge, 'QWATCH_PRO_SMARTWATCH_HUB');
-  assert.equal(bridge.bluetoothTopology.bluetoothRelayActive, true);
-  assert.equal(bridge.bluetoothTopology.byteRoundTripVerified, true);
-});
-
-test('316. [WAVE 371 AI BIOPHYSICS 2B: HRV RMSSD, DAY STRAIN (0-21), AUTONOMIC RECOVERY (0-100%) & PTT-PWV]', () => {
-  const bridge = bleWearableOs.bridgeShenzhenWhoopToQWatchProAndInterpretAi();
-  const bio = bridge.qWatchProProcessedMetrics;
-  assert.ok(bio.hrvRmssdMs > 30 && bio.hrvRmssdMs < 120);
-  assert.ok(bio.whoopEquivalentDayStrain0to21 >= 0 && bio.whoopEquivalentDayStrain0to21 <= 21);
-  assert.ok(bio.autonomicRecoveryPct >= 67 && bio.autonomicRecoveryPct <= 100);
-  assert.equal(bio.ruitangTier, 'GREEN');
-  assert.ok(bio.fusedPwvMps >= 4.2 && bio.fusedPwvMps <= 9.0);
-});
-
-test('317. [WAVE 373 AI HEALTH INTERPRETER 2C: RED ESCALATION ON HYPOXIA/FEVER/HYPERTENSIVE CRISIS]', () => {
-  const redBridge = bleWearableOs.bridgeShenzhenWhoopToQWatchProAndInterpretAi({
-    shenzhenWhoopInput: {
-      heartRateBpm: 112,
-      restingHeartRate30dBaselineBpm: 65,
-      rrIntervalsMsWindow: [535, 540, 530, 538],
-      spO2Pct: 89,
-      skinTempCelsius: 38.9,
-      activeCardioMinutesToday: 10,
-      averageWorkoutHrBpm: 120,
-      maxHrBpm: 185,
-      sleepSlowWaveMinutes: 45,
-      sleepRemMinutes: 50,
-      totalSleepMinutes: 310,
-      batteryPct: 75
-    }
+test('317. [WAVE 373 FAIL-CLOSED 2C: BAD READINGS PRODUCE NO OBSERVATIONS, NO TIER; VENDOR-ONLY → COMPANION APP]', () => {
+  const out = bleWearableOs.interpretStandardBleHealthReadings({
+    services: ['0000ff01-aaaa-bbbb-cccc-ddddeeeeffff'],
+    readings: [
+      { characteristicUuid16: BLE_HR, bytes: [0x04, 72] },
+      { characteristicUuid16: 0xff01, bytes: [1, 2, 3] }
+    ]
   });
-  assert.equal(redBridge.qWatchProProcessedMetrics.ruitangTier, 'RED');
-  assert.ok(redBridge.aiHealthInterpretation.plainLanguageCustomerSummary.includes('Zona Merah'));
-  assert.equal(redBridge.clinicallyReviewed, false);
-  assert.equal(redBridge.requiresHumanPhysicianSignoff, true);
+  assert.equal(out.fhirWearableBundle.entry.length, 0);
+  assert.deepEqual(out.qualityCounts, { GOOD: 0, NOISE: 1, MISSING: 1 });
+  assert.equal(out.deviceRoute.route, 'aplikasi-pendamping');
+  assert.equal(out.clinicallyReviewed, false);
+  assert.equal(out.requiresHumanPhysicianSignoff, true);
+  const json = JSON.stringify(out);
+  assert.equal(json.includes('RED'), false);
+  assert.equal(json.includes('escalat'), false);
 });
 
-test('318. [WAVE 375 AI HEALTH INTERPRETER 2D: HL7 FHIR R4 WEARABLE BUNDLE WITH LOINC 8867-4, 80404-7 & 59408-5]', () => {
-  const bridge = bleWearableOs.bridgeShenzhenWhoopToQWatchProAndInterpretAi();
-  const bundle = bridge.fhirWearableBundle;
-  assert.equal(bundle.resourceType, 'Bundle');
-  assert.equal(bundle.entry.length, 4);
-  const loincCodes = bundle.entry
-    .filter((e) => e.resource.resourceType === 'Observation')
-    .map((e) => e.resource.code.coding[0].code);
-  assert.deepEqual(loincCodes, ['8867-4', '80404-7', '59408-5']);
+test('318. [WAVE 375 EMPTY INPUT 2D: NO READINGS → EXPLICIT "NOTHING RECEIVED", NOT A DEFAULT VALUE]', () => {
+  const out = bleWearableOs.interpretStandardBleHealthReadings();
+  assert.equal(out.aiHealthInterpretation.plainLanguageCustomerSummary,
+    'No readings received. Nothing is shown until a standard Bluetooth health device sends a measurement.');
+  assert.deepEqual(out.qualityCounts, { GOOD: 0, NOISE: 0, MISSING: 0 });
+  assert.equal(out.fhirWearableBundle.entry.length, 0);
+  assert.equal(out.decodedReadings.length, 0);
 });
 
-test('319. [WAVE 378 MULTI-DEVICE HUB 3A: ALL 8 CONNECTED BLUETOOTH WEARABLE FAMILIES DECODED SIMULTANEOUSLY]', () => {
-  const mesh = bleWearableOs.orchestrateAllConnectedBluetoothWearables();
-  assert.equal(mesh.totalSupportedWearableFamilies, 8);
-  assert.equal(mesh.allDevicesByteRoundTripVerified, true);
-  assert.equal(mesh.imitatedDeviceStreams.length, 8);
-  assert.equal(Object.isFrozen(mesh), true);
+test('319. [WAVE 378 FLEET 3A: ONLY CALLER-SUPPLIED DEVICES; EMPTY FLEET IS MISSING, NOT SIMULATED]', () => {
+  const empty = bleWearableOs.orchestrateAllConnectedBluetoothWearables();
+  assert.equal(empty.totalConnectedDevices, 0);
+  assert.equal(empty.fleetQuality, 'MISSING');
+  assert.equal(empty.totalSupportedWearableFamilies, 8);
+  assert.equal(empty.profilesWithTestedDecoder, 3);
+  assert.equal(Object.isFrozen(empty), true);
+
+  const two = bleWearableOs.orchestrateAllConnectedBluetoothWearables({
+    devices: [
+      { services: [0x180d], readings: [{ characteristicUuid16: BLE_HR, bytes: [0x06, 72] }] },
+      { services: [0x1810], readings: [{ characteristicUuid16: BLE_BP, bytes: BLE_BP_BYTES }] }
+    ]
+  });
+  assert.equal(two.totalConnectedDevices, 2);
+  assert.equal(two.fleetQuality, 'REPORTED_PER_READING');
 });
 
-test('320. [WAVE 381 STREAMLINED UI/UX 4A: 3-STEP ZERO-FRICTION JOURNEY & TWO-TAP COMPLIANCE]', () => {
-  const ux = bleWearableOs.evaluateStreamlinedThreeStepUserJourney();
-  assert.equal(ux.totalSteps, 3);
-  assert.equal(ux.steps.length, 3);
-  assert.equal(ux.twoTapRuleCompliant, true);
-  assert.equal(ux.journeyArchitecture, 'THREE_STEP_ZERO_FRICTION_PUBLIC_UX');
+test('320. [WAVE 381 UX 4A: 3-STEP JOURNEY STATUS FOLLOWS REAL DATA; NOT CLAIMED USER-VALIDATED]', () => {
+  const idle = bleWearableOs.evaluateStreamlinedThreeStepUserJourney();
+  assert.deepEqual(idle.steps.map((s) => s.status), ['NOT_PAIRED', 'NO_MEASUREMENTS', 'NOTHING_TO_SHARE']);
+  assert.equal(idle.twoTapRuleCompliant, true);
+  assert.equal(idle.validatedWithUsers, false);
+
+  const ready = bleWearableOs.evaluateStreamlinedThreeStepUserJourney({ connectedDeviceCount: 1, goodReadingCount: 2 });
+  assert.deepEqual(ready.steps.map((s) => s.status), ['PAIRED', 'MEASUREMENTS_AVAILABLE', 'READY_TO_SHARE']);
 });
 
-test('321. [WAVE 384 COCKPIT DOM 4B: UNIVERSAL BLUETOOTH WEARABLE HUB & 3-STEP JOURNEY IN /body-exposure HTML]', () => {
+test('321. [WAVE 384 COCKPIT DOM 4B: STANDARD BLUETOOTH PANEL WITHOUT INVENTED VENDOR DEVICES OR SCORES]', () => {
   const html = fullSdk.renderInteractiveWave95CockpitHtml();
   assert.ok(html.includes('id="ble-wearable-hub-panel"'));
   assert.ok(html.includes('id="ble-device-selector"'));
   assert.ok(html.includes('id="btn-connect-ble-wearable"'));
-  assert.ok(html.includes('id="whoop-qwatch-bridge-status"'));
+  assert.ok(html.includes('id="ble-standard-bridge-status"'));
   assert.ok(html.includes('id="streamlined-3step-user-journey"'));
-  assert.ok(html.includes('SHENZHEN_WHOOP_4_STRAP'));
-  assert.ok(html.includes('QWATCH_PRO_SMARTWATCH_HUB'));
+  for (const fabricated of ['SHENZHEN_WHOOP_4_STRAP', 'QWATCH_PRO_SMARTWATCH_HUB', 'whoop-qwatch-bridge-status', 'Recovery 84%', '0xFF01']) {
+    assert.equal(html.includes(fabricated), false, fabricated);
+  }
 });
 
 test('322. [WAVE 386 SECURITY SINK INVARIANT 4C: ZERO .innerHTML SINKS IN COCKPIT ENGINE]', () => {
@@ -3450,39 +3503,41 @@ test('323. [WAVE 388 HOLISTIC AUTO-KERNEL 5A: CRITICAL FUNCTIONS AUTO-CHECKED AT
   assert.ok(reg.totalFunctionsChecked >= 46);
 });
 
-test('324. [WAVE 390 HOLISTIC AUTO-KERNEL 5B: AUTO-EXPANSION INCLUDES SHENZHEN WHOOP <-> QWATCH BLE AI BRIDGE]', () => {
+test('324. [WAVE 390 HOLISTIC AUTO-KERNEL 5B: EXPANSION REGISTRY NAMES THE STANDARD BLE GATT ADAPTER]', () => {
   const gov = holisticKernel.runHolisticAutoExpansionAndSmoothOsGovernor();
-  assert.equal(gov.autoMaturityPercentage, 100.0);
-  assert.equal(gov.autoRepairActive, true);
   const expIds = gov.autoExpandedCapabilities.map((e) => e.expansionId);
-  assert.ok(expIds.includes('AUTO_EXP_03_SHENZHEN_WHOOP_QWATCH_BLE_AI_BRIDGE'));
+  assert.ok(expIds.includes('AUTO_EXP_03_STANDARD_BLE_GATT_HEALTH_ADAPTER'));
+  assert.equal(expIds.includes('AUTO_EXP_03_SHENZHEN_WHOOP_QWATCH_BLE_AI_BRIDGE'), false);
 });
 
-test('325. [WAVE 392 COCKPIT SERVER 5C: CLEAN IMPORT OF scripts/start-cockpit.mjs & LIVE HTTP SERVER CREATION]', () => {
+test('325. [WAVE 392 COCKPIT SERVER 5C: STANDARD BLE ROUTE REPLACES THE VENDOR BRIDGE ROUTE]', () => {
   const server = createCockpitServer();
   assert.equal(typeof server.listen, 'function');
   const daemonSrc = nodeFs.readFileSync(nodePath.resolve('scripts/start-cockpit.mjs'), 'utf8');
   assert.ok(daemonSrc.includes('/api/v10/wearables/bluetooth-bridge'));
-  assert.ok(daemonSrc.includes('/api/v10/wearables/whoop-qwatch'));
+  assert.ok(daemonSrc.includes('/api/v10/wearables/standard-ble'));
   assert.ok(daemonSrc.includes('/api/v10/os/quadricentennial'));
+  assert.equal(daemonSrc.includes('/api/v10/wearables/whoop-qwatch'), false);
 });
 
-test('326. [WAVE 394 CLI 5D: scripts/panacea-cli.mjs SUPPORTS GENERALIZED BLUETOOTH & WEARABLE DEVICE ADAPTER MODE]', () => {
+test('326. [WAVE 394 CLI 5D: BLUETOOTH / DEVICES MODE USES THE STANDARD READING INTERPRETER]', () => {
   const cliSrc = nodeFs.readFileSync(nodePath.resolve('scripts/panacea-cli.mjs'), 'utf8');
-  assert.ok(cliSrc.includes('bridgeUniversalWearableStreamToAi'));
+  assert.ok(cliSrc.includes('interpretStandardBleHealthReadings'));
   assert.ok(cliSrc.includes("mode === 'devices'"));
   assert.ok(cliSrc.includes("mode === 'bluetooth'"));
+  assert.equal(cliSrc.includes('qWatchProProcessedMetrics'), false);
 });
 
-test('327. [WAVE 396 SDK BARREL 5E: UNIFIED BARREL EXPORTS ALL WAVE 361-400 BLUETOOTH & UX FUNCTIONS]', () => {
+test('327. [WAVE 396 SDK BARREL 5E: BARREL EXPORTS THE STANDARD BLE FUNCTIONS; VENDOR BRIDGE REMOVED]', () => {
   assert.equal(typeof fullSdk.encodeAndDecodeUniversalBleWearablePacket, 'function');
-  assert.equal(typeof fullSdk.bridgeShenzhenWhoopToQWatchProAndInterpretAi, 'function');
+  assert.equal(typeof fullSdk.interpretStandardBleHealthReadings, 'function');
   assert.equal(typeof fullSdk.orchestrateAllConnectedBluetoothWearables, 'function');
   assert.equal(typeof fullSdk.evaluateStreamlinedThreeStepUserJourney, 'function');
   assert.equal(typeof fullSdk.runPanaceaMedWave400QuadricentennialMasterOs, 'function');
+  assert.equal(fullSdk.bridgeShenzhenWhoopToQWatchProAndInterpretAi, undefined);
 });
 
-test('328. [WAVE 398 QUADRICENTENNIAL MASTER 5F: DEEP OBJECT.FREEZE IMMUTABILITY & EPISTEMIC SAFETY GATES]', () => {
+test('328. [WAVE 398 MASTER 5F: DEEP OBJECT.FREEZE, EPISTEMIC SAFETY FLAGS, ZERO DEVICES BY DEFAULT]', () => {
   const master = bleWearableOs.runPanaceaMedWave400QuadricentennialMasterOs();
   assert.equal(Object.isFrozen(master), true);
   assert.equal(Object.isFrozen(master.wearableFleet), true);
@@ -3490,19 +3545,23 @@ test('328. [WAVE 398 QUADRICENTENNIAL MASTER 5F: DEEP OBJECT.FREEZE IMMUTABILITY
   assert.equal(Object.isFrozen(master.holisticGovernor), true);
   assert.equal(master.clinicallyReviewed, false);
   assert.equal(master.requiresHumanPhysicianSignoff, true);
+  assert.equal(master.wearableFleet.totalConnectedDevices, 0);
 });
 
-test('329. [WAVE 399 QUADRICENTENNIAL MASTER 5G: DETERMINISTIC SHA-256 SEAL & 100% UNIVERSAL READINESS]', () => {
+test('329. [WAVE 399 MASTER 5G: DETERMINISTIC SHA-256 SEAL; NO SELF-AWARDED MATURITY PERCENTAGE]', () => {
   const run1 = bleWearableOs.runPanaceaMedWave400QuadricentennialMasterOs();
   const run2 = bleWearableOs.runPanaceaMedWave400QuadricentennialMasterOs();
   assert.equal(run1.quadricentennialSha256Seal.length, 64);
   assert.equal(run1.quadricentennialSha256Seal, run2.quadricentennialSha256Seal);
-  assert.equal(run1.universalMaturityPercentage, 100.0);
+  assert.equal(run1.universalMaturityPercentage, null);
   assert.equal(run1.allGatesGreen, true);
-  assert.equal(run1.totalWavesUnified, 400);
+  const withReading = bleWearableOs.runPanaceaMedWave400QuadricentennialMasterOs({
+    wearables: { devices: [{ services: [0x180d], readings: [{ characteristicUuid16: BLE_HR, bytes: [0x06, 72] }] }] }
+  });
+  assert.notEqual(withReading.quadricentennialSha256Seal, run1.quadricentennialSha256Seal);
 });
 
-test('330. [WAVE 400 GRAND QUADRICENTENNIAL MILESTONE: SUB-40MS END-TO-END EXECUTION (330/330 PASS)]', () => {
+test('330. [WAVE 400 MILESTONE: SUB-40MS END-TO-END EXECUTION (330/330 PASS)]', () => {
   const master = bleWearableOs.runPanaceaMedWave400QuadricentennialMasterOs();
   assert.ok(master.executionDurationMs < 40);
 });

@@ -1,542 +1,241 @@
 /**
  * @file src/core/panaceamedUniversalBleWearableBridgeOs.mjs
- * @description PanaceaMed Universal Bluetooth (BLE GATT) Wearable Imitation,
- * Shenzhen Whoop <-> qWatch Pro Cross-Bridge, AI Health Data Interpreter &
- * Streamlined 3-Step User Journey OS (Waves 361–400 Quadricentennial Release).
+ * @description Adapter jembatan Bluetooth LE untuk cockpit/CLI lama (src/core), hanya profil standar Bluetooth SIG.
  *
- * Mencakup:
- *  - Wave 361–370: Universal BLE GATT Binary Encoder/Decoder & 8-Device Imitation Program
- *                  (Shenzhen Whoop 4.0 Strap, qWatch Pro Hub, Huawei NearLink, Xiaomi HyperOS,
- *                   Apple Watch BLE, Garmin ANT+/BLE, Smart Ring, Omron/Contour Clinical BLE)
- *  - Wave 371–380: Bidirectional Shenzhen Whoop -> qWatch Pro -> PanaceaMed Primary Device
- *                  Cross-Bridge (Kalman PTT Fusion, Day Strain 0-21, Recovery 0-100%, HRV RMSSD)
- *  - Wave 381–390: AI Clinical & Everyday Health Interpreter + HL7 FHIR R4 Wearable Bundle
- *  - Wave 391–400: Streamlined 3-Step UI/UX Journey, Self-Healing Auto-Repair & Wave 400 Master Seal
+ * Versi sebelumnya memuat UUID vendor karangan (ASCII "SZWHOOPBLE01"/"QWATCHPROHUB"), frame 16-byte karangan,
+ * nilai vital default, rumus strain/recovery tiruan, tekanan darah tanpa manset dari PTT, dan Observation FHIR
+ * 80404-7 yang dilabeli RMSSD (80404-7 adalah SDNN). Semua itu dihapus.
+ *
+ * Sekarang:
+ * - Nomor layanan/karakteristik dari Bluetooth SIG Assigned Numbers (service_uuids.yaml, characteristic_uuids.yaml).
+ * - Decode byte hanya lewat src/domains/devices (GSS 2026-09-09, PHD Transcoding WP v16), tidak ada decoder kedua.
+ * - Input hilang → q:'MISSING'; byte ditolak decoder, nilai khusus, atau kontak sensor tidak terdeteksi → q:'NOISE'.
+ *   Tidak ada rentang "klinis" yang dikarang di sini: NOISE berarti tidak lolos format/mutu yang dilaporkan perangkat.
+ * - Perangkat dengan protokol vendor diarahkan ke aplikasi pendamping; tidak didekode tanpa fixture dari perangkat sendiri.
+ * - Tidak ada interpretasi klinis, skor pemulihan, tier Ruitang, atau klaim enkripsi/penyimpanan di modul ini.
+ *
+ * Kode LOINC diverifikasi lewat NLM Clinical Tables (2026-11-16): 8867-4 Heart rate, 8310-5 Body temperature,
+ * 8480-6 Systolic blood pressure, 8462-4 Diastolic blood pressure. Tidak ada kode LOINC RMSSD di indeks NLM.
  */
 
 import crypto from 'node:crypto';
 import * as astralWave350 from './panaceamedAstralAmethystPublicOrchestratorOs.mjs';
 import * as holisticKernel from './panaceamedHolisticAutoKernelOs.mjs';
+import {
+  LAYANAN_GATT,
+  KARAKTERISTIK_GATT,
+  parseHeartRateMeasurement,
+  decodeTemperatureMeasurement,
+  decodeBloodPressureMeasurement,
+  classifyGattServices
+} from '../domains/devices/index.ts';
 
+// Nomor 16-bit SIG. Ekspansi 128-bit lewat Base UUID sengaja tidak dihitung di sini (dilakukan adapter browser).
 export const BLE_GATT_STANDARD_AND_VENDOR_UUIDS = Object.freeze({
-  HEART_RATE_SERVICE: '0000180d-0000-1000-8000-00805f9b34fb',
-  HEART_RATE_MEASUREMENT_CHAR: '00002a37-0000-1000-8000-00805f9b34fb',
-  PULSE_OXIMETER_SERVICE: '00001822-0000-1000-8000-00805f9b34fb',
-  PLX_CONTINUOUS_MEASUREMENT_CHAR: '00002a5f-0000-1000-8000-00805f9b34fb',
-  HEALTH_THERMOMETER_SERVICE: '00001809-0000-1000-8000-00805f9b34fb',
-  TEMPERATURE_MEASUREMENT_CHAR: '00002a1c-0000-1000-8000-00805f9b34fb',
-  BLOOD_PRESSURE_SERVICE: '00001810-0000-1000-8000-00805f9b34fb',
-  BATTERY_SERVICE: '0000180f-0000-1000-8000-00805f9b34fb',
-  SHENZHEN_WHOOP_RAW_PPG_IMU_SERVICE: '0000ff01-535a-5748-4f4f-50424c453031',
-  SHENZHEN_WHOOP_RECOVERY_SLEEP_CHAR: '0000ff02-535a-5748-4f4f-50424c453032',
-  QWATCH_PRO_COMPANION_BRIDGE_SERVICE: '0000ff10-5157-4154-4348-50524f485542'
+  HEART_RATE_SERVICE: LAYANAN_GATT.heartRate,
+  HEART_RATE_MEASUREMENT_CHAR: KARAKTERISTIK_GATT.heartRateMeasurement,
+  HEALTH_THERMOMETER_SERVICE: LAYANAN_GATT.healthThermometer,
+  TEMPERATURE_MEASUREMENT_CHAR: KARAKTERISTIK_GATT.temperatureMeasurement,
+  BLOOD_PRESSURE_SERVICE: LAYANAN_GATT.bloodPressure,
+  BLOOD_PRESSURE_MEASUREMENT_CHAR: KARAKTERISTIK_GATT.bloodPressureMeasurement,
+  PULSE_OXIMETER_SERVICE: LAYANAN_GATT.pulseOximeter,
+  PLX_CONTINUOUS_MEASUREMENT_CHAR: 0x2a5f,
+  GLUCOSE_SERVICE: LAYANAN_GATT.glucose,
+  GLUCOSE_MEASUREMENT_CHAR: 0x2a18,
+  CONTINUOUS_GLUCOSE_MONITORING_SERVICE: LAYANAN_GATT.continuousGlucoseMonitoring,
+  CGM_MEASUREMENT_CHAR: 0x2aa7,
+  BODY_COMPOSITION_SERVICE: LAYANAN_GATT.bodyComposition,
+  // Sengaja kosong: UUID vendor hanya boleh masuk bersama fixture tangkapan perangkat milik pengguna.
+  VENDOR_PROPRIETARY: Object.freeze([])
 });
 
+const U = BLE_GATT_STANDARD_AND_VENDOR_UUIDS;
+
+const profil = (profileId, serviceUuid16, measurementCharUuid16, decoderStatus, label) =>
+  Object.freeze({ profileId, serviceUuid16, measurementCharUuid16, decoderStatus, label });
+
+// Kelas perangkat menurut profil standar, bukan merek. decoderStatus menyatakan apa yang benar-benar teruji.
 export const UNIVERSAL_BLE_WEARABLE_PROFILES = Object.freeze({
-  SHENZHEN_WHOOP_4_STRAP: Object.freeze({
-    deviceId: 'SHENZHEN_WHOOP_4_STRAP',
-    deviceName: 'Shenzhen Whoop-Class Biometric Strap 4.0 (Screenless 100Hz PPG + IMU)',
-    protocolFamily: 'BLE_5_3_GATT_AND_SHENZHEN_FF01',
-    originCluster: 'Shenzhen Huaqiangbei / Nanshan Smart Wearable Line',
-    supportedMetrics: Object.freeze(['hrBpm', 'rrIntervalMs', 'hrvRmssdMs', 'spO2Pct', 'skinTempCelsius', 'dayStrain0to21', 'recoveryPct', 'sleepEfficiencyPct']),
-    canStreamToQWatchPro: true,
-    samplingRateHz: 100
-  }),
-  QWATCH_PRO_SMARTWATCH_HUB: Object.freeze({
-    deviceId: 'QWATCH_PRO_SMARTWATCH_HUB',
-    deviceName: 'qWatch Pro Companion Smartwatch & BLE Aggregator Hub',
-    protocolFamily: 'BLE_5_3_DUAL_ROLE_CENTRAL_PERIPHERAL_FF10',
-    originCluster: 'Shenzhen Smart Wrist Hub (ECG + PPG + AMOLED Display)',
-    supportedMetrics: Object.freeze(['hrBpm', 'hrvRmssdMs', 'spO2Pct', 'cufflessSystolicMmHg', 'cufflessDiastolicMmHg', 'pwvMps', 'ecgLeadIStatus', 'relayedWhoopStrain']),
-    canIngestExternalBleStrap: true,
-    samplingRateHz: 250
-  }),
-  HUAWEI_WATCH_GT_NEARLINK: Object.freeze({
-    deviceId: 'HUAWEI_WATCH_GT_NEARLINK',
-    deviceName: 'Huawei Watch GT / TruSeen 5.5+ NearLink & BLE',
-    protocolFamily: 'NEARLINK_SLE_AND_BLE_GATT',
-    originCluster: 'Shenzhen Bantian Campus',
-    supportedMetrics: Object.freeze(['hrBpm', 'hrvRmssdMs', 'spO2Pct', 'skinTempCelsius', 'pwvMps']),
-    canStreamToQWatchPro: true,
-    samplingRateHz: 100
-  }),
-  XIAOMI_MIBAND_HYPEROS: Object.freeze({
-    deviceId: 'XIAOMI_MIBAND_HYPEROS',
-    deviceName: 'Xiaomi Smart Band HyperOS BLE Beacon',
-    protocolFamily: 'BLE_GATT_MIBAND_V8',
-    originCluster: 'Beijing / Shenzhen Ecosystem',
-    supportedMetrics: Object.freeze(['hrBpm', 'spO2Pct', 'stepsCount', 'sleepEfficiencyPct']),
-    canStreamToQWatchPro: true,
-    samplingRateHz: 50
-  }),
-  APPLE_WATCH_BLE_BROADCAST: Object.freeze({
-    deviceId: 'APPLE_WATCH_BLE_BROADCAST',
-    deviceName: 'Apple Watch HealthKit / BLE Heart Rate & HRV Broadcast',
-    protocolFamily: 'BLE_GATT_0X180D_STANDARD',
-    originCluster: 'Global Consumer Wearable',
-    supportedMetrics: Object.freeze(['hrBpm', 'rrIntervalMs', 'hrvRmssdMs', 'spO2Pct', 'vo2MaxMlKgMin']),
-    canStreamToQWatchPro: true,
-    samplingRateHz: 100
-  }),
-  GARMIN_FENIX_BLE_ANT: Object.freeze({
-    deviceId: 'GARMIN_FENIX_BLE_ANT',
-    deviceName: 'Garmin Fenix / Forerunner Dual BLE & ANT+ Biometric Broadcast',
-    protocolFamily: 'BLE_GATT_AND_ANT_PLUS_BRIDGE',
-    originCluster: 'Global Endurance & Dive Wearable',
-    supportedMetrics: Object.freeze(['hrBpm', 'rrIntervalMs', 'hrvRmssdMs', 'bodyBattery0to100', 'lactateThresholdBpm']),
-    canStreamToQWatchPro: true,
-    samplingRateHz: 100
-  }),
-  SHENZHEN_SMART_RING_BLE: Object.freeze({
-    deviceId: 'SHENZHEN_SMART_RING_BLE',
-    deviceName: 'Shenzhen Oura-Class Titanium Smart Ring (Finger Arteriolar PPG)',
-    protocolFamily: 'BLE_5_2_MICRO_RING_FF01',
-    originCluster: 'Shenzhen Baoan Micro-Optics',
-    supportedMetrics: Object.freeze(['hrBpm', 'hrvRmssdMs', 'spO2Pct', 'skinTempCelsius', 'sleepEfficiencyPct']),
-    canStreamToQWatchPro: true,
-    samplingRateHz: 50
-  }),
-  OMRON_CONTOUR_CLINICAL_BLE: Object.freeze({
-    deviceId: 'OMRON_CONTOUR_CLINICAL_BLE',
-    deviceName: 'BLE Clinical Blood Pressure Cuff (0x1810) & Glucometer (0x1808)',
-    protocolFamily: 'IEEE_11073_20601_BLE_MEDICAL',
-    originCluster: 'Clinical Home Care Peripherals',
-    supportedMetrics: Object.freeze(['systolicMmHg', 'diastolicMmHg', 'hrBpm', 'capillaryGlucoseMgDl']),
-    canStreamToQWatchPro: true,
-    samplingRateHz: 1
+  HEART_RATE_SENSOR: profil('HEART_RATE_SENSOR', U.HEART_RATE_SERVICE, U.HEART_RATE_MEASUREMENT_CHAR, 'DECODER_TESTED', 'Heart rate sensor (chest strap, watch broadcast)'),
+  HEALTH_THERMOMETER: profil('HEALTH_THERMOMETER', U.HEALTH_THERMOMETER_SERVICE, U.TEMPERATURE_MEASUREMENT_CHAR, 'DECODER_TESTED', 'Health thermometer'),
+  BLOOD_PRESSURE_MONITOR: profil('BLOOD_PRESSURE_MONITOR', U.BLOOD_PRESSURE_SERVICE, U.BLOOD_PRESSURE_MEASUREMENT_CHAR, 'DECODER_TESTED', 'Blood pressure cuff'),
+  PULSE_OXIMETER: profil('PULSE_OXIMETER', U.PULSE_OXIMETER_SERVICE, U.PLX_CONTINUOUS_MEASUREMENT_CHAR, 'RECOGNIZED_NO_DECODER', 'Pulse oximeter'),
+  GLUCOSE_METER: profil('GLUCOSE_METER', U.GLUCOSE_SERVICE, U.GLUCOSE_MEASUREMENT_CHAR, 'RECOGNIZED_NO_DECODER', 'Glucose meter (finger-stick)'),
+  CONTINUOUS_GLUCOSE_MONITOR: profil('CONTINUOUS_GLUCOSE_MONITOR', U.CONTINUOUS_GLUCOSE_MONITORING_SERVICE, U.CGM_MEASUREMENT_CHAR, 'RECOGNIZED_NO_DECODER', 'Continuous glucose monitor'),
+  BODY_COMPOSITION_SCALE: profil('BODY_COMPOSITION_SCALE', U.BODY_COMPOSITION_SERVICE, null, 'RECOGNIZED_NO_DECODER', 'Body composition scale'),
+  VENDOR_PROPRIETARY_WEARABLE: profil('VENDOR_PROPRIETARY_WEARABLE', null, null, 'COMPANION_APP_ONLY', 'Ring, strap or watch using a vendor protocol')
+});
+
+const LOINC = Object.freeze({
+  heartRate: Object.freeze({ code: '8867-4', display: 'Heart rate' }),
+  bodyTemperature: Object.freeze({ code: '8310-5', display: 'Body temperature' }),
+  systolic: Object.freeze({ code: '8480-6', display: 'Systolic blood pressure' }),
+  diastolic: Object.freeze({ code: '8462-4', display: 'Diastolic blood pressure' })
+});
+
+const SAFETY = Object.freeze({ clinicallyReviewed: false, requiresHumanPhysicianSignoff: true });
+
+// Pembacaan perangkat = observasi, tetapi bukan rekam medis bertanda tangan (CLAUDE.md §8).
+const OBSERVED = Object.freeze({ truthClass: 'OBSERVED_CLINICAL', isSignedMedicalRecord: false });
+
+// Heart Rate memakai parser kanonik domain devices; bentuk hasilnya diseragamkan ke { ok, value } / { ok:false, reason }.
+const decodeHeartRate = (b) => {
+  const r = parseHeartRateMeasurement(b);
+  return r.ok ? { ok: true, value: r.reading } : { ok: false, reason: r.reason, detail: null };
+};
+
+const DECODER = new Map([
+  [KARAKTERISTIK_GATT.heartRateMeasurement, decodeHeartRate],
+  [KARAKTERISTIK_GATT.temperatureMeasurement, decodeTemperatureMeasurement],
+  [KARAKTERISTIK_GATT.bloodPressureMeasurement, decodeBloodPressureMeasurement]
+]);
+
+const keByte = (bytes) => {
+  if (bytes instanceof Uint8Array) return bytes;
+  if (!Array.isArray(bytes)) return null;
+  if (!bytes.every((x) => Number.isInteger(x) && x >= 0 && x <= 0xff)) return null;
+  return Uint8Array.from(bytes);
+};
+
+/**
+ * Decode satu notifikasi karakteristik standar. Nama lama dipertahankan untuk pemanggil; fungsi ini tidak lagi
+ * meng-encode paket karangan.
+ * @param {{ characteristicUuid16?: number, bytes?: number[] | Uint8Array }} payload
+ */
+export function encodeAndDecodeUniversalBleWearablePacket(payload = {}) {
+  const { characteristicUuid16, bytes } = payload ?? {};
+  const dasar = { characteristicUuid16: characteristicUuid16 ?? null, ...SAFETY };
+  if (!Number.isInteger(characteristicUuid16) || bytes == null) {
+    return Object.freeze({ ...dasar, q: 'MISSING', reason: 'INPUT_MISSING', reading: null, truthClass: 'OBSERVED_CLINICAL', isSignedMedicalRecord: false });
+  }
+  const decoder = DECODER.get(characteristicUuid16);
+  if (!decoder) {
+    return Object.freeze({ ...dasar, q: 'MISSING', reason: 'NO_STANDARD_DECODER', reading: null, ...OBSERVED });
+  }
+  const b = keByte(bytes);
+  if (!b) return Object.freeze({ ...dasar, q: 'NOISE', reason: 'NOT_BYTES', reading: null, ...OBSERVED });
+  const hasil = decoder(b);
+  if (!hasil.ok) {
+    return Object.freeze({ ...dasar, q: 'NOISE', reason: `DECODER_REJECTED:${hasil.reason}`, detail: hasil.detail, reading: null, ...OBSERVED });
+  }
+  // Kontak sensor dilaporkan tidak ada → angka bpm tidak dipakai (GSS §3.126 flag bit 1–2).
+  if (characteristicUuid16 === KARAKTERISTIK_GATT.heartRateMeasurement && hasil.value.contact === 'not-detected') {
+    return Object.freeze({ ...dasar, q: 'NOISE', reason: 'SENSOR_CONTACT_NOT_DETECTED', reading: Object.freeze({ ...hasil.value }), ...OBSERVED });
+  }
+  return Object.freeze({ ...dasar, q: 'GOOD', reason: null, reading: Object.freeze({ ...hasil.value }), ...OBSERVED });
+}
+
+const observasi = (loinc, value, unit, ucum) => Object.freeze({
+  resource: Object.freeze({
+    resourceType: 'Observation',
+    status: 'preliminary',
+    category: Object.freeze([Object.freeze({ coding: Object.freeze([Object.freeze({ system: 'http://terminology.hl7.org/CodeSystem/observation-category', code: 'vital-signs' })]) })]),
+    code: Object.freeze({ coding: Object.freeze([Object.freeze({ system: 'http://loinc.org', code: loinc.code, display: loinc.display })]) }),
+    valueQuantity: Object.freeze({ value, unit, system: 'http://unitsofmeasure.org', code: ucum }),
+    note: Object.freeze([Object.freeze({ text: 'Unsigned device measurement; not reviewed by a clinician.' })])
   })
 });
 
-// ============================================================================
-// WAVE 361–370: UNIVERSAL BLE GATT BINARY PACKET IMITATION & DECODER
-// ============================================================================
-
-export function encodeAndDecodeUniversalBleWearablePacket(payload = {}) {
-  const {
-    deviceId = 'SHENZHEN_WHOOP_4_STRAP',
-    heartRateBpm = 64,
-    rrIntervalMs = 938,
-    spO2Pct = 98,
-    skinTempCelsius = 36.55,
-    accelMilliG = 1020,
-    batteryPct = 92,
-    sleepSlowWaveMinutes = 104,
-    sleepRemMinutes = 112,
-    totalSleepMinutes = 465
-  } = payload;
-
-  const profile =
-    UNIVERSAL_BLE_WEARABLE_PROFILES[deviceId] ||
-    UNIVERSAL_BLE_WEARABLE_PROFILES.SHENZHEN_WHOOP_4_STRAP;
-
-  // Bangun frame biner BLE GATT 16-byte (IEEE-11073 / Bluetooth SIG 0x2A37 + Shenzhen 0xFF01 extension)
-  // Byte 0: Flags (0x16 = 8-bit HR + Energy Expended absent + RR-Interval present + Sensor Contact supported & detected)
-  // Byte 1: Heart Rate (uint8, bpm)
-  // Byte 2..3: R-R Interval dalam satuan 1/1024 detik (uint16 little-endian)
-  // Byte 4: SpO2 % (uint8)
-  // Byte 5..6: Skin Temp dalam 0.01 °C (uint16 little-endian)
-  // Byte 7..8: 3-Axis Accelerometer Vector Magnitude dalam milli-g (uint16 little-endian)
-  // Byte 9: Battery Level % (uint8)
-  // Byte 10..11: Slow-Wave Deep Sleep (N3) minutes (uint16 little-endian)
-  // Byte 12..13: REM Sleep minutes (uint16 little-endian)
-  // Byte 14..15: Total Sleep minutes (uint16 little-endian)
-  const rawBuffer = new ArrayBuffer(16);
-  const view = new DataView(rawBuffer);
-
-  const clampedHr = Math.max(25, Math.min(240, Math.round(heartRateBpm)));
-  const rr1024Units = Math.max(200, Math.min(4096, Math.round((rrIntervalMs * 1024) / 1000)));
-  const clampedSpo2 = Math.max(50, Math.min(100, Math.round(spO2Pct)));
-  const tempCentiC = Math.max(2500, Math.min(4300, Math.round(skinTempCelsius * 100)));
-  const clampedAccel = Math.max(0, Math.min(16000, Math.round(accelMilliG)));
-  const clampedBattery = Math.max(0, Math.min(100, Math.round(batteryPct)));
-
-  view.setUint8(0, 0x16);
-  view.setUint8(1, clampedHr);
-  view.setUint16(2, rr1024Units, true);
-  view.setUint8(4, clampedSpo2);
-  view.setUint16(5, tempCentiC, true);
-  view.setUint16(7, clampedAccel, true);
-  view.setUint8(9, clampedBattery);
-  view.setUint16(10, Math.round(sleepSlowWaveMinutes), true);
-  view.setUint16(12, Math.round(sleepRemMinutes), true);
-  view.setUint16(14, Math.round(totalSleepMinutes), true);
-
-  const byteArray = new Uint8Array(rawBuffer);
-  const hexPacket = Buffer.from(byteArray).toString('hex');
-
-  // Decode kembali dari buffer biner GATT (sebagaimana diterima oleh qWatch Pro atau Web Bluetooth API)
-  const rxView = new DataView(byteArray.buffer, byteArray.byteOffset, byteArray.byteLength);
-  const flags = rxView.getUint8(0);
-  const sensorContactDetected = (flags & 0x06) === 0x06;
-  const decodedHrBpm = rxView.getUint8(1);
-  const decodedRr1024 = rxView.getUint16(2, true);
-  const decodedRrMs = Number(((decodedRr1024 * 1000) / 1024).toFixed(1));
-  const decodedSpO2Pct = rxView.getUint8(4);
-  const decodedSkinTempCelsius = Number((rxView.getUint16(5, true) / 100).toFixed(2));
-  const decodedAccelG = Number((rxView.getUint16(7, true) / 1000).toFixed(3));
-  const decodedBatteryPct = rxView.getUint8(9);
-  const decodedSlowWaveMin = rxView.getUint16(10, true);
-  const decodedRemMin = rxView.getUint16(12, true);
-  const decodedTotalSleepMin = rxView.getUint16(14, true);
-
-  const byteRoundTripVerified =
-    decodedHrBpm === clampedHr &&
-    decodedSpO2Pct === clampedSpo2 &&
-    Math.abs(decodedRrMs - rrIntervalMs) <= 1.5 &&
-    Math.abs(decodedSkinTempCelsius - skinTempCelsius) <= 0.02;
-
-  return Object.freeze({
-    deviceId: profile.deviceId,
-    deviceName: profile.deviceName,
-    protocolFamily: profile.protocolFamily,
-    gattServiceUuid: BLE_GATT_STANDARD_AND_VENDOR_UUIDS.SHENZHEN_WHOOP_RAW_PPG_IMU_SERVICE,
-    hexPacket,
-    packetByteLength: byteArray.byteLength,
-    sensorContactDetected,
-    byteRoundTripVerified,
-    decodedTelemetry: Object.freeze({
-      heartRateBpm: decodedHrBpm,
-      rrIntervalMs: decodedRrMs,
-      spO2Pct: decodedSpO2Pct,
-      skinTempCelsius: decodedSkinTempCelsius,
-      accelerationG: decodedAccelG,
-      batteryPct: decodedBatteryPct,
-      sleepSlowWaveMinutes: decodedSlowWaveMin,
-      sleepRemMinutes: decodedRemMin,
-      totalSleepMinutes: decodedTotalSleepMin
-    }),
-    truthClass: 'DERIVED_BIOPHYSICAL',
-    clinicallyReviewed: false,
-    requiresHumanPhysicianSignoff: true
-  });
+/** Observation FHIR R4 hanya untuk bacaan q:'GOOD'; tidak ada entri pengganti untuk data hilang. */
+function keFhir(decoded) {
+  const entry = [];
+  for (const d of decoded) {
+    if (d.q !== 'GOOD') continue;
+    const r = d.reading;
+    if (d.characteristicUuid16 === KARAKTERISTIK_GATT.heartRateMeasurement) {
+      entry.push(observasi(LOINC.heartRate, r.bpm, 'beats/minute', '/min'));
+    } else if (d.characteristicUuid16 === KARAKTERISTIK_GATT.temperatureMeasurement) {
+      entry.push(observasi(LOINC.bodyTemperature, r.value, r.unit === 'Cel' ? '°C' : '°F', r.unit));
+    } else if (d.characteristicUuid16 === KARAKTERISTIK_GATT.bloodPressureMeasurement) {
+      const satuan = r.unit === 'kPa' ? 'kPa' : 'mmHg';
+      entry.push(observasi(LOINC.systolic, r.systolic, satuan, r.unit));
+      entry.push(observasi(LOINC.diastolic, r.diastolic, satuan, r.unit));
+    }
+  }
+  return Object.freeze({ resourceType: 'Bundle', type: 'collection', entry: Object.freeze(entry) });
 }
 
-// ============================================================================
-// WAVE 371–380: SHENZHEN WHOOP <-> QWATCH PRO <-> PANACEAMED CROSS-BRIDGE &
-// AI HEALTH INTERPRETER
-// ============================================================================
+/**
+ * Proses bacaan dari satu perangkat BLE: klasifikasi layanan lalu decode karakteristik standar.
+ * @param {{ deviceLabel?: string, services?: Array<number|string>, readings?: Array<{characteristicUuid16:number, bytes:number[]}> }} payload
+ */
+export function interpretStandardBleHealthReadings(payload = {}) {
+  const { deviceLabel = null, services = [], readings = [] } = payload ?? {};
+  const route = classifyGattServices(Array.isArray(services) ? services : []);
+  const decoded = (Array.isArray(readings) ? readings : []).map((r) => encodeAndDecodeUniversalBleWearablePacket(r));
+  const good = decoded.filter((d) => d.q === 'GOOD').length;
+  const noise = decoded.filter((d) => d.q === 'NOISE').length;
+  const missing = decoded.filter((d) => d.q === 'MISSING').length;
+  const fhirWearableBundle = keFhir(decoded);
 
-export function bridgeShenzhenWhoopToQWatchProAndInterpretAi(payload = {}) {
-  const startNs = process.hrtime.bigint();
+  const summary = decoded.length === 0
+    ? 'No readings received. Nothing is shown until a standard Bluetooth health device sends a measurement.'
+    : `${good} reading(s) decoded from standard Bluetooth profiles; ${noise} rejected as unreliable; ${missing} without a standard decoder. These are device measurements, not a diagnosis.`;
 
-  const {
-    // 1. Data dari gelang Shenzhen Whoop-Class (Screenless Strap)
-    shenzhenWhoopInput = {
-      heartRateBpm: 62,
-      restingHeartRate30dBaselineBpm: 65,
-      rrIntervalsMsWindow: [945, 982, 920, 995, 934, 1002, 948, 990],
-      spO2Pct: 98,
-      skinTempCelsius: 36.5,
-      activeCardioMinutesToday: 52,
-      averageWorkoutHrBpm: 144,
-      maxHrBpm: 188,
-      sleepSlowWaveMinutes: 108,
-      sleepRemMinutes: 116,
-      totalSleepMinutes: 470,
-      batteryPct: 89
-    },
-    // 2. Data dari jam pintar qWatch Pro (Wrist Companion & Sensor Fusion Hub)
-    qWatchProInput = {
-      wristEcgRPeakToPpgFootPttMs: 218, // Pulse Transit Time (ms) untuk estimasi PWV & TD cuffless
-      wristAmbientTempCelsius: 25.4,
-      qWatchBatteryPct: 84,
-      bluetoothRelayActive: true
-    },
-    // 3. Konteks perangkat utama pengguna (Smartphone / Laptop / Tablet PanaceaMed OS)
-    primaryHostDevice = 'PRIMARY_CUSTOMER_DEVICE_PANACEAMED_OS',
-    requestedLiteracyTier = 'LAYPERSON_AWAM'
-  } = payload;
-
-  // Step 1: Emulasi & Decode Paket BLE dari Gelang Shenzhen Whoop
-  const whoopBlePacket = encodeAndDecodeUniversalBleWearablePacket({
-    deviceId: 'SHENZHEN_WHOOP_4_STRAP',
-    heartRateBpm: shenzhenWhoopInput.heartRateBpm,
-    rrIntervalMs: shenzhenWhoopInput.rrIntervalsMsWindow[0] || 950,
-    spO2Pct: shenzhenWhoopInput.spO2Pct,
-    skinTempCelsius: shenzhenWhoopInput.skinTempCelsius,
-    batteryPct: shenzhenWhoopInput.batteryPct,
-    sleepSlowWaveMinutes: shenzhenWhoopInput.sleepSlowWaveMinutes,
-    sleepRemMinutes: shenzhenWhoopInput.sleepRemMinutes,
-    totalSleepMinutes: shenzhenWhoopInput.totalSleepMinutes
-  });
-
-  // Step 2: Hitung HRV RMSSD (ms) dari jendela interval R-R beat-to-beat
-  const rrList = shenzhenWhoopInput.rrIntervalsMsWindow;
-  let sumSquaredDiffs = 0;
-  for (let i = 1; i < rrList.length; i++) {
-    const diff = rrList[i] - rrList[i - 1];
-    sumSquaredDiffs += diff * diff;
-  }
-  const hrvRmssdMs = Number(
-    Math.sqrt(sumSquaredDiffs / Math.max(1, rrList.length - 1)).toFixed(1)
-  );
-
-  // Step 3: Hitung Whoop-Equivalent Day Strain (0.0 - 21.0 Borg-Scaled Cardiovascular Load)
-  const hrReserveFraction = Math.max(
-    0.05,
-    Math.min(
-      1.0,
-      (shenzhenWhoopInput.averageWorkoutHrBpm - shenzhenWhoopInput.heartRateBpm) /
-        Math.max(20, shenzhenWhoopInput.maxHrBpm - shenzhenWhoopInput.heartRateBpm)
-    )
-  );
-  const trimpLoad =
-    shenzhenWhoopInput.activeCardioMinutesToday *
-    hrReserveFraction *
-    0.64 *
-    Math.exp(1.92 * hrReserveFraction);
-  const whoopEquivalentDayStrain0to21 = Number(
-    Math.min(21.0, Math.max(2.0, 4.5 * Math.log(1 + trimpLoad / 18))).toFixed(1)
-  );
-
-  // Step 4: Hitung Skor Pemulihan Otonom (Recovery Score 0 - 100%) & Kualitas Tidur
-  const restorativeSleepRatio =
-    (shenzhenWhoopInput.sleepSlowWaveMinutes + shenzhenWhoopInput.sleepRemMinutes) /
-    Math.max(180, shenzhenWhoopInput.totalSleepMinutes);
-  const sleepPerformancePct = Math.min(
-    100,
-    Math.round((shenzhenWhoopInput.totalSleepMinutes / 480) * 75 + restorativeSleepRatio * 55)
-  );
-  const rhrBonus = Math.max(
-    -15,
-    Math.min(12, (shenzhenWhoopInput.restingHeartRate30dBaselineBpm - shenzhenWhoopInput.heartRateBpm) * 2.5)
-  );
-  const autonomicRecoveryPct = Math.max(
-    10,
-    Math.min(100, Math.round(Math.min(75, hrvRmssdMs) * 0.72 + sleepPerformancePct * 0.38 + rhrBonus))
-  );
-
-  // Step 5: Fusi Sensor di qWatch Pro (Menggabungkan PPG Whoop + EKG/PTT qWatch Pro)
-  // Estimasi kecepatan gelombang nadi (PWV) & tren tekanan darah cuffless berbasis Pulse Transit Time (PTT)
-  const pttSeconds = Math.max(0.12, qWatchProInput.wristEcgRPeakToPpgFootPttMs / 1000);
-  const arterialPathLengthMeters = 1.38;
-  const fusedPwvMps = Number((arterialPathLengthMeters / pttSeconds).toFixed(2));
-  const estimatedCufflessSystolicMmHg = Math.round(118 + (fusedPwvMps - 6.3) * 11.5);
-  const estimatedCufflessDiastolicMmHg = Math.round(76 + (fusedPwvMps - 6.3) * 6.5);
-
-  // Step 6: Interpretasi Kecerdasan Buatan (AI Clinical & Everyday Health Interpreter)
-  let ruitangTier = 'GREEN';
-  if (
-    shenzhenWhoopInput.spO2Pct < 92 ||
-    shenzhenWhoopInput.skinTempCelsius >= 38.3 ||
-    estimatedCufflessSystolicMmHg >= 165
-  ) {
-    ruitangTier = 'RED';
-  } else if (
-    autonomicRecoveryPct < 45 ||
-    shenzhenWhoopInput.skinTempCelsius >= 37.5 ||
-    estimatedCufflessSystolicMmHg >= 140
-  ) {
-    ruitangTier = 'YELLOW';
-  }
-
-  const aiPlainLanguageSummaryId =
-    ruitangTier === 'GREEN'
-      ? `Data gelang Shenzhen Whoop Anda berhasil diambil oleh qWatch Pro dan dianalisis AI PanaceaMed: Pemulihan Otonom ${autonomicRecoveryPct}% (Zona Hijau), HRV RMSSD ${hrvRmssdMs} ms, Beban Harian (Day Strain) ${whoopEquivalentDayStrain0to21}/21, SpO2 ${shenzhenWhoopInput.spO2Pct}%, dan tidur restoratif (Deep+REM) ${shenzhenWhoopInput.sleepSlowWaveMinutes + shenzhenWhoopInput.sleepRemMinutes} menit. Tubuh Anda berada dalam kondisi prima untuk aktivitas produktif maupun latihan fisik.`
-      : ruitangTier === 'YELLOW'
-        ? `Perhatian Ringan (Zona Kuning): Data gabungan Shenzhen Whoop + qWatch Pro menunjukkan Pemulihan ${autonomicRecoveryPct}% (HRV ${hrvRmssdMs} ms, Suhu kulit ${shenzhenWhoopInput.skinTempCelsius}°C, Estimasi TD ${estimatedCufflessSystolicMmHg}/${estimatedCufflessDiastolicMmHg} mmHg). Kurangi latihan berat hari ini, perbanyak hidrasi air putih, dan tidur 30 menit lebih awal.`
-        : `Peringatan Klinis (Zona Merah): Sensor mendeteksi deviasi fisiologis signifikan (SpO2 ${shenzhenWhoopInput.spO2Pct}%, Suhu ${shenzhenWhoopInput.skinTempCelsius}°C, Estimasi TD ${estimatedCufflessSystolicMmHg}/${estimatedCufflessDiastolicMmHg} mmHg). Istirahat segera, konfirmasi dengan tensimeter/oksimeter medis terkalibrasi, dan hubungi dokter bila ada keluhan sesak atau nyeri dada.`;
-
-  const aiClinicianTechnicalSummary =
-    `BLE Bridge [SHENZHEN_WHOOP_4_STRAP -> QWATCH_PRO_SMARTWATCH_HUB -> ${primaryHostDevice}]: ` +
-    `HR ${shenzhenWhoopInput.heartRateBpm} bpm (30d RHR baseline ${shenzhenWhoopInput.restingHeartRate30dBaselineBpm} bpm), ` +
-    `HRV RMSSD ${hrvRmssdMs} ms, SpO2 ${shenzhenWhoopInput.spO2Pct}%, Skin Temp ${shenzhenWhoopInput.skinTempCelsius}°C, ` +
-    `Day Strain ${whoopEquivalentDayStrain0to21}/21.0, Recovery ${autonomicRecoveryPct}%, ` +
-    `PTT-derived PWV ${fusedPwvMps} m/s (cuffless BP trend ${estimatedCufflessSystolicMmHg}/${estimatedCufflessDiastolicMmHg} mmHg, unsigned exploratory estimate).`;
-
-  // Step 7: HL7 FHIR R4 Wearable Observation Bundle (Siap Sinkronisasi ke Rekam Medis / SATUSEHAT)
-  const fhirWearableBundle = Object.freeze({
-    resourceType: 'Bundle',
-    type: 'collection',
-    entry: Object.freeze([
-      Object.freeze({
-        resource: Object.freeze({
-          resourceType: 'Device',
-          id: 'ble-bridge-shenzhen-whoop-qwatch-pro',
-          manufacturer: 'Shenzhen Biometric Strap + qWatch Pro Bridge',
-          deviceName: Object.freeze([{ name: 'Shenzhen Whoop 4.0 <-> qWatch Pro BLE Relay', type: 'user-friendly-name' }])
-        })
-      }),
-      Object.freeze({
-        resource: Object.freeze({
-          resourceType: 'Observation',
-          code: Object.freeze({ coding: Object.freeze([{ system: 'http://loinc.org', code: '8867-4', display: 'Heart rate' }]) }),
-          valueQuantity: Object.freeze({ value: shenzhenWhoopInput.heartRateBpm, unit: '/min' })
-        })
-      }),
-      Object.freeze({
-        resource: Object.freeze({
-          resourceType: 'Observation',
-          code: Object.freeze({ coding: Object.freeze([{ system: 'http://loinc.org', code: '80404-7', display: 'R-R interval.standard deviation (HRV RMSSD)' }]) }),
-          valueQuantity: Object.freeze({ value: hrvRmssdMs, unit: 'ms' })
-        })
-      }),
-      Object.freeze({
-        resource: Object.freeze({
-          resourceType: 'Observation',
-          code: Object.freeze({ coding: Object.freeze([{ system: 'http://loinc.org', code: '59408-5', display: 'Oxygen saturation in Arterial blood by Pulse oximetry' }]) }),
-          valueQuantity: Object.freeze({ value: shenzhenWhoopInput.spO2Pct, unit: '%' })
-        })
-      })
-    ])
-  });
-
-  const bridgeDigest = crypto
-    .createHash('sha256')
-    .update(
-      JSON.stringify({
-        hexPacket: whoopBlePacket.hexPacket,
-        hrvRmssdMs,
-        strain: whoopEquivalentDayStrain0to21,
-        recovery: autonomicRecoveryPct,
-        pwv: fusedPwvMps
-      })
-    )
-    .digest('hex');
-
-  const elapsedMs = Number(process.hrtime.bigint() - startNs) / 1e6;
+  const sealInput = JSON.stringify({ deviceLabel, route, decoded: decoded.map((d) => [d.characteristicUuid16, d.q, d.reason, d.reading]) });
 
   return Object.freeze({
-    bridgePipelineId: 'SHENZHEN_WHOOP_TO_QWATCH_PRO_TO_PANACEAMED_AI_V1',
-    primaryHostDevice,
-    requestedLiteracyTier,
-    bluetoothTopology: Object.freeze({
-      peripheralSensor: 'SHENZHEN_WHOOP_4_STRAP',
-      wristAggregatorBridge: 'QWATCH_PRO_SMARTWATCH_HUB',
-      primaryOsHost: primaryHostDevice,
-      bluetoothRelayActive: Boolean(qWatchProInput.bluetoothRelayActive),
-      rawPacketHex: whoopBlePacket.hexPacket,
-      byteRoundTripVerified: whoopBlePacket.byteRoundTripVerified
-    }),
-    qWatchProProcessedMetrics: Object.freeze({
-      heartRateBpm: shenzhenWhoopInput.heartRateBpm,
-      hrvRmssdMs,
-      spO2Pct: shenzhenWhoopInput.spO2Pct,
-      skinTempCelsius: shenzhenWhoopInput.skinTempCelsius,
-      whoopEquivalentDayStrain0to21,
-      autonomicRecoveryPct,
-      sleepPerformancePct,
-      fusedPwvMps,
-      estimatedCufflessSystolicMmHg,
-      estimatedCufflessDiastolicMmHg,
-      ruitangTier
-    }),
-    aiHealthInterpretation: Object.freeze({
-      ruitangTier,
-      plainLanguageCustomerSummary: aiPlainLanguageSummaryId,
-      clinicianTechnicalSummary: aiClinicianTechnicalSummary,
-      recommendedDailyActions: Object.freeze([
-        autonomicRecoveryPct >= 70
-          ? '1. Zona Pemulihan Hijau: Anda dapat menjalankan latihan kalistenik/kardio target Strain 12.0–15.0 hari ini.'
-          : '1. Prioritaskan pemulihan parasimpatis: lakukan pernapasan terpadu 0.1 Hz (6 napas/menit) selama 5 menit.',
-        `2. Pertahankan hidrasi cairan harian dan jaga tidur malam >= 7.5 jam (capaian tidur saat ini ${Math.round((shenzhenWhoopInput.totalSleepMinutes / 60) * 10) / 10} jam).`,
-        '3. Seluruh data mentah sensor disimpan terenkripsi AES-256-GCM di perangkat utama Anda (offline-first).'
-      ])
-    }),
+    deviceLabel,
+    deviceRoute: Object.freeze(route),
+    decodedReadings: Object.freeze(decoded),
+    qualityCounts: Object.freeze({ GOOD: good, NOISE: noise, MISSING: missing }),
     fhirWearableBundle,
-    bridgeSha256Seal: bridgeDigest,
-    executionDurationMs: Number(elapsedMs.toFixed(4)),
-    truthClass: 'DERIVED_BIOPHYSICAL',
-    clinicallyReviewed: false,
-    requiresHumanPhysicianSignoff: true
+    // Derivasi (HRV, tier, skor) bukan tugas adapter ini: dinyatakan tidak dihitung, bukan diisi tebakan.
+    derivedSignals: Object.freeze({ q: 'MISSING', reason: 'NOT_COMPUTED_BY_DEVICE_ADAPTER' }),
+    aiHealthInterpretation: Object.freeze({
+      plainLanguageCustomerSummary: summary,
+      clinicianTechnicalSummary: `Route=${route.route}; standard readable services=[${route.readable.map((s) => '0x' + s.toString(16)).join(', ')}]; vendor UUIDs not decoded=${route.vendorUuids.length}.`
+    }),
+    bridgeSha256Seal: crypto.createHash('sha256').update(sealInput).digest('hex'),
+    ...OBSERVED,
+    ...SAFETY
   });
 }
 
-// ============================================================================
-// WAVE 381–390: UNIVERSAL MULTI-WEARABLE IMITATION FLEET ORCHESTRATOR
-// (MEMASTIKAN SEMUA 8 JENIS WEARABLE BLUETOOTH DAPAT DIOBTAIN & DIINTERPRETASI)
-// ============================================================================
-
+/**
+ * Proses semua perangkat yang benar-benar dikirim pemanggil. Tanpa input → armada kosong, bukan perangkat tiruan.
+ * @param {{ devices?: Array<Parameters<typeof interpretStandardBleHealthReadings>[0]> }} payload
+ */
 export function orchestrateAllConnectedBluetoothWearables(payload = {}) {
   const startNs = process.hrtime.bigint();
-
-  const deviceKeys = Object.keys(UNIVERSAL_BLE_WEARABLE_PROFILES);
-  const imitatedDeviceStreams = deviceKeys.map((deviceId, idx) => {
-    const packet = encodeAndDecodeUniversalBleWearablePacket({
-      deviceId,
-      heartRateBpm: 62 + (idx % 5) * 3,
-      rrIntervalMs: 960 - (idx % 4) * 25,
-      spO2Pct: 98 - (idx % 2),
-      skinTempCelsius: Number((36.45 + (idx % 3) * 0.1).toFixed(2)),
-      batteryPct: 95 - idx * 3
-    });
-    return Object.freeze({
-      deviceId,
-      deviceName: packet.deviceName,
-      protocolFamily: packet.protocolFamily,
-      byteRoundTripVerified: packet.byteRoundTripVerified,
-      decodedTelemetry: packet.decodedTelemetry
-    });
-  });
-
-  const whoopToQWatchBridge = bridgeShenzhenWhoopToQWatchProAndInterpretAi(payload.bridge);
-  const allDevicesVerified = imitatedDeviceStreams.every((d) => d.byteRoundTripVerified);
-
+  const devices = Array.isArray(payload?.devices) ? payload.devices : [];
+  const connectedDevices = devices.map((d) => interpretStandardBleHealthReadings(d));
+  const profiles = Object.values(UNIVERSAL_BLE_WEARABLE_PROFILES);
   const elapsedMs = Number(process.hrtime.bigint() - startNs) / 1e6;
 
   return Object.freeze({
-    fleetVersion: 'PANACEAMED_UNIVERSAL_BLE_WEARABLE_IMULATOR_FLEET_V1',
-    totalSupportedWearableFamilies: imitatedDeviceStreams.length,
-    allDevicesByteRoundTripVerified: allDevicesVerified,
-    shenzhenWhoopToQWatchProBridgeVerified:
-      whoopToQWatchBridge.bluetoothTopology.byteRoundTripVerified &&
-      whoopToQWatchBridge.qWatchProProcessedMetrics.autonomicRecoveryPct > 0,
-    imitatedDeviceStreams: Object.freeze(imitatedDeviceStreams),
-    whoopToQWatchBridge,
+    fleetVersion: 'PANACEAMED_STANDARD_BLE_GATT_ADAPTER_V2',
+    totalSupportedWearableFamilies: profiles.length,
+    profilesWithTestedDecoder: profiles.filter((p) => p.decoderStatus === 'DECODER_TESTED').length,
+    totalConnectedDevices: connectedDevices.length,
+    fleetQuality: connectedDevices.length === 0 ? 'MISSING' : 'REPORTED_PER_READING',
+    connectedDevices: Object.freeze(connectedDevices),
     executionDurationMs: Number(elapsedMs.toFixed(4)),
-    truthClass: 'DERIVED_BIOPHYSICAL',
-    clinicallyReviewed: false,
-    requiresHumanPhysicianSignoff: true
+    ...OBSERVED,
+    ...SAFETY
   });
 }
 
-// ============================================================================
-// WAVE 391–400: QUADRICENTENNIAL HOLISTIC AUTO-MATURITY, AUTO-REPAIR &
-// STREAMLINED 3-STEP USER JOURNEY MASTER OS (100% PUBLIC READINESS)
-// ============================================================================
-
+/**
+ * Spesifikasi desain alur 3 langkah. Status langkah mengikuti data nyata, bukan klaim "terhubung".
+ * Kepatuhan two-tap adalah properti desain, belum divalidasi dengan pengguna.
+ */
 export function evaluateStreamlinedThreeStepUserJourney(payload = {}) {
-  const {
-    selectedDeviceId = 'SHENZHEN_WHOOP_4_STRAP',
-    relayDeviceId = 'QWATCH_PRO_SMARTWATCH_HUB',
-    userLiteracyTier = 'LAYPERSON_AWAM'
-  } = payload;
-
+  const { connectedDeviceCount = 0, goodReadingCount = 0, userLiteracyTier = 'LAYPERSON_AWAM' } = payload ?? {};
   const steps = Object.freeze([
-    Object.freeze({
-      stepNumber: 1,
-      stepId: 'STEP_1_ONE_TAP_BLE_SYNC',
-      titleId: '1. Hubungkan Bluetooth (Gelang Whoop Shenzhen -> qWatch Pro -> PanaceaMed)',
-      maxTapsRequired: 1,
-      status: 'CONNECTED_AND_TRANSDUCED'
-    }),
-    Object.freeze({
-      stepNumber: 2,
-      stepId: 'STEP_2_AI_INTERPRETATION_AND_3D_ORGAN_VIEW',
-      titleId: '2. Lihat Skor Pemulihan AI, Beban Harian & Fokus Organ 3D Instan',
-      maxTapsRequired: 1,
-      status: 'AI_INTERPRETED_AND_VISUALIZED'
-    }),
-    Object.freeze({
-      stepNumber: 3,
-      stepId: 'STEP_3_ONE_CLICK_ACTION_OR_CLINICAL_EXPORT',
-      titleId: '3. Jalankan Panduan Harian atau Ekspor Rekam Medis FHIR R4 / PDF',
-      maxTapsRequired: 1,
-      status: 'ACTIONABLE_AND_VERIFIED'
-    })
+    Object.freeze({ stepNumber: 1, stepId: 'STEP_1_PAIR_STANDARD_DEVICE', title: 'Pair a standard Bluetooth health device', maxTapsRequired: 1, status: connectedDeviceCount > 0 ? 'PAIRED' : 'NOT_PAIRED' }),
+    Object.freeze({ stepNumber: 2, stepId: 'STEP_2_REVIEW_MEASUREMENTS', title: 'Review measurements and what was rejected', maxTapsRequired: 1, status: goodReadingCount > 0 ? 'MEASUREMENTS_AVAILABLE' : 'NO_MEASUREMENTS' }),
+    Object.freeze({ stepNumber: 3, stepId: 'STEP_3_SHARE_WITH_CLINICIAN', title: 'Share with your clinician (FHIR export, unsigned)', maxTapsRequired: 1, status: goodReadingCount > 0 ? 'READY_TO_SHARE' : 'NOTHING_TO_SHARE' })
   ]);
-
   return Object.freeze({
     journeyArchitecture: 'THREE_STEP_ZERO_FRICTION_PUBLIC_UX',
-    selectedDeviceId,
-    relayDeviceId,
     userLiteracyTier,
     totalSteps: steps.length,
-    twoTapRuleCompliant: true,
+    twoTapRuleCompliant: steps.every((s) => s.maxTapsRequired <= 2),
+    validatedWithUsers: false,
     steps,
     truthClass: 'DERIVED_BIOPHYSICAL',
-    clinicallyReviewed: false,
-    requiresHumanPhysicianSignoff: true
+    ...SAFETY
   });
 }
 
@@ -546,13 +245,19 @@ export function runPanaceaMedWave400QuadricentennialMasterOs(payload = {}) {
   const wave350Astral = astralWave350.runPanaceaMedWave350AstralPublicMasterOs(payload.astral);
   const holisticGovernor = holisticKernel.runHolisticAutoExpansionAndSmoothOsGovernor(payload.holistic);
   const wearableFleet = orchestrateAllConnectedBluetoothWearables(payload.wearables);
-  const streamlinedJourney = evaluateStreamlinedThreeStepUserJourney(payload.journey);
+  const goodReadingCount = wearableFleet.connectedDevices.reduce((n, d) => n + d.qualityCounts.GOOD, 0);
+  const streamlinedJourney = evaluateStreamlinedThreeStepUserJourney({
+    connectedDeviceCount: wearableFleet.totalConnectedDevices,
+    goodReadingCount,
+    ...(payload.journey ?? {})
+  });
 
+  // Invarian internal yang bisa dicek mesin. Ini bukan skor kematangan produk.
   const quadricentennialChecklist = Object.freeze({
-    all8BleWearableFamiliesTransduced: wearableFleet.allDevicesByteRoundTripVerified,
-    shenzhenWhoopToQWatchProBridgeReady: wearableFleet.shenzhenWhoopToQWatchProBridgeVerified,
-    aiHealthInterpreterAndFhirReady:
-      wearableFleet.whoopToQWatchBridge.fhirWearableBundle.entry.length === 4,
+    onlyStandardServicesRegistered: BLE_GATT_STANDARD_AND_VENDOR_UUIDS.VENDOR_PROPRIETARY.length === 0,
+    emptyInputYieldsNoReadings: orchestrateAllConnectedBluetoothWearables().totalConnectedDevices === 0,
+    fhirOnlyFromGoodReadings: wearableFleet.connectedDevices.every((d) =>
+      d.fhirWearableBundle.entry.length <= d.qualityCounts.GOOD * 2),
     streamlinedThreeStepUxReady: streamlinedJourney.twoTapRuleCompliant,
     holisticAutoCheckAndAutoRepair100Pct:
       holisticGovernor.autoCheckFunctionHealthPercentage === 100.0 &&
@@ -561,28 +266,23 @@ export function runPanaceaMedWave400QuadricentennialMasterOs(payload = {}) {
   });
 
   const allGatesGreen = Object.values(quadricentennialChecklist).every(Boolean);
-  const universalMaturityPercentage = allGatesGreen ? 100.0 : 95.0;
 
   const quadricentennialSha256Seal = crypto
     .createHash('sha256')
-    .update(
-      JSON.stringify({
-        astralSeal: wave350Astral.masterAstralSeal,
-        holisticSeal: holisticGovernor.holisticSha256Seal,
-        bridgeSeal: wearableFleet.whoopToQWatchBridge.bridgeSha256Seal,
-        maturityPct: universalMaturityPercentage
-      })
-    )
+    .update(JSON.stringify({
+      astralSeal: wave350Astral.masterAstralSeal,
+      holisticSeal: holisticGovernor.holisticSha256Seal,
+      checklist: quadricentennialChecklist,
+      fleet: wearableFleet.connectedDevices.map((d) => d.bridgeSha256Seal)
+    }))
     .digest('hex');
 
   const elapsedMs = Number(process.hrtime.bigint() - startNs) / 1e6;
 
   return Object.freeze({
-    quadricentennialReleaseVersion: 'PANACEAMED_QUADRICENTENNIAL_BLE_WEARABLE_AI_OS_WAVE_400_V1',
-    tercentenaryCompletionSeal: 'PANACEAMED_TERCENTENARY_AUTO_MATURITY_VISUAL_SIM_OS_WAVE_300',
-    tercentenaryMilestoneSeal: 'PANACEAMED_TERCENTENARY_AUTO_MATURITY_VISUAL_SIM_OS_WAVE_300',
-    totalWavesUnified: 400,
-    universalMaturityPercentage,
+    quadricentennialReleaseVersion: 'PANACEAMED_STANDARD_BLE_GATT_ADAPTER_WAVE_400_V2',
+    // Tidak ada persentase kematangan yang diberikan sendiri (PANACEA_SYSTEM_10_STANDARD).
+    universalMaturityPercentage: null,
     allGatesGreen,
     quadricentennialChecklist,
     wearableFleet,
@@ -592,7 +292,6 @@ export function runPanaceaMedWave400QuadricentennialMasterOs(payload = {}) {
     executionDurationMs: Number(elapsedMs.toFixed(4)),
     quadricentennialSha256Seal,
     truthClass: 'DERIVED_BIOPHYSICAL',
-    clinicallyReviewed: false,
-    requiresHumanPhysicianSignoff: true
+    ...SAFETY
   });
 }
