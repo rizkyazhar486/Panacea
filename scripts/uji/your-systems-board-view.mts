@@ -12,7 +12,7 @@ const render = (rows: ReturnType<typeof buildSystemBoard>, selected: never = nul
 
 // kosong: satu catatan jujur, tanpa daftar 11 baris, tanpa nilai karangan
 const kosong = render(buildSystemBoard(new Map(), NOW))
-assert.match(kosong, /0 of 11 have data/); assert.match(kosong, /No lab result, vital or device reading/)
+assert.match(kosong, /0 of 11 have data/); assert.match(kosong, /Nothing you recorded is linked to a body system yet/)
 assert.doesNotMatch(kosong, /data-system=/); assert.doesNotMatch(kosong, /<details/)
 
 // data: baris ber-data tampil dengan nilai, satuan, umur; sistem tanpa data dilipat

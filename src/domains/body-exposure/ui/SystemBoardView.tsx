@@ -51,7 +51,7 @@ export function SystemBoardView({ rows, metricLabel, selected, onSelect }: { row
         <ul className="grid gap-2 lg:grid-cols-2">{withData.map(row)}</ul>
       ) : (
         <p className="rounded-xl border border-dashed border-neutral-300 px-3 py-3 text-[12px] text-neutral-500 dark:border-white/15">
-          No lab result, vital or device reading is linked to a body system yet. Record one below and it appears here.
+          Nothing you recorded is linked to a body system yet; record a reading below and it appears here.
         </p>
       )}
       {withData.length > 0 && without.length > 0 && (
@@ -60,7 +60,7 @@ export function SystemBoardView({ rows, metricLabel, selected, onSelect }: { row
           <ul className="mt-2 grid gap-2 lg:grid-cols-2">{without.map(row)}</ul>
         </details>
       )}
-      <p className="px-1 text-[11px] leading-snug text-neutral-500">Tests are grouped by the system they are usually read with, not by where a problem is. Reference anatomy, not a scan of you.</p>
+      <p className="px-1 text-[11px] leading-snug text-neutral-500">Tests are grouped by the system they are usually read with, not by where a problem is.</p>
     </section>
   )
 }
