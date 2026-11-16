@@ -244,6 +244,9 @@ export function readUnifiedLocalVitals(
   return merged
 }
 
+/** The only role a credential-less auto-resume may assume. */
+export const AUTO_RESUME_ROLE: Role = 'pasien'
+
 export function resolveAutoResumeAccount(options: {
   readonly ownerEmail: string
   readonly profiles?: Readonly<Record<string, ProfileEdit>>
@@ -259,23 +262,23 @@ export function resolveAutoResumeAccount(options: {
     if (!onboarded && !hasHp) return null
     if (!hasHp && !hasBc && !hasSync) return null
 
-    const remembered = listRememberedAccounts({
-      profiles: options.profiles,
-      patients: options.patients,
-      ownerEmail: options.ownerEmail,
-    })
+    // Only an explicitly remembered account may resume. Never synthesize the
+    // owner identity from seed patients or fall back to the owner e-mail.
+    const remembered = listRememberedAccounts({ profiles: options.profiles })
     const primary = remembered[0]
-    const email = (primary?.email || options.ownerEmail).trim().toLowerCase()
+    if (!primary) return null
+    const email = primary.email.trim().toLowerCase()
     const id = `local:${encodeURIComponent(email)}`
-    const role: Role = primary?.role ?? (email === options.ownerEmail.toLowerCase() ? 'owner' : 'pasien')
+    // Credential-less resume reads forgeable localStorage, so it can never grant
+    // owner/admin/clinical authority: those require a real sign-in (fail closed).
     return {
       id,
       email,
-      name: primary?.name || email.split('@')[0],
-      role,
-      patientId: primary?.patientId || `self-u-${id}`,
-      isOwner: email === options.ownerEmail.toLowerCase(),
-      isSubscriber: role === 'owner' || email === options.ownerEmail.toLowerCase(),
+      name: primary.name || email.split('@')[0],
+      role: AUTO_RESUME_ROLE,
+      patientId: primary.patientId || `self-u-${id}`,
+      isOwner: false,
+      isSubscriber: false,
       loggedAt: new Date().toISOString(),
     }
   } catch {

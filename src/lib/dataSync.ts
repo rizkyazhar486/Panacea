@@ -23,6 +23,10 @@ function getChannel(): BroadcastChannel | null {
   if (channel !== undefined) return channel
   try {
     channel = typeof BroadcastChannel !== 'undefined' ? new BroadcastChannel(CHANNEL_NAME) : null
+    // In Node (tests, SSR) an open BroadcastChannel keeps the process alive
+    // forever; `npm run uji` hung on main because of it. Browsers have no
+    // unref(), so this is a no-op there and cross-tab delivery is unchanged.
+    ;(channel as { unref?: () => void } | null)?.unref?.()
   } catch {
     channel = null
   }

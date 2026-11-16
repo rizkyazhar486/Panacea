@@ -20,6 +20,7 @@ import {
   resolveAutoResumeAccount,
   restoreFullLocalVault,
 } from '../../src/domains/identity/localRecovery.ts'
+import { rememberAccountProfile } from '../../src/domains/identity/bootVitals.ts'
 
 // Install isolated localStorage mock for pure contract execution
 const mem = new Map<string, string>()
@@ -142,9 +143,16 @@ assert.ok(discovered.some((d) => d.name === 'Polar H10' && d.batteryPercent === 
 assert.ok(discovered.some((d) => d.name === 'WHOOP 4.0'))
 assert.ok(discovered.some((d) => d.id === 'sync:auto-health-bridge'), 'pmd_auto_sync_status_v2 surfaced in connected devices')
 
-// Auto-resume respects onboarded telemetry presence AND explicit logout flag
+// Auto-resume respects onboarded telemetry presence AND explicit logout flag.
+// It needs an explicitly remembered account (never a synthesized owner) and
+// resumes without owner authority (see auto-resume-fail-closed.mts).
+assert.equal(resolveAutoResumeAccount({ ownerEmail: 'owner.qa@example.invalid' }), null, 'no remembered account → no synthesized owner session')
+rememberAccountProfile(acc)
 const autoResumed = resolveAutoResumeAccount({ ownerEmail: 'owner.qa@example.invalid' })
 assert.ok(autoResumed && autoResumed.id && autoResumed.patientId)
+assert.equal(autoResumed.email, myEmail)
+assert.equal(autoResumed.role, 'pasien', 'credential-less resume never restores owner role')
+assert.equal(autoResumed.isOwner, false)
 mem.set('panacea.explicit_logout.v1', '1')
 assert.equal(resolveAutoResumeAccount({ ownerEmail: 'owner.qa@example.invalid' }), null, 'explicit logout prevents unwanted auto-login')
 mem.delete('panacea.explicit_logout.v1')
