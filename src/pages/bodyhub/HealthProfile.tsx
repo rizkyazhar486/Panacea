@@ -430,7 +430,7 @@ export function HealthProfile() {
               )
             }}
           >
-            ♻️ Recover &amp; Sync Local Logs
+            ♻️ Recover logs
           </Button>
         </div>
       </Card>

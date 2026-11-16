@@ -83,11 +83,16 @@ export function UniversalCompactBodyCockpit() {
 
   const r = readout
   return (
-    <section aria-label="Body numbers summary" data-body-cockpit className="dark relative z-[2] mt-3 overflow-hidden rounded-[24px] border border-emerald-500/30 bg-[#060c10]/95 p-4 text-white sm:p-6">
-      <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <h2 className="text-base font-black tracking-tight sm:text-lg">Your body numbers</h2>
-        <span className="text-[11px] text-white/55">Only what you recorded, or calculated from it</span>
-      </div>
+    <details aria-label="Body numbers summary" data-body-cockpit className="dark relative z-[2] mt-3 overflow-hidden rounded-[24px] border border-emerald-500/30 bg-[#060c10]/95 p-4 text-white sm:p-6">
+      {/* Closed by default: twelve tiles with hints are too much text for the first screen (UI legibility ratchet);
+          the summary line still shows the headline numbers the person recorded. */}
+      <summary className="flex min-h-[44px] cursor-pointer list-none flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+        <span className="text-[14px] font-black tracking-tight">Your body numbers</span>
+        <span className="text-[14px] font-semibold tabular-nums text-white/70" data-cockpit-headline>
+          {[r.weight && `${r.weight.value.toFixed(1)} kg`, r.bmi && `BMI ${r.bmi.value.toFixed(1)}`].filter(Boolean).join(' · ')}
+        </span>
+      </summary>
+      <p className="mt-2 text-[11px] text-white/55">Only what you recorded, or calculated from it</p>
 
       <div className="mt-3 grid grid-cols-2 gap-2.5 sm:grid-cols-4">
         <Tile label="Weight" reading={r.weight} unit="kg" digits={1} hint="Add weight" />
@@ -126,6 +131,6 @@ export function UniversalCompactBodyCockpit() {
       <div className="mt-3 border-t border-white/10 pt-3 text-[11px] text-white/45">
         <BatasKlaimKesehatan permukaan="longevity.body-composition" />
       </div>
-    </section>
+    </details>
   )
 }
