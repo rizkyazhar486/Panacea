@@ -16,6 +16,11 @@ jobs:
     permissions:
       contents: read
       deployments: write
+    # Secrets cannot appear in a step `if`, and a step's own `env` is not visible to
+    # its `if`. Expose only a yes/no flag job-wide so the token itself never reaches
+    # `npm ci` install scripts or the build; the publish step alone receives it.
+    env:
+      HAS_CLOUDFLARE_CREDENTIALS: ${{ secrets.CLOUDFLARE_API_TOKEN != '' && secrets.CLOUDFLARE_ACCOUNT_ID != '' }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -30,15 +35,15 @@ jobs:
         run: npm run build
         env:
           VITE_API_URL: ${{ vars.VITE_API_URL }}
+      # cloudflare/pages-action is gone from GitHub ("Unable to resolve action", every
+      # main run since dcdaef8), so the whole job failed at setup before any step ran.
+      # Cloudflare's supported replacement is wrangler-action running `pages deploy`.
+      # Without both secrets the publish is skipped; the build/verification above
+      # still has to pass.
       - name: Publish to Cloudflare Pages
-        if: ${{ env.CLOUDFLARE_API_TOKEN != '' && env.CLOUDFLARE_ACCOUNT_ID != '' }}
-        uses: cloudflare/pages-action@v1
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        if: ${{ env.HAS_CLOUDFLARE_CREDENTIALS == 'true' }}
+        uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          projectName: panaceamed
-          directory: dist
-          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+          command: pages deploy dist --project-name=panaceamed --branch=main
