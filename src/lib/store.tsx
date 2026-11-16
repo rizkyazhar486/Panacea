@@ -600,11 +600,16 @@ export function StoreProvider({ children, visibilityDocument }: { children: Reac
   // (re-pulled by the posts poll below) and was never safe to treat as the local
   // source of truth for that data — see AUDIT_STATUS_REVAMP_UI.md.
   useEffect(() => {
+    // Hanya tulis bila state tab ini berubah sejak penulisan terakhir. Menulis ulang state lama
+    // saat pagehide/beforeunload tanpa perubahan menimpa data yang lebih baru dari tab lain.
+    let dirty = true
     const flush = () => {
+      if (!dirty) return
       const { account: _account, ...rest } = stateRef.current
       const persist = buildPersistedSnapshot(rest)
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(persist))
+        dirty = false
       } catch {
         /* quota exceeded even without media — give up persisting this update */
       }
