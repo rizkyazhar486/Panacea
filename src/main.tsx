@@ -137,7 +137,7 @@ const SecondOpinion = lazy(() => import('./pages/clinical/SecondOpinion').then((
 const OrganDonorCard = lazy(() => import('./pages/clinical/OrganDonorCard').then((m) => ({ default: m.OrganDonorCard })))
 const FitnessHub = lazy(() => import('./pages/fitness/FitnessHub').then((m) => ({ default: m.FitnessHub })))
 const PusatLatihan = lazy(() => import('./pages/fitness/PusatLatihan').then((m) => ({ default: m.PusatLatihan })))
-const PusatTubuh = lazy(() => import('./pages/PusatTubuh').then((m) => ({ default: m.PusatTubuh })))
+const BodyAnalyzerPage = lazy(() => import('./app/BodyAnalyzerPage'))
 const Ikhtisar = lazy(() => import('./pages/bodyhub/Ikhtisar').then((m) => ({ default: m.Ikhtisar })))
 const Harian = lazy(() => import('./pages/bodyhub/Harian').then((m) => ({ default: m.Harian })))
 const CariSemua = lazy(() => import('./pages/CariSemua').then((m) => ({ default: m.CariSemua })))
@@ -288,7 +288,7 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/organ-donor" element={<OrganDonorCard />} />
               <Route path="/fitness-hub" element={<FitnessHub />} />
               <Route path="/latihan" element={<PusatLatihan />} />
-              <Route path="/tubuh" element={<PusatTubuh />} />
+              <Route path="/tubuh" element={<BodyAnalyzerPage />} />
               <Route path="/ikhtisar" element={<Ikhtisar />} />
               <Route path="/harian" element={<Harian />} />
               <Route path="/cari" element={<CariSemua />} />

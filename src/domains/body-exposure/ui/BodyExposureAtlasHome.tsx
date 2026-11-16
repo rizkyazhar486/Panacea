@@ -15,7 +15,7 @@
  * projections of the same state: phone sheet, wide panel). This file holds the state and the three stages.
  */
 
-import { Suspense, lazy, useCallback, useMemo, useState } from 'react'
+import { Suspense, lazy, useCallback, useEffect, useMemo, useState } from 'react'
 import { useAdaptive } from '../../../shared/adaptive/useAdaptive'
 import { CardiopulmonaryCouplingDeck } from './CardiopulmonaryCouplingDeck'
 import { SoftTissueBiomechanicsDeck } from './SoftTissueBiomechanicsDeck'
@@ -53,6 +53,8 @@ interface BodyExposureAtlasHomeProps {
   Viewer: AtlasViewerComponent
   /** Sends a camera command to that viewer. */
   sendCamera: (command: AtlasCameraCommand) => void
+  /** When it changes to a system, the stage opens that system's physiology card; null leaves the stage as it is. */
+  focusSystem?: BodySystemId | null
 }
 
 const STAGES: readonly { id: AtlasStage; label: string; short: string }[] = [
@@ -87,9 +89,9 @@ const layerSpec = (id: AtlasLayerId | null) => ATLAS_LAYERS.find((layer) => laye
 
 export { decksFor, type StructureCouplingContext }
 
-export function BodyExposureAtlasHome({ Viewer, sendCamera }: BodyExposureAtlasHomeProps) {
+export function BodyExposureAtlasHome({ Viewer, sendCamera, focusSystem = null }: BodyExposureAtlasHomeProps) {
   const { isDesktop } = useAdaptive()
-  const [stage, setStage] = useState<AtlasStage>('anatomy')
+  const [stage, setStage] = useState<AtlasStage>(focusSystem ? 'physiology' : 'anatomy')
   const [depth, setDepth] = useState(0)
   // Unset = follow the screen: a phone starts on the lighter 'focus' plate, a wide stage on the peeled body.
   const [chosenMode, setChosenMode] = useState<AtlasPlateMode | null>(null)
@@ -103,7 +105,7 @@ export function BodyExposureAtlasHome({ Viewer, sendCamera }: BodyExposureAtlasH
   const [sheet, setSheet] = useState<SheetSnap>('peek')
   // The Physiology stage opens on the body systems; picking a structure routes to its simulation deck instead.
   const [physiologyView, setPhysiologyView] = useState<PhysiologyView>('systems')
-  const [systemFocus, setSystemFocus] = useState<BodySystemId | null>(null)
+  const [systemFocus, setSystemFocus] = useState<BodySystemId | null>(focusSystem)
   /** A self-check is a focus mode: while one runs, the stage's own next-step button steps aside. */
   const [selfCheckOpen, setSelfCheckOpen] = useState(false)
   const [clinicalTool, setClinicalTool] = useState<ClinicalTool>('vascular')
@@ -184,6 +186,7 @@ export function BodyExposureAtlasHome({ Viewer, sendCamera }: BodyExposureAtlasH
   const pickRoute = useMemo(() => (selectedStructure ? routePick(selectedStructure) : null), [selectedStructure])
   const pickedSystems = pickRoute?.systems ?? []
   const openSystem = useCallback((id: BodySystemId | null) => { setSystemFocus(id); setPhysiologyView('systems') }, [])
+  useEffect(() => { if (focusSystem) { setStage('physiology'); openSystem(focusSystem) } }, [focusSystem, openSystem])
   // A system card's "Simulate" hands its tab to the deck through the same context a structure pick uses.
   const simulate = useCallback((simulation: StageSimulation) => {
     setCouplingContext((current) => ({ ...(current ?? { physiology: simulation.deck, clinical: clinicalTool }), physiology: simulation.deck, softTissueTab: simulation.softTissueTab }))
