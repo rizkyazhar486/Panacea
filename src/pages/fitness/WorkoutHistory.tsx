@@ -19,6 +19,8 @@ import { useVitals } from '../../lib/useVitals'
 import { GrafikOlahraga } from '../../components/GrafikOlahraga'
 import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 import { parseTargetValue } from '../../domains/training-goals'
+import { adoptAllDeviceLocalBuckets } from '../../domains/identity/localRecovery'
+import { useOptionalStore } from '../../lib/store'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // History Latihan — sesi nyata beserta deret detak jantung per menit.
@@ -31,13 +33,28 @@ import { parseTargetValue } from '../../domains/training-goals'
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function WorkoutHistory() {
+  const store = useOptionalStore()
   const vitals = useVitals()
   const demo = useMemo(() => getDemo(), [])
   // Membaca ulang tiap kali store menyiarkan perubahan (vitals ikut berubah).
   const [buka, setBuka] = useState<string | null>(null)
   const [tarikan, setTarikan] = useState(0)
+  const [recoveryMsg, setRecoveryMsg] = useState('')
   const workouts = useMemo(() => getWorkouts(), [vitals, tarikan])
   const notifs = useMemo(() => getHrNotifications(), [vitals, tarikan])
+
+  const recoverWorkouts = () => {
+    const res = adoptAllDeviceLocalBuckets(store?.account ?? null, {
+      patient: store?.activePatient ?? null,
+      sleepLogs: store?.state.sleepLogs,
+    })
+    setTarikan((n) => n + 1)
+    setRecoveryMsg(
+      res.workoutsRecovered > 0
+        ? `Recovered ${res.workoutsRecovered} workout/alert record(s) from saved device storage.`
+        : 'Checked legacy & local storage buckets — all saved sessions are already displayed.',
+    )
+  }
 
   // Sessions pushed by the device live on the server; this screen used to read
   // localStorage only, so a correctly-configured Workouts automation still
@@ -59,7 +76,7 @@ export function WorkoutHistory() {
       })
       .catch(() => { /* offline: yang tersimpan lokal tetap tampil */ })
     return () => { hidup = false }
-  }, [])
+  }, [store?.account?.id])
 
   // Dihitung BESERTA asalnya. Angka ini menggerakkan seluruh sebaran zona,
   // jadi menampilkannya tanpa menyebut ia terukur, diperkirakan, atau sekadar
@@ -108,6 +125,26 @@ export function WorkoutHistory() {
             <Link to="/health-data/tutorial" className="font-semibold text-ink underline">Sync diagnostics</Link>
             {' '}inspects what actually arrived and names which setting is wrong.
           </p>
+          <div style={{ marginTop: 12, display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 10 }}>
+            <button
+              type="button"
+              onClick={recoverWorkouts}
+              data-testid="recover-legacy-workouts-btn"
+              style={{
+                borderRadius: 12,
+                border: '1px solid #00BF63',
+                background: 'rgba(0, 191, 99, 0.12)',
+                color: '#00BF63',
+                padding: '8px 14px',
+                fontSize: 12,
+                fontWeight: 800,
+                cursor: 'pointer',
+              }}
+            >
+              ♻️ Recover Saved Legacy &amp; Device Workouts
+            </button>
+            {recoveryMsg && <span style={{ fontSize: 12, fontWeight: 600 }}>{recoveryMsg}</span>}
+          </div>
         </Card>
       </div>
     )
@@ -115,13 +152,49 @@ export function WorkoutHistory() {
 
   return (
     <div className="space-y-4">
-      <SectionTitle
-        icon={<IconRun />}
-        title="Training History"
-        subtitle={`${workouts.length} sessions stored · HRmax ${hrMax} bpm ${
-          hr.asal === 'terukur' ? '(measured)' : hr.asal === 'perkiraan-usia' ? '(estimated from age)' : '(assumed)'
-        }`}
-      />
+      <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
+        <SectionTitle
+          icon={<IconRun />}
+          title="Training History"
+          subtitle={`${workouts.length} sessions stored · HRmax ${hrMax} bpm ${
+            hr.asal === 'terukur' ? '(measured)' : hr.asal === 'perkiraan-usia' ? '(estimated from age)' : '(assumed)'
+          }`}
+        />
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+          <Link
+            to="/recovery"
+            style={{
+              borderRadius: 12,
+              border: '1px solid rgba(0, 191, 99, 0.35)',
+              background: 'rgba(0, 191, 99, 0.08)',
+              color: '#00BF63',
+              padding: '7px 12px',
+              fontSize: 11,
+              fontWeight: 800,
+              textDecoration: 'none',
+            }}
+          >
+            ⚡ Recovery Studio (HBOT / Cryo / PBM)
+          </Link>
+          <button
+            type="button"
+            onClick={recoverWorkouts}
+            style={{
+              borderRadius: 12,
+              border: '1px solid rgba(0, 191, 99, 0.45)',
+              background: 'rgba(0, 191, 99, 0.1)',
+              color: '#00BF63',
+              padding: '7px 12px',
+              fontSize: 11,
+              fontWeight: 800,
+              cursor: 'pointer',
+            }}
+          >
+            ♻️ Recover Legacy Workouts
+          </button>
+        </div>
+      </div>
+      {recoveryMsg && <div style={{ fontSize: 12, fontWeight: 600, color: '#00BF63' }}>{recoveryMsg}</div>}
 
       {/* Zona latihan seluruhnya bergantung pada angka ini, jadi asalnya
           dinyatakan di tempat ia dipakai -- bukan disembunyikan di profil. */}

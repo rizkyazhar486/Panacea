@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState, type CSSProperties } from 'react'
 import { getDemoTersimpan } from '../../lib/profile'
-import { getVitals, type Vitals } from '../../lib/healthVitals'
+import { type Vitals } from '../../lib/healthVitals'
+import { readUnifiedLocalVitals } from '../../domains/identity/bootVitals'
 import { useOptionalStore } from '../../lib/store'
 import { useOptionalLongitudinalState } from '../../lib/useLongitudinalState'
 
@@ -90,11 +91,15 @@ export const PersonalBodyGlassTelemetry: React.FC<PersonalBodyGlassTelemetryProp
   const vitals = useMemo<Partial<Vitals>>(() => {
     void rev
     try {
-      return getVitals(account)
+      return readUnifiedLocalVitals(account, {
+        patient: activePatient,
+        patientVitals: activePatient ? store?.state.vitals[activePatient.id] : undefined,
+        sleepLogs: store?.state.sleepLogs,
+      })
     } catch {
       return {}
     }
-  }, [account, rev])
+  }, [account, activePatient, store?.state.vitals, store?.state.sleepLogs, rev])
 
   const demo = useMemo(() => {
     void rev

@@ -41,6 +41,7 @@ export interface BluetoothLike {
     filters: readonly { services: readonly string[] }[]
     optionalServices: readonly string[]
   }): Promise<DeviceLike>
+  getDevices?(): Promise<readonly DeviceLike[]>
 }
 
 export type BluetoothAvailability = 'available' | 'no-web-bluetooth' | 'insecure-page'
@@ -104,18 +105,11 @@ async function optionalService(server: GattServerLike, name: string): Promise<Se
   try { return await server.getPrimaryService(name) } catch { return null }
 }
 
-export async function connectHeartRateWearable(
-  bluetooth: BluetoothLike | null | undefined,
+async function connectGattHeartRateDevice(
+  device: DeviceLike,
   handlers: WearableHandlers,
-  now: () => number = () => performance.now(),
+  now: () => number,
 ): Promise<ConnectOutcome> {
-  if (!bluetooth || typeof bluetooth.requestDevice !== 'function') return { ok: false, reason: 'unavailable' }
-  let device: DeviceLike
-  try {
-    device = await bluetooth.requestDevice({ filters: [{ services: [HEART_RATE] }], optionalServices: [...OPTIONAL] })
-  } catch (error) {
-    return { ok: false, reason: refusalOf(error) }
-  }
   const gatt = device.gatt
   if (!gatt) return { ok: false, reason: 'failed' }
 
@@ -195,4 +189,45 @@ export async function connectHeartRateWearable(
       },
     },
   }
+}
+
+export async function connectHeartRateWearable(
+  bluetooth: BluetoothLike | null | undefined,
+  handlers: WearableHandlers,
+  now: () => number = () => performance.now(),
+): Promise<ConnectOutcome> {
+  if (!bluetooth || typeof bluetooth.requestDevice !== 'function') return { ok: false, reason: 'unavailable' }
+  let device: DeviceLike
+  try {
+    device = await bluetooth.requestDevice({ filters: [{ services: [HEART_RATE] }], optionalServices: [...OPTIONAL] })
+  } catch (error) {
+    return { ok: false, reason: refusalOf(error) }
+  }
+  return connectGattHeartRateDevice(device, handlers, now)
+}
+
+/**
+ * 1-Click Auto-Connect: reconnects to an already-paired Bluetooth LE heart-rate
+ * wearable when the browser permits `getDevices()`, falling back seamlessly to the
+ * standard browser chooser when no paired peripheral responds in range.
+ */
+export async function autoConnectWearable(
+  bluetooth: BluetoothLike | null | undefined,
+  handlers: WearableHandlers,
+  now: () => number = () => performance.now(),
+): Promise<ConnectOutcome> {
+  if (!bluetooth) return { ok: false, reason: 'unavailable' }
+  if (typeof bluetooth.getDevices === 'function') {
+    try {
+      const paired = await bluetooth.getDevices()
+      for (const dev of paired) {
+        if (!dev?.gatt) continue
+        const attempt = await connectGattHeartRateDevice(dev, handlers, now)
+        if (attempt.ok) return attempt
+      }
+    } catch {
+      /* fall through to standard chooser */
+    }
+  }
+  return connectHeartRateWearable(bluetooth, handlers, now)
 }

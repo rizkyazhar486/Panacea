@@ -1,7 +1,7 @@
 import { createContext, createElement, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { barisBelumAda, gpsTampil, makananTampil, ringkasGpsUntukAkun, tampilkanWellness, tidurTampil, wellnessBelumAda } from './homeCrossTabDailyState'
 import { useStore } from './store'
-import { getVitals } from './healthVitals'
+import { readUnifiedLocalVitals } from '../domains/identity/bootVitals.ts'
 import { ambilLab, type ButirLab } from './lab'
 import { api, backendEnabled } from './api'
 import { PERISTIWA_SINKRON } from './antreanKlinis'
@@ -25,7 +25,11 @@ type DeviceSeries = { selfVitals: SelfVital[]; vo2maxLog: Vo2MaxEntry[] }
 
 export function LongitudinalStateProvider({ children }: { children: ReactNode }) {
   const { state: app, account, lupakanCatatanDihapus } = useStore()
-  const [local, setLocal] = useState<LongitudinalSources['local']>(() => ({ owner: account, labs: ambilLab(account), vitals: getVitals(account) }))
+  const [local, setLocal] = useState<LongitudinalSources['local']>(() => ({
+    owner: account,
+    labs: ambilLab(account),
+    vitals: readUnifiedLocalVitals(account),
+  }))
   const [clinicalRevision, setClinicalRevision] = useState(0)
   const [server, setServer] = useState(emptyLongitudinalServer)
   const [labServer, setLabServer] = useState<LabServer | null>(null)
@@ -52,16 +56,21 @@ export function LongitudinalStateProvider({ children }: { children: ReactNode })
   }, [akunId])
 
   useEffect(() => {
-    // Persistent ownership is required; a new UI session cannot adopt legacy data.
-    setLocal({ owner: account, labs: ambilLab(account), vitals: getVitals(account) })
+    setLocal({
+      owner: account,
+      labs: ambilLab(account),
+      vitals: readUnifiedLocalVitals(account),
+    })
   }, [account])
 
   useEffect(() => {
-    // Legacy local keys carry no patient id. Notifications cannot authorize
-    // transferring their contents to another account; server sources are scoped.
     const lab = () => setLocal(previous => ({ ...previous, owner: account, labs: ambilLab(account) }))
     const health = () => {
-      setLocal(previous => ({ ...previous, owner: account, vitals: getVitals(account) }))
+      setLocal(previous => ({
+        ...previous,
+        owner: account,
+        vitals: readUnifiedLocalVitals(account),
+      }))
       setClinicalRevision(v => v + 1)
     }
     const clinical = () => setClinicalRevision(v => v + 1)

@@ -5,6 +5,7 @@ import { useBluetoothWearable } from './useBluetoothWearable.ts'
 import { LiveTrace } from './LiveTrace.tsx'
 import { deviceLabel, type SensorLocation } from '../engine/gattCommon.ts'
 import { vitalsPatchFrom, type WearableSavePatch } from '../engine/liveSession.ts'
+import { recordConnectedDevice } from '../adapters/deviceRegistry.ts'
 import type { ConnectRefusal, BluetoothAvailability } from '../adapters/webBluetooth.ts'
 
 export interface BluetoothWearablePanelProps {
@@ -76,6 +77,17 @@ export function BluetoothWearablePanel({ onSave, previousRmssd = [], appleHealth
     setSave({ state: 'saving', atMs: latest.atMs })
     try {
       await onSave({ ...patch, measuredAt: ble.wallTimeOf(latest.atMs) })
+      recordConnectedDevice({
+        id: `ble:${deviceLabel(device).toLowerCase()}`,
+        name: deviceLabel(device),
+        transport: 'ble_gatt',
+        manufacturer: device?.manufacturer,
+        model: device?.model,
+        sensorLocation: device?.sensorLocation,
+        batteryPercent: device?.batteryPercent,
+        lastMetrics: Object.keys(patch).filter((k) => k !== 'source' && k !== 'measuredAt'),
+        pairedInBrowser: true,
+      })
       setSave({ state: 'saved', atMs: latest.atMs })
     } catch {
       setSave({ state: 'failed', atMs: null })

@@ -13,6 +13,7 @@ import '../../styles/home-odyssey.css'
 import '../../styles/home-utility-polish.css'
 import '../../styles/home-mobile-stability.css'
 import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
+import type { QuickConnectState } from '../../domains/devices/adapters/quickConnectSession.ts'
 
 const LazyPapanWidget = lazy(() => import('../../components/PapanWidget').then((m) => ({ default: m.PapanWidget })))
 const LazyKisiFitur = lazy(() => import('../../components/KisiFitur').then((m) => ({ default: m.KisiFitur })))
@@ -116,7 +117,18 @@ export default function Beranda() {
   const [externalDailyState, setExternalDailyState] = useState<HomeDailyState | null>(null)
   const [logsOpen, setLogsOpen] = useState(false)
   const [exploreOpen, setExploreOpen] = useState(false)
+  const [wearableQuick, setWearableQuick] = useState<QuickConnectState | null>(null)
   const lowMemory = typeof document !== 'undefined' && document.documentElement.classList.contains('pmd-low-memory')
+
+  const handleAutoConnectWearable = async () => {
+    const mod = await import('../../domains/devices/adapters/quickConnectSession.ts')
+    await mod.triggerQuickWearableConnect((st) => {
+      setWearableQuick(st)
+      if (st.status === 'connected') {
+        setRefresh((x) => x + 1)
+      }
+    })
+  }
 
   const localDailyState = useMemo<HomeDailyState>(() => ({
     foods: state.foods ?? [],
@@ -252,11 +264,34 @@ export default function Beranda() {
             Useful actions, recorded health signals and your own widgets — dense enough to work every day, light enough to stay smooth.
           </p>
 
-          <div className="home-odyssey-actions">
-            <Link to="/latihan" className="home-primary-action">Start training <span aria-hidden>→</span></Link>
+          <div className="home-odyssey-actions" style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+            <button
+              type="button"
+              id="btn-auto-connect-wearable"
+              onClick={() => void handleAutoConnectWearable()}
+              disabled={wearableQuick?.status === 'connecting'}
+              className="home-primary-action"
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
+              title="1-Click Auto-Connect Bluetooth LE Wearable (HR, HRV, SpO2)"
+            >
+              <span aria-hidden>{wearableQuick?.status === 'connecting' ? '⌛' : wearableQuick?.status === 'connected' ? '●' : '⚡'}</span>
+              <span>
+                {wearableQuick?.status === 'connecting'
+                  ? 'Connecting…'
+                  : wearableQuick?.status === 'connected'
+                  ? `${wearableQuick.deviceName || 'Wearable'} (${wearableQuick.bpm || 0} bpm)`
+                  : '1-Click Auto-Connect Wearable'}
+              </span>
+            </button>
+            <Link to="/latihan" className="home-secondary-action">Start training <span aria-hidden>→</span></Link>
             <button type="button" onClick={() => setLogsOpen(true)} className="home-secondary-action">Quick log <span aria-hidden>＋</span></button>
             <Link to="/readiness" className="home-secondary-action">Review readiness <span aria-hidden>↗</span></Link>
           </div>
+          {wearableQuick?.message && (
+            <div style={{ marginTop: 6, fontSize: 11, fontWeight: 700, color: '#00BF63' }}>
+              {wearableQuick.status === 'connected' ? '● ' : ''}{wearableQuick.message}
+            </div>
+          )}
 
           {signals.length > 0 ? (
             <div className="home-signal-rail no-scrollbar -mx-1 mt-4 flex snap-x gap-2.5 overflow-x-auto px-1 pb-1" aria-label="Recorded health signals" aria-live="polite">

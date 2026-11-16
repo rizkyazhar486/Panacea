@@ -1,7 +1,7 @@
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
 import { Link } from 'react-router-dom'
 import { useStore } from '../../lib/store'
-import { getVitals } from '../../lib/healthVitals'
+import { readUnifiedLocalVitals } from '../../domains/identity/bootVitals'
 import { deretMetrik } from '../../lib/riwayatVitals'
 import { IconHeart, IconMoon, IconPlus, IconRun } from '../icons'
 import '../../styles/home-human-interface.css'
@@ -47,27 +47,52 @@ function ConnectionStatusGlyph({ online }: { online: boolean }) {
 }
 
 export function HomeHealthBrief() {
-  const { state } = useStore()
+  const { state, activePatient } = useStore()
   const [refresh, setRefresh] = useState(0)
   const [online, setOnline] = useState(() => typeof navigator === 'undefined' ? true : navigator.onLine)
+  const [bleNote, setBleNote] = useState<string | null>(null)
+  const [bleBusy, setBleBusy] = useState(false)
+
+  const handleQuickWearable = async () => {
+    setBleBusy(true)
+    try {
+      const mod = await import('../../domains/devices/adapters/quickConnectSession')
+      await mod.triggerQuickWearableConnect((next) => {
+        setBleNote(next.message)
+        if (next.status === 'connected') setRefresh((v) => v + 1)
+      })
+    } finally {
+      setBleBusy(false)
+    }
+  }
 
   useEffect(() => {
     const update = () => setRefresh((value) => value + 1)
     const markOnline = () => setOnline(true)
     const markOffline = () => setOnline(false)
     window.addEventListener('panacea:health-updated', update)
+    window.addEventListener('panacea:body-character-updated', update)
     window.addEventListener('focus', update)
     window.addEventListener('online', markOnline)
     window.addEventListener('offline', markOffline)
     return () => {
       window.removeEventListener('panacea:health-updated', update)
+      window.removeEventListener('panacea:body-character-updated', update)
       window.removeEventListener('focus', update)
       window.removeEventListener('online', markOnline)
       window.removeEventListener('offline', markOffline)
     }
   }, [])
 
-  const vitals = useMemo(() => getVitals(), [refresh])
+  const vitals = useMemo(
+    () =>
+      readUnifiedLocalVitals(state.account, {
+        patient: activePatient,
+        patientVitals: activePatient ? state.vitals[activePatient.id] : undefined,
+        sleepLogs: state.sleepLogs,
+      }),
+    [refresh, state.account, activePatient, state.vitals, state.sleepLogs],
+  )
   const latestSleep = useMemo(() => [...(state.sleepLogs ?? [])]
     .filter((item) => typeof item?.hours === 'number' && item.hours > 0)
     .sort((a, b) => (a.date < b.date ? 1 : -1))[0], [state.sleepLogs])
@@ -127,16 +152,43 @@ export function HomeHealthBrief() {
       <BatasKlaimKesehatan permukaan="wellness.home-brief" />
       <div className="panacea-instrument-head">
         <span className="panacea-instrument-date">{date}</span>
-        <Link
-          to="/health-data"
-          className="panacea-instrument-status"
-          data-online={online ? 'true' : 'false'}
-          aria-label={`${online ? 'Online' : 'Offline'}. Open connected health data. Current source: ${source}`}
-          title={`${online ? 'Online' : 'Offline'} · ${source}`}
-        >
-          <ConnectionStatusGlyph online={online} />
-        </Link>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <button
+            type="button"
+            onClick={() => void handleQuickWearable()}
+            disabled={bleBusy}
+            data-testid="home-auto-connect-wearable"
+            title={bleNote ?? '1-Click Auto-Connect Paired Bluetooth Wearable'}
+            style={{
+              font: 'inherit',
+              fontSize: 11,
+              fontWeight: 700,
+              padding: '5px 10px',
+              borderRadius: 999,
+              border: '1px solid rgba(0, 191, 99, 0.35)',
+              background: 'rgba(0, 191, 99, 0.12)',
+              color: '#00BF63',
+              cursor: 'pointer',
+              minHeight: 30,
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {bleBusy ? 'Connecting…' : '⚡ Auto-Connect Wearable'}
+          </button>
+          <Link
+            to="/health-data"
+            className="panacea-instrument-status"
+            data-online={online ? 'true' : 'false'}
+            aria-label={`${online ? 'Online' : 'Offline'}. Open connected health data. Current source: ${source}`}
+            title={`${online ? 'Online' : 'Offline'} · ${source}`}
+          >
+            <ConnectionStatusGlyph online={online} />
+          </Link>
+        </div>
       </div>
+      {bleNote && (
+        <div style={{ fontSize: 11, fontWeight: 600, color: '#00BF63', marginTop: 4 }}>{bleNote}</div>
+      )}
 
       <div className="panacea-instrument-rail flex-1">
         <button

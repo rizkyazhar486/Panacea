@@ -37,7 +37,7 @@ export function EmailOtpLogin({ role, name, str, email, setEmail, consentOk, onL
       const a = await api.emailOtpVerify(cleanEmail, code.trim(), name.trim() || cleanEmail.split('@')[0], role)
       onLogin({
         ...a,
-        id: a.id ?? (role === 'pasien' || role === 'dokter' ? `local:${encodeURIComponent(cleanEmail)}` : `acc-${role}-${encodeURIComponent(cleanEmail)}`),
+        id: a.id ?? `local:${encodeURIComponent(cleanEmail)}`,
         isOwner: a.email.toLowerCase() === OWNER_EMAIL,
         isSubscriber: role === 'owner',
         str: STR_ROLES.includes(role) ? str.trim() : undefined,
