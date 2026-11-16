@@ -225,7 +225,7 @@ export function BodyExposureOS() {
         </Suspense>
       </div>
 
-      <details open style={{ borderColor: 'rgba(0, 191, 99, 0.28)' }} className="relative z-[2] mt-3 overflow-hidden rounded-[28px] border bg-black/35">
+      <details style={{ borderColor: 'rgba(0, 191, 99, 0.28)' }} className="relative z-[2] mt-3 overflow-hidden rounded-[28px] border bg-black/35">
         <summary className="flex min-h-[54px] cursor-pointer list-none items-center justify-between gap-3 px-4 text-xs font-black text-white/80 transition hover:text-white">
           <span>Wearable Hub · Vitality · EMV QR Pass</span>
           <span className="text-[9px] font-bold uppercase tracking-[.14em] text-white/35">25 BLE devices &amp; dynamic pass</span>

@@ -330,7 +330,7 @@ export function BodyComposition() {
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div>
               <div className="text-xs font-bold text-ink">Quick Baseline Setup (1-Click)</div>
-              <div className="text-[11px] text-neutral-500">Fill what you know here or sync wearable — Composition Score, BMI, BMR, Muscle Mass &amp; Body Type update live.</div>
+              <div className="text-sm text-neutral-500">Enter what you know or sync a wearable.</div>
             </div>
             <div className="flex flex-wrap gap-2">
               <button type="button" onClick={() => syncNow(false)} className="min-h-[44px] rounded-full bg-brand px-3.5 py-2 text-xs font-bold text-ink active:scale-95">
