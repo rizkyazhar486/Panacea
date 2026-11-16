@@ -43,11 +43,6 @@
     },
     {
       "jenis": "email",
-      "nilai": "demo.user@panaceamed.id",
-      "alasan": "alamat peran operasional milik domain panaceamed.id (bukan pasien); sengaja ada di konfigurasi/UI (akun demo)"
-    },
-    {
-      "jenis": "email",
       "nilai": "support@panaceamed.id",
       "alasan": "alamat peran operasional milik domain panaceamed.id (bukan pasien); sengaja ada di konfigurasi/UI (kontak publik di halaman tata kelola)"
     },
@@ -70,11 +65,6 @@
       "jenis": "email",
       "nilai": "budi@rs.id",
       "alasan": "masukan sintetis untuk tes redaksi galat klien (server/uji/galatKlien.uji.ts); tes memastikan alamat ini TIDAK bocor"
-    },
-    {
-      "jenis": "email",
-      "nilai": "user@gmail.com",
-      "alasan": "placeholder bawaan formulir login saat email kosong (Login.tsx), bukan akun nyata"
     },
     {
       "jenis": "email",

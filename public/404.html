@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <title>PanaceaMed — Longitudinal Health OS</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>
+    // GitHub Pages & Static SPA HashRouter Redirect Guard
+    (function () {
+      var path = window.location.pathname;
+      var search = window.location.search || '';
+      var hash = window.location.hash || '';
+      if (path && path !== '/' && path !== '/index.html') {
+        var cleanPath = path.replace(/^\/+/, '');
+        window.location.replace('/#/' + cleanPath + search + hash);
+      } else {
+        window.location.replace('/' + search + hash);
+      }
+    })();
+  </script>
+  <style>
+    body {
+      background: #04130b;
+      color: #e2e8f0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div>
+    <h1 style="font-size: 1.25rem; font-weight: 800; color: #00bf63; margin-bottom: 0.5rem;">PanaceaMed</h1>
+    <p style="font-size: 0.875rem; color: #94a3b8;">Mengalihkan ke sistem terintegrasi…</p>
+  </div>
+</body>
+</html>

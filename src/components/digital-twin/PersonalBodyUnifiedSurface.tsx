@@ -102,7 +102,14 @@ export function PersonalBodyUnifiedSurface(props: PersonalBodyUnifiedSurfaceProp
 
   return (
     <div role="dialog" aria-modal="true" aria-label={title} className="dark fixed inset-0 z-[120] overflow-y-auto overscroll-contain bg-[#030405] pb-[env(safe-area-inset-bottom)]">
-      <PermukaanTubuh {...props} compact={false} onClose={() => window.history.back()} />
+      <PermukaanTubuh
+        {...props}
+        compact={false}
+        onClose={() => {
+          setLayarPenuh(false)
+          if (window.history.state?.pmdBody3d) window.history.back()
+        }}
+      />
     </div>
   )
 }

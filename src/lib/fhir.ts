@@ -127,6 +127,12 @@ export const UKURAN: Ukuran[] = [
   },
   { kunci: 'trigliserida', loinc: '2571-8', display: 'Triglyceride [Mass/volume] in Serum or Plasma', satuan: 'mg/dL', ucum: 'mg/dL', kategori: 'laboratory' },
   { kunci: 'hdl', loinc: '2085-9', display: 'Cholesterol in HDL [Mass/volume] in Serum or Plasma', satuan: 'mg/dL', ucum: 'mg/dL', kategori: 'laboratory' },
+  { kunci: 'spo2Pct', loinc: '59408-5', display: 'Oxygen saturation in Arterial blood by Pulse oximetry', satuan: '%', ucum: '%', kategori: 'vital-signs' },
+  { kunci: 'respRate', loinc: '9279-1', display: 'Respiratory rate', satuan: 'breaths/min', ucum: '/min', kategori: 'vital-signs' },
+  { kunci: 'bodyTempC', loinc: '8310-5', display: 'Body temperature', satuan: 'Cel', ucum: 'Cel', kategori: 'vital-signs' },
+  { kunci: 'bodyFatPct', loinc: '41982-0', display: 'Percentage of body fat Measured', satuan: '%', ucum: '%', kategori: 'vital-signs' },
+  { kunci: 'bmi', loinc: '39156-5', display: 'Body mass index (BMI)', satuan: 'kg/m2', ucum: 'kg/m2', kategori: 'vital-signs' },
+  { kunci: 'steps', loinc: '55423-8', display: 'Number of steps', satuan: '{steps}', ucum: '{steps}', kategori: 'vital-signs' },
 ]
 
 // Angka turunan. Tidak satu pun memakai LOINC, dan itu disengaja: masing-masing
@@ -152,6 +158,14 @@ export const TURUNAN: Ukuran[] = [
   {
     kunci: 'bioAge', display: 'Biological age (Panaceamed points model)', satuan: 'years', ucum: 'a',
     kategori: 'survey', catatan: 'Transparent points model whose weights are chosen by the author, not derived from research. Directional only.',
+  },
+  {
+    kunci: 'hrvMs', display: 'Heart Rate Variability RMSSD', satuan: 'ms', ucum: 'ms',
+    kategori: 'survey', catatan: 'Root mean square of successive RR interval differences (RMSSD) from wearable or ECG capture.',
+  },
+  {
+    kunci: 'sleepH', display: 'Total Sleep Duration', satuan: 'hours', ucum: 'h',
+    kategori: 'survey', catatan: 'Total nocturnal sleep duration reported by wearable or user diary.',
   },
 ]
 
