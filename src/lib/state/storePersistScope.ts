@@ -15,3 +15,18 @@ export function stripHeavyPostMedia(posts: SocialPost[]): SocialPost[] {
 export function buildPersistedSnapshot<T extends { posts: SocialPost[] }>(state: T): T {
   return { ...state, posts: stripHeavyPostMedia(state.posts) }
 }
+
+/**
+ * Sidik murah untuk teks JSON yang akan ditulis: panjang + hash 32-bit (FNV-1a). Dipakai untuk melewati
+ * penulisan localStorage yang isinya sama persis dengan penulisan terakhir, tanpa menyimpan salinan
+ * seluruh state di memori. Bukan hash kriptografis; tabrakan hanya berarti satu penulisan dilewati
+ * dan akan tertulis pada perubahan berikutnya.
+ */
+export function persistFingerprint(json: string): string {
+  let h = 0x811c9dc5
+  for (let i = 0; i < json.length; i += 1) {
+    h ^= json.charCodeAt(i)
+    h = Math.imul(h, 0x01000193) >>> 0
+  }
+  return `${json.length}:${h.toString(16)}`
+}
