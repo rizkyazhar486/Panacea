@@ -3,7 +3,6 @@ import { loadBluetoothWearablePanel, recordConnectedDevice, type WearableSavePat
 import { loadBodyExposureLocalHub } from '../../domains/body-exposure'
 import { lazy, Suspense, useEffect, useRef, useState } from 'react'
 import { Fold } from '../../shared/ui/Fold'
-import { WhenOpened } from '../../shared/ui/WhenOpened'
 import { Prosa } from '../../components/Prosa'
 import { KolomAngka } from '../../components/KolomAngka'
 import { simpanTeks } from '../../lib/unduh'
@@ -19,8 +18,7 @@ import { mergeDemoStored } from '../../lib/profile'
 import { parseHealthFile, type ImportResult } from '../../lib/healthImport'
 import { getVitals, mergeVitals } from '../../lib/healthVitals'
 import { readUnifiedLocalVitals, recoverSameUserVitalsIntoScope } from '../../domains/identity/localRecovery'
-// Export actions load on click: the clinical-operations barrel drags FHIR/interop code into the page otherwise.
-const loadInteropActions = () => import('../../domains/clinical-operations/ui/clinicalInteropActions')
+import { foldsOpenForSession } from '../../shared/ui/foldsPreference'
 import { deretMetrik } from '../../lib/riwayatVitals'
 import { parseWorkouts, parseHrNotifications } from '../../lib/workoutImport'
 import { mergeWorkouts, mergeHrNotifications } from '../../lib/workoutStore'
@@ -86,6 +84,14 @@ export function HealthProfile() {
   const [p, setP] = useState<HealthProfile>(DEF)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [syncOpened, setSyncOpened] = useState(() => {
+    if (typeof window === 'undefined') return false
+    try {
+      return foldsOpenForSession(window.location.hash, window.sessionStorage)
+    } catch {
+      return false
+    }
+  })
   const [savedAt, setSavedAt] = useState<string | null>(null)
   const [err, setErr] = useState('')
   const [note, setNote] = useState('')
@@ -356,12 +362,12 @@ export function HealthProfile() {
     }
   }
   async function exportFhir() {
-    const { downloadClinicalFhirBundle } = await loadInteropActions()
+    const { downloadClinicalFhirBundle } = await import('../../domains/clinical-operations')
     downloadClinicalFhirBundle({ vitals: mergedExportVitals(), patient: activePatient, account })
     setNote('Exported HL7 FHIR R4 SATUSEHAT bundle.')
   }
   async function exportSoapSbar() {
-    const { downloadSoapSbarReport } = await loadInteropActions()
+    const { downloadSoapSbarReport } = await import('../../domains/clinical-operations')
     downloadSoapSbarReport({ vitals: mergedExportVitals(), patient: activePatient, account })
     setNote('Exported patient health summary (SOAP/SBAR draft).')
   }
@@ -480,11 +486,21 @@ export function HealthProfile() {
       <Fold label="Sync">
       {backendEnabled && <AutoSyncCard />}
       <SyncDiagnosticsCard />
-      <WhenOpened>
+      {syncOpened ? (
         <Suspense fallback={null}>
           <BodyExposureLocalHub initialTab="emv_pass" compact />
         </Suspense>
-      </WhenOpened>
+      ) : (
+        <div className="mt-3 flex justify-center">
+          <button
+            type="button"
+            onClick={() => setSyncOpened(true)}
+            className="inline-flex min-h-[44px] items-center gap-2 rounded-xl border border-brand/30 bg-brand-50/60 px-4 py-2.5 text-xs font-bold text-brand-dark transition hover:bg-brand-50"
+          >
+            <span>⚡ Buka 25 Wearable Hub &amp; Health Pass</span>
+          </button>
+        </div>
+      )}
 
       {p.lastDeviceSyncAt && <DeviceSyncSummary profile={p} />}
       </Fold>
