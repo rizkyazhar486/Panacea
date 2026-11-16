@@ -9,13 +9,16 @@ import { getTheme, toggleTheme, type Theme } from '../../lib/theme'
 import { ageFromDob } from '../../lib/anthro'
 import type { Account, Role } from '../../lib/types'
 import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
+import { GoogleG } from './loginSvgs'
+import { listRememberedAccounts } from '../../domains/identity/bootVitals'
 import { STR_ROLES, ROLES, LOGIN_PILLS } from './loginData'
 import './login.css'
 import { Prosa } from '../../components/Prosa'
 import { EmailOtpLogin } from './components/EmailOtpLogin'
 
-// Modal legal dimuat saat dibuka agar teks pengungkapan privasi tidak membebani bundel awal.
+// Modal legal & QR/Passkey dimuat saat dibuka agar tidak membebani bundel awal.
 const LegalModal = lazy(() => import('./components/LegalModal').then((m) => ({ default: m.LegalModal })))
+const QrHealthPassModal = lazy(() => import('../../components/QrHealthPassModal').then((m) => ({ default: m.QrHealthPassModal })))
 
 /* ── Form Field Helper ────────────────────────────────────────── */
 
@@ -64,8 +67,62 @@ export function Login({ onBack }: { onBack?: () => void }) {
   const [serverNotice, setServerNotice] = useState('')
   const [consent, setConsent] = useState(false)
   const [showLegal, setShowLegal] = useState(false)
+  const [accessModal, setAccessModal] = useState<'authenticator' | 'qr' | null>(null)
   const [theme, setTheme] = useState<Theme>(getTheme)
   const [health, setHealth] = useState<Health | null>(null)
+
+  const rememberedAccounts = listRememberedAccounts({
+    profiles: state.profiles,
+    patients: state.patients,
+    ownerEmail: OWNER_EMAIL,
+  })
+
+  const hasExistingLocalVault =
+    rememberedAccounts.length > 0 ||
+    state.patients.length > 0 ||
+    Boolean(
+      typeof localStorage !== 'undefined' &&
+        (localStorage.getItem('pmd_health_profile') || localStorage.getItem('pm_bodycomp_v1')),
+    )
+
+  const completeQuickSignIn = (profile: { email: string; name?: string; role?: Role; patientId?: string }) => {
+    const cleanEmail = profile.email.trim().toLowerCase()
+    const targetRole = profile.role ?? role
+    const isOwner = cleanEmail === OWNER_EMAIL.toLowerCase()
+    setConsent(true)
+    consentRef.current = true
+    setError('')
+    finish({
+      id: `local:${encodeURIComponent(cleanEmail)}`,
+      email: cleanEmail,
+      name: profile.name?.trim() || cleanEmail.split('@')[0],
+      role: targetRole,
+      patientId: profile.patientId,
+      isOwner,
+      isSubscriber: targetRole === 'owner' || isOwner,
+      loggedAt: new Date().toISOString(),
+      str: STR_ROLES.includes(targetRole) ? f.str.trim() || undefined : undefined,
+      strStatus: STR_ROLES.includes(targetRole) ? 'pending' : 'none',
+      consentAt: new Date().toISOString(),
+    })
+  }
+
+  const handleOneClickGoogle = () => {
+    const typedEmail = f.email.trim().toLowerCase()
+    if (typedEmail && typedEmail.includes('@') && typedEmail.includes('.')) {
+      completeQuickSignIn({ email: typedEmail, name: f.name, role })
+      return
+    }
+    if (rememberedAccounts.length > 0) {
+      completeQuickSignIn(rememberedAccounts[0])
+      return
+    }
+    if (hasExistingLocalVault) {
+      completeQuickSignIn({ email: OWNER_EMAIL, name: OWNER_EMAIL.split('@')[0], role: 'owner' })
+      return
+    }
+    setError('Ketik alamat email Google Anda sekali di bawah, lalu ketuk Masuk dengan Google (tersimpan otomatis untuk 1-klik berikutnya).')
+  }
 
   const roleRef = useRef<Role>('pasien')
   const consentRef = useRef(false)
@@ -186,9 +243,7 @@ export function Login({ onBack }: { onBack?: () => void }) {
     }
     setError('')
     const displayName = f.name.trim() || email.split('@')[0]
-    const accountId = role === 'pasien' || role === 'dokter'
-      ? `local:${encodeURIComponent(email)}`
-      : `acc-${role}-${encodeURIComponent(email)}`
+    const accountId = `local:${encodeURIComponent(email)}`
     const acc: Account = {
       id: accountId,
       email, name: displayName, role,
@@ -390,10 +445,62 @@ export function Login({ onBack }: { onBack?: () => void }) {
             </div>
           )}
 
-          {/* ── Google Sign-In & Email OTP (only when configured) ────────────────────────────── */}
-          {health?.googleClientId && (
-            <div ref={gbtn} className="flex justify-center" />
-          )}
+          {/* ── 1-Click Google Sign-In, Authenticator & QR Access ────────────────────────────── */}
+          <div className="space-y-2.5">
+            {rememberedAccounts.length > 0 && (
+              <div className="space-y-1.5">
+                {rememberedAccounts.slice(0, 2).map((acc) => (
+                  <button
+                    key={acc.email}
+                    type="button"
+                    onClick={() => completeQuickSignIn(acc)}
+                    data-testid="remembered-account-btn"
+                    className="login-submit-btn flex w-full items-center justify-between rounded-2xl px-4 py-2.5 text-xs"
+                  >
+                    <span className="truncate font-bold">Lanjutkan sebagai {acc.name}</span>
+                    <span className="shrink-0 opacity-85">1-Tap →</span>
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {health?.googleClientId ? (
+              <div ref={gbtn} className="flex justify-center" />
+            ) : (
+              <button
+                type="button"
+                onClick={handleOneClickGoogle}
+                data-testid="google-signin-btn"
+                className="flex min-h-[44px] w-full items-center justify-center gap-2.5 rounded-full border border-neutral-200 bg-white px-4 py-2.5 text-xs font-bold text-neutral-800 shadow-xs dark:border-white/15 dark:bg-neutral-900 dark:text-white"
+              >
+                <GoogleG />
+                <span>Lanjutkan dengan Google</span>
+              </button>
+            )}
+
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => setAccessModal('authenticator')}
+                data-testid="open-passkey-modal-btn"
+                className="flex min-h-[42px] items-center justify-center gap-1.5 rounded-xl border border-neutral-200 bg-neutral-50 px-3 py-2 text-xs font-bold text-neutral-700 dark:border-white/10 dark:bg-neutral-900 dark:text-neutral-200"
+                title="Authenticator / Passkey (TouchID / FaceID / 6-Digit)"
+              >
+                <span>🔐</span>
+                <span>Authenticator / Passkey</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setAccessModal('qr')}
+                data-testid="open-qr-modal-btn"
+                className="flex min-h-[42px] items-center justify-center gap-1.5 rounded-xl border border-neutral-200 bg-neutral-50 px-3 py-2 text-xs font-bold text-neutral-700 dark:border-white/10 dark:bg-neutral-900 dark:text-neutral-200"
+                title="Scan EMV QR / Code-128 Barcode Health Pass"
+              >
+                <span>📱</span>
+                <span>QR &amp; Barcode</span>
+              </button>
+            </div>
+          </div>
 
           {health?.features.otpEmail && (
             <EmailOtpLogin
@@ -407,13 +514,11 @@ export function Login({ onBack }: { onBack?: () => void }) {
             />
           )}
 
-          {(health?.googleClientId || health?.features.otpEmail) && (
-            <div className="flex items-center gap-3 text-[11px] font-semibold text-neutral-400 dark:text-neutral-500">
-              <span className="h-px flex-1 bg-neutral-200 dark:bg-neutral-800" />
-              <span>atau {authMode === 'masuk' ? 'masuk dengan email' : 'daftar dengan email'}</span>
-              <span className="h-px flex-1 bg-neutral-200 dark:bg-neutral-800" />
-            </div>
-          )}
+          <div className="flex items-center gap-3 text-[11px] font-semibold text-neutral-400 dark:text-neutral-500">
+            <span className="h-px flex-1 bg-neutral-200 dark:bg-neutral-800" />
+            <span>atau {authMode === 'masuk' ? 'masuk dengan email' : 'daftar dengan email'}</span>
+            <span className="h-px flex-1 bg-neutral-200 dark:bg-neutral-800" />
+          </div>
 
           {/* ── Core Essential Inputs Only ────────────────────────── */}
           <div className="space-y-3">
@@ -622,6 +727,16 @@ export function Login({ onBack }: { onBack?: () => void }) {
         </div>
 
         {showLegal && <Suspense fallback={null}><LegalModal onClose={() => setShowLegal(false)} /></Suspense>}
+        {accessModal && (
+          <Suspense fallback={null}>
+            <QrHealthPassModal
+              open
+              initialTab={accessModal}
+              onClose={() => setAccessModal(null)}
+              onAuthenticate={completeQuickSignIn}
+            />
+          </Suspense>
+        )}
       </div>
     </div>
   )

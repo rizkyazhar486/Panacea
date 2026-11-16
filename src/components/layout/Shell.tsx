@@ -4,7 +4,7 @@ import { PencarianGlobal } from '../PencarianGlobal'
 import { useGestur } from '../../lib/useGestur'
 import { pasangKilau } from '../../lib/kilau'
 import { buatAlurKembali } from '../../lib/alurHalaman'
-import { useState, useEffect, useLayoutEffect, useCallback, useRef, type ReactNode } from 'react'
+import { useState, useEffect, useLayoutEffect, useCallback, useRef, lazy, Suspense, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import { LogoMark } from '../Logo'
 import { FabNavigasi } from '../FabNavigasi'
@@ -47,8 +47,8 @@ import { useStore } from '../../lib/store'
 import { getTheme, toggleTheme, type Theme } from '../../lib/theme'
 import { ageFromDob } from '../../lib/anthro'
 import { Badge } from '../ui'
-import { Login } from '../../pages/Login'
-import { Landing } from '../../pages/Landing'
+const Landing = lazy(() => import('../../pages/Landing').then((m) => ({ default: m.Landing })))
+const Login = lazy(() => import('../../pages/Login').then((m) => ({ default: m.Login })))
 import { ContactService } from '../ContactService'
 import { NotificationBell } from '../NotificationBell'
 import { InstallBanner } from '../InstallApp'
@@ -68,10 +68,18 @@ import { judulRute } from '../../lib/judulRute'
 import '../../styles/command-bar.css'
 import '../../styles/superpage-convergence.css'
 
+const QrHealthPassModal = lazy(() =>
+  import('../QrHealthPassModal').then((m) => ({ default: m.QrHealthPassModal })),
+)
+
 // Public entry: marketing landing first, then the login screen on demand.
 function PublicEntry() {
   const [showLogin, setShowLogin] = useState(false)
-  return showLogin ? <Login onBack={() => setShowLogin(false)} /> : <Landing onMasuk={() => setShowLogin(true)} />
+  return (
+    <Suspense fallback={null}>
+      {showLogin ? <Login onBack={() => setShowLogin(false)} /> : <Landing onMasuk={() => setShowLogin(true)} />}
+    </Suspense>
+  )
 }
 
 type Nav = { to: string; label: string; icon: typeof IconDashboard; roles: Role[]; end?: boolean; group?: string }
@@ -308,6 +316,7 @@ export function Shell({ children }: { children: ReactNode }) {
   const [theme, setTheme] = useState<Theme>(getTheme)
   const [spacesOpen, setSpacesOpen] = useState(false)
   const [userMenuBuka, setUserMenuBuka] = useState(false)
+  const [qrModalOpen, setQrModalOpen] = useState<'qr' | 'authenticator' | 'recovery' | null>(null)
   const userBtnRef = useRef<HTMLButtonElement>(null)
   const userMenuPanelRef = useRef<HTMLDivElement>(null)
   const [userMenuPos, setUserMenuPos] = useState({ top: 64, right: 16 })
@@ -694,6 +703,21 @@ export function Shell({ children }: { children: ReactNode }) {
                 tersisa di sini hanya yang benar-benar dipakai setiap hari. */}
             <NotificationBell />
             <button
+              type="button"
+              onClick={() => setQrModalOpen('qr')}
+              className="grid h-9 w-9 place-items-center rounded-full border border-black/10 bg-white text-neutral-600 transition-colors hover:text-brand-dark dark:border-white/15 dark:bg-neutral-900 dark:text-neutral-200"
+              title="QR Health Pass, Code-128 Barcode, Passkey & Data Vault"
+              aria-label="Open QR Health Pass and Authenticator"
+              data-testid="header-qr-pass-btn"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.1" aria-hidden="true">
+                <rect x="3" y="3" width="7" height="7" rx="1.5" />
+                <rect x="14" y="3" width="7" height="7" rx="1.5" />
+                <rect x="3" y="14" width="7" height="7" rx="1.5" />
+                <path d="M14 14h3v3h-3zM19 14v7M14 19h5" strokeLinecap="round" />
+              </svg>
+            </button>
+            <button
               onClick={() => setTheme(toggleTheme())}
               className="hidden h-10 w-10 place-items-center rounded-full border border-black/5 bg-white text-neutral-500 transition-colors hover:bg-neutral-50 hover:text-brand-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/30 sm:grid"
               title={theme === 'dark' ? 'Light mode' : 'Dark mode'}
@@ -840,6 +864,17 @@ export function Shell({ children }: { children: ReactNode }) {
                       <IconSettings size={16} className="text-emerald-600 dark:text-emerald-400" />
                       <span>Pengaturan Akun</span>
                     </NavLink>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setUserMenuBuka(false)
+                        setQrModalOpen('qr')
+                      }}
+                      className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left text-xs font-semibold text-neutral-700 transition hover:bg-neutral-100 dark:text-neutral-200 dark:hover:bg-neutral-800"
+                    >
+                      <span className="text-sm">📱</span>
+                      <span>QR Pass, Passkey &amp; Recovery</span>
+                    </button>
                   </div>
 
                   {/* Switch Role / Ganti Peran */}
@@ -1019,6 +1054,11 @@ export function Shell({ children }: { children: ReactNode }) {
       {onHome && ['pasien', 'dokter', 'owner'].includes(account.role) && <><OnboardingTour /><AssessmentPrompt /></>}
 
       <ContactService buka={bantuanBuka} onTutup={() => setBantuanBuka(false)} />
+      {qrModalOpen && (
+        <Suspense fallback={null}>
+          <QrHealthPassModal open initialTab={qrModalOpen} onClose={() => setQrModalOpen(null)} />
+        </Suspense>
+      )}
     </div>
   )
 }

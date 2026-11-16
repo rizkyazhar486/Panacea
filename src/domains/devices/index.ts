@@ -29,10 +29,24 @@ export { tracePoints } from './engine/traceGeometry.ts'
 export type { TracePoint } from './engine/traceGeometry.ts'
 
 // ── ADAPTERS ──
-export { bluetoothAvailability, connectHeartRateWearable } from './adapters/webBluetooth.ts'
+export { bluetoothAvailability, connectHeartRateWearable, autoConnectWearable } from './adapters/webBluetooth.ts'
 export type {
   BluetoothAvailability, BluetoothLike, ConnectedWearable, ConnectOutcome, ConnectRefusal, WearableHandlers,
 } from './adapters/webBluetooth.ts'
+
+export {
+  triggerQuickWearableConnect,
+  disconnectQuickWearable,
+  type QuickConnectState,
+} from './adapters/quickConnectSession.ts'
+export {
+  listSavedDevices,
+  recordConnectedDevice,
+  forgetSavedDevice,
+  discoverConnectedDevices,
+  type ConnectedDeviceRecord,
+  type DeviceTransportKind,
+} from './adapters/deviceRegistry.ts'
 
 // ── UI (loaded on demand: the panel is React and only the health-data page shows it) ──
 export const loadBluetoothWearablePanel = () =>

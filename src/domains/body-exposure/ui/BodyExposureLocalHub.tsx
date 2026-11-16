@@ -20,10 +20,18 @@ import {
   type EmvPassMode,
   type WearableCategory,
 } from '../engine/localHubEngine'
-import { loadBluetoothWearablePanel, type WearableSavePatch } from '../../devices/index.ts'
+import {
+  discoverConnectedDevices,
+  loadBluetoothWearablePanel,
+  triggerQuickWearableConnect,
+  type ConnectedDeviceRecord,
+  type QuickConnectState,
+  type WearableSavePatch,
+} from '../../devices/index.ts'
+import { readUnifiedLocalVitals, recoverSameUserVitalsIntoScope } from '../../identity/index.ts'
 import { useOptionalStore } from '../../../lib/store'
 import { useOptionalLongitudinalState } from '../../../lib/useLongitudinalState'
-import { getVitals, mergeVitals, type Vitals } from '../../../lib/healthVitals'
+import { mergeVitals, type Vitals } from '../../../lib/healthVitals'
 import { deretMetrik } from '../../../lib/riwayatVitals'
 import { downloadClinicalFhirBundle, printClinicalReport } from '../../clinical-operations'
 
@@ -94,7 +102,16 @@ export function BodyExposureLocalHub({
   const [emvMode, setEmvMode] = useState<EmvPassMode>('universal')
   const [epochMs, setEpochMs] = useState<number>(() => Date.now())
   const [subtleHex, setSubtleHex] = useState<string | null>(null)
-  const [vitals, setVitals] = useState<Vitals>(() => getVitals(account))
+  const [vitals, setVitals] = useState<Vitals>(() =>
+    readUnifiedLocalVitals(account, {
+      patient,
+      patientVitals: patient ? store?.state.vitals[patient.id] : undefined,
+      sleepLogs: store?.state.sleepLogs,
+    }),
+  )
+  const [bleQuick, setBleQuick] = useState<QuickConnectState | null>(null)
+  const [connectedDevices, setConnectedDevices] = useState<ConnectedDeviceRecord[]>([])
+  const [recoveryNotice, setRecoveryNotice] = useState('')
   const [activeCardIdx, setActiveCardIdx] = useState(0)
   const scrollerRef = useRef<HTMLDivElement | null>(null)
 
@@ -156,17 +173,35 @@ export function BodyExposureLocalHub({
   }
 
   useEffect(() => {
-    const refresh = () => setVitals(getVitals(account))
+    const refresh = () =>
+      setVitals(
+        readUnifiedLocalVitals(account, {
+          patient,
+          patientVitals: patient ? store?.state.vitals[patient.id] : undefined,
+          sleepLogs: store?.state.sleepLogs,
+        }),
+      )
     refresh()
+    const refreshDevices = () => {
+      void discoverConnectedDevices({
+        ownerEmail: account?.email,
+        vitalsSource: typeof vitals.source === 'string' ? vitals.source : undefined,
+      }).then(setConnectedDevices)
+    }
+    refreshDevices()
+    window.addEventListener('panacea:devices-updated', refreshDevices)
     window.addEventListener('panacea:health-updated', refresh)
+    window.addEventListener('panacea:health-updated', refreshDevices)
     window.addEventListener('panacea:body-character-updated', refresh)
     window.addEventListener('storage', refresh)
     return () => {
+      window.removeEventListener('panacea:devices-updated', refreshDevices)
       window.removeEventListener('panacea:health-updated', refresh)
+      window.removeEventListener('panacea:health-updated', refreshDevices)
       window.removeEventListener('panacea:body-character-updated', refresh)
       window.removeEventListener('storage', refresh)
     }
-  }, [account])
+  }, [account, patient, store?.state.vitals, store?.state.sleepLogs, vitals.source])
 
   useEffect(() => {
     const timer = window.setInterval(() => setEpochMs(Date.now()), 1000)
@@ -303,7 +338,27 @@ export function BodyExposureLocalHub({
             })}
           </div>
 
-          <div style={{ display: 'flex', gap: 6 }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+            <button
+              type="button"
+              onClick={() => void triggerQuickWearableConnect(setBleQuick)}
+              disabled={bleQuick?.status === 'connecting'}
+              data-testid="hub-auto-connect-wearable"
+              style={{
+                ...primaryButton,
+                minHeight: TOUCH,
+                padding: '0 12px',
+                borderRadius: 10,
+                fontSize: 11,
+                fontWeight: 800,
+              }}
+            >
+              {bleQuick?.status === 'connecting'
+                ? '⌛ Connecting BLE…'
+                : bleQuick?.status === 'connected'
+                ? `● ${bleQuick.bpm ? `${bleQuick.bpm} bpm Live` : 'Wearable Connected'}`
+                : '⚡ 1-Click Auto-Connect Wearable'}
+            </button>
             <button
               type="button"
               onClick={handleExportFhir}
@@ -339,6 +394,11 @@ export function BodyExposureLocalHub({
               🖨️ Cetak PDF
             </button>
           </div>
+          {bleQuick && (
+            <div style={{ width: '100%', fontSize: 11, fontWeight: 700, color: bleQuick.status === 'connected' ? TONE.liveText : TONE.dim }}>
+              {bleQuick.message}
+            </div>
+          )}
         </div>
       </div>
 
@@ -438,6 +498,63 @@ export function BodyExposureLocalHub({
 
       {tab === 'wearables' && (
         <div style={{ marginTop: 14, display: 'flex', flexDirection: 'column', gap: 14 }}>
+          <div style={{ ...glass, padding: 14 }} data-testid="connected-devices-vault">
+            <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
+              <div>
+                <div style={{ ...eyebrow, color: TONE.liveText }}>What Has Connected &amp; Recovered Devices ({connectedDevices.length})</div>
+                <div style={{ marginTop: 3, fontSize: 12, color: TONE.dim }}>
+                  Paired Bluetooth straps, smartwatches, and synced device exports remembered for this account.
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  const res = recoverSameUserVitalsIntoScope(account, {
+                    patient,
+                    patientVitals: patient ? store?.state.vitals[patient.id] : undefined,
+                    sleepLogs: store?.state.sleepLogs,
+                  })
+                  setVitals(
+                    readUnifiedLocalVitals(account, {
+                      patient,
+                      patientVitals: patient ? store?.state.vitals[patient.id] : undefined,
+                      sleepLogs: store?.state.sleepLogs,
+                    }),
+                  )
+                  setRecoveryNotice(
+                    `Recovered ${res.mergedFieldsCount} metric(s), ${res.historyDaysRecovered} history day(s), ${res.workoutsRecovered} workout(s), ${res.devicesDiscovered} device(s).`,
+                  )
+                }}
+                style={{ ...subtleButton, minHeight: TOUCH, fontSize: 11, fontWeight: 700, borderColor: TONE.lineStrong, color: TONE.liveText }}
+              >
+                ♻️ Recover Device Data &amp; Logs
+              </button>
+            </div>
+            {recoveryNotice && (
+              <div style={{ marginTop: 8, fontSize: 11, fontWeight: 700, color: TONE.liveText }}>{recoveryNotice}</div>
+            )}
+            {connectedDevices.length > 0 ? (
+              <div style={{ marginTop: 10, display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 8 }}>
+                {connectedDevices.map((dev) => (
+                  <div key={dev.id} style={{ borderRadius: 12, border: `1px solid ${TONE.live}`, background: 'rgba(0, 191, 99, 0.08)', padding: '9px 11px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', gap: 6, fontSize: 10, fontWeight: 800, color: TONE.liveText }}>
+                      <span>{dev.transport.toUpperCase()}</span>
+                      <span>{dev.batteryPercent != null ? `🔋 ${dev.batteryPercent}%` : dev.pairedInBrowser ? 'PAIRED' : 'SYNCED'}</span>
+                    </div>
+                    <div style={{ marginTop: 3, fontSize: 13, fontWeight: 800, color: TONE.text }}>{dev.name}</div>
+                    <div style={{ marginTop: 2, fontSize: 11, color: TONE.dim }}>
+                      Last sync: {dev.lastConnectedAt.slice(0, 16).replace('T', ' ')}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div style={{ marginTop: 8, fontSize: 12, color: TONE.faint }}>
+                No paired wearable or sync device recorded yet. Tap &quot;1-Click Auto-Connect Wearable&quot; or connect below.
+              </div>
+            )}
+          </div>
+
           <div style={{ ...glass, padding: 14 }}>
             <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
               <div>

@@ -20,7 +20,8 @@ import {
   printClinicalReport,
   serializeClinicalFhirBundle,
 } from '../../domains/clinical-operations'
-import { getVitals } from '../../lib/healthVitals'
+import { readUnifiedLocalVitals } from '../../domains/identity/localRecovery'
+import { readRecoveryLedger } from '../../domains/personal-health/adapters/recoveryLedgerStorage'
 
 export const GROUPS = [
   {
@@ -102,7 +103,11 @@ export function ClinicalHub() {
 
   const vitals = useMemo(() => {
     void rev
-    const current = getVitals(account)
+    const current = readUnifiedLocalVitals(account, {
+      patient: activePatient,
+      patientVitals: activePatient?.id ? state.vitals[activePatient.id] : undefined,
+      sleepLogs: state.sleepLogs,
+    })
     return {
       ...current,
       weightKg: Number(weight) > 0 ? Number(weight) : current.weightKg,
@@ -110,13 +115,23 @@ export function ClinicalHub() {
       systolic: Number(sbp) > 0 ? Number(sbp) : current.systolic,
       diastolic: Number(dbp) > 0 ? Number(dbp) : current.diastolic,
     }
-  }, [account, weight, height, sbp, dbp, rev])
+  }, [account, activePatient, state.vitals, state.sleepLogs, weight, height, sbp, dbp, rev])
 
   const emrCount = activePatient?.id && state.records[activePatient.id] ? 1 : 0
-  const { soapText, sbarText } = useMemo(
-    () => generateSoapSbarSummary({ patient: activePatient, vitals, account, emrCount }),
-    [activePatient, vitals, account, emrCount],
-  )
+  const recoveryLedger = useMemo(() => {
+    void rev
+    return readRecoveryLedger()
+  }, [rev])
+  const { soapText, sbarText } = useMemo(() => {
+    const base = generateSoapSbarSummary({ patient: activePatient, vitals, account, emrCount })
+    if (!recoveryLedger.length) return base
+    const latest = recoveryLedger[0]
+    const recoveryNote = `\nHolistic Recovery Ledger (${recoveryLedger.length} unreviewed draft session(s)): Latest ${latest.modalityName} · ${latest.doseLabel} (${latest.emvReceiptToken}).`
+    return {
+      soapText: `${base.soapText}${recoveryNote}`,
+      sbarText: `${base.sbarText}${recoveryNote}`,
+    }
+  }, [activePatient, vitals, account, emrCount, recoveryLedger])
   const fhirBundle = useMemo(
     () => buildClinicalFhirBundle({ vitals, patient: activePatient, account, now: new Date() }),
     [vitals, activePatient, account],

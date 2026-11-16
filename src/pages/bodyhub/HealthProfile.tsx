@@ -1,5 +1,5 @@
 import { capturePersonalHealthOperation, readPersonalHealthFile, readPersonalHealthImage } from '../../domains/personal-health'
-import { loadBluetoothWearablePanel, type WearableSavePatch } from '../../domains/devices'
+import { loadBluetoothWearablePanel, recordConnectedDevice, type WearableSavePatch } from '../../domains/devices'
 import { loadBodyExposureLocalHub } from '../../domains/body-exposure'
 import { lazy, Suspense, useEffect, useRef, useState } from 'react'
 import { Fold } from '../../shared/ui/Fold'
@@ -17,6 +17,7 @@ import { useStore } from '../../lib/store'
 import { mergeDemoStored } from '../../lib/profile'
 import { parseHealthFile, type ImportResult } from '../../lib/healthImport'
 import { getVitals, mergeVitals } from '../../lib/healthVitals'
+import { readUnifiedLocalVitals, recoverSameUserVitalsIntoScope } from '../../domains/identity/localRecovery'
 import { downloadClinicalFhirBundle, downloadSoapSbarReport } from '../../domains/clinical-operations'
 import { deretMetrik } from '../../lib/riwayatVitals'
 import { parseWorkouts, parseHrNotifications } from '../../lib/workoutImport'
@@ -103,26 +104,63 @@ export function HealthProfile() {
     async function load(initial: boolean) {
       let data: Partial<HealthProfile> = {}
       if (initial) { try { data = JSON.parse(localStorage.getItem(LKEY) || '{}') } catch { /* ignore */ } }
-      if (backendEnabled) {
-        try { const remote = await api.getHealthProfile(); if (remote && Object.keys(remote).length) data = { ...data, ...(remote as Partial<HealthProfile>) } } catch { /* offline */ }
-      }
-      if (!alive) return
-      // Anything the server holds — including readings pushed straight from the
-      // phone by the Health Auto Export webhook — is republished to the shared
-      // vitals store, so a webhook sync reaches the rest of the app too and not
-      // just this form.
-      mergeVitals({
-        weightKg: data.weightKg, heightCm: data.heightCm, bodyFatPct: data.bodyFatPct,
-        vo2max: data.vo2max, restingHr: data.restingHr, hrvMs: data.hrvMs,
-        recoveryPct: data.recoveryPct, strain: data.strain, sleepH: data.sleepH,
-        steps: data.steps, activeKcal: data.activeKcal,
-        source: data.deviceSyncSource ?? data.source, measuredAt: data.lastDeviceSyncAt,
+      const unified = readUnifiedLocalVitals(account, { patient: activePatient })
+      const buildHydrated = (src: Partial<HealthProfile>) => ({
+        weightKg: typeof src.weightKg === 'number' && src.weightKg > 0 ? src.weightKg : unified.weightKg,
+        heightCm: typeof src.heightCm === 'number' && src.heightCm > 0 ? src.heightCm : unified.heightCm,
+        bodyFatPct: typeof src.bodyFatPct === 'number' && src.bodyFatPct > 0 ? src.bodyFatPct : unified.bodyFatPct,
+        muscleMassKg: typeof src.muscleMassKg === 'number' && src.muscleMassKg > 0 ? src.muscleMassKg : unified.skeletalMuscleKg,
+        vo2max: typeof src.vo2max === 'number' && src.vo2max > 0 ? src.vo2max : unified.vo2max,
+        restingHr: typeof src.restingHr === 'number' && src.restingHr > 0 ? src.restingHr : unified.restingHr,
+        hrvMs: typeof src.hrvMs === 'number' && src.hrvMs > 0 ? src.hrvMs : unified.hrvMs,
+        sleepH: typeof src.sleepH === 'number' && src.sleepH > 0 ? src.sleepH : unified.sleepH,
+        steps: typeof src.steps === 'number' && src.steps > 0 ? src.steps : unified.steps,
       })
-      if (initial) { setP({ ...DEF, ...data }); setSavedAt((data as HealthProfile).updatedAt ?? null); setLoading(false) }
-      else if (Object.keys(data).length) {
-        // Merge server-authoritative device fields over the current form without
-        // clobbering unsaved edits to unrelated fields.
-        setP((cur) => ({ ...cur, ...data }))
+
+      if (initial) {
+        const hydrated = buildHydrated(data)
+        mergeVitals({
+          weightKg: hydrated.weightKg ?? data.weightKg, heightCm: hydrated.heightCm ?? data.heightCm, bodyFatPct: hydrated.bodyFatPct ?? data.bodyFatPct,
+          vo2max: hydrated.vo2max ?? data.vo2max, restingHr: hydrated.restingHr ?? data.restingHr, hrvMs: hydrated.hrvMs ?? data.hrvMs,
+          recoveryPct: data.recoveryPct, strain: data.strain, sleepH: hydrated.sleepH ?? data.sleepH,
+          steps: hydrated.steps ?? data.steps, activeKcal: data.activeKcal,
+          source: data.deviceSyncSource ?? data.source, measuredAt: data.lastDeviceSyncAt,
+        })
+        setP({
+          ...DEF,
+          ...data,
+          ...(hydrated.weightKg ? { weightKg: hydrated.weightKg } : {}),
+          ...(hydrated.heightCm ? { heightCm: hydrated.heightCm } : {}),
+          ...(hydrated.bodyFatPct ? { bodyFatPct: hydrated.bodyFatPct } : {}),
+          ...(hydrated.muscleMassKg ? { muscleMassKg: hydrated.muscleMassKg } : {}),
+          ...(hydrated.vo2max ? { vo2max: hydrated.vo2max } : {}),
+          ...(hydrated.restingHr ? { restingHr: hydrated.restingHr } : {}),
+          ...(hydrated.hrvMs ? { hrvMs: hydrated.hrvMs } : {}),
+          ...(hydrated.sleepH ? { sleepH: hydrated.sleepH } : {}),
+          ...(hydrated.steps ? { steps: hydrated.steps } : {}),
+        })
+        setSavedAt((data as HealthProfile).updatedAt ?? null)
+        setLoading(false)
+      }
+
+      if (backendEnabled) {
+        try {
+          const remote = await api.getHealthProfile()
+          if (!alive || !remote || !Object.keys(remote).length) return
+          const remoteData = remote as Partial<HealthProfile>
+          const merged = { ...data, ...remoteData }
+          mergeVitals({
+            weightKg: merged.weightKg, heightCm: merged.heightCm, bodyFatPct: merged.bodyFatPct,
+            vo2max: merged.vo2max, restingHr: merged.restingHr, hrvMs: merged.hrvMs,
+            recoveryPct: merged.recoveryPct, strain: merged.strain, sleepH: merged.sleepH,
+            steps: merged.steps, activeKcal: merged.activeKcal,
+            source: merged.deviceSyncSource ?? merged.source, measuredAt: merged.lastDeviceSyncAt,
+          })
+          setP((cur) => {
+            const next = { ...cur, ...remoteData }
+            return JSON.stringify(next) === JSON.stringify(cur) ? cur : next
+          })
+        } catch { /* offline */ }
       }
     }
     load(true)
@@ -179,6 +217,14 @@ export function HealthProfile() {
       activeKcal: p.activeKcal || undefined,
     })
     try { window.dispatchEvent(new Event('panacea:body-character-updated')) } catch { /* SSR/test */ }
+    if (p.source && p.source !== 'Manual') {
+      recordConnectedDevice({
+        id: `src:${p.source.toLowerCase()}`,
+        name: p.source,
+        transport: 'health_sync',
+        ownerEmail: account?.email,
+      })
+    }
     if (backendEnabled) {
       try { await api.saveHealthProfile(payload as unknown as Record<string, unknown>) }
       catch { setErr('Saved on this device, but syncing to the server failed (offline). It will be kept locally automatically.') }
@@ -350,7 +396,33 @@ export function HealthProfile() {
             ))}
           </div>
         </div>
-        {account && <div className="mt-2 text-[10px] text-neutral-500">Account: {account.email}</div>}
+        <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
+          {account && <div className="text-[10px] text-neutral-500">Account: {account.email}</div>}
+          <Button
+            variant="ghost"
+            onClick={() => {
+              const res = recoverSameUserVitalsIntoScope(account, { patient: activePatient })
+              const latest = readUnifiedLocalVitals(account, { patient: activePatient })
+              setP((cur) => ({
+                ...cur,
+                ...(latest.weightKg ? { weightKg: latest.weightKg } : {}),
+                ...(latest.heightCm ? { heightCm: latest.heightCm } : {}),
+                ...(latest.bodyFatPct ? { bodyFatPct: latest.bodyFatPct } : {}),
+                ...(latest.skeletalMuscleKg ? { muscleMassKg: latest.skeletalMuscleKg } : {}),
+                ...(latest.vo2max ? { vo2max: latest.vo2max } : {}),
+                ...(latest.restingHr ? { restingHr: latest.restingHr } : {}),
+                ...(latest.hrvMs ? { hrvMs: latest.hrvMs } : {}),
+                ...(latest.sleepH ? { sleepH: latest.sleepH } : {}),
+                ...(latest.steps ? { steps: latest.steps } : {}),
+              }))
+              setNote(
+                `Recovery complete: ${res.mergedFieldsCount} vitals, ${res.historyDaysRecovered} history day(s), ${res.labsRecovered} lab(s), ${res.workoutsRecovered} workout(s), ${res.devicesDiscovered} connected device(s).`,
+              )
+            }}
+          >
+            ♻️ Recover &amp; Sync Local Logs
+          </Button>
+        </div>
       </Card>
 
       <Card className="!p-5">

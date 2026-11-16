@@ -7,9 +7,47 @@ import { buildMarker } from './scripts/vite/buildMarker.mjs'
 export default defineConfig({
   server: {
     allowedHosts: true,
+    proxy: {
+      '/api/v': {
+        target: 'http://127.0.0.1:4040',
+        changeOrigin: true,
+      },
+      '/body-exposure-cockpit': {
+        target: 'http://127.0.0.1:4040',
+        changeOrigin: true,
+        rewrite: () => '/body-exposure',
+      },
+      '/api': {
+        target: 'http://127.0.0.1:8787',
+        changeOrigin: true,
+      },
+      '/ws': {
+        target: 'ws://127.0.0.1:8787',
+        ws: true,
+      },
+    },
   },
   preview: {
     allowedHosts: true,
+    proxy: {
+      '/api/v': {
+        target: 'http://127.0.0.1:4040',
+        changeOrigin: true,
+      },
+      '/body-exposure-cockpit': {
+        target: 'http://127.0.0.1:4040',
+        changeOrigin: true,
+        rewrite: () => '/body-exposure',
+      },
+      '/api': {
+        target: 'http://127.0.0.1:8787',
+        changeOrigin: true,
+      },
+      '/ws': {
+        target: 'ws://127.0.0.1:8787',
+        ws: true,
+      },
+    },
   },
   // Relative base so the build works under any path (e.g. GitHub Pages subfolder).
   base: './',
