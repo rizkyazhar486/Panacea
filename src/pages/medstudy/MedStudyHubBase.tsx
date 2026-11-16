@@ -10,10 +10,11 @@ import { EXAM_INFO, EXAM_ORDER, questionsForExam, type ExamTrack } from '../../l
 import '../../styles/panacea2026.css'
 import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 
-type Section = 'golden-journey' | 'prometheus' | 'evidence' | 'practice' | 'osce' | 'case-bank' | 'station-sim' | 'skills' | 'procedures' | 'therapy' | 'diseases' | 'mnemonik' | 'techniques' | 'timeline' | 'usmle'
+type Section = 'golden-journey' | 'cad-cae-3d' | 'prometheus' | 'evidence' | 'practice' | 'osce' | 'case-bank' | 'station-sim' | 'skills' | 'procedures' | 'therapy' | 'diseases' | 'mnemonik' | 'techniques' | 'timeline' | 'usmle'
 
 const SECTIONS: { id: Section; label: string; emoji: string }[] = [
   { id: 'golden-journey', label: 'Golden Journey', emoji: '🌟' },
+  { id: 'cad-cae-3d', label: '3D CAD/CAE Studio', emoji: '🩻' },
   { id: 'prometheus', label: 'Prometheus Arena', emoji: '⚔️' },
   { id: 'evidence', label: 'Live Evidence', emoji: '🔎' },
   { id: 'practice', label: 'Questions', emoji: '❓' },
@@ -31,6 +32,7 @@ const SECTIONS: { id: Section; label: string; emoji: string }[] = [
 ]
 
 const GoldenJourneyWorkbench = lazy(() => import('../../domains/medstudyhub/ui/GoldenJourneyWorkbench.tsx').then((m) => ({ default: m.GoldenJourneyWorkbench })))
+const MedSciBodyCaeStudio3D = lazy(() => import('../../components/bodyhub/MedSciBodyCaeStudio3D.tsx').then((m) => ({ default: m.MedSciBodyCaeStudio3D })))
 const PrometheusArenaView = lazy(() => import('../../domains/prometheus-learning/ui/PrometheusArenaView.tsx').then((m) => ({ default: m.PrometheusArenaView })))
 const SkdiSkillsSection = lazy(() => import('./SkdiSkillsSection'))
 const SkdiTherapySection = lazy(() => import('./SkdiTherapySection'))
@@ -78,7 +80,7 @@ export function MedStudyHub() {
       <section className="liquid-panel p-3 sm:p-4">
         <div className="mb-3 flex items-center justify-between gap-3"><div className="panacea-kicker !text-neutral-500 dark:!text-white/50">Medical workspace</div><div className="text-[10px] text-neutral-400">Live sources + local structured learning</div></div>
         <div className="flex gap-1.5 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          {SECTIONS.map((item) => <button key={item.id} onClick={() => setSection(item.id)} className={`shrink-0 rounded-full border px-3 py-2 text-[11px] font-black transition ${section === item.id ? 'border-neutral-950 bg-neutral-950 text-white dark:border-white dark:bg-white dark:text-neutral-950' : 'border-black/[.05] bg-white/55 text-neutral-500 dark:border-white/10 dark:bg-white/[.035] dark:text-white/50'}`}>{item.emoji} {item.label}</button>)}
+          {SECTIONS.map((item) => <button key={item.id} onClick={() => setSection(item.id)} className={`min-h-11 shrink-0 rounded-full border px-3 py-2 text-[11px] font-black transition ${section === item.id ? 'border-neutral-950 bg-neutral-950 text-white dark:border-white dark:bg-white dark:text-neutral-950' : 'border-black/[.05] bg-white/55 text-neutral-600 dark:border-white/10 dark:bg-white/[.035] dark:text-white/75'}`}>{item.emoji} {item.label}</button>)}
         </div>
       </section>
 
@@ -97,6 +99,7 @@ export function MedStudyHub() {
 
       <Suspense fallback={<SectionFallback />}>
         {section === 'golden-journey' && <GoldenJourneyWorkbench />}
+        {section === 'cad-cae-3d' && <MedSciBodyCaeStudio3D />}
         {section === 'prometheus' && <PrometheusArenaView />}
         {section === 'case-bank' && <OsceCaseBankSection />}
         {section === 'station-sim' && <StationSimulatorSection />}
