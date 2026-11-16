@@ -79,7 +79,8 @@ const TABS: TabDef[] = [
     ringkas: 'SpO₂, ECG recordings, jet lag, pregnancy, wheelchair physiology' },
 ]
 
-export function PusatTubuh() {
+/** `tanpaTubuh`: the parent page already shows the one 3D body, so this page must not mount a second canvas. */
+export function PusatTubuh({ tanpaTubuh = false }: { tanpaTubuh?: boolean } = {}) {
   /**
    * Angka tubuh terkini, ditampilkan di atas seluruh tab.
    *
@@ -130,7 +131,7 @@ export function PusatTubuh() {
       <CekHarian />
       <UbinLab />
       {/* Tubuh 3D setinggi ~2.300px; di atas, ia mendorong hasil darah ke y~3.080. */}
-      <PersonalBodyUnifiedSurface compact defaultFocus="identity" shareable cameraCapture />
+      {!tanpaTubuh && <PersonalBodyUnifiedSurface compact defaultFocus="identity" shareable cameraCapture />}
       <HalamanTab
       judul="Body Signals"
       subjudul="Phone-first checks, energy, heart, sleep, movement and clinical trackers"
