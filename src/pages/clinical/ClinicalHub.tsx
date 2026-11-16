@@ -359,7 +359,7 @@ export function ClinicalHub() {
           </div>
         </section>
 
-        <div className="mt-6 grid gap-4 border-t border-white/10 pt-4 sm:grid-cols-3" aria-label="Clinician workflow and interoperability readiness" data-testid="physician-workbench-actions">
+        <div className="mt-6 grid gap-4 border-t border-white/10 pt-4 sm:grid-cols-3" aria-label="Clinician workflow and interoperability readiness" data-surface="dark" data-testid="physician-workbench-actions">
           <div className="border-l-2 border-emerald-400 pl-3">
             <div className="text-[10px] font-black uppercase tracking-[.12em] text-emerald-300">Auto-SOAP / SBAR &amp; Consilium</div>
             <p className="mt-1 text-xs text-white/70">

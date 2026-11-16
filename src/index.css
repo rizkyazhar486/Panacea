@@ -3049,3 +3049,11 @@ html:not(.dark) body button[data-cta="primary"] {
 .text-white\/50 {
   color: rgb(255 255 255 / 0.6);
 }
+
+/* Always-dark surfaces (data-surface="dark") keep the dark-theme text palette in the light theme: the light remaps above
+   assume a light background and drop contrast to 1.9-3.6 on a dark card. :not(:hover) keeps hover:text-white working. */
+:root:not(.dark) [data-surface="dark"] .text-emerald-300:not(:hover) { color: #6ee7b7; }
+:root:not(.dark) [data-surface="dark"] .text-amber-300:not(:hover) { color: #fcd34d; }
+:root:not(.dark) [data-surface="dark"] .text-amber-200:not(:hover) { color: #fde68a; }
+:root:not(.dark) [data-surface="dark"] .text-cyan-300:not(:hover) { color: #67e8f9; }
+:root:not(.dark) [data-surface="dark"] .text-rose-300:not(:hover) { color: #fda4af; }

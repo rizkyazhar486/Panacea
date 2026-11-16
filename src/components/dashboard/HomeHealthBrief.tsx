@@ -158,6 +158,7 @@ export function HomeHealthBrief() {
             onClick={() => void handleQuickWearable()}
             disabled={bleBusy}
             data-testid="home-auto-connect-wearable"
+            className="text-emerald-700 dark:text-[#00BF63]"
             title={bleNote ?? '1-Click Auto-Connect Paired Bluetooth Wearable'}
             style={{
               font: 'inherit',
@@ -167,7 +168,6 @@ export function HomeHealthBrief() {
               borderRadius: 999,
               border: '1px solid rgba(0, 191, 99, 0.35)',
               background: 'rgba(0, 191, 99, 0.12)',
-              color: '#00BF63',
               cursor: 'pointer',
               minHeight: 44,
               whiteSpace: 'nowrap',
