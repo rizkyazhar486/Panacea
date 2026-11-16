@@ -5,6 +5,16 @@ export { parseHeartRateMeasurement } from './engine/gattHeartRate.ts'
 export type { HeartRateParse, HeartRateReading, HeartRateRefusal, SensorContact } from './engine/gattHeartRate.ts'
 export { parseBatteryLevel, parseBodySensorLocation, cleanDeviceText, deviceLabel, DEVICE_TEXT_MAX } from './engine/gattCommon.ts'
 export type { SensorLocation } from './engine/gattCommon.ts'
+export {
+  LAYANAN_GATT, KARAKTERISTIK_GATT,
+  decodeSfloat, decodeFloat, decodeDateTime,
+  decodeTemperatureMeasurement, decodeBloodPressureMeasurement,
+  classifyGattServices,
+} from './engine/bleGattHealth.ts'
+export type {
+  MedFloat, MedFloatKhusus, AlasanTolak, Hasil, WaktuPerangkat,
+  BacaanSuhu, BacaanTekananDarah, MasalahMutuTekanan, JalurPerangkat, KlasifikasiPerangkat,
+} from './engine/bleGattHealth.ts'
 
 // ── ENGINE: beat intervals and the live session ──
 export { rmssd, rmssdOfRecording, RMSSD_MIN_RECORDING_MS } from './engine/beatIntervals.ts'

@@ -8,6 +8,7 @@ const ZONES = [
   { to: '/fitness-hub', label: 'Your Body', queryAware: false },
   { to: '/clinical-hub', label: 'Clinical', queryAware: false },
   { to: '/?t=for-you', label: 'For You', queryAware: true },
+  { to: '/body-exposure', label: 'Open 3D', queryAware: false },
 ] as const
 
 // Latar zona aktif adalah satu bentuk bersama (OneShape) yang meluncur antar zona.
@@ -16,7 +17,22 @@ const idleClass = 'border-transparent bg-transparent text-neutral-600 hover:text
 
 export function PanaceaZoneNav() {
   const location = useLocation()
-  const forYouActive = location.pathname === '/' && new URLSearchParams(location.search).get('t') === 'for-you'
+  const pathname = location.pathname
+  const forYouActive =
+    (pathname === '/' && new URLSearchParams(location.search).get('t') === 'for-you') ||
+    pathname === '/for-you'
+  const isBodyActive = pathname === '/fitness-hub' || pathname === '/fitness' || pathname === '/tubuh' || pathname === '/body'
+  const isClinicalActive = pathname === '/clinical-hub' || pathname === '/clinical' || pathname === '/emr'
+  const isOpen3DActive = pathname === '/body-exposure' || pathname.startsWith('/body-exposure')
+
+  const isZoneActive = (to: string, isActive: boolean) => {
+    if (to === '/?t=for-you') return forYouActive
+    if (to === '/fitness-hub') return isBodyActive
+    if (to === '/clinical-hub') return isClinicalActive
+    if (to === '/body-exposure') return isOpen3DActive
+    return isActive
+  }
+
   const railRef = useRef<HTMLDivElement | null>(null)
 
   useLayoutEffect(() => {
@@ -51,10 +67,10 @@ export function PanaceaZoneNav() {
           <NavLink
             key={zone.to}
             to={zone.to}
-            data-one-shape-active={String(zone.queryAware ? forYouActive : location.pathname === zone.to)}
-            data-panacea-zone-active={String(zone.queryAware ? forYouActive : location.pathname === zone.to)}
+            data-one-shape-active={String(isZoneActive(zone.to, location.pathname === zone.to))}
+            data-panacea-zone-active={String(isZoneActive(zone.to, location.pathname === zone.to))}
             className={({ isActive }) => {
-              const selected = zone.queryAware ? forYouActive : isActive
+              const selected = isZoneActive(zone.to, isActive)
               return `grid h-11 min-w-[74px] shrink-0 place-items-center rounded-[14px] border px-3 text-[11px] font-bold transition duration-200 active:scale-[.98] sm:min-w-[92px] sm:px-3.5 sm:text-[12px] ${selected ? activeClass : idleClass}`
             }}
           >

@@ -38,30 +38,39 @@ export function PersonalBodyAvatar3D({ compact = false }: { compact?: boolean } 
     }
   }, [])
 
+  const activePatient = useMemo(
+    () => state.patients.find((p) => p.id === state.activePatientId) ?? null,
+    [state.patients, state.activePatientId],
+  )
   const profile = account ? state.profiles[account.email] ?? {} : {}
   const input = useMemo(() => {
     const demo = getDemoTersimpan()
     const body = getBodyCharacter()
-    const heightCm = typeof demo.heightCm === 'number' && demo.heightCm > 0 ? demo.heightCm : 170
-    const weightKg = typeof demo.weightKg === 'number' && demo.weightKg > 0 ? demo.weightKg : 70
+    const v = getVitals(account) as Record<string, unknown>
+    const recHeight = typeof v.heightCm === 'number' && v.heightCm > 0 ? v.heightCm : demo.heightCm
+    const recWeight = typeof v.weightKg === 'number' && v.weightKg > 0 ? v.weightKg : demo.weightKg
+    const heightCm = typeof recHeight === 'number' && recHeight > 0 ? recHeight : 170
+    const weightKg = typeof recWeight === 'number' && recWeight > 0 ? recWeight : 70
     const bmi = weightKg / Math.pow(heightCm / 100, 2)
     // Lemak tubuh terukur (impor Apple Health / BIA) bila ada. Tanpa ini model
     // memakai densitas lazim: tetap benar totalnya, hanya tidak personal.
-    const v = getVitals() as Record<string, unknown>
     const bf = typeof v.bodyFatPct === 'number' && v.bodyFatPct >= 2 && v.bodyFatPct <= 70
       ? v.bodyFatPct
       : undefined
+    const patientOrAccSex = activePatient?.sex ?? account?.sex
+    const mappedSex: 'M' | 'F' | undefined =
+      demo.sex ?? (patientOrAccSex === 'P' ? 'F' : patientOrAccSex === 'L' ? 'M' : undefined)
     return {
       heightCm,
       weightKg,
       bmi,
-      sex: demo.sex,
+      sex: mappedSex,
       bodyFatPct: bf,
       shape: characterShape(body.bodyType),
       bodyType: body.bodyType,
       face: profile.avatar,
     }
-  }, [profile.avatar, revision])
+  }, [account, activePatient?.sex, profile.avatar, revision])
 
   // Bentuk antropometrik diselesaikan sekali per perubahan ukuran. Gagal-tertutup:
   // ukuran di luar kisaran manusia menghasilkan null, dan perendernya jatuh ke
@@ -91,9 +100,9 @@ export function PersonalBodyAvatar3D({ compact = false }: { compact?: boolean } 
     const renderer = buatRendererAman({ antialias: true, alpha: false, preserveDrawingBuffer: true })
     if (!renderer) return tandaiTanpaWebgl(mount)
     renderer.domElement.dataset.personalAvatarCanvas = 'true'
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2))
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, compact ? 1.25 : 1.5))
     renderer.outputColorSpace = THREE.SRGBColorSpace
-    renderer.shadowMap.enabled = true
+    renderer.shadowMap.enabled = !compact
     mount.innerHTML = ''
     mount.appendChild(renderer.domElement)
 
@@ -107,7 +116,7 @@ export function PersonalBodyAvatar3D({ compact = false }: { compact?: boolean } 
     scene.add(new THREE.HemisphereLight(0xd8f4ff, 0x17211a, 2.0))
     const key = new THREE.DirectionalLight(0xffffff, 2.8)
     key.position.set(3, 5, 4)
-    key.castShadow = true
+    key.castShadow = !compact
     scene.add(key)
     const rim = new THREE.DirectionalLight(0x5bc7ff, 1.8)
     rim.position.set(-4, 3, -4)
@@ -119,7 +128,7 @@ export function PersonalBodyAvatar3D({ compact = false }: { compact?: boolean } 
     )
     floor.rotation.x = -Math.PI / 2
     floor.position.y = -1.68
-    floor.receiveShadow = true
+    floor.receiveShadow = !compact
     scene.add(floor)
 
     const person = new THREE.Group()

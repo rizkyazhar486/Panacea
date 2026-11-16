@@ -58,6 +58,13 @@ export function WideStage({ plate, depth, viewer, search, rail, regionChips, ref
               <a href="#/radiology" style={{ color: TONE.dim, textDecoration: 'none', padding: '2px 8px', borderRadius: 6, border: `1px solid ${TONE.line}`, background: 'rgba(255,255,255,0.02)' }}>
                 Radiology MPR
               </a>
+              <button
+                type="button"
+                onClick={() => document.getElementById('body-exposure-local-hub')?.scrollIntoView({ behavior: 'smooth' })}
+                style={{ color: TONE.liveText, padding: '2px 8px', borderRadius: 6, border: `1px solid ${TONE.live}`, background: 'rgba(0, 191, 99, 0.12)', fontWeight: 700, cursor: 'pointer' }}
+              >
+                Local Hub · QR
+              </button>
             </nav>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>

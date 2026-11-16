@@ -116,6 +116,8 @@ export {
 // the dependency-free omnicausalis gate) can load it; the import runs only when called.
 export const loadDiagnosticImagingVolumetricStudio = () =>
   import("./ui/KaloLumenVolumetricStudio.tsx").then((module) => ({ default: module.DiagnosticImagingVolumetricStudio }));
+export const loadBodyExposureLocalHub = () =>
+  import("./ui/BodyExposureLocalHub.tsx").then((module) => ({ default: module.BodyExposureLocalHub }));
 export {
   BodyExposureAtlasHome,
   PRIMARY_VIEWPORT_CONTROLS,

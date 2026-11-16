@@ -4,12 +4,16 @@
 // reach into src/components. This file is the one place that knows both sides. It contains no decisions:
 // only the mapping from the stage's contract to the viewer's props and camera channel.
 
-import { useMemo } from 'react'
+import { lazy, Suspense, useMemo } from 'react'
 import { Body3D, CT_WINDOWS, MOTION_OFF, type AnatomyLayer } from '../components/bodyhub/Body3D'
 // The stage component is React (.tsx); the domain index stays importable from plain Node, so it is reached here
 // directly, as src/app may (only domain-to-domain imports must go through an index).
 import { BodyExposureAtlasHome } from '../domains/body-exposure/ui/BodyExposureAtlasHome.tsx'
 import type { AtlasCameraCommand, AtlasViewerProps } from '../domains/body-exposure/engine/atlas-stage/viewerContract.ts'
+
+const BodyExposureLocalHub = lazy(() =>
+  import('../domains/body-exposure/ui/BodyExposureLocalHub.tsx').then((m) => ({ default: m.BodyExposureLocalHub })),
+)
 
 /** The stage fills the box the home gives it; these utilities already exist in the compiled CSS. */
 const STAGE_CLASS = 'relative h-full w-full overflow-hidden'
@@ -43,5 +47,12 @@ function sendCamera(command: AtlasCameraCommand) {
 }
 
 export default function BodyExposureAtlasRoute() {
-  return <BodyExposureAtlasHome Viewer={AtlasViewer} sendCamera={sendCamera} />
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <BodyExposureAtlasHome Viewer={AtlasViewer} sendCamera={sendCamera} />
+      <Suspense fallback={null}>
+        <BodyExposureLocalHub />
+      </Suspense>
+    </div>
+  )
 }

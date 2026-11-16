@@ -9,7 +9,6 @@ import { getTheme, toggleTheme, type Theme } from '../../lib/theme'
 import { ageFromDob } from '../../lib/anthro'
 import type { Account, Role } from '../../lib/types'
 import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
-import { GoogleG } from './loginSvgs'
 import { STR_ROLES, ROLES, LOGIN_PILLS } from './loginData'
 import './login.css'
 import { Prosa } from '../../components/Prosa'
@@ -171,15 +170,28 @@ export function Login({ onBack }: { onBack?: () => void }) {
 
   function doLogin() {
     if (!consentOk()) return
-    const email = (f.email.trim() || 'user@gmail.com').toLowerCase()
-    const isOwner = email === OWNER_EMAIL
+    const email = f.email.trim().toLowerCase()
+    if (!email || !email.includes('@') || !email.includes('.')) {
+      setError('Masukkan alamat email aktif Anda untuk masuk atau membuat akun permanen.')
+      return
+    }
+    if (authMode === 'daftar' && !f.name.trim()) {
+      setError('Nama lengkap wajib diisi saat mendaftar akun baru.')
+      return
+    }
+    const isOwner = email === OWNER_EMAIL.toLowerCase()
     if (role === 'admin' && !isOwner && !state.adminEmails.includes(email)) {
-      setError('Email ini belum terdaftar dengan otorisasi Admin.')
+      setError('Email ini belum terdaftar dengan otorisasi Faskes / Admin.')
       return
     }
     setError('')
+    const displayName = f.name.trim() || email.split('@')[0]
+    const accountId = role === 'pasien' || role === 'dokter'
+      ? `local:${encodeURIComponent(email)}`
+      : `acc-${role}-${encodeURIComponent(email)}`
     const acc: Account = {
-      email, name: f.name.trim() || 'Pengguna Panacea', role,
+      id: accountId,
+      email, name: displayName, role,
       isSubscriber: role === 'owner', loggedAt: new Date().toISOString(),
       sex: simple ? undefined : f.sex,
       dob: simple || !f.dob ? undefined : f.dob,
@@ -193,30 +205,6 @@ export function Login({ onBack }: { onBack?: () => void }) {
       gelar: role === 'kontributor' ? f.gelar.trim() || undefined : undefined,
       subspesialis: role === 'verifikator' ? f.subspesialis.trim() || undefined : undefined,
       strStatus: clinical ? 'pending' : 'none', consentAt: new Date().toISOString(), isOwner,
-    }
-    if (backendEnabled) {
-      api.devLogin(acc.email, acc.name, role)
-        .then(a => finish({ ...a, isOwner, isSubscriber: acc.isSubscriber }))
-        .catch(() => finish(acc))
-      return
-    }
-    finish(acc)
-  }
-
-  function doDemoLogin() {
-    setConsent(true)
-    setError('')
-    const isOwner = role === 'owner'
-    const acc: Account = {
-      email: isOwner ? OWNER_EMAIL : 'demo.user@panaceamed.id',
-      name: role === 'pasien' ? 'Pengguna Demo' : role === 'owner' ? 'Owner Panacea' : 'dr. Demo Klinisi',
-      role,
-      isSubscriber: isOwner,
-      loggedAt: new Date().toISOString(),
-      str: clinical ? '31.1.1.100.1.23.123456' : undefined,
-      strStatus: clinical ? 'verified' : 'none',
-      consentAt: new Date().toISOString(),
-      isOwner,
     }
     if (backendEnabled) {
       api.devLogin(acc.email, acc.name, role)
@@ -362,7 +350,7 @@ export function Login({ onBack }: { onBack?: () => void }) {
                   className="login-role-tab"
                 >
                   <span>🩺</span>
-                  <span>Klinisi / Medis (STR)</span>
+                  <span>Klinisi (STR) &amp; Faskes</span>
                 </button>
               </div>
 
@@ -371,14 +359,14 @@ export function Login({ onBack }: { onBack?: () => void }) {
                 <div className="space-y-2 rounded-2xl border border-neutral-200/80 bg-neutral-50/70 p-3 dark:border-white/10 dark:bg-white/[0.03]">
                   <div className="flex items-center justify-between text-[11px]">
                     <span className="font-bold uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
-                      Peran Medis Aktif:
+                      Peran Terpilih:
                     </span>
                     <span className="font-bold text-emerald-600 dark:text-emerald-400">
-                      Kredensial STR Diperlukan
+                      {clinical ? 'Kredensial STR Diperlukan' : 'Otorisasi Faskes / Admin'}
                     </span>
                   </div>
-                  <div className="grid grid-cols-3 gap-1.5">
-                    {ROLES.filter(r => r.id !== 'pasien').map(r => {
+                  <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-3">
+                    {ROLES.filter(r => r.id !== 'pasien' && r.id !== 'owner').map(r => {
                       const isSelected = role === r.id
                       return (
                         <button
@@ -402,26 +390,9 @@ export function Login({ onBack }: { onBack?: () => void }) {
             </div>
           )}
 
-          {/* ── Google One-Click Login ────────────────────────────── */}
-          {health?.googleClientId ? (
+          {/* ── Google Sign-In & Email OTP (only when configured) ────────────────────────────── */}
+          {health?.googleClientId && (
             <div ref={gbtn} className="flex justify-center" />
-          ) : (
-            <div className="space-y-1.5">
-              <button
-                type="button"
-                onClick={doDemoLogin}
-                className="login-google-btn flex min-h-[44px] w-full items-center justify-center gap-2.5 rounded-full px-4 py-2.5 text-xs font-bold shadow-xs active:scale-[0.99]"
-              >
-                <GoogleG />
-                <span>Masuk Cepat dengan Akun Demo</span>
-                <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-extrabold text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
-                  Demo
-                </span>
-              </button>
-              <p className="text-center text-[10.5px] text-neutral-400">
-                Google OAuth belum diset di .env — klik untuk masuk instan dengan akun simulasi.
-              </p>
-            </div>
           )}
 
           {health?.features.otpEmail && (
@@ -436,12 +407,13 @@ export function Login({ onBack }: { onBack?: () => void }) {
             />
           )}
 
-          {/* Divider */}
-          <div className="flex items-center gap-3 text-[11px] font-semibold text-neutral-400 dark:text-neutral-500">
-            <span className="h-px flex-1 bg-neutral-200 dark:bg-neutral-800" />
-            <span>atau {authMode === 'masuk' ? 'masuk dengan email' : 'daftar dengan email'}</span>
-            <span className="h-px flex-1 bg-neutral-200 dark:bg-neutral-800" />
-          </div>
+          {(health?.googleClientId || health?.features.otpEmail) && (
+            <div className="flex items-center gap-3 text-[11px] font-semibold text-neutral-400 dark:text-neutral-500">
+              <span className="h-px flex-1 bg-neutral-200 dark:bg-neutral-800" />
+              <span>atau {authMode === 'masuk' ? 'masuk dengan email' : 'daftar dengan email'}</span>
+              <span className="h-px flex-1 bg-neutral-200 dark:bg-neutral-800" />
+            </div>
+          )}
 
           {/* ── Core Essential Inputs Only ────────────────────────── */}
           <div className="space-y-3">

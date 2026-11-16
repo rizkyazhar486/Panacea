@@ -1,8 +1,10 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { SuperPageCapabilityRail } from '../../components/SuperPageCapabilityRail'
 import { ForYouOmniFeed } from '../../components/ForYouOmniFeed'
-import { useStore } from '../../lib/store'
+import { useOptionalStore } from '../../lib/store'
+import { useOptionalLongitudinalState } from '../../lib/useLongitudinalState'
+import { getVitals } from '../../lib/healthVitals'
 import {
   IconBook,
   IconChat,
@@ -58,13 +60,81 @@ function DestinationRail({ label, items }: { label: string; items: Destination[]
 }
 
 export function ForYouHub() {
-  const { account } = useStore()
+  const store = useOptionalStore()
+  const longitudinal = useOptionalLongitudinalState()
+  const account = store?.account ?? null
+  const [rev, setRev] = useState(0)
+  useEffect(() => {
+    const refresh = () => setRev((x) => x + 1)
+    window.addEventListener('panacea:health-updated', refresh)
+    window.addEventListener('panacea:body-character-updated', refresh)
+    window.addEventListener('storage', refresh)
+    return () => {
+      window.removeEventListener('panacea:health-updated', refresh)
+      window.removeEventListener('panacea:body-character-updated', refresh)
+      window.removeEventListener('storage', refresh)
+    }
+  }, [])
+  const vitals = useMemo(() => {
+    void rev
+    return getVitals(account)
+  }, [account, longitudinal, rev])
   const name = account?.name?.trim().split(/\s+/)[0] || 'You'
   const [score, setScore] = useState<number | null>(null)
   const [budget, setBudget] = useState('')
   const [motivation, setMotivation] = useState(0)
   const [prompt, setPrompt] = useState('')
   const [saved, setSaved] = useState(false)
+
+  const triage = useMemo(() => {
+    const pos = (v: unknown) => (typeof v === 'number' && Number.isFinite(v) && v > 0 ? v : null)
+    const rhr = pos(vitals.restingHr) ?? pos(vitals.heartRate)
+    const sbp = pos(vitals.systolic)
+    const spo2 = pos(vitals.spo2Pct)
+    const sleep = pos(vitals.sleepH)
+    if (rhr == null && sbp == null && spo2 == null && sleep == null) {
+      return {
+        tier: 'NEUTRAL',
+        badge: 'AWAITING FIRST READING',
+        tone: '#94a3b8',
+        title: 'Start with one simple check-in or wearable sync',
+        action: 'Open My Health Data to pair Bluetooth sensors or log sleep/blood pressure. Missing values stay empty.',
+        to: '/fitness-hub?view=health-data',
+        cta: 'Sync Health Data',
+      }
+    }
+    if ((spo2 != null && spo2 < 94) || (sbp != null && sbp >= 160) || (rhr != null && rhr >= 120)) {
+      return {
+        tier: 'RED',
+        badge: 'PROMPT CHECK RECOMMENDED',
+        tone: '#fb7185',
+        title: 'A recorded reading sits outside comfortable resting bounds',
+        action: 'Sit quietly for 5 minutes and repeat measurement; if symptoms (chest pain, shortness of breath, dizziness) occur, seek urgent clinical evaluation.',
+        to: '/emergency',
+        cta: 'Emergency Triage',
+      }
+    }
+    if ((sbp != null && sbp >= 135) || (sleep != null && sleep < 6) || (rhr != null && rhr >= 95)) {
+      return {
+        tier: 'AMBER',
+        badge: 'GENTLE ATTENTION',
+        tone: '#fbbf24',
+        title: 'Recovery or cardiovascular load deserves an easy day',
+        action: 'Prioritize hydration, 10 minutes slow breathing, and an earlier bedtime tonight; discuss persistent elevated readings with a doctor.',
+        to: '/fitness-hub?view=recovery',
+        cta: 'Open Recovery',
+      }
+    }
+    return {
+      tier: 'GREEN',
+      badge: 'WITHIN REFERENCE BOUNDS',
+      tone: '#34d399',
+      title: 'Today’s recorded signals look steady',
+      action: 'Keep up brisk walking / Zone-2 movement, regular sleep timing, and balanced meals. Draft preventive summary (clinicallyReviewed: false).',
+      to: '/fitness-hub?view=body',
+      cta: 'Review Your Body',
+    }
+  }, [vitals])
 
   useEffect(() => {
     if (typeof window === 'undefined') return
@@ -127,6 +197,18 @@ export function ForYouHub() {
             Ask →
           </Link>
         </div>
+      </section>
+
+      <section aria-label="Personalized preventive triage" className="border-t border-white/10 pt-4">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', color: triage.tone }}>{triage.badge} · PUBLIC READINESS &amp; 24H COMPANION (UNREVIEWED DRAFT)</span>
+          <div className="flex flex-wrap items-center gap-3">
+            <Link to={triage.to} className="inline-flex min-h-[44px] items-center text-xs font-black text-emerald-300 hover:text-white">{triage.cta} →</Link>
+            <Link to="/emergency" className="inline-flex min-h-[44px] items-center text-xs font-black text-rose-300 hover:text-white">Darurat 118/119 →</Link>
+          </div>
+        </div>
+        <h2 className="mt-1 text-base font-black text-white">{triage.title}</h2>
+        <p className="mt-1 text-xs leading-relaxed text-white/65">{triage.action}</p>
       </section>
 
       <ForYouOmniFeed />

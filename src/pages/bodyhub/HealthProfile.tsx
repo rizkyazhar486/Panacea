@@ -1,5 +1,6 @@
 import { capturePersonalHealthOperation, readPersonalHealthFile, readPersonalHealthImage } from '../../domains/personal-health'
 import { loadBluetoothWearablePanel, type WearableSavePatch } from '../../domains/devices'
+import { loadBodyExposureLocalHub } from '../../domains/body-exposure'
 import { lazy, Suspense, useEffect, useRef, useState } from 'react'
 import { Fold } from '../../shared/ui/Fold'
 import { Prosa } from '../../components/Prosa'
@@ -13,9 +14,10 @@ import { Card, SectionTitle, Field, inputClass, Button, Badge } from '../../comp
 import { IconHeart, IconActivity, IconCheck, IconChevronRight } from '../../components/icons'
 import { api, backendEnabled, apiBaseUrl, type KatalogMetrik } from '../../lib/api'
 import { useStore } from '../../lib/store'
-import { setDemo } from '../../lib/profile'
+import { mergeDemoStored } from '../../lib/profile'
 import { parseHealthFile, type ImportResult } from '../../lib/healthImport'
-import { mergeVitals } from '../../lib/healthVitals'
+import { getVitals, mergeVitals } from '../../lib/healthVitals'
+import { downloadClinicalFhirBundle, downloadSoapSbarReport } from '../../domains/clinical-operations'
 import { deretMetrik } from '../../lib/riwayatVitals'
 import { parseWorkouts, parseHrNotifications } from '../../lib/workoutImport'
 import { mergeWorkouts, mergeHrNotifications } from '../../lib/workoutStore'
@@ -68,12 +70,16 @@ const LKEY = 'pmd_health_profile'
 
 // The Bluetooth panel is React plus the radio code: loaded only when this page renders it.
 const BluetoothWearablePanel = lazy(loadBluetoothWearablePanel)
+const BodyExposureLocalHub = lazy(loadBodyExposureLocalHub)
 
 /** A reading from the person's own Bluetooth band joins their health data like any other sync. */
-const saveBluetoothReading = (patch: WearableSavePatch) => { mergeVitals(patch) }
+const saveBluetoothReading = (patch: WearableSavePatch) => {
+  mergeVitals(patch)
+  try { window.dispatchEvent(new Event('panacea:body-character-updated')) } catch { /* SSR/test */ }
+}
 
 export function HealthProfile() {
-  const { account } = useStore()
+  const { account, activePatient } = useStore()
   const [p, setP] = useState<HealthProfile>(DEF)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -146,9 +152,33 @@ export function HealthProfile() {
     const payload = { ...p, history, updatedAt: now }
     setP(payload)
     try { localStorage.setItem(LKEY, JSON.stringify(payload)) } catch { /* ignore */ }
-    // Keep the shared local demographics in sync for every calculator.
-    setDemo({ age: p.age || undefined, sex: p.sex, weightKg: p.weightKg || undefined, heightCm: p.heightCm || undefined,
-      vo2max: p.vo2max || undefined, restingHr: p.restingHr || undefined, hrvMs: p.hrvMs || undefined })
+    // Keep the shared local demographics & live vitals in sync across every surface without inventing zeroed defaults.
+    mergeDemoStored({
+      age: p.age || undefined,
+      sex: p.sex,
+      weightKg: p.weightKg || undefined,
+      heightCm: p.heightCm || undefined,
+      vo2max: p.vo2max || undefined,
+      restingHr: p.restingHr || undefined,
+      hrvMs: p.hrvMs || undefined,
+    }, 'health-profile-save')
+    mergeVitals({
+      source: p.source,
+      measuredAt: now,
+      weightKg: p.weightKg || undefined,
+      heightCm: p.heightCm || undefined,
+      bodyFatPct: p.bodyFatPct || undefined,
+      skeletalMuscleKg: p.muscleMassKg || undefined,
+      vo2max: p.vo2max || undefined,
+      restingHr: p.restingHr || undefined,
+      hrvMs: p.hrvMs || undefined,
+      recoveryPct: p.recoveryPct || undefined,
+      strain: p.strain || undefined,
+      sleepH: p.sleepH || undefined,
+      steps: p.steps || undefined,
+      activeKcal: p.activeKcal || undefined,
+    })
+    try { window.dispatchEvent(new Event('panacea:body-character-updated')) } catch { /* SSR/test */ }
     if (backendEnabled) {
       try { await api.saveHealthProfile(payload as unknown as Record<string, unknown>) }
       catch { setErr('Saved on this device, but syncing to the server failed (offline). It will be kept locally automatically.') }
@@ -263,6 +293,28 @@ export function HealthProfile() {
   function exportJson() {
     download(`health-data-${hariIni()}.json`, JSON.stringify(p, null, 2), 'application/json')
   }
+  function mergedExportVitals() {
+    const currentVitals = getVitals(account)
+    return {
+      ...currentVitals,
+      ...(p.weightKg > 0 ? { weightKg: p.weightKg } : {}),
+      ...(p.heightCm > 0 ? { heightCm: p.heightCm } : {}),
+      ...(p.bodyFatPct > 0 ? { bodyFatPct: p.bodyFatPct } : {}),
+      ...(p.vo2max > 0 ? { vo2max: p.vo2max } : {}),
+      ...(p.restingHr > 0 ? { restingHr: p.restingHr } : {}),
+      ...(p.hrvMs > 0 ? { hrvMs: p.hrvMs } : {}),
+      ...(p.sleepH > 0 ? { sleepH: p.sleepH } : {}),
+      ...(p.steps > 0 ? { steps: p.steps } : {}),
+    }
+  }
+  function exportFhir() {
+    downloadClinicalFhirBundle({ vitals: mergedExportVitals(), patient: activePatient, account })
+    setNote('Exported HL7 FHIR R4 SATUSEHAT bundle.')
+  }
+  function exportSoapSbar() {
+    downloadSoapSbarReport({ vitals: mergedExportVitals(), patient: activePatient, account })
+    setNote('Exported patient health summary (SOAP/SBAR draft).')
+  }
   function exportCsv() {
     const rows = p.history ?? []
     if (!rows.length) { setErr('No history to export yet — save your data first.'); return }
@@ -341,6 +393,8 @@ export function HealthProfile() {
             input.click()
           }} className="!px-4">Choose export file…</Button>
           <button onClick={exportJson} className="rounded-xl bg-neutral-100 px-4 py-2 text-xs font-bold text-neutral-600 transition hover:bg-neutral-200">Download JSON</button>
+          <button onClick={exportFhir} className="rounded-xl bg-neutral-100 px-4 py-2 text-xs font-bold text-neutral-600 transition hover:bg-neutral-200">Download FHIR R4</button>
+          <button onClick={exportSoapSbar} className="rounded-xl bg-neutral-100 px-4 py-2 text-xs font-bold text-neutral-600 transition hover:bg-neutral-200">Download Summary</button>
           <button onClick={exportCsv} className="rounded-xl bg-neutral-100 px-4 py-2 text-xs font-bold text-neutral-600 transition hover:bg-neutral-200">Download history CSV</button>
           {note && <span className="w-full text-[11px] font-semibold text-brand-dark">{note}</span>}
         </div>
@@ -350,6 +404,9 @@ export function HealthProfile() {
       <Fold label="Sync">
       {backendEnabled && <AutoSyncCard />}
       <SyncDiagnosticsCard />
+      <Suspense fallback={null}>
+        <BodyExposureLocalHub initialTab="emv_pass" compact />
+      </Suspense>
 
       {p.lastDeviceSyncAt && <DeviceSyncSummary profile={p} />}
       </Fold>
