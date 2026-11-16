@@ -206,3 +206,62 @@ Setiap aturan baru wajib memiliki 4 kelas bukti terotomatisasi:
 3. **Verifikasi Kredensial Render & MongoDB:** Pastikan backup berkala MongoDB Atlas & variabel env (`MONGODB_URI`, `CORS_ORIGINS`, `GOOGLE_CLIENT_ID`, `JWT_SECRET`, `MIDTRANS_*`, `VAPID_*`) terkelola rapi di dashboard Render.
 4. **Tetapkan Penanggung Jawab Hukum/Regulasi & Klinis Fase Akhir:** Siapkan dokumen UU PDP (persetujuan, retensi, penghapusan), registrasi PSE, serta tinjauan klinis independen sebelum memasuki Tahap 2/3.
 5. **Kunci Penugasan Lane:** Tandai baris penugasan **Hydrogen** dan **Argon** pada `docs/governance/TASK_BOARD.md` setelah Claude menggabungkan antrean stabilisasi `Fase A`.
+
+---
+
+## 10. Amandemen A (2026-11-16, Claude Orchestrator) — dilipat ke direktif ini
+
+Amandemen ini menggantikan draf amandemen terpisah (PR #3077, ditutup) agar hanya ada **satu direktif kanonik**.
+Bila bertentangan dengan bagian 0–9 soal peran, gerbang `G1..G9` dan tahap rilis, **bagian 0–9 menang**.
+
+### 10.1 Keputusan Pemilik (2026-11-16, di chat)
+1. Direktif ini (V2) adalah **satu-satunya direktif kanonik**; perubahan datang sebagai PR ke berkas ini.
+2. Deskripsi peran **Hydrogen** (lane kedalaman biologis & observabilitas) dan **Argon** (lane klinis, interop, fitness, E2E) pada bagian 3 **benar dan final**.
+
+### 10.2 Koreksi dan penegasan fakta (bukti 2026-11-16)
+
+| Pernyataan | Status | Bukti |
+|---|---|---|
+| Backend produksi hidup dan menyimpan data di MongoDB | **Terkonfirmasi** | `GET https://panaceamed-backend.onrender.com/api/health` → `"penyimpanan":"mongo"`, `"penyimpananSehat":true`, `s5xx:0` |
+| Frontend yang disajikan memanggil backend itu | **Terkonfirmasi** | `VITE_API_URL` di `.env.local` menunjuk host Render; string host ada di `dist/assets/index-*.js` |
+| `panaceamed.id` disajikan dari `vite preview` di laptop pemilik lewat Cloudflare Tunnel | **Terkonfirmasi** | `~/.cloudflared/config.yml` (ingress `127.0.0.1:4399`), `ps`, tunnel mati → 502/1033 |
+| `server/data.json` di checkout adalah data produksi | **Salah.** Itu berkas dev lokal berisi 3 pengguna uji | inspeksi baca-saja |
+| Sesi peramban pemilik terautentikasi ke backend | **Belum terverifikasi** | pemilik harus masuk ulang dengan akun yang sama |
+
+Pemulihan akun dan log lama = **masuk dengan akun yang sama** agar aplikasi membaca dari backend, lalu bandingkan jumlah
+dengan salinan lokal. Tidak ada agent yang membaca, mengekspor atau mengubah data Mongo produksi tanpa instruksi eksplisit
+pemilik dan metode baca-saja yang tercatat audit. Rujukan `ORCHESTRATOR_DIRECTIVE_GEMINI_HANDOFF.pdf` di hierarki
+otoritas tidak ditemukan di repositori pada sesi ini; jangan dianggap ada sampai dibuat.
+
+### 10.3 Protokol perselisihan antar-agent
+1. Tulis klaim + bukti (file:baris, perintah, URL). Pangkat bukan bukti.
+2. Peninjau mereproduksi bukti; yang tak bisa direproduksi ditandai `{unverified}` dan tidak memblokir.
+3. Bila tetap berselisih, Orkestrator memutuskan dengan urutan: keselamatan > integritas data > bukti > reversibilitas > kesederhanaan > kecepatan, alasan ditulis di PR.
+4. Bila Orkestrator pihak yang berselisih atau cakupan/risiko berubah, Pemilik memutuskan; agent lain lanjut pada baris yang tidak terblokir.
+
+### 10.4 Pemicu ketidakstabilan (berhenti, isolasi, lapor pemilik)
+`main` merah; auth/RBAC/consent/audit/tanda tangan berubah tanpa tes; PHI atau rahasia di diff; tes dihapus/di-skip/dilonggarkan; agent non-Claude mengedit branch agent lain; penyimpanan kebenaran pasien kedua; klaim validitas klinis/lisensi/kepatuhan; push langsung ke `main`; dokumen otoritas ganda.
+
+### 10.5 Aturan isolasi worktree (insiden nyata 2026-11-16)
+Bukti: branch checkout bersama diganti agent paralel di antara dua perintah; commit `06179efc5` nyasar ke nama branch agent lain dan terdorong ke remote (`feat/perf-ux-interop-split`). Tiga dokumen direktif juga ditulis paralel.
+1. Setiap agent bekerja di `git worktree` sendiri: `git worktree add ../Panaceamed.id-wt-<agent>-<tugas> -b <tipe>/<scope> origin/main`; jangan `git switch/checkout` di checkout utama.
+2. Sebelum commit/push, pastikan branch dalam perintah yang sama: `test "$(git branch --show-current)" = "<branch>"`, dan dorong dengan refspec jelas `git push -u origin <branch>`; jangan `push HEAD` dari checkout bersama.
+3. Sebelum menulis dokumen otoritas baru, cari PR dan branch remote (`gh pr list`, `git branch -r`) dan klaim baris TASK_BOARD.
+4. Bila branch/commit nyasar tercipta, pembuatnya melapor ke pemilik dengan SHA; hanya Claude yang membersihkan ref agent lain, tanpa force.
+
+### 10.6 Gerbang tambahan (DIUSULKAN; butuh persetujuan pemilik, `G1..G9` tidak berubah)
+| Gerbang | Tambahan | Alasan |
+|---|---|---|
+| `G3+` | **Latihan durabilitas data:** masuk di peramban bersih, pulihkan, bandingkan jumlah rekaman dengan ekspor; uji restore backup Atlas | Pemulihan bergantung pada backend; restore belum terbukti |
+| `G9+` | **Alur dukungan & penghapusan:** laporan penyalahgunaan, takedown, hapus data pengguna, kontak insiden, diuji sekali | Pengguna publik butuh jalur pemulihan; kewajiban UU PDP dikonfirmasi penasihat hukum |
+| **`G10`** | **Hak aset:** logo, video tutorial, data ICRP dibersihkan atau dicabut (EXT-D8-A/B/C) | Risiko hukum di `EXTERNAL_GATES.md` |
+| **`G11`** | **Uji beban & kegagalan pada batas pengguna rencana + pagar bandwidth/biaya** | Layanan Render ditangguhkan karena bandwidth 2026-10-29 (`TASK_BOARD.md` T-OPS-BW-01) |
+
+### 10.7 Tangga menuju skala platform (tiap anak tangga butuh bukti sebelum yang berikutnya)
+1 Inti kepercayaan (identitas, consent, audit, data awet) · 2 Satu kebiasaan harian yang berulang (retensi terukur) · 3 Satu episode institusi terukur · 4 Interoperabilitas (FHIR/DICOM/fixture perangkat, ekspor/impor, situs kedua) · 5 Rujukan lintas situs & adaptor pembayar per yurisdiksi · 6 API/SDK terbuka dengan sandbox · 7 Pembayaran/klaim hanya lewat mitra berlisensi, dikonfirmasi penasihat hukum · 8 Operasi teraudit pada skala besar. Melompati anak tangga = cacat. Tanpa klaim dominasi, kepatuhan atau lisensi tanpa bukti.
+
+### 10.8 Bootstrap Gemini (CLI & Chat)
+1. Baca `AGENTS.md`, `CLAUDE.md`, `docs/governance/README.md`, lalu direktif ini.
+2. Nyatakan lane dan apa yang benar-benar bisa dijalankan. Agent chat hanya memberi usulan dan menandai fakta ingatan `{unverified}`.
+3. Agent CLI: buat worktree sendiri (10.5), jalankan `git fetch`, `gh pr list`, `node scripts/qa/acceptance-v2.mjs`, klaim satu baris TASK_BOARD, baru kerja.
+4. Laporan per tugas: SHA, perubahan, bukti, PR/branch, blocker atau satu keputusan yang dibutuhkan (≤120 kata).
