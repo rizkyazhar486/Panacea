@@ -169,7 +169,7 @@ export function HomeHealthBrief() {
               background: 'rgba(0, 191, 99, 0.12)',
               color: '#00BF63',
               cursor: 'pointer',
-              minHeight: 30,
+              minHeight: 44,
               whiteSpace: 'nowrap',
             }}
           >

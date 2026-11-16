@@ -375,7 +375,7 @@ export function ClinicalHub() {
                   key={btn.label}
                   type="button"
                   onClick={btn.onClick}
-                  style={{ minHeight: 40, padding: '4px 12px', borderRadius: 999, border: '1px solid rgba(255,255,255,0.16)' }}
+                  style={{ minHeight: 44, padding: '4px 12px', borderRadius: 999, border: '1px solid rgba(255,255,255,0.16)' }}
                   className={`inline-flex items-center text-xs font-black ${btn.cls} hover:text-white`}
                 >
                   {btn.label}
@@ -411,7 +411,7 @@ export function ClinicalHub() {
                   id={btn.id}
                   type="button"
                   onClick={btn.onClick}
-                  style={{ minHeight: 40, padding: '4px 12px', borderRadius: 999, border: '1px solid rgba(255,255,255,0.16)' }}
+                  style={{ minHeight: 44, padding: '4px 12px', borderRadius: 999, border: '1px solid rgba(255,255,255,0.16)' }}
                   className={`inline-flex items-center text-xs font-black ${btn.cls} hover:text-white`}
                 >
                   {btn.label}
