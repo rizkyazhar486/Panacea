@@ -64,17 +64,21 @@ export function ForYouDailyStack() {
     [expanded],
   )
 
-  const triageColor = useMemo<'green' | 'yellow' | 'red'>(() => {
-    const sbp = Number(vitals.systolic)
-    const dbp = Number(vitals.diastolic)
-    const hr = Number(vitals.restingHr ?? vitals.heartRate)
-    const spo2 = Number(vitals.spo2Pct)
-    const sleep = Number(vitals.sleepH)
+  const triageTier = useMemo<'neutral' | 'green' | 'yellow' | 'red'>(() => {
+    const pos = (v: unknown) => (typeof v === 'number' && Number.isFinite(v) && v > 0 ? v : null)
+    const sbp = pos(vitals.systolic)
+    const dbp = pos(vitals.diastolic)
+    const hr = pos(vitals.restingHr) ?? pos(vitals.heartRate)
+    const spo2 = pos(vitals.spo2Pct)
+    const sleep = pos(vitals.sleepH)
 
-    if ((sbp > 0 && sbp >= 160) || (dbp > 0 && dbp >= 100) || (hr > 0 && hr >= 120) || (spo2 > 0 && spo2 < 92)) {
+    if (sbp == null && dbp == null && hr == null && spo2 == null && sleep == null) {
+      return 'neutral'
+    }
+    if ((sbp != null && sbp >= 160) || (dbp != null && dbp >= 100) || (hr != null && hr >= 120) || (spo2 != null && spo2 < 92)) {
       return 'red'
     }
-    if ((sbp > 0 && sbp >= 130) || (dbp > 0 && dbp >= 85) || (hr > 0 && hr >= 100) || (sleep > 0 && sleep < 6)) {
+    if ((sbp != null && sbp >= 130) || (dbp != null && dbp >= 85) || (hr != null && hr >= 100) || (sleep != null && sleep < 6)) {
       return 'yellow'
     }
     return 'green'
@@ -110,82 +114,80 @@ export function ForYouDailyStack() {
         </div>
       </div>
 
-      {/* 24-Hour Circadian Protocol & 3-Color Self-Triage */}
-      <div className="mb-3 rounded-[20px] border border-white/[.08] bg-white/[0.025] p-3 text-xs">
+      {/* 24-Hour Circadian Companion (Fail-closed when vitals unrecorded) */}
+      <div className="mb-3 rounded-[18px] border border-white/[.07] bg-white/[.022] p-3 text-xs">
         <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/[.06] pb-2">
           <div className="flex items-center gap-2">
             <span
-              className={`h-2.5 w-2.5 rounded-full ${
-                triageColor === 'red'
-                  ? 'bg-rose-500 animate-pulse'
-                  : triageColor === 'yellow'
-                  ? 'bg-amber-400'
-                  : 'bg-emerald-400'
-              }`}
+              style={{
+                width: 8,
+                height: 8,
+                borderRadius: 9999,
+                display: 'inline-block',
+                backgroundColor:
+                  triageTier === 'red' ? '#f43f5e'
+                    : triageTier === 'yellow' ? '#fbbf24'
+                      : triageTier === 'green' ? '#34d399'
+                        : '#94a3b8',
+              }}
             />
-            <span className="font-bold text-white tracking-wide">
-              {triageColor === 'red'
-                ? 'Triase: Perhatian Medis Diperlukan Segera'
-                : triageColor === 'yellow'
-                ? 'Triase: Perlu Penyesuaian Gaya Hidup & Istirahat'
-                : 'Triase: Kondisi Tubuh Stabil & Siap Beraktivitas'}
+            <span className="font-bold text-white">
+              {triageTier === 'red'
+                ? 'Triase: Perhatian Medis Diperlukan Segera (Draft)'
+                : triageTier === 'yellow'
+                  ? 'Triase: Perlu Penyesuaian Istirahat & Hidrasi (Draft)'
+                  : triageTier === 'green'
+                    ? 'Triase: Tanda Vital Tercatat dalam Rentang Acuan (Draft)'
+                    : 'Panduan Harian 24 Jam (Menunggu Pengukuran Awal)'}
             </span>
           </div>
           <div className="flex items-center gap-2">
             <a
               href="tel:119"
-              className="inline-flex min-h-[32px] items-center rounded-lg bg-rose-500/20 px-2.5 py-1 text-[10px] font-black text-rose-300 border border-rose-500/40 hover:bg-rose-500/30 transition"
+              style={{ minHeight: 36, borderRadius: 10, background: 'rgba(244,63,94,0.16)', border: '1px solid rgba(244,63,94,0.38)', color: '#fda4af', padding: '4px 10px' }}
+              className="inline-flex items-center text-[10px] font-black transition hover:text-white"
               title="Hubungi Sistem Penanggulangan Gawat Darurat Terpadu (SPGDT) 119"
             >
-              🚨 Hubungi SPGDT 119
+              SPGDT 119
             </a>
             <Link
               to="/emergency"
-              className="inline-flex min-h-[32px] items-center rounded-lg bg-white/10 px-2.5 py-1 text-[10px] font-black text-white/80 hover:text-white border border-white/15"
+              style={{ minHeight: 36, borderRadius: 10, background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.16)', padding: '4px 10px' }}
+              className="inline-flex items-center text-[10px] font-black text-white/80 hover:text-white"
             >
               Protokol Darurat →
             </Link>
           </div>
         </div>
 
-        <p className="mt-2 text-[11px] leading-relaxed text-white/70">
-          {triageColor === 'red'
-            ? 'Peringatan tanda vital memerlukan evaluasi medis langsung. Jika mengalami nyeri dada, sesak nafas berat, atau pusing mendadak, segera hubungi SPGDT 119 atau kunjungi IGD terdekat.'
-            : triageColor === 'yellow'
-            ? 'Tekanan darah atau denyut jantung berada di ambang batas atas atau durasi tidur kurang optimal. Prioritaskan hidrasi air mineral, istirahat cukup, dan hindari konsumsi kafein berlebih hari ini.'
-            : 'Seluruh parameter tanda vital berada dalam rentang normal harian. Ritme sirkadian tubuh terjaga baik untuk mendukung fokus dan latihan fisik.'}
+        <p style={{ fontSize: 11, lineHeight: 1.5 }} className="mt-2 text-white/70">
+          {triageTier === 'red'
+            ? 'Bacaan terbaru berada di luar ambang istirahat normal. Bila muncul nyeri dada, sesak napas berat, atau pusing mendadak, hubungi SPGDT 119 atau kunjungi IGD terdekat.'
+            : triageTier === 'yellow'
+              ? 'Tekanan darah/nadi berada di batas atas atau durasi tidur belum optimal. Prioritaskan hidrasi, istirahat cukup, dan konsultasi bila keluhan berlanjut.'
+              : triageTier === 'green'
+                ? 'Parameter vital yang tercatat berada dalam batas referensi umum. Lanjutkan rutinitas sirkadian harian (bukan pengganti evaluasi dokter).'
+                : 'Belum ada angka tekanan darah, denyut jantung, SpO2, atau tidur yang tercatat — lengkapi di Your Body -> Data atau sinkronkan wearable.'}
         </p>
 
-        {/* 4-Phase Circadian Timeline */}
         <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
-          <div className="rounded-[14px] border border-white/[.05] bg-black/20 p-2.5">
-            <div className="text-[9px] font-black uppercase tracking-[.1em] text-amber-300">06:00–09:00 · Pagi</div>
-            <div className="mt-0.5 font-bold text-white text-[11px]">Kesiapan &amp; Sinar Matahari</div>
-            <p className="mt-1 text-[10px] text-white/50 leading-relaxed">
-              Hidrasi 500ml air, paparan cahaya alami 15 menit, cek skor kesiapan &amp; HRV.
-            </p>
-          </div>
-          <div className="rounded-[14px] border border-white/[.05] bg-black/20 p-2.5">
-            <div className="text-[9px] font-black uppercase tracking-[.1em] text-cyan-300">09:00–14:00 · Siang</div>
-            <div className="mt-0.5 font-bold text-white text-[11px]">Nutrisi &amp; Fokus Kerja</div>
-            <p className="mt-1 text-[10px] text-white/50 leading-relaxed">
-              Makanan padat nutrisi, jeda peregangan ergonomi tiap 60 menit, batas kafein pk 14:00.
-            </p>
-          </div>
-          <div className="rounded-[14px] border border-white/[.05] bg-black/20 p-2.5">
-            <div className="text-[9px] font-black uppercase tracking-[.1em] text-emerald-300">14:00–18:00 · Sore</div>
-            <div className="mt-0.5 font-bold text-white text-[11px]">Aktivitas &amp; Latihan</div>
-            <p className="mt-1 text-[10px] text-white/50 leading-relaxed">
-              Penuhi target langkah ({vitals.steps ? `${vitals.steps.toLocaleString()} / 8.000` : 'target 8.000'}), latihan kekuatan atau aerobik terukur.
-            </p>
-          </div>
-          <div className="rounded-[14px] border border-white/[.05] bg-black/20 p-2.5">
-            <div className="text-[9px] font-black uppercase tracking-[.1em] text-purple-300">18:00–22:00 · Malam</div>
-            <div className="mt-0.5 font-bold text-white text-[11px]">Pemulihan &amp; Tidur</div>
-            <p className="mt-1 text-[10px] text-white/50 leading-relaxed">
-              Redupkan layar, suhu kamar sejuk, target tidur restoratif 7–8 jam.
-            </p>
-          </div>
+          {[
+            { tag: '06:00–09:00 · Pagi', color: '#fcd34d', title: 'Hidrasi & Cahaya Pagi', desc: 'Minum bertahap sesuai kebutuhan & paparan cahaya pagi.' },
+            { tag: '09:00–14:00 · Siang', color: '#67e8f9', title: 'Nutrisi & Ergonomi', desc: 'Makan seimbang & peregangan tiap 60 menit duduk.' },
+            {
+              tag: '14:00–18:00 · Sore',
+              color: '#6ee7b7',
+              title: 'Aktivitas Terukur',
+              desc: vitals.steps ? `Langkah tercatat: ${Math.round(vitals.steps).toLocaleString('en-US')}.` : 'Lanjutkan aktivitas fisik ringan sesuai kondisi Anda.',
+            },
+            { tag: '18:00–22:00 · Malam', color: '#d8b4fe', title: 'Pemulihan Sirkadian', desc: 'Redupkan layar 1 jam sebelum tidur; target 7–8 jam.' },
+          ].map((slot) => (
+            <div key={slot.tag} style={{ borderRadius: 14, border: '1px solid rgba(255,255,255,0.06)', background: 'rgba(0,0,0,0.22)', padding: 10 }}>
+              <div style={{ color: slot.color, fontSize: 9, fontWeight: 900, letterSpacing: '0.1em', textTransform: 'uppercase' }}>{slot.tag}</div>
+              <div style={{ fontSize: 11 }} className="mt-1 font-bold text-white">{slot.title}</div>
+              <p style={{ fontSize: 10, lineHeight: 1.45 }} className="mt-1 text-white/50">{slot.desc}</p>
+            </div>
+          ))}
         </div>
       </div>
 
