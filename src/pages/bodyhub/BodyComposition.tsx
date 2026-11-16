@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Fold } from '../../shared/ui/Fold'
 import { Prosa } from '../../components/Prosa'
 import { KolomAngka } from '../../components/KolomAngka'
@@ -8,7 +8,7 @@ import { useOptionalStore } from '../../lib/store'
 import { deretMetrik } from '../../lib/riwayatVitals'
 import { IconHeart, IconActivity, IconChartUp, IconMoon } from '../../components/icons'
 import { getHealthCache, pushBiometrics, mergeHealthCache, mergeDemoStored } from '../../lib/profile'
-import { mergeVitals } from '../../lib/healthVitals'
+import { getVitals, mergeVitals } from '../../lib/healthVitals'
 import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 import {
   DEF, PERLU_UBIN, bacaTersimpan, biometrikUntukDibagikan, kurangKomposisi, serialisasi, terapkan, yangKurang,
@@ -115,8 +115,16 @@ function syncFromHealthProfile(
   const num = (v: unknown) => (typeof v === 'number' && Number.isFinite(v) && v > 0 ? v : undefined)
   const patch: Partial<Record<KunciBody, number | string>> = {}
   const changed: string[] = []
-  const wKg = num(hc.weightKg) ?? num(extra?.weightKg); if (wKg) { patch.w = wKg; changed.push('Weight') }
-  const hCm = num(hc.heightCm) ?? num(extra?.heightCm); if (hCm) { patch.h = hCm; changed.push('Height') }
+  const setIfDiff = (key: KunciBody, label: string, nextVal: number | undefined) => {
+    if (nextVal == null) return
+    const prevVal = Number(cur.b[key])
+    if (!cur.diisi.has(key) || !Number.isFinite(prevVal) || Math.abs(prevVal - nextVal) > 1e-4) {
+      patch[key] = nextVal
+      changed.push(label)
+    }
+  }
+  const wKg = num(hc.weightKg) ?? num(extra?.weightKg); setIfDiff('w', 'Weight', wKg)
+  const hCm = num(hc.heightCm) ?? num(extra?.heightCm); setIfDiff('h', 'Height', hCm)
   if (!cur.diisi.has('age') && extra?.dob) {
     const dobMs = Date.parse(extra.dob)
     if (Number.isFinite(dobMs)) {
@@ -132,13 +140,13 @@ function syncFromHealthProfile(
   const bf = num(hc.bodyFatPct)
   // Massa lemak dari persen lemak perangkat butuh berat yang nyata; tanpa berat, persen itu tidak dihitung.
   const beratNyata = wKg ?? (cur.diisi.has('w') ? cur.b.w : undefined)
-  if (bf && beratNyata) { patch.bfm = +((beratNyata * bf) / 100).toFixed(1); changed.push('Body Fat') }
-  const smm = num(hc.muscleMassKg); if (smm) { patch.smm = smm; changed.push('Muscle Mass') }
-  const vo2 = num(hc.vo2max); if (vo2) { patch.vo2 = vo2; changed.push('VO₂max') }
-  const rhr = num(hc.restingHr); if (rhr) { patch.rhr = rhr; changed.push('Resting HR') }
-  const hrv = num(hc.hrvMs); if (hrv) { patch.hrv = hrv; changed.push('HRV') }
-  const sleepH = num(hc.sleepH); if (sleepH) { patch.sleepH = sleepH; changed.push('Sleep') }
-  return { next: terapkan(cur, patch), changed }
+  if (bf && beratNyata) setIfDiff('bfm', 'Body Fat', +((beratNyata * bf) / 100).toFixed(1))
+  setIfDiff('smm', 'Muscle Mass', num(hc.muscleMassKg))
+  setIfDiff('vo2', 'VO₂max', num(hc.vo2max))
+  setIfDiff('rhr', 'Resting HR', num(hc.restingHr))
+  setIfDiff('hrv', 'HRV', num(hc.hrvMs))
+  setIfDiff('sleepH', 'Sleep', num(hc.sleepH))
+  return { next: changed.length ? terapkan(cur, patch) : cur, changed }
 }
 
 export function BodyComposition() {
@@ -147,22 +155,36 @@ export function BodyComposition() {
   const activePatient = store?.activePatient ?? null
   const [masukan, setMasukan] = useState<KeadaanMasukan>(() => {
     const initial = load()
-    if (localStorage.getItem(KEY) == null) return syncFromHealthProfile(initial).next
+    if (localStorage.getItem(KEY) == null) {
+      const fresh = getVitals(store?.account ?? null)
+      return syncFromHealthProfile(initial, {
+        heightCm: fresh.heightCm ?? activePatient?.heightCm,
+        weightKg: fresh.weightKg ?? activePatient?.weightKg,
+        sex: activePatient?.sex,
+        dob: activePatient?.dob,
+      }).next
+    }
     return initial
   })
   const { b, diisi } = masukan
+  const lastSharedRef = useRef<string>('')
   const [syncNote, setSyncNote] = useState('')
   const [baruDisimpan, setBaruDisimpan] = useState<string | null>(null)
   const [useInBodyBfm, setUseInBodyBfm] = useState(false)
   const [quickOpen, setQuickOpen] = useState(false)
   // Hanya isian nyata yang disimpan; sebelum ada satu pun isian, tidak ada yang ditulis (halaman lain membaca kunci ini).
   useEffect(() => {
-    try { if (diisi.size > 0 || localStorage.getItem(KEY) != null) localStorage.setItem(KEY, JSON.stringify(serialisasi(masukan))) } catch { /* ignore */ }
+    try { if (masukan.diisi.size > 0 || localStorage.getItem(KEY) != null) localStorage.setItem(KEY, JSON.stringify(serialisasi(masukan))) } catch { /* ignore */ }
   }, [masukan])
   // Keep the shared Health Profile cache in sync with manual edits made here too,
   // so calculators elsewhere in the app don't drift from what's shown on this page.
   // Hanya yang benar-benar diisi yang dibagikan: angka bawaan tidak boleh sampai ke profil bersama.
-  useEffect(() => { pushBiometrics(biometrikUntukDibagikan(masukan)) }, [masukan])
+  useEffect(() => {
+    const sig = JSON.stringify(biometrikUntukDibagikan(masukan))
+    if (sig === lastSharedRef.current) return
+    lastSharedRef.current = sig
+    pushBiometrics(biometrikUntukDibagikan(masukan))
+  }, [masukan])
   const u = (p: Partial<Record<KunciBody, unknown>>) => {
     const patchVitals: Record<string, unknown> = {}
     if (typeof p.w === 'number' && Number.isFinite(p.w) && p.w > 0) patchVitals.weightKg = p.w
@@ -183,12 +205,14 @@ export function BodyComposition() {
   }
 
   function syncNow(silent = false) {
+    const freshVital = getVitals(store?.account ?? null)
+    const freshPatient = store?.activePatient ?? activePatient
     setMasukan((cur) => {
       const { next, changed } = syncFromHealthProfile(cur, {
-        heightCm: vital.heightCm ?? activePatient?.heightCm,
-        weightKg: vital.weightKg ?? activePatient?.weightKg,
-        sex: activePatient?.sex,
-        dob: activePatient?.dob,
+        heightCm: freshVital.heightCm ?? freshPatient?.heightCm,
+        weightKg: freshVital.weightKg ?? freshPatient?.weightKg,
+        sex: freshPatient?.sex,
+        dob: freshPatient?.dob,
       })
       if (!silent) setSyncNote(changed.length ? `Synced from wearable & profile: ${changed.join(', ')}.` : 'No new device or profile fields found yet.')
       return changed.length ? next : cur

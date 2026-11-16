@@ -429,6 +429,9 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/catatan" element={<PusatCatatan />} />
               <Route path="/rujukan" element={<PusatRujukan />} />
               <Route path="/athlete" element={<Athlete />} />
+              <Route path="/fitness" element={<Navigate to="/latihan" replace />} />
+              <Route path="/login" element={<Navigate to="/" replace />} />
+              <Route path="/for-you" element={<Navigate to="/?t=for-you" replace />} />
               <Route path="/recovery" element={<Navigate to="/tubuh?t=pulih" replace />} />
               <Route path="/workout" element={<Navigate to="/latihan?t=sesi" replace />} />
               <Route path="/sexual-health" element={<SexualHealth />} />
@@ -467,18 +470,16 @@ createRoot(document.getElementById('root')!).render(
 // 500ms so it never flashes imperceptibly on a fast connection.
 const SPLASH_MIN_MS = 500
 const splashShownAt = performance.now()
-requestAnimationFrame(() => {
+const dismissSplash = () => {
   const splash = document.getElementById('pmd-splash')
   if (!splash) return
+  splash.style.pointerEvents = 'none'
+  splash.style.opacity = '0'
+  setTimeout(() => splash.remove(), 450)
+}
+setTimeout(dismissSplash, 2200)
+requestAnimationFrame(() => {
+  if (!document.getElementById('pmd-splash')) return
   const wait = Math.max(0, SPLASH_MIN_MS - (performance.now() - splashShownAt))
-  setTimeout(() => {
-    // pointer-events must drop in the same tick as opacity, not after the
-    // 450ms fade finishes — otherwise this fixed, full-viewport, z-index:9999
-    // layer keeps swallowing every tap/click underneath it (menu, search,
-    // any button anywhere) for the whole fade duration despite being
-    // invisible.
-    splash.style.pointerEvents = 'none'
-    splash.style.opacity = '0'
-    setTimeout(() => splash.remove(), 450)
-  }, wait)
+  setTimeout(dismissSplash, wait)
 })

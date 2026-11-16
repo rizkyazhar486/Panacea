@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { FOR_YOU_WIDGET_CATALOG, type ForYouWidgetDefinition } from '../../lib/forYouWidgetCatalog'
-import { getVitals, type Vitals } from '../../lib/healthVitals'
+import { type Vitals } from '../../lib/healthVitals'
+import { readUnifiedLocalVitals } from '../../domains/identity/bootVitals'
 import { useOptionalStore } from '../../lib/store'
 
 function sourceLabel(widget: ForYouWidgetDefinition) {
@@ -53,11 +54,13 @@ export function ForYouDailyStack() {
   const vitals = useMemo<Partial<Vitals>>(() => {
     void rev
     try {
-      return getVitals(account)
+      return readUnifiedLocalVitals(account, {
+        sleepLogs: store?.state.sleepLogs,
+      })
     } catch {
       return {}
     }
-  }, [account, rev])
+  }, [account, store?.state.sleepLogs, rev])
 
   const visibleWidgets = useMemo(
     () => expanded ? FOR_YOU_WIDGET_CATALOG : FOR_YOU_WIDGET_CATALOG.slice(0, 4),

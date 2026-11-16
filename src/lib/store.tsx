@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactNode } from 'react'
 import { parseWithdrawAmount, checkTokenAmount } from '../domains/wallet/index.ts'
 import { bindPersonalHealthAccount } from '../shared/kernel/personalHealthStorageScope.ts'
+import { resolveAutoResumeAccount, rememberAccountProfile } from '../domains/identity/bootVitals.ts'
 import { normalisasiDaftarPasien } from './normalisasiPasien'
 import { hariIni } from './tanggal'
 import { api, backendEnabled, type BackendPost } from './api'
@@ -192,18 +193,14 @@ function legacySelfPatientId(email: string): string {
 // health caches are allowed to read or write. Use the full normalized email
 // (not the legacy truncated patient key) so two local accounts cannot alias.
 function normalizeLocalHealthIdentity(account: Account): Account {
+  const email = account.email?.trim().toLowerCase() ?? ''
   const serverId = account.id?.trim()
-  if (serverId) {
-    return serverId === account.id ? account : { ...account, id: serverId }
-  }
-  if (account.role !== 'pasien' && account.role !== 'dokter') return account
-
-  const email = account.email.trim().toLowerCase()
-  if (!email) return account
-  const identified: Account = { ...account, id: `local:${encodeURIComponent(email)}` }
-  return account.role === 'dokter' && !account.patientId?.trim()
-    ? { ...identified, patientId: 'p1' }
-    : identified
+  const id = serverId || (email ? `local:${encodeURIComponent(email)}` : '')
+  if (!id) return account
+  const existingPatientId = account.patientId?.trim()
+  const patientId = existingPatientId || `self-u-${id}`
+  if (id === account.id && patientId === account.patientId) return account
+  return { ...account, id, patientId }
 }
 
 function pindahkanKunciPasien<T>(map: Record<string, T>, dari: string, ke: string): Record<string, T> {
@@ -311,15 +308,56 @@ function saveSession(account: Account) {
 function clearSession() {
   try { localStorage.removeItem(SESSION_KEY) } catch { /* ignore */ }
 }
-// Returns the remembered account if the session is still within 7 days, else
-// clears it (auto-logout) and returns null.
+// Returns the remembered account if the session is still within 7 days, or
+// automatically adopts the active user session when the user is already onboarded
+// or has saved health/wearable profiles without forcing an unwanted re-login.
 function loadSession(): Account | null {
   try {
     const raw = localStorage.getItem(SESSION_KEY)
-    if (!raw) return null
-    const { account, loginAt } = JSON.parse(raw) as { account: Account; loginAt: number }
-    if (!account || typeof loginAt !== 'number' || Date.now() - loginAt > SESSION_TTL) { clearSession(); return null }
-    return account
+    if (raw) {
+      const { account, loginAt } = JSON.parse(raw) as { account: Account; loginAt: number }
+      if (account && typeof loginAt === 'number' && Date.now() - loginAt <= SESSION_TTL) {
+        const normalized = normalizeLocalHealthIdentity(account)
+        if (normalized !== account) {
+          try { localStorage.setItem(SESSION_KEY, JSON.stringify({ account: normalized, loginAt })) } catch { /* ignore */ }
+        }
+        return normalized
+      }
+    }
+    // Auto-reconciliation fallback: if user already has completed onboarding,
+    // or has health profile / biometric telemetry / workout logs in localStorage,
+    // adopt seamlessly into their active account without forcing a re-login.
+    const hpRaw = localStorage.getItem('pmd_health_profile')
+    const bcRaw = localStorage.getItem('pm_bodycomp_v1')
+    const onboarded = localStorage.getItem('panacea_onboarded_v1') === '1'
+    if (hpRaw || bcRaw || onboarded) {
+      let pmdProf: Record<string, unknown> = {}
+      try { pmdProf = JSON.parse(localStorage.getItem('pmd_profile') || '{}') } catch { /* ignore */ }
+      const email = typeof pmdProf?.email === 'string' && pmdProf.email.includes('@')
+        ? pmdProf.email.trim().toLowerCase()
+        : OWNER_EMAIL.trim().toLowerCase()
+      const isOwner = email === OWNER_EMAIL.trim().toLowerCase()
+      const targetRole: Role = (typeof pmdProf?.role === 'string' && ['owner', 'dokter', 'pasien', 'perawat', 'admin'].includes(pmdProf.role))
+        ? (pmdProf.role as Role)
+        : (isOwner ? 'owner' : 'pasien')
+      const targetName = typeof pmdProf?.name === 'string' && pmdProf.name.trim()
+        ? pmdProf.name.trim()
+        : (isOwner ? 'Dr. Rizky Muhammad Asrizal' : email.split('@')[0])
+      const fallbackAccount: Account = {
+        id: `local:${encodeURIComponent(email)}`,
+        email,
+        name: targetName,
+        role: targetRole,
+        isOwner,
+        isSubscriber: isOwner || targetRole === 'owner',
+        loggedAt: new Date().toISOString(),
+        patientId: `self-u-local%3A${encodeURIComponent(email)}`,
+        consentAt: new Date().toISOString(),
+      }
+      saveSession(fallbackAccount)
+      return fallbackAccount
+    }
+    return null
   } catch { return null }
 }
 
@@ -327,8 +365,26 @@ function load(): AppState {
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
     const base = raw ? { ...seed(), ...JSON.parse(raw) } : seed()
-    // Restore a remembered login (≤7 days) so frequent users stay signed in.
-    return { ...base, account: loadSession() }
+    // Restore a remembered login (<=7 days) OR auto-resume onboarded personal vault without forcing re-login.
+    let account = loadSession()
+    if (!account) {
+      const resumed = resolveAutoResumeAccount({
+        ownerEmail: OWNER_EMAIL,
+        profiles: base.profiles,
+        patients: base.patients,
+      })
+      if (resumed) {
+        account = normalizeLocalHealthIdentity(resumed)
+        saveSession(account)
+      }
+    }
+    const patients = Array.isArray(base.patients) ? base.patients : []
+    let activePatientId = base.activePatientId
+    if ((!activePatientId || activePatientId === 'none') && patients.length > 0) {
+      const owned = account?.patientId ? patients.find((p: Patient) => p.id === account.patientId) : undefined
+      activePatientId = owned?.id ?? patients[0].id
+    }
+    return { ...base, account, activePatientId }
   } catch {
     /* ignore */
   }
@@ -499,6 +555,26 @@ export function StoreProvider({ children, visibilityDocument }: { children: Reac
     return () => bindPersonalHealthAccount(null)
   }, [state.account])
 
+  useEffect(() => {
+    const acc = state.account
+    if (!acc) return
+    rememberAccountProfile(acc)
+    const patient = state.patients.find((p) => p.id === state.activePatientId) ?? null
+    const patientVitals = patient ? state.vitals[patient.id] : undefined
+    const sleepLogs = state.sleepLogs
+    let cancelled = false
+    void import('../domains/identity/localRecovery.ts')
+      .then(({ recoverSameUserVitalsIntoScope }) => {
+        if (cancelled) return
+        recoverSameUserVitalsIntoScope(acc, { patient, patientVitals, sleepLogs })
+      })
+      .catch(() => {})
+    return () => {
+      cancelled = true
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.account?.id, state.account?.patientId])
+
   // Rekam yang dikembalikan server adalah canonical: identitas penandatangan,
   // waktu tanda tangan, dan verifikasi fisik dicap server, bukan dipercaya dari klien.
   const terimaBalasanKlinis: TerimaBalasan = (op, hasil) => {
@@ -524,17 +600,33 @@ export function StoreProvider({ children, visibilityDocument }: { children: Reac
   // (re-pulled by the posts poll below) and was never safe to treat as the local
   // source of truth for that data — see AUDIT_STATUS_REVAMP_UI.md.
   useEffect(() => {
-    const t = setTimeout(() => {
-      const { account: _account, ...rest } = state
+    const flush = () => {
+      const { account: _account, ...rest } = stateRef.current
       const persist = buildPersistedSnapshot(rest)
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(persist))
       } catch {
         /* quota exceeded even without media — give up persisting this update */
       }
-    }, 400)
-    return () => clearTimeout(t)
-  }, [state])
+    }
+    const t = setTimeout(flush, 400)
+    const onHidden = () => {
+      if (!visibilityDocument || visibilityDocument.visibilityState === 'hidden') flush()
+    }
+    if (typeof window !== 'undefined') {
+      window.addEventListener('pagehide', flush)
+      window.addEventListener('beforeunload', flush)
+    }
+    visibilityDocument?.addEventListener('visibilitychange', onHidden)
+    return () => {
+      clearTimeout(t)
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('pagehide', flush)
+        window.removeEventListener('beforeunload', flush)
+      }
+      visibilityDocument?.removeEventListener('visibilitychange', onHidden)
+    }
+  }, [state, visibilityDocument])
 
   // Auto-login DISABLED by request: the app always starts at the landing/login,
   // even if a backend session cookie exists. Users sign in explicitly each visit.
@@ -776,11 +868,13 @@ export function StoreProvider({ children, visibilityDocument }: { children: Reac
               : x,
           ),
         })),
-      login: (account) =>
-        setState((st) => {
+      login: (account) => {
+        try { localStorage.removeItem('panacea.explicit_logout.v1') } catch { /* ignore */ }
+        return setState((st) => {
           const identifiedAccount = normalizeLocalHealthIdentity(account)
           // A patient gets their OWN record, built from registration details
-          // (no dummy data). Doctors start with an empty patient list.
+          // (no dummy data). Existing self-patient records retain all previously
+          // entered demographics, vitals and clinical state across re-logins.
           if (identifiedAccount.role === 'pasien') {
             const self = patientFromAccount(identifiedAccount)
             const legacyId = legacySelfPatientId(identifiedAccount.email)
@@ -789,7 +883,7 @@ export function StoreProvider({ children, visibilityDocument }: { children: Reac
             const patients = stableAda
               ? st.patients
               : legacyAda
-                ? st.patients.map((p) => (p.id === legacyId ? { ...p, ...self } : p))
+                ? st.patients.map((p) => (p.id === legacyId ? { ...self, ...p, id: self.id } : p))
                 : [...st.patients, self]
             const acc = { ...identifiedAccount, patientId: self.id }
             saveSession(acc) // remember login for 7 days
@@ -810,25 +904,59 @@ export function StoreProvider({ children, visibilityDocument }: { children: Reac
               activePatientId: self.id,
             }
           }
+          const activePatientId =
+            (!st.activePatientId || st.activePatientId === 'none') && st.patients.length > 0
+              ? (identifiedAccount.patientId && st.patients.some((p) => p.id === identifiedAccount.patientId)
+                  ? identifiedAccount.patientId
+                  : st.patients[0].id)
+              : st.activePatientId
           saveSession(identifiedAccount) // remember login for 7 days
-          return { ...st, account: identifiedAccount }
-        }),
-      logout: () => { clearSession(); return setState((st) => ({ ...st, account: null })) },
+          return { ...st, account: identifiedAccount, activePatientId }
+        })
+      },
+      logout: () => {
+        clearSession()
+        try { localStorage.setItem('panacea.explicit_logout.v1', '1') } catch { /* ignore */ }
+        return setState((st) => ({ ...st, account: null }))
+      },
       syncWalletBalance: (balance) =>
         setState((st) => (st.wallet.balance === balance ? st : { ...st, wallet: { ...st.wallet, balance } })),
       verifyStr: () => {
         if (backendEnabled) api.saveSettings({ strStatus: 'verified' }).catch(() => {})
-        setState((st) => (st.account ? { ...st, account: { ...st.account, strStatus: 'verified' } } : st))
+        setState((st) => {
+          if (!st.account) return st
+          const nextAcc: Account = { ...st.account, strStatus: 'verified' }
+          saveSession(nextAcc)
+          return { ...st, account: nextAcc }
+        })
       },
       setMode: (role) =>
         setState((st) => {
           if (!st.account) return st
-          // Allow mode switching for platform owner or during local development/demo
+          // Allow mode switching for platform owner or during local development
           if (!st.account.isOwner && backendEnabled) return st
+          const nextAccount = normalizeLocalHealthIdentity({ ...st.account, role })
+          let patients = st.patients
+          let activePatientId = st.activePatientId
+          if (role === 'pasien') {
+            const ownPatient = patients.find((p) => p.id === nextAccount.patientId)
+            if (ownPatient) {
+              activePatientId = ownPatient.id
+            } else if (patients.length === 0) {
+              const self = patientFromAccount(nextAccount)
+              const patched = { ...self, id: nextAccount.patientId ?? self.id }
+              patients = [patched]
+              activePatientId = patched.id
+            } else {
+              activePatientId = patients[0].id
+            }
+          }
+          saveSession(nextAccount)
           return {
             ...st,
-            account: { ...st.account, role },
-            activePatientId: role === 'pasien' ? st.patients[0]?.id ?? st.activePatientId : st.activePatientId,
+            account: nextAccount,
+            patients,
+            activePatientId,
           }
         }),
       addAdminEmail: (email) =>

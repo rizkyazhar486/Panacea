@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { lazy, Suspense, useRef, useState } from 'react'
 import { Prosa } from '../../components/Prosa'
 import { hariIni } from '../../lib/tanggal'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../../components/ui'
@@ -6,6 +6,10 @@ import { IconMoon, IconLeaf, IconActivity } from '../../components/icons'
 import { VideoGallery } from '../../components/VideoGallery'
 import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 import { getHealthCache, hasHealth } from '../../lib/profile'
+
+const HolisticRecoveryModalities = lazy(() =>
+  import('../../components/HolisticRecoveryModalities').then((m) => ({ default: m.HolisticRecoveryModalities })),
+)
 
 type RecoveryType = 'surgery' | 'injury' | 'illness' | 'overtraining'
 
@@ -324,6 +328,9 @@ export function Recovery() {
       </Card>
 
       <SleepScoreCard />
+      <Suspense fallback={null}>
+        <HolisticRecoveryModalities />
+      </Suspense>
       <MeditationCard />
     </div>
   )
