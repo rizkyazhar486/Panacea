@@ -4,7 +4,7 @@ import { PencarianGlobal } from '../PencarianGlobal'
 import { useGestur } from '../../lib/useGestur'
 import { pasangKilau } from '../../lib/kilau'
 import { buatAlurKembali } from '../../lib/alurHalaman'
-import { useState, useEffect, useLayoutEffect, useCallback, useRef, type ReactNode } from 'react'
+import { useState, useEffect, useLayoutEffect, useCallback, useRef, lazy, Suspense, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import { LogoMark } from '../Logo'
 import { FabNavigasi } from '../FabNavigasi'
@@ -47,8 +47,8 @@ import { useStore } from '../../lib/store'
 import { getTheme, toggleTheme, type Theme } from '../../lib/theme'
 import { ageFromDob } from '../../lib/anthro'
 import { Badge } from '../ui'
-import { Login } from '../../pages/Login'
 import { Landing } from '../../pages/Landing'
+import { Memuat, RangkaKartu } from '../Rangka'
 import { ContactService } from '../ContactService'
 import { NotificationBell } from '../NotificationBell'
 import { InstallBanner } from '../InstallApp'
@@ -68,10 +68,23 @@ import { judulRute } from '../../lib/judulRute'
 import '../../styles/command-bar.css'
 import '../../styles/superpage-convergence.css'
 
+// Sign-in opens only on a click, so its code and login.css stay out of the first download (F2 bundle budget).
+// No idle prefetch: a failed background fetch would fire vite:preloadError, whose recovery reloads the page mid-read.
+const Login = lazy(() => import('../../pages/Login').then((m) => ({ default: m.Login })))
+
+function LoginScreen({ onBack }: { onBack: () => void }) {
+  const loading = (
+    <div className="mx-auto min-h-screen w-full max-w-md px-4 py-16">
+      <Memuat label="Opening sign-in"><RangkaKartu baris={3} /></Memuat>
+    </div>
+  )
+  return <Suspense fallback={loading}><Login onBack={onBack} /></Suspense>
+}
+
 // Public entry: marketing landing first, then the login screen on demand.
 function PublicEntry() {
   const [showLogin, setShowLogin] = useState(false)
-  return showLogin ? <Login onBack={() => setShowLogin(false)} /> : <Landing onMasuk={() => setShowLogin(true)} />
+  return showLogin ? <LoginScreen onBack={() => setShowLogin(false)} /> : <Landing onMasuk={() => setShowLogin(true)} />
 }
 
 type Nav = { to: string; label: string; icon: typeof IconDashboard; roles: Role[]; end?: boolean; group?: string }
@@ -509,7 +522,7 @@ export function Shell({ children }: { children: ReactNode }) {
   // The reference atlas is educational geometry, not a patient record.
   // It stays reachable before sign-in so the first screen is the body, not the marketing page.
   if (!account && loc.pathname === '/body-explorer') {
-    if (masukDariAtlas) return <Login onBack={() => setMasukDariAtlas(false)} />
+    if (masukDariAtlas) return <LoginScreen onBack={() => setMasukDariAtlas(false)} />
     return (
       <div className={`min-h-screen transition-colors ${theme === 'dark' ? 'dark bg-[#070b10] text-white' : 'bg-neutral-50 text-neutral-900'}`}>
         <header className="sticky top-0 z-30 flex items-center justify-between gap-3 border-b border-black/5 bg-white/85 px-4 py-2.5 backdrop-blur-xl dark:border-white/10 dark:bg-[#070b10]/85 sm:px-6">
