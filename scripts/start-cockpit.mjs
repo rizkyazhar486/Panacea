@@ -11,6 +11,11 @@ import {
   evaluateFiveDimension100PercentPublicReadiness,
   runPanaceaMedWave700UniversalPublic100ReadinessMasterOs
 } from '../src/core/panaceamedUniversalPublic100ReadinessOs.mjs';
+import {
+  evaluatePublicGeneralReadinessScore,
+  evaluateSevenPersonaPublicJourney,
+  runPanaceaMedWave700PublicGeneralReadinessMasterOs
+} from '../src/core/panaceamedPublicGeneralReadinessCenturyWave700Os.mjs';
 import { runPanaceaMedWave600DailyWearableMasterOs } from '../src/core/panaceamedTwentyFiveWearablesDailyLifeOs.mjs';
 import { runPanaceaMedWave550VisaMastercardAndMultiDeviceMasterOs } from '../src/core/panaceamedVisaMastercardTokenQrAndMultiDeviceOs.mjs';
 import { runPanaceaMedWave500FluidChameleonMasterOs } from '../src/core/panaceamedFluidChameleonCamouflageOs.mjs';
@@ -146,7 +151,12 @@ export function createCockpitServer() {
       singleScoreHero: evaluateSingleScoreZeroOverwhelmUx(),
       vitalityCards: evaluateInteractiveVitalityScrollingCards()
     });
-    if (req.method === "GET" && urlPath === "/api/v19/public/readiness-100") return sendJson(runPanaceaMedWave700UniversalPublic100ReadinessMasterOs());
+    if (req.method === "GET" && (urlPath === "/api/v19/public/readiness" || urlPath === "/api/v19/public/readiness-100")) return sendJson({
+      wave700Master: runPanaceaMedWave700PublicGeneralReadinessMasterOs(),
+      septencentennialReadiness: runPanaceaMedWave700UniversalPublic100ReadinessMasterOs()
+    });
+    if (req.method === "GET" && urlPath === "/api/v19/public/emergency-pass") return sendJson(evaluateSevenPersonaPublicJourney('PERSONA_06_PARAMEDIS_IGD_DARURAT'));
+    if (req.method === "GET" && urlPath === "/api/v19/public/family-safety") return sendJson(evaluateSevenPersonaPublicJourney('PERSONA_02_IBU_DAN_BALITA_POSYANDU'));
     if (req.method === "GET" && urlPath === "/api/v19/public/everyday-triage") return sendJson({
       triage: evaluateUniversalPublicEverydayTriageAndGuide(),
       household: evaluateHouseholdAndCommunityPublicHealthCompanion(),
