@@ -47,7 +47,7 @@ function Tile({ label, reading, unit, digits = 0, hint }: { label: string; readi
         </>
       ) : (
         <>
-          <div className="mt-1 text-2xl font-black text-white/30" aria-label="not recorded">—</div>
+          <div className="mt-1 text-2xl font-black text-white/30"><span aria-hidden="true">—</span><span className="sr-only">not recorded</span></div>
           <span className="mt-1 block text-[11px] text-white/55">{hint}</span>
         </>
       )}

@@ -10,6 +10,9 @@ const KARANGAN: Array<[RegExp, string]> = [
   [/ready for SATUSEHAT|SATUSEHAT bridging/i, 'klaim integrasi SATUSEHAT siap'],
 ]
 for (const [re, nama] of KARANGAN) assert.doesNotMatch(src, re, `cockpit tidak boleh memuat: ${nama}`)
+// aksesibilitas: aria-label pada <div> tanpa peran membuat axe melaporkan `incomplete`; teks kosong memakai sr-only
+assert.doesNotMatch(src, /<div[^>]*\baria-label=/, 'aria-label pada div tanpa peran')
+assert.match(src, /className="sr-only">not recorded/)
 // positif (berpasangan): yang harus ada
 assert.match(src, /buildCockpitReadout/); assert.match(src, /not recorded/); assert.match(src, /BatasKlaimKesehatan/)
 assert.match(src, /not reviewed by a clinician/)
