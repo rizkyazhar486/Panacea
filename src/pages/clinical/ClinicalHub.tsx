@@ -12,14 +12,8 @@ import { SurfaceGuide } from '../../components/SurfaceGuide'
 import { MentalHealthClinicalResearchLab } from '../../components/MentalHealthClinicalResearchLab'
 import { Fold } from '../../shared/ui/Fold'
 import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
-import {
-  buildClinicalFhirBundle,
-  downloadClinicalFhirBundle,
-  downloadSoapSbarReport,
-  generateSoapSbarSummary,
-  printClinicalReport,
-  serializeClinicalFhirBundle,
-} from '../../domains/clinical-operations'
+import { buildClinicalFhirBundle, generateSoapSbarSummary, serializeClinicalFhirBundle } from '../../domains/clinical-operations/model/clinicalInterop'
+import { downloadClinicalFhirBundle, downloadSoapSbarReport, printClinicalReport } from '../../domains/clinical-operations/ui/clinicalInteropActions'
 import { readUnifiedLocalVitals } from '../../domains/identity/localRecovery'
 import { readRecoveryLedger } from '../../domains/personal-health/adapters/recoveryLedgerStorage'
 

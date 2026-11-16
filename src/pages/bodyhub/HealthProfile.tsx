@@ -19,7 +19,8 @@ import { mergeDemoStored } from '../../lib/profile'
 import { parseHealthFile, type ImportResult } from '../../lib/healthImport'
 import { getVitals, mergeVitals } from '../../lib/healthVitals'
 import { readUnifiedLocalVitals, recoverSameUserVitalsIntoScope } from '../../domains/identity/localRecovery'
-import { downloadClinicalFhirBundle, downloadSoapSbarReport } from '../../domains/clinical-operations'
+// Export actions load on click: the clinical-operations barrel drags FHIR/interop code into the page otherwise.
+const loadInteropActions = () => import('../../domains/clinical-operations/ui/clinicalInteropActions')
 import { deretMetrik } from '../../lib/riwayatVitals'
 import { parseWorkouts, parseHrNotifications } from '../../lib/workoutImport'
 import { mergeWorkouts, mergeHrNotifications } from '../../lib/workoutStore'
@@ -354,11 +355,13 @@ export function HealthProfile() {
       ...(p.steps > 0 ? { steps: p.steps } : {}),
     }
   }
-  function exportFhir() {
+  async function exportFhir() {
+    const { downloadClinicalFhirBundle } = await loadInteropActions()
     downloadClinicalFhirBundle({ vitals: mergedExportVitals(), patient: activePatient, account })
     setNote('Exported HL7 FHIR R4 SATUSEHAT bundle.')
   }
-  function exportSoapSbar() {
+  async function exportSoapSbar() {
+    const { downloadSoapSbarReport } = await loadInteropActions()
     downloadSoapSbarReport({ vitals: mergedExportVitals(), patient: activePatient, account })
     setNote('Exported patient health summary (SOAP/SBAR draft).')
   }
