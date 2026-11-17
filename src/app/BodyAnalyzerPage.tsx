@@ -82,6 +82,12 @@ export default function BodyAnalyzerPage() {
             🧬 MedSciHub UHD 5K 4D Anatomy & AI-EMR
           </a>
           <a
+            href="/multiscale-quantum-exposome-os.html"
+            style={{ fontSize: "11px", fontWeight: 700, padding: "6px 10px", borderRadius: "8px", background: "rgba(6, 182, 212, 0.22)", color: "#67e8f9", border: "1px solid rgba(6, 182, 212, 0.5)", textDecoration: "none" }}
+          >
+            🌌 6-Tier Quantum-to-Exposome Living OS
+          </a>
+          <a
             href="/digital-cellular-biosphere-os.html"
             style={{ fontSize: "11px", fontWeight: 700, padding: "6px 10px", borderRadius: "8px", background: "rgba(16, 185, 129, 0.22)", color: "#34d399", border: "1px solid rgba(16, 185, 129, 0.5)", textDecoration: "none" }}
           >
