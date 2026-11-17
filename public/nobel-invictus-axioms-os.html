@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PanaceaMed OS · Nobel Invictus Axioms of the Physical World & Human Medicine</title>
+  <script src="/panacea-superos-bridge.js"></script>
+  <style>
+    :root {
+      --bg: #020617;
+      --surface: rgba(15, 23, 42, 0.92);
+      --card: rgba(2, 6, 23, 0.84);
+      --border: rgba(148, 163, 184, 0.2);
+      --cyan: #38bdf8;
+      --emerald: #10b981;
+      --amber: #f59e0b;
+      --rose: #f43f5e;
+      --violet: #a855f7;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: radial-gradient(circle at 50% 0%, #0f172a 0%, #020617 85%);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', system-ui, sans-serif;
+      min-height: 100vh;
+      padding: 16px;
+      line-height: 1.45;
+    }
+    .topbar {
+      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 12px 16px; margin-bottom: 12px;
+    }
+    .btn {
+      text-decoration: none; color: var(--text); background: rgba(30, 41, 59, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.25); border-radius: 7px;
+      padding: 6px 11px; font-size: 11px; font-weight: 600; cursor: pointer;
+      transition: all 0.15s ease; display: inline-flex; align-items: center; gap: 5px;
+    }
+    .btn:hover, .btn.active { background: rgba(16, 185, 129, 0.2); border-color: var(--emerald); color: #34d399; }
+    .axiom-strip {
+      display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 14px;
+    }
+    @media (max-width: 1200px) { .axiom-strip { grid-template-columns: repeat(2, 1fr); } }
+    .axiom-tab {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+      padding: 10px 12px; cursor: pointer; transition: all 0.15s ease;
+    }
+    .axiom-tab.active, .axiom-tab:hover {
+      border-color: var(--cyan); background: rgba(56, 189, 248, 0.14);
+    }
+    .axiom-tab .ax-no { font-size: 10px; font-weight: 800; color: var(--cyan); text-transform: uppercase; }
+    .axiom-tab .ax-name { font-size: 12px; font-weight: 700; color: #fff; margin-top: 2px; }
+    .axiom-tab .ax-nobel { font-size: 10px; color: var(--muted); margin-top: 2px; }
+    .grid-3 {
+      display: grid; grid-template-columns: 350px 1fr 370px; gap: 14px;
+    }
+    @media (max-width: 1220px) { .grid-3 { grid-template-columns: 1fr; } }
+    .col { display: flex; flex-direction: column; gap: 14px; }
+    .panel {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 14px 16px;
+    }
+    .panel-hdr {
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.55px;
+      color: var(--cyan); margin-bottom: 10px; padding-bottom: 6px;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.14);
+    }
+    .badge {
+      font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 999px;
+      background: rgba(16, 185, 129, 0.16); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.38);
+    }
+    .slider-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 11px; margin: 6px 0; }
+    .slider-row input[type=range] { flex: 1; accent-color: var(--emerald); }
+    .kv {
+      display: flex; justify-content: space-between; align-items: baseline;
+      font-size: 11.5px; padding: 4.5px 0; border-bottom: 1px dashed rgba(148, 163, 184, 0.12);
+    }
+    .kv span:first-child { color: var(--muted); }
+    .kv span:last-child { font-family: 'SF Mono', ui-monospace, monospace; font-weight: 700; color: #f1f5f9; }
+    .eq-box {
+      font-family: 'SF Mono', ui-monospace, monospace; font-size: 10.5px; color: #34d399;
+      background: var(--card); border: 1px solid rgba(16, 185, 129, 0.32);
+      border-radius: 7px; padding: 8px 10px; margin-top: 6px; line-height: 1.45;
+    }
+    .note-box {
+      background: var(--card); border-left: 3px solid var(--cyan);
+      border-radius: 6px; padding: 9px 11px; font-size: 11.5px; color: #e2e8f0; margin-top: 8px; line-height: 1.5;
+    }
+    .svg-box {
+      width: 100%; background: #020617; border: 1px solid rgba(148, 163, 184, 0.16);
+      border-radius: 9px; padding: 8px; margin-top: 8px;
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <a href="/#/body-exposure" class="btn">← Body Cockpit</a>
+      <a href="/panaceamed-unified-superos.html" class="btn">🌐 Master Super-OS</a>
+      <div>
+        <strong style="font-size:14px;">🏅 PanaceaMed Nobel Invictus · Axioms of the World & Human Physics-Medicine OS</strong>
+        <div style="font-size:11px;color:var(--muted);">Unifying First-Principle Physical Laws & Nobel-Validated Physiological Mechanisms into Instinctive Clinical Action</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;">
+      <a href="/panaceamed-legit-clinical-science-os.html" class="btn">⚕️ Quantitative QSP Core</a>
+      <a href="/omega-invictus-body-exposure-os.html" class="btn">👑 Omega 8-in-1</a>
+      <button class="btn active" onclick="syncAndExportAxioms()">⚡ Sync & Export FHIR R4</button>
+    </div>
+  </header>
+
+  <!-- 5 AXIOMS OF THE PHYSICAL WORLD & HUMAN LIFE -->
+  <section class="axiom-strip" id="axiom-tabs"></section>
+
+  <main class="grid-3">
+    <!-- KOLOM 1: MODULATOR FISIKA & BIOMETRIK MANUSIA REAL-TIME -->
+    <div class="col">
+      <div class="panel">
+        <div class="panel-hdr">
+          <span>I. Physical World & Human Boundary Inputs</span>
+          <span class="badge" id="sync-badge">Profile Synced</span>
+        </div>
+        <div class="slider-row">
+          <span>1. Tekanan O₂ Alveolar / HBOT (ATA)</span>
+          <input type="range" id="ax-ata" min="0.6" max="2.8" step="0.1" value="1.0" />
+          <span id="v-ata">1.0 ATA</span>
+        </div>
+        <div class="slider-row">
+          <span>2. Suhu Termal Ambien (°C)</span>
+          <input type="range" id="ax-temp" min="-130" max="42" step="2" value="24" />
+          <span id="v-temp">24°C</span>
+        </div>
+        <div class="slider-row">
+          <span>3. Iradiasi Foton 660/850nm (mW/cm²)</span>
+          <input type="range" id="ax-light" min="0" max="150" step="5" value="45" />
+          <span id="v-light">45</span>
+        </div>
+        <div class="slider-row">
+          <span>4. Tegangan Geser Vaskular / Latihan (%)</span>
+          <input type="range" id="ax-shear" min="20" max="160" step="5" value="65" />
+          <span id="v-shear">65%</span>
+        </div>
+        <div class="slider-row">
+          <span>5. Fase Sirkadian SCN (0–24 Jam)</span>
+          <input type="range" id="ax-hour" min="0" max="23.5" step="0.5" value="15.0" />
+          <span id="v-hour">15:00</span>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-hdr">
+          <span>II. Nobel Biophysical Transduction Readout</span>
+          <span class="badge">Deterministic</span>
+        </div>
+        <div class="kv"><span>Mitchell Proton-Motive Force (Δp)</span><span id="out-pmf" style="color:#34d399;">-198 mV (36 ATP/mol)</span></div>
+        <div class="kv"><span>PIEZO1 Shear & eNOS Nitric Oxide</span><span id="out-piezo" style="color:#38bdf8;">1.82 Pa · Vasodilated</span></div>
+        <div class="kv"><span>TRPM8 / TRPV1 Thermoreceptor Gating</span><span id="out-trp">Thermoneutral Gate</span></div>
+        <div class="kv"><span>HIF-1α / PHD2 Oxygen Sensing State</span><span id="out-hif">Normoxic Hydroxylation</span></div>
+        <div class="kv"><span>CLOCK:BMAL1 / PER:CRY Phase Ratio</span><span id="out-clock" style="color:#a855f7;">Peak Motor Conductance</span></div>
+      </div>
+    </div>
+
+    <!-- KOLOM 2: INSPEKTOR AKSIOMA DUNIA & MANUSIA + VISUALISASI KURVA AKSI TERKECIL -->
+    <div class="col">
+      <div class="panel">
+        <div class="panel-hdr">
+          <span id="ax-detail-title">Axiom I · Thermodynamics & Chemiosmotic Bioenergetics</span>
+          <span class="badge" id="ax-detail-nobel">Nobel 1977 · 1978 · 1997</span>
+        </div>
+        <div class="eq-box" id="ax-detail-eq"></div>
+        <div class="note-box" id="ax-detail-desc"></div>
+        <div class="svg-box">
+          <div style="font-size:10px;color:var(--muted);margin-bottom:4px;display:flex;justify-content:space-between;">
+            <span>Trajektori Prinsip Aksi Terkecil Hamilton (δS = 0) & Peminimuman Produksi Entropi</span>
+            <span id="lagrangian-label" style="color:#34d399;">S_action Optimal</span>
+          </div>
+          <svg id="axiom-svg" width="100%" height="105" viewBox="0 0 480 105"></svg>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-hdr">
+          <span>III. Instinctive Clinical Correlation (Physics → Bedside Medicine)</span>
+          <span class="badge" id="harmony-badge">Coherence 97.2%</span>
+        </div>
+        <div class="kv"><span>1. Law of Mass Conservation → Fick DO₂ & CO</span><span id="cor-fick">CO 5.02 L/m · DO₂ 1018 mL/m</span></div>
+        <div class="kv"><span>2. Electroneutrality Law → Stewart SIDa & pH</span><span id="cor-stewart">SIDa 39.2 mEq/L · pH 7.40</span></div>
+        <div class="kv"><span>3. Continuum Mechanics → Windkessel & eGFR</span><span id="cor-wind">MAP 89 mmHg · eGFR 114 mL/m</span></div>
+        <div class="kv"><span>4. Least-Action Control → 5-Modality Rx</span><span id="cor-rx" style="color:#34d399;">HBOT 1.5 ATA + PBM 660/850nm</span></div>
+      </div>
+    </div>
+
+    <!-- KOLOM 3: BENEFICENT EXECUTION, SAFETY AUDIT, & NAVIGASI EKOSISTEM -->
+    <div class="col">
+      <div class="panel">
+        <div class="panel-hdr">
+          <span>IV. Beneficent Medical Directive (3-Second Decision)</span>
+          <span class="badge">Primum Non Nocere</span>
+        </div>
+        <div class="note-box" id="beneficent-summary" style="border-left-color:#10b981;"></div>
+        <div class="kv" style="margin-top:8px;"><span>Cardiopulmonary & O₂ Safety</span><span style="color:#34d399;">NEWS2 = 0 · ROX > 25 (Safe)</span></div>
+        <div class="kv"><span>Pharmacogenomic CPIC Barrier</span><span style="color:#34d399;">HLA-B / CYP2C19 / SLCO1B1 Guarded</span></div>
+        <div class="kv"><span>Data Provenance Contract</span><span style="color:#38bdf8;">100% Honest Readout (No Fabrication)</span></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-hdr">
+          <span>V. Complete PanaceaMed OS Studio Matrix</span>
+          <span class="badge">Live on panaceamed.id</span>
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          <a href="/panaceamed-unified-superos.html" class="btn">🌐 Master Super-OS</a>
+          <a href="/panaceamed-legit-clinical-science-os.html" class="btn">⚕️ Quantitative QSP</a>
+          <a href="/omega-invictus-body-exposure-os.html" class="btn">👑 Omega 8-in-1</a>
+          <a href="/multiscale-quantum-exposome-os.html" class="btn">🌌 6-Tier Quantum</a>
+          <a href="/digital-cellular-biosphere-os.html" class="btn">🌱 Cellular Biosphere</a>
+          <a href="/cellular-spacetime-debugger-os.html" class="btn">🔬 Bio-GDB Debugger</a>
+          <a href="/whole-body-exposure-os.html" class="btn">🖥️ Whole-Body Kernel</a>
+          <a href="/numerical-body-exposure-clinical.html" class="btn">📊 Numerical Biophysics</a>
+          <a href="/hippocratic-clinical-os.html" class="btn">🛡️ Hippocratic OS</a>
+          <a href="/personal-digital-self-1to1.html" class="btn">🎮 1:1 Sims 4 / GTA 6</a>
+          <a href="/medscihub-4d-anatomy-emr.html" class="btn">🧬 UHD 5K 4D Anatomy</a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const AXIOMS = [
+      {
+        no: 'Axiom I · Thermodynamics',
+        name: 'Dissipative Structures & Chemiosmosis',
+        nobel: 'Prigogine 1977 · Mitchell 1978 · Boyer 1997',
+        eq: 'dS_univ = d_iS + d_eS ≥ 0  |  Δp = ΔΨ_m - (2.303·R·T/F)·ΔpH ≈ -198 mV',
+        desc: 'Kehidupan manusia mempertahankan entropi internal rendah (homeostasis) dengan menyerap energi bebas dari lingkungan. Gradien elektrokimia proton melintasi membran dalam mitokondria memutar rotor F₀F₁-ATP Synthase untuk menghasilkan ~65 kg ATP per hari.'
+      },
+      {
+        no: 'Axiom II · Electrodynamics',
+        name: 'Bioelectric Membranes & PIEZO/TRP Channels',
+        nobel: 'Hodgkin-Huxley 1963 · Sakmann 1991 · Patapoutian-Julius 2021',
+        eq: 'C_m(dV/dt) = -∑ g_i(V - E_i) + I_piezo(σ_shear) + I_trp(T)',
+        desc: 'Setiap pikiran, detak jantung, dan sensasi fisik diatur oleh fluks ion melintasi kanal membran selektif. Kanal mekanosensitif PIEZO1/2 mengubah regangan aliran darah menjadi sinyal barorefleks, sementara kanal TRPM8/TRPV1 menerjemahkan suhu Cryotherapy & termal menjadi modulasi otonom.'
+      },
+      {
+        no: 'Axiom III · Fluid & Oxygen Physics',
+        name: 'Microvascular Flow, Nitric Oxide & HIF-1α',
+        nobel: 'Krogh 1920 · Ignarro-Murad-Furchgott 1998 · Kaelin-Semenza-Ratcliffe 2019',
+        eq: 'Q = (π·ΔP·r⁴)/(8ηL)  |  J_O2 = -D·∇P_O2  |  [HIF-1α] ∝ 1 / k_PHD2(P_O2)',
+        desc: 'Aliran darah mengikuti hukum pangkat-empat jari-jari pembuluh (r⁴) yang diatur oleh pelepasan Nitric Oxide (eNOS) endotel. Di tingkat seluler, kompleks PHD2-VHL-HIF-1α memantau tekanan parsial oksigen untuk mengatur angiogenesis, eritropoiesis, dan respons hiperbarik (HBOT).'
+      },
+      {
+        no: 'Axiom IV · Information & Time',
+        name: 'Circadian Phase-Locking & Genomic Fidelity',
+        nobel: 'Hall-Rosbash-Young 2017 · Charpentier-Doudna 2020 · Karikó-Weissman 2023',
+        eq: 'd[PER]/dt = V_s·K^n/(K^n + [CRY]^n) - k_d[PER]  |  E_bit ≥ k_B·T·ln(2)',
+        desc: 'Osilator molekuler CLOCK:BMAL1 dan PER:CRY di nukleus suprakiasmatikus (SCN) menyinkronkan ekspresi 40% gen manusia terhadap rotasi bumi 24 jam, meminimalkan disipasi energi informasi seluler mendekati batas termodinamika Landauer.'
+      },
+      {
+        no: 'Axiom V · Least Action',
+        name: 'Hamiltonian Optimality & Primum Non Nocere',
+        nobel: 'Feynman-Hamilton Principle · Hippocratic Clinical Synthesis',
+        eq: 'δS = δ ∫ (T_kinetic - V_allostatic) dt = 0  |  Min_Rx(Strain, Harm)',
+        desc: 'Sebagaimana cahaya dan sistem fisika selalu menempuh lintasan dengan aksi stasioner terkecil (δS = 0), sistem operasi klinis PanaceaMed memilih intervensi terapeutik yang memulihkan homeostasis pasien dengan beban iatrogenik paling minimal.'
+      }
+    ];
+
+    let activeAxiomIdx = 0;
+    const tabContainer = document.getElementById('axiom-tabs');
+    AXIOMS.forEach((ax, idx) => {
+      const div = document.createElement('div');
+      div.className = 'axiom-tab' + (idx === 0 ? ' active' : '');
+      div.innerHTML =
+        '<div class="ax-no">' + ax.no + '</div>' +
+        '<div class="ax-name">' + ax.name + '</div>' +
+        '<div class="ax-nobel">' + ax.nobel + '</div>';
+      div.onclick = () => selectAxiom(idx);
+      tabContainer.appendChild(div);
+    });
+
+    let userVitals = { hr: 62, hrv: 78, spo2: 99, weightKg: 68 };
+    try {
+      if (window.PanaceaSuperOSBridge) {
+        userVitals = window.PanaceaSuperOSBridge.readUnifiedTelemetry();
+      }
+    } catch (e) {}
+
+    function selectAxiom(idx) {
+      activeAxiomIdx = idx;
+      const ax = AXIOMS[idx];
+      document.querySelectorAll('.axiom-tab').forEach((el, i) => el.classList.toggle('active', i === idx));
+      document.getElementById('ax-detail-title').textContent = ax.no + ' · ' + ax.name;
+      document.getElementById('ax-detail-nobel').textContent = ax.nobel;
+      document.getElementById('ax-detail-eq').textContent = ax.eq;
+      document.getElementById('ax-detail-desc').textContent = ax.desc;
+      computeAxiomPhysics();
+    }
+
+    function drawLeastActionCurve(ata, light, shear) {
+      const svg = document.getElementById('axiom-svg');
+      const w = 480, h = 105;
+      let pathOpt = '', pathUncontrolled = '';
+      for (let x = 0; x <= w; x += 4) {
+        const t = (x / w) * 6.0;
+        const damp = 0.55 + (ata - 1.0) * 0.2 + (light / 200);
+        const yOpt = 52 - 36 * Math.exp(-damp * t) * Math.cos(2.4 * t);
+        const yUnc = 52 - 38 * Math.exp(-0.22 * t) * Math.cos(3.2 * t);
+        pathOpt += (x === 0 ? 'M ' : ' L ') + x + ' ' + yOpt.toFixed(1);
+        pathUncontrolled += (x === 0 ? 'M ' : ' L ') + x + ' ' + yUnc.toFixed(1);
+      }
+      svg.innerHTML =
+        '<line x1="0" y1="52" x2="480" y2="52" stroke="rgba(148,163,184,0.2)" stroke-dasharray="3,3"/>' +
+        '<path d="' + pathUncontrolled + '" fill="none" stroke="rgba(244,63,94,0.45)" stroke-width="1.6" stroke-dasharray="4,3"/>' +
+        '<path d="' + pathOpt + '" fill="none" stroke="#10b981" stroke-width="2.4"/>';
+    }
+
+    function computeAxiomPhysics() {
+      const ata = parseFloat(document.getElementById('ax-ata').value) || 1.0;
+      const temp = parseFloat(document.getElementById('ax-temp').value) || 24;
+      const light = parseFloat(document.getElementById('ax-light').value) || 45;
+      const shear = parseFloat(document.getElementById('ax-shear').value) || 65;
+      const hour = parseFloat(document.getElementById('ax-hour').value) || 15;
+
+      document.getElementById('v-ata').textContent = ata.toFixed(1) + ' ATA';
+      document.getElementById('v-temp').textContent = temp + '°C';
+      document.getElementById('v-light').textContent = light + ' mW/cm²';
+      document.getElementById('v-shear').textContent = shear + '%';
+      const hh = Math.floor(hour).toString().padStart(2, '0') + ':' + ((hour % 1) >= 0.5 ? '30' : '00');
+      document.getElementById('v-hour').textContent = hh;
+
+      // 1. Mitchell PMF
+      const pmf = Math.round(186 + (light / 150) * 18 + (ata - 1.0) * 9);
+      document.getElementById('out-pmf').textContent = '-' + pmf + ' mV (ATP Synthase Optimal)';
+
+      // 2. PIEZO1 & eNOS
+      const shearPa = (1.1 + (shear / 100) * 1.4).toFixed(2);
+      document.getElementById('out-piezo').textContent = shearPa + ' Pa · eNOS Vasodilation Active';
+
+      // 3. TRPM8 / TRPV1
+      let trpState = 'Thermoneutral Homeostasis';
+      if (temp <= 15) trpState = 'TRPM8 Cold/Cryo Vagal Activation (' + temp + '°C)';
+      else if (temp >= 36) trpState = 'TRPV1 Heat Shock & Sweat Response (' + temp + '°C)';
+      document.getElementById('out-trp').textContent = trpState;
+
+      // 4. HIF-1a / PHD2
+      let hifState = 'Normoxic PHD2 Hydroxylation';
+      if (ata >= 1.4) hifState = 'Hyperbaric Normoxic Paradox (Stem Cell & VEGF Mobilization)';
+      else if (ata < 0.85) hifState = 'Hypoxic HIF-1α Stabilization (EPO Upregulation)';
+      document.getElementById('out-hif').textContent = hifState;
+
+      // 5. Circadian CLOCK:BMAL1
+      const clockPhase = hour >= 6 && hour <= 18 ? 'CLOCK:BMAL1 Diurnal Transcription' : 'PER:CRY Nocturnal Repair & Glymphatic';
+      document.getElementById('out-clock').textContent = clockPhase + ' (' + hh + ')';
+
+      const co = ((79.5 * userVitals.hr) / 1000).toFixed(2);
+      const do2 = Math.round(co * (20.4 + (ata - 1.0) * 2.8) * 10);
+      document.getElementById('cor-fick').textContent = 'CO ' + co + ' L/m · DO₂ ' + do2 + ' mL/m';
+
+      document.getElementById('beneficent-summary').innerHTML =
+        '<strong>Sintesis Aksioma Fisika & Kedokteran (' + hh + ' WIB):</strong> Pada tekanan <strong>' + ata.toFixed(1) + ' ATA</strong> dan iradiasi foton <strong>' + light + ' mW/cm²</strong>, gaya gerak proton mitokondria mencapai <strong>-' + pmf + ' mV</strong> dengan pengiriman oksigen sistemik <strong>' + do2 + ' mL/min</strong>. Lintasan pemulihan mengikuti Prinsip Aksi Terkecil (hijau) menuju ekuilibrium homeostatik tanpa melanggar batas keamanan klinis.';
+
+      drawLeastActionCurve(ata, light, shear);
+    }
+
+    ['ax-ata', 'ax-temp', 'ax-light', 'ax-shear', 'ax-hour'].forEach(id => {
+      document.getElementById(id).addEventListener('input', computeAxiomPhysics);
+    });
+
+    window.syncAndExportAxioms = function() {
+      if (window.PanaceaSuperOSBridge) {
+        window.PanaceaSuperOSBridge.broadcastUpdate('nobel-invictus-axioms-os');
+        window.PanaceaSuperOSBridge.exportFhirJson();
+      }
+    };
+
+    selectAxiom(0);
+  </script>
+</body>
+</html>

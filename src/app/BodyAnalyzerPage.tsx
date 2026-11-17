@@ -52,6 +52,12 @@ export default function BodyAnalyzerPage() {
         </span>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
           <a
+            href="/nobel-invictus-axioms-os.html"
+            style={{ fontSize: "11px", fontWeight: 800, padding: "6px 12px", borderRadius: "8px", background: "linear-gradient(90deg, rgba(245,158,11,0.28), rgba(16,185,129,0.28))", color: "#fde68a", border: "1px solid rgba(245, 158, 11, 0.65)", textDecoration: "none" }}
+          >
+            🏅 Nobel Invictus Physics-Medicine Axioms
+          </a>
+          <a
             href="/panaceamed-legit-clinical-science-os.html"
             style={{ fontSize: "11px", fontWeight: 800, padding: "6px 12px", borderRadius: "8px", background: "rgba(16, 185, 129, 0.28)", color: "#6ee7b7", border: "1px solid rgba(16, 185, 129, 0.65)", textDecoration: "none" }}
           >
