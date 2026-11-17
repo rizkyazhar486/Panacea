@@ -1,7 +1,6 @@
 /**
- * PanaceaMed Super-OS Real-Time Cross-Studio Biometric & FHIR R4 Bridge
- * Connects React Cockpit <-> 1:1 Personal Self (Sims4/GTA6) <-> UHD 5K 4D Anatomy & AI-EMR
- * Works offline & across 2G/3G/4G/5G/BLE (Water-Adaptive 3T Sync)
+ * PanaceaMed Super-OS Real-Time Cross-Studio Biometric Bridge + Global 1-Click/1-Scan/1-Tap Omni-Dock
+ * Compacts User Journey across all pages into 1 Click, 1 Scan, and 1 Tap (Cmd+K / Ctrl+K)
  */
 (function () {
   var CHANNEL_NAME = 'panacea_superos_bus_v1';
@@ -147,4 +146,35 @@
       setTimeout(function () { URL.revokeObjectURL(url); }, 1500);
     }
   };
+
+  // Inject Global 1-Click · 1-Scan · 1-Tap Floating Dynamic Omni-Pill into every studio page
+  function injectGlobalOneTapDock() {
+    if (typeof document === 'undefined' || document.getElementById('pnc-global-1tap-pill')) return;
+    var wrap = document.createElement('div');
+    wrap.id = 'pnc-global-1tap-pill';
+    wrap.style.cssText = 'position:fixed;bottom:46px;left:50%;transform:translateX(-50%);z-index:9999;display:flex;align-items:center;gap:6px;background:rgba(2,6,23,0.92);backdrop-filter:blur(20px);border:1px solid rgba(16,185,129,0.55);border-radius:999px;padding:5px 12px;box-shadow:0 10px 30px rgba(0,0,0,0.75);font-family:-apple-system,BlinkMacSystemFont,sans-serif;font-size:11px;color:#f8fafc;';
+    wrap.innerHTML =
+      '<a href="/panaceamed-1tap-hypervisor-os.html" style="text-decoration:none;color:#fde68a;font-weight:800;padding:4px 8px;border-radius:999px;background:rgba(245,158,11,0.2);border:1px solid rgba(245,158,11,0.5);">⚡ 1-Tap Hypervisor (Cmd+K)</a>' +
+      '<a href="/#/body-exposure" style="text-decoration:none;color:#38bdf8;font-weight:700;padding:4px 8px;">Cockpit</a>' +
+      '<a href="/panaceamed-frontier-civilization-superos.html" style="text-decoration:none;color:#34d399;font-weight:700;padding:4px 8px;">0-Queue RS</a>' +
+      '<a href="/panaceamed-omni-athletic-geomed-os.html" style="text-decoration:none;color:#fb923c;font-weight:700;padding:4px 8px;">Garmin/Dive/Club</a>' +
+      '<a href="/panaceamed-legit-clinical-science-os.html" style="text-decoration:none;color:#c084fc;font-weight:700;padding:4px 8px;">QSP/ICU</a>' +
+      '<button onclick="window.PanaceaSuperOSBridge.exportFhirJson()" style="background:rgba(16,185,129,0.22);color:#34d399;border:1px solid rgba(16,185,129,0.5);border-radius:999px;padding:3px 9px;font-size:10.5px;font-weight:800;cursor:pointer;">1-Tap FHIR</button>';
+    document.body.appendChild(wrap);
+
+    window.addEventListener('keydown', function (ev) {
+      if ((ev.metaKey || ev.ctrlKey) && ev.key.toLowerCase() === 'k') {
+        ev.preventDefault();
+        window.location.href = '/panaceamed-1tap-hypervisor-os.html';
+      }
+    });
+  }
+
+  if (typeof window !== 'undefined') {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', injectGlobalOneTapDock);
+    } else {
+      injectGlobalOneTapDock();
+    }
+  }
 })();

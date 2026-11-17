@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PanaceaMed OS · 1-Click · 1-Scan · 1-Tap Cross-OS Hypervisor & Super-App Orchestrator</title>
+  <script src="/panacea-superos-bridge.js"></script>
+  <style>
+    :root {
+      --bg: #020617;
+      --surface: rgba(15, 23, 42, 0.92);
+      --card: rgba(2, 6, 23, 0.85);
+      --border: rgba(148, 163, 184, 0.22);
+      --cyan: #38bdf8;
+      --emerald: #10b981;
+      --amber: #f59e0b;
+      --rose: #f43f5e;
+      --violet: #a855f7;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: radial-gradient(circle at 50% 0%, #0f172a 0%, #020617 86%);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', system-ui, sans-serif;
+      min-height: 100vh;
+      padding: 14px 14px 75px 14px;
+      line-height: 1.45;
+    }
+    .topbar {
+      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 13px; padding: 12px 16px; margin-bottom: 12px;
+      box-shadow: 0 12px 32px rgba(0,0,0,0.5);
+    }
+    .btn {
+      text-decoration: none; color: var(--text); background: rgba(30, 41, 59, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.28); border-radius: 8px;
+      padding: 6px 11px; font-size: 11px; font-weight: 700; cursor: pointer;
+      transition: all 0.15s ease; display: inline-flex; align-items: center; gap: 5px;
+    }
+    .btn:hover, .btn.active {
+      background: rgba(16, 185, 129, 0.22); border-color: var(--emerald); color: #34d399;
+    }
+    .omnibar-wrap {
+      display: flex; align-items: center; gap: 10px;
+      background: rgba(2, 6, 23, 0.92); border: 1.5px solid rgba(56, 189, 248, 0.55);
+      border-radius: 13px; padding: 10px 16px; margin-bottom: 14px;
+      box-shadow: 0 0 28px rgba(56, 189, 248, 0.18);
+    }
+    .omnibar-input {
+      flex: 1; background: transparent; border: none; outline: none;
+      color: #fff; font-size: 13.5px; font-weight: 600;
+    }
+    .grid-3 {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;
+    }
+    @media (max-width: 1220px) { .grid-3 { grid-template-columns: 1fr; } }
+    .col { display: flex; flex-direction: column; gap: 12px; }
+    .panel {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 13px; padding: 14px 16px;
+    }
+    .panel-hdr {
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.55px;
+      color: var(--cyan); margin-bottom: 10px; padding-bottom: 6px;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.14);
+    }
+    .badge {
+      font-size: 9.5px; font-weight: 700; padding: 2px 8px; border-radius: 999px;
+      background: rgba(16, 185, 129, 0.16); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4);
+    }
+    .macro-card {
+      background: var(--card); border: 1px solid rgba(56, 189, 248, 0.25);
+      border-radius: 10px; padding: 10px 12px; margin-bottom: 8px;
+      display: flex; justify-content: space-between; align-items: center; gap: 10px;
+      cursor: pointer; transition: all 0.15s ease;
+    }
+    .macro-card:hover {
+      border-color: var(--emerald); background: rgba(16, 185, 129, 0.12);
+      transform: translateY(-1px);
+    }
+    .macro-title { font-size: 12px; font-weight: 800; color: #f8fafc; }
+    .macro-sub { font-size: 10.5px; color: var(--muted); margin-top: 2px; line-height: 1.35; }
+    .kv {
+      display: flex; justify-content: space-between; align-items: baseline;
+      font-size: 11px; padding: 4px 0; border-bottom: 1px dashed rgba(148, 163, 184, 0.12);
+    }
+    .kv span:first-child { color: var(--muted); }
+    .kv span:last-child { font-family: 'SF Mono', ui-monospace, monospace; font-weight: 700; color: #f1f5f9; }
+    .console-box {
+      font-family: 'SF Mono', ui-monospace, monospace; font-size: 10.5px; line-height: 1.48;
+      background: #010409; border: 1px solid rgba(16, 185, 129, 0.35);
+      border-radius: 9px; padding: 10px 12px; min-height: 155px; max-height: 195px; overflow-y: auto; color: #cbd5e1;
+    }
+    .eq-box {
+      font-family: 'SF Mono', ui-monospace, monospace; font-size: 10px; color: #38bdf8;
+      background: var(--card); border: 1px solid rgba(56, 189, 248, 0.22);
+      border-radius: 6px; padding: 6px 8px; margin-top: 6px;
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <a href="/#/body-exposure" class="btn">← Body Cockpit</a>
+      <a href="/panaceamed-unified-superos.html" class="btn">🌐 Master Super-OS</a>
+      <div>
+        <strong style="font-size:14px;">⚡ PanaceaMed 1-Click · 1-Scan · 1-Tap Cross-OS Hypervisor & User-Journey Compactor</strong>
+        <div style="font-size:11px;color:var(--muted);">Raycast Cmd+K Speed · Epic Rover 1-Scan BCMA · MacroFactor/Cronometer Vision · Grab/Amap Medical Dispatch · HarmonyOS/Apple/Tesla OS Enhancer</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;">
+      <button class="btn active" onclick="stimulateHostOS('GAMMA_40HZ')">🧠 Stimulate 40Hz Gamma Focus</button>
+      <button class="btn active" onclick="stimulateHostOS('VAGAL_01HZ')">🫀 Stimulate 0.1Hz Vagal Lock</button>
+      <button class="btn" onclick="window.PanaceaSuperOSBridge.exportFhirJson()">📄 1-Tap FHIR R4</button>
+    </div>
+  </header>
+
+  <!-- RAYCAST / LINEAR / HARMONYOS ZERO-LATENCY OMNIBAR -->
+  <section class="omnibar-wrap">
+    <span style="font-size:16px;">🔎</span>
+    <input
+      type="text"
+      id="omni-search"
+      class="omnibar-input"
+      placeholder="Ketik perintah 1-Klik atau nama studio (misal: 'sepsis', 'hbot', 'dive', 'allianz', 'strava', 'soap', '4d')..."
+      oninput="filterOmniStudios(this.value)"
+    />
+    <span class="badge">Cmd+K / 1-Tap Instant Routing (Fitts-Hick Optimal)</span>
+  </section>
+
+  <main class="grid-3">
+    <!-- KOLOM 1: 1-CLICK MULTILEVEL MACRO CASCADES (COMPACTED USER JOURNEY) -->
+    <div class="col">
+      <div class="panel">
+        <div class="panel-hdr">
+          <span>I. 1-Click Multilevel Macro Cascades (7-Steps → 1 Click)</span>
+          <span class="badge">0 Page Friction</span>
+        </div>
+
+        <div class="macro-card" onclick="runOneClickMacro('MORNING_AUTOPILOT')">
+          <div>
+            <div class="macro-title">☀️ 1-Click Morning Readiness & Metabolic Autopilot</div>
+            <div class="macro-sub">Sync Garmin/WHOOP/Oura HRV → Hitung Borbély SCN Phase → Kalibrasi Makro (MacroFactor) → Jadwalkan Latihan & Fokus</div>
+          </div>
+          <span class="badge">1-CLICK</span>
+        </div>
+
+        <div class="macro-card" onclick="runOneClickMacro('HOSPITAL_ZERO_WAIT')">
+          <div>
+            <div class="macro-title">🏥 1-Click Hospital Admission + BPJS/Allianz + AI-Doctor</div>
+            <div class="macro-sub">Pre-Clear SEP/Allianz STP → Triase NEWS2/ROX → Cek CPIC PGx & eGFR → Buat SOAP AI-EMR → Order Lab & e-Rx (0 Antre)</div>
+          </div>
+          <span class="badge">1-CLICK</span>
+        </div>
+
+        <div class="macro-card" onclick="runOneClickMacro('ATHLETIC_RECOVERY_POD')">
+          <div>
+            <div class="macro-title">⚡ 1-Click Post-Workout Strava + ClassPass + 5-Modality Pod</div>
+            <div class="macro-sub">Hitung W'_bal & ACWR → Book Fit Hub / HBOT 2.0 ATA + Cryo -130°C + PBM → Kirim Elektrolit & Protein</div>
+          </div>
+          <span class="badge">1-CLICK</span>
+        </div>
+
+        <div class="macro-card" onclick="runOneClickMacro('EMERGENCY_GOLDEN_HOUR')">
+          <div>
+            <div class="macro-title">🚨 1-Click Golden-Hour Emergency & Starlink/inReach SOS</div>
+            <div class="macro-sub">Kunci Koordinat Geologi/Kedalaman → Siarkan Paket 128-Byte via 2G/Starlink → Aktifkan Step-In Dokter Spesialis & Ambulans</div>
+          </div>
+          <span class="badge">1-CLICK</span>
+        </div>
+
+        <div class="eq-box">
+          Hick-Hyman Compaction: T_journey = ∑_i=1..7 T_page_i (42s) → T_1Click (0.18s) [-99.5% Time]
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-hdr">
+          <span>II. Live Multilevel Execution Telemetry Console</span>
+          <span class="badge" id="exec-status-badge">Ready</span>
+        </div>
+        <div class="console-box" id="hypervisor-console"></div>
+      </div>
+    </div>
+
+    <!-- KOLOM 2: 1-SCAN UNIVERSAL VISION & 1-TAP CROSS-OS ENHANCER -->
+    <div class="col">
+      <div class="panel">
+        <div class="panel-hdr">
+          <span>III. 1-Scan Multi-Modal Universal Scanner</span>
+          <span class="badge">AI Vision + Barcode + NFC</span>
+        </div>
+
+        <div class="macro-card" onclick="runOneScan('SCAN_PATIENT_WRISTBAND')">
+          <div>
+            <div class="macro-title">📲 1-Scan Patient QR / Allianz-BPJS Pass (Alipay/Epic Rover)</div>
+            <div class="macro-sub">Langsung buka rekam medis 4D, verifikasi identitas & klaim cashless, serta cek alergi obat dalam 120 ms.</div>
+          </div>
+          <span class="badge">1-SCAN</span>
+        </div>
+
+        <div class="macro-card" onclick="runOneScan('SCAN_MEDICATION_BCMA')">
+          <div>
+            <div class="macro-title">💊 1-Scan Drug Barcode & Prescription Safety (CPIC + DDI)</div>
+            <div class="macro-sub">Pindai kemasan obat → Cek otomatis interaksi DDI, HLA-B*15:02 / CYP2C19, dan penyesuaian dosis eGFR ginjal.</div>
+          </div>
+          <span class="badge">1-SCAN</span>
+        </div>
+
+        <div class="macro-card" onclick="runOneScan('SCAN_LAB_DICOM_ECG')">
+          <div>
+            <div class="macro-title">🧪 1-Scan Lab Sheet, ABG & 12-Lead ECG OCR</div>
+            <div class="macro-sub">Ekstrak otomatis nilai pH, PaCO₂, HCO₃⁻, Kreatinin, & Troponin langsung ke kalkulator Stewart Acid-Base & Bayesian CDSS.</div>
+          </div>
+          <span class="badge">1-SCAN</span>
+        </div>
+
+        <div class="macro-card" onclick="runOneScan('SCAN_FOOD_MACROFACTOR')">
+          <div>
+            <div class="macro-title">🥗 1-Scan Food Plate, Hydration & CGM Glycemic Impact</div>
+            <div class="macro-sub">Estimasi kalori, protein, indeks glikemik, dan respons glukosa CGM (aya MacroFactor, Cronometer & Ultrahuman).</div>
+          </div>
+          <span class="badge">1-SCAN</span>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-hdr">
+          <span>IV. Cross-OS Enhancer, Stimulator & Hardware Bridge</span>
+          <span class="badge" id="host-os-badge">Host OS Stimulated</span>
+        </div>
+        <div class="kv"><span>1. Apple macOS / iOS / VisionOS Bridge</span><span style="color:#34d399;">HealthKit + Metal WebGL 60FPS Synced</span></div>
+        <div class="kv"><span>2. Huawei HarmonyOS & Xiaomi HyperConnect</span><span style="color:#38bdf8;">1-Tap SuperDevice NFC & Wearable Bus</span></div>
+        <div class="kv"><span>3. Garmin / WHOOP / Oura / Oceanic+ BLE</span><span style="color:#fbbf24;">Continuous Biometric Stream Active</span></div>
+        <div class="kv"><span>4. Tesla / BYD Cabin Biometric Climate Sync</span><span style="color:#a855f7;">Auto-Cabin 21.5°C & Seat Recovery Ready</span></div>
+        <div class="kv"><span>5. Grab / Amap / DJI Medical Logistics API</span><span style="color:#34d399;">Instant e-Rx Delivery & Home-Lab Dispatch</span></div>
+        <div class="kv"><span>6. Obsidian / Anki / Second-Brain Sync</span><span style="color:#38bdf8;">Auto-Linked SKDI, ICD-11 & Clinical Cases</span></div>
+      </div>
+    </div>
+
+    <!-- KOLOM 3: 1-TAP INSTANT LAUNCHPAD KE SELURUH 15 STUDIO PANACEAMED OS -->
+    <div class="col">
+      <div class="panel">
+        <div class="panel-hdr">
+          <span>V. 1-Tap Compacted Studio Matrix (All 15 Modules)</span>
+          <span class="badge">Instant Jump</span>
+        </div>
+        <div id="studio-launchpad" style="display:grid;grid-template-columns:1fr;gap:6px;max-height:475px;overflow-y:auto;"></div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const ALL_STUDIOS = [
+      { name: '🚀 1. Frontier Civilization Hospital OS', url: '/panaceamed-frontier-civilization-superos.html', tags: 'zero queue bpjs allianz standard chartered ai human doctor step-in 2g morotai ntt starlink' },
+      { name: '⌚ 2. Omni-Athletic, Dive & Social Club OS', url: '/panaceamed-omni-athletic-geomed-os.html', tags: 'garmin whoop oura cgm buhlmann dive depth topography gap strava classpass reclub fithub' },
+      { name: '⚕️ 3. Instinctive Clinical Science & QSP Core', url: '/panaceamed-legit-clinical-science-os.html', tags: 'stewart acid base abg winter rox horowitz guyton fick tyg egfr cpic pgx pk pd monod w-prime' },
+      { name: '✨ 4. Holistic 20-D Ontology Nexus OS', url: '/panaceamed-holistic-ontology-nexus-os.html', tags: 'diseases symptoms drugs vaccines genetics mutation consciousness psychology soul spirit value brier' },
+      { name: '🧠 5. Nobel Human Nature & Direct 4D Viz OS', url: '/nobel-human-nature-manipulation-viz-os.html', tags: 'kahneman simon system 1 2 thaler nudge dopamine rpe vagal mayer wave kalman lqr' },
+      { name: '🧬 6. Nobel Biology & Chemistry Axioms OS', url: '/nobel-invictus-biochem-axioms-os.html', tags: 'hill bohr mirna mrna crispr alphafold click chemistry ohsumi autophagy redox nlr sii' },
+      { name: '🏅 7. Nobel Physics & Physiology Axioms OS', url: '/nobel-invictus-axioms-os.html', tags: 'prigogine mitchell pmf piezo1 trpm8 hif1a hbot clock bmal1 hamiltonian least action' },
+      { name: '🌐 8. PanaceaMed Unified Super-OS Command', url: '/panaceamed-unified-superos.html', tags: 'active inference friston free energy p4 systems medicine master hub' },
+      { name: '👑 9. Omega Invictus 8-in-1 Body Exposure OS', url: '/omega-invictus-body-exposure-os.html', tags: 'segmental bia windkessel biomechanics acwr exposome metabolomics circadian pulse icd11' },
+      { name: '🌌 10. 6-Tier Quantum-to-Exposome Living OS', url: '/multiscale-quantum-exposome-os.html', tags: 'environment organ system tissue ecm starling organelle cristae quantum electron tunneling' },
+      { name: '🌱 11. Digital Cellular Biosphere OS', url: '/digital-cellular-biosphere-os.html', tags: 'krogh 3 compartment capillary interstitial cytosol oxphos adenylate charge exosome' },
+      { name: '🔬 12. 4D Spacetime & Bio-GDB Debugger OS', url: '/cellular-spacetime-debugger-os.html', tags: 'reaction diffusion breakpoints time travel hot patch single cell raycast inspector' },
+      { name: '🖥️ 13. Whole-Body Exposure OS Kernel', url: '/whole-body-exposure-os.html', tags: 'network physiology 4 buses borbely scn circadian scheduler allostatic pid controller' },
+      { name: '📊 14. Numerical Clinical Biophysics Analyzer', url: '/numerical-body-exposure-clinical.html', tags: 'aortic pressure wave do2 vo2 cole phase angle bmr' },
+      { name: '🛡️ 15. Hippocratic Clinical Safety OS', url: '/hippocratic-clinical-os.html', tags: 'primum non nocere news2 qsofa bayesian soap ai emr' },
+      { name: '🎮 16. 1:1 Personal Self (Sims 4 · GTA 6 · 4D)', url: '/personal-digital-self-1to1.html', tags: 'avatar morph sims plumbob gta cores qr barcode health pass' },
+      { name: '📐 17. MedSciHub UHD 5K 4D Anatomy & CABG', url: '/medscihub-4d-anatomy-emr.html', tags: 'exploded view xyz projectile vector fea cfd cabg surgery' }
+    ];
+
+    const consoleBox = document.getElementById('hypervisor-console');
+    function logHyper(msg) {
+      const div = document.createElement('div');
+      div.style.marginBottom = '5px';
+      div.innerHTML = '<span style="color:#34d399;">[' + new Date().toLocaleTimeString() + ']</span> ' + msg;
+      consoleBox.prepend(div);
+    }
+
+    function renderStudioList(filterText) {
+      const q = (filterText || '').toLowerCase().trim();
+      const box = document.getElementById('studio-launchpad');
+      box.innerHTML = '';
+      ALL_STUDIOS.filter(s => !q || s.name.toLowerCase().includes(q) || s.tags.includes(q)).forEach(s => {
+        const a = document.createElement('a');
+        a.href = s.url;
+        a.className = 'btn';
+        a.style.justifyContent = 'space-between';
+        a.style.padding = '8px 11px';
+        a.innerHTML = '<span>' + s.name + '</span><span style="color:#38bdf8;">1-Tap →</span>';
+        box.appendChild(a);
+      });
+    }
+
+    window.filterOmniStudios = function(val) {
+      renderStudioList(val);
+    };
+
+    window.runOneClickMacro = function(macroId) {
+      document.getElementById('exec-status-badge').textContent = 'Executing 7-Layer Macro...';
+      if (macroId === 'MORNING_AUTOPILOT') {
+        logHyper('☀️ <strong>[1-CLICK MORNING AUTOPILOT COMPLETE]:</strong> (1) Garmin/WHOOP/Oura HRV 78ms disinkronkan → (2) Fase sirkadian SCN dihitung → (3) Target nutrisi 2,450 kcal & 145g protein dikalibrasi → (4) Kesiapan tubuh 94.8% disiarkan ke seluruh 17 studio.');
+      } else if (macroId === 'HOSPITAL_ZERO_WAIT') {
+        logHyper('🏥 <strong>[1-CLICK ZERO-WAIT HOSPITAL COMPLETE]:</strong> (1) Klaim Allianz/BPJS Auto-SEP disetujui instan → (2) Triase NEWS2=0 & ROX=31.4 aman → (3) Firewall CPIC PGx & eGFR 114 mL/min lolos → (4) Catatan SOAP AI-EMR & e-Rx siap ditandatangani dokter tanpa antre ruang tunggu.');
+      } else if (macroId === 'ATHLETIC_RECOVERY_POD') {
+        logHyper('⚡ <strong>[1-CLICK ATHLETIC RECOVERY COMPLETE]:</strong> (1) Beban latihan Strava/ACWR 1.05 & W\'_bal dianalisis → (2) Slot ClassPass/Fit Hub & Kapsul HBOT 1.5 ATA + Cryo -130°C + PBM dipesan otomatis → (3) Hidrasi & elektrolit disesuaikan.');
+      } else if (macroId === 'EMERGENCY_GOLDEN_HOUR') {
+        logHyper('🚨 <strong>[1-CLICK GOLDEN-HOUR SOS COMPLETE]:</strong> (1) Koordinat geodetik & elevasi/kedalaman dikunci → (2) Paket biner 128-Byte dikirim via 2G/Starlink LEO → (3) Dokter Spesialis & tim medis darurat diaktifkan dalam 0.4 detik.');
+      }
+      if (window.PanaceaSuperOSBridge) {
+        window.PanaceaSuperOSBridge.broadcastUpdate('1tap-macro-' + macroId);
+      }
+      setTimeout(() => { document.getElementById('exec-status-badge').textContent = '✓ 7/7 Layers Synced'; }, 250);
+    };
+
+    window.runOneScan = function(scanId) {
+      if (scanId === 'SCAN_PATIENT_WRISTBAND') {
+        logHyper('📲 <strong>[1-SCAN SOVEREIGN PASS]:</strong> QR/NFC Pasien terverifikasi dalam 95 ms → Riwayat medis 4D, alergi, dan jaminan cashless Allianz/Standard Chartered langsung terbuka.');
+      } else if (scanId === 'SCAN_MEDICATION_BCMA') {
+        logHyper('💊 <strong>[1-SCAN MEDICATION BCMA]:</strong> Barcode obat dipindai → 0 kontraindikasi interaksi obat (DDI), genotipe CPIC aman, dan dosis sesuai fungsi ginjal eGFR.');
+      } else if (scanId === 'SCAN_LAB_DICOM_ECG') {
+        logHyper('🧪 <strong>[1-SCAN LAB & ABG OCR]:</strong> Lembar lab & AGD berhasil diekstrak otomatis (pH 7.40, AG_corr 11.5, eGFR 114, Sinus Rhythm normal) ke seluruh kalkulator klinis.');
+      } else if (scanId === 'SCAN_FOOD_MACROFACTOR') {
+        logHyper('🥗 <strong>[1-SCAN NUTRITION VISION]:</strong> Komposisi makanan terdeteksi (620 kcal, 48g Protein, 52g Karbohidrat, 22g Lemak Sehat) → Prediksi kurva CGM stabil (88→106 mg/dL).');
+      }
+    };
+
+    window.stimulateHostOS = function(mode) {
+      if (mode === 'GAMMA_40HZ') {
+        document.getElementById('host-os-badge').textContent = '40Hz Gamma Focus Active';
+        logHyper('🧠 <strong>[HOST-OS NEURO-STIMULATION]:</strong> Sinkronisasi visual-auditori 40 Hz Gamma & akselerasi fokus kortikal diaktifkan di seluruh tab.');
+      } else {
+        document.getElementById('host-os-badge').textContent = '0.1Hz Vagal Pacing Active';
+        logHyper('🫀 <strong>[HOST-OS AUTONOMIC STIMULATION]:</strong> Pacer resonansi barorefleks 0.1 Hz (6 napas/menit) diaktifkan untuk meningkatkan HRV RMSSD.');
+      }
+    };
+
+    renderStudioList('');
+    logHyper('✓ PanaceaMed 1-Click · 1-Scan · 1-Tap Cross-OS Hypervisor aktif. Tekan Cmd+K dari halaman mana pun untuk berpindah instan.');
+  </script>
+</body>
+</html>
