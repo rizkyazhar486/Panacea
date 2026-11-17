@@ -82,6 +82,12 @@ export default function BodyAnalyzerPage() {
             🧬 MedSciHub UHD 5K 4D Anatomy & AI-EMR
           </a>
           <a
+            href="/hippocratic-clinical-os.html"
+            style={{ fontSize: "11px", fontWeight: 700, padding: "6px 10px", borderRadius: "8px", background: "rgba(244, 63, 94, 0.18)", color: "#fb7185", border: "1px solid rgba(244, 63, 94, 0.45)", textDecoration: "none" }}
+          >
+            ⚕️ Hippocratic Clinical OS (Primum Non Nocere)
+          </a>
+          <a
             href="/omniscience-natural-laws-engine.html"
             style={{ fontSize: "11px", fontWeight: 700, padding: "6px 10px", borderRadius: "8px", background: "rgba(245, 158, 11, 0.18)", color: "#fbbf24", border: "1px solid rgba(245, 158, 11, 0.4)", textDecoration: "none" }}
           >
