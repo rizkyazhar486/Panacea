@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PanaceaMed OS · 1:1 Personal Digital Self (Sims 4 & GTA 6 Edition) + QR/Barcode Pass</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <style>
+    :root {
+      --bg: #030712;
+      --panel: rgba(15, 23, 42, 0.82);
+      --border: rgba(56, 189, 248, 0.3);
+      --emerald: #10b981;
+      --cyan: #38bdf8;
+      --rose: #f43f5e;
+      --amber: #f59e0b;
+      --violet: #a855f7;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: radial-gradient(circle at 50% 18%, #0f172a 0%, #020617 78%);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', system-ui, sans-serif;
+      overflow: hidden; height: 100vh; width: 100vw; user-select: none;
+    }
+    #canvas-3d { position: fixed; inset: 0; z-index: 1; }
+    .top-bar {
+      position: fixed; top: 12px; left: 12px; right: 12px; z-index: 10;
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      background: var(--panel); backdrop-filter: blur(20px);
+      border: 1px solid var(--border); border-radius: 14px; padding: 10px 16px;
+      box-shadow: 0 12px 32px rgba(0,0,0,0.55);
+    }
+    .nav-links { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    .nav-btn {
+      text-decoration: none; color: #e2e8f0; background: rgba(30, 41, 59, 0.8);
+      border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 8px;
+      padding: 6px 11px; font-size: 11px; font-weight: 700; cursor: pointer;
+    }
+    .nav-btn.active, .nav-btn:hover { background: rgba(16, 185, 129, 0.22); border-color: var(--emerald); color: #34d399; }
+    .left-panel, .right-panel {
+      position: fixed; top: 70px; bottom: 64px; width: 355px; z-index: 10;
+      background: var(--panel); backdrop-filter: blur(20px);
+      border: 1px solid var(--border); border-radius: 14px; padding: 14px;
+      overflow-y: auto; display: flex; flex-direction: column; gap: 12px;
+      box-shadow: 0 12px 32px rgba(0,0,0,0.6);
+    }
+    .left-panel { left: 12px; }
+    .right-panel { right: 12px; width: 375px; }
+    .bottom-bar {
+      position: fixed; bottom: 12px; left: 12px; right: 12px; z-index: 10;
+      display: flex; align-items: center; justify-content: space-between;
+      background: var(--panel); backdrop-filter: blur(20px);
+      border: 1px solid var(--border); border-radius: 12px; padding: 8px 16px; font-size: 11px;
+    }
+    .card {
+      background: rgba(2, 6, 23, 0.68); border: 1px solid rgba(148, 163, 184, 0.16);
+      border-radius: 11px; padding: 11px 12px;
+    }
+    .card-hdr {
+      font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.7px;
+      color: var(--cyan); margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;
+    }
+    .need-row, .stat-row { margin: 6px 0; }
+    .need-label { display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 3px; font-weight: 600; }
+    .bar-bg { width: 100%; height: 7px; background: rgba(30,41,59,0.9); border-radius: 999px; overflow: hidden; }
+    .bar-fill { height: 100%; border-radius: 999px; transition: width 0.35s ease; }
+    .gta-seg-bar { display: grid; grid-template-columns: repeat(5, 1fr); gap: 3px; height: 7px; }
+    .gta-seg { background: rgba(30,41,59,0.9); border-radius: 2px; overflow: hidden; }
+    .gta-seg-fill { height: 100%; background: linear-gradient(90deg, #38bdf8, #a855f7); }
+    .moodlet-grid { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+    .moodlet {
+      font-size: 10px; font-weight: 700; padding: 4px 8px; border-radius: 7px;
+      background: rgba(16, 185, 129, 0.16); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.38);
+    }
+    .qr-box {
+      display: flex; flex-direction: column; align-items: center; gap: 8px;
+      background: #ffffff; color: #020617; border-radius: 10px; padding: 12px; margin-top: 4px;
+    }
+    .qr-meta { font-family: monospace; font-size: 10px; font-weight: 700; color: #0f172a; text-align: center; }
+    .slider-ctrl { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 11px; margin: 5px 0; }
+    .slider-ctrl input[type=range] { flex: 1; accent-color: var(--emerald); }
+    .cores-row { display: flex; gap: 10px; justify-content: space-around; margin: 6px 0; }
+    .core-circle {
+      width: 56px; height: 56px; border-radius: 50%; border: 3px solid var(--emerald);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      font-size: 10px; font-weight: 800; background: rgba(16,185,129,0.1);
+    }
+  </style>
+</head>
+<body>
+  <div id="canvas-3d"></div>
+
+  <header class="top-bar">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <a href="/#/" class="nav-btn">← Beranda OS</a>
+      <strong style="font-size:14px;">1:1 Personal Digital Self · Sims 4 Bio-Needs + GTA 6 Stats + QR/Barcode Identity</strong>
+    </div>
+    <div class="nav-links">
+      <a href="/#/body-exposure" class="nav-btn">Body Analyzer Cockpit</a>
+      <a href="/medscihub-4d-anatomy-emr.html" class="nav-btn">UHD 5K 4D Anatomy</a>
+      <a href="/deep-human-lab/medscihub-3d-multiscale-simulation.html" class="nav-btn">Deep Human Lab 3D</a>
+    </div>
+  </header>
+
+  <!-- PANEL KIRI: THE SIMS 4 BIO-NEEDS, PLUMBOB & 1:1 MORPH -->
+  <aside class="left-panel">
+    <div class="card">
+      <div class="card-hdr">
+        <span>The Sims 4 · Plumbob & 6 Bio-Needs</span>
+        <span id="plumbob-state" style="color:#34d399;">● Radiant Homeostasis</span>
+      </div>
+      <div id="sims-needs-container"></div>
+      <div class="moodlet-grid" id="moodlets-box">
+        <span class="moodlet">+3 Energized (Wearable Synced)</span>
+        <span class="moodlet">+2 Focused (Optimal HRV)</span>
+        <span class="moodlet">+2 Cryo/HBOT Primed</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-hdr">
+        <span>1:1 Body Morph & Avatar Customizer</span>
+        <span id="morph-tag">Synced</span>
+      </div>
+      <div class="slider-ctrl"><span>Tinggi (cm)</span><input type="range" id="m-height" min="150" max="200" value="173" /><span id="v-height">173</span></div>
+      <div class="slider-ctrl"><span>Massa Otot (%)</span><input type="range" id="m-muscle" min="25" max="60" value="44" /><span id="v-muscle">44%</span></div>
+      <div class="slider-ctrl"><span>Body Fat (%)</span><input type="range" id="m-fat" min="6" max="35" value="14" /><span id="v-fat">14%</span></div>
+      <div class="slider-ctrl"><span>Aura / Shader</span><input type="range" id="m-aura" min="0" max="100" value="80" /><span id="v-aura">80%</span></div>
+    </div>
+
+    <div class="card">
+      <div class="card-hdr"><span>Personal Traits & Aspiration</span><span>1:1 Identity</span></div>
+      <div style="font-size:11px;line-height:1.55;color:#cbd5e1;">
+        <div>• <strong>Archetype:</strong> Physician-Technologist & Endurance Athlete</div>
+        <div>• <strong>Active Traits:</strong> High Vagal Tone · Metabolic Efficiency · Bio-Quantified</div>
+        <div>• <strong>Life Goal:</strong> Peak Longevity & Holistic Cellular Recovery</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- PANEL KANAN: GTA 6 CHARACTER HUD + DYNAMIC QR CODE & BARCODE PASS -->
+  <aside class="right-panel">
+    <div class="card">
+      <div class="card-hdr">
+        <span>GTA 6 · Character Attributes & Cores</span>
+        <span id="gta-ovr" style="color:#38bdf8;">96 OVR</span>
+      </div>
+      <div class="cores-row">
+        <div class="core-circle" style="border-color:#f43f5e;"><span style="color:#f43f5e;">♥ HEALTH</span><span id="core-hp">98%</span></div>
+        <div class="core-circle" style="border-color:#38bdf8;"><span style="color:#38bdf8;">⚡ STAMINA</span><span id="core-st">95%</span></div>
+        <div class="core-circle" style="border-color:#a855f7;"><span style="color:#a855f7;">◎ FOCUS</span><span id="core-fc">94%</span></div>
+      </div>
+      <div id="gta-stats-container"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-hdr">
+        <span>Personified QR (EMVCo) & Barcode (Code-128)</span>
+        <span id="pass-mode-label">Clinical & Gym Tap</span>
+      </div>
+      <div style="display:flex;gap:5px;margin-bottom:6px;">
+        <button class="nav-btn active" style="flex:1;padding:4px;" onclick="setPassMode('EMR')">AI-EMR</button>
+        <button class="nav-btn" style="flex:1;padding:4px;" onclick="setPassMode('GYM')">Gym/Wearable</button>
+        <button class="nav-btn" style="flex:1;padding:4px;" onclick="setPassMode('RECOVERY')">HBOT/Cryo</button>
+      </div>
+      <div class="qr-box">
+        <div id="qr-svg-holder"></div>
+        <div id="barcode-svg-holder" style="width:100%;display:flex;justify-content:center;"></div>
+        <div class="qr-meta" id="qr-payload-text">PNC-ID: RIZKYAZHAR486 · OVR:96 · FHIR-R4</div>
+      </div>
+    </div>
+  </aside>
+
+  <footer class="bottom-bar">
+    <div><strong>Digital Self Profile:</strong> <span id="profile-name">Rizky Azhar (rizkyazhar486)</span></div>
+    <div><strong>Kontrol 3D:</strong> Geser untuk rotasi 360° Avatar & Plumbob · Ubah slider untuk 1:1 Body Morph</div>
+    <div style="color:#34d399;"><strong>Storage Sync:</strong> pmd_health_profile + pm_bodycomp_v1 Active</div>
+  </footer>
+
+  <script>
+    // 1. Hydrate from localStorage (pmd_health_profile & pm_bodycomp_v1)
+    let userProfile = {
+      id: 'rizkyazhar486',
+      name: 'dr. Rizky Azhar',
+      hr: 62,
+      hrv: 78,
+      spo2: 99,
+      vo2max: 56,
+      sleepHours: 7.8,
+      steps: 10420,
+      heightCm: 173,
+      weightKg: 68,
+      musclePct: 44,
+      bodyFatPct: 14
+    };
+
+    try {
+      const rawProf = localStorage.getItem('pmd_health_profile');
+      if (rawProf) {
+        const p = JSON.parse(rawProf);
+        const src = p.value || p.data || p;
+        if (src.name || src.fullName) userProfile.name = src.name || src.fullName;
+        if (src.restingHeartRate || src.heartRate) userProfile.hr = Number(src.restingHeartRate || src.heartRate) || 62;
+        if (src.hrv) userProfile.hrv = Number(src.hrv) || 78;
+        if (src.spo2) userProfile.spo2 = Number(src.spo2) || 99;
+        if (src.vo2max || src.vo2Max) userProfile.vo2max = Number(src.vo2max || src.vo2Max) || 56;
+        if (src.heightCm || src.height) userProfile.heightCm = Number(src.heightCm || src.height) || 173;
+        if (src.weightKg || src.weight) userProfile.weightKg = Number(src.weightKg || src.weight) || 68;
+      }
+      const rawComp = localStorage.getItem('pm_bodycomp_v1');
+      if (rawComp) {
+        const c = JSON.parse(rawComp);
+        const cs = c.value || c.data || c;
+        if (cs.bodyFatPct || cs.bodyFat) userProfile.bodyFatPct = Number(cs.bodyFatPct || cs.bodyFat) || 14;
+        if (cs.musclePct || cs.skeletalMusclePct) userProfile.musclePct = Number(cs.musclePct || cs.skeletalMusclePct) || 44;
+      }
+    } catch (e) {}
+
+    document.getElementById('profile-name').textContent = userProfile.name + ' (' + userProfile.id + ')';
+    document.getElementById('m-height').value = userProfile.heightCm;
+    document.getElementById('v-height').textContent = userProfile.heightCm;
+    document.getElementById('m-muscle').value = userProfile.musclePct;
+    document.getElementById('v-muscle').textContent = userProfile.musclePct + '%';
+    document.getElementById('m-fat').value = userProfile.bodyFatPct;
+    document.getElementById('v-fat').textContent = userProfile.bodyFatPct + '%';
+
+    // 2. Render Sims 4 Bio-Needs
+    const simsNeeds = [
+      { name: 'Energy & Circadian Sleep', val: Math.min(100, Math.round((userProfile.sleepHours / 8) * 100)), col: '#10b981' },
+      { name: 'Cellular Fuel & Metabolic Balance', val: 92, col: '#10b981' },
+      { name: 'Neuromuscular Recovery (HRV ' + userProfile.hrv + 'ms)', val: Math.min(100, userProfile.hrv + 16), col: '#38bdf8' },
+      { name: 'Dopamine Flow & Athletic Drive', val: 95, col: '#10b981' },
+      { name: 'Hydration & Electrolyte Homeostasis', val: 91, col: '#38bdf8' },
+      { name: 'Social & Clinical Ecosystem Sync', val: 98, col: '#a855f7' }
+    ];
+
+    const needsEl = document.getElementById('sims-needs-container');
+    simsNeeds.forEach(n => {
+      const row = document.createElement('div');
+      row.className = 'need-row';
+      row.innerHTML =
+        '<div class="need-label"><span>' + n.name + '</span><span style="color:' + n.col + ';">' + n.val + '%</span></div>' +
+        '<div class="bar-bg"><div class="bar-fill" style="width:' + n.val + '%;background:' + n.col + ';"></div></div>';
+      needsEl.appendChild(row);
+    });
+
+    // 3. Render GTA 6 Character Stats (5-Segment Skill Bars)
+    const gtaStats = [
+      { name: 'Stamina & Endurance (VO2Max ' + userProfile.vo2max + ')', val: 96 },
+      { name: 'Strength & Motor-Unit Activation', val: Math.min(100, userProfile.musclePct * 2 + 6) },
+      { name: 'Lung Capacity & HBOT Saturation (SpO2 ' + userProfile.spo2 + '%)', val: userProfile.spo2 },
+      { name: 'Autonomic Reflex & Cardiac Efficiency (' + userProfile.hr + ' bpm)', val: 94 },
+      { name: 'Bio-Technical Intelligence & Precision', val: 99 }
+    ];
+
+    const gtaEl = document.getElementById('gta-stats-container');
+    function renderGtaStats() {
+      gtaEl.innerHTML = '';
+      gtaStats.forEach(s => {
+        const row = document.createElement('div');
+        row.className = 'stat-row';
+        let segs = '';
+        for (let i = 0; i < 5; i++) {
+          const segFill = Math.max(0, Math.min(100, (s.val - i * 20) * 5));
+          segs += '<div class="gta-seg"><div class="gta-seg-fill" style="width:' + segFill + '%;"></div></div>';
+        }
+        row.innerHTML =
+          '<div class="need-label"><span>' + s.name + '</span><span style="color:#38bdf8;">' + s.val + '/100</span></div>' +
+          '<div class="gta-seg-bar">' + segs + '</div>';
+        gtaEl.appendChild(row);
+      });
+    }
+    renderGtaStats();
+
+    // 4. Deterministic Dynamic QR Code (SVG) & Code-128 Barcode Generator
+    let activePassMode = 'EMR';
+    function hashStr(str) {
+      let h = 2166136261;
+      for (let i = 0; i < str.length; i++) {
+        h ^= str.charCodeAt(i);
+        h = Math.imul(h, 16777619);
+      }
+      return h >>> 0;
+    }
+
+    function generateQrAndBarcode() {
+      const payload = 'PNC|' + activePassMode + '|' + userProfile.id.toUpperCase() + '|HR:' + userProfile.hr + '|HRV:' + userProfile.hrv + '|H:' + userProfile.heightCm + '|M:' + userProfile.musclePct + '|F:' + userProfile.bodyFatPct;
+      document.getElementById('qr-payload-text').textContent = payload;
+
+      // 21x21 QR Matrix SVG
+      const size = 21;
+      const cell = 6;
+      let svg = '<svg width="' + (size * cell) + '" height="' + (size * cell) + '" viewBox="0 0 ' + (size * cell) + ' ' + (size * cell) + '" xmlns="http://www.w3.org/2000/svg">';
+      svg += '<rect width="100%" height="100%" fill="#ffffff"/>';
+
+      function isFinder(r, c) {
+        const inTL = r < 7 && c < 7;
+        const inTR = r < 7 && c >= size - 7;
+        const inBL = r >= size - 7 && c < 7;
+        if (!inTL && !inTR && !inBL) return null;
+        const lr = inBL ? r - (size - 7) : r;
+        const lc = inTR ? c - (size - 7) : c;
+        if (lr === 0 || lr === 6 || lc === 0 || lc === 6) return true;
+        if (lr >= 2 && lr <= 4 && lc >= 2 && lc <= 4) return true;
+        return false;
+      }
+
+      for (let r = 0; r < size; r++) {
+        for (let c = 0; c < size; c++) {
+          const f = isFinder(r, c);
+          let on = false;
+          if (f !== null) {
+            on = f;
+          } else {
+            const h = hashStr(payload + ':' + r + ':' + c);
+            on = (h % 2) === 0;
+          }
+          if (on) {
+            svg += '<rect x="' + (c * cell) + '" y="' + (r * cell) + '" width="' + cell + '" height="' + cell + '" fill="#020617"/>';
+          }
+        }
+      }
+      svg += '</svg>';
+      document.getElementById('qr-svg-holder').innerHTML = svg;
+
+      // Code-128 Style Linear Barcode SVG
+      let bSvg = '<svg width="260" height="42" viewBox="0 0 260 42" xmlns="http://www.w3.org/2000/svg">';
+      bSvg += '<rect width="100%" height="100%" fill="#ffffff"/>';
+      let x = 8;
+      for (let i = 0; i < 58; i++) {
+        const h = hashStr(payload + '#bar#' + i);
+        const w = (h % 3) + 1;
+        if (i % 2 === 0) {
+          bSvg += '<rect x="' + x + '" y="4" width="' + w + '" height="34" fill="#020617"/>';
+        }
+        x += w + ((h >> 3) % 2) + 1;
+        if (x > 250) break;
+      }
+      bSvg += '</svg>';
+      document.getElementById('barcode-svg-holder').innerHTML = bSvg;
+    }
+
+    window.setPassMode = function(mode) {
+      activePassMode = mode;
+      document.getElementById('pass-mode-label').textContent = mode + ' Pass Active';
+      generateQrAndBarcode();
+    };
+    generateQrAndBarcode();
+
+    // 5. Three.js 1:1 Avatar Twin + Floating Sims 4 Plumbob + GTA 6 Aura Ring
+    const container = document.getElementById('canvas-3d');
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(42, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.set(0, 1.1, 7.2);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    container.appendChild(renderer.domElement);
+
+    scene.add(new THREE.AmbientLight(0x38bdf8, 0.7));
+    const d1 = new THREE.DirectionalLight(0xffffff, 1.3);
+    d1.position.set(5, 8, 6);
+    scene.add(d1);
+    const d2 = new THREE.PointLight(0x10b981, 1.4, 20);
+    d2.position.set(-4, 3, 4);
+    scene.add(d2);
+
+    const avatarGroup = new THREE.Group();
+    scene.add(avatarGroup);
+
+    const bodyMat = new THREE.MeshStandardMaterial({ color: 0x38bdf8, roughness: 0.25, metalness: 0.55, transparent: true, opacity: 0.92 });
+    const coreMat = new THREE.MeshStandardMaterial({ color: 0xf43f5e, emissive: 0x881337, roughness: 0.2 });
+
+    const head = new THREE.Mesh(new THREE.SphereGeometry(0.42, 32, 32), bodyMat);
+    head.position.set(0, 1.75, 0);
+    avatarGroup.add(head);
+
+    const torso = new THREE.Mesh(new THREE.CylinderGeometry(0.52, 0.42, 1.35, 32), bodyMat);
+    torso.position.set(0, 0.72, 0);
+    avatarGroup.add(torso);
+
+    const heartCore = new THREE.Mesh(new THREE.SphereGeometry(0.18, 24, 24), coreMat);
+    heartCore.position.set(0.12, 0.92, 0.36);
+    avatarGroup.add(heartCore);
+
+    const leftArm = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.11, 1.25, 20), bodyMat);
+    leftArm.position.set(-0.74, 0.72, 0);
+    avatarGroup.add(leftArm);
+
+    const rightArm = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.11, 1.25, 20), bodyMat);
+    rightArm.position.set(0.74, 0.72, 0);
+    avatarGroup.add(rightArm);
+
+    const leftLeg = new THREE.Mesh(new THREE.CylinderGeometry(0.17, 0.13, 1.45, 20), bodyMat);
+    leftLeg.position.set(-0.24, -0.72, 0);
+    avatarGroup.add(leftLeg);
+
+    const rightLeg = new THREE.Mesh(new THREE.CylinderGeometry(0.17, 0.13, 1.45, 20), bodyMat);
+    rightLeg.position.set(0.24, -0.72, 0);
+    avatarGroup.add(rightLeg);
+
+    // Sims 4 Floating Plumbob (Octahedron Crystal)
+    const plumbobGeo = new THREE.OctahedronGeometry(0.32, 0);
+    plumbobGeo.scale(0.65, 1.35, 0.65);
+    const plumbobMat = new THREE.MeshStandardMaterial({
+      color: 0x10b981, emissive: 0x065f46, roughness: 0.1, metalness: 0.3, transparent: true, opacity: 0.92
+    });
+    const plumbob = new THREE.Mesh(plumbobGeo, plumbobMat);
+    plumbob.position.set(0, 2.65, 0);
+    scene.add(plumbob);
+
+    // GTA 6 Ground Radar / Biometric Ring
+    const ringGeo = new THREE.RingGeometry(1.15, 1.28, 64);
+    const ringMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8, side: THREE.DoubleSide, transparent: true, opacity: 0.65 });
+    const groundRing = new THREE.Mesh(ringGeo, ringMat);
+    groundRing.rotation.x = Math.PI / 2;
+    groundRing.position.set(0, -1.48, 0);
+    scene.add(groundRing);
+
+    function applyMorph() {
+      const h = parseFloat(document.getElementById('m-height').value);
+      const m = parseFloat(document.getElementById('m-muscle').value);
+      const f = parseFloat(document.getElementById('m-fat').value);
+      const a = parseFloat(document.getElementById('m-aura').value);
+
+      document.getElementById('v-height').textContent = h;
+      document.getElementById('v-muscle').textContent = m + '%';
+      document.getElementById('v-fat').textContent = f + '%';
+      document.getElementById('v-aura').textContent = a + '%';
+
+      userProfile.heightCm = h;
+      userProfile.musclePct = m;
+      userProfile.bodyFatPct = f;
+
+      const scaleY = h / 173;
+      const widthScale = 0.85 + ((m - 25) / 100) + ((f - 10) / 140);
+      avatarGroup.scale.set(widthScale, scaleY, widthScale);
+      groundRing.material.opacity = a / 100;
+
+      gtaStats[1].val = Math.min(100, Math.round(m * 2 + 6));
+      renderGtaStats();
+      generateQrAndBarcode();
+
+      try {
+        localStorage.setItem('pmd_personal_digital_self_v1', JSON.stringify(userProfile));
+      } catch (e) {}
+    }
+
+    ['m-height', 'm-muscle', 'm-fat', 'm-aura'].forEach(id => {
+      document.getElementById(id).addEventListener('input', applyMorph);
+    });
+
+    let dragging = false, px = 0;
+    renderer.domElement.addEventListener('pointerdown', (e) => { dragging = true; px = e.clientX; });
+    window.addEventListener('pointerup', () => { dragging = false; });
+    window.addEventListener('pointermove', (e) => {
+      if (!dragging) return;
+      avatarGroup.rotation.y += (e.clientX - px) * 0.01;
+      px = e.clientX;
+    });
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    let clock = 0;
+    function animate() {
+      requestAnimationFrame(animate);
+      clock += 0.035;
+      plumbob.rotation.y += 0.025;
+      plumbob.position.y = 2.65 + Math.sin(clock) * 0.08;
+      const pulse = 1 + Math.sin(clock * 2.2) * 0.08;
+      heartCore.scale.set(pulse, pulse, pulse);
+      if (!dragging) avatarGroup.rotation.y += 0.003;
+      renderer.render(scene, camera);
+    }
+    animate();
+  </script>
+</body>
+</html>

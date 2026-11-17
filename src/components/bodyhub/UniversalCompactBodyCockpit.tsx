@@ -83,35 +83,16 @@ export function UniversalCompactBodyCockpit() {
 
   const r = readout
   return (
-    <section
-      aria-label="Universal Compact Body Intelligence Cockpit"
-      className="dark relative z-[2] mt-3 overflow-hidden rounded-[24px] border border-emerald-500/30 bg-[#060c10]/95 p-4 text-white shadow-2xl backdrop-blur-xl sm:p-6"
-    >
-      {/* 1. Header & Live Persona Selector */}
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 pb-4">
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="inline-block h-2.5 w-2.5 animate-pulse rounded-full bg-emerald-400" aria-hidden="true" />
-            <h2 className="text-base font-black tracking-tight text-white sm:text-lg">
-              Body Intelligence Cockpit &middot; All-in-One Synthesis
-            </h2>
-            <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-[10px] font-black uppercase tracking-wider text-emerald-300">
-              Wave 700
-            </span>
-            <a
-              href="/deep-human-lab/medscihub-3d-multiscale-simulation.html"
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{ minHeight: 44 }}
-              className="inline-flex items-center gap-1.5 rounded-full border border-cyan-400/40 bg-cyan-950/40 px-3 text-xs font-black text-cyan-300 transition hover:bg-cyan-500 hover:text-black"
-            >
-              <span>💎 Launch 3D MedSciHub Multiscale OS &rarr;</span>
-            </a>
-          </div>
-          <p className="mt-0.5 text-xs text-white/65">
-            Real-time biometric fusion of body composition, circumferences, hemodynamics, sleep, longevity, and recovery.
-          </p>
-        </div>
+    <details aria-label="Body numbers summary" data-body-cockpit className="dark relative z-[2] mt-3 overflow-hidden rounded-[24px] border border-emerald-500/30 bg-[#060c10]/95 p-4 text-white sm:p-6">
+      {/* Closed by default: twelve tiles with hints are too much text for the first screen (UI legibility ratchet);
+          the summary line still shows the headline numbers the person recorded. */}
+      <summary className="flex min-h-[44px] cursor-pointer list-none flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+        <span className="text-[14px] font-black tracking-tight">Your body numbers</span>
+        <span className="text-[14px] font-semibold tabular-nums text-white/70" data-cockpit-headline>
+          {[r.weight && `${r.weight.value.toFixed(1)} kg`, r.bmi && `BMI ${r.bmi.value.toFixed(1)}`].filter(Boolean).join(' · ')}
+        </span>
+      </summary>
+      <p className="mt-2 text-[11px] text-white/55">Only what you recorded, or calculated from it</p>
 
       <div className="mt-3 grid grid-cols-2 gap-2.5 sm:grid-cols-4">
         <Tile label="Weight" reading={r.weight} unit="kg" digits={1} hint="Add weight" />
