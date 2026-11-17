@@ -82,7 +82,7 @@ export default function BodyAnalyzerPage() {
             👑 Omega Invictus 8-in-1 Body Exposure OS
           </a>
           <a
-            href="/personal-digital-self-1to1.html"
+            href="/nobel-human-nature-manipulation-viz-os.html" style={{ fontSize: "11px", fontWeight: 800, padding: "6px 12px", borderRadius: "8px", background: "linear-gradient(90deg, rgba(56,189,248,0.3), rgba(16,185,129,0.3))", color: "#f8fafc", border: "1px solid rgba(56, 189, 248, 0.7)", textDecoration: "none" }}>🧠 Nobel Human Nature, Manipulation & 4D Viz OS</a> <a href="/personal-digital-self-1to1.html"
             style={{
               fontSize: '11px',
               fontWeight: 700,
