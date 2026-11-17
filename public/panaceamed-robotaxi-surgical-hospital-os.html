@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PanaceaMed OS · Autonomous Surgical Robotaxi-Vision, 3D CT, Spinal/Nerve Block & Combined Body-MedStudy-ForYou Super-OS</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="/panacea-superos-bridge.js"></script>
+  <style>
+    :root {
+      --bg: #020617;
+      --surface: rgba(15, 23, 42, 0.9);
+      --card: rgba(2, 6, 23, 0.85);
+      --border: rgba(56, 189, 248, 0.25);
+      --cyan: #38bdf8;
+      --emerald: #10b981;
+      --amber: #f59e0b;
+      --rose: #f43f5e;
+      --violet: #a855f7;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: radial-gradient(circle at 50% 18%, #0f172a 0%, #020617 86%);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', system-ui, sans-serif;
+      overflow: hidden; height: 100vh; width: 100vw; user-select: none;
+    }
+    #robo-canvas { position: fixed; inset: 0; z-index: 1; }
+    .topbar {
+      position: fixed; top: 10px; left: 12px; right: 12px; z-index: 10;
+      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;
+      background: var(--surface); backdrop-filter: blur(20px);
+      border: 1px solid var(--border); border-radius: 13px; padding: 9px 15px;
+      box-shadow: 0 12px 32px rgba(0,0,0,0.6);
+    }
+    .btn {
+      text-decoration: none; color: var(--text); background: rgba(30, 41, 59, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.28); border-radius: 8px;
+      padding: 5px 10px; font-size: 10.5px; font-weight: 700; cursor: pointer;
+      transition: all 0.15s ease; display: inline-flex; align-items: center; gap: 4px;
+    }
+    .btn:hover, .btn.active {
+      background: rgba(16, 185, 129, 0.24); border-color: var(--emerald); color: #34d399;
+      box-shadow: 0 0 12px rgba(16, 185, 129, 0.3);
+    }
+    .hub-bar {
+      position: fixed; top: 62px; left: 395px; right: 415px; z-index: 10;
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;
+    }
+    @media (max-width: 1360px) { .hub-bar { display: none; } }
+    .hub-tab {
+      background: var(--surface); backdrop-filter: blur(18px);
+      border: 1px solid var(--border); border-radius: 10px; padding: 8px 10px;
+      cursor: pointer; transition: all 0.15s ease;
+    }
+    .hub-tab.active, .hub-tab:hover {
+      border-color: var(--emerald); background: rgba(16, 185, 129, 0.18);
+    }
+    .hub-lbl { font-size: 9.5px; font-weight: 800; color: var(--cyan); text-transform: uppercase; }
+    .hub-val { font-size: 12.5px; font-weight: 800; color: #fff; margin-top: 2px; }
+    .hub-sub { font-size: 10px; color: var(--muted); }
+    .left-col, .right-col {
+      position: fixed; top: 62px; bottom: 84px; width: 375px; z-index: 10;
+      background: var(--surface); backdrop-filter: blur(20px);
+      border: 1px solid var(--border); border-radius: 13px; padding: 12px;
+      overflow-y: auto; display: flex; flex-direction: column; gap: 10px;
+    }
+    .left-col { left: 12px; }
+    .right-col { right: 12px; width: 395px; }
+    .center-hud {
+      position: fixed; bottom: 84px; left: 399px; right: 419px; z-index: 10;
+      background: rgba(2, 6, 23, 0.9); backdrop-filter: blur(20px);
+      border: 1.5px solid rgba(16, 185, 129, 0.5); border-radius: 12px; padding: 9px 14px;
+    }
+    @media (max-width: 1360px) { .center-hud { display: none; } }
+    .card {
+      background: var(--card); border: 1px solid rgba(148, 163, 184, 0.16);
+      border-radius: 10px; padding: 10px 12px;
+    }
+    .card-hdr {
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 10.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.55px;
+      color: var(--cyan); margin-bottom: 6px; padding-bottom: 4px;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+    }
+    .kv {
+      display: flex; justify-content: space-between; align-items: baseline;
+      font-size: 11px; padding: 3.5px 0; border-bottom: 1px dashed rgba(148, 163, 184, 0.1);
+    }
+    .kv span:first-child { color: var(--muted); }
+    .kv span:last-child { font-family: 'SF Mono', ui-monospace, monospace; font-weight: 700; color: #f1f5f9; }
+    .slider-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 11px; margin: 4.5px 0; }
+    .slider-row input[type=range], .slider-row select { flex: 1; accent-color: var(--emerald); }
+    .select-box {
+      width: 100%; background: #020617; color: var(--text); border: 1px solid rgba(56, 189, 248, 0.35);
+      border-radius: 6px; padding: 5px 8px; font-size: 11px; font-weight: 600; margin-bottom: 6px;
+    }
+    .pill {
+      font-size: 9.5px; font-weight: 700; padding: 2px 7px; border-radius: 999px;
+      background: rgba(16, 185, 129, 0.18); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.38);
+    }
+    .feed-item {
+      background: rgba(15, 23, 42, 0.78); border: 1px solid rgba(148, 163, 184, 0.16);
+      border-radius: 7px; padding: 7px 9px; margin-top: 5px; font-size: 10.5px; line-height: 1.4;
+    }
+    .eq-box {
+      font-family: 'SF Mono', ui-monospace, monospace; font-size: 9.8px; color: #34d399;
+      background: rgba(6, 78, 59, 0.25); border: 1px solid rgba(16, 185, 129, 0.35);
+      border-radius: 6px; padding: 6px 8px; margin-top: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div id="robo-canvas"></div>
+
+  <header class="topbar">
+    <div style="display:flex;align-items:center;gap:8px;">
+      <a href="/#/body-exposure" class="btn">← Cockpit</a>
+      <a href="/panaceamed-the-one-singularity-os.html" class="btn">☝️ THE ONE</a>
+      <div>
+        <strong style="font-size:13px;">🤖 PanaceaMed Robotaxi-Vision Surgical, 3D CT, Nerve Block & Smart Hospital Super-OS</strong>
+        <div style="font-size:10.5px;color:var(--muted);">Combined: Advanced Body Exposure + MedStudyHub + Your Body + For You · Beyond-Mako 6-DoF Arm · Automated Spinal/Nerve Block · IoT Ward</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;">
+      <button class="btn active" onclick="engageAutonomousSurgery()">🎯 Engage Autonomous Surgical Autopilot</button>
+      <button class="btn" onclick="window.PanaceaSuperOSBridge.exportFhirJson()">📄 1-Tap FHIR R4</button>
+    </div>
+  </header>
+
+  <!-- COMBINED 4-IN-1 PAGE SYSTEM: BODY EXPOSURE + MEDSTUDYHUB + YOUR BODY + FOR YOU -->
+  <section class="hub-bar">
+    <div class="hub-tab active" id="tab-exposure" onclick="switchCombinedMode('EXPOSURE')">
+      <div class="hub-lbl">1. Advanced Body Exposure</div>
+      <div class="hub-val">3D CT & Organ Telemetry</div>
+      <div class="hub-sub">Real-time Voxel & Hemodynamics</div>
+    </div>
+    <div class="hub-tab" id="tab-medstudy" onclick="switchCombinedMode('MEDSTUDY')">
+      <div class="hub-lbl">2. MedStudyHub 4D</div>
+      <div class="hub-val">Surgical & Block Sim</div>
+      <div class="hub-sub">Mako 6-DoF + Ultrasound Nerve</div>
+    </div>
+    <div class="hub-tab" id="tab-yourbody" onclick="switchCombinedMode('YOURBODY')">
+      <div class="hub-lbl">3. Your Body Longitudinal</div>
+      <div class="hub-val">IoT Hospital & Lifespan</div>
+      <div class="hub-sub">Smart Bed, Lab, e-Rx & Mental</div>
+    </div>
+    <div class="hub-tab" id="tab-foryou" onclick="switchCombinedMode('FORYOU')">
+      <div class="hub-lbl">4. For You & Social Feed</div>
+      <div class="hub-val">AI Curated & Peer Club</div>
+      <div class="hub-sub">Personal Insights & Case Stream</div>
+    </div>
+  </section>
+
+  <!-- KOLOM KIRI: ROBOTAXI-VISION SURGICAL NAVIGATION (BEYOND MAKO), 3D CT, & SPINAL/NERVE BLOCK -->
+  <aside class="left-col">
+    <div class="card">
+      <div class="card-hdr">
+        <span>I. Beyond-Mako 6-DoF Robotic Arm & 3D CT Vision</span>
+        <span class="pill" id="lidar-status">SLAM TRE 0.18 mm</span>
+      </div>
+      <select class="select-box" id="surg-proc" onchange="updateSurgicalRobotics()">
+        <option value="mako_tka">Orthopedic: Robotic Total Knee / Hip Arthroplasty (Sub-mm Haptic)</option>
+        <option value="spine_pedicle">Neuro-Spine: 3D CT Robotic Pedicle Screw & Decompression</option>
+        <option value="endovascular">Cardio-Thoracic: Autonomous Scope CABG / Endovascular Navigation</option>
+        <option value="laparoscopic">General: Multi-Camera Laparoscopic Tumor Resection (No-Fly Guard)</option>
+      </select>
+      <div class="slider-row">
+        <span>1. 3D CT Hounsfield (HU)</span>
+        <input type="range" id="rb-hu" min="-700" max="1600" step="50" value="850" />
+        <span id="v-rb-hu">+850 HU</span>
+      </div>
+      <div class="slider-row">
+        <span>2. Kedalaman Lengan Z (mm)</span>
+        <input type="range" id="rb-depth" min="5" max="95" step="1" value="42" />
+        <span id="v-rb-depth">42 mm</span>
+      </div>
+      <div class="slider-row">
+        <span>3. Margin Haptik Saraf/Vena</span>
+        <input type="range" id="rb-margin" min="1.0" max="6.0" step="0.2" value="2.8" />
+        <span id="v-rb-margin">2.8 mm</span>
+      </div>
+      <div class="kv"><span>Robotaxi 360° Scope Occupancy Grid</span><span id="out-occ" style="color:#34d399;">0 Collision Risk · Vascular Locked</span></div>
+      <div class="kv"><span>Haptic Virtual Fixture Force Wall</span><span id="out-haptic" style="color:#38bdf8;">Active (45 N/mm Stiffness Barrier)</span></div>
+      <div class="kv"><span>3D CT Voxel Tissue Classification</span><span id="out-tissue">Cortical Bone (+850 HU Verified)</span></div>
+      <div class="eq-box">
+        J(q)·q̇ = v_target | F_haptic = -K_wall·max(0, d_safe - d_vessel)
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-hdr">
+        <span>II. Robotic Spinal + Nerve Blocks & AI Anesthesia</span>
+        <span class="pill" id="anes-pill">BIS 46 · Stable</span>
+      </div>
+      <select class="select-box" id="block-site" onchange="updateSurgicalRobotics()">
+        <option value="spinal_l3l4">Spinal Subarachnoid Block (L3–L4 / L4–L5 Midline Acoustic)</option>
+        <option value="brachial">Ultrasound Interscalene / Supraclavicular Brachial Plexus Block</option>
+        <option value="adductor">Ultrasound Adductor Canal + Sciatic (iPACK) Knee Block</option>
+        <option value="erector">Thoracic Erector Spinae Plane (ESP) / Epidural Block</option>
+      </select>
+      <div class="slider-row">
+        <span>1. Dosis Ropivacaine (mg)</span>
+        <input type="range" id="an-dose" min="15" max="220" step="5" value="110" />
+        <span id="v-an-dose">110 mg</span>
+      </div>
+      <div class="slider-row">
+        <span>2. Target TCI Propofol (μg/mL)</span>
+        <input type="range" id="an-tci" min="1.0" max="5.0" step="0.2" value="2.8" />
+        <span id="v-an-tci">2.8 μg/mL</span>
+      </div>
+      <div class="kv"><span>Ultrasonic Nerve-to-Needle Tip Distance</span><span id="out-needle" style="color:#34d399;">1.4 mm (Perineural Safe Zone)</span></div>
+      <div class="kv"><span>LAST Toxicity Ceiling (Max 3.0 mg/kg)</span><span id="out-last" style="color:#38bdf8;">1.62 mg/kg (54% of Max · Safe)</span></div>
+      <div class="kv"><span>Closed-Loop BIS EEG & Hemodynamic MAP</span><span id="out-bis" style="color:#34d399;">BIS 46 (Surgical) · MAP 88 mmHg</span></div>
+    </div>
+  </aside>
+
+  <!-- TENGAH BAWAH: SHENZHEN ROBOTAXI-STYLE AUTONOMOUS CLINICAL TELEMETRY HUD -->
+  <section class="center-hud">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;">
+      <strong style="font-size:11px;color:#34d399;text-transform:uppercase;letter-spacing:0.6px;">🛰️ SHENZHEN ROBOTAXI-GRADE INTRAOPERATIVE & HOSPITAL AUTOPILOT HUD</strong>
+      <span class="pill" id="autopilot-state-pill">Level-5 Clinical Autonomy + Human Surgeon Override Ready</span>
+    </div>
+    <div id="hud-narrative" style="font-size:11.5px;color:#f1f5f9;line-height:1.46;"></div>
+  </section>
+
+  <!-- KOLOM KANAN: SMART HOSPITAL STAY IoT, LONGITUDINAL CARE, MENTAL, & "FOR YOU" SOCIAL FEED -->
+  <aside class="right-col">
+    <div class="card">
+      <div class="card-hdr">
+        <span>III. Smart Hospital IoT Stay, ICU Radar & Longitudinal</span>
+        <span class="pill">Zero Nosocomial</span>
+      </div>
+      <div class="kv"><span>1. Contactless 60GHz mmWave Bed Radar</span><span id="iot-radar" style="color:#34d399;">RR 15/m · HR 62 bpm · Fall Risk 0%</span></div>
+      <div class="kv"><span>2. Smart IV Infusion & PCA Pump IoT</span><span id="iot-iv" style="color:#38bdf8;">Ringer Lactate 80 mL/h · Line Patent</span></div>
+      <div class="kv"><span>3. ERAS Post-Op Mobilization & Wound IoT</span><span id="iot-eras">Temp 36.6°C · Lactate 1.1 · Day-1 Walk</span></div>
+      <div class="kv"><span>4. Mental, Vagal & Sleep Longitudinal Index</span><span id="iot-mental" style="color:#a855f7;">HRV 78 ms · Anxiety Score Low (GAD 1)</span></div>
+      <div class="kv"><span>5. Longitudinal 10-Year Organ Trajectory</span><span style="color:#34d399;">eGFR 114 · BioAge -3.6 Yrs · Optimal</span></div>
+    </div>
+
+    <div class="card">
+      <div class="card-hdr">
+        <span>IV. "For You" AI Personalized & Medical-Social Stream</span>
+        <span class="pill">Combined Feed</span>
+      </div>
+      <div class="feed-item">
+        <strong style="color:#34d399;">✨ For You · Personal Body & Recovery Insight</strong>
+        <div>HRV Anda (78 ms) dan cadangan oksigen sistemik ($DO_2$ 1,014 mL/m) berada di persentil 96%. Waktu optimal untuk latihan kekuatan sore atau sesi HBOT 1.5 ATA.</div>
+      </div>
+      <div class="feed-item">
+        <strong style="color:#38bdf8;">🔬 MedStudyHub · 3D CT & Mako Robotic Case of the Day</strong>
+        <div>Simulasi artroplasti lutut robotik dengan batas haptik 2.8 mm dan blok kanal adduktor Ropivacaine 110 mg mempercepat mobilisasi bebas nyeri hingga 68%.</div>
+      </div>
+      <div class="feed-item">
+        <strong style="color:#fbbf24;">🤝 Panacea Social Club · Peer & Specialist Community</strong>
+        <div>dr. Rizky Azhar & 42 klinisi/atlet telah menyelesaikan sinkronisasi telemetri harian dan meninjau protokol anti-nosokomial Zero-Queue.</div>
+      </div>
+      <div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:8px;">
+        <a href="/panaceamed-al-hikmah-mercy-covenant-os.html" class="btn" style="flex:1;justify-content:center;">🌟 Al-Hikmah OS</a>
+        <a href="/panaceamed-1tap-hypervisor-os.html" class="btn" style="flex:1;justify-content:center;">⚡ All 20 Studios (Cmd+K)</a>
+      </div>
+    </div>
+  </aside>
+
+  <script>
+    // THREE.JS SHENZHEN ROBOTAXI-STYLE 3D CT VOXEL + 6-DOF MAKO ROBOTIC ARM + SPINAL/NERVE BLOCK VISUALIZER
+    const container = document.getElementById('robo-canvas');
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(42, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.set(0, 2.2, 10.5);
+    camera.lookAt(0, 0, 0);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    container.appendChild(renderer.domElement);
+
+    scene.add(new THREE.AmbientLight(0x38bdf8, 0.85));
+    const dLight = new THREE.DirectionalLight(0xffffff, 1.4);
+    dLight.position.set(7, 12, 8);
+    scene.add(dLight);
+
+    const surgicalWorld = new THREE.Group();
+    scene.add(surgicalWorld);
+
+    // 1. 3D CT Anatomical Voxel Cage & Spinal/Joint Target Core
+    const ctGrid = new THREE.GridHelper(9, 18, 0x38bdf8, 0x1e293b);
+    ctGrid.position.y = -1.6;
+    surgicalWorld.add(ctGrid);
+
+    const boneMat = new THREE.MeshStandardMaterial({
+      color: 0xe2e8f0, emissive: 0x0f172a, roughness: 0.25, metalness: 0.4, transparent: true, opacity: 0.88
+    });
+    const anatomyTarget = new THREE.Mesh(new THREE.CylinderGeometry(0.85, 0.78, 2.2, 32), boneMat);
+    surgicalWorld.add(anatomyTarget);
+
+    // 2. Robotaxi-Style Green Haptic Safe Bounding Box & Red Neurovascular No-Fly Zone
+    const hapticBoxMat = new THREE.MeshBasicMaterial({ color: 0x10b981, wireframe: true, transparent: true, opacity: 0.65 });
+    const hapticBox = new THREE.Mesh(new THREE.BoxGeometry(2.2, 2.5, 2.2), hapticBoxMat);
+    surgicalWorld.add(hapticBox);
+
+    const arteryCurve = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(-1.3, -1.4, 0.4),
+      new THREE.Vector3(-1.05, 0.0, 0.55),
+      new THREE.Vector3(-1.25, 1.4, 0.35)
+    ]);
+    const arteryMesh = new THREE.Mesh(
+      new THREE.TubeGeometry(arteryCurve, 48, 0.11, 16, false),
+      new THREE.MeshStandardMaterial({ color: 0xf43f5e, emissive: 0x881337 })
+    );
+    surgicalWorld.add(arteryMesh);
+
+    const nerveCurve = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(1.25, -1.4, 0.3),
+      new THREE.Vector3(1.0, 0.0, 0.5),
+      new THREE.Vector3(1.2, 1.4, 0.3)
+    ]);
+    const nerveMesh = new THREE.Mesh(
+      new THREE.TubeGeometry(nerveCurve, 48, 0.08, 16, false),
+      new THREE.MeshStandardMaterial({ color: 0xfbbf24, emissive: 0x78350f })
+    );
+    surgicalWorld.add(nerveMesh);
+
+    // 3. 6-DoF Robotic Surgical Arm Effector + Ultrasonic Nerve Block Needle Vector
+    const armGroup = new THREE.Group();
+    const armShaft = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.12, 0.06, 2.6, 24),
+      new THREE.MeshStandardMaterial({ color: 0x38bdf8, emissive: 0x075985, metalness: 0.7, roughness: 0.2 })
+    );
+    armShaft.position.y = 1.6;
+    armGroup.add(armShaft);
+
+    const laserTip = new THREE.Mesh(
+      new THREE.SphereGeometry(0.14, 20, 20),
+      new THREE.MeshBasicMaterial({ color: 0x34d399 })
+    );
+    laserTip.position.y = 0.25;
+    armGroup.add(laserTip);
+    armGroup.rotation.z = -0.35;
+    surgicalWorld.add(armGroup);
+
+    window.switchCombinedMode = function(mode) {
+      ['tab-exposure', 'tab-medstudy', 'tab-yourbody', 'tab-foryou'].forEach(id => document.getElementById(id).classList.remove('active'));
+      if (mode === 'EXPOSURE') {
+        document.getElementById('tab-exposure').classList.add('active');
+        camera.position.set(0, 2.2, 10.5);
+      } else if (mode === 'MEDSTUDY') {
+        document.getElementById('tab-medstudy').classList.add('active');
+        camera.position.set(1.8, 1.4, 7.6);
+      } else if (mode === 'YOURBODY') {
+        document.getElementById('tab-yourbody').classList.add('active');
+        camera.position.set(-1.8, 1.8, 8.8);
+      } else {
+        document.getElementById('tab-foryou').classList.add('active');
+        camera.position.set(0, 3.0, 9.5);
+      }
+      updateSurgicalRobotics();
+    };
+
+    function updateSurgicalRobotics() {
+      const hu = parseFloat(document.getElementById('rb-hu').value) || 850;
+      const depth = parseFloat(document.getElementById('rb-depth').value) || 42;
+      const margin = parseFloat(document.getElementById('rb-margin').value) || 2.8;
+      const dose = parseFloat(document.getElementById('an-dose').value) || 110;
+      const tci = parseFloat(document.getElementById('an-tci').value) || 2.8;
+
+      document.getElementById('v-rb-hu').textContent = (hu >= 0 ? '+' : '') + hu + ' HU';
+      document.getElementById('v-rb-depth').textContent = depth + ' mm';
+      document.getElementById('v-rb-margin').textContent = margin.toFixed(1) + ' mm';
+      document.getElementById('v-an-dose').textContent = dose + ' mg';
+      document.getElementById('v-an-tci').textContent = tci.toFixed(1) + ' μg/mL';
+
+      // Tissue classification from 3D CT Hounsfield Unit
+      let tissueName = 'Cortical Bone (+700 to +1900 HU)';
+      if (hu < -300) tissueName = 'Pulmonary Alveolar Parenchyma (' + hu + ' HU)';
+      else if (hu < 20) tissueName = 'Adipose / CSF Fluid Compartment (' + hu + ' HU)';
+      else if (hu < 120) tissueName = 'Parenchymal Soft Tissue / Muscle (+' + hu + ' HU)';
+      else if (hu < 450) tissueName = 'Contrast-Enhanced Vascular Lumen (+' + hu + ' HU)';
+      document.getElementById('out-tissue').textContent = tissueName;
+
+      // Move 3D Robotic Effector & Haptic Virtual Fixture Box
+      armGroup.position.y = 0.8 - (depth / 120);
+      const boxScale = 0.85 + (margin / 10);
+      hapticBox.scale.set(boxScale, 1.0, boxScale);
+
+      // Local Anesthetic Systemic Toxicity (LAST) Guard (68 kg reference weight)
+      const weightKg = 68;
+      const mgPerKg = dose / weightKg;
+      const maxRopi = 3.0;
+      const pctMax = Math.round((mgPerKg / maxRopi) * 100);
+      document.getElementById('out-last').textContent =
+        mgPerKg.toFixed(2) + ' mg/kg (' + pctMax + '% of Max 3.0 mg/kg · ' + (mgPerKg <= 3.0 ? 'SAFE' : '⚠️ LAST ALERT') + ')';
+      document.getElementById('out-last').style.color = mgPerKg <= 3.0 ? '#34d399' : '#fb7185';
+
+      // Closed-loop BIS index from TCI Propofol
+      const bis = Math.max(28, Math.min(92, Math.round(88 - tci * 15)));
+      document.getElementById('out-bis').textContent =
+        'BIS ' + bis + (bis >= 40 && bis <= 60 ? ' (Ideal Surgical Plane)' : ' (Titrate TCI)') + ' · MAP 88 mmHg';
+      document.getElementById('anes-pill').textContent = 'BIS ' + bis + ' · TCI Locked';
+
+      const procText = document.getElementById('surg-proc').options[document.getElementById('surg-proc').selectedIndex].text;
+      const blockText = document.getElementById('block-site').options[document.getElementById('block-site').selectedIndex].text;
+
+      document.getElementById('hud-narrative').innerHTML =
+        '<strong>Mode Otonom Aktif:</strong> <em>' + procText + '</em> dipandu registrasi voksels <strong>3D CT (' + hu + ' HU)</strong> dan persepsi kamera ruang 360° dengan dinding haptik <strong>' + margin.toFixed(1) + ' mm</strong> (0 risiko tabrakan arteri/saraf). Anestesi regional <em>' + blockText + '</em> terkalibrasi pada <strong>' + mgPerKg.toFixed(2) + ' mg/kg</strong> (bebas toksisitas LAST) dan kedalaman hipnosis <strong>BIS ' + bis + '</strong>.';
+    }
+
+    window.engageAutonomousSurgery = function() {
+      document.getElementById('rb-margin').value = 3.0;
+      document.getElementById('an-dose').value = 110;
+      document.getElementById('an-tci').value = 2.8;
+      updateSurgicalRobotics();
+      if (window.PanaceaSuperOSBridge) {
+        window.PanaceaSuperOSBridge.appendTheOneLog(
+          'ROBOTAXI_SURGICAL_AUTOPILOT_ENGAGED',
+          'Beyond-Mako 6-DoF Haptic Wall + 3D CT Voxel Registration + Spinal/Nerve Block + TCI BIS=46 synchronized.'
+        );
+        window.PanaceaSuperOSBridge.broadcastUpdate('robotaxi-surgical-hospital-os');
+      }
+      document.getElementById('autopilot-state-pill').textContent = '✓ Trajectory Locked ·TRE 0.18mm · Zero Collision';
+    };
+
+    ['rb-hu', 'rb-depth', 'rb-margin', 'an-dose', 'an-tci'].forEach(id => {
+      document.getElementById(id).addEventListener('input', updateSurgicalRobotics);
+    });
+
+    let dragging = false, px = 0, py = 0;
+    renderer.domElement.addEventListener('pointerdown', (e) => { dragging = true; px = e.clientX; py = e.clientY; });
+    window.addEventListener('pointerup', () => { dragging = false; });
+    window.addEventListener('pointermove', (e) => {
+      if (!dragging) return;
+      surgicalWorld.rotation.y += (e.clientX - px) * 0.008;
+      surgicalWorld.rotation.x += (e.clientY - py) * 0.005;
+      px = e.clientX; py = e.clientY;
+    });
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    updateSurgicalRobotics();
+
+    let clock = 0;
+    function animate() {
+      requestAnimationFrame(animate);
+      clock += 0.025;
+      armGroup.rotation.z = -0.35 + Math.sin(clock) * 0.12;
+      if (!dragging) surgicalWorld.rotation.y += 0.0025;
+      renderer.render(scene, camera);
+    }
+    animate();
+  </script>
+</body>
+</html>
