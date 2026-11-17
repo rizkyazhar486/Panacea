@@ -239,6 +239,15 @@ export function UniversalCompactBodyCockpit() {
             <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-[10px] font-black uppercase tracking-wider text-emerald-300">
               Wave 700
             </span>
+            <a
+              href="/deep-human-lab/medscihub-3d-multiscale-simulation.html"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ minHeight: 44 }}
+              className="inline-flex items-center gap-1.5 rounded-full border border-cyan-400/40 bg-cyan-950/40 px-3 text-xs font-black text-cyan-300 transition hover:bg-cyan-500 hover:text-black"
+            >
+              <span>💎 Launch 3D MedSciHub Multiscale OS &rarr;</span>
+            </a>
           </div>
           <p className="mt-0.5 text-xs text-white/65">
             Real-time biometric fusion of body composition, circumferences, hemodynamics, sleep, longevity, and recovery.

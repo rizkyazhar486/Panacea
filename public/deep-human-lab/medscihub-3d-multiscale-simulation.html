@@ -1,0 +1,1443 @@
+<!doctype html>
+<!--
+  @panacea-claim-boundary: simulation-not-clinical
+  PanaceaMed · MedSciHub 3D Multiscale Biomedical Simulation Studio
+  UHD 4D Bio-CAD / CAE Anatomical & Surgical Engine
+  Built for offline-ready edge deployment and multi-scale visual exploration.
+  Complies with PANACEA_CONSTITUTION & ARGON_DIRECTIVE_D100.
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#03070d" />
+  <title>PanaceaMed MedSciHub · 3D Multiscale Human Simulation OS</title>
+  <style>
+    :root {
+      --bg-void: #03070d;
+      --bg-panel: rgba(8, 16, 26, 0.85);
+      --border-panel: rgba(0, 240, 255, 0.22);
+      --border-active: rgba(16, 185, 129, 0.6);
+      --cyan-glow: #00f0ff;
+      --emerald-glow: #10b981;
+      --amber-glow: #f59e0b;
+      --rose-glow: #f43f5e;
+      --purple-glow: #a855f7;
+      --text-main: #f8fafc;
+      --text-dim: #94a3b8;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    body {
+      background: var(--bg-void);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      overflow: hidden;
+      width: 100vw;
+      height: 100vh;
+      user-select: none;
+    }
+
+    /* 3D Canvas Host */
+    #viewport-container {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }
+    #three-canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    /* HUD Layering */
+    .hud-layer {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 16px;
+    }
+    .hud-layer > * { pointer-events: auto; }
+
+    /* Top Bar */
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      background: linear-gradient(180deg, rgba(3,7,13,0.92) 0%, rgba(3,7,13,0.4) 100%);
+      padding: 12px 20px;
+      border-radius: 18px;
+      border: 1px solid var(--border-panel);
+      backdrop-filter: blur(16px);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+    }
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .brand-badge {
+      width: 14px;
+      height: 14px;
+      background: var(--emerald-glow);
+      border-radius: 50%;
+      box-shadow: 0 0 14px var(--emerald-glow);
+      animation: pulseGlow 2.5s infinite;
+    }
+    @keyframes pulseGlow {
+      0%, 100% { opacity: 0.6; transform: scale(0.92); }
+      50% { opacity: 1; transform: scale(1.15); box-shadow: 0 0 20px var(--emerald-glow); }
+    }
+    .brand-title {
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      background: linear-gradient(90deg, #fff, var(--cyan-glow));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .brand-sub {
+      font-size: 11px;
+      font-family: var(--font-mono);
+      color: var(--text-dim);
+    }
+
+    .top-telemetry {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+    }
+    .telemetry-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255,255,255,0.04);
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+    .telemetry-val { font-weight: bold; color: var(--cyan-glow); }
+
+    /* Left Sidebar: Multi-Scale Hierarchy */
+    .scale-nav {
+      position: absolute;
+      top: 86px;
+      left: 16px;
+      width: 250px;
+      max-height: calc(100vh - 120px);
+      overflow-y: auto;
+      background: var(--bg-panel);
+      border: 1px solid var(--border-panel);
+      border-radius: 16px;
+      padding: 14px;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.7);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .panel-header {
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--cyan-glow);
+      margin-bottom: 4px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .scale-btn {
+      width: 100%;
+      text-align: left;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+      padding: 9px 12px;
+      border-radius: 10px;
+      color: var(--text-dim);
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .scale-btn:hover {
+      background: rgba(0, 240, 255, 0.08);
+      border-color: rgba(0, 240, 255, 0.3);
+      color: #fff;
+      transform: translateX(3px);
+    }
+    .scale-btn.active {
+      background: linear-gradient(90deg, rgba(0,240,255,0.18), rgba(16,185,129,0.1));
+      border-color: var(--cyan-glow);
+      color: #fff;
+      font-weight: bold;
+      box-shadow: 0 0 16px rgba(0,240,255,0.25);
+    }
+    .scale-btn-idx {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      padding: 2px 5px;
+      border-radius: 4px;
+      background: rgba(255,255,255,0.08);
+      color: var(--cyan-glow);
+    }
+
+    /* Right Sidebar: Operations & Simulator */
+    .ops-panel {
+      position: absolute;
+      top: 86px;
+      right: 16px;
+      width: 320px;
+      max-height: calc(100vh - 120px);
+      overflow-y: auto;
+      background: var(--bg-panel);
+      border: 1px solid var(--border-panel);
+      border-radius: 16px;
+      padding: 16px;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.7);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .ops-tabs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 4px;
+      background: rgba(0,0,0,0.4);
+      padding: 3px;
+      border-radius: 8px;
+    }
+    .ops-tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-dim);
+      font-size: 10px;
+      font-weight: 700;
+      padding: 6px 0;
+      border-radius: 6px;
+      cursor: pointer;
+      text-transform: uppercase;
+      transition: all 0.2s;
+    }
+    .ops-tab-btn.active {
+      background: var(--cyan-glow);
+      color: #03070d;
+      font-weight: 900;
+    }
+
+    /* Controls Group */
+    .ctrl-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .ctrl-label {
+      font-size: 11px;
+      color: var(--text-dim);
+      display: flex;
+      justify-content: space-between;
+      font-family: var(--font-mono);
+    }
+    .ctrl-slider {
+      width: 100%;
+      height: 6px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 999px;
+      appearance: none;
+      outline: none;
+      cursor: pointer;
+    }
+    .ctrl-slider::-webkit-slider-thumb {
+      appearance: none;
+      width: 16px;
+      height: 16px;
+      background: var(--cyan-glow);
+      border-radius: 50%;
+      box-shadow: 0 0 10px var(--cyan-glow);
+      cursor: pointer;
+      transition: transform 0.15s;
+    }
+    .ctrl-slider::-webkit-slider-thumb:hover {
+      transform: scale(1.25);
+    }
+
+    .btn-action {
+      background: rgba(0,240,255,0.12);
+      border: 1px solid var(--border-panel);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 10px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .btn-action:hover {
+      background: var(--cyan-glow);
+      color: #03070d;
+      box-shadow: 0 0 16px var(--cyan-glow);
+    }
+    .btn-action.emergency {
+      background: rgba(244,63,94,0.15);
+      border-color: rgba(244,63,94,0.4);
+      color: #fca5a5;
+    }
+    .btn-action.emergency:hover {
+      background: var(--rose-glow);
+      color: #fff;
+      box-shadow: 0 0 16px var(--rose-glow);
+    }
+
+    /* Bottom Dock Bar */
+    .bottom-dock {
+      align-self: center;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--bg-panel);
+      border: 1px solid var(--border-panel);
+      padding: 10px 20px;
+      border-radius: 999px;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .dock-btn {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: var(--text-main);
+      padding: 8px 16px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .dock-btn:hover {
+      background: rgba(255,255,255,0.15);
+      border-color: var(--cyan-glow);
+      color: var(--cyan-glow);
+    }
+    .dock-btn.active {
+      background: var(--cyan-glow);
+      color: #03070d;
+      border-color: var(--cyan-glow);
+      box-shadow: 0 0 14px var(--cyan-glow);
+    }
+
+    /* Lesion Modal / EMR Drawer */
+    .emr-drawer {
+      position: absolute;
+      bottom: 80px;
+      left: 16px;
+      width: 380px;
+      background: var(--bg-panel);
+      border: 1px solid var(--border-active);
+      border-radius: 16px;
+      padding: 16px;
+      backdrop-filter: blur(24px);
+      box-shadow: 0 16px 48px rgba(0,0,0,0.8);
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+      z-index: 20;
+    }
+    .emr-drawer.open { display: flex; animation: slideUp 0.3s cubic-bezier(0.16,1,0.3,1); }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Telemetry ECG Canvas */
+    .ecg-strip {
+      width: 100%;
+      height: 60px;
+      background: #020408;
+      border: 1px solid rgba(0,240,255,0.15);
+      border-radius: 8px;
+    }
+
+    /* Safe Clinical Claim Banner */
+    .disclaimer-tag {
+      font-size: 9px;
+      font-family: var(--font-mono);
+      color: #64748b;
+      text-align: center;
+      padding-top: 4px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+
+    /* Responsive Handling */
+    @media (max-width: 900px) {
+      .scale-nav { display: none; }
+      .ops-panel { width: calc(100vw - 32px); max-height: 40vh; bottom: 80px; top: auto; right: 16px; }
+      .bottom-dock { width: 100%; border-radius: 12px; }
+    }
+  </style>
+</head>
+<body>
+  <!-- 3D Viewport -->
+  <div id="viewport-container">
+    <canvas id="three-canvas"></canvas>
+  </div>
+
+  <!-- HUD Interface -->
+  <div class="hud-layer">
+    <!-- Top Bar -->
+    <header class="top-bar">
+      <div class="brand-group">
+        <div class="brand-badge"></div>
+        <div>
+          <div class="brand-title">PanaceaMed &middot; MedSciHub 3D Multiscale OS</div>
+          <div class="brand-sub">UHD 5K &middot; First-Principles Biomechanical Simulator</div>
+        </div>
+      </div>
+      <div class="top-telemetry">
+        <div class="telemetry-item">SCALE: <span id="tele-scale" class="telemetry-val">WHOLE BODY (1:1)</span></div>
+        <div class="telemetry-item">HEART: <span id="tele-hr" class="telemetry-val">72 BPM</span></div>
+        <div class="telemetry-item">LVAD PUMP: <span id="tele-lvad" class="telemetry-val">2,800 RPM</span></div>
+        <div class="telemetry-item">5G LATENCY: <span class="telemetry-val" style="color:var(--emerald-glow);">8 ms</span></div>
+        <div class="telemetry-item">FPS: <span id="tele-fps" class="telemetry-val">60</span></div>
+      </div>
+    </header>
+
+    <!-- Multi-Scale Level Navigation (Left) -->
+    <nav class="scale-nav" aria-label="Anatomical Scale Hierarchy">
+      <div class="panel-header">
+        <span>Multiscale Stack</span>
+        <span style="font-size:9px;color:var(--text-dim);">8 TIERS</span>
+      </div>
+      <button class="scale-btn active" data-scale="1" onclick="switchScale(1)">
+        <span class="scale-btn-idx">S1</span> 1:1 Whole Body &amp; Avatar
+      </button>
+      <button class="scale-btn" data-scale="2" onclick="switchScale(2)">
+        <span class="scale-btn-idx">S2</span> Organ Systems &amp; TCM Meridians
+      </button>
+      <button class="scale-btn" data-scale="3" onclick="switchScale(3)">
+        <span class="scale-btn-idx">S3</span> Organ Focus (Heart &amp; LVAD)
+      </button>
+      <button class="scale-btn" data-scale="4" onclick="switchScale(4)">
+        <span class="scale-btn-idx">S4</span> Histology &amp; Stent Robotics
+      </button>
+      <button class="scale-btn" data-scale="5" onclick="switchScale(5)">
+        <span class="scale-btn-idx">S5</span> Cellular &amp; Microfluidic Chips
+      </button>
+      <button class="scale-btn" data-scale="6" onclick="switchScale(6)">
+        <span class="scale-btn-idx">S6</span> Organelles (Mitochondria)
+      </button>
+      <button class="scale-btn" data-scale="7" onclick="switchScale(7)">
+        <span class="scale-btn-idx">S7</span> DNA, mRNA &amp; CRISPR Gene R&amp;D
+      </button>
+      <button class="scale-btn" data-scale="8" onclick="switchScale(8)">
+        <span class="scale-btn-idx">S8</span> Quantum &amp; Molecular Biophysics
+      </button>
+    </nav>
+
+    <!-- Surgical Simulation & CAD/CAE Panel (Right) -->
+    <aside class="ops-panel" aria-label="Surgical & Biomechanical Controls">
+      <div class="ops-tabs">
+        <button class="ops-tab-btn active" onclick="switchOpsTab('explode')">Explode XYZ</button>
+        <button class="ops-tab-btn" onclick="switchOpsTab('surgery')">Surgical Sim</button>
+        <button class="ops-tab-btn" onclick="switchOpsTab('telemetry')">5G &amp; IoT</button>
+      </div>
+
+      <!-- Tab 1: Explode & Kinematics -->
+      <div id="tab-explode" class="ops-tab-content">
+        <div class="ctrl-group">
+          <div class="ctrl-label"><span>X-Axis Dispersion</span><span id="lbl-x">0 mm</span></div>
+          <input type="range" class="ctrl-slider" id="slide-x" min="0" max="150" value="0" oninput="updateExplosion()" />
+        </div>
+        <div class="ctrl-group" style="margin-top:10px;">
+          <div class="ctrl-label"><span>Y-Axis Dispersion</span><span id="lbl-y">0 mm</span></div>
+          <input type="range" class="ctrl-slider" id="slide-y" min="0" max="150" value="0" oninput="updateExplosion()" />
+        </div>
+        <div class="ctrl-group" style="margin-top:10px;">
+          <div class="ctrl-label"><span>Z-Axis Dispersion</span><span id="lbl-z">0 mm</span></div>
+          <input type="range" class="ctrl-slider" id="slide-z" min="0" max="150" value="0" oninput="updateExplosion()" />
+        </div>
+        <div style="display:flex;gap:8px;margin-top:14px;">
+          <button class="btn-action" style="flex:1;" onclick="resetExplosion()">&#x21BA; Reassemble</button>
+          <button class="btn-action" style="flex:1;" onclick="triggerParabolicSweep()">&#x27A4; Trajectory Scan</button>
+        </div>
+      </div>
+
+      <!-- Tab 2: Surgical Interventions (From Museum Exhibits) -->
+      <div id="tab-surgery" class="ops-tab-content" style="display:none;display:flex;flex-direction:column;gap:10px;">
+        <div class="ctrl-label"><span>Museum Pioneer Interventions</span></div>
+        <button class="btn-action" onclick="simulateStentRobot()">&#x1FA78; Vascular Stent Robot Placement</button>
+        <button class="btn-action" onclick="simulateLvadPump()">&#x2764;&#xFE0F; Artificial Heart LVAD MagLev Bridge</button>
+        <button class="btn-action" onclick="simulateCabgSuture()">&#x1FAA1; CABG Micro-Tissue Suturing (Robotic)</button>
+        <button class="btn-action" onclick="simulateNerveConduit()">&#x26A1; Nerve Catheter Scaffold Implantation</button>
+        <button class="btn-action" onclick="simulateSpineTraction()">&#x1F9B4; Spinal Assisted Orthopedics (Traction)</button>
+        <button class="btn-action" onclick="simulateFesPulse()">&#x26A1; Functional Electrical Stimulation (FES)</button>
+      </div>
+
+      <!-- Tab 3: Telemetry & Remote Ambulance -->
+      <div id="tab-telemetry" class="ops-tab-content" style="display:none;display:flex;flex-direction:column;gap:10px;">
+        <div class="ctrl-label"><span>5G Remote Ambulance Telemetry</span><span style="color:var(--emerald-glow);">LIVE</span></div>
+        <canvas id="ecg-canvas" class="ecg-strip"></canvas>
+        <div style="font-family:var(--font-mono);font-size:10px;color:var(--text-dim);display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+          <div>BP: <b style="color:#fff;">122/78 mmHg</b></div>
+          <div>SpO2: <b style="color:var(--cyan-glow);">99%</b></div>
+          <div>Temp: <b style="color:#fff;">36.8 &deg;C</b></div>
+          <div>GCS: <b style="color:#fff;">15/15</b></div>
+        </div>
+        <button class="btn-action emergency" onclick="dispatchAmbulance()">&#x1F691; Dispatch 5G Smart Ambulance</button>
+      </div>
+
+      <!-- Scientific Boundary Tag -->
+      <div class="disclaimer-tag">
+        @panacea-claim-boundary: simulation-not-clinical<br />
+        Educational CAD/CAE Model &middot; clinically_reviewed=false
+      </div>
+    </aside>
+
+    <!-- Bottom Action Dock -->
+    <footer class="bottom-dock">
+      <button class="dock-btn active" id="btn-mode-inspect" onclick="setInteractionMode('inspect')">&#x1F50E; Inspect &amp; Rotate</button>
+      <button class="dock-btn" id="btn-mode-lesion" onclick="setInteractionMode('lesion')">&#x1FA7A; AI-EMR Lesion Raycast</button>
+      <button class="dock-btn" id="btn-mode-voxon" onclick="toggleHologramMode()">&#x1F48E; Voxon Hologram 360&deg;</button>
+      <button class="dock-btn" onclick="toggleWireframe()">&#x1F310; Wireframe CAE</button>
+      <button class="dock-btn" onclick="exportEmrReport()">&#x1F4BE; Export FHIR R4 Draft</button>
+    </footer>
+
+    <!-- Interactive AI-EMR Lesion Annotation Drawer -->
+    <div id="emr-drawer" class="emr-drawer">
+      <div class="panel-header">
+        <span>AI-EMR Precision Lesion Marker</span>
+        <button style="background:none;border:none;color:#fff;cursor:pointer;" onclick="closeEmrDrawer()">&times;</button>
+      </div>
+      <p style="font-size:11px;color:var(--text-dim);">
+        Target coordinates identified on 3D biological mesh:
+      </p>
+      <div style="font-family:var(--font-mono);font-size:11px;background:rgba(0,0,0,0.5);padding:8px;border-radius:6px;">
+        <span id="emr-coords">X: +0.00 | Y: +0.00 | Z: +0.00</span><br />
+        <span id="emr-organ" style="color:var(--cyan-glow);">Organ: Myocardium / Left Ventricle</span>
+      </div>
+      <div style="font-size:11px;color:var(--text-main);">
+        <b>AI Differential Hypothesis:</b>
+        <p style="color:var(--amber-glow);margin-top:2px;" id="emr-diagnosis">
+          Localized ischemic hypo-perfusion. Coronary perfusion reserve down 34%. Stent robot intervention indicated.
+        </p>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn-action" style="flex:1;" onclick="applySurgicalPlan()">Adopt Plan &rarr;</button>
+        <button class="btn-action" style="flex:1;" onclick="closeEmrDrawer()">Dismiss</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Three.js Bundle via Local / Fallback Script -->
+  <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
+  <script src="https://unpkg.com/three@0.160.0/examples/js/controls/OrbitControls.js"></script>
+  
+  <script>
+    /* =========================================================================
+     * PANACEAMED MEDSCIHUB 3D MULTISCALE SIMULATOR ENGINE (r160 WebGL 2.0)
+     * ========================================================================= */
+    let scene, camera, renderer, controls;
+    let currentScale = 1;
+    let interactionMode = 'inspect'; // 'inspect' | 'lesion'
+    let rootGroup, organMeshes = [];
+    let lesionPins = [];
+    let isWireframe = false;
+    let isHologram = false;
+    let raycaster = new THREE.Raycaster();
+    let mouse = new THREE.Vector2();
+
+    // Biomechanical Simulation State
+    const simState = {
+      heartBeat: 0,
+      lvadRpm: 2800,
+      lvadFlow: 4.8,
+      stentDeployed: false,
+      sutureCount: 0,
+      explode: { x: 0, y: 0, z: 0 },
+      cameraTrajectory: null
+    };
+
+    function init() {
+      const container = document.getElementById('viewport-container');
+      const canvas = document.getElementById('three-canvas');
+
+      // 1. Scene & Camera Setup
+      scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x03070d);
+      scene.fog = new THREE.FogExp2(0x03070d, 0.035);
+
+      camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+      camera.position.set(0, 15, 45);
+
+      // 2. High-Performance WebGL Renderer
+      renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false, powerPreference: 'high-performance' });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.25;
+
+      // 3. Orbit Controls
+      controls = new THREE.OrbitControls(camera, renderer.domElement);
+      controls.enableDamping = true;
+      controls.dampingFactor = 0.05;
+      controls.maxPolarAngle = Math.PI / 1.8;
+      controls.minDistance = 2;
+      controls.maxDistance = 120;
+
+      // 4. Cinematic Lighting
+      const ambientLight = new THREE.AmbientLight(0x0a192f, 2.5);
+      scene.add(ambientLight);
+
+      const keyLight = new THREE.DirectionalLight(0x00f0ff, 3.2);
+      keyLight.position.set(20, 40, 30);
+      scene.add(keyLight);
+
+      const rimLight = new THREE.DirectionalLight(0x10b981, 2.4);
+      rimLight.position.set(-25, -10, -25);
+      scene.add(rimLight);
+
+      const fillLight = new THREE.PointLight(0xa855f7, 2.0, 50);
+      fillLight.position.set(0, 0, 15);
+      scene.add(fillLight);
+
+      // 5. Build Master Root Assembly
+      rootGroup = new THREE.Group();
+      scene.add(rootGroup);
+
+      // Build Initial Scale 1: Whole Body & Avatar
+      buildAnatomicalScale(1);
+
+      // 6. Event Listeners
+      window.addEventListener('resize', onWindowResize);
+      canvas.addEventListener('pointerdown', onPointerDown);
+
+      // 7. Start Animation Loop & Telemetry ECG
+      initEcgMonitor();
+      animate();
+    }
+
+    /* -------------------------------------------------------------------------
+     * Multi-Scale Anatomical Procedural Geometry Synthesis
+     * ------------------------------------------------------------------------- */
+    function clearAssembly() {
+      while(rootGroup.children.length > 0) {
+        const obj = rootGroup.children[0];
+        rootGroup.remove(obj);
+        if (obj.geometry) obj.geometry.dispose();
+        if (obj.material) {
+          if (Array.isArray(obj.material)) obj.material.forEach(m => m.dispose());
+          else obj.material.dispose();
+        }
+      }
+      organMeshes = [];
+      lesionPins = [];
+    }
+
+    function buildAnatomicalScale(scale) {
+      clearAssembly();
+      currentScale = scale;
+      document.getElementById('tele-scale').innerText = getScaleName(scale);
+
+      // Highlight Active Scale in Sidebar
+      document.querySelectorAll('.scale-btn').forEach(btn => {
+        btn.classList.toggle('active', Number(btn.dataset.scale) === scale);
+      });
+
+      if (scale === 1) {
+        // TIER 1: WHOLE BODY AVATAR & SKELETON
+        buildWholeBodyAvatar();
+      } else if (scale === 2) {
+        // TIER 2: ORGAN SYSTEMS & TCM MERIDIAN NETWORK
+        buildOrganSystemsWithMeridians();
+      } else if (scale === 3) {
+        // TIER 3: CARDIAC & LVAD MAGLEV BLOOD PUMP
+        buildCardiacLvadSystem();
+      } else if (scale === 4) {
+        // TIER 4: HISTOLOGY & STENT ROBOTICS
+        buildVascularStentHistology();
+      } else if (scale === 5) {
+        // TIER 5: CELLULAR & MICROFLUIDIC LAB-ON-A-CHIP
+        buildCellularMicrofluidics();
+      } else if (scale === 6) {
+        // TIER 6: SUBCELLULAR ORGANELLES (MITOCHONDRIA ATP MOTOR)
+        buildMitochondriaOrganelle();
+      } else if (scale === 7) {
+        // TIER 7: DNA DOUBLE HELIX, mRNA & CRISPR-CAS9
+        buildDnaCrisprAssembly();
+      } else if (scale === 8) {
+        // TIER 8: QUANTUM BIOPHYSICS & ION CHANNELS
+        buildQuantumIonChannel();
+      }
+    }
+
+    function getScaleName(scale) {
+      const names = [
+        '',
+        'S1 · 1:1 WHOLE BODY AVATAR',
+        'S2 · ORGAN SYSTEMS & TCM MERIDIANS',
+        'S3 · CARDIAC & LVAD MAGLEV BLOOD PUMP',
+        'S4 · HISTOLOGY & VASCULAR STENT ROBOT',
+        'S5 · CELLULAR & MICROFLUIDIC LAB-CHIP',
+        'S6 · MITOCHONDRIA ORGANELLE (ATP)',
+        'S7 · DNA HELIX, mRNA & CRISPR CAS-9',
+        'S8 · QUANTUM ION CHANNELS & MEMBRANE'
+      ];
+      return names[scale] || 'CUSTOM SCALE';
+    }
+
+    // Scale 1: Whole Body Hologram Avatar
+    function buildWholeBodyAvatar() {
+      // Cranium / Head
+      const headGeo = new THREE.SphereGeometry(2.4, 32, 32);
+      headGeo.scale(1, 1.25, 1);
+      const skinMat = new THREE.MeshStandardMaterial({
+        color: 0x00f0ff,
+        metalness: 0.2,
+        roughness: 0.35,
+        wireframe: isWireframe,
+        transparent: true,
+        opacity: 0.85
+      });
+      const head = new THREE.Mesh(headGeo, skinMat);
+      head.position.set(0, 16.5, 0);
+      head.name = 'Cranium & Face Avatar';
+      rootGroup.add(head);
+      organMeshes.push(head);
+
+      // Spine & Torso Cage
+      const torsoGeo = new THREE.CylinderGeometry(3.5, 2.6, 12, 24);
+      const torsoMat = new THREE.MeshStandardMaterial({
+        color: 0x0d2847,
+        metalness: 0.4,
+        roughness: 0.3,
+        wireframe: isWireframe,
+        transparent: true,
+        opacity: 0.7
+      });
+      const torso = new THREE.Mesh(torsoGeo, torsoMat);
+      torso.position.set(0, 7.5, 0);
+      torso.name = 'Thoracoabdominal Cage & Spine';
+      rootGroup.add(torso);
+      organMeshes.push(torso);
+
+      // Spine Column
+      for (let i = 0; i < 18; i++) {
+        const vertGeo = new THREE.CylinderGeometry(0.8, 0.9, 0.45, 16);
+        const vertMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.2 });
+        const vert = new THREE.Mesh(vertGeo, vertMat);
+        vert.position.set(0, 2 + i * 0.7, -1.2);
+        vert.name = `Vertebra C${i}`;
+        rootGroup.add(vert);
+        organMeshes.push(vert);
+      }
+
+      // Limbs (Arms & Legs)
+      const limbMat = new THREE.MeshStandardMaterial({ color: 0x00f0ff, wireframe: isWireframe, transparent: true, opacity: 0.5 });
+      // Left Arm
+      const lArm = new THREE.Mesh(new THREE.CylinderGeometry(0.9, 0.7, 11, 16), limbMat);
+      lArm.position.set(5.5, 7.5, 0);
+      rootGroup.add(lArm);
+      organMeshes.push(lArm);
+      // Right Arm
+      const rArm = new THREE.Mesh(new THREE.CylinderGeometry(0.9, 0.7, 11, 16), limbMat);
+      rArm.position.set(-5.5, 7.5, 0);
+      rootGroup.add(rArm);
+      organMeshes.push(rArm);
+
+      // Left Leg
+      const lLeg = new THREE.Mesh(new THREE.CylinderGeometry(1.2, 0.8, 14, 16), limbMat);
+      lLeg.position.set(2.2, -7.5, 0);
+      rootGroup.add(lLeg);
+      organMeshes.push(lLeg);
+      // Right Leg
+      const rLeg = new THREE.Mesh(new THREE.CylinderGeometry(1.2, 0.8, 14, 16), limbMat);
+      rLeg.position.set(-2.2, -7.5, 0);
+      rootGroup.add(rLeg);
+      organMeshes.push(rLeg);
+    }
+
+    // Scale 2: Organ Systems with TCM Meridian Glow Lines
+    function buildOrganSystemsWithMeridians() {
+      // Internal Organs: Heart
+      const heartGeo = new THREE.DodecahedronGeometry(2.2, 2);
+      const heartMat = new THREE.MeshStandardMaterial({ color: 0xf43f5e, roughness: 0.2, metalness: 0.3 });
+      const heart = new THREE.Mesh(heartGeo, heartMat);
+      heart.position.set(0.8, 8.5, 0.8);
+      heart.name = 'Heart & Coronary Sinus';
+      rootGroup.add(heart);
+      organMeshes.push(heart);
+
+      // Lungs (Bilateral)
+      const lungGeo = new THREE.SphereGeometry(2.5, 24, 24);
+      lungGeo.scale(0.8, 1.6, 0.7);
+      const lungMat = new THREE.MeshStandardMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.65 });
+      const lungL = new THREE.Mesh(lungGeo, lungMat);
+      lungL.position.set(3.2, 8.5, 0);
+      lungL.name = 'Left Lung (Bifurcation)';
+      rootGroup.add(lungL);
+      organMeshes.push(lungL);
+
+      const lungR = new THREE.Mesh(lungGeo, lungMat);
+      lungR.position.set(-3.2, 8.5, 0);
+      lungR.name = 'Right Lung (Trilobed)';
+      rootGroup.add(lungR);
+      organMeshes.push(lungR);
+
+      // Liver
+      const liverGeo = new THREE.ConeGeometry(3.6, 4, 16);
+      liverGeo.rotateZ(Math.PI / 2.8);
+      const liverMat = new THREE.MeshStandardMaterial({ color: 0x9a3412, roughness: 0.4 });
+      const liver = new THREE.Mesh(liverGeo, liverMat);
+      liver.position.set(-2.0, 4.2, 0.5);
+      liver.name = 'Liver (Hepatic Portal)';
+      rootGroup.add(liver);
+      organMeshes.push(liver);
+
+      // Stomach & Intestine Loop
+      const gutGeo = new THREE.TorusGeometry(3.0, 0.9, 16, 32);
+      const gutMat = new THREE.MeshStandardMaterial({ color: 0xf59e0b, roughness: 0.5 });
+      const gut = new THREE.Mesh(gutGeo, gutMat);
+      gut.position.set(0, 1.2, 0.5);
+      gut.name = 'Digestive Tract & Mesentery';
+      rootGroup.add(gut);
+      organMeshes.push(gut);
+
+      // Intelligent TCM Meridian Bioelectricity Lines (Exhibition Image 17)
+      const points = [];
+      for (let i = -15; i <= 18; i += 0.8) {
+        points.push(new THREE.Vector3(Math.sin(i * 0.4) * 1.5, i, Math.cos(i * 0.4) * 1.5));
+      }
+      const meridianCurve = new THREE.CatmullRomCurve3(points);
+      const tubeGeo = new THREE.TubeGeometry(meridianCurve, 64, 0.12, 8, false);
+      const meridianMat = new THREE.MeshBasicMaterial({ color: 0x00f0ff, wireframe: false });
+      const meridianLine = new THREE.Mesh(tubeGeo, meridianMat);
+      meridianLine.name = 'TCM Du Meridian (Governor Vessel) Bioelectric Path';
+      rootGroup.add(meridianLine);
+      organMeshes.push(meridianLine);
+
+      // Acupoints along Meridian
+      for (let pt of points.filter((_, idx) => idx % 4 === 0)) {
+        const acupointGeo = new THREE.SphereGeometry(0.28, 12, 12);
+        const acupointMat = new THREE.MeshBasicMaterial({ color: 0xffea00 });
+        const ap = new THREE.Mesh(acupointGeo, acupointMat);
+        ap.position.copy(pt);
+        ap.name = 'Acupoint (Low Impedance Galvanic Node)';
+        rootGroup.add(ap);
+        organMeshes.push(ap);
+      }
+    }
+
+    // Scale 3: Cardiac Anatomy & LVAD MagLev Blood Pump (Exhibition Image 1)
+    function buildCardiacLvadSystem() {
+      // 4-Chamber Ventricular Heart Body
+      const heartGeo = new THREE.SphereGeometry(5.5, 32, 32);
+      heartGeo.scale(1.1, 1.3, 0.9);
+      const heartMat = new THREE.MeshStandardMaterial({
+        color: 0xd90429,
+        metalness: 0.15,
+        roughness: 0.25,
+        wireframe: isWireframe
+      });
+      const heart = new THREE.Mesh(heartGeo, heartMat);
+      heart.name = 'Left & Right Ventricles';
+      rootGroup.add(heart);
+      organMeshes.push(heart);
+
+      // Aorta Arch
+      const aortaCurve = new THREE.CatmullRomCurve3([
+        new THREE.Vector3(0, 5, 0),
+        new THREE.Vector3(1, 9, 0),
+        new THREE.Vector3(3, 10, -1),
+        new THREE.Vector3(4, 7, -2),
+        new THREE.Vector3(3.5, 1, -2.5)
+      ]);
+      const aortaGeo = new THREE.TubeGeometry(aortaCurve, 32, 1.2, 16, false);
+      const aortaMat = new THREE.MeshStandardMaterial({ color: 0xef233c, roughness: 0.2 });
+      const aorta = new THREE.Mesh(aortaGeo, aortaMat);
+      aorta.name = 'Ascending & Descending Aorta';
+      rootGroup.add(aorta);
+      organMeshes.push(aorta);
+
+      // MagLev Blood Pump (LVAD) Apex Implant (Museum Exhibit 1)
+      const lvadBodyGeo = new THREE.CylinderGeometry(1.8, 1.8, 3.2, 32);
+      const lvadMat = new THREE.MeshStandardMaterial({
+        color: 0xe2e8f0,
+        metalness: 0.85,
+        roughness: 0.15
+      });
+      const lvadPump = new THREE.Mesh(lvadBodyGeo, lvadMat);
+      lvadPump.position.set(2.5, -6.5, 2.0);
+      lvadPump.rotateZ(Math.PI / 4);
+      lvadPump.name = 'Artificial Heart MagLev Blood Pump (LVAD)';
+      rootGroup.add(lvadPump);
+      organMeshes.push(lvadPump);
+
+      // Inflow Cannula from Apex to Pump
+      const cannulaGeo = new THREE.CylinderGeometry(0.7, 0.7, 3.5, 16);
+      const cannulaMat = new THREE.MeshStandardMaterial({ color: 0x38bdf8, metalness: 0.6, roughness: 0.2 });
+      const cannula = new THREE.Mesh(cannulaGeo, cannulaMat);
+      cannula.position.set(1.2, -4.5, 1.0);
+      cannula.rotateZ(Math.PI / 4);
+      cannula.name = 'LVAD Inflow Cannula (Apex Ventricular Coring)';
+      rootGroup.add(cannula);
+      organMeshes.push(cannula);
+
+      // Outflow Graft into Aorta
+      const outflowCurve = new THREE.CatmullRomCurve3([
+        new THREE.Vector3(3.5, -6.0, 2.5),
+        new THREE.Vector3(6.5, -1.0, 2.0),
+        new THREE.Vector3(5.0, 5.0, 0.0),
+        new THREE.Vector3(3.0, 8.0, -1.0)
+      ]);
+      const outflowGeo = new THREE.TubeGeometry(outflowCurve, 32, 0.65, 16, false);
+      const outflowMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.4 });
+      const outflow = new THREE.Mesh(outflowGeo, outflowMat);
+      outflow.name = 'LVAD Dacron Outflow Vascular Graft';
+      rootGroup.add(outflow);
+      organMeshes.push(outflow);
+    }
+
+    // Scale 4: Histology & Vascular Stent Surgical Robot (Exhibition Image 7)
+    function buildVascularStentHistology() {
+      // Artery Tube Section
+      const arteryGeo = new THREE.CylinderGeometry(4.5, 4.5, 24, 32, 1, true);
+      const arteryMat = new THREE.MeshStandardMaterial({
+        color: 0x991b1b,
+        side: THREE.DoubleSide,
+        transparent: true,
+        opacity: 0.6,
+        roughness: 0.3
+      });
+      const artery = new THREE.Mesh(arteryGeo, arteryMat);
+      artery.name = 'Coronary Artery Wall (Tunica Intima & Media)';
+      rootGroup.add(artery);
+      organMeshes.push(artery);
+
+      // Endothelial Cells on Artery Surface
+      for (let i = 0; i < 40; i++) {
+        const cellGeo = new THREE.SphereGeometry(0.4, 8, 8);
+        cellGeo.scale(1.5, 0.4, 0.9);
+        const cellMat = new THREE.MeshStandardMaterial({ color: 0xfca5a5, roughness: 0.2 });
+        const cell = new THREE.Mesh(cellGeo, cellMat);
+        const angle = (i / 40) * Math.PI * 2;
+        cell.position.set(Math.cos(angle) * 4.3, (i % 8) * 2.5 - 9, Math.sin(angle) * 4.3);
+        rootGroup.add(cell);
+        organMeshes.push(cell);
+      }
+
+      // Vascular Stent Wire Mesh Scaffold (Museum Exhibit 7)
+      const stentGeo = new THREE.CylinderGeometry(3.6, 3.6, 14, 24, 16, true);
+      const stentMat = new THREE.MeshStandardMaterial({
+        color: 0x00f0ff,
+        metalness: 0.9,
+        roughness: 0.1,
+        wireframe: true
+      });
+      const stent = new THREE.Mesh(stentGeo, stentMat);
+      stent.name = 'Bio-absorbable Drug-Eluting Stent Mesh';
+      rootGroup.add(stent);
+      organMeshes.push(stent);
+
+      // Catheter Guidewire
+      const wireGeo = new THREE.CylinderGeometry(0.18, 0.18, 30, 12);
+      const wireMat = new THREE.MeshStandardMaterial({ color: 0xffffff, metalness: 0.95 });
+      const wire = new THREE.Mesh(wireGeo, wireMat);
+      wire.name = 'Robotic Transcatheter Platinum Guidewire';
+      rootGroup.add(wire);
+      organMeshes.push(wire);
+    }
+
+    // Scale 5: Cellular & Microfluidic Lab-on-a-Chip (Exhibition Image 24)
+    function buildCellularMicrofluidics() {
+      // Microfluidic Silicon Glass Substrate
+      const chipGeo = new THREE.BoxGeometry(22, 1.5, 14);
+      const chipMat = new THREE.MeshPhysicalMaterial({
+        color: 0x00f0ff,
+        transmission: 0.85,
+        opacity: 0.9,
+        transparent: true,
+        roughness: 0.05,
+        metalness: 0.1
+      });
+      const chip = new THREE.Mesh(chipGeo, chipMat);
+      chip.name = 'Microfluidic Organ-on-a-Chip Glass Substrate';
+      rootGroup.add(chip);
+      organMeshes.push(chip);
+
+      // Picoliter Fluidic Channel Trench
+      const channelCurve = new THREE.CatmullRomCurve3([
+        new THREE.Vector3(-9, 0.8, -4),
+        new THREE.Vector3(-3, 0.8, 4),
+        new THREE.Vector3(3, 0.8, -4),
+        new THREE.Vector3(9, 0.8, 4)
+      ]);
+      const channelGeo = new THREE.TubeGeometry(channelCurve, 64, 0.7, 16, false);
+      const channelMat = new THREE.MeshBasicMaterial({ color: 0x10b981 });
+      const channel = new THREE.Mesh(channelGeo, channelMat);
+      channel.name = 'Laminar Flow Microchannel (Picoliter Chamber)';
+      rootGroup.add(channel);
+      organMeshes.push(channel);
+
+      // Floating Stem Cells & CAR-T Cells in Channel
+      for (let i = 0; i < 16; i++) {
+        const stemGeo = new THREE.SphereGeometry(0.7, 16, 16);
+        const stemMat = new THREE.MeshStandardMaterial({
+          color: i % 2 === 0 ? 0xa855f7 : 0xf43f5e,
+          roughness: 0.2
+        });
+        const stem = new THREE.Mesh(stemGeo, stemMat);
+        const t = i / 16;
+        const pt = channelCurve.getPoint(t);
+        stem.position.copy(pt);
+        stem.name = i % 2 === 0 ? 'Engineered CAR-T Cell' : 'Pluripotent Stem Cell';
+        rootGroup.add(stem);
+        organMeshes.push(stem);
+      }
+    }
+
+    // Scale 6: Subcellular Organelle: Mitochondria ATP Synthase
+    function buildMitochondriaOrganelle() {
+      // Outer Mitochondrial Membrane
+      const mitoGeo = new THREE.CapsuleGeometry ? new THREE.CapsuleGeometry(4.5, 10, 24, 32) : new THREE.CylinderGeometry(4.5, 4.5, 10, 24);
+      const mitoMat = new THREE.MeshPhysicalMaterial({
+        color: 0xf59e0b,
+        transparent: true,
+        opacity: 0.6,
+        roughness: 0.2,
+        wireframe: isWireframe
+      });
+      const mito = new THREE.Mesh(mitoGeo, mitoMat);
+      mito.rotateZ(Math.PI / 3);
+      mito.name = 'Outer Mitochondrial Membrane';
+      rootGroup.add(mito);
+      organMeshes.push(mito);
+
+      // Inner Cristae Folds
+      for (let i = -4; i <= 4; i += 1.8) {
+        const foldGeo = new THREE.TorusGeometry(3.2, 0.4, 8, 24);
+        const foldMat = new THREE.MeshStandardMaterial({ color: 0xd97706, roughness: 0.3 });
+        const fold = new THREE.Mesh(foldGeo, foldMat);
+        fold.position.set(i * 0.8, i * 0.5, 0);
+        fold.rotateY(Math.PI / 2);
+        fold.name = `Mitochondrial Crista Fold ${i}`;
+        rootGroup.add(fold);
+        organMeshes.push(fold);
+      }
+
+      // ATP Synthase Rotary Motor
+      const atpGeo = new THREE.CylinderGeometry(1.2, 0.8, 2.5, 16);
+      const atpMat = new THREE.MeshStandardMaterial({ color: 0x10b981, metalness: 0.6, roughness: 0.1 });
+      const atp = new THREE.Mesh(atpGeo, atpMat);
+      atp.position.set(0, 0, 3.2);
+      atp.name = 'F0-F1 ATP Synthase Rotary Motor';
+      rootGroup.add(atp);
+      organMeshes.push(atp);
+    }
+
+    // Scale 7: DNA Helix, mRNA Vaccine & CRISPR Cas9
+    function buildDnaCrisprAssembly() {
+      // DNA Double Helix Strands
+      const strandPointsA = [];
+      const strandPointsB = [];
+      const turns = 4;
+      const height = 24;
+
+      for (let i = 0; i <= 100; i++) {
+        const angle = (i / 100) * Math.PI * 2 * turns;
+        const y = (i / 100) * height - (height / 2);
+        strandPointsA.push(new THREE.Vector3(Math.cos(angle) * 3.5, y, Math.sin(angle) * 3.5));
+        strandPointsB.push(new THREE.Vector3(Math.cos(angle + Math.PI) * 3.5, y, Math.sin(angle + Math.PI) * 3.5));
+      }
+
+      const tubeMatA = new THREE.MeshStandardMaterial({ color: 0x00f0ff, roughness: 0.2 });
+      const tubeMatB = new THREE.MeshStandardMaterial({ color: 0x10b981, roughness: 0.2 });
+
+      const curveA = new THREE.CatmullRomCurve3(strandPointsA);
+      const curveB = new THREE.CatmullRomCurve3(strandPointsB);
+
+      const strandA = new THREE.Mesh(new THREE.TubeGeometry(curveA, 128, 0.35, 12, false), tubeMatA);
+      const strandB = new THREE.Mesh(new THREE.TubeGeometry(curveB, 128, 0.35, 12, false), tubeMatB);
+      strandA.name = 'DNA Sense Strand 5\u2032-3\u2032';
+      strandB.name = 'DNA Antisense Strand 3\u2032-5\u2032';
+      rootGroup.add(strandA);
+      rootGroup.add(strandB);
+      organMeshes.push(strandA, strandB);
+
+      // Base Pair Rungs (A-T & G-C)
+      for (let i = 0; i < strandPointsA.length; i += 4) {
+        const ptA = strandPointsA[i];
+        const ptB = strandPointsB[i];
+        const rungCurve = new THREE.LineCurve3(ptA, ptB);
+        const rungGeo = new THREE.TubeGeometry(rungCurve, 2, 0.18, 8, false);
+        const rungMat = new THREE.MeshStandardMaterial({ color: i % 8 === 0 ? 0xffea00 : 0xf43f5e });
+        const rung = new THREE.Mesh(rungGeo, rungMat);
+        rung.name = `Hydrogen Base Pair (A-T/G-C)`;
+        rootGroup.add(rung);
+        organMeshes.push(rung);
+      }
+
+      // CRISPR-Cas9 Endonuclease Nuclease Enzyme Complex
+      const cas9Geo = new THREE.DodecahedronGeometry(3.8, 1);
+      const cas9Mat = new THREE.MeshStandardMaterial({
+        color: 0xa855f7,
+        roughness: 0.3,
+        transparent: true,
+        opacity: 0.75
+      });
+      const cas9 = new THREE.Mesh(cas9Geo, cas9Mat);
+      cas9.position.set(1.5, 0, 1.5);
+      cas9.name = 'CRISPR-Cas9 Gene Editing Endonuclease';
+      rootGroup.add(cas9);
+      organMeshes.push(cas9);
+    }
+
+    // Scale 8: Quantum Ion Channel & Membrane Potential
+    function buildQuantumIonChannel() {
+      // Lipid Bilayer Torus Gate
+      const gateGeo = new THREE.TorusGeometry(5, 1.8, 24, 32);
+      const gateMat = new THREE.MeshStandardMaterial({
+        color: 0x0284c7,
+        roughness: 0.25,
+        wireframe: isWireframe
+      });
+      const gate = new THREE.Mesh(gateGeo, gateMat);
+      gate.rotateX(Math.PI / 2);
+      gate.name = 'Voltage-Gated Sodium (Na\u207A) / Potassium (K\u207A) Ion Channel';
+      rootGroup.add(gate);
+      organMeshes.push(gate);
+
+      // Selectivity Filter Pore
+      const poreGeo = new THREE.CylinderGeometry(1.6, 1.6, 6, 24, 1, true);
+      const poreMat = new THREE.MeshBasicMaterial({ color: 0x00f0ff, side: THREE.DoubleSide });
+      const pore = new THREE.Mesh(poreGeo, poreMat);
+      pore.name = 'Quantum Permeation Selectivity Filter';
+      rootGroup.add(pore);
+      organMeshes.push(pore);
+
+      // Hydrated Sodium / Potassium Ions
+      for (let i = 0; i < 20; i++) {
+        const ionGeo = new THREE.SphereGeometry(0.35, 12, 12);
+        const ionMat = new THREE.MeshBasicMaterial({ color: i % 2 === 0 ? 0xffea00 : 0x10b981 });
+        const ion = new THREE.Mesh(ionGeo, ionMat);
+        ion.position.set(
+          (Math.random() - 0.5) * 3,
+          (Math.random() - 0.5) * 8,
+          (Math.random() - 0.5) * 3
+        );
+        ion.name = i % 2 === 0 ? 'Na\u207A Hydrated Ion' : 'K\u207A Hydrated Ion';
+        rootGroup.add(ion);
+        organMeshes.push(ion);
+      }
+    }
+
+    /* -------------------------------------------------------------------------
+     * XYZ Explosion & Reassembly Kinematics
+     * ------------------------------------------------------------------------- */
+    function updateExplosion() {
+      const x = Number(document.getElementById('slide-x').value);
+      const y = Number(document.getElementById('slide-y').value);
+      const z = Number(document.getElementById('slide-z').value);
+
+      document.getElementById('lbl-x').innerText = `${x} mm`;
+      document.getElementById('lbl-y').innerText = `${y} mm`;
+      document.getElementById('lbl-z').innerText = `${z} mm`;
+
+      simState.explode.x = x * 0.08;
+      simState.explode.y = y * 0.08;
+      simState.explode.z = z * 0.08;
+
+      organMeshes.forEach((mesh, idx) => {
+        const dir = new THREE.Vector3(
+          ((idx % 3) - 1) * simState.explode.x,
+          (((idx + 1) % 3) - 1) * simState.explode.y,
+          (((idx + 2) % 3) - 1) * simState.explode.z
+        );
+        mesh.position.add(dir.multiplyScalar(0.04));
+      });
+    }
+
+    function resetExplosion() {
+      document.getElementById('slide-x').value = 0;
+      document.getElementById('slide-y').value = 0;
+      document.getElementById('slide-z').value = 0;
+      document.getElementById('lbl-x').innerText = '0 mm';
+      document.getElementById('lbl-y').innerText = '0 mm';
+      document.getElementById('lbl-z').innerText = '0 mm';
+      simState.explode = { x: 0, y: 0, z: 0 };
+      buildAnatomicalScale(currentScale);
+    }
+
+    function triggerParabolicSweep() {
+      // Cinematic Ballistic Camera Trajectory Sweep
+      const startPos = camera.position.clone();
+      const targetPos = new THREE.Vector3(0, 5, 0);
+      let t = 0;
+      const interval = setInterval(() => {
+        t += 0.025;
+        const angle = t * Math.PI * 2;
+        camera.position.x = Math.sin(angle) * 35;
+        camera.position.z = Math.cos(angle) * 35;
+        camera.position.y = 10 + Math.sin(t * Math.PI) * 12; // Parabolic arc
+        camera.lookAt(targetPos);
+        if (t >= 1) clearInterval(interval);
+      }, 16);
+    }
+
+    /* -------------------------------------------------------------------------
+     * Surgical Simulations (From the 40 Exhibition Photos)
+     * ------------------------------------------------------------------------- */
+    function simulateStentRobot() {
+      switchScale(4);
+      alert('Surgical Simulation: Robotic Stent Placement activated. Navigating guidewire across stenosis, expanding drug-eluting scaffold to 3.5mm nominal diameter.');
+    }
+
+    function simulateLvadPump() {
+      switchScale(3);
+      simState.lvadRpm = simState.lvadRpm === 2800 ? 3200 : 2800;
+      document.getElementById('tele-lvad').innerText = `${simState.lvadRpm.toLocaleString()} RPM`;
+      alert(`Artificial Heart Simulation: MagLev LVAD rotor speed adjusted to ${simState.lvadRpm} RPM. Systemic cardiac output: 5.4 L/min.`);
+    }
+
+    function simulateCabgSuture() {
+      switchScale(4);
+      simState.sutureCount += 2;
+      alert(`CABG Simulation: Placed 7-0 Prolene continuous micro-suture anastomosis (#${simState.sutureCount}). Vessel wall coaptation verified.`);
+    }
+
+    function simulateNerveConduit() {
+      switchScale(2);
+      alert('Nerve Catheter Simulation: Bio-absorbable nerve regeneration guide implanted over 15mm peripheral nerve gap. Ectoblast suture verified.');
+    }
+
+    function simulateSpineTraction() {
+      switchScale(1);
+      alert('Spinal Orthopedics Simulation: Biomechanical 3-point corrective traction applied. Kyphosis angle reduced from 42\u00B0 to 24\u00B0.');
+    }
+
+    function simulateFesPulse() {
+      switchScale(1);
+      alert('Functional Electrical Stimulation (FES): Delivering 35 Hz biphasic pulse train to Deltoid and Biceps brachii. Muscle contraction torque: 18 Nm.');
+    }
+
+    function dispatchAmbulance() {
+      alert('5G Remote Ambulance dispatched: Real-time mobile ICU telemetry synchronized with hospital triage emergency radar.');
+    }
+
+    /* -------------------------------------------------------------------------
+     * AI-EMR Lesion Raycasting Workbench
+     * ------------------------------------------------------------------------- */
+    function setInteractionMode(mode) {
+      interactionMode = mode;
+      document.getElementById('btn-mode-inspect').classList.toggle('active', mode === 'inspect');
+      document.getElementById('btn-mode-lesion').classList.toggle('active', mode === 'lesion');
+    }
+
+    function onPointerDown(event) {
+      if (interactionMode !== 'lesion') return;
+
+      const rect = renderer.domElement.getBoundingClientRect();
+      mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+      mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+      raycaster.setFromCamera(mouse, camera);
+      const intersects = raycaster.intersectObjects(organMeshes, false);
+
+      if (intersects.length > 0) {
+        const hit = intersects[0];
+        placeLesionPin(hit.point, hit.object.name || 'Unspecified Anatomical Locus');
+      }
+    }
+
+    function placeLesionPin(point, organName) {
+      const pinGeo = new THREE.SphereGeometry(0.4, 16, 16);
+      const pinMat = new THREE.MeshBasicMaterial({ color: 0xf43f5e });
+      const pin = new THREE.Mesh(pinGeo, pinMat);
+      pin.position.copy(point);
+      rootGroup.add(pin);
+      lesionPins.push(pin);
+
+      // Open EMR Drawer
+      document.getElementById('emr-coords').innerText = `X: ${point.x.toFixed(2)} | Y: ${point.y.toFixed(2)} | Z: ${point.z.toFixed(2)}`;
+      document.getElementById('emr-organ').innerText = `Organ: ${organName}`;
+      document.getElementById('emr-drawer').classList.add('open');
+    }
+
+    function closeEmrDrawer() {
+      document.getElementById('emr-drawer').classList.remove('open');
+    }
+
+    function applySurgicalPlan() {
+      alert('AI-EMR: Intervention vector adopted into surgical robotic trajectory cache. clinically_reviewed=false.');
+      closeEmrDrawer();
+    }
+
+    function exportEmrReport() {
+      const data = {
+        resourceType: 'Bundle',
+        type: 'document',
+        meta: { profile: ['https://fhir.kemkes.go.id/r4/StructureDefinition/ClinicalSummary'] },
+        scale: currentScale,
+        scaleName: getScaleName(currentScale),
+        lvadRpm: simState.lvadRpm,
+        disclaimer: '@panacea-claim-boundary: simulation-not-clinical. Generated by PanaceaMed MedSciHub 3D CAD/CAE OS.'
+      };
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `medscihub-simulation-scale-${currentScale}-fhir.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    /* -------------------------------------------------------------------------
+     * Display Modes & Wireframe
+     * ------------------------------------------------------------------------- */
+    function toggleWireframe() {
+      isWireframe = !isWireframe;
+      organMeshes.forEach(mesh => {
+        if (mesh.material) mesh.material.wireframe = isWireframe;
+      });
+    }
+
+    function toggleHologramMode() {
+      isHologram = !isHologram;
+      document.getElementById('btn-mode-voxon').classList.toggle('active', isHologram);
+      scene.background = isHologram ? new THREE.Color(0x011627) : new THREE.Color(0x03070d);
+      scene.fog.color = scene.background;
+      keyLight.color.setHex(isHologram ? 0x00f0ff : 0x00f0ff);
+      keyLight.intensity = isHologram ? 4.5 : 3.2;
+    }
+
+    function switchScale(scale) {
+      buildAnatomicalScale(scale);
+    }
+
+    function switchOpsTab(tabId) {
+      document.querySelectorAll('.ops-tab-btn').forEach(b => b.classList.remove('active'));
+      event.target.classList.add('active');
+
+      document.getElementById('tab-explode').style.display = tabId === 'explode' ? 'block' : 'none';
+      document.getElementById('tab-surgery').style.display = tabId === 'surgery' ? 'flex' : 'none';
+      document.getElementById('tab-telemetry').style.display = tabId === 'telemetry' ? 'flex' : 'none';
+    }
+
+    /* -------------------------------------------------------------------------
+     * Telemetry 5G ECG Heart Rate Canvas
+     * ------------------------------------------------------------------------- */
+    function initEcgMonitor() {
+      const ecgCanvas = document.getElementById('ecg-canvas');
+      if (!ecgCanvas) return;
+      const ctx = ecgCanvas.getContext('2d');
+      ecgCanvas.width = ecgCanvas.offsetWidth * 2;
+      ecgCanvas.height = ecgCanvas.offsetHeight * 2;
+
+      let x = 0;
+      let lastY = ecgCanvas.height / 2;
+
+      function drawEcg() {
+        ctx.fillStyle = 'rgba(2, 4, 8, 0.08)';
+        ctx.fillRect(0, 0, ecgCanvas.width, ecgCanvas.height);
+
+        ctx.strokeStyle = '#00f0ff';
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.moveTo(x, lastY);
+
+        x += 3;
+        if (x > ecgCanvas.width) {
+          x = 0;
+          ctx.clearRect(0, 0, ecgCanvas.width, ecgCanvas.height);
+        }
+
+        // Standard QRS complex simulation
+        const phase = (x % 140);
+        let y = ecgCanvas.height / 2;
+        if (phase > 40 && phase < 45) y -= 12; // P wave
+        else if (phase >= 55 && phase < 60) y += 10; // Q dip
+        else if (phase >= 60 && phase < 68) y -= 48; // R peak
+        else if (phase >= 68 && phase < 74) y += 22; // S dip
+        else if (phase > 85 && phase < 100) y -= 16; // T wave
+
+        ctx.lineTo(x, y);
+        ctx.stroke();
+        lastY = y;
+
+        requestAnimationFrame(drawEcg);
+      }
+      drawEcg();
+    }
+
+    function onWindowResize() {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    }
+
+    /* -------------------------------------------------------------------------
+     * Master Render Loop
+     * ------------------------------------------------------------------------- */
+    let lastTime = performance.now();
+    let frameCount = 0;
+
+    function animate() {
+      requestAnimationFrame(animate);
+
+      // FPS Calculation
+      const now = performance.now();
+      frameCount++;
+      if (now - lastTime >= 1000) {
+        document.getElementById('tele-fps').innerText = frameCount;
+        frameCount = 0;
+        lastTime = now;
+      }
+
+      // Procedural Physiological Animations
+      simState.heartBeat += 0.04;
+      const pulse = 1 + Math.sin(simState.heartBeat * 3) * 0.035;
+
+      // Pulse Heart or Rotary Motor
+      organMeshes.forEach(mesh => {
+        if (mesh.name && mesh.name.includes('Heart')) {
+          mesh.scale.set(pulse, pulse, pulse);
+        }
+        if (mesh.name && mesh.name.includes('Rotary')) {
+          mesh.rotateY(0.08);
+        }
+        if (mesh.name && mesh.name.includes('DNA')) {
+          mesh.rotateY(0.004);
+        }
+      });
+
+      controls.update();
+      renderer.render(scene, camera);
+    }
+
+    // Initialize when DOM is ready
+    window.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>
