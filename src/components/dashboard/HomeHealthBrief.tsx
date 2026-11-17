@@ -173,7 +173,7 @@ export function HomeHealthBrief() {
               whiteSpace: 'nowrap',
             }}
           >
-            {bleBusy ? 'Connecting…' : '⚡ Auto-Connect Wearable'}
+            {bleBusy ? 'Connecting…' : '⚡ Connect'}
           </button>
           <Link
             to="/health-data"
