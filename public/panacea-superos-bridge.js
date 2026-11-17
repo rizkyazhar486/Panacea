@@ -1,48 +1,86 @@
 /**
- * PanaceaMed Super-OS Real-Time Cross-Studio Biometric Bridge + Global 1-Click/1-Scan/1-Tap Omni-Dock
- * Compacts User Journey across all pages into 1 Click, 1 Scan, and 1 Tap (Cmd+K / Ctrl+K)
+ * PanaceaMed "THE ONE" Singularity Bridge
+ * One Connection · One Database (pmd_the_one_db_v1) · One Log (pmd_the_one_log_v1) · One Sync Across Multiple Devices
  */
 (function () {
-  var CHANNEL_NAME = 'panacea_superos_bus_v1';
+  var CHANNEL_NAME = 'panacea_the_one_bus_v1';
   var bus = typeof BroadcastChannel !== 'undefined' ? new BroadcastChannel(CHANNEL_NAME) : null;
 
-  function readUnifiedTelemetry() {
-    var state = {
+  function readTheOneDatabase() {
+    var db = {
       ownerId: 'rizkyazhar486',
-      name: 'dr. Rizky Azhar',
+      name: 'dr. Rizky Muhammad Azrissal',
       hr: 62,
       hrv: 78,
+      sbp: 118,
+      dbp: 75,
+      rr: 15,
       spo2: 99,
       vo2max: 56.4,
+      tempC: 36.6,
       heightCm: 173,
       weightKg: 68,
       musclePct: 44,
       bodyFatPct: 14,
-      workoutCount: 0,
-      networkTier: (navigator.connection && navigator.connection.effectiveType) || (navigator.onLine ? '5g-fiber' : 'offline-3t-mesh'),
+      paco2: 40,
+      hco3: 24,
+      lactate: 1.1,
+      creatinine: 0.90,
+      glucose: 86,
+      triglycerides: 92,
+      devices: ['MacBook Air M-Series', 'iPhone / iOS HealthKit', 'Garmin / WHOOP / Oura BLE', 'Hospital Zero-Queue Terminal', 'Starlink / 2G Frontier Node'],
+      networkTier: (navigator.connection && navigator.connection.effectiveType) || (navigator.onLine ? '5g-fiber-multi-device' : 'offline-local-first'),
       ts: Date.now()
     };
     try {
+      var savedOne = JSON.parse(localStorage.getItem('pmd_the_one_db_v1') || '{}');
+      Object.assign(db, savedOne);
+
       var prof = JSON.parse(localStorage.getItem('pmd_health_profile') || '{}');
       var p = prof.value || prof.data || prof;
-      if (p.restingHeartRate || p.heartRate) state.hr = Number(p.restingHeartRate || p.heartRate) || state.hr;
-      if (p.hrv) state.hrv = Number(p.hrv) || state.hrv;
-      if (p.spo2) state.spo2 = Number(p.spo2) || state.spo2;
-      if (p.vo2max || p.vo2Max) state.vo2max = Number(p.vo2max || p.vo2Max) || state.vo2max;
-      if (p.heightCm || p.height) state.heightCm = Number(p.heightCm || p.height) || state.heightCm;
-      if (p.weightKg || p.weight) state.weightKg = Number(p.weightKg || p.weight) || state.weightKg;
+      if (p.restingHeartRate || p.heartRate) db.hr = Number(p.restingHeartRate || p.heartRate) || db.hr;
+      if (p.hrv) db.hrv = Number(p.hrv) || db.hrv;
+      if (p.spo2) db.spo2 = Number(p.spo2) || db.spo2;
+      if (p.vo2max || p.vo2Max) db.vo2max = Number(p.vo2max || p.vo2Max) || db.vo2max;
+      if (p.heightCm || p.height) db.heightCm = Number(p.heightCm || p.height) || db.heightCm;
+      if (p.weightKg || p.weight) db.weightKg = Number(p.weightKg || p.weight) || db.weightKg;
 
       var comp = JSON.parse(localStorage.getItem('pm_bodycomp_v1') || '{}');
       var c = comp.value || comp.data || comp;
-      if (c.musclePct || c.skeletalMusclePct) state.musclePct = Number(c.musclePct || c.skeletalMusclePct) || state.musclePct;
-      if (c.bodyFatPct || c.bodyFat) state.bodyFatPct = Number(c.bodyFatPct || c.bodyFat) || state.bodyFatPct;
-
-      var self = JSON.parse(localStorage.getItem('pmd_personal_digital_self_v1') || '{}');
-      if (self.heightCm) state.heightCm = Number(self.heightCm);
-      if (self.musclePct) state.musclePct = Number(self.musclePct);
-      if (self.bodyFatPct) state.bodyFatPct = Number(self.bodyFatPct);
+      if (c.musclePct || c.skeletalMusclePct) db.musclePct = Number(c.musclePct || c.skeletalMusclePct) || db.musclePct;
+      if (c.bodyFatPct || c.bodyFat) db.bodyFatPct = Number(c.bodyFatPct || c.bodyFat) || db.bodyFatPct;
     } catch (e) {}
-    return state;
+    return db;
+  }
+
+  function appendTheOneLog(eventTitle, detailText) {
+    var entry = {
+      id: 'LOG-' + Date.now(),
+      iso: new Date().toISOString(),
+      event: eventTitle,
+      detail: detailText
+    };
+    try {
+      var logs = JSON.parse(localStorage.getItem('pmd_the_one_log_v1') || '[]');
+      logs.unshift(entry);
+      if (logs.length > 60) logs.length = 60;
+      localStorage.setItem('pmd_the_one_log_v1', JSON.stringify(logs));
+    } catch (e) {}
+    return entry;
+  }
+
+  function writeTheOneDatabase(patch, reasonLabel) {
+    var cur = readTheOneDatabase();
+    var next = Object.assign({}, cur, patch, { ts: Date.now() });
+    try {
+      localStorage.setItem('pmd_the_one_db_v1', JSON.stringify(next));
+    } catch (e) {}
+    var logEntry = appendTheOneLog(reasonLabel || 'ONE_SYNC_UPDATE', 'HR ' + next.hr + ' bpm | HRV ' + next.hrv + ' ms | SpO2 ' + next.spo2 + '% | Cr ' + next.creatinine + ' mg/dL');
+    if (bus) {
+      try { bus.postMessage({ db: next, log: logEntry }); } catch (e) {}
+    }
+    window.dispatchEvent(new CustomEvent('panacea:the-one-sync', { detail: { db: next, log: logEntry } }));
+    return next;
   }
 
   function computeRecoveryPrescription(t) {
@@ -60,7 +98,7 @@
     var rx = computeRecoveryPrescription(t);
     return {
       resourceType: 'Bundle',
-      id: 'panaceamed-satusehat-r4-' + t.ts,
+      id: 'panaceamed-the-one-r4-' + t.ts,
       type: 'collection',
       timestamp: new Date(t.ts).toISOString(),
       meta: { profile: ['https://fhir.kemkes.go.id/r4/StructureDefinition/Bundle'] },
@@ -76,26 +114,24 @@
         {
           resource: {
             resourceType: 'Observation',
-            id: 'vital-panel',
+            id: 'the-one-vital-panel',
             status: 'final',
-            code: { coding: [{ system: 'http://loinc.org', code: '85353-1', display: 'Vital signs & 1:1 Digital Twin panel' }] },
             component: [
               { code: { text: 'Heart Rate (bpm)' }, valueQuantity: { value: t.hr, unit: 'bpm' } },
               { code: { text: 'HRV RMSSD (ms)' }, valueQuantity: { value: t.hrv, unit: 'ms' } },
               { code: { text: 'SpO2 (%)' }, valueQuantity: { value: t.spo2, unit: '%' } },
               { code: { text: 'VO2Max (mL/kg/min)' }, valueQuantity: { value: t.vo2max, unit: 'mL/kg/min' } },
-              { code: { text: 'Skeletal Muscle (%)' }, valueQuantity: { value: t.musclePct, unit: '%' } },
-              { code: { text: 'Body Fat (%)' }, valueQuantity: { value: t.bodyFatPct, unit: '%' } }
+              { code: { text: 'Serum Creatinine (mg/dL)' }, valueQuantity: { value: t.creatinine, unit: 'mg/dL' } }
             ]
           }
         },
         {
           resource: {
             resourceType: 'CarePlan',
-            id: 'holistic-5-modality-recovery',
+            id: 'the-one-holistic-plan',
             status: 'active',
             intent: 'plan',
-            title: 'Autonomous 5-Modality Recovery Prescription (HBOT, Cryo, PBM, X-Tone, X-Cryo)',
+            title: 'PanaceaMed THE ONE Unified Multi-Diagnosis & 5-Modality CarePlan',
             description: JSON.stringify(rx)
           }
         }
@@ -103,78 +139,48 @@
     };
   }
 
-  function broadcastUpdate(sourceLabel) {
-    var payload = {
-      source: sourceLabel || 'panacea-studio',
-      telemetry: readUnifiedTelemetry(),
-      prescription: null
-    };
-    payload.prescription = computeRecoveryPrescription(payload.telemetry);
-    if (bus) {
-      try { bus.postMessage(payload); } catch (e) {}
-    }
-    window.dispatchEvent(new CustomEvent('panacea:superos-sync', { detail: payload }));
-    return payload;
-  }
-
-  if (bus) {
-    bus.onmessage = function (ev) {
-      if (ev && ev.data) {
-        window.dispatchEvent(new CustomEvent('panacea:superos-sync', { detail: ev.data }));
-      }
-    };
-  }
-
-  window.addEventListener('storage', function () {
-    broadcastUpdate('storage-event');
-  });
-
   window.PanaceaSuperOSBridge = {
-    readUnifiedTelemetry: readUnifiedTelemetry,
+    readUnifiedTelemetry: readTheOneDatabase,
+    readTheOneDatabase: readTheOneDatabase,
+    writeTheOneDatabase: writeTheOneDatabase,
+    appendTheOneLog: appendTheOneLog,
     computeRecoveryPrescription: computeRecoveryPrescription,
     buildFhirR4Bundle: buildFhirR4Bundle,
-    broadcastUpdate: broadcastUpdate,
+    broadcastUpdate: function (src) {
+      return writeTheOneDatabase({}, src || 'ONE_BROADCAST');
+    },
     exportFhirJson: function () {
-      var t = readUnifiedTelemetry();
+      var t = readTheOneDatabase();
+      appendTheOneLog('ONE_FHIR_EXPORT', 'Exported SATUSEHAT FHIR R4 Bundle for ' + t.ownerId);
       var bundle = buildFhirR4Bundle(t);
       var blob = new Blob([JSON.stringify(bundle, null, 2)], { type: 'application/json' });
       var url = URL.createObjectURL(blob);
       var a = document.createElement('a');
       a.href = url;
-      a.download = 'PanaceaMed-FHIR-R4-' + t.ownerId + '.json';
+      a.download = 'PanaceaMed-THE-ONE-FHIR-R4-' + t.ownerId + '.json';
       a.click();
       setTimeout(function () { URL.revokeObjectURL(url); }, 1500);
     }
   };
 
-  // Inject Global 1-Click · 1-Scan · 1-Tap Floating Dynamic Omni-Pill into every studio page
-  function injectGlobalOneTapDock() {
+  function injectTheOneOmniPill() {
     if (typeof document === 'undefined' || document.getElementById('pnc-global-1tap-pill')) return;
     var wrap = document.createElement('div');
     wrap.id = 'pnc-global-1tap-pill';
-    wrap.style.cssText = 'position:fixed;bottom:46px;left:50%;transform:translateX(-50%);z-index:9999;display:flex;align-items:center;gap:6px;background:rgba(2,6,23,0.92);backdrop-filter:blur(20px);border:1px solid rgba(16,185,129,0.55);border-radius:999px;padding:5px 12px;box-shadow:0 10px 30px rgba(0,0,0,0.75);font-family:-apple-system,BlinkMacSystemFont,sans-serif;font-size:11px;color:#f8fafc;';
+    wrap.style.cssText = 'position:fixed;bottom:44px;left:50%;transform:translateX(-50%);z-index:9999;display:flex;align-items:center;gap:8px;background:rgba(2,6,23,0.94);backdrop-filter:blur(20px);border:1.5px solid rgba(16,185,129,0.7);border-radius:999px;padding:5px 14px;box-shadow:0 12px 32px rgba(0,0,0,0.8);font-family:-apple-system,BlinkMacSystemFont,sans-serif;font-size:11px;color:#f8fafc;';
     wrap.innerHTML =
-      '<a href="/panaceamed-1tap-hypervisor-os.html" style="text-decoration:none;color:#fde68a;font-weight:800;padding:4px 8px;border-radius:999px;background:rgba(245,158,11,0.2);border:1px solid rgba(245,158,11,0.5);">⚡ 1-Tap Hypervisor (Cmd+K)</a>' +
-      '<a href="/#/body-exposure" style="text-decoration:none;color:#38bdf8;font-weight:700;padding:4px 8px;">Cockpit</a>' +
-      '<a href="/panaceamed-frontier-civilization-superos.html" style="text-decoration:none;color:#34d399;font-weight:700;padding:4px 8px;">0-Queue RS</a>' +
-      '<a href="/panaceamed-omni-athletic-geomed-os.html" style="text-decoration:none;color:#fb923c;font-weight:700;padding:4px 8px;">Garmin/Dive/Club</a>' +
-      '<a href="/panaceamed-legit-clinical-science-os.html" style="text-decoration:none;color:#c084fc;font-weight:700;padding:4px 8px;">QSP/ICU</a>' +
-      '<button onclick="window.PanaceaSuperOSBridge.exportFhirJson()" style="background:rgba(16,185,129,0.22);color:#34d399;border:1px solid rgba(16,185,129,0.5);border-radius:999px;padding:3px 9px;font-size:10.5px;font-weight:800;cursor:pointer;">1-Tap FHIR</button>';
+      '<a href="/panaceamed-the-one-singularity-os.html" style="text-decoration:none;color:#ffffff;font-weight:800;padding:4px 10px;border-radius:999px;background:linear-gradient(90deg,#10b981,#0284c7);">☝️ THE ONE Ultra-Page</a>' +
+      '<a href="/#/body-exposure" style="text-decoration:none;color:#38bdf8;font-weight:700;padding:4px 6px;">Cockpit</a>' +
+      '<a href="/panaceamed-1tap-hypervisor-os.html" style="text-decoration:none;color:#fde68a;font-weight:700;padding:4px 6px;">Cmd+K</a>' +
+      '<button onclick="window.PanaceaSuperOSBridge.exportFhirJson()" style="background:rgba(16,185,129,0.22);color:#34d399;border:1px solid rgba(16,185,129,0.5);border-radius:999px;padding:3px 9px;font-size:10.5px;font-weight:800;cursor:pointer;">1-Tap Sync & FHIR</button>';
     document.body.appendChild(wrap);
-
-    window.addEventListener('keydown', function (ev) {
-      if ((ev.metaKey || ev.ctrlKey) && ev.key.toLowerCase() === 'k') {
-        ev.preventDefault();
-        window.location.href = '/panaceamed-1tap-hypervisor-os.html';
-      }
-    });
   }
 
   if (typeof window !== 'undefined') {
     if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', injectGlobalOneTapDock);
+      document.addEventListener('DOMContentLoaded', injectTheOneOmniPill);
     } else {
-      injectGlobalOneTapDock();
+      injectTheOneOmniPill();
     }
   }
 })();
