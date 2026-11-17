@@ -82,6 +82,12 @@ export default function BodyAnalyzerPage() {
             🧬 MedSciHub UHD 5K 4D Anatomy & AI-EMR
           </a>
           <a
+            href="/omniscience-natural-laws-engine.html"
+            style={{ fontSize: "11px", fontWeight: 700, padding: "6px 10px", borderRadius: "8px", background: "rgba(245, 158, 11, 0.18)", color: "#fbbf24", border: "1px solid rgba(245, 158, 11, 0.4)", textDecoration: "none" }}
+          >
+            ⚛️ Omniscience Natural Laws & Adaptive Tech
+          </a>
+          <a
             href="/deep-human-lab/medscihub-3d-multiscale-simulation.html"
             style={{
               fontSize: '11px',
