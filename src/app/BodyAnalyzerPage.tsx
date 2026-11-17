@@ -31,6 +31,73 @@ export default function BodyAnalyzerPage() {
 
   return (
     <div className="mx-auto w-full max-w-[1280px] space-y-4">
+
+      <nav
+        aria-label="Super-OS 3D & Personalization Studios"
+        style={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          gap: '8px',
+          padding: '10px 14px',
+          margin: '0 0 12px 0',
+          borderRadius: '12px',
+          background: 'rgba(15, 23, 42, 0.78)',
+          border: '1px solid rgba(56, 189, 248, 0.28)',
+          alignItems: 'center',
+          justifyContent: 'space-between'
+        }}
+      >
+        <span style={{ fontSize: '12px', fontWeight: 700, color: '#38bdf8' }}>
+          ⚡ Super-OS 1:1 Studios & QR/Barcode Pass
+        </span>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+          <a
+            href="/personal-digital-self-1to1.html"
+            style={{
+              fontSize: '11px',
+              fontWeight: 700,
+              padding: '6px 10px',
+              borderRadius: '8px',
+              background: 'rgba(16, 185, 129, 0.18)',
+              color: '#34d399',
+              border: '1px solid rgba(16, 185, 129, 0.4)',
+              textDecoration: 'none'
+            }}
+          >
+            🎮 1:1 Personal Self (Sims 4 · GTA 6 · QR/Barcode)
+          </a>
+          <a
+            href="/medscihub-4d-anatomy-emr.html"
+            style={{
+              fontSize: '11px',
+              fontWeight: 700,
+              padding: '6px 10px',
+              borderRadius: '8px',
+              background: 'rgba(56, 189, 248, 0.18)',
+              color: '#38bdf8',
+              border: '1px solid rgba(56, 189, 248, 0.4)',
+              textDecoration: 'none'
+            }}
+          >
+            🧬 MedSciHub UHD 5K 4D Anatomy & AI-EMR
+          </a>
+          <a
+            href="/deep-human-lab/medscihub-3d-multiscale-simulation.html"
+            style={{
+              fontSize: '11px',
+              fontWeight: 700,
+              padding: '6px 10px',
+              borderRadius: '8px',
+              background: 'rgba(168, 85, 247, 0.18)',
+              color: '#c084fc',
+              border: '1px solid rgba(168, 85, 247, 0.4)',
+              textDecoration: 'none'
+            }}
+          >
+            🔬 Deep Human Lab 3D Multiscale
+          </a>
+        </div>
+      </nav>
       <h1 className="sr-only">Your Body: body analyzer</h1>
       <div ref={stageRef} className="scroll-mt-16">
         <BodyExposureAtlasHome Viewer={AtlasViewer} sendCamera={sendCamera} focusSystem={system} />
