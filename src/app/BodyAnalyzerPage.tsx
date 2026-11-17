@@ -82,6 +82,12 @@ export default function BodyAnalyzerPage() {
             🧬 MedSciHub UHD 5K 4D Anatomy & AI-EMR
           </a>
           <a
+            href="/digital-cellular-biosphere-os.html"
+            style={{ fontSize: "11px", fontWeight: 700, padding: "6px 10px", borderRadius: "8px", background: "rgba(16, 185, 129, 0.22)", color: "#34d399", border: "1px solid rgba(16, 185, 129, 0.5)", textDecoration: "none" }}
+          >
+            🌐 Digital Cellular Biosphere OS
+          </a>
+          <a
             href="/cellular-spacetime-debugger-os.html"
             style={{ fontSize: "11px", fontWeight: 700, padding: "6px 10px", borderRadius: "8px", background: "rgba(56, 189, 248, 0.22)", color: "#7dd3fc", border: "1px solid rgba(56, 189, 248, 0.5)", textDecoration: "none" }}
           >
