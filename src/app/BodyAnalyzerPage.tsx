@@ -82,6 +82,12 @@ export default function BodyAnalyzerPage() {
             🧬 MedSciHub UHD 5K 4D Anatomy & AI-EMR
           </a>
           <a
+            href="/numerical-body-exposure-clinical.html"
+            style={{ fontSize: "11px", fontWeight: 700, padding: "6px 10px", borderRadius: "8px", background: "rgba(14, 165, 233, 0.18)", color: "#7dd3fc", border: "1px solid rgba(14, 165, 233, 0.45)", textDecoration: "none" }}
+          >
+            📊 Numerical Body Exposure & Biophysics
+          </a>
+          <a
             href="/hippocratic-clinical-os.html"
             style={{ fontSize: "11px", fontWeight: 700, padding: "6px 10px", borderRadius: "8px", background: "rgba(244, 63, 94, 0.18)", color: "#fb7185", border: "1px solid rgba(244, 63, 94, 0.45)", textDecoration: "none" }}
           >

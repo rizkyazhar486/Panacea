@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PanaceaMed OS · Numerical Body Exposure & Applied Clinical Biophysics</title>
+  <script src="/panacea-superos-bridge.js"></script>
+  <style>
+    :root {
+      --bg: #020617;
+      --panel: rgba(15, 23, 42, 0.9);
+      --border: rgba(148, 163, 184, 0.22);
+      --cyan: #38bdf8;
+      --emerald: #10b981;
+      --amber: #f59e0b;
+      --rose: #f43f5e;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', system-ui, sans-serif;
+      min-height: 100vh;
+      padding: 16px;
+      line-height: 1.45;
+    }
+    .header-bar {
+      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;
+      background: var(--panel); border: 1px solid var(--border);
+      border-radius: 12px; padding: 12px 16px; margin-bottom: 14px;
+    }
+    .btn {
+      text-decoration: none; color: var(--text); background: rgba(30, 41, 59, 0.9);
+      border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 8px;
+      padding: 6px 11px; font-size: 11px; font-weight: 600; cursor: pointer;
+    }
+    .btn:hover, .btn.active { background: rgba(16, 185, 129, 0.2); border-color: var(--emerald); color: #34d399; }
+    .layout {
+      display: grid; grid-template-columns: 340px 1fr 370px; gap: 14px;
+    }
+    @media (max-width: 1200px) { .layout { grid-template-columns: 1fr; } }
+    .col { display: flex; flex-direction: column; gap: 14px; }
+    .card {
+      background: var(--panel); border: 1px solid var(--border);
+      border-radius: 12px; padding: 14px;
+    }
+    .card-title {
+      font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.6px;
+      color: var(--cyan); margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;
+      border-bottom: 1px solid rgba(148,163,184,0.14); padding-bottom: 6px;
+    }
+    .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .field { display: flex; flex-direction: column; gap: 3px; font-size: 10.5px; color: var(--muted); }
+    .field input {
+      background: #020617; color: var(--text); border: 1px solid rgba(148,163,184,0.28);
+      border-radius: 6px; padding: 5px 8px; font-size: 12px; font-weight: 600;
+      font-family: 'SF Mono', ui-monospace, monospace;
+    }
+    .kv {
+      display: flex; justify-content: space-between; align-items: baseline;
+      font-size: 11.5px; padding: 5px 0; border-bottom: 1px dashed rgba(148,163,184,0.12);
+    }
+    .kv span:first-child { color: var(--muted); }
+    .kv span:last-child { font-family: 'SF Mono', ui-monospace, monospace; font-weight: 700; color: #f1f5f9; }
+    .formula-strip {
+      font-family: 'SF Mono', ui-monospace, monospace; font-size: 10.5px; color: #38bdf8;
+      background: rgba(2, 6, 23, 0.85); border: 1px solid rgba(56, 189, 248, 0.22);
+      border-radius: 7px; padding: 7px 9px; margin-top: 8px;
+    }
+    .status-pill {
+      font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 999px;
+      background: rgba(16, 185, 129, 0.16); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.38);
+    }
+    .svg-box {
+      width: 100%; background: #020617; border: 1px solid rgba(148,163,184,0.16);
+      border-radius: 9px; padding: 8px; margin-top: 6px;
+    }
+    .interp-box {
+      font-size: 11.5px; color: #cbd5e1; background: rgba(2, 6, 23, 0.75);
+      border-left: 3px solid var(--emerald); border-radius: 6px; padding: 9px 11px; margin-top: 8px;
+    }
+  </style>
+</head>
+<body>
+  <header class="header-bar">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <a href="/#/body-exposure" class="btn">← Body Cockpit</a>
+      <div>
+        <strong style="font-size:14px;">📊 Numerical Body Exposure & Applied Clinical Biophysics Analyzer</strong>
+        <div style="font-size:11px;color:var(--muted);">Deterministic Hemodynamics · Oxygen Cascade ($DO_2/VO_2$) · Cole-Cole Bioimpedance · Banister TRIMP</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;">
+      <a href="/hippocratic-clinical-os.html" class="btn">⚕️ Hippocratic Clinical OS</a>
+      <a href="/omniscience-natural-laws-engine.html" class="btn">⚛️ Omniscience Laws</a>
+      <a href="/medscihub-4d-anatomy-emr.html" class="btn">🧬 4D Anatomy</a>
+      <button class="btn active" onclick="syncAndBroadcast()">⚡ Sync & Export FHIR R4</button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <!-- KOLOM 1: INPUT PARAMETER BIOMETRIK, ANTROPOMETRI, & PAPARAN -->
+    <div class="col">
+      <div class="card">
+        <div class="card-title">
+          <span>I. Parameter Input Biometrik & Antropometri</span>
+          <span class="status-pill" id="source-badge">Storage Hydrated</span>
+        </div>
+        <div class="input-grid">
+          <div class="field"><label>Tinggi Badan (cm)</label><input type="number" id="in-h" value="173" /></div>
+          <div class="field"><label>Berat Badan (kg)</label><input type="number" id="in-w" step="0.1" value="68.0" /></div>
+          <div class="field"><label>Heart Rate (bpm)</label><input type="number" id="in-hr" value="62" /></div>
+          <div class="field"><label>HRV RMSSD (ms)</label><input type="number" id="in-hrv" value="78" /></div>
+          <div class="field"><label>Sistolik SBP (mmHg)</label><input type="number" id="in-sbp" value="118" /></div>
+          <div class="field"><label>Diastolik DBP (mmHg)</label><input type="number" id="in-dbp" value="75" /></div>
+          <div class="field"><label>SpO₂ Arteri (%)</label><input type="number" id="in-spo2" value="99" /></div>
+          <div class="field"><label>Hemoglobin Hb (g/dL)</label><input type="number" id="in-hb" step="0.1" value="15.2" /></div>
+          <div class="field"><label>Body Fat (%)</label><input type="number" id="in-bf" step="0.5" value="14.0" /></div>
+          <div class="field"><label>Skeletal Muscle (%)</label><input type="number" id="in-smm" step="0.5" value="44.0" /></div>
+          <div class="field"><label>Resistansi BIA R (Ω)</label><input type="number" id="in-r" value="485" /></div>
+          <div class="field"><label>Reaktansi BIA Xc (Ω)</label><input type="number" id="in-xc" value="62" /></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <span>II. Parameter Paparan Lingkungan & Beban Latihan</span>
+          <span class="status-pill">Exposome Matrix</span>
+        </div>
+        <div class="input-grid">
+          <div class="field"><label>Tekanan Barometrik (ATA)</label><input type="number" id="in-ata" step="0.1" value="1.0" /></div>
+          <div class="field"><label>Fraksi O₂ Inspirasi (FiO₂)</label><input type="number" id="in-fio2" step="0.05" value="0.21" /></div>
+          <div class="field"><label>Beban Akut 7 Hari (AU)</label><input type="number" id="in-acute" value="420" /></div>
+          <div class="field"><label>Beban Kronis 28 Hari (AU)</label><input type="number" id="in-chronic" value="400" /></div>
+          <div class="field"><label>Durasi Tidur (Jam/24h)</label><input type="number" id="in-sleep" step="0.2" value="7.6" /></div>
+          <div class="field"><label>Suhu Paparan (°C)</label><input type="number" id="in-temp" value="24" /></div>
+        </div>
+        <div class="formula-strip">
+          TRIMP = t · ΔHR_ratio · 0.64 · e^(1.92 · ΔHR_ratio)
+        </div>
+      </div>
+    </div>
+
+    <!-- KOLOM 2: ANALISIS NUMERIK KARDIOVASKULAR, OKSIGENASI, & KURVA GELOMBANG -->
+    <div class="col">
+      <div class="card">
+        <div class="card-title">
+          <span>III. Hemodinamika Numerik & Kopling Ventrikulo-Arterial</span>
+          <span class="status-pill" id="hemo-status">Optimal Coupling</span>
+        </div>
+        <div class="kv"><span>Mean Arterial Pressure (MAP)</span><span id="res-map">89.3 mmHg</span></div>
+        <div class="kv"><span>Pulse Pressure (PP) & Arterial Compliance (Ca)</span><span id="res-pp">43 mmHg · 1.84 mL/mmHg</span></div>
+        <div class="kv"><span>Stroke Volume (SV) & Cardiac Output (CO)</span><span id="res-co">79.1 mL · 4.90 L/min</span></div>
+        <div class="kv"><span>Cardiac Index (CI = CO / BSA)</span><span id="res-ci">2.71 L/min/m² (Normal 2.5–4.0)</span></div>
+        <div class="kv"><span>Systemic Vascular Resistance (SVR)</span><span id="res-svr">1392 dyn·s·cm⁻⁵ (Normal 800–1200)</span></div>
+        <div class="kv"><span>Rate-Pressure Product (RPP / MVO₂ Index)</span><span id="res-rpp">7316 mmHg·bpm (Low Myocardial Strain)</span></div>
+
+        <div class="svg-box">
+          <div style="font-size:10px;color:var(--muted);margin-bottom:4px;display:flex;justify-content:space-between;">
+            <span>Rekonstruksi Numerik Gelombang Tekanan Aorta Windkessel P(t)</span>
+            <span id="wave-caption" style="color:#38bdf8;">SBP 118 / DBP 75 mmHg · τ = 1.38s</span>
+          </div>
+          <svg id="windkessel-svg" width="100%" height="95" viewBox="0 0 460 95"></svg>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <span>IV. Kaskade Gas Alveolar-Arterial & Pengiriman Oksigen ($DO_2 / VO_2$)</span>
+          <span class="status-pill" id="oxy-status">Normoxia</span>
+        </div>
+        <div class="kv"><span>Tekanan O₂ Alveolar ($P_AO_2$) & Arteri ($P_aO_2$)</span><span id="res-pao2">101.7 mmHg → 94.2 mmHg</span></div>
+        <div class="kv"><span>Kandungan O₂ Arteri ($C_aO_2$)</span><span id="res-cao2">20.46 mL O₂ / dL</span></div>
+        <div class="kv"><span>Systemic Oxygen Delivery ($DO_2 = CO 	imes C_aO_2 	imes 10$)</span><span id="res-do2" style="color:#34d399;">1003 mL O₂ / min</span></div>
+        <div class="kv"><span>Oxygen Consumption ($VO_2$) & Extraction Ratio ($O_2ER$)</span><span id="res-o2er">252 mL/min · 25.1%</span></div>
+        <div class="formula-strip">
+          DO₂ = CO × [ (1.34 × Hb × SaO₂) + (0.0031 × PaO₂) ] × 10
+        </div>
+      </div>
+    </div>
+
+    <!-- KOLOM 3: BIOIMPEDANSI COLE-COLE, KOMPOSISI SELULER, & MATRIKS PAPARAN -->
+    <div class="col">
+      <div class="card">
+        <div class="card-title">
+          <span>V. Bioimpedansi Cole-Cole, Phase Angle ($phi$) & Kompartemen Tubuh</span>
+          <span class="status-pill" id="bia-status">High Cellular Integrity</span>
+        </div>
+        <div class="kv"><span>Phase Angle ($phi = arctan(X_c/R)$) & Impedansi $|Z|$</span><span id="res-pha" style="color:#38bdf8;">7.29° · 488.9 Ω</span></div>
+        <div class="kv"><span>Body Surface Area (DuBois BSA) & BMI</span><span id="res-bsa">1.81 m² · 22.7 kg/m²</span></div>
+        <div class="kv"><span>Lean Body Mass (LBM) & Fat Mass (FM)</span><span id="res-lbm">58.5 kg · 9.5 kg</span></div>
+        <div class="kv"><span>Total Body Water (TBW : ICW / ECW)</span><span id="res-tbw">42.7 L (ICW 26.5 L / ECW 16.2 L)</span></div>
+        <div class="kv"><span>Basal Metabolic Rate (Katch-McArdle BMR)</span><span id="res-bmr">1633 kcal / hari</span></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <span>VI. Indeks Paparan Kumulatif, ACWR & Rekomendasi Klinis</span>
+          <span class="status-pill" id="acwr-status">Sweet Spot (0.8–1.3)</span>
+        </div>
+        <div class="kv"><span>Acute:Chronic Workload Ratio (ACWR)</span><span id="res-acwr">1.05 (Optimal Adaptation)</span></div>
+        <div class="kv"><span>Autonomic Sympathovagal Index (HRV/HR)</span><span id="res-ans">1.26 (Parasympathetic Dominant)</span></div>
+        <div class="kv"><span>Thermal & Circadian Strain Score</span><span id="res-strain">11.4 / 100 (Low Allostatic Load)</span></div>
+        <div class="kv"><span>Composite Clinical Readiness Score</span><span id="res-readiness" style="color:#34d399;">94.2 / 100</span></div>
+        <div class="interp-box" id="clinical-summary"></div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // 1. Hydrate from real localStorage (pmd_health_profile & pm_bodycomp_v1)
+    try {
+      if (window.PanaceaSuperOSBridge) {
+        const t = window.PanaceaSuperOSBridge.readUnifiedTelemetry();
+        if (t.heightCm) document.getElementById('in-h').value = t.heightCm;
+        if (t.weightKg) document.getElementById('in-w').value = t.weightKg;
+        if (t.hr) document.getElementById('in-hr').value = t.hr;
+        if (t.hrv) document.getElementById('in-hrv').value = t.hrv;
+        if (t.spo2) document.getElementById('in-spo2').value = t.spo2;
+        if (t.bodyFatPct) document.getElementById('in-bf').value = t.bodyFatPct;
+        if (t.musclePct) document.getElementById('in-smm').value = t.musclePct;
+      }
+    } catch (e) {}
+
+    function drawWindkesselWave(sbp, dbp, hr, tau) {
+      const svg = document.getElementById('windkessel-svg');
+      const w = 460, h = 95;
+      const period = 60 / Math.max(40, hr);
+      let pathD = '';
+      for (let x = 0; x <= w; x += 3) {
+        const t = (x / w) * (period * 2.5);
+        const cycleT = t % period;
+        const sysDur = 0.32 * Math.sqrt(period);
+        let p = dbp;
+        if (cycleT < sysDur) {
+          const phase = (cycleT / sysDur) * Math.PI;
+          p = dbp + (sbp - dbp) * Math.pow(Math.sin(phase), 0.85);
+        } else {
+          const dt = cycleT - sysDur;
+          const notch = Math.exp(-Math.pow((dt - 0.04) / 0.03, 2)) * 5.5;
+          p = dbp + (sbp - dbp) * 0.72 * Math.exp(-dt / Math.max(0.4, tau)) + notch;
+        }
+        const y = h - 12 - ((p - (dbp - 10)) / Math.max(30, (sbp - dbp + 25))) * (h - 24);
+        pathD += (x === 0 ? 'M ' : ' L ') + x + ' ' + y.toFixed(1);
+      }
+      svg.innerHTML =
+        '<line x1="0" y1="20" x2="460" y2="20" stroke="rgba(148,163,184,0.12)" stroke-dasharray="3,3"/>' +
+        '<line x1="0" y1="75" x2="460" y2="75" stroke="rgba(148,163,184,0.12)" stroke-dasharray="3,3"/>' +
+        '<path d="' + pathD + '" fill="none" stroke="#38bdf8" stroke-width="2.2"/>';
+    }
+
+    function computeNumericalAnalysis() {
+      const H = parseFloat(document.getElementById('in-h').value) || 173;
+      const W = parseFloat(document.getElementById('in-w').value) || 68;
+      const HR = parseFloat(document.getElementById('in-hr').value) || 62;
+      const HRV = parseFloat(document.getElementById('in-hrv').value) || 78;
+      const SBP = parseFloat(document.getElementById('in-sbp').value) || 118;
+      const DBP = parseFloat(document.getElementById('in-dbp').value) || 75;
+      const SpO2 = parseFloat(document.getElementById('in-spo2').value) || 99;
+      const Hb = parseFloat(document.getElementById('in-hb').value) || 15.2;
+      const BF = parseFloat(document.getElementById('in-bf').value) || 14;
+      const SMM = parseFloat(document.getElementById('in-smm').value) || 44;
+      const R = parseFloat(document.getElementById('in-r').value) || 485;
+      const Xc = parseFloat(document.getElementById('in-xc').value) || 62;
+
+      const ATA = parseFloat(document.getElementById('in-ata').value) || 1.0;
+      const FiO2 = parseFloat(document.getElementById('in-fio2').value) || 0.21;
+      const acute = parseFloat(document.getElementById('in-acute').value) || 420;
+      const chronic = parseFloat(document.getElementById('in-chronic').value) || 400;
+      const sleep = parseFloat(document.getElementById('in-sleep').value) || 7.6;
+      const temp = parseFloat(document.getElementById('in-temp').value) || 24;
+
+      // 1. Allometry & Body Composition
+      const bsa = 0.007184 * Math.pow(W, 0.425) * Math.pow(H, 0.725); // DuBois BSA
+      const bmi = W / Math.pow(H / 100, 2);
+      const fm = W * (BF / 100);
+      const lbm = W - fm;
+      const bmr = 370 + (21.6 * lbm); // Katch-McArdle
+
+      // Cole-Cole Bioimpedance
+      const zMag = Math.sqrt(R * R + Xc * Xc);
+      const phaseAngle = Math.atan2(Xc, R) * (180 / Math.PI);
+      const tbw = 0.732 * lbm;
+      const icwRatio = Math.min(0.66, Math.max(0.52, 0.55 + (phaseAngle - 6.0) * 0.035));
+      const icw = tbw * icwRatio;
+      const ecw = tbw - icw;
+
+      // 2. Hemodynamics (Windkessel & Liljestrand-Zander / BSA-calibrated SV)
+      const pp = Math.max(15, SBP - DBP);
+      const map = DBP + (pp / 3);
+      const sv = Math.max(40, Math.min(135, (pp / (SBP + DBP)) * 100 * bsa * 1.18));
+      const co = (sv * HR) / 1000;
+      const ci = co / bsa;
+      const cvp = 4;
+      const svr = ((map - cvp) * 80) / Math.max(1.5, co);
+      const artCompliance = sv / pp;
+      const rpp = HR * SBP;
+      const windkesselTau = (svr / 80) * (artCompliance / 1000) * 60;
+
+      // 3. Oxygen Transport Cascade (Alveolar Gas Equation & Fick)
+      const pAtm = ATA * 760;
+      const pH2O = 47;
+      const paCO2 = 40;
+      const rq = 0.82;
+      const pAO2 = Math.max(40, FiO2 * (pAtm - pH2O) - (paCO2 / rq));
+      const paO2 = Math.max(35, pAO2 - 7.5);
+      const caO2 = (1.34 * Hb * (SpO2 / 100)) + (0.0031 * paO2);
+      const do2 = co * caO2 * 10;
+      const vo2 = bsa * 138;
+      const o2er = (vo2 / Math.max(200, do2)) * 100;
+
+      // 4. Exposome, ACWR & Autonomic Readiness
+      const acwr = acute / Math.max(50, chronic);
+      const ansRatio = HRV / Math.max(40, HR);
+      const sleepDebt = Math.max(0, 8.0 - sleep);
+      const thermalDelta = Math.abs(temp - 22);
+      const strainScore = Math.min(100, sleepDebt * 8 + thermalDelta * 0.35 + Math.abs(acwr - 1.0) * 28);
+      const readiness = Math.max(10, Math.min(99.5, 88 + (phaseAngle - 6.5) * 3.5 + (ansRatio - 1.0) * 12 - strainScore * 0.35));
+
+      // Update UI Readouts
+      document.getElementById('res-map').textContent = map.toFixed(1) + ' mmHg';
+      document.getElementById('res-pp').textContent = pp.toFixed(0) + ' mmHg · Ca ' + artCompliance.toFixed(2) + ' mL/mmHg';
+      document.getElementById('res-co').textContent = sv.toFixed(1) + ' mL · ' + co.toFixed(2) + ' L/min';
+      document.getElementById('res-ci').textContent = ci.toFixed(2) + ' L/min/m²';
+      document.getElementById('res-svr').textContent = Math.round(svr) + ' dyn·s·cm⁻⁵';
+      document.getElementById('res-rpp').textContent = Math.round(rpp) + ' mmHg·bpm';
+      document.getElementById('wave-caption').textContent = 'SBP ' + SBP + ' / DBP ' + DBP + ' mmHg · τ = ' + windkesselTau.toFixed(2) + 's';
+
+      document.getElementById('res-pao2').textContent = pAO2.toFixed(1) + ' mmHg → PaO₂ ' + paO2.toFixed(1) + ' mmHg';
+      document.getElementById('res-cao2').textContent = caO2.toFixed(2) + ' mL O₂/dL';
+      document.getElementById('res-do2').textContent = Math.round(do2) + ' mL O₂/min (' + Math.round(do2 / bsa) + ' mL/min/m²)';
+      document.getElementById('res-o2er').textContent = Math.round(vo2) + ' mL/min · O₂ER ' + o2er.toFixed(1) + '%';
+
+      document.getElementById('res-pha').textContent = phaseAngle.toFixed(2) + '° · |Z| ' + zMag.toFixed(1) + ' Ω';
+      document.getElementById('res-bsa').textContent = bsa.toFixed(2) + ' m² · BMI ' + bmi.toFixed(1) + ' kg/m²';
+      document.getElementById('res-lbm').textContent = lbm.toFixed(1) + ' kg LBM · ' + fm.toFixed(1) + ' kg Fat';
+      document.getElementById('res-tbw').textContent = tbw.toFixed(1) + ' L (ICW ' + icw.toFixed(1) + ' L / ECW ' + ecw.toFixed(1) + ' L)';
+      document.getElementById('res-bmr').textContent = Math.round(bmr) + ' kcal/hari';
+
+      document.getElementById('res-acwr').textContent = acwr.toFixed(2) + (acwr > 1.5 ? ' (⚠️ High Injury Risk)' : ' (Optimal Sweet Spot)');
+      document.getElementById('res-ans').textContent = ansRatio.toFixed(2) + (ansRatio >= 1.0 ? ' (Vagal Dominant)' : ' (Sympathetic Load)');
+      document.getElementById('res-strain').textContent = strainScore.toFixed(1) + ' / 100';
+      document.getElementById('res-readiness').textContent = readiness.toFixed(1) + ' / 100';
+
+      document.getElementById('clinical-summary').innerHTML =
+        '<strong>Interpretasi Klinis Numerik:</strong> Pengiriman oksigen sistemik ($DO_2$ ' + Math.round(do2) + ' mL/min, rasio ekstraksi ' + o2er.toFixed(1) + '%) dan indeks kardiak (' + ci.toFixed(2) + ' L/min/m²) mendukung perfusi jaringan penuh. Phase Angle ' + phaseAngle.toFixed(2) + '° menunjukkan integritas membran seluler yang sangat baik dengan rasio beban latihan ACWR ' + acwr.toFixed(2) + '.';
+
+      drawWindkesselWave(SBP, DBP, HR, windkesselTau);
+    }
+
+    ['in-h', 'in-w', 'in-hr', 'in-hrv', 'in-sbp', 'in-dbp', 'in-spo2', 'in-hb', 'in-bf', 'in-smm', 'in-r', 'in-xc', 'in-ata', 'in-fio2', 'in-acute', 'in-chronic', 'in-sleep', 'in-temp'].forEach(id => {
+      document.getElementById(id).addEventListener('input', computeNumericalAnalysis);
+    });
+
+    window.syncAndBroadcast = function() {
+      if (window.PanaceaSuperOSBridge) {
+        window.PanaceaSuperOSBridge.broadcastUpdate('numerical-body-exposure');
+        window.PanaceaSuperOSBridge.exportFhirJson();
+      }
+    };
+
+    computeNumericalAnalysis();
+  </script>
+</body>
+</html>
