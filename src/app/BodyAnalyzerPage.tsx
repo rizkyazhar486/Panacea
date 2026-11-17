@@ -52,6 +52,12 @@ export default function BodyAnalyzerPage() {
         </span>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
           <a
+            href="/panaceamed-unified-superos.html"
+            style={{ fontSize: "11px", fontWeight: 800, padding: "6px 12px", borderRadius: "8px", background: "linear-gradient(90deg, rgba(16,185,129,0.32), rgba(56,189,248,0.32))", color: "#ffffff", border: "1px solid rgba(16, 185, 129, 0.75)", textDecoration: "none" }}
+          >
+            🌐 PanaceaMed Unified Super-OS (Master Command)
+          </a>
+          <a
             href="/omega-invictus-body-exposure-os.html"
             style={{ fontSize: "11px", fontWeight: 800, padding: "6px 11px", borderRadius: "8px", background: "linear-gradient(90deg, rgba(16,185,129,0.28), rgba(56,189,248,0.28))", color: "#f8fafc", border: "1px solid rgba(56, 189, 248, 0.65)", textDecoration: "none" }}
           >
