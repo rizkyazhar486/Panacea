@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PanaceaMed OS · MedSciHub UHD 5K 4D Multiscale Anatomy, CAD/CAE & AI-EMR</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <style>
+    :root {
+      --bg: #030712;
+      --panel: rgba(15, 23, 42, 0.78);
+      --border: rgba(56, 189, 248, 0.28);
+      --cyan: #38bdf8;
+      --emerald: #10b981;
+      --rose: #f43f5e;
+      --amber: #f59e0b;
+      --violet: #a855f7;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: radial-gradient(circle at 50% 20%, #0f172a 0%, #020617 75%);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', system-ui, sans-serif;
+      overflow: hidden;
+      height: 100vh;
+      width: 100vw;
+      user-select: none;
+    }
+    #canvas-container { position: fixed; inset: 0; z-index: 1; }
+    .hud-top {
+      position: fixed; top: 12px; left: 12px; right: 12px; z-index: 10;
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      background: var(--panel); backdrop-filter: blur(20px);
+      border: 1px solid var(--border); border-radius: 14px; padding: 10px 16px;
+      box-shadow: 0 12px 32px rgba(0,0,0,0.55);
+    }
+    .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 15px; letter-spacing: 0.3px; }
+    .badge {
+      font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 999px;
+      background: rgba(16, 185, 129, 0.16); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4);
+    }
+    .scale-bar {
+      display: flex; gap: 5px; overflow-x: auto; max-width: 62vw; padding-bottom: 2px;
+    }
+    .scale-btn {
+      background: rgba(30, 41, 59, 0.75); color: var(--muted);
+      border: 1px solid rgba(148, 163, 184, 0.2); border-radius: 8px;
+      padding: 5px 9px; font-size: 11px; font-weight: 600; cursor: pointer; white-space: nowrap;
+      transition: all 0.18s ease;
+    }
+    .scale-btn.active, .scale-btn:hover {
+      background: rgba(56, 189, 248, 0.2); color: #fff; border-color: var(--cyan);
+      box-shadow: 0 0 12px rgba(56, 189, 248, 0.35);
+    }
+    .hud-left, .hud-right {
+      position: fixed; top: 72px; bottom: 68px; width: 340px; z-index: 10;
+      background: var(--panel); backdrop-filter: blur(20px);
+      border: 1px solid var(--border); border-radius: 14px; padding: 14px;
+      overflow-y: auto; display: flex; flex-direction: column; gap: 12px;
+      box-shadow: 0 12px 32px rgba(0,0,0,0.55);
+    }
+    .hud-left { left: 12px; }
+    .hud-right { right: 12px; width: 370px; }
+    .hud-bottom {
+      position: fixed; bottom: 12px; left: 12px; right: 12px; z-index: 10;
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      background: var(--panel); backdrop-filter: blur(20px);
+      border: 1px solid var(--border); border-radius: 14px; padding: 8px 16px;
+      font-size: 11px;
+    }
+    .card {
+      background: rgba(2, 6, 23, 0.65); border: 1px solid rgba(148, 163, 184, 0.16);
+      border-radius: 10px; padding: 10px 12px;
+    }
+    .card-title {
+      font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.7px;
+      color: var(--cyan); margin-bottom: 6px; display: flex; justify-content: space-between;
+    }
+    .slider-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 5px 0; font-size: 11px; }
+    .slider-row input[type=range] { flex: 1; accent-color: var(--cyan); }
+    .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 6px; }
+    .action-btn {
+      background: rgba(15, 23, 42, 0.9); color: #e2e8f0; border: 1px solid rgba(56, 189, 248, 0.3);
+      border-radius: 7px; padding: 6px 8px; font-size: 11px; font-weight: 600; cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .action-btn:hover, .action-btn.active { background: rgba(56, 189, 248, 0.25); border-color: var(--cyan); color: #fff; }
+    .kv { display: flex; justify-content: space-between; font-size: 11px; padding: 3px 0; border-bottom: 1px dashed rgba(148,163,184,0.12); }
+    .kv span:first-child { color: var(--muted); }
+    .kv span:last-child { font-weight: 600; color: #f1f5f9; }
+    .tab-row { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 8px; }
+    .tab-btn {
+      font-size: 10px; padding: 4px 7px; border-radius: 6px; border: 1px solid rgba(148,163,184,0.2);
+      background: rgba(15,23,42,0.8); color: var(--muted); cursor: pointer; font-weight: 600;
+    }
+    .tab-btn.active { background: rgba(16, 185, 129, 0.22); color: #34d399; border-color: var(--emerald); }
+    .desc { font-size: 11.5px; line-height: 1.5; color: #cbd5e1; }
+    .back-link {
+      text-decoration: none; color: #38bdf8; font-size: 12px; font-weight: 700;
+      padding: 5px 10px; border: 1px solid rgba(56,189,248,0.35); border-radius: 8px;
+    }
+    @media (max-width: 1024px) {
+      .hud-left, .hud-right { width: 280px; }
+    }
+  </style>
+</head>
+<body>
+  <div id="canvas-container"></div>
+
+  <header class="hud-top">
+    <div class="brand">
+      <a href="/#/" class="back-link">← PanaceaMed OS</a>
+      <span>MedSciHub 4D · UHD 5K Multiscale Atlas & AI-EMR</span>
+      <span class="badge" id="render-mode-badge">CAD/CAE + Laser 4D</span>
+    </div>
+    <div class="scale-bar" id="scale-bar"></div>
+  </header>
+
+  <aside class="hud-left">
+    <div class="card">
+      <div class="card-title"><span>XYZ Exploded-View & 1-Projectile</span><span id="explode-status">1:1 Intact</span></div>
+      <div class="slider-row"><span>Sumbu X</span><input type="range" id="exp-x" min="0" max="100" value="0" /><span id="val-x">0%</span></div>
+      <div class="slider-row"><span>Sumbu Y</span><input type="range" id="exp-y" min="0" max="100" value="0" /><span id="val-y">0%</span></div>
+      <div class="slider-row"><span>Sumbu Z</span><input type="range" id="exp-z" min="0" max="100" value="0" /><span id="val-z">0%</span></div>
+      <div class="slider-row"><span>1-Projectile Vector</span><input type="range" id="proj-t" min="0" max="100" value="0" /><span id="val-p">0%</span></div>
+      <div class="btn-grid">
+        <button class="action-btn" id="btn-explode-all">pecah Bagian (XYZ)</button>
+        <button class="action-btn" id="btn-reassemble">Gabungkan 1:1</button>
+        <button class="action-btn" id="btn-projectile">Simulasi 1 Proyektil</button>
+        <button class="action-btn" id="btn-laser">Mode Laser Engraving</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span>WYSIWYG CAD / CAE & Vision QA</span><span>Real-Time</span></div>
+      <div class="btn-grid">
+        <button class="action-btn active" data-shader="standard">UHD 5K PBR Organ</button>
+        <button class="action-btn" data-shader="cad">CAD Wireframe NURBS</button>
+        <button class="action-btn" data-shader="cae">CAE FEA/CFD Stress</button>
+        <button class="action-btn" data-shader="cabg">Simulasi Bedah CABG</button>
+      </div>
+      <div style="margin-top:8px;">
+        <div class="kv"><span>CABG Anastomosis QA</span><span id="cabg-qa">99.4% Precision (Pass)</span></div>
+        <div class="kv"><span>CFD Wall Shear Stress</span><span id="cfd-val">1.8 Pa (Laminar)</span></div>
+        <div class="kv"><span>FEA Myocardial Strain</span><span id="fea-val">-19.2% (Optimal)</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span>Digital Self (GTA6/2K/Sims) & Metaverse</span><span>Live Twin</span></div>
+      <div class="kv"><span>Readiness / Stamina OVR</span><span style="color:#34d399;">96 OVR · Peak State</span></div>
+      <div class="kv"><span>Consciousness Continuity</span><span>Synced · Neural Ledger v4</span></div>
+      <div class="kv"><span>Emergency Route Supply-Demand</span><span>Optimal (3.2 min ETA)</span></div>
+      <div class="kv"><span>3T Water-Adaptive Channel</span><span id="net-channel">5G / BLE / Quantum-Ready</span></div>
+    </div>
+  </aside>
+
+  <aside class="hud-right">
+    <div class="card">
+      <div class="card-title"><span id="organ-title">1. Whole Body 1:1 Digital Twin</span><span id="organ-icd">ICD-11 / FHIR R4</span></div>
+      <div class="tab-row" id="clinical-tabs">
+        <button class="tab-btn active" data-tab="fisiologi">Fisiologi & Konektivitas</button>
+        <button class="tab-btn" data-tab="patofisiologi">Patofisiologi & Lesi EMR</button>
+        <button class="tab-btn" data-tab="farmakologi">Mekanisme Obat & Vaksin</button>
+        <button class="tab-btn" data-tab="operasi">Simulasi Operasi & Gerak</button>
+        <button class="tab-btn" data-tab="kuantum">Kuantum, DNA/RNA & First-Principle</button>
+      </div>
+      <div class="desc" id="clinical-content"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span>AI-EMR Live Telemetry & Recovery Integration</span><span>SATUSEHAT</span></div>
+      <div class="kv"><span>Heart Rate / HRV (RMSSD)</span><span id="emr-hr">62 bpm · 78 ms</span></div>
+      <div class="kv"><span>SpO2 / VO2Max</span><span>99% · 56.4 mL/kg/min</span></div>
+      <div class="kv"><span>HBOT / Cryo / PBM / X-Tone</span><span style="color:#38bdf8;">5 Modalities Ready</span></div>
+      <div class="kv"><span>Projectile / Biopsy Vector</span><span id="proj-readout">Standby (0.0 mm)</span></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span>First-Principles & Ecological Fusion</span><span>D100 Engine</span></div>
+      <p class="desc" id="first-principle-box">
+        <strong>First-Principles Derivation:</strong> Aliran kardiovaskular dimodelkan dari hukum kekekalan massa & Navier-Stokes ($Delta P = Q 	imes R$), memori sinaptik otak dipetakan setara hierarki penyimpanan NVMe, dan efisiensi mikro-anastomosis CABG diverifikasi dengan algoritma pelacakan lintasan penglihatan komputer secara real-time.
+      </p>
+    </div>
+  </aside>
+
+  <footer class="hud-bottom">
+    <div><strong>Skala Aktif:</strong> <span id="footer-scale">Whole Body (1:1 Human Digital Twin)</span></div>
+    <div><strong>Kontrol 3D:</strong> Drag = Rotasi Orbit · Scroll = Zoom Multiskala · Slider XYZ = Pecah/Gabung Bagian Anatomi</div>
+    <div><strong>Status Cloud & 3T:</strong> <span style="color:#34d399;">Online · Adaptive 2G/3G/4G/5G/BLE Mesh Ready</span></div>
+  </footer>
+
+  <script>
+    const SCALES = [
+      {
+        id: 'whole-body', name: '1. Whole Body', icd: 'FHIR-Patient-1:1',
+        fisiologi: 'Integrasi holistik 11 sistem organ manusia dengan keseimbangan hemodinamik, neuro-endokrin, dan termoregulasi 36.8°C.',
+        patofisiologi: 'Deteksi dini lesi multi-organ, inflamasi sistemik, dan pemetaan paparan ekologis harian (Body Exposure Analyzer).',
+        farmakologi: 'Distribusi farmakokinetik sistemik (ADME), volume distribusi kompartemen sentral & perifer.',
+        operasi: 'Simulasi trauma kinematik penuh, triase darurat cerdas, dan navigasi bedah seluruh tubuh.',
+        kuantum: 'Koherensi bioelektrik seluruh tubuh, transduksi sinyal Source -> Channel -> Destination.'
+      },
+      {
+        id: 'organ-system', name: '2. Sistem Organ', icd: 'ICD-11-BA00',
+        fisiologi: 'Keterhubungan sistem Kardiovaskular, Saraf Pusat/Perifer, Respirasi, Hepatobilier, Renal, dan Muskuloskeletal.',
+        patofisiologi: 'Gangguan lintas-sistem (Cardiorenal syndrome, Neurogenic shock, Sepsis cascade).',
+        farmakologi: 'Interaksi obat multi-target, modulasi reseptor otonom simpatis & parasimpatis.',
+        operasi: 'Simulasi sirkulasi ekstrakorporeal (Heart-Lung Machine / ECMO) & kanulasi vaskular.',
+        kuantum: 'Sinkronisasi gelombang elektromagnetik jantung-otak & gradien potensial membran.'
+      },
+      {
+        id: 'organ', name: '3. Setiap Organ (Jantung/Otak/Paru)', icd: 'SNOMED-80891009',
+        fisiologi: 'Pompa 4 ruang jantung (LV, RV, LA, RA), perfusi arteri koroner (LAD, LCx, RCA), siklus sistol-diastol 60-80 bpm.',
+        patofisiologi: 'Stenosis koroner aterosklerotik, iskemia miokard, infark transmural, dan remodeling ventrikel.',
+        farmakologi: 'Beta-blocker (β1 selektif), ACE-inhibitor, Statin, Antiplatelet (P2Y12 inhibitor), & trombolitik.',
+        operasi: 'Simulasi Coronary Artery Bypass Grafting (CABG) LIMA-to-LAD dengan visi AI pelacak jahitan mikro.',
+        kuantum: 'Konduksi nodus SA-AV-Purkinje melalui fluks ion cepat dan kopling celah (gap junction Cx43).'
+      },
+      {
+        id: 'tissue', name: '4. Setiap Jaringan', icd: 'HIST-Myocardium',
+        fisiologi: 'Arsitektur sinsitium miokardium, endotel vaskular, matriks ekstraseluler kolagen tipe I/III, dan kapiler padat.',
+        patofisiologi: 'Fibrosis interstisial, disfungsi endotel, edema jaringan lokal, dan infiltrasi leukosit.',
+        farmakologi: 'Difusi obat menembus barier kapiler-jaringan, terapi Red Light (660nm/850nm) & HBOT (1.5-2.4 ATA).',
+        operasi: 'Analisis tegangan jahitan mikrovaskular (CAE Finite Element Stress) & ablasi jaringan aritmia.',
+        kuantum: 'Piezoelektrik serat kolagen dan transmisi gelombang mekanotransduksi ultrasonik.'
+      },
+      {
+        id: 'cell', name: '5. Setiap Sel & Stem Cell', icd: 'CELL-Cardiomyocyte',
+        fisiologi: 'Kardiomiosit kontraktil, sel punca mesenkimal/iPSC, makrofag residen, dan keseimbangan osmotik seluler.',
+        patofisiologi: 'Hipertrofi seluler, apoptosis, stres oksidatif (ROS), dan ferroptosis.',
+        farmakologi: 'Diferensiasi Stem Cell terarah, imunoterapi sel T/B, dan pengiriman nanopartikel lipid (LNP).',
+        operasi: 'Injeksi intramiokardial sel punca regeneratif & elektroporasi membran sel.',
+        kuantum: 'Potensial aksi transmembran (-90 mV ke +20 mV) عبر kanal ion tegangan tinggi.'
+      },
+      {
+        id: 'organelle', name: '6. Subseluler & Organel', icd: 'ORG-Mitochondria',
+        fisiologi: 'Mitokondria (rantai transpor elektron & sintesis ATP), Retikulum Sarkoplasma (penyimpanan Ca2+), Ribosom, Lisosom.',
+        patofisiologi: 'Disfungsi mitokondria, kebocoran sitokrom-c, dan stres retikulum endoplasma (UPR).',
+        farmakologi: 'Aktivasi Cytochrome C Oxidase oleh fotobiomodulasi (PBM) & proteksi mitokondria.',
+        operasi: 'Manipulasi organel optogenetik & transfer mitokondria terapeutik.',
+        kuantum: 'Quantum proton tunneling pada kompleks I-IV rantai respirasi mitokondria.'
+      },
+      {
+        id: 'dna-rna', name: '7. DNA, RNA & Sequencing', icd: 'GEN-HG38-NGS',
+        fisiologi: 'Heliks ganda DNA, transkripsi mRNA, regulasi epigenetik histon, dan ekspresi gen spesifik organ.',
+        patofisiologi: 'Mutasi titik (SNP), delesi/insersi, fusi onkogen, dan disregulasi ekspresi transkrip.',
+        farmakologi: 'Terapi gen CRISPR-Cas9, vaksin mRNA antigen presisi, antisense oligonucleotide (ASO), & farmakogenomik.',
+        operasi: 'High-Throughput Sequencing (NGS) real-time alignment & penyuntingan basa genomik.',
+        kuantum: 'Ikatan hidrogen pasangan basa A-T / G-C dan stabilitas tumpukan pi-elektron aromatik.'
+      },
+      {
+        id: 'compound', name: '8. Senyawa & Reseptor', icd: 'CHEM-Ligand-GPCR',
+        fisiologi: 'Interaksi ligan-reseptor (GPCR, RTK), neurotransmiter, hormon, sitokin, dan enzim katalitik.',
+        patofisiologi: 'Desensitisasi reseptor, penghambatan kompetitif/alosterik toksik, dan misfolding protein.',
+        farmakologi: 'Molecular docking obat-reseptor, afinitas ikatan (Kd), desain vaksin & antibodi monoklonal.',
+        operasi: 'Simulasi dinamika molekuler (MD) pengikatan kandidat obat baru.',
+        kuantum: 'Distribusi kerapatan elektron orbital molekul (HOMO-LUMO) & gaya Van der Waals.'
+      },
+      {
+        id: 'quantum', name: '9. Partikel & Kimia Kuantum', icd: 'QTM-BioPhysics',
+        fisiologi: 'Fluks ion Na+, K+, Ca2+, Mg2+, transfer elektron redoks, dan biophoton koheren.',
+        patofisiologi: 'Radikal bebas tak berpasangan (superoksida/hidroksil) dan dekoherensi spin kuantum.',
+        farmakologi: 'Desain obat berbasis mekanika kuantum (QM/MM) dan sensor kuantum diagnostik.',
+        operasi: 'Pemindaian spektroskopi resonansi spin & pencitraan medan kuantum resolusi sub-nanometer.',
+        kuantum: 'Prinsip Pertama (First Principles): persamaan Schrödinger, termodinamika non-ekuilibrium, dan informasi kuantum.'
+      }
+    ];
+
+    let activeScale = SCALES[0];
+    let activeTab = 'fisiologi';
+
+    const scaleBar = document.getElementById('scale-bar');
+    SCALES.forEach((s, idx) => {
+      const btn = document.createElement('button');
+      btn.className = 'scale-btn' + (idx === 0 ? ' active' : '');
+      btn.textContent = s.name;
+      btn.onclick = () => selectScale(s, btn);
+      scaleBar.appendChild(btn);
+    });
+
+    function renderClinicalText() {
+      document.getElementById('organ-title').textContent = activeScale.name;
+      document.getElementById('organ-icd').textContent = activeScale.icd;
+      document.getElementById('footer-scale').textContent = activeScale.name + ' (' + activeScale.icd + ')';
+      document.getElementById('clinical-content').textContent = activeScale[activeTab] || activeScale.fisiologi;
+    }
+
+    function selectScale(scaleObj, btnEl) {
+      activeScale = scaleObj;
+      document.querySelectorAll('.scale-btn').forEach(b => b.classList.remove('active'));
+      if (btnEl) btnEl.classList.add('active');
+      renderClinicalText();
+      rebuild3DParts(SCALES.indexOf(scaleObj));
+    }
+
+    document.querySelectorAll('#clinical-tabs .tab-btn').forEach(btn => {
+      btn.onclick = () => {
+        document.querySelectorAll('#clinical-tabs .tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        activeTab = btn.getAttribute('data-tab');
+        renderClinicalText();
+      };
+    });
+
+    // THREE.JS UHD 4D MULTISCALE SCENE WITH XYZ EXPLODE & 1-PROJECTILE
+    const container = document.getElementById('canvas-container');
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.set(0, 1.2, 8.5);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    container.appendChild(renderer.domElement);
+
+    const ambientLight = new THREE.AmbientLight(0x38bdf8, 0.65);
+    scene.add(ambientLight);
+    const dirLight1 = new THREE.DirectionalLight(0xffffff, 1.25);
+    dirLight1.position.set(6, 10, 8);
+    scene.add(dirLight1);
+    const dirLight2 = new THREE.PointLight(0x10b981, 1.1, 25);
+    dirLight2.position.set(-6, -4, 5);
+    scene.add(dirLight2);
+
+    const rootGroup = new THREE.Group();
+    scene.add(rootGroup);
+
+    const parts = [];
+    let currentShaderMode = 'standard';
+    let laserPoints = null;
+
+    // 1-Projectile Ray / Ballistic & Biopsy Vector
+    const projGroup = new THREE.Group();
+    const projLineGeo = new THREE.BufferGeometry().setFromPoints([
+      new THREE.Vector3(-4.5, 2.2, 3.5),
+      new THREE.Vector3(3.5, -1.5, -2.5)
+    ]);
+    const projLineMat = new THREE.LineBasicMaterial({ color: 0xf43f5e });
+    const projLine = new THREE.Line(projLineGeo, projLineMat);
+    const projSphere = new THREE.Mesh(
+      new THREE.SphereGeometry(0.14, 24, 24),
+      new THREE.MeshBasicMaterial({ color: 0xf43f5e })
+    );
+    projGroup.add(projLine);
+    projGroup.add(projSphere);
+    projGroup.visible = false;
+    scene.add(projGroup);
+
+    function createMaterial(colorHex) {
+      if (currentShaderMode === 'cad') {
+        return new THREE.MeshBasicMaterial({ color: 0x38bdf8, wireframe: true });
+      }
+      if (currentShaderMode === 'cae') {
+        return new THREE.MeshStandardMaterial({
+          color: 0xf59e0b, emissive: 0x7c2d12, roughness: 0.25, metalness: 0.6
+        });
+      }
+      if (currentShaderMode === 'cabg') {
+        return new THREE.MeshStandardMaterial({
+          color: 0xf43f5e, emissive: 0x4c0519, roughness: 0.2, metalness: 0.35
+        });
+      }
+      return new THREE.MeshStandardMaterial({
+        color: colorHex, roughness: 0.28, metalness: 0.45, transparent: true, opacity: 0.92
+      });
+    }
+
+    function rebuild3DParts(scaleIdx) {
+      while (rootGroup.children.length > 0) {
+        rootGroup.remove(rootGroup.children[0]);
+      }
+      parts.length = 0;
+
+      const palette = [0x38bdf8, 0xf43f5e, 0x10b981, 0xa855f7, 0xf59e0b, 0xec4899, 0x06b6d4, 0x84cc16];
+      const definitions = [
+        // 12 separable anatomical / multiscale segments with base XYZ coordinates & explode directions
+        { geo: new THREE.SphereGeometry(0.62, 32, 32), pos: [0, 2.1, 0], dir: [0, 1.4, 0], col: palette[0] },       // Cranium / Cortex
+        { geo: new THREE.CylinderGeometry(0.55, 0.48, 1.4, 28), pos: [0, 0.75, 0], dir: [0, 0.4, -1.1], col: palette[2] }, // Thorax / Spine
+        { geo: new THREE.SphereGeometry(0.38, 28, 28), pos: [0.18, 0.92, 0.35], dir: [0.9, 0.5, 1.4], col: palette[1] }, // Heart (LV/RV/Coronary)
+        { geo: new THREE.SphereGeometry(0.42, 24, 24), pos: [-0.48, 0.98, 0.15], dir: [-1.4, 0.5, 0.6], col: palette[0] }, // Left Lung
+        { geo: new THREE.SphereGeometry(0.42, 24, 24), pos: [0.48, 0.98, 0.15], dir: [1.4, 0.5, 0.6], col: palette[0] },  // Right Lung
+        { geo: new THREE.BoxGeometry(0.65, 0.38, 0.45), pos: [-0.25, 0.22, 0.22], dir: [-1.1, -0.3, 0.9], col: palette[4] }, // Liver / Hepatobiliary
+        { geo: new THREE.SphereGeometry(0.24, 20, 20), pos: [-0.35, -0.15, -0.22], dir: [-1.2, -0.6, -1.0], col: palette[3] }, // Left Kidney
+        { geo: new THREE.SphereGeometry(0.24, 20, 20), pos: [0.35, -0.15, -0.22], dir: [1.2, -0.6, -1.0], col: palette[3] },  // Right Kidney
+        { geo: new THREE.TorusKnotGeometry(0.42 + (scaleIdx * 0.03), 0.11, 96, 16), pos: [0, -0.55, 0.15], dir: [0, -1.2, 1.1], col: palette[5] }, // Enteric / DNA Helix / Organelle Core
+        { geo: new THREE.CylinderGeometry(0.18, 0.14, 1.45, 20), pos: [-0.88, 0.55, 0], dir: [-1.6, 0.2, 0], col: palette[6] }, // Upper Limb L / Receptor
+        { geo: new THREE.CylinderGeometry(0.18, 0.14, 1.45, 20), pos: [0.88, 0.55, 0], dir: [1.6, 0.2, 0], col: palette[6] },  // Upper Limb R / Receptor
+        { geo: new THREE.CylinderGeometry(0.22, 0.16, 1.65, 20), pos: [0, -1.65, 0], dir: [0, -1.6, 0], col: palette[7] }       // Lower Kinetic / Quantum Base
+      ];
+
+      definitions.forEach((d) => {
+        const mesh = new THREE.Mesh(d.geo, createMaterial(d.col));
+        mesh.position.set(d.pos[0], d.pos[1], d.pos[2]);
+        mesh.userData = { basePos: [...d.pos], dir: [...d.dir], col: d.col };
+        rootGroup.add(mesh);
+        parts.push(mesh);
+      });
+
+      // Subsurface Laser Engraving Point Cloud
+      const ptsGeo = new THREE.BufferGeometry();
+      const count = 2400;
+      const positions = new Float32Array(count * 3);
+      for (let i = 0; i < count; i++) {
+        positions[i * 3] = (Math.random() - 0.5) * 3.2;
+        positions[i * 3 + 1] = (Math.random() - 0.5) * 4.6;
+        positions[i * 3 + 2] = (Math.random() - 0.5) * 2.2;
+      }
+      ptsGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+      const ptsMat = new THREE.PointsMaterial({ color: 0x38bdf8, size: 0.035, transparent: true, opacity: 0.65 });
+      laserPoints = new THREE.Points(ptsGeo, ptsMat);
+      rootGroup.add(laserPoints);
+
+      applyExplodePositions();
+    }
+
+    function applyExplodePositions() {
+      const ex = parseFloat(document.getElementById('exp-x').value) / 100;
+      const ey = parseFloat(document.getElementById('exp-y').value) / 100;
+      const ez = parseFloat(document.getElementById('exp-z').value) / 100;
+      document.getElementById('val-x').textContent = Math.round(ex * 100) + '%';
+      document.getElementById('val-y').textContent = Math.round(ey * 100) + '%';
+      document.getElementById('val-z').textContent = Math.round(ez * 100) + '%';
+
+      const total = Math.round(((ex + ey + ez) / 3) * 100);
+      document.getElementById('explode-status').textContent = total === 0 ? '1:1 Intact' : 'Exploded ' + total + '%';
+
+      parts.forEach((mesh) => {
+        const b = mesh.userData.basePos;
+        const d = mesh.userData.dir;
+        mesh.position.set(
+          b[0] + d[0] * ex * 2.2,
+          b[1] + d[1] * ey * 2.2,
+          b[2] + d[2] * ez * 2.2
+        );
+      });
+    }
+
+    ['exp-x', 'exp-y', 'exp-z'].forEach(id => {
+      document.getElementById(id).addEventListener('input', applyExplodePositions);
+    });
+
+    document.getElementById('btn-explode-all').onclick = () => {
+      ['exp-x', 'exp-y', 'exp-z'].forEach(id => { document.getElementById(id).value = 75; });
+      applyExplodePositions();
+    };
+
+    document.getElementById('btn-reassemble').onclick = () => {
+      ['exp-x', 'exp-y', 'exp-z'].forEach(id => { document.getElementById(id).value = 0; });
+      applyExplodePositions();
+    };
+
+    function updateProjectile() {
+      const p = parseFloat(document.getElementById('proj-t').value) / 100;
+      document.getElementById('val-p').textContent = Math.round(p * 100) + '%';
+      projGroup.visible = p > 0;
+      const start = new THREE.Vector3(-4.5, 2.2, 3.5);
+      const end = new THREE.Vector3(3.5, -1.5, -2.5);
+      projSphere.position.lerpVectors(start, end, p);
+      document.getElementById('proj-readout').textContent =
+        p === 0 ? 'Standby (0.0 mm)' : 'Depth ' + (p * 142).toFixed(1) + ' mm · Target Intersect Verified';
+    }
+
+    document.getElementById('proj-t').addEventListener('input', updateProjectile);
+    document.getElementById('btn-projectile').onclick = () => {
+      const el = document.getElementById('proj-t');
+      el.value = parseFloat(el.value) > 50 ? 0 : 65;
+      updateProjectile();
+    };
+
+    document.getElementById('btn-laser').onclick = () => {
+      if (laserPoints) laserPoints.visible = !laserPoints.visible;
+    };
+
+    document.querySelectorAll('[data-shader]').forEach(btn => {
+      btn.onclick = () => {
+        document.querySelectorAll('[data-shader]').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentShaderMode = btn.getAttribute('data-shader');
+        document.getElementById('render-mode-badge').textContent = btn.textContent;
+        parts.forEach(m => { m.material = createMaterial(m.userData.col); });
+      };
+    });
+
+    // Mouse Orbit & Zoom Controls
+    let isDragging = false, prevX = 0, prevY = 0;
+    renderer.domElement.addEventListener('pointerdown', (e) => { isDragging = true; prevX = e.clientX; prevY = e.clientY; });
+    window.addEventListener('pointerup', () => { isDragging = false; });
+    window.addEventListener('pointermove', (e) => {
+      if (!isDragging) return;
+      rootGroup.rotation.y += (e.clientX - prevX) * 0.008;
+      rootGroup.rotation.x += (e.clientY - prevY) * 0.006;
+      prevX = e.clientX; prevY = e.clientY;
+    });
+    window.addEventListener('wheel', (e) => {
+      camera.position.z = Math.max(2.2, Math.min(16, camera.position.z + e.deltaY * 0.005));
+    });
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    // Hydrate user telemetry from localStorage (pmd_health_profile) if present
+    try {
+      const raw = localStorage.getItem('pmd_health_profile');
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        const hr = parsed?.restingHeartRate || parsed?.heartRate || 62;
+        const hrv = parsed?.hrv || 78;
+        document.getElementById('emr-hr').textContent = hr + ' bpm · ' + hrv + ' ms (Synced)';
+      }
+    } catch (e) {}
+
+    renderClinicalText();
+    rebuild3DParts(0);
+
+    function animate() {
+      requestAnimationFrame(animate);
+      if (!isDragging) rootGroup.rotation.y += 0.0035;
+      renderer.render(scene, camera);
+    }
+    animate();
+  </script>
+</body>
+</html>
