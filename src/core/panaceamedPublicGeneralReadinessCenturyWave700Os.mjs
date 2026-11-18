@@ -145,7 +145,7 @@ export const SEVEN_UNIVERSAL_PUBLIC_PERSONAS = Object.freeze([
   Object.freeze({
     personaId: 'PERSONA_07_DOKTER_DAN_FASKES_BPJS',
     roleName: 'Dokter Umum, Spesialis & Faskes BPJS / SatuSehat',
-    representativeProfile: 'dr. Rizky Muhammad Asrizal, Sp.PD di Poliklinik Rawat Jalan',
+    representativeProfile: 'dr. Rizky Muhammad Azrissal, Sp.PD di Poliklinik Rawat Jalan',
     coreNeed: 'Draf otomatis rekam medis SOAP, operan jaga SBAR 1-klik, kalkulator infus terverifikasi ganda Delta = 0, koding ICD-10 & INA-CBGs',
     dailyActionGuideline: 'Draf SOAP siap ditinjau: Diagnosis Utama I10 (Hipertensi Esensial), E11.9 (DM Tipe 2 Tanpa Komplikasi). Infus NaCl 0.9% 500 mL / 8 jam (21 tpm makro, Delta = 0)',
     targetVitalsBaseline: Object.freeze({ icd10Codes: ['I10', 'E11.9'], doublePassDelta: 0, signoffMethod: 'Ed25519' })
