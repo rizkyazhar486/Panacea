@@ -160,6 +160,8 @@ const DataLabAdvanced = lazy(() => import('./pages/bodyhub/DataLabAdvanced').the
 const BioSimulators = lazy(() => import('./pages/longevity/BioSimulators').then((m) => ({ default: m.BioSimulators })))
 const DesignDemo = lazy(() => import('./pages/DesignDemo').then((m) => ({ default: m.DesignDemo })))
 const Storefront = lazy(() => import('./features/storefront/StorefrontPage').then((m) => ({ default: m.StorefrontPage })))
+const ScanStudio = lazy(() => import('./pages/ScanStudio').then((m) => ({ default: m.ScanStudio })))
+const DeviceSyncHub = lazy(() => import('./pages/DeviceSyncHub').then((m) => ({ default: m.DeviceSyncHub })))
 
 // Apply the saved appearance (theme, text size, motion) and language before first paint.
 applyAppearance()
@@ -454,6 +456,9 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/vault" element={<Navigate to="/store" replace />} />
               <Route path="/apothecary" element={<Navigate to="/store" replace />} />
               <Route path="/private-vault" element={<Navigate to="/store" replace />} />
+              {/* AAA Digital Twin Scan Studio & One-Tap Wearable Sync Hub */}
+              <Route path="/scan" element={<ScanStudio />} />
+              <Route path="/sync" element={<DeviceSyncHub />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspense>

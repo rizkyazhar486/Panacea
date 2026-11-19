@@ -1,8 +1,13 @@
 import { useEffect, useState } from 'react'
-import { simpanTeks } from '../../lib/unduh'
-import { hariIni } from '../../lib/tanggal'
 import { useNavigate } from 'react-router-dom'
 import { useStore } from '../../lib/store'
+import { readUnifiedLocalVitals } from '../../domains/identity/localRecovery'
+import type { AutoExportMode, ExportFormat } from '../../lib/export/autoExportEngine'
+import {
+  exportArtifactNow,
+  readAutoExportMode,
+  writeAutoExportMode,
+} from '../../components/sync/autoExportBrowserAdapter'
 import { Card, SectionTitle, Button, inputClass } from '../../components/ui'
 import {
   IconSettings,
@@ -63,6 +68,8 @@ export function Settings() {
   const [motion, setMotionState] = useState<boolean>(getReducedMotion)
   const [simple, setSimpleState] = useState<boolean>(getSimpleMode)
   const [showPwd, setShowPwd] = useState(false)
+  const [autoExportMode, setAutoExportModeState] = useState<AutoExportMode>(() => readAutoExportMode())
+  const [exportNote, setExportNote] = useState('')
 
   const s = state.settings
   const S = simple
@@ -126,11 +133,57 @@ export function Settings() {
     setLangState(l)
   }
 
-  function exportData() {
-    const { account: _a, ...rest } = state
-    const slim = { ...rest, posts: rest.posts.map((p) => ({ ...p, photos: undefined, videoUrl: undefined })) }
-    void simpanTeks(JSON.stringify(slim, null, 2), `panaceamed-data-${hariIni()}.json`,
-      'application/json', 'Data Panaceamed.id')
+  function exportData(format: ExportFormat = 'json') {
+    const vitals = readUnifiedLocalVitals(state.account, { patient: store.activePatient })
+    const nowIso = new Date().toISOString()
+    const profileKey = state.account?.email ? state.account.email.split('@')[0] : 'rizkyazhar486'
+    const fullName =
+      state.account?.isOwner || profileKey.toLowerCase().includes('rizky')
+        ? 'dr. Rizky Muhammad Azrissal'
+        : state.account?.name || 'dr. Rizky Muhammad Azrissal'
+    const res = exportArtifactNow(format, {
+      exportedAtIso: nowIso,
+      owner: {
+        profileKey,
+        fullName,
+        username: `@${profileKey.replace(/[^a-zA-Z0-9_]/g, '') || 'rizkyazhar486'}`,
+        mrn: store.activePatient?.mrn || 'PMD-000486',
+      },
+      vitals: {
+        heightCm: vitals.heightCm ?? null,
+        weightKg: vitals.weightKg ?? null,
+        bodyFatPct: vitals.bodyFatPct ?? null,
+        restingHrBpm: vitals.restingHr ?? vitals.heartRate ?? null,
+        hrvMs: vitals.hrvMs ?? null,
+        vo2max: vitals.vo2max ?? null,
+        sleepHours: vitals.sleepH ?? null,
+        steps: vitals.steps ?? null,
+        spo2Pct: vitals.spo2Pct ?? null,
+      },
+      longitudinalRows: [
+        {
+          date: nowIso.slice(0, 10),
+          source: vitals.source || 'PanaceaMed OS',
+          vo2max: vitals.vo2max ?? null,
+          restingHrBpm: vitals.restingHr ?? vitals.heartRate ?? null,
+          hrvMs: vitals.hrvMs ?? null,
+          sleepHours: vitals.sleepH ?? null,
+          steps: vitals.steps ?? null,
+          spo2Pct: vitals.spo2Pct ?? null,
+          weightKg: vitals.weightKg ?? null,
+          bodyFatPct: vitals.bodyFatPct ?? null,
+          ahiEventsPerHour: null,
+        },
+      ],
+      conditions: store.activePatient?.chronicConditions ?? [],
+    })
+    setExportNote(res.status)
+  }
+
+  function changeAutoExportMode(mode: AutoExportMode) {
+    setAutoExportModeState(mode)
+    writeAutoExportMode(mode)
+    setExportNote(`Auto-Export on Sync: ${mode}`)
   }
 
   return (
@@ -278,30 +331,54 @@ export function Settings() {
       {/* ── Pesan & Saran (feedback) ───────────────────────────── */}
       <FeedbackCard simple={S} />
 
-      {/* ── Privacy & Data (export + local reset, merged) ─────────── */}
+      {/* ── Privacy & Data (hardened Auto-Export + local reset) ─────────── */}
       <Card>
         <SectionTitle
           icon={<IconDownload size={S ? 22 : 20} />}
           title={t('privacy', lang)}
-          subtitle={t('privacySub', lang)}
+          subtitle="Auto-Export & portable records"
         />
-        <button
-          onClick={exportData}
-          className={`flex w-full items-center gap-3 border border-neutral-200 text-left hover:bg-neutral-50 ${
-            S ? 'rounded-2xl p-5' : 'rounded-xl p-4'
-          }`}
-        >
-          <span className={`grid shrink-0 place-items-center rounded-full bg-brand-50 text-brand-dark ${S ? 'h-14 w-14' : 'h-11 w-11'}`}><IconDownload size={S ? 22 : 20} /></span>
-          <span className="min-w-0 flex-1">
-            <span className={`block font-bold ${S ? 'text-base' : 'text-sm'}`}>{t('exportData', lang)}</span>
-            <span className={`block text-neutral-500 ${S ? 'text-xs' : 'text-[11px]'}`}>{t('exportSub', lang)}</span>
-          </span>
-          <IconChevronRight size={18} className="text-neutral-500" />
-        </button>
+        <div className="mb-3 rounded-xl border border-neutral-200 p-3 dark:border-white/15">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <span className="text-xs font-bold text-ink">Auto-Export on Sync</span>
+            <div className="flex flex-wrap gap-1" role="radiogroup" aria-label="Auto-Export on Sync">
+              {(
+                [
+                  { id: 'off', label: 'Off' },
+                  { id: 'local', label: 'Local Download' },
+                  { id: 'neon', label: 'Neon Cloud' },
+                  { id: 'both', label: 'Both' },
+                ] as const
+              ).map((opt) => (
+                <button
+                  key={opt.id}
+                  type="button"
+                  role="radio"
+                  aria-checked={autoExportMode === opt.id}
+                  onClick={() => changeAutoExportMode(opt.id)}
+                  className={`min-h-[36px] rounded-lg border px-2.5 text-[11px] font-bold transition ${
+                    autoExportMode === opt.id
+                      ? 'border-brand bg-brand/15 text-brand-dark'
+                      : 'border-neutral-200 text-neutral-600 dark:border-white/15 dark:text-slate-300'
+                  }`}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="mt-2.5 grid grid-cols-2 gap-2 sm:grid-cols-4">
+            <button type="button" onClick={() => exportData('json')} className="min-h-[40px] rounded-xl border border-neutral-200 text-xs font-bold hover:border-brand dark:border-white/15">JSON</button>
+            <button type="button" onClick={() => exportData('csv')} className="min-h-[40px] rounded-xl border border-neutral-200 text-xs font-bold hover:border-brand dark:border-white/15">CSV</button>
+            <button type="button" onClick={() => exportData('fhir')} className="min-h-[40px] rounded-xl border border-neutral-200 text-xs font-bold hover:border-brand dark:border-white/15">FHIR R4</button>
+            <button type="button" onClick={() => exportData('neon')} className="min-h-[40px] rounded-xl border border-neutral-200 text-xs font-bold hover:border-brand dark:border-white/15">Neon Cloud</button>
+          </div>
+          {exportNote && <p role="status" className="mt-2 font-mono text-[11px] text-emerald-600 dark:text-emerald-300">{exportNote}</p>}
+        </div>
         <div className={`mt-3 flex items-center justify-between gap-3 rounded-xl border border-neutral-200 ${S ? 'p-4' : 'p-3'}`}>
           <span className="min-w-0">
             <span className={`block font-bold ${S ? 'text-base' : 'text-sm'}`}>Reset Saved App State</span>
-            <span className={`block text-neutral-500 ${S ? 'text-xs' : 'text-[11px]'}`}>Other local caches and server-held records are not erased</span>
+            <span className={`block text-neutral-500 ${S ? 'text-xs' : 'text-[11px]'}`}>Cloud records stay intact</span>
           </span>
           <Button variant="ghost" onClick={resetDemo} className="shrink-0">Reset</Button>
         </div>
@@ -311,21 +388,18 @@ export function Settings() {
       <Card>
         <SectionTitle
           icon={<IconLogout size={S ? 22 : 18} />}
-          title="Sesi Akun & Keluar"
-          subtitle="Keluar dari sesi akun aktif pada perangkat ini"
+          title="Session"
+          subtitle="Sign out on this device"
         />
-        <p className={`text-neutral-500 ${S ? 'text-sm' : 'text-xs'}`}>
-          Setelah keluar, data rekam medis Anda tetap tersimpan dengan aman di server dan Anda dapat masuk kembali kapan saja.
-        </p>
         <button
           type="button"
           onClick={handleLogout}
-          className={`mt-4 flex w-full items-center justify-center gap-2 rounded-2xl border border-red-200 bg-red-50/60 font-bold text-red-600 transition hover:bg-red-100 hover:text-red-700 dark:border-red-900/40 dark:bg-red-950/20 dark:text-red-400 dark:hover:bg-red-950/40 ${
+          className={`mt-2 flex w-full items-center justify-center gap-2 rounded-2xl border border-red-200 bg-red-50/60 font-bold text-red-600 transition hover:bg-red-100 hover:text-red-700 dark:border-red-900/40 dark:bg-red-950/20 dark:text-red-400 dark:hover:bg-red-950/40 ${
             S ? 'py-4 text-base' : 'py-3 text-sm'
           }`}
         >
           <IconLogout size={18} />
-          <span>Keluar dari Akun (Log Out)</span>
+          <span>Log Out</span>
         </button>
       </Card>
 
