@@ -160,6 +160,7 @@ const DataLabAdvanced = lazy(() => import('./pages/bodyhub/DataLabAdvanced').the
 const BioSimulators = lazy(() => import('./pages/longevity/BioSimulators').then((m) => ({ default: m.BioSimulators })))
 const DesignDemo = lazy(() => import('./pages/DesignDemo').then((m) => ({ default: m.DesignDemo })))
 const Storefront = lazy(() => import('./features/storefront/StorefrontPage').then((m) => ({ default: m.StorefrontPage })))
+const SpatialCommandOS = lazy(() => import('./pages/SpatialCommandOS').then((m) => ({ default: m.SpatialCommandOS })))
 
 // Apply the saved appearance (theme, text size, motion) and language before first paint.
 applyAppearance()
@@ -454,6 +455,8 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/vault" element={<Navigate to="/store" replace />} />
               <Route path="/apothecary" element={<Navigate to="/store" replace />} />
               <Route path="/private-vault" element={<Navigate to="/store" replace />} />
+              {/* Panacea Stark / AUGMA-Class Holographic Spatial Command OS */}
+              <Route path="/command-os" element={<SpatialCommandOS />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspense>

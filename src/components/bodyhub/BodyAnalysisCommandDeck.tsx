@@ -34,6 +34,7 @@ const COMBINED_ROUTES = [
   { to: '/fitness-hub?view=body', label: 'Body Comp & Fitness', code: '03' },
   { to: '/for-you', label: 'For You', code: '04' },
   { to: '/clinical-hub', label: 'Clinical & Visit OS', code: '05' },
+  { to: '/command-os', label: 'Spatial Command OS', code: '06' },
 ] as const
 
 const STUDIO_TRACKS: readonly StudioTrack[] = [
