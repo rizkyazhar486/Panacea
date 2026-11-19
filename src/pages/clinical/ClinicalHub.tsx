@@ -347,6 +347,44 @@ export function ClinicalHub() {
 
         <PersonalBodyUnifiedSurface compact defaultFocus="clinical" shareable={false} cameraCapture={false} />
 
+        <Fold label="Frontier & Surgical OS">
+          <div className="space-y-3 border-t border-white/10 pt-3">
+            <p className="text-[11px] leading-snug text-white/65">
+              Clinician-in-loop workflow links: pre-arrival zero-queue triage, draft AI-EMR sign-off, 3D/4D anatomical &amp; surgical simulation, and low-bandwidth 2G/Starlink sync (simulation &amp; draft only; clinical authority remains with licensed doctors).
+            </p>
+            <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+              <Link
+                to="/doctor-review"
+                className="flex min-h-[48px] flex-col justify-center rounded-xl border border-emerald-400/35 bg-white/[0.03] px-3 py-2 text-xs font-bold text-white transition hover:border-emerald-400"
+              >
+                <span>AI + Human Doctor Step-In</span>
+                <span className="text-[10px] font-normal text-emerald-300">Review &amp; sign draft notes / labs →</span>
+              </Link>
+              <a
+                href="/panaceamed-frontier-civilization-superos.html"
+                className="flex min-h-[48px] flex-col justify-center rounded-xl border border-cyan-400/30 bg-white/[0.03] px-3 py-2 text-xs font-bold text-white transition hover:border-cyan-400"
+              >
+                <span>Zero-Queue Triage &amp; 2G/Starlink</span>
+                <span className="text-[10px] font-normal text-cyan-300">Pre-arrival routing &amp; binary mesh ↗</span>
+              </a>
+              <a
+                href="/panaceamed-robotaxi-surgical-hospital-os.html"
+                className="flex min-h-[48px] flex-col justify-center rounded-xl border border-white/15 bg-white/[0.03] px-3 py-2 text-xs font-bold text-white transition hover:border-emerald-400"
+              >
+                <span>Surgical Nav, 3D CT &amp; Blocks</span>
+                <span className="text-[10px] font-normal text-white/65">Educational simulation studio ↗</span>
+              </a>
+              <a
+                href="/cellular-spacetime-debugger-os.html"
+                className="flex min-h-[48px] flex-col justify-center rounded-xl border border-white/15 bg-white/[0.03] px-3 py-2 text-xs font-bold text-white transition hover:border-cyan-400"
+              >
+                <span>4D Cellular Bio-GDB &amp; Anatomy</span>
+                <span className="text-[10px] font-normal text-white/65">Multiscale physiology inspector ↗</span>
+              </a>
+            </div>
+          </div>
+        </Fold>
+
         <nav aria-label="Clinical references" className="border-y border-white/10">
           <div className="flex gap-6 overflow-x-auto py-1 no-scrollbar">
             {REFERENCE_LINKS.map((item) => (

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState } from 'react'
 import { Prosa } from '../../../components/Prosa'
 import { Reveal } from '../../../components/Reveal'
 import { HISTORY_POSTER, renderEraGlyph } from '../landingSvgs'
@@ -10,36 +10,65 @@ import {
 } from '../landingData'
 
 /**
- * Video yang hanya berputar SAAT TERLIHAT.
- * Menghindari beban unduhan bersamaan dan layar hitam pada perangkat seluler.
+ * Realistic historical science plate replacing uncanny auto-playing synthetic era clips.
+ * Offers an explicit opt-in user-controlled clip toggle while defaulting to crisp vector archival telemetry.
  */
 export function VideoSaatTerlihat({ src, judul }: { src: string; judul: string }) {
-  const acuan = useRef<HTMLVideoElement>(null)
-  useEffect(() => {
-    const el = acuan.current
-    if (!el) return
-    const pengamat = new IntersectionObserver(
-      ([masuk]) => {
-        if (masuk.isIntersecting) void el.play().catch(() => {})
-        else el.pause()
-      },
-      { threshold: 0.35 },
+  const [showClip, setShowClip] = useState(false)
+  const [failed, setFailed] = useState(false)
+
+  if (showClip && !failed && src) {
+    return (
+      <div className="mt-3 space-y-2">
+        <video
+          src={src}
+          controls
+          muted
+          playsInline
+          preload="metadata"
+          poster={HISTORY_POSTER}
+          onError={() => setFailed(true)}
+          aria-label={`Archival reference clip for ${judul}`}
+          className="aspect-video w-full rounded-xl bg-[#040911] object-cover shadow-inner"
+        />
+        <button
+          type="button"
+          onClick={() => setShowClip(false)}
+          className="astro-chip inline-flex min-h-[44px] items-center rounded-xl px-3 text-[11px] font-bold"
+        >
+          Kembali ke diagram arsip
+        </button>
+      </div>
     )
-    pengamat.observe(el)
-    return () => pengamat.disconnect()
-  }, [])
+  }
+
   return (
-    <video
-      ref={acuan}
-      src={src}
-      muted
-      loop
-      playsInline
-      preload="none"
-      poster={HISTORY_POSTER}
-      aria-label={`Mood of the ${judul} era`}
-      className="mt-3 aspect-video w-full rounded-xl bg-[#06120c] object-cover shadow-inner"
-    />
+    <div className="astro-surface astro-horizon-grid mt-3 flex flex-col justify-between rounded-2xl p-4 text-white">
+      <div className="flex items-center justify-between gap-2">
+        <span className="font-astro text-[10px] font-bold uppercase tracking-[0.18em] text-cyan-300">
+          ARCHIVAL MEDICAL EPOCH
+        </span>
+        <span className="font-astro-mono text-[10px] font-bold text-emerald-300">{judul.toUpperCase()}</span>
+      </div>
+      <svg viewBox="0 0 360 88" className="my-2 h-20 w-full" role="img" aria-label={`Historical medical science coordinate plate for ${judul}`}>
+        <circle cx="48" cy="44" r="24" fill="none" stroke="rgba(34,211,238,0.45)" strokeWidth="1.4" strokeDasharray="3 3" />
+        <circle cx="48" cy="44" r="6" fill="#10b981" />
+        <line x1="78" y1="44" x2="342" y2="44" stroke="rgba(148,163,184,0.28)" strokeWidth="1.2" />
+        <path d="M96 44 L134 44 L146 22 L158 64 L170 36 L186 44 L260 44 L272 24 L284 62 L298 44 L342 44" fill="none" stroke="#22d3ee" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+        <text x="96" y="16" fill="#cbd5e1" fontSize="9" fontFamily="monospace">EVIDENCE CONTINUUM · OBSERVATION → PHYSIOLOGY → AI-EMR</text>
+      </svg>
+      {src && !failed && (
+        <div className="flex justify-end">
+          <button
+            type="button"
+            onClick={() => setShowClip(true)}
+            className="astro-chip inline-flex min-h-[44px] items-center rounded-xl px-3 text-[11px] font-bold"
+          >
+            Putar klip arsip opsional
+          </button>
+        </div>
+      )}
+    </div>
   )
 }
 
@@ -105,18 +134,18 @@ export function ScienceOdysseySection() {
             </div>
           </Reveal>
 
-          {/* Self-hosted animated timeline video with safeguard poster */}
+          {/* Self-hosted timeline overview — user-controlled playback (no forced auto-loop) */}
           {(scienceTab === 'eras' || scienceTab === 'all') && (
             <Reveal delay={80}>
-              <div className="mt-8 overflow-hidden rounded-[2rem] border border-black/5 bg-gradient-to-br from-[#02180e] via-[#042817] to-[#02120b] shadow-2xl shadow-brand/20 dark:border-white/10">
+              <div className="astro-surface mt-8 overflow-hidden rounded-[2rem]">
                 <video
                   src={`${import.meta.env.BASE_URL}media/history.mp4`}
-                  autoPlay
+                  controls
                   muted
-                  loop
                   playsInline
+                  preload="metadata"
                   poster={HISTORY_POSTER}
-                  className="aspect-video w-full bg-[#06120c] object-cover"
+                  className="aspect-video w-full bg-[#040911] object-cover"
                 />
               </div>
             </Reveal>

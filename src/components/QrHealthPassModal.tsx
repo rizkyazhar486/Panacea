@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Portal } from './Portal'
 import { deriveTokenizedEmvPass, encodeCode128Pattern, encodeQrMatrix21 } from '../domains/body-exposure/engine/localHubEngine'
+import { pack128ByteFrontierFrame } from '../domains/body-exposure/engine/systemBoard'
 import {
   buildOtpAuthUri,
   encodePairingQrPayload,
@@ -21,6 +22,7 @@ import {
 import {
   adoptAllDeviceLocalBuckets,
   exportFullLocalVault,
+  readUnifiedLocalVitals,
   restoreFullLocalVault,
 } from '../domains/identity/localRecovery'
 import {
@@ -163,6 +165,22 @@ export function QrHealthPassModal({
         : null,
     [account, patient, epochMs],
   )
+
+  const frontierFrame = useMemo(() => {
+    if (!account) return null
+    const v = readUnifiedLocalVitals(account, { patient })
+    const packed = pack128ByteFrontierFrame({
+      hrBpm: (v.restingHr ?? v.heartRate) ?? null,
+      hrvMs: v.hrvMs ?? null,
+      spo2Pct: v.spo2Pct ?? null,
+      systolicMmHg: v.systolic ?? null,
+      diastolicMmHg: v.diastolic ?? null,
+      epochSec: Math.floor(epochMs / 1000),
+    })
+    if (!packed.ok) return null
+    const hex = Array.from(packed.bytes, (b) => b.toString(16).padStart(2, '0')).join('')
+    return { byteLength: packed.byteLength, txMsAt9600bps: packed.txMsAt9600bps, hex }
+  }, [account, patient, epochMs])
 
   const pairingPayload = useMemo(
     () => (account ? encodePairingQrPayload(account) : ''),
@@ -503,7 +521,26 @@ export function QrHealthPassModal({
               </div>
 
               <BarcodeSvgBox value={emv.payloads.wristbandCode128} />
-              <div style={{ fontSize: 11, fontFamily: 'monospace', opacity: 0.72 }}>{emv.payloads.wristbandCode128}</div>
+              <div className="font-astro-mono" style={{ fontSize: 11, opacity: 0.78 }}>{emv.payloads.wristbandCode128}</div>
+
+              {frontierFrame && (
+                <div className="astro-surface w-full rounded-xl p-3 text-left text-white">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="font-astro text-[10px] font-bold uppercase tracking-[0.14em] text-cyan-300">
+                      Sovereign Pass · 2G/Starlink Delta Frame
+                    </span>
+                    <span className="font-astro-mono text-[10px] font-bold text-emerald-300">
+                      {frontierFrame.byteLength}B · {frontierFrame.txMsAt9600bps}ms @ 9.6kbps
+                    </span>
+                  </div>
+                  <div className="font-astro-mono mt-1 truncate text-[10px] text-slate-300" title={frontierFrame.hex}>
+                    PM2G:{frontierFrame.hex}
+                  </div>
+                  <div className="mt-1 text-[10px] leading-snug text-slate-300">
+                    Canonical internal identity pass &amp; recorded-vitals binary frame. Institutional payer clearing (BPJS / global insurance) connects only through verified payer adapters.
+                  </div>
+                </div>
+              )}
 
               <div style={{ display: 'flex', gap: 8, width: '100%' }}>
                 <button
@@ -512,7 +549,7 @@ export function QrHealthPassModal({
                     const txt = qrMode === 'pairing' ? pairingPayload : activeQrPayload
                     void navigator.clipboard?.writeText(txt).then(() => setStatus('QR/Pairing code copied!'))
                   }}
-                  className="w-full rounded-xl border border-black/10 py-2.5 text-xs font-bold dark:border-white/15"
+                  className="min-h-[44px] w-full rounded-xl border border-black/10 py-2.5 text-xs font-bold dark:border-white/15"
                 >
                   📋 Copy {qrMode === 'pairing' ? 'Pairing Token' : 'EMV Payload'}
                 </button>
@@ -529,7 +566,7 @@ export function QrHealthPassModal({
                       .then(() => setStatus('Written to NFC Health Tag! Ready for tap handoff.'))
                       .catch(() => setStatus('NFC tap cancelled or tag unavailable.'))
                   }}
-                  className="w-full rounded-xl border border-black/10 py-2.5 text-xs font-bold dark:border-white/15"
+                  className="min-h-[44px] w-full rounded-xl border border-black/10 py-2.5 text-xs font-bold dark:border-white/15"
                 >
                   📡 NFC Tap Handoff
                 </button>

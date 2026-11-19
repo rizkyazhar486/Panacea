@@ -21,22 +21,32 @@ interface HeroSectionProps {
 
 export function HeroSection({ onMasuk }: HeroSectionProps) {
   return (
-    <section className="relative overflow-hidden px-4 py-16 sm:px-8 sm:py-20 lg:py-24">
-      {/* Cinematic brand film (Higgsfield) behind the hero */}
+    <section className="astro-horizon-grid relative overflow-hidden px-4 py-16 sm:px-8 sm:py-20 lg:py-24">
+      {/* Realistic astronomical bio-telemetry horizon backdrop (replaces uncanny auto-looping synthetic video) */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <video
-          src="https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260702_023227_88b54135-7489-48de-9476-ca0657fc0d29.mp4"
-          autoPlay
-          muted
-          loop
-          playsInline
-          className="absolute inset-0 h-full w-full object-cover"
-        />
-        <div className="hero-video-scrim absolute inset-0" />
+        <svg
+          aria-hidden="true"
+          viewBox="0 0 1200 640"
+          preserveAspectRatio="xMidYMid slice"
+          className="absolute inset-0 h-full w-full opacity-35 dark:opacity-55"
+        >
+          <defs>
+            <radialGradient id="astroOrb" cx="50%" cy="42%" r="55%">
+              <stop offset="0%" stopColor="#22d3ee" stopOpacity="0.22" />
+              <stop offset="55%" stopColor="#10b981" stopOpacity="0.08" />
+              <stop offset="100%" stopColor="#020617" stopOpacity="0" />
+            </radialGradient>
+          </defs>
+          <rect width="1200" height="640" fill="url(#astroOrb)" />
+          <circle cx="600" cy="310" r="190" fill="none" stroke="rgba(34,211,238,0.22)" strokeWidth="1" strokeDasharray="4 6" />
+          <circle cx="600" cy="310" r="310" fill="none" stroke="rgba(16,185,129,0.18)" strokeWidth="1" />
+          <circle cx="600" cy="310" r="450" fill="none" stroke="rgba(148,163,184,0.12)" strokeWidth="1" strokeDasharray="2 10" />
+          <path d="M0 470 Q320 410 600 450 T1200 430" fill="none" stroke="rgba(34,211,238,0.28)" strokeWidth="1.5" />
+        </svg>
         <Suspense fallback={null}>
           <InteractiveAura />
         </Suspense>
-        <div className="orb absolute -left-20 top-10 h-72 w-72 rounded-full bg-brand/20 blur-3xl" />
+        <div className="orb absolute -left-20 top-10 h-72 w-72 rounded-full bg-cyan-400/15 blur-3xl" />
         <div
           className="orb absolute right-0 top-40 h-80 w-80 rounded-full bg-emerald-400/15 blur-3xl"
           style={{ animationDelay: '-6s' }}

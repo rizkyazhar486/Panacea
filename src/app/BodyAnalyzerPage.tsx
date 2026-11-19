@@ -13,6 +13,9 @@ import type { BodySystemId } from '../domains/body-exposure/data/bodySystems'
 import { PusatTubuh } from '../pages/PusatTubuh'
 import { WhenOpened } from '../shared/ui/WhenOpened'
 
+const BodyAnalysisCommandDeck = lazy(() =>
+  import('../components/bodyhub/BodyAnalysisCommandDeck.tsx').then((m) => ({ default: m.BodyAnalysisCommandDeck })),
+)
 const BodyExposureLocalHub = lazy(() =>
   import('../domains/body-exposure/ui/BodyExposureLocalHub.tsx').then((m) => ({ default: m.BodyExposureLocalHub })),
 )
@@ -31,146 +34,10 @@ export default function BodyAnalyzerPage() {
 
   return (
     <div className="mx-auto w-full max-w-[1280px] space-y-4">
-
-      <nav
-        aria-label="Super-OS 3D & Personalization Studios"
-        style={{
-          display: 'flex',
-          flexWrap: 'wrap',
-          gap: '8px',
-          padding: '10px 14px',
-          margin: '0 0 12px 0',
-          borderRadius: '12px',
-          background: 'rgba(15, 23, 42, 0.78)',
-          border: '1px solid rgba(56, 189, 248, 0.28)',
-          alignItems: 'center',
-          justifyContent: 'space-between'
-        }}
-      >
-        <span style={{ fontSize: '12px', fontWeight: 700, color: '#38bdf8' }}>
-          ⚡ Super-OS 1:1 Studios & QR/Barcode Pass
-        </span>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-          <a
-            href="/nobel-invictus-biochem-axioms-os.html"
-            style={{ fontSize: "11px", fontWeight: 800, padding: "6px 12px", borderRadius: "8px", background: "linear-gradient(90deg, rgba(16,185,129,0.3), rgba(168,85,247,0.3))", color: "#a7f3d0", border: "1px solid rgba(16, 185, 129, 0.7)", textDecoration: "none" }}
-          >
-            🧬 Nobel Invictus Biology & Chemistry Axioms
-          </a>
-          <a
-            href="/nobel-invictus-axioms-os.html"
-            style={{ fontSize: "11px", fontWeight: 800, padding: "6px 12px", borderRadius: "8px", background: "linear-gradient(90deg, rgba(245,158,11,0.28), rgba(16,185,129,0.28))", color: "#fde68a", border: "1px solid rgba(245, 158, 11, 0.65)", textDecoration: "none" }}
-          >
-            🏅 Nobel Invictus Physics-Medicine Axioms
-          </a>
-          <a
-            href="/panaceamed-legit-clinical-science-os.html"
-            style={{ fontSize: "11px", fontWeight: 800, padding: "6px 12px", borderRadius: "8px", background: "rgba(16, 185, 129, 0.28)", color: "#6ee7b7", border: "1px solid rgba(16, 185, 129, 0.65)", textDecoration: "none" }}
-          >
-            ⚕️ Instinctive Clinical Science & QSP Core
-          </a>
-          <a
-            href="/panaceamed-unified-superos.html"
-            style={{ fontSize: "11px", fontWeight: 800, padding: "6px 12px", borderRadius: "8px", background: "linear-gradient(90deg, rgba(16,185,129,0.32), rgba(56,189,248,0.32))", color: "#ffffff", border: "1px solid rgba(16, 185, 129, 0.75)", textDecoration: "none" }}
-          >
-            🌐 PanaceaMed Unified Super-OS (Master Command)
-          </a>
-          <a
-            href="/omega-invictus-body-exposure-os.html"
-            style={{ fontSize: "11px", fontWeight: 800, padding: "6px 11px", borderRadius: "8px", background: "linear-gradient(90deg, rgba(16,185,129,0.28), rgba(56,189,248,0.28))", color: "#f8fafc", border: "1px solid rgba(56, 189, 248, 0.65)", textDecoration: "none" }}
-          >
-            👑 Omega Invictus 8-in-1 Body Exposure OS
-          </a>
-          <a
-            href="/panaceamed-robotaxi-surgical-hospital-os.html" style={{ fontSize: "11.5px", fontWeight: 900, padding: "6px 14px", borderRadius: "8px", background: "linear-gradient(90deg, rgba(16,185,129,0.42), rgba(56,189,248,0.42))", color: "#ffffff", border: "1px solid rgba(56, 189, 248, 0.85)", textDecoration: "none" }}>🤖 Robotaxi Surgical, 3D CT, Nerve Block & Combined Body-ForYou OS</a> <a href="/panaceamed-al-hikmah-mercy-covenant-os.html" style={{ fontSize: "11.5px", fontWeight: 900, padding: "6px 14px", borderRadius: "8px", background: "linear-gradient(90deg, rgba(16,185,129,0.42), rgba(245,158,11,0.42))", color: "#fde68a", border: "1px solid rgba(251, 191, 36, 0.85)", textDecoration: "none" }}>🌟 Al-Hikmah & Mercy Covenant OS (Siddiq · Amanah · Tabligh · Fatanah · Shifa)</a> <a href="/panaceamed-the-one-singularity-os.html" style={{ fontSize: "11.5px", fontWeight: 900, padding: "6px 14px", borderRadius: "8px", background: "linear-gradient(90deg, #10b981, #0284c7, #7c3aed)", color: "#ffffff", border: "1px solid rgba(255, 255, 255, 0.6)", textDecoration: "none" }}>☝️ THE ONE Singularity Ultra-Page (1-System · 1-DB · 1-Log · 1-Projectile · 1-Explanation)</a> <a href="/panaceamed-1tap-hypervisor-os.html" style={{ fontSize: "11px", fontWeight: 800, padding: "6px 12px", borderRadius: "8px", background: "linear-gradient(90deg, rgba(16,185,129,0.38), rgba(56,189,248,0.38))", color: "#ffffff", border: "1px solid rgba(16, 185, 129, 0.85)", textDecoration: "none" }}>⚡ 1-Click · 1-Scan · 1-Tap Cross-OS Hypervisor (Cmd+K)</a> <a href="/panaceamed-omni-athletic-geomed-os.html" style={{ fontSize: "11px", fontWeight: 800, padding: "6px 12px", borderRadius: "8px", background: "linear-gradient(90deg, rgba(249,115,22,0.34), rgba(16,185,129,0.34))", color: "#fed7aa", border: "1px solid rgba(249, 115, 22, 0.8)", textDecoration: "none" }}>⌚ Omni-Athletic & Geo-Dive OS (Garmin · WHOOP · Oura · Strava · ClassPass · Reclub)</a> <a href="/panaceamed-frontier-civilization-superos.html" style={{ fontSize: "11px", fontWeight: 800, padding: "6px 12px", borderRadius: "8px", background: "linear-gradient(90deg, rgba(245,158,11,0.34), rgba(16,185,129,0.34))", color: "#fde68a", border: "1px solid rgba(251, 191, 36, 0.8)", textDecoration: "none" }}>🚀 Frontier Civilization Super-OS (Zero-Queue · AI+Human Doctor · Allianz Pass · 2G/Starlink)</a> <a href="/panaceamed-holistic-ontology-nexus-os.html" style={{ fontSize: "11px", fontWeight: 800, padding: "6px 12px", borderRadius: "8px", background: "linear-gradient(90deg, rgba(168,85,247,0.32), rgba(16,185,129,0.32))", color: "#f8fafc", border: "1px solid rgba(168, 85, 247, 0.7)", textDecoration: "none" }}>✨ Holistic Ontology Nexus (20-Dimension Mind-Body-Genome OS)</a> <a href="/nobel-human-nature-manipulation-viz-os.html" style={{ fontSize: "11px", fontWeight: 800, padding: "6px 12px", borderRadius: "8px", background: "linear-gradient(90deg, rgba(56,189,248,0.3), rgba(16,185,129,0.3))", color: "#f8fafc", border: "1px solid rgba(56, 189, 248, 0.7)", textDecoration: "none" }}>🧠 Nobel Human Nature, Manipulation & 4D Viz OS</a> <a href="/personal-digital-self-1to1.html"
-            style={{
-              fontSize: '11px',
-              fontWeight: 700,
-              padding: '6px 10px',
-              borderRadius: '8px',
-              background: 'rgba(16, 185, 129, 0.18)',
-              color: '#34d399',
-              border: '1px solid rgba(16, 185, 129, 0.4)',
-              textDecoration: 'none'
-            }}
-          >
-            🎮 1:1 Personal Self (Sims 4 · GTA 6 · QR/Barcode)
-          </a>
-          <a
-            href="/medscihub-4d-anatomy-emr.html"
-            style={{
-              fontSize: '11px',
-              fontWeight: 700,
-              padding: '6px 10px',
-              borderRadius: '8px',
-              background: 'rgba(56, 189, 248, 0.18)',
-              color: '#38bdf8',
-              border: '1px solid rgba(56, 189, 248, 0.4)',
-              textDecoration: 'none'
-            }}
-          >
-            🧬 MedSciHub UHD 5K 4D Anatomy & AI-EMR
-          </a>
-          <a
-            href="/multiscale-quantum-exposome-os.html"
-            style={{ fontSize: "11px", fontWeight: 700, padding: "6px 10px", borderRadius: "8px", background: "rgba(6, 182, 212, 0.22)", color: "#67e8f9", border: "1px solid rgba(6, 182, 212, 0.5)", textDecoration: "none" }}
-          >
-            🌌 6-Tier Quantum-to-Exposome Living OS
-          </a>
-          <a
-            href="/digital-cellular-biosphere-os.html"
-            style={{ fontSize: "11px", fontWeight: 700, padding: "6px 10px", borderRadius: "8px", background: "rgba(16, 185, 129, 0.22)", color: "#34d399", border: "1px solid rgba(16, 185, 129, 0.5)", textDecoration: "none" }}
-          >
-            🌐 Digital Cellular Biosphere OS
-          </a>
-          <a
-            href="/cellular-spacetime-debugger-os.html"
-            style={{ fontSize: "11px", fontWeight: 700, padding: "6px 10px", borderRadius: "8px", background: "rgba(56, 189, 248, 0.22)", color: "#7dd3fc", border: "1px solid rgba(56, 189, 248, 0.5)", textDecoration: "none" }}
-          >
-            🔬 4D Cellular Spacetime & Bio-Debugger
-          </a>
-          <a
-            href="/whole-body-exposure-os.html"
-            style={{ fontSize: "11px", fontWeight: 700, padding: "6px 10px", borderRadius: "8px", background: "rgba(16, 185, 129, 0.22)", color: "#6ee7b7", border: "1px solid rgba(16, 185, 129, 0.5)", textDecoration: "none" }}
-          >
-            🖥️ Whole-Body OS Kernel (Network & Circadian)
-          </a>
-          <a
-            href="/numerical-body-exposure-clinical.html"
-            style={{ fontSize: "11px", fontWeight: 700, padding: "6px 10px", borderRadius: "8px", background: "rgba(14, 165, 233, 0.18)", color: "#7dd3fc", border: "1px solid rgba(14, 165, 233, 0.45)", textDecoration: "none" }}
-          >
-            📊 Numerical Body Exposure & Biophysics
-          </a>
-          <a
-            href="/hippocratic-clinical-os.html"
-            style={{ fontSize: "11px", fontWeight: 700, padding: "6px 10px", borderRadius: "8px", background: "rgba(244, 63, 94, 0.18)", color: "#fb7185", border: "1px solid rgba(244, 63, 94, 0.45)", textDecoration: "none" }}
-          >
-            ⚕️ Hippocratic Clinical OS (Primum Non Nocere)
-          </a>
-          <a
-            href="/omniscience-natural-laws-engine.html"
-            style={{ fontSize: "11px", fontWeight: 700, padding: "6px 10px", borderRadius: "8px", background: "rgba(245, 158, 11, 0.18)", color: "#fbbf24", border: "1px solid rgba(245, 158, 11, 0.4)", textDecoration: "none" }}
-          >
-            ⚛️ Omniscience Natural Laws & Adaptive Tech
-          </a>
-          <a
-            href="/deep-human-lab/medscihub-3d-multiscale-simulation.html"
-            style={{
-              fontSize: '11px',
-              fontWeight: 700,
-              padding: '6px 10px',
-              borderRadius: '8px',
-              background: 'rgba(168, 85, 247, 0.18)',
-              color: '#c084fc',
-              border: '1px solid rgba(168, 85, 247, 0.4)',
-              textDecoration: 'none'
-            }}
-          >
-            🔬 Deep Human Lab 3D Multiscale
-          </a>
-        </div>
-      </nav>
       <h1 className="sr-only">Your Body: body analyzer</h1>
+      <Suspense fallback={null}>
+        <BodyAnalysisCommandDeck focusSystem={system} />
+      </Suspense>
       <div ref={stageRef} className="scroll-mt-16">
         <BodyExposureAtlasHome Viewer={AtlasViewer} sendCamera={sendCamera} focusSystem={system} />
         <div className="mt-1 text-right">
