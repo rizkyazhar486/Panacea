@@ -4,7 +4,7 @@ import {
   runNeonParameterizedSql,
   sanitizeProfileKey,
   type EdgeEnv,
-} from './_edgeGuard'
+} from './_edgeGuard.ts'
 
 export async function onRequestOptions(context: { request: Request; env: EdgeEnv }): Promise<Response> {
   return preflightResponse(context.request, context.env)

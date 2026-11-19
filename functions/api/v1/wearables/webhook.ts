@@ -4,7 +4,7 @@ import {
   runNeonParameterizedSql,
   sanitizeProfileKey,
   type EdgeEnv,
-} from '../_edgeGuard'
+} from '../_edgeGuard.ts'
 
 type WearableVendorSource = 'whoop' | 'garmin' | 'oura' | 'apple_watch' | 'amazfit'
 

@@ -12,12 +12,16 @@ import type { ProfileEdit } from '../../lib/types'
 import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 import { WhenOpened } from '../../shared/ui/WhenOpened'
 import { buildNeonOutboxEvent } from '../../domains/character/index.ts'
+import { extractProfileKeyFromAccount } from '../../domains/beta/index.ts'
 
 const GtaCharacterPersonaCard = lazy(() =>
   import('../../components/GtaCharacterPersonaCard').then((m) => ({ default: m.GtaCharacterPersonaCard })),
 )
 const QrHealthPassModal = lazy(() =>
   import('../../components/QrHealthPassModal').then((m) => ({ default: m.QrHealthPassModal })),
+)
+const BetaFeedbackWidget = lazy(() =>
+  import('../../components/beta/BetaFeedbackWidget').then((m) => ({ default: m.BetaFeedbackWidget })),
 )
 
 const NEON_OUTBOX_KEY = 'pmd_neon_sync_outbox_v1'
@@ -68,8 +72,9 @@ function ProfileIsi({ account }: { account: NonNullable<ReturnType<typeof useSto
   const email = account.email
   const profile = state.profiles[email] ?? {}
   const isCanonicalOwner = email.toLowerCase() === OWNER_EMAIL.toLowerCase() || account.isOwner
+  const isolatedKey = extractProfileKeyFromAccount(account)
   const displayName = profile.name?.trim() || (isCanonicalOwner ? 'dr. Rizky Muhammad Azrissal' : account.name)
-  const usernameClean = (profile.username?.trim() || (isCanonicalOwner ? 'rizkyazhar486' : email.split('@')[0])).replace(/^@+/, '')
+  const usernameClean = (profile.username?.trim() || (isCanonicalOwner ? 'rizkyazhar486' : isolatedKey)).replace(/^@+/, '')
   const handle = '@' + usernameClean
   const verifiedClinician = Boolean(account.role === 'dokter' || account.isOwner || isCanonicalOwner)
   const clinicalCategory = profile.profession?.trim() || (verifiedClinician ? 'Doctor · Digital Twin & Longevity' : '')
@@ -99,7 +104,7 @@ function ProfileIsi({ account }: { account: NonNullable<ReturnType<typeof useSto
     updateProfile(email, cleaned)
     try {
       const ev = buildNeonOutboxEvent({
-        profileKey: cleaned.username || usernameClean,
+        profileKey: isolatedKey,
         entityType: 'panacea_profiles',
         payload: {
           fullName: cleaned.name,
@@ -479,6 +484,12 @@ function ProfileIsi({ account }: { account: NonNullable<ReturnType<typeof useSto
         ) : (
           list.map((p) => <PostCard key={p.id} post={p} viewerEmail={email} viewerName={account.name} />)
         )}
+      </div>
+
+      <div className="mt-6">
+        <Suspense fallback={null}>
+          <BetaFeedbackWidget mode="card" />
+        </Suspense>
       </div>
 
       {/* Tombol Keluar dari Akun */}

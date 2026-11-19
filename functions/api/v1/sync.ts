@@ -1,10 +1,20 @@
 import {
+  authorizeProfileRequest,
   jsonResponse,
   preflightResponse,
   runNeonParameterizedSql,
   sanitizeProfileKey,
   type EdgeEnv,
-} from './_edgeGuard'
+} from './_edgeGuard.ts'
+
+const ALLOWED_FUNNEL_STEPS = new Set([
+  'landed',
+  'onboarded',
+  'opened_body_exposure',
+  'completed_scan',
+  'completed_sync',
+  'completed_export',
+])
 
 export async function onRequestOptions(context: { request: Request; env: EdgeEnv }): Promise<Response> {
   return preflightResponse(context.request, context.env)
@@ -19,6 +29,10 @@ export async function onRequestPost(context: { request: Request; env: EdgeEnv })
       idempotencyKey?: string
       payloadJson?: Record<string, unknown>
     }>
+    funnelEvents?: Array<{
+      eventId?: string
+      stepName?: string
+    }>
   }
   try {
     body = await context.request.json()
@@ -26,10 +40,23 @@ export async function onRequestPost(context: { request: Request; env: EdgeEnv })
     return jsonResponse(context.request, context.env, 400, { ok: false, error: 'Malformed JSON body.' })
   }
 
-  const profileKey = sanitizeProfileKey(body?.profileKey ?? context.request.headers.get('X-Profile-Key'))
+  const profileKey = sanitizeProfileKey(body?.profileKey ?? context.request.headers.get('X-Profile-Key'), '')
+  if (!profileKey) {
+    return jsonResponse(context.request, context.env, 400, { ok: false, error: 'Valid profileKey is required.' })
+  }
+
+  const auth = await authorizeProfileRequest(context.request, context.env, profileKey)
+  if (!auth.ok) {
+    return jsonResponse(context.request, context.env, auth.status, { ok: false, error: auth.error })
+  }
+
   const events = Array.isArray(body?.events) ? body.events.slice(0, 50) : []
-  if (events.length === 0) {
-    return jsonResponse(context.request, context.env, 400, { ok: false, error: 'At least one outbox event is required.' })
+  const funnelEvents = Array.isArray(body?.funnelEvents) ? body.funnelEvents.slice(0, 20) : []
+  if (events.length === 0 && funnelEvents.length === 0) {
+    return jsonResponse(context.request, context.env, 400, {
+      ok: false,
+      error: 'At least one outbox or funnel event is required.',
+    })
   }
 
   const dbUrl = context.env?.DATABASE_URL?.trim()
@@ -37,7 +64,9 @@ export async function onRequestPost(context: { request: Request; env: EdgeEnv })
     return jsonResponse(context.request, context.env, 202, {
       ok: true,
       mode: 'local_first_sovereign',
-      acceptedCount: events.length,
+      authMode: auth.authMode,
+      profileKey,
+      acceptedCount: events.length + funnelEvents.length,
       note: 'Edge DATABASE_URL unbound; events remain safely queued in browser outbox.',
     })
   }
@@ -65,9 +94,26 @@ export async function onRequestPost(context: { request: Request; env: EdgeEnv })
     synced += 1
   }
 
+  for (const fe of funnelEvents) {
+    if (!fe?.eventId || !fe?.stepName || !ALLOWED_FUNNEL_STEPS.has(fe.stepName)) continue
+    const res = await runNeonParameterizedSql(
+      dbUrl,
+      profileKey,
+      `INSERT INTO panacea_beta_funnel_events (event_id, profile_key, step_name)
+       VALUES ($1, $2, $3)
+       ON CONFLICT (event_id) DO NOTHING`,
+      [String(fe.eventId).slice(0, 64), profileKey, fe.stepName],
+    )
+    if (!res.ok) {
+      return jsonResponse(context.request, context.env, res.status, { ok: false, error: res.error, synced })
+    }
+    synced += 1
+  }
+
   return jsonResponse(context.request, context.env, 200, {
     ok: true,
     mode: 'neon_rls',
+    authMode: auth.authMode,
     profileKey,
     syncedCount: synced,
   })

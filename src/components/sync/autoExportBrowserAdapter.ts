@@ -95,9 +95,15 @@ export function exportArtifactNow(
   format: ExportFormat,
   input: CanonicalExportBundleInput,
 ): { readonly status: string; readonly filename?: string; readonly sha256: string } {
+  const notifyBetaExport = () => {
+    try {
+      if (typeof window !== 'undefined') window.dispatchEvent(new Event('panacea:beta-export'))
+    } catch { /* ignore */ }
+  }
   if (format === 'neon') {
     const queued = enqueueNeonBatchToOutbox(input)
     writeLastAutoExportHash(queued.sha256)
+    notifyBetaExport()
     return { status: `Queued to Neon (${queued.outboxLength})`, sha256: queued.sha256 }
   }
   const artifact =
@@ -107,11 +113,64 @@ export function exportArtifactNow(
         ? buildFhirR4BundleExport(input)
         : buildCanonicalJsonExport(input)
   const outcome = triggerSafeBrowserDownload(artifact)
-  if (outcome === 'downloaded') writeLastAutoExportHash(artifact.sha256)
+  if (outcome === 'downloaded') {
+    writeLastAutoExportHash(artifact.sha256)
+    notifyBetaExport()
+  }
   return {
-    status: outcome === 'downloaded' ? `Saved ${artifact.filename}` : 'Download blocked',
+    status: outcome === 'downloaded' ? `Saved ${artifact.filename}` : 'Download blocked · Use Copy / Share JSON',
     filename: artifact.filename,
     sha256: artifact.sha256,
+  }
+}
+
+export async function shareOrCopyArtifact(
+  format: Exclude<ExportFormat, 'neon'>,
+  input: CanonicalExportBundleInput,
+): Promise<{ readonly ok: boolean; readonly status: string }> {
+  const artifact =
+    format === 'csv'
+      ? buildLongitudinalCsvExport(input)
+      : format === 'fhir'
+        ? buildFhirR4BundleExport(input)
+        : buildCanonicalJsonExport(input)
+  const notify = () => {
+    try {
+      if (typeof window !== 'undefined') window.dispatchEvent(new Event('panacea:beta-export'))
+    } catch { /* ignore */ }
+  }
+  try {
+    if (typeof navigator !== 'undefined' && typeof navigator.share === 'function') {
+      const file = typeof File === 'function'
+        ? new File([artifact.content], artifact.filename, { type: artifact.mimeType })
+        : null
+      if (file && typeof navigator.canShare === 'function' && navigator.canShare({ files: [file] })) {
+        await navigator.share({ title: artifact.filename, files: [file] })
+      } else {
+        await navigator.share({ title: artifact.filename, text: artifact.content.slice(0, 8000) })
+      }
+      writeLastAutoExportHash(artifact.sha256)
+      notify()
+      return { ok: true, status: `Shared ${artifact.filename}` }
+    }
+  } catch {
+    /* fallback to clipboard or download below */
+  }
+  try {
+    if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(artifact.content)
+      writeLastAutoExportHash(artifact.sha256)
+      notify()
+      return { ok: true, status: `Copied ${artifact.filename} JSON` }
+    }
+  } catch {
+    /* fallback to blob download */
+  }
+  const outcome = triggerSafeBrowserDownload(artifact)
+  if (outcome === 'downloaded') notify()
+  return {
+    ok: outcome === 'downloaded',
+    status: outcome === 'downloaded' ? `Saved ${artifact.filename}` : 'Copy/share unavailable',
   }
 }
 

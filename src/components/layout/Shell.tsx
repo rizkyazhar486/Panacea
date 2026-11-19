@@ -71,14 +71,45 @@ import '../../styles/superpage-convergence.css'
 const QrHealthPassModal = lazy(() =>
   import('../QrHealthPassModal').then((m) => ({ default: m.QrHealthPassModal })),
 )
+const BetaOnboardingModal = lazy(() =>
+  import('../beta/BetaOnboardingModal').then((m) => ({ default: m.BetaOnboardingModal })),
+)
+const FirstRunMissionBar = lazy(() =>
+  import('../beta/FirstRunMissionBar').then((m) => ({ default: m.FirstRunMissionBar })),
+)
+const BetaFeedbackWidget = lazy(() =>
+  import('../beta/BetaFeedbackWidget').then((m) => ({ default: m.BetaFeedbackWidget })),
+)
 
-// Public entry: marketing landing first, then the login screen on demand.
-function PublicEntry() {
-  const [showLogin, setShowLogin] = useState(false)
+// Public entry: marketing landing first, with 15-second isolated Beta Onboarding or full login on demand.
+function PublicEntry({ initialShowLogin = false }: { initialShowLogin?: boolean }) {
+  const [showLogin, setShowLogin] = useState(initialShowLogin)
+  const [betaDismissed, setBetaDismissed] = useState(false)
   return (
-    <Suspense fallback={null}>
-      {showLogin ? <Login onBack={() => setShowLogin(false)} /> : <Landing onMasuk={() => setShowLogin(true)} />}
-    </Suspense>
+    <>
+      <Suspense fallback={null}>
+        {showLogin ? <Login onBack={() => setShowLogin(false)} /> : <Landing onMasuk={() => setShowLogin(true)} />}
+      </Suspense>
+      {!showLogin && !betaDismissed && (
+        <Suspense fallback={null}>
+          <BetaOnboardingModal
+            onDismiss={() => setBetaDismissed(true)}
+            onOpenFullLogin={() => setShowLogin(true)}
+          />
+        </Suspense>
+      )}
+      {!showLogin && betaDismissed && (
+        <button
+          type="button"
+          onClick={() => setBetaDismissed(false)}
+          data-testid="reopen-beta-pass-btn"
+          style={{ bottom: 'max(14px, env(safe-area-inset-bottom))', right: '14px' }}
+          className="dark fixed z-40 min-h-[44px] rounded-full border border-emerald-400/40 bg-[#060a10]/95 px-4 text-xs font-black text-emerald-200 shadow-lg backdrop-blur-md"
+        >
+          15s Beta Pass →
+        </button>
+      )}
+    </>
   )
 }
 
@@ -566,7 +597,7 @@ export function Shell({ children }: { children: ReactNode }) {
     </div>
   )
 
-  if (!account) return <PublicEntry />
+  if (!account) return <PublicEntry initialShowLogin={loc.pathname === '/login'} />
   const items = saring(nav.filter((n) => n.roles.includes(account.role)), tersembunyi)
   const judul = judulRute(loc.pathname, items, [...nav, ...KATALOG], navMatches)
   const ruteAktif = [...nav, ...KATALOG].find((n) => navMatches(n, loc.pathname))
@@ -1040,10 +1071,16 @@ export function Shell({ children }: { children: ReactNode }) {
         >
           {onHome && account.role === 'owner' && <PeringatanPenyimpanan />}
           {onHome && <div className="lg:hidden"><InstallBanner /></div>}
+          {onHome && (
+            <Suspense fallback={null}>
+              <FirstRunMissionBar />
+            </Suspense>
+          )}
 
           <div key={`${loc.pathname}:${nonceSegar}`} className="page-enter w-full">
             {children}
           </div>
+          <div style={{ height: 'env(safe-area-inset-bottom, 0px)' }} className="lg:hidden" aria-hidden="true" />
         </main>
       </div>
 
@@ -1083,6 +1120,10 @@ export function Shell({ children }: { children: ReactNode }) {
       )}
 
       {onHome && ['pasien', 'dokter', 'owner'].includes(account.role) && <><OnboardingTour /><AssessmentPrompt /></>}
+
+      <Suspense fallback={null}>
+        <BetaFeedbackWidget mode="pill" />
+      </Suspense>
 
       <ContactService buka={bantuanBuka} onTutup={() => setBantuanBuka(false)} />
       {qrModalOpen && (

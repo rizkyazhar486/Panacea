@@ -141,10 +141,10 @@ test('Domain purity guard: GTA character & Fascia engines contain zero forbidden
 test('Neon schema & push-neon --dry-run verify all idempotent tables, RLS, and canonical seed without secrets', () => {
   const schemaCheck = validateSchemaLocally()
   assert.equal(schemaCheck.ok, true)
-  assert.equal(schemaCheck.tableCount, 16)
+  assert.equal(schemaCheck.tableCount, 18)
   assert.equal(schemaCheck.rlsEnabled, true)
   const out = execFileSync(process.execPath, ['scripts/db/push-neon.mjs', '--dry-run'], { encoding: 'utf8' })
   const parsed = JSON.parse(out)
   assert.equal(parsed.status, 'SCHEMA_AND_SEED_VERIFIED')
-  assert.equal(parsed.tableCount, 16)
+  assert.equal(parsed.tableCount, 18)
 })

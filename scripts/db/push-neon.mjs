@@ -33,6 +33,8 @@ export const EXPECTED_TABLES = Object.freeze([
   'panacea_scientific_benchmarks',
   'panacea_consent_grants',
   'panacea_commercial_entitlements',
+  'panacea_beta_feedback',
+  'panacea_beta_funnel_events',
 ])
 
 export const CANONICAL_SEED_STATEMENTS = Object.freeze([

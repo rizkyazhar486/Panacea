@@ -15,6 +15,14 @@ import { STR_ROLES, ROLES, LOGIN_PILLS } from './loginData'
 import './login.css'
 import { Prosa } from '../../components/Prosa'
 import { EmailOtpLogin } from './components/EmailOtpLogin'
+import { BETA_ROLES, buildIsolatedBetaAccount, type BetaRole } from '../../domains/beta/index.ts'
+import { InfoDisclosure } from '../../components/ui/InfoDisclosure'
+import {
+  generateBetaNonceHex,
+  markMissionStep,
+  registerBetaSessionEdge,
+  trackBetaFunnelStep,
+} from '../../components/beta/betaClientAdapter'
 
 // Modal legal & QR/Passkey dimuat saat dibuka agar tidak membebani bundel awal.
 const LegalModal = lazy(() => import('./components/LegalModal').then((m) => ({ default: m.LegalModal })))
@@ -70,6 +78,10 @@ export function Login({ onBack }: { onBack?: () => void }) {
   const [accessModal, setAccessModal] = useState<'authenticator' | 'qr' | null>(null)
   const [theme, setTheme] = useState<Theme>(getTheme)
   const [health, setHealth] = useState<Health | null>(null)
+  const [betaName, setBetaName] = useState('')
+  const [betaRole, setBetaRole] = useState<BetaRole>('patient')
+  const [betaPinOrInvite, setBetaPinOrInvite] = useState('')
+  const [betaBusy, setBetaBusy] = useState(false)
 
   const rememberedAccounts = listRememberedAccounts({
     profiles: state.profiles,
@@ -122,6 +134,41 @@ export function Login({ onBack }: { onBack?: () => void }) {
       return
     }
     setError('Ketik alamat email Google Anda sekali di bawah, lalu ketuk Masuk dengan Google (tersimpan otomatis untuk 1-klik berikutnya).')
+  }
+
+  const startQuickBetaPass = async () => {
+    if (betaBusy) return
+    setBetaBusy(true)
+    setError('')
+    try {
+      const extra = betaPinOrInvite.trim()
+      const isPin = /^\d{6}$/.test(extra)
+      const res = buildIsolatedBetaAccount({
+        name: betaName,
+        role: betaRole,
+        pin6: isPin ? extra : undefined,
+        inviteCode: !isPin && extra ? extra : undefined,
+        nonceHex: generateBetaNonceHex(4),
+        nowIso: new Date().toISOString(),
+      })
+      if (!res.ok) {
+        setError(res.error)
+        return
+      }
+      setConsent(true)
+      consentRef.current = true
+      markMissionStep(res.profileKey, 'profile')
+      finish(res.account)
+      void registerBetaSessionEdge({
+        profileKey: res.profileKey,
+        name: res.account.name,
+        role: res.betaRole,
+        inviteCode: res.inviteCode,
+        mode: 'beta_pass',
+      }).then(() => trackBetaFunnelStep(res.account, 'onboarded'))
+    } finally {
+      setBetaBusy(false)
+    }
   }
 
   const roleRef = useRef<Role>('pasien')
@@ -339,6 +386,60 @@ export function Login({ onBack }: { onBack?: () => void }) {
           <div className="space-y-4">
             <div className="lg:hidden"><Wordmark size={32} /></div>
 
+          {/* ── Quick Beta Pass (15-second isolated tester workspace) ── */}
+          <div className="dark rounded-2xl border border-emerald-400/30 bg-[#060a10] p-3.5 text-white shadow-sm">
+            <div className="flex items-center justify-between gap-2">
+              <span className="font-mono text-[10px] font-bold uppercase tracking-[0.14em] text-emerald-300">
+                Quick Beta Pass (15s)
+              </span>
+              <InfoDisclosure title="Isolated Beta Workspace" badge="Multi-User">
+                <p>Creates an isolated profile_key so testers never overwrite each other.</p>
+              </InfoDisclosure>
+            </div>
+            <div className="mt-2 space-y-2">
+              <input
+                value={betaName}
+                onChange={(e) => setBetaName(e.target.value)}
+                placeholder="Name (e.g. Alya / dr. Budi)"
+                data-testid="login-beta-name"
+                className="min-h-[44px] w-full rounded-xl border border-white/15 bg-black/60 px-3 text-xs text-white outline-none focus:border-emerald-400"
+              />
+              <div className="grid grid-cols-3 gap-1.5">
+                {BETA_ROLES.map((r) => (
+                  <button
+                    key={r}
+                    type="button"
+                    onClick={() => setBetaRole(r)}
+                    className={`min-h-[44px] rounded-xl border px-2 text-xs font-bold capitalize transition ${
+                      betaRole === r
+                        ? 'border-emerald-400 bg-emerald-500/20 text-emerald-200'
+                        : 'border-white/15 bg-white/[0.04] text-slate-300'
+                    }`}
+                  >
+                    {r}
+                  </button>
+                ))}
+              </div>
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                <input
+                  value={betaPinOrInvite}
+                  onChange={(e) => setBetaPinOrInvite(e.target.value)}
+                  placeholder="6-digit PIN / Invite (opt)"
+                  className="min-h-[44px] w-full rounded-xl border border-white/15 bg-black/60 px-3 text-xs text-white outline-none focus:border-cyan-400"
+                />
+                <button
+                  type="button"
+                  disabled={betaBusy}
+                  onClick={() => void startQuickBetaPass()}
+                  data-testid="login-beta-submit"
+                  className="min-h-[44px] rounded-xl bg-emerald-500 px-3 text-xs font-black text-black transition hover:bg-emerald-400 disabled:opacity-60"
+                >
+                  {betaBusy ? 'Creating…' : 'Start Beta Pass →'}
+                </button>
+              </div>
+            </div>
+          </div>
+
           {/* ── Mode Auth: Masuk vs Daftar Baru ─────────────────── */}
           <div className="flex rounded-full border border-neutral-200/80 bg-neutral-100/80 p-1 dark:border-white/10 dark:bg-white/[0.04]">
             <button
@@ -465,15 +566,12 @@ export function Login({ onBack }: { onBack?: () => void }) {
             {health?.googleClientId ? (
               <div ref={gbtn} className="flex justify-center" />
             ) : (
-              <button
-                type="button"
-                onClick={handleOneClickGoogle}
-                data-testid="google-signin-btn"
-                className="flex min-h-[44px] w-full items-center justify-center gap-2.5 rounded-full border border-neutral-200 bg-white px-4 py-2.5 text-xs font-bold text-neutral-800 shadow-xs dark:border-white/15 dark:bg-neutral-900 dark:text-white"
-              >
-                <GoogleG />
-                <span>Lanjutkan dengan Google</span>
-              </button>
+              <div className="flex items-center justify-between rounded-xl border border-neutral-200/80 bg-neutral-50 px-3 py-2 text-xs text-neutral-600 dark:border-white/10 dark:bg-white/[0.03] dark:text-slate-300">
+                <span>Google Sign-In activates once origin OAuth key is set.</span>
+                <InfoDisclosure title="Origin OAuth Notice" badge="Local-First">
+                  <p>Use Quick Beta Pass above, Passkey, QR Pass, or Email login cleanly without OAuth blockers.</p>
+                </InfoDisclosure>
+              </div>
             )}
 
             <div className="grid grid-cols-2 gap-2">

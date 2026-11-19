@@ -72,28 +72,40 @@ if (SKIP_BUILD) {
 const wranglerPath = path.join(ROOT, 'wrangler.toml')
 const wranglerContent = fs.existsSync(wranglerPath) ? fs.readFileSync(wranglerPath, 'utf8') : ''
 const hasSpaLock = wranglerContent.includes('not_found_handling = "single-page-application"')
+const hasWorkerMain =
+  wranglerContent.includes('main = "worker/index.ts"') &&
+  wranglerContent.includes('binding = "ASSETS"') &&
+  wranglerContent.includes('run_worker_first = ["/api/*"]') &&
+  fs.existsSync(path.join(ROOT, 'worker', 'index.ts'))
 const hasDistRedirects = fs.existsSync(path.join(ROOT, 'dist', '_redirects'))
 const hasPublicRedirects = fs.existsSync(path.join(ROOT, 'public', '_redirects'))
 const edgeApiPaths = [
   'functions/api/v1/_edgeGuard.ts',
   'functions/api/v1/health.ts',
+  'functions/api/v1/session.ts',
   'functions/api/v1/sync.ts',
   'functions/api/v1/export.ts',
+  'functions/api/v1/feedback.ts',
   'functions/api/v1/wearables/webhook.ts',
 ]
 const missingEdgeHandlers = edgeApiPaths.filter((p) => !fs.existsSync(path.join(ROOT, p)))
-const edgeConfigPass = hasSpaLock && !hasDistRedirects && !hasPublicRedirects && missingEdgeHandlers.length === 0
+const edgeConfigPass =
+  hasSpaLock &&
+  hasWorkerMain &&
+  !hasDistRedirects &&
+  !hasPublicRedirects &&
+  missingEdgeHandlers.length === 0
 
 checks.push({
   dimension: '2. Cloudflare SPA & Edge API Lock',
   pass: edgeConfigPass,
   detail: edgeConfigPass
-    ? `wrangler.toml SPA locked; 0 _redirects; ${edgeApiPaths.length} Edge API handlers present`
-    : `spaLock=${hasSpaLock}, dist/_redirects=${hasDistRedirects}, public/_redirects=${hasPublicRedirects}, missingEdge=${missingEdgeHandlers.join(',')}`,
+    ? `wrangler.toml Worker+SPA locked; 0 _redirects; worker/index.ts + ${edgeApiPaths.length} Edge handlers present`
+    : `spaLock=${hasSpaLock}, workerMain=${hasWorkerMain}, dist/_redirects=${hasDistRedirects}, public/_redirects=${hasPublicRedirects}, missingEdge=${missingEdgeHandlers.join(',')}`,
 })
 
 // 3. Identity, Privacy, Secret & Orchestrator Lock Hygiene
-const scanRoots = ['src', 'functions', 'scripts', 'sql', 'DOCS/legacy']
+const scanRoots = ['src', 'worker', 'functions', 'scripts', 'sql', 'DOCS/legacy']
 const trackedCode = scanRoots.flatMap((dir) => walkFiles(path.join(ROOT, dir), ['.ts', '.tsx', '.js', '.mjs', '.jsx', '.sql', '.md']))
 const typoHits = []
 const secretHits = []
@@ -124,11 +136,16 @@ checks.push({
 // 4. Neon Persistence, RLS & Legacy Schema Integrity
 const sql001Path = path.join(ROOT, 'sql', '001_panaceamed_neon_os.sql')
 const sql002Path = path.join(ROOT, 'sql', '002_panaceamed_legacy_governance.sql')
+const sql003Path = path.join(ROOT, 'sql', '003_panaceamed_beta_50.sql')
 const neonPushPath = path.join(ROOT, 'scripts', 'db', 'push-neon.mjs')
-const hasNeonFiles = fs.existsSync(sql001Path) && fs.existsSync(sql002Path) && fs.existsSync(neonPushPath)
+const hasNeonFiles =
+  fs.existsSync(sql001Path) &&
+  fs.existsSync(sql002Path) &&
+  fs.existsSync(sql003Path) &&
+  fs.existsSync(neonPushPath)
 
 let neonPass = false
-let neonDetail = 'Missing sql/001, sql/002, or scripts/db/push-neon.mjs'
+let neonDetail = 'Missing sql/001..003 or scripts/db/push-neon.mjs'
 if (hasNeonFiles) {
   const pushArgs = process.env.DATABASE_URL ? ['scripts/db/push-neon.mjs'] : ['scripts/db/push-neon.mjs', '--dry-run']
   const neonRes = runCmd('node', pushArgs)
@@ -139,11 +156,11 @@ if (hasNeonFiles) {
     tableCount = parsed.tableCount || 0
     rlsEnabled = Boolean(parsed.rlsEnabled)
   } catch { /* ignore */ }
-  neonPass = neonRes.ok && tableCount >= 16 && (process.env.DATABASE_URL ? true : rlsEnabled)
+  neonPass = neonRes.ok && tableCount >= 18 && (process.env.DATABASE_URL ? true : rlsEnabled)
   neonDetail = neonPass
     ? process.env.DATABASE_URL
       ? `Neon live push PASSED (${tableCount} tables + RLS)`
-      : `Neon 001+002 schema & RLS dry-run PASSED (${tableCount} tables; DATABASE_URL unset)`
+      : `Neon 001+002+003 schema & RLS dry-run PASSED (${tableCount} tables; DATABASE_URL unset)`
     : `Neon script failed (exit ${neonRes.status}, tables=${tableCount}, rls=${rlsEnabled})`
 }
 
