@@ -2659,6 +2659,7 @@ export interface PharmacyProduct {
 // -------- Editable user profile (name, status/bio, avatar) -----------------
 export interface ProfileEdit {
   name?: string
+  username?: string
   bio?: string
   avatar?: string // data URL / uploaded photo
   sex?: 'L' | 'P' | '-' // jenis kelamin (L=laki-laki, P=perempuan, -=tidak disebut)

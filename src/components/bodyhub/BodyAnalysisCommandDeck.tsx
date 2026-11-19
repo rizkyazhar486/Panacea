@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { lazy, Suspense, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useOptionalStore } from '../../lib/store'
 import { useOptionalLongitudinalState } from '../../lib/useLongitudinalState'
@@ -14,6 +14,13 @@ import {
 } from '../../domains/body-exposure/engine/systemBoard'
 import type { BodySystemId } from '../../domains/body-exposure/data/bodySystems'
 import { WhenOpened } from '../../shared/ui/WhenOpened'
+
+const GtaCharacterPersonaCard = lazy(() =>
+  import('../GtaCharacterPersonaCard').then((m) => ({ default: m.GtaCharacterPersonaCard })),
+)
+const FasciaKineticTwinCard = lazy(() =>
+  import('../FasciaKineticTwinCard').then((m) => ({ default: m.FasciaKineticTwinCard })),
+)
 
 interface StudioTrack {
   readonly id: 'multiscale' | 'physiology' | 'surgical' | 'frontier'
@@ -287,6 +294,21 @@ export function BodyAnalysisCommandDeck({ focusSystem }: { readonly focusSystem:
         </summary>
         <WhenOpened>
           <KernelTelemetryDrawer />
+        </WhenOpened>
+      </details>
+
+      <details className="mt-2 rounded-xl border border-emerald-400/20 bg-black/30 px-3 py-1.5">
+        <summary className="font-astro flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-2 text-[11px] font-bold uppercase tracking-[0.12em] text-emerald-200">
+          <span>1:1 GTA Character HUD · Longevium Digital Twin · Feet-to-Face Fascia Chain</span>
+          <span className="font-astro-mono text-[10px] text-cyan-300">OPEN TWIN ▾</span>
+        </summary>
+        <WhenOpened>
+          <div className="mt-3 space-y-4 pb-2">
+            <Suspense fallback={<p role="status" className="py-2 text-xs text-slate-300">Loading Parametric Digital Twin…</p>}>
+              <GtaCharacterPersonaCard />
+              <FasciaKineticTwinCard />
+            </Suspense>
+          </div>
         </WhenOpened>
       </details>
     </section>

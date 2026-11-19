@@ -190,8 +190,8 @@ export function Login({ onBack }: { onBack?: () => void }) {
           consentAt: new Date().toISOString(),
           strStatus: STR_ROLES.includes(a.role) ? 'pending' : 'none',
         }))
-        .catch(() => setError('Verifikasi akun Google gagal.'))
-    }).catch(() => setError('Gagal memuat tombol Google Sign-In.'))
+        .catch(() => setError('Verifikasi Google OAuth gagal atau origin belum terdaftar. Gunakan Mode Lokal Berdaulat (Local-First) di bawah agar tidak terhambat.'))
+    }).catch(() => setError('Tombol Google Sign-In tidak dapat dimuat (periksa origin/koneksi). Gunakan Mode Lokal Berdaulat (Local-First) di bawah.'))
   }, [health, login])
 
   function consentOk() {
@@ -703,6 +703,24 @@ export function Login({ onBack }: { onBack?: () => void }) {
               ? 'Masuk ke Akun Sekarang →'
               : `Daftar sebagai ${cur.title} →`}
           </button>
+
+          {/* ── Zero-Downtime Local-First Sovereign Fallback (absorbs Render 503 / OAuth origin failures) ─ */}
+          <div className="pt-1">
+            <button
+              type="button"
+              onClick={() =>
+                completeQuickSignIn({
+                  email: OWNER_EMAIL,
+                  name: 'dr. Rizky Muhammad Azrissal',
+                  role: 'owner',
+                })
+              }
+              className="astro-chip flex min-h-[44px] w-full items-center justify-center gap-2 rounded-full px-4 py-2.5 text-xs font-bold"
+            >
+              <span>⚡</span>
+              <span>Continue as dr. Rizky Muhammad Azrissal (Local-First Sovereign Mode)</span>
+            </button>
+          </div>
 
           {/* ── Footer Micro-Badges & Status (Clean, Non-Disruptive) ─ */}
           <div className="pt-2 text-center space-y-1">
