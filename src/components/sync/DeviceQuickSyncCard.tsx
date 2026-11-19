@@ -189,9 +189,15 @@ export function DeviceQuickSyncCard() {
 
         <InfoDisclosure title="Sync & Auto-Export Architecture" badge="SHA-256">
           <p>Supports Apple Health XML/JSON, WHOOP/Garmin/Oura CSV/JSON, and Web Bluetooth GATT HR/EEG.</p>
-          <p>Gesture-safe exports with SHA-256 deduplication, Object URL cleanup, and offline Neon outbox queueing.</p>
+          <p>Gesture-safe exports with SHA-256 deduplication, /api/v1/wearables/webhook bridge, and Neon outbox queueing.</p>
         </InfoDisclosure>
       </header>
+
+      <div className="mt-3 flex flex-wrap gap-1.5 font-mono text-[10px] font-bold text-cyan-200">
+        <span className="rounded-full border border-cyan-400/30 bg-cyan-500/10 px-2.5 py-1">1. Pick Device</span>
+        <span className="rounded-full border border-cyan-400/30 bg-cyan-500/10 px-2.5 py-1">2. Connect / QR</span>
+        <span className="rounded-full border border-emerald-400/30 bg-emerald-500/10 px-2.5 py-1 text-emerald-200">3. Auto-Export</span>
+      </div>
 
       {/* 6 Quick-Connect Tiles (1-word status) */}
       <div className="mt-4 grid grid-cols-2 gap-2.5 sm:grid-cols-3">

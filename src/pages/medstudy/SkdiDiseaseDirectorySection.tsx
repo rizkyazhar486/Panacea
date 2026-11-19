@@ -16,37 +16,9 @@ import { REFERENSI_SUMBER } from '../../lib/referensiSumber'
 import { api, backendEnabled, type IcdEntry } from '../../lib/api'
 import { levelTone, levelLabel } from './shared'
 import { useTujuan, modeAwam } from '../../lib/tujuan'
+import { loadShardedDiseaseRecord } from '../../components/medstudy/corpusShardClient'
 
-interface NoteData {
-  notes: Record<string, SkdiDiseaseNote>
-  stations: Record<string, OsceStationNote>
-  aliases: Record<string, string>
-}
-
-function useNoteData(armed: boolean) {
-  const [data, setData] = useState<NoteData | null>(null)
-  useEffect(() => {
-    if (!armed || data) return
-    let alive = true
-    Promise.all([
-      import('../../lib/skdiDiseaseNotes'),
-      import('../../lib/osceStationNotes'),
-      import('../../lib/skdiDiseaseNoteAliases'),
-    ]).then(([n, o, a]) => {
-      if (!alive) return
-      setData({
-        notes: n.SKDI_DISEASE_NOTES,
-        stations: o.OSCE_STATION_NOTES,
-        aliases: a.SKDI_DISEASE_NOTE_ALIASES,
-      })
-    }).catch(() => {
-      // Supplement tetap dapat dibuka walaupun bundle besar gagal dimuat.
-      // Empty/fetch failure tidak boleh menghapus catatan kecil yang sudah ada.
-    })
-    return () => { alive = false }
-  }, [armed, data])
-  return data
-}
+type ResolvedNote = ReturnType<typeof ownNoteView> | ReturnType<typeof osceNoteView> | null
 
 function ownNoteView(own: SkdiDiseaseNote) {
   const blocks: { title: string; items: string[] }[] = []
@@ -70,22 +42,10 @@ function ownNoteView(own: SkdiDiseaseNote) {
   }
 }
 
-function resolveNote(disease: string, data: NoteData | null) {
-  // Supplement kecil disimpan terpisah supaya 16 gap lama langsung tersedia,
-  // bahkan sebelum corpus ~MB selesai diunduh.
-  const supplement = SKDI_DISEASE_NOTES_SUPPLEMENT[disease]
-  if (supplement) return ownNoteView(supplement)
-  if (!data) return null
-
-  const own = data.notes[disease]
-  if (own) return ownNoteView(own)
-
-  const aliasKey = data.aliases[disease]
-  const station = aliasKey ? data.stations[aliasKey] : undefined
-  if (!station) return null
+function osceNoteView(sourceStation: string, station: OsceStationNote) {
   return {
     kind: 'osce' as const,
-    sourceStation: aliasKey,
+    sourceStation,
     definisi: station.definisi as string | undefined,
     deep: undefined,
     blocks: [
@@ -109,6 +69,12 @@ function resolveNote(disease: string, data: NoteData | null) {
     referensi: [] as string[],
     tips: station.tips,
   }
+}
+
+function resolveNote(disease: string, cache: Record<string, ResolvedNote>): ResolvedNote {
+  const supplement = SKDI_DISEASE_NOTES_SUPPLEMENT[disease]
+  if (supplement) return ownNoteView(supplement)
+  return cache[disease] ?? null
 }
 
 function rantaiKeTeks(langkah: string[]): string[] {
@@ -260,8 +226,25 @@ export default function SkdiDiseaseDirectorySection() {
   const [levelFilter, setLevelFilter] = useState<'all' | '4' | '3' | '2' | '1'>('all')
   const awam = modeAwam(useTujuan())
   const [expanded, setExpanded] = useState<string | null>(null)
-  const [wantNotes, setWantNotes] = useState(false)
-  const noteData = useNoteData(wantNotes)
+  const [noteCache, setNoteCache] = useState<Record<string, ResolvedNote>>({})
+  const [loadingDisease, setLoadingDisease] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (!expanded || SKDI_DISEASE_SUPPLEMENT_KEYS.has(expanded) || noteCache[expanded]) return
+    let alive = true
+    setLoadingDisease(expanded)
+    void loadShardedDiseaseRecord(expanded).then((res) => {
+      if (!alive) return
+      const mapped = !res
+        ? null
+        : res.kind === 'skdi'
+          ? ownNoteView(res.own)
+          : osceNoteView(res.sourceStation, res.station)
+      setNoteCache((prev) => ({ ...prev, [expanded]: mapped }))
+      setLoadingDisease((cur) => (cur === expanded ? null : cur))
+    })
+    return () => { alive = false }
+  }, [expanded, noteCache])
 
   const filtered = useMemo(() => {
     const q = query.toLowerCase().trim()
@@ -305,8 +288,8 @@ export default function SkdiDiseaseDirectorySection() {
             kehamilan, fungsi ginjal/hati, alergi, interaksi obat, berat penyakit, dan temuan pemeriksaan.
           </p>
         )}
-        {wantNotes && !noteData && (
-          <p className="mt-2 text-[12px] font-semibold text-brand-dark">Memuat corpus catatan utama… catatan supplement tetap dapat dibuka.</p>
+        {loadingDisease && (
+          <p className="mt-2 text-[12px] font-semibold text-brand-dark">Memuat shard catatan (&lt;40 kB)… catatan supplement tetap dapat dibuka.</p>
         )}
         <input
           className="mt-3 w-full rounded-xl border border-neutral-200 bg-white px-4 py-2.5 text-[13px] outline-none focus:border-brand dark:border-white/10 dark:bg-white/5"
@@ -338,7 +321,7 @@ export default function SkdiDiseaseDirectorySection() {
           <div className="mt-2 space-y-2">
             {diseases.map((e, i) => {
               const hasNote = SKDI_NOTE_KEYS.has(e.disease) || SKDI_DISEASE_SUPPLEMENT_KEYS.has(e.disease)
-              const note = resolveNote(e.disease, noteData)
+              const note = resolveNote(e.disease, noteCache)
               const isOpen = expanded === e.disease
               return (
                 <div key={i} className="rounded-xl bg-neutral-50 p-3 dark:bg-white/5">
@@ -346,7 +329,6 @@ export default function SkdiDiseaseDirectorySection() {
                     className="w-full text-left"
                     onClick={() => {
                       if (!hasNote) return
-                      if (!SKDI_DISEASE_SUPPLEMENT_KEYS.has(e.disease)) setWantNotes(true)
                       setExpanded(isOpen ? null : e.disease)
                     }}
                   >

@@ -7,14 +7,14 @@
  * - Supports `--dry-run` for deterministic CI & offline QA validation.
  * - Driver cascade: `@neondatabase/serverless` -> `pg` (SSL) -> Neon HTTP SQL API (`fetch`) -> `psql`.
  */
-import { existsSync, readFileSync } from 'node:fs'
+import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { spawnSync } from 'node:child_process'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const ROOT = join(__dirname, '..', '..')
-const SCHEMA_PATH = join(ROOT, 'sql', '001_panaceamed_neon_os.sql')
+const SQL_DIR = join(ROOT, 'sql')
 
 export const EXPECTED_TABLES = Object.freeze([
   'panacea_profiles',
@@ -29,6 +29,10 @@ export const EXPECTED_TABLES = Object.freeze([
   'panacea_rd_evidence_registry',
   'panacea_audit_trail',
   'panacea_sync_outbox',
+  'panacea_continuum_episodes',
+  'panacea_scientific_benchmarks',
+  'panacea_consent_grants',
+  'panacea_commercial_entitlements',
 ])
 
 export const CANONICAL_SEED_STATEMENTS = Object.freeze([
@@ -83,6 +87,19 @@ export const CANONICAL_SEED_STATEMENTS = Object.freeze([
      evidence_tier = EXCLUDED.evidence_tier,
      benchmark_metrics_json = EXCLUDED.benchmark_metrics_json,
      verified_at = NOW();`,
+
+  `INSERT INTO panacea_continuum_episodes (episode_id, profile_key, phase, literacy_lens, teach_back_confirmed, red_flag_escalated, non_phi_pass_ref, clinically_reviewed)
+   VALUES ('EP-PMD-000486-BASELINE', 'rizkyazhar486', 'before_illness', 'plain_universal', TRUE, FALSE, 'PMD-000486', FALSE)
+   ON CONFLICT (episode_id) DO UPDATE SET
+     updated_at = NOW();`,
+
+  `INSERT INTO panacea_commercial_entitlements (profile_key, humanitarian_free_core, tier, personal_data_sale_allowed, emergency_paywall_allowed)
+   VALUES ('rizkyazhar486', TRUE, 'free_core', FALSE, FALSE)
+   ON CONFLICT (profile_key) DO UPDATE SET
+     humanitarian_free_core = TRUE,
+     personal_data_sale_allowed = FALSE,
+     emergency_paywall_allowed = FALSE,
+     updated_at = NOW();`,
 ])
 
 function loadEnvLocalDatabaseUrl() {
@@ -106,20 +123,38 @@ export function splitSqlStatements(sql) {
     .filter(Boolean)
 }
 
+function listOrderedSqlFiles() {
+  if (!existsSync(SQL_DIR)) return []
+  return readdirSync(SQL_DIR)
+    .filter((f) => /^\d+.*\.sql$/i.test(f))
+    .sort()
+    .map((f) => join(SQL_DIR, f))
+}
+
 export function validateSchemaLocally() {
-  if (!existsSync(SCHEMA_PATH)) {
-    return { ok: false, error: 'Missing sql/001_panaceamed_neon_os.sql' }
+  const sqlFiles = listOrderedSqlFiles()
+  if (sqlFiles.length === 0) {
+    return { ok: false, error: 'Missing numbered sql/*.sql files' }
   }
-  const sql = readFileSync(SCHEMA_PATH, 'utf8')
-  const missingTables = EXPECTED_TABLES.filter((t) => !new RegExp(`CREATE\\s+TABLE\\s+IF\\s+NOT\\s+EXISTS\\s+${t}\\b`, 'i').test(sql))
+  const combinedSql = sqlFiles.map((f) => readFileSync(f, 'utf8')).join('\n\n')
+  const missingTables = EXPECTED_TABLES.filter(
+    (t) => !new RegExp(`CREATE\\s+TABLE\\s+IF\\s+NOT\\s+EXISTS\\s+${t}\\b`, 'i').test(combinedSql),
+  )
   if (missingTables.length > 0) {
     return { ok: false, error: `Missing idempotent DDL for tables: ${missingTables.join(', ')}` }
   }
-  const statements = splitSqlStatements(sql)
+  const hasRls =
+    /ENABLE\s+ROW\s+LEVEL\s+SECURITY/i.test(combinedSql) &&
+    combinedSql.includes("current_setting('app.current_profile_key', true)")
+  if (!hasRls) {
+    return { ok: false, error: 'Missing Neon Row-Level Security (app.current_profile_key) policies in sql/*.sql' }
+  }
+  const statements = sqlFiles.flatMap((f) => splitSqlStatements(readFileSync(f, 'utf8')))
   return {
     ok: true,
-    schemaPath: 'sql/001_panaceamed_neon_os.sql',
+    schemaFiles: sqlFiles.map((f) => `sql/${f.split('/').pop()}`),
     tableCount: EXPECTED_TABLES.length,
+    rlsEnabled: true,
     ddlStatementCount: statements.length,
     seedStatementCount: CANONICAL_SEED_STATEMENTS.length,
     tables: EXPECTED_TABLES,
@@ -148,8 +183,9 @@ async function runViaNeonHttpApi(databaseUrl, statements) {
 }
 
 async function runLivePush(databaseUrl) {
-  const sql = readFileSync(SCHEMA_PATH, 'utf8')
-  const allStatements = [...splitSqlStatements(sql), ...CANONICAL_SEED_STATEMENTS]
+  const sqlFiles = listOrderedSqlFiles()
+  const sql = sqlFiles.map((f) => readFileSync(f, 'utf8')).join('\n\n')
+  const allStatements = [...sqlFiles.flatMap((f) => splitSqlStatements(readFileSync(f, 'utf8'))), ...CANONICAL_SEED_STATEMENTS]
 
   // 1. Try @neondatabase/serverless if installed
   try {
@@ -228,7 +264,9 @@ if (isMain) {
     console.log(JSON.stringify({
       mode: dryRun ? 'dry-run' : 'no-database-url',
       status: 'SCHEMA_AND_SEED_VERIFIED',
+      schemaFiles: check.schemaFiles,
       tableCount: check.tableCount,
+      rlsEnabled: check.rlsEnabled,
       ddlStatementCount: check.ddlStatementCount,
       seedStatementCount: check.seedStatementCount,
       tables: check.tables,

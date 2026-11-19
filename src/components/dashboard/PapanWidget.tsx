@@ -313,14 +313,15 @@ export function UbinKlinis() {
     if (!siap) return
     let batal = false
     Promise.all([
-      import('../../lib/skdiDiseaseNotes'),
+      import('../medstudy/corpusShardClient').then((m) => m.loadCorpusManifest('skdi')),
+      import('../../lib/skdiDiseaseNoteIndex'),
       import('../../lib/skdiTherapyReference'),
       import('../../lib/osceUkmppdRiwayat'),
     ])
-      .then(([d, t, o]) => {
+      .then(([manifest, idx, t, o]) => {
         if (batal) return
         setN({
-          penyakit: Object.keys(d.SKDI_DISEASE_NOTES).length,
+          penyakit: manifest?.totalKeys ?? idx.SKDI_NOTE_KEYS.size,
           obat: t.SKDI_ENTRIES.length,
           stasiun: o.RIWAYAT_OSCE.length,
         })
