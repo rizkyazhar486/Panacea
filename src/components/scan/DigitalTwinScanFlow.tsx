@@ -20,6 +20,8 @@ import { computeOneWayAnova, computeRepeatedMeasuresAnova } from '../../domains/
 import { InfoDisclosure } from '../ui/InfoDisclosure'
 import { triggerSafeBrowserDownload } from '../sync/autoExportBrowserAdapter'
 import { sanitizeExportFilename, sha256Hex } from '../../lib/export/autoExportEngine'
+import { extractProfileKeyFromAccount, formatMrnForAccount } from '../../domains/beta/index.ts'
+import { trackBetaFunnelStep } from '../beta/betaClientAdapter'
 
 type ScanTab = 'builder' | 'cad' | 'skin' | 'neuro' | 'anova'
 type ScanStep = 0 | 1 | 2 | 3
@@ -59,8 +61,10 @@ export function DigitalTwinScanFlow({ initialTab = 'builder' }: { readonly initi
   const [step, setStep] = useState<ScanStep>(0)
   const [capturedSteps, setCapturedSteps] = useState<number[]>([])
   const [cameraActive, setCameraActive] = useState(false)
+  const [cameraBlocked, setCameraBlocked] = useState(false)
   const [cameraStatus, setCameraStatus] = useState('Ready')
   const videoRef = useRef<HTMLVideoElement | null>(null)
+  const photoInputRef = useRef<HTMLInputElement | null>(null)
   const streamRef = useRef<MediaStream | null>(null)
 
   // Builder / Archetype state
@@ -81,16 +85,16 @@ export function DigitalTwinScanFlow({ initialTab = 'builder' }: { readonly initi
   })
   const [skinCaptureNote, setSkinCaptureNote] = useState('Optical baseline')
 
-  // Neuro qEEG + OSA state
+  // Neuro qEEG + OSA state (raw text prevents blank inputs from silently coercing to 0)
   const [eegDevice, setEegDevice] = useState<EegDeviceVendor>('muse')
-  const [ahiInput, setAhiInput] = useState<number>(3.8)
-  const [spo2NadirInput, setSpo2NadirInput] = useState<number>(94)
+  const [ahiText, setAhiText] = useState<string>('3.8')
+  const [spo2NadirText, setSpo2NadirText] = useState<string>('94')
 
   // ANOVA mode
   const [anovaMode, setAnovaMode] = useState<'longitudinal' | 'bilateral'>('longitudinal')
 
-  const profileKey = account?.email ? account.email.split('@')[0] : 'rizkyazhar486'
-  const mrn = patient?.mrn || 'PMD-000486'
+  const profileKey = extractProfileKeyFromAccount(account)
+  const mrn = formatMrnForAccount(account, patient?.mrn)
 
   // Stop camera stream on unmount
   useEffect(() => {
@@ -109,7 +113,8 @@ export function DigitalTwinScanFlow({ initialTab = 'builder' }: { readonly initi
       return
     }
     if (typeof navigator === 'undefined' || !navigator.mediaDevices?.getUserMedia) {
-      setCameraStatus('No camera · Manual capture active')
+      setCameraBlocked(true)
+      setCameraStatus('Camera blocked')
       return
     }
     try {
@@ -119,16 +124,67 @@ export function DigitalTwinScanFlow({ initialTab = 'builder' }: { readonly initi
         videoRef.current.srcObject = stream
         await videoRef.current.play().catch(() => {})
       }
+      setCameraBlocked(false)
       setCameraActive(true)
       setCameraStatus('Live')
     } catch {
-      setCameraStatus('Permission denied · Calibration mode')
+      setCameraBlocked(true)
+      setCameraStatus('Camera blocked')
+    }
+  }
+
+  const onPhotoSelected = async (file?: File) => {
+    if (!file) return
+    try {
+      const imgUrl = URL.createObjectURL(file)
+      const img = new Image()
+      await new Promise<void>((resolve, reject) => {
+        img.onload = () => resolve()
+        img.onerror = () => reject(new Error('Image load failed'))
+        img.src = imgUrl
+      })
+      try {
+        const c = document.createElement('canvas')
+        c.width = 64
+        c.height = 64
+        const ctx = c.getContext('2d')
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, 64, 64)
+          const { data } = ctx.getImageData(16, 16, 32, 32)
+          let sumL = 0
+          const lums: number[] = []
+          for (let i = 0; i < data.length; i += 4) {
+            const lum = (0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2]) / 255
+            lums.push(lum)
+            sumL += lum
+          }
+          const n = Math.max(1, lums.length)
+          const meanL = sumL / n
+          const stdL = Math.sqrt(lums.reduce((acc, v) => acc + (v - meanL) ** 2, 0) / n)
+          setSkinOptical((prev) => ({
+            ...prev,
+            meanLuminance01: Math.max(0.18, Math.min(0.88, Number(meanL.toFixed(3)))),
+            toneStdDev01: Math.min(0.45, Number(stdL.toFixed(3))),
+          }))
+        }
+      } finally {
+        URL.revokeObjectURL(imgUrl)
+      }
+      setSkinCaptureNote(`Photo sampled (${file.name.slice(0, 24)})`)
+    } catch {
+      setSkinCaptureNote('Photo uploaded (fallback optical baseline)')
+    } finally {
+      setCameraBlocked(false)
+      setCameraStatus('Photo captured')
+      captureStep()
+      if (photoInputRef.current) photoInputRef.current.value = ''
     }
   }
 
   const captureStep = () => {
     setCapturedSteps((prev) => (prev.includes(step) ? prev : [...prev, step]))
     setStep((cur) => (cur < 3 ? ((cur + 1) as ScanStep) : 0))
+    void trackBetaFunnelStep(account, 'completed_scan')
   }
 
   const sampleSkinFrame = () => {
@@ -253,16 +309,16 @@ export function DigitalTwinScanFlow({ initialTab = 'builder' }: { readonly initi
     [eegDevice],
   )
 
-  const osa = useMemo(
-    () =>
-      evaluateOsaSleepMonitor({
-        ahiEventsPerHour: ahiInput,
-        odiEventsPerHour: Number((ahiInput * 0.85).toFixed(1)),
-        spo2NadirPct: spo2NadirInput,
-        studySource: 'hsat',
-      }),
-    [ahiInput, spo2NadirInput],
-  )
+  const osa = useMemo(() => {
+    const ahiVal = ahiText.trim() === '' ? Number.NaN : Number(ahiText)
+    const spo2Val = spo2NadirText.trim() === '' ? Number.NaN : Number(spo2NadirText)
+    return evaluateOsaSleepMonitor({
+      ahiEventsPerHour: ahiVal,
+      odiEventsPerHour: Number.isFinite(ahiVal) ? Number((ahiVal * 0.85).toFixed(1)) : null,
+      spo2NadirPct: spo2Val,
+      studySource: 'hsat',
+    })
+  }, [ahiText, spo2NadirText])
 
   const anova = useMemo(() => {
     if (anovaMode === 'bilateral') {
@@ -404,17 +460,60 @@ export function DigitalTwinScanFlow({ initialTab = 'builder' }: { readonly initi
               ))}
             </div>
 
-            {/* Minimal Reticle Stage */}
-            <div className="relative mt-3 flex h-48 items-center justify-center overflow-hidden rounded-xl border border-cyan-400/25 bg-black">
-              <video ref={videoRef} muted playsInline className={`h-full w-full object-cover ${cameraActive ? 'block' : 'hidden'}`} />
-              {!cameraActive && (
-                <svg viewBox="0 0 180 140" className="h-36 w-44" role="img" aria-label={`Scan reticle: ${SCAN_STEPS[step].label}`}>
-                  <ellipse cx="90" cy="68" rx={step === 3 ? 28 : 34} ry={step === 3 ? 52 : 46} fill="none" stroke="#22d3ee" strokeWidth="1.5" strokeDasharray="5 5" />
-                  <path d="M40 24 L26 24 L26 38 M140 24 L154 24 L154 38 M40 116 L26 116 L26 102 M140 116 L154 116 L154 102" fill="none" stroke="#10b981" strokeWidth="2" />
-                  <text x="90" y="72" textAnchor="middle" fill="#cbd5e1" fontSize="10" fontFamily="monospace">
-                    {SCAN_STEPS[step].label.toUpperCase()}
-                  </text>
-                </svg>
+            {/* Minimal Reticle Stage or Camera Blocked Fail-Safe Card */}
+            <input
+              ref={photoInputRef}
+              type="file"
+              accept="image/*"
+              capture="environment"
+              className="hidden"
+              onChange={(e) => void onPhotoSelected(e.target.files?.[0])}
+            />
+            <div className="relative mt-3 flex min-h-[192px] items-center justify-center overflow-hidden rounded-xl border border-cyan-400/25 bg-black p-3">
+              <video ref={videoRef} muted playsInline className={`h-48 w-full object-cover ${cameraActive ? 'block' : 'hidden'}`} />
+              {!cameraActive && cameraBlocked ? (
+                <div
+                  role="region"
+                  aria-label="Camera blocked recovery"
+                  data-testid="camera-blocked-recovery"
+                  className="dark w-full space-y-2.5 text-center text-white"
+                >
+                  <p className="text-xs font-bold text-amber-200">
+                    Camera blocked · Tap to Upload Photo or Use Guided Demo
+                  </p>
+                  <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                    <button
+                      type="button"
+                      onClick={() => photoInputRef.current?.click()}
+                      data-testid="scan-upload-photo-btn"
+                      className="min-h-[44px] rounded-xl border border-cyan-400/40 bg-cyan-500/15 px-3 text-xs font-bold text-cyan-100"
+                    >
+                      Upload Photo
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setCameraBlocked(false)
+                        setCameraStatus('Guided Demo')
+                        captureStep()
+                      }}
+                      data-testid="scan-guided-demo-btn"
+                      className="min-h-[44px] rounded-xl bg-emerald-500 px-3 text-xs font-black text-black"
+                    >
+                      Use Guided Demo
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                !cameraActive && (
+                  <svg viewBox="0 0 180 140" className="h-36 w-44" role="img" aria-label={`Scan reticle: ${SCAN_STEPS[step].label}`}>
+                    <ellipse cx="90" cy="68" rx={step === 3 ? 28 : 34} ry={step === 3 ? 52 : 46} fill="none" stroke="#22d3ee" strokeWidth="1.5" strokeDasharray="5 5" />
+                    <path d="M40 24 L26 24 L26 38 M140 24 L154 24 L154 38 M40 116 L26 116 L26 102 M140 116 L154 116 L154 102" fill="none" stroke="#10b981" strokeWidth="2" />
+                    <text x="90" y="72" textAnchor="middle" fill="#cbd5e1" fontSize="10" fontFamily="monospace">
+                      {SCAN_STEPS[step].label.toUpperCase()}
+                    </text>
+                  </svg>
+                )
               )}
             </div>
 
@@ -693,7 +792,7 @@ export function DigitalTwinScanFlow({ initialTab = 'builder' }: { readonly initi
       )}
 
       {/* TAB 4: AI BRAIN (qEEG) & OSA SLEEP APNEA MONITOR */}
-      {tab === 'neuro' && qEeg.ok && osa.ok && (
+      {tab === 'neuro' && qEeg.ok && (
         <div className="mt-4 space-y-3">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div className="flex flex-wrap gap-1.5">
@@ -716,17 +815,17 @@ export function DigitalTwinScanFlow({ initialTab = 'builder' }: { readonly initi
 
             <InfoDisclosure
               title="qEEG & OSA Clinical Details"
-              badge={osa.clinicianReferralRequired ? 'Referral' : qEeg.truthClass}
+              badge={osa.ok && osa.clinicianReferralRequired ? 'Referral' : qEeg.truthClass}
             >
               <p>
                 Peer Percentile: <strong>{qEeg.peerPercentile}th</strong> · Cognitive Delta:{' '}
                 <strong>{qEeg.cognitiveDeltaYears > 0 ? `+${qEeg.cognitiveDeltaYears}` : qEeg.cognitiveDeltaYears} yrs</strong>
               </p>
               <p className="font-mono text-[10px] text-cyan-200">
-                θ/β {qEeg.ratios.thetaToBeta} · α/θ {qEeg.ratios.alphaToTheta} · SpO2 Nadir {osa.spo2NadirPct}% · ODI {osa.odiEventsPerHour ?? '—'}/hr
+                θ/β {qEeg.ratios.thetaToBeta} · α/θ {qEeg.ratios.alphaToTheta} · SpO2 Nadir {osa.ok ? `${osa.spo2NadirPct}%` : '—'} · ODI {osa.ok ? (osa.odiEventsPerHour ?? '—') : '—'}/hr
               </p>
-              <p className={osa.clinicianReferralRequired ? 'text-rose-300 font-semibold' : 'text-slate-300'}>
-                {osa.referralGuidance}
+              <p className={osa.ok && osa.clinicianReferralRequired ? 'text-rose-300 font-semibold' : 'text-slate-300'}>
+                {osa.ok ? osa.referralGuidance : osa.error}
               </p>
               <p className="text-[10px] text-slate-400">{qEeg.epistemicNotice}</p>
             </InfoDisclosure>
@@ -748,8 +847,8 @@ export function DigitalTwinScanFlow({ initialTab = 'builder' }: { readonly initi
             </div>
             <div className="rounded-2xl border border-white/10 bg-[#090d14] p-4">
               <div className="font-mono text-[10px] uppercase text-slate-400">OSA / AHI</div>
-              <div className={`mt-1 font-mono text-2xl font-black ${osa.clinicianReferralRequired ? 'text-rose-400' : 'text-emerald-300'}`}>
-                {osa.ahiEventsPerHour} · {osa.severity}
+              <div className={`mt-1 font-mono text-2xl font-black ${osa.ok && osa.clinicianReferralRequired ? 'text-rose-400' : 'text-emerald-300'}`}>
+                {osa.ok ? `${osa.ahiEventsPerHour} · ${osa.severity}` : '— · Unrecorded'}
               </div>
               <div className="mt-1 flex items-center gap-2">
                 <label className="font-mono text-[10px] text-slate-400">
@@ -759,8 +858,8 @@ export function DigitalTwinScanFlow({ initialTab = 'builder' }: { readonly initi
                     min={0}
                     max={80}
                     step={0.5}
-                    value={ahiInput}
-                    onChange={(e) => setAhiInput(Number(e.target.value) || 0)}
+                    value={ahiText}
+                    onChange={(e) => setAhiText(e.target.value)}
                     className="dark ml-1 w-14 rounded border border-white/15 bg-black px-1.5 py-0.5 text-white"
                   />
                 </label>
@@ -770,8 +869,8 @@ export function DigitalTwinScanFlow({ initialTab = 'builder' }: { readonly initi
                     type="number"
                     min={65}
                     max={100}
-                    value={spo2NadirInput}
-                    onChange={(e) => setSpo2NadirInput(Number(e.target.value) || 94)}
+                    value={spo2NadirText}
+                    onChange={(e) => setSpo2NadirText(e.target.value)}
                     className="dark ml-1 w-14 rounded border border-white/15 bg-black px-1.5 py-0.5 text-white"
                   />
                 </label>

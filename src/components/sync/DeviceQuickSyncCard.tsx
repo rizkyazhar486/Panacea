@@ -9,9 +9,16 @@ import {
   exportArtifactNow,
   readAutoExportMode,
   runAutoExportOnSync,
+  shareOrCopyArtifact,
   writeAutoExportMode,
 } from './autoExportBrowserAdapter'
 import { InfoDisclosure } from '../ui/InfoDisclosure'
+import {
+  extractProfileKeyFromAccount,
+  formatDisplayNameForAccount,
+  formatMrnForAccount,
+} from '../../domains/beta/index.ts'
+import { trackBetaFunnelStep } from '../beta/betaClientAdapter'
 
 interface QuickDevice {
   readonly id: string
@@ -51,17 +58,25 @@ export function DeviceQuickSyncCard() {
   const [bleBusy, setBleBusy] = useState(false)
   const [qrOpen, setQrOpen] = useState(false)
   const [autoMode, setAutoMode] = useState<AutoExportMode>(() => readAutoExportMode())
+  const [manualWeight, setManualWeight] = useState('')
+  const [manualHr, setManualHr] = useState('')
+  const [manualSleep, setManualSleep] = useState('')
+
+  const bleSupported =
+    typeof navigator !== 'undefined' &&
+    'bluetooth' in navigator &&
+    Boolean((navigator as { bluetooth?: unknown }).bluetooth)
+  const visibleDevices = bleSupported
+    ? QUICK_DEVICES
+    : QUICK_DEVICES.filter((d) => d.kind !== 'ble')
 
   const vitals = useMemo(() => {
     void rev
     return readUnifiedLocalVitals(account, { patient })
   }, [account, patient, rev])
 
-  const profileKey = account?.email ? account.email.split('@')[0] : 'rizkyazhar486'
-  const canonicalName =
-    account?.isOwner || profileKey.toLowerCase().includes('rizky')
-      ? 'dr. Rizky Muhammad Azrissal'
-      : account?.name || 'dr. Rizky Muhammad Azrissal'
+  const profileKey = extractProfileKeyFromAccount(account)
+  const canonicalName = formatDisplayNameForAccount(account)
 
   const buildExportInput = (): CanonicalExportBundleInput => {
     const nowIso = new Date().toISOString()
@@ -71,7 +86,7 @@ export function DeviceQuickSyncCard() {
         profileKey,
         fullName: canonicalName,
         username: `@${profileKey.replace(/[^a-zA-Z0-9_]/g, '') || 'rizkyazhar486'}`,
-        mrn: patient?.mrn || 'PMD-000486',
+        mrn: formatMrnForAccount(account, patient?.mrn),
       },
       vitals: {
         heightCm: vitals.heightCm ?? null,
@@ -169,6 +184,44 @@ export function DeviceQuickSyncCard() {
   const handleManualExport = (format: ExportFormat) => {
     const res = exportArtifactNow(format, buildExportInput())
     setStatusMsg(res.status)
+    void trackBetaFunnelStep(account, 'completed_export')
+  }
+
+  const handleShareCopy = async () => {
+    const res = await shareOrCopyArtifact('json', buildExportInput())
+    setStatusMsg(res.status)
+    if (res.ok) void trackBetaFunnelStep(account, 'completed_export')
+  }
+
+  const saveQuickManualEntry = () => {
+    const patch: Record<string, number | string> = { source: 'Manual Entry' }
+    let count = 0
+    const w = manualWeight.trim() ? Number(manualWeight) : Number.NaN
+    if (Number.isFinite(w) && w > 20 && w < 350) {
+      patch.weightKg = w
+      count += 1
+    }
+    const hr = manualHr.trim() ? Number(manualHr) : Number.NaN
+    if (Number.isFinite(hr) && hr >= 30 && hr <= 220) {
+      patch.restingHr = hr
+      count += 1
+    }
+    const sl = manualSleep.trim() ? Number(manualSleep) : Number.NaN
+    if (Number.isFinite(sl) && sl > 0 && sl <= 24) {
+      patch.sleepH = sl
+      count += 1
+    }
+    if (count === 0) {
+      setStatusMsg('Enter at least one valid Weight, Resting HR, or Sleep value.')
+      return
+    }
+    mergeVitals(patch)
+    try {
+      window.dispatchEvent(new Event('panacea:health-updated'))
+    } catch { /* ignore */ }
+    setRev((v) => v + 1)
+    setStatusMsg(`Saved ${count} manual reading(s)`)
+    void trackBetaFunnelStep(account, 'completed_sync')
   }
 
   const handleAutoModeChange = (next: AutoExportMode) => {
@@ -189,13 +242,20 @@ export function DeviceQuickSyncCard() {
 
         <InfoDisclosure title="Sync & Auto-Export Architecture" badge="SHA-256">
           <p>Supports Apple Health XML/JSON, WHOOP/Garmin/Oura CSV/JSON, and Web Bluetooth GATT HR/EEG.</p>
-          <p>Exports use synchronous gesture triggers, sanitized filenames, Object URL revocation, and SHA-256 deduplication. Offline Neon sync queues safely in local storage.</p>
+          <p>Safari hides Web Bluetooth GATT; use File Import or Quick Entry.</p>
+          <p>Gesture-safe exports with SHA-256 deduplication, /api/v1/wearables/webhook bridge, and Neon outbox queueing.</p>
         </InfoDisclosure>
       </header>
 
-      {/* 6 Quick-Connect Tiles (1-word status) */}
+      <div className="mt-3 flex flex-wrap gap-1.5 font-mono text-[10px] font-bold text-cyan-200">
+        <span className="rounded-full border border-cyan-400/30 bg-cyan-500/10 px-2.5 py-1">1. Pick Device</span>
+        <span className="rounded-full border border-cyan-400/30 bg-cyan-500/10 px-2.5 py-1">2. Connect / QR</span>
+        <span className="rounded-full border border-emerald-400/30 bg-emerald-500/10 px-2.5 py-1 text-emerald-200">3. Auto-Export</span>
+      </div>
+
+      {/* Quick-Connect Tiles (1-word status; iOS Safari automatically prioritizes File Import + Manual Entry) */}
       <div className="mt-4 grid grid-cols-2 gap-2.5 sm:grid-cols-3">
-        {QUICK_DEVICES.map((d) => {
+        {visibleDevices.map((d) => {
           const connected = isConnected(d)
           return (
             <button
@@ -221,6 +281,47 @@ export function DeviceQuickSyncCard() {
             </button>
           )
         })}
+      </div>
+
+      {/* 1-Tap Quick Manual Entry (works cleanly on every mobile browser without BLE) */}
+      <div className="mt-3 grid grid-cols-2 gap-2 rounded-2xl border border-white/10 bg-[#090d14] p-3 sm:grid-cols-4">
+        <input
+          type="number"
+          step="0.1"
+          placeholder="Weight kg"
+          aria-label="Quick manual weight kg"
+          data-testid="sync-manual-weight"
+          value={manualWeight}
+          onChange={(e) => setManualWeight(e.target.value)}
+          className="min-h-[44px] rounded-xl border border-white/15 bg-black/50 px-2.5 font-mono text-xs text-white outline-none focus:border-cyan-400"
+        />
+        <input
+          type="number"
+          placeholder="Resting HR"
+          aria-label="Quick manual resting HR"
+          data-testid="sync-manual-hr"
+          value={manualHr}
+          onChange={(e) => setManualHr(e.target.value)}
+          className="min-h-[44px] rounded-xl border border-white/15 bg-black/50 px-2.5 font-mono text-xs text-white outline-none focus:border-cyan-400"
+        />
+        <input
+          type="number"
+          step="0.1"
+          placeholder="Sleep hrs"
+          aria-label="Quick manual sleep hours"
+          data-testid="sync-manual-sleep"
+          value={manualSleep}
+          onChange={(e) => setManualSleep(e.target.value)}
+          className="min-h-[44px] rounded-xl border border-white/15 bg-black/50 px-2.5 font-mono text-xs text-white outline-none focus:border-cyan-400"
+        />
+        <button
+          type="button"
+          onClick={saveQuickManualEntry}
+          data-testid="sync-manual-save-btn"
+          className="min-h-[44px] rounded-xl border border-emerald-400/40 bg-emerald-500/20 px-3 text-xs font-bold text-emerald-200 hover:bg-emerald-500/30"
+        >
+          Quick Save
+        </button>
       </div>
 
       {/* 1-Tap Sync from Phone Bar */}
@@ -294,7 +395,7 @@ export function DeviceQuickSyncCard() {
           </div>
         </div>
 
-        <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
+        <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-5">
           {(
             [
               { id: 'json', label: 'Export JSON' },
@@ -312,6 +413,14 @@ export function DeviceQuickSyncCard() {
               {btn.label}
             </button>
           ))}
+          <button
+            type="button"
+            onClick={() => void handleShareCopy()}
+            data-testid="sync-share-copy-btn"
+            className="col-span-2 min-h-[44px] rounded-xl border border-cyan-400/35 bg-cyan-500/15 font-mono text-[11px] font-bold text-cyan-200 transition hover:bg-cyan-500/25 sm:col-span-1"
+          >
+            Copy / Share JSON
+          </button>
         </div>
       </div>
 

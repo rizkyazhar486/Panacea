@@ -14,6 +14,9 @@ const UnifiedHumanSimulationProjector = lazy(() => import('./UnifiedHumanSimulat
 const PanelKoplingMultiSkala = lazy(() => import('../../components/digital-twin/PanelKoplingMultiSkala'))
 const PanelUbiquitin = lazy(() => import('../../components/digital-twin/PanelUbiquitin'))
 const BodyExposureLocalHub = lazy(loadBodyExposureLocalHub)
+const BodyExposureUnifiedLensBar = lazy(() =>
+  import('../../components/bodyhub/BodyExposureUnifiedLensBar').then((m) => ({ default: m.BodyExposureUnifiedLensBar })),
+)
 
 type ExposureMode = 'identity' | 'atlas' | 'localization' | 'physiology' | 'imaging' | 'endoscopy' | 'surgery' | 'molecular' | 'clinical'
 
@@ -151,8 +154,8 @@ export function BodyExposureOS() {
             <h2 id="body-exposure-os-title" className="mt-1 text-xl font-black tracking-[-.035em] text-white sm:text-2xl">
               Your body. Every scale.
             </h2>
-            <BatasKlaimKesehatan permukaan="body.exposure-os" className="mt-2 text-[11px] leading-snug text-white/55" />
-            <p className="mt-1 truncate text-[10px] font-bold text-white/42 sm:text-[11px]">
+            <BatasKlaimKesehatan permukaan="body.exposure-os" className="mt-2" />
+            <p className="mt-1 truncate text-[10px] font-bold text-slate-300 sm:text-[11px]">
               You → anatomy → function → imaging → micro
             </p>
           </div>
@@ -222,6 +225,9 @@ export function BodyExposureOS() {
             onDomainChange={syncModeFromProjector}
             requestedStructure={strukturDiminta}
           />
+        </Suspense>
+        <Suspense fallback={null}>
+          <BodyExposureUnifiedLensBar selectedSystemId={selectedBodySystemId} onSelectSystem={setSelectedBodySystemId} />
         </Suspense>
       </div>
 

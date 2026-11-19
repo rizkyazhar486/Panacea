@@ -8,6 +8,7 @@
 
 import { getVitals, type Vitals } from '../../lib/healthVitals.ts'
 import { getDemoTersimpan, getHealthCache } from '../../lib/profile.ts'
+import { isBetaAccount } from '../beta/betaOnboardingEngine.ts'
 import type { Account, Patient, ProfileEdit, Role, SleepLog, VitalSign } from '../../lib/types.ts'
 
 export const PASSKEY_STORAGE_KEY = 'panacea.passkeys.v1'
@@ -189,9 +190,10 @@ export function readUnifiedLocalVitals(
   },
 ): Vitals {
   const scoped = getVitals(account ?? null)
-  const hc = readPositiveHealthProfileCache()
-  const bc = readBodyCompFilled()
-  const demo = getDemoTersimpan()
+  const isolatedBeta = isBetaAccount(account)
+  const hc = isolatedBeta ? {} : readPositiveHealthProfileCache()
+  const bc = isolatedBeta ? {} : readBodyCompFilled()
+  const demo = isolatedBeta ? {} : getDemoTersimpan()
 
   const latestPatientVital = options?.patientVitals?.length
     ? [...options.patientVitals].sort((a, b) => (a.takenAt < b.takenAt ? 1 : -1))[0]

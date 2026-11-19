@@ -10,6 +10,7 @@ import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
 import { useOptionalStore } from '../lib/store'
 import { useOptionalLongitudinalState } from '../lib/useLongitudinalState'
 import { getVitals } from '../lib/healthVitals'
+import { WhenOpened } from '../shared/ui/WhenOpened'
 
 const BodyComposition = lazy(() => import('./bodyhub/BodyComposition').then((m) => ({ default: m.BodyComposition })))
 const BodyExposureOS = lazy(() => import('./bodyhub/BodyExposureOS').then((m) => ({ default: m.BodyExposureOS })))
@@ -244,16 +245,18 @@ export function UnifiedBodyWorkspace() {
           </Suspense>
         )}
         {(activeKey === 'body' || activeKey === 'body-exposure') && (
-          <details className="rounded-2xl border border-cyan-400/20 bg-[#05070b] p-3 text-white">
+          <details className="dark rounded-2xl border border-cyan-400/20 bg-[#05070b] p-3 text-white">
             <summary className="flex min-h-[44px] cursor-pointer list-none items-center justify-between font-mono text-[11px] font-bold uppercase tracking-[0.12em] text-cyan-300">
               <span>Digital Twin · CAD/CAE · Skin · Brain/OSA · ANOVA</span>
               <span>OPEN ▾</span>
             </summary>
-            <div className="mt-3">
-              <Suspense fallback={<div className="p-4 text-xs text-slate-400">Loading studio…</div>}>
-                <DigitalTwinScanFlow />
-              </Suspense>
-            </div>
+            <WhenOpened>
+              <div className="mt-3">
+                <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading studio…</div>}>
+                  <DigitalTwinScanFlow />
+                </Suspense>
+              </div>
+            </WhenOpened>
           </details>
         )}
         {['body', 'training', 'ranked', 'recovery', 'nutrition', 'health-data'].includes(activeKey) && (

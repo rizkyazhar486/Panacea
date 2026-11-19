@@ -1,7 +1,12 @@
-import { useEffect, useState } from 'react'
+import { lazy, Suspense, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useStore } from '../../lib/store'
 import { readUnifiedLocalVitals } from '../../domains/identity/localRecovery'
+import {
+  extractProfileKeyFromAccount,
+  formatDisplayNameForAccount,
+  formatMrnForAccount,
+} from '../../domains/beta/index.ts'
 import type { AutoExportMode, ExportFormat } from '../../lib/export/autoExportEngine'
 import {
   exportArtifactNow,
@@ -40,6 +45,10 @@ import { enablePush, disablePush, pushStatus, resyncPush, type PushStatus } from
 import { InstallApp } from '../../components/InstallApp'
 import { OfflineReady, type OfflinePage } from '../../components/OfflineReady'
 import { api, backendEnabled } from '../../lib/api'
+
+const BetaFeedbackWidget = lazy(() =>
+  import('../../components/beta/BetaFeedbackWidget').then((m) => ({ default: m.BetaFeedbackWidget })),
+)
 
 const OFFLINE_PAGES: OfflinePage[] = [
   { label: 'Athlete', imp: () => import('../Athlete') },
@@ -136,18 +145,15 @@ export function Settings() {
   function exportData(format: ExportFormat = 'json') {
     const vitals = readUnifiedLocalVitals(state.account, { patient: store.activePatient })
     const nowIso = new Date().toISOString()
-    const profileKey = state.account?.email ? state.account.email.split('@')[0] : 'rizkyazhar486'
-    const fullName =
-      state.account?.isOwner || profileKey.toLowerCase().includes('rizky')
-        ? 'dr. Rizky Muhammad Azrissal'
-        : state.account?.name || 'dr. Rizky Muhammad Azrissal'
+    const profileKey = extractProfileKeyFromAccount(state.account)
+    const fullName = formatDisplayNameForAccount(state.account)
     const res = exportArtifactNow(format, {
       exportedAtIso: nowIso,
       owner: {
         profileKey,
         fullName,
         username: `@${profileKey.replace(/[^a-zA-Z0-9_]/g, '') || 'rizkyazhar486'}`,
-        mrn: store.activePatient?.mrn || 'PMD-000486',
+        mrn: formatMrnForAccount(state.account, store.activePatient?.mrn),
       },
       vitals: {
         heightCm: vitals.heightCm ?? null,
@@ -383,6 +389,10 @@ export function Settings() {
           <Button variant="ghost" onClick={resetDemo} className="shrink-0">Reset</Button>
         </div>
       </Card>
+
+      <Suspense fallback={null}>
+        <BetaFeedbackWidget mode="card" />
+      </Suspense>
 
       {/* Sesi Akun & Logout */}
       <Card>

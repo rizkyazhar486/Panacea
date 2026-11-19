@@ -1,10 +1,14 @@
-import { useState, type CSSProperties } from 'react'
+import { lazy, Suspense, useState, type CSSProperties } from 'react'
 import { Link } from 'react-router-dom'
 import { LANGS, setLang, tr } from '../../../lib/i18n'
 import { useBahasa } from '../../../lib/useBahasa'
 import { SleepCheckin } from '../../recovery-checkin/index'
 import { readSimpleStart, writeSimpleStart } from '../adapters/simpleModeStorage'
 import { SEE_EVERYTHING_ROUTE, SIMPLE_ACTIONS } from '../model/simpleActions'
+
+const UniversalSimpleDeck = lazy(() =>
+  import('../../../components/universal/UniversalSimpleDeck').then((m) => ({ default: m.UniversalSimpleDeck })),
+)
 
 // Gaya inline yang sengaja dibatasi pada halaman ini: anggaran CSS pemblokir sudah
 // habis (cssBlokirGzip ≤ 115200), dan halaman ini dimuat malas.
@@ -48,6 +52,10 @@ export function SimpleHome() {
           </span>
         </Link>
       ))}
+
+      <Suspense fallback={null}>
+        <UniversalSimpleDeck />
+      </Suspense>
 
       <SleepCheckin />
 

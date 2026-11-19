@@ -168,3 +168,16 @@ CREATE TABLE IF NOT EXISTS panacea_sync_outbox (
   synced_at TIMESTAMPTZ
 );
 CREATE INDEX IF NOT EXISTS idx_panacea_outbox_status ON panacea_sync_outbox(status, created_at ASC);
+
+CREATE TABLE IF NOT EXISTS panacea_continuum_episodes (
+  episode_id TEXT PRIMARY KEY,
+  profile_key TEXT NOT NULL REFERENCES panacea_profiles(profile_key) ON DELETE CASCADE,
+  phase TEXT NOT NULL CHECK (phase IN ('before_illness', 'during_illness', 'after_illness')),
+  literacy_lens TEXT NOT NULL DEFAULT 'plain_universal' CHECK (literacy_lens IN ('plain_universal', 'patient_partner', 'clinician_brief')),
+  teach_back_confirmed BOOLEAN NOT NULL DEFAULT FALSE,
+  red_flag_escalated BOOLEAN NOT NULL DEFAULT FALSE,
+  non_phi_pass_ref TEXT NOT NULL,
+  clinically_reviewed BOOLEAN NOT NULL DEFAULT FALSE,
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_panacea_continuum_profile ON panacea_continuum_episodes(profile_key, updated_at DESC);
