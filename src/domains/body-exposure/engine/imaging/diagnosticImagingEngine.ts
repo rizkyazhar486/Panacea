@@ -33,9 +33,9 @@ export const diagnosticImagingEngine = {
   evaluateTransferFunction: evaluateHounsfieldTransferFunction,
   computeMprSlice: computeMprSliceCoordinates,
   createDefaultState: createDefaultKaloLumenState,
-  reconstructPhotorealistic3DCGFromDicomFolder: (kalolumenModule as any).reconstructPhotorealistic3DCGFromDicomFolder ?? (() => ({ status: "reconstructed" })),
-  updateIndependentLayerCrossSection: (kalolumenModule as any).updateIndependentLayerCrossSection ?? (() => ({ status: "updated" })),
-  updateDirectionalLightSource: (kalolumenModule as any).updateDirectionalLightSource ?? (() => ({ status: "lit" }))
+  reconstructPhotorealistic3DCGFromDicomFolder: kalolumenModule.reconstructPhotorealistic3DCGFromDicomFolder,
+  updateIndependentLayerCrossSection: kalolumenModule.updateIndependentLayerCrossSection,
+  updateDirectionalLightSource: kalolumenModule.updateDirectionalLightSource,
 };
 
 export { createDefaultKaloLumenState };

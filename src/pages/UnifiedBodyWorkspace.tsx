@@ -228,6 +228,13 @@ export function UnifiedBodyWorkspace() {
       </section>
 
       <section role="tabpanel" aria-label={active.label} className="min-w-0 space-y-3">
+        {isExposure ? (
+          <Suspense fallback={<Loader exposure />}><Active /></Suspense>
+        ) : (
+          <PersonalBodySurfaceShown>
+            <Suspense fallback={<Loader />}><Active /></Suspense>
+          </PersonalBodySurfaceShown>
+        )}
         {activeKey === 'body' && (
           <Suspense fallback={<div className="p-4 text-xs text-white/50">Loading cockpit…</div>}>
             <UniversalCompactBodyCockpit />
@@ -235,13 +242,6 @@ export function UnifiedBodyWorkspace() {
         )}
         {['body', 'training', 'ranked', 'recovery', 'nutrition', 'health-data'].includes(activeKey) && (
           <YourBodyDailyStrip activeKey={activeKey} />
-        )}
-        {isExposure ? (
-          <Suspense fallback={<Loader exposure />}><Active /></Suspense>
-        ) : (
-          <PersonalBodySurfaceShown>
-            <Suspense fallback={<Loader />}><Active /></Suspense>
-          </PersonalBodySurfaceShown>
         )}
       </section>
 
@@ -288,7 +288,7 @@ function YourBodyDailyStrip({ activeKey }: { readonly activeKey: BodyView }) {
         <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#5ff2a7' }}>{copy.title}</div>
         <div style={{ marginTop: 2, fontSize: 12, color: '#cbd5e1' }}>{copy.detail}</div>
       </div>
-      <Link to={copy.to} style={{ minHeight: 38, display: 'inline-flex', alignItems: 'center', padding: '0 12px', borderRadius: 999, border: '1px solid rgba(0,191,99,0.45)', background: 'rgba(0,191,99,0.14)', color: '#5ff2a7', fontSize: 11, fontWeight: 800, textDecoration: 'none' }}>
+      <Link to={copy.to} style={{ minHeight: 44, display: 'inline-flex', alignItems: 'center', padding: '0 12px', borderRadius: 999, border: '1px solid rgba(0,191,99,0.45)', background: 'rgba(0,191,99,0.14)', color: '#5ff2a7', fontSize: 11, fontWeight: 800, textDecoration: 'none' }}>
         {copy.cta} →
       </Link>
     </div>

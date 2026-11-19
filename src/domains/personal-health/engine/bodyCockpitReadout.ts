@@ -58,6 +58,19 @@ export interface AllostaticPidFeedback {
   readonly source: string
 }
 
+export interface ClinicalPreventiveAssuranceReadout {
+  readonly recordedSignalCount: number
+  readonly totalCoreSignals: 10
+  readonly coveragePct: number
+  readonly triageStage: 'routine-preventive' | 'lifestyle-early-action' | 'clinician-review-recommended'
+  readonly assuranceClaimReadiness: 'verified-longitudinal-ready' | 'partial-baseline'
+  readonly preventableAcuteBurdenReductionEstPct: number
+  readonly dailyPreventionActions: readonly string[]
+  readonly clinicallyReviewed: false
+  readonly basis: 'derived'
+  readonly source: string
+}
+
 const RANGE = {
   weightKg: [20, 400], heightCm: [80, 250], age: [1, 120], waistCm: [30, 250], hipCm: [40, 250], neckCm: [15, 80],
   bodyFatPct: [2, 70], muscleMassKg: [5, 120], visceralFatLevel: [1, 59], totalBodyWaterPct: [30, 80],
@@ -86,6 +99,7 @@ export interface CockpitReadout {
   networkBuses: NetworkPhysiologyBuses
   circadianBorbely: CircadianBorbelyState | null
   allostaticPid: AllostaticPidFeedback | null
+  preventiveAssurance: ClinicalPreventiveAssuranceReadout | null
   /** Plain names of the recorded inputs that would unlock a derived value that is currently missing. */
   missing: readonly string[]
 }
@@ -100,6 +114,70 @@ export function navyBodyFatPct(sex: 'M' | 'F', heightCm: number, waistCm: number
   const bf = 495 / dens - 450
   const [lo, hi] = RANGE.bodyFatPct
   return Number.isFinite(bf) && bf >= lo && bf <= hi ? round(bf, 1) : null
+}
+
+/** Deterministic preventive triage, outpatient burden estimate, and assurance readiness; null with < 2 core signals. */
+function derivePreventiveAssurance(p: {
+  w: number | null; h: number | null; waist: number | null
+  bp: { systolic: number; diastolic: number } | null
+  rhr: number | null; hrv: number | null; spo2: number | null
+  vo2: number | null; sleep: number | null; wkMin: number | null
+  smmPresent: boolean
+}): ClinicalPreventiveAssuranceReadout | null {
+  const coreSignals = [p.w, p.h, p.waist, p.bp, p.rhr, p.hrv, p.spo2, p.vo2, p.sleep, p.smmPresent ? 1 : null]
+  const recordedSignalCount = coreSignals.filter((v) => v !== null).length
+  if (recordedSignalCount < 2) return null
+
+  const needsClinician =
+    (p.spo2 !== null && p.spo2 < 94) ||
+    (p.bp !== null && (p.bp.systolic >= 140 || p.bp.diastolic >= 90)) ||
+    (p.rhr !== null && p.rhr >= 100)
+  const needsEarlyAction =
+    (p.bp !== null && (p.bp.systolic >= 125 || p.bp.diastolic >= 80)) ||
+    (p.w !== null && p.h !== null && p.waist !== null && p.waist / p.h >= 0.5) ||
+    (p.sleep !== null && p.sleep < 6.5)
+
+  const triageStage: ClinicalPreventiveAssuranceReadout['triageStage'] = needsClinician
+    ? 'clinician-review-recommended'
+    : needsEarlyAction
+      ? 'lifestyle-early-action'
+      : 'routine-preventive'
+
+  const actions: string[] = []
+  if (needsClinician) {
+    actions.push('Book clinician review for recorded abnormal vital threshold before strenuous exertion.')
+  }
+  if (p.bp !== null && (p.bp.systolic >= 125 || p.bp.diastolic >= 80)) {
+    actions.push('Repeat morning seated blood pressure measurement (2 readings, 1 min apart) and moderate sodium.')
+  }
+  if (p.sleep !== null && p.sleep < 6.5) {
+    actions.push('Protect a 7-8 hour nocturnal recovery window to lower autonomic strain.')
+  }
+  if (p.w !== null && p.h !== null && p.waist !== null && p.waist / p.h >= 0.5) {
+    actions.push('Track waist-to-height ratio weekly alongside 150+ min/week moderate aerobic movement.')
+  }
+  if (p.wkMin !== null && p.wkMin < 150) {
+    actions.push('Accumulate >= 150 min/week moderate aerobic activity plus 2x resistance sessions.')
+  }
+  if (actions.length === 0) {
+    actions.push('Maintain daily baseline logging and routine outpatient preventive checkups.')
+  }
+  if (recordedSignalCount < 4) {
+    actions.push('Record >= 4 longitudinal signals (BP, RHR/HRV, SpO2, Sleep/Body) to unlock full assurance readiness.')
+  }
+
+  return {
+    recordedSignalCount,
+    totalCoreSignals: 10,
+    coveragePct: Math.round((recordedSignalCount / 10) * 100),
+    triageStage,
+    assuranceClaimReadiness: recordedSignalCount >= 4 ? 'verified-longitudinal-ready' : 'partial-baseline',
+    preventableAcuteBurdenReductionEstPct: Math.min(45, recordedSignalCount * 4 + (triageStage === 'routine-preventive' ? 5 : 0)),
+    dailyPreventionActions: actions,
+    clinicallyReviewed: false,
+    basis: 'derived',
+    source: 'Illustrative outpatient-first preventive surveillance & triage model from recorded baselines (draft only)',
+  }
 }
 
 export function buildCockpitReadout(input: CockpitInput): CockpitReadout {
@@ -239,6 +317,11 @@ export function buildCockpitReadout(input: CockpitInput): CockpitReadout {
     }
   }
 
+  const preventiveAssurance = derivePreventiveAssurance({
+    w, h, waist, bp, rhr, hrv, spo2, vo2, sleep, wkMin,
+    smmPresent: compartments.skeletalMuscleMassKg !== null,
+  })
+
   return {
     weight: rec(w), height: rec(h), bmi,
     waistToHip: waist !== null && hip !== null ? der(round(waist / hip, 2), 'waist ÷ hip') : null,
@@ -248,7 +331,7 @@ export function buildCockpitReadout(input: CockpitInput): CockpitReadout {
     meanArterialPressure: mapVal !== null ? der(mapVal, '(systolic + 2 × diastolic) ÷ 3') : null,
     restingHr: rec(rhr), hrvMs: rec(hrv),
     spo2Pct: rec(spo2), vo2max: rec(vo2), sleepH: rec(sleep),
-    compartments, networkBuses, circadianBorbely, allostaticPid,
+    compartments, networkBuses, circadianBorbely, allostaticPid, preventiveAssurance,
     missing: [...new Set(missing)],
   }
 }

@@ -33,3 +33,5 @@ export const CANONICAL_TEACHABLE_FIGURES = [
   { figureId: "TEACHABLE_FIG_CICR_STARLING", structureFmaId: "FMA:7101", predictPrompt: "PREDICT FIRST: If end-diastolic sarcomere length increases from 1.9 um to 2.2 um, what happens to active tension?", verifiedMechanismOption: "Tension rises sharply because interfilament lattice spacing narrows and Troponin-C Ca2+ affinity increases." },
   { figureId: "TEACHABLE_FIG_KALOLUMEN_HU_LAYERS", structureFmaId: "FMA:7088", predictPrompt: "PREDICT FIRST: If you toggle Layer 1 Cross-Section ON while keeping Layer 2 & 3 OFF, what is revealed?", verifiedMechanismOption: "Only the outer skin envelope is sliced open, exposing the intact 3D myocardium and bone inside." }
 ] as const;
+
+export const updateDirectionalLightSource = computeLightDirectionFromMouseDrag;

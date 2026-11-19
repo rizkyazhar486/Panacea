@@ -44,4 +44,25 @@ assert.equal(tanpaUsia.bmr, null); assert.equal(tanpaUsia.bmi?.value, 22.9)
 assert.equal(buildCockpitReadout({ weightKg: 70, heightCm: 175, age: 30, sex: 'X' as never }).bmr, null)
 // determinisme
 assert.deepEqual(buildCockpitReadout({ weightKg: 70, heightCm: 175 }), buildCockpitReadout({ weightKg: 70, heightCm: 175 }))
+
+// preventiveAssurance: fail-closed tanpa < 2 sinyal, deterministik & terukur dengan sinyal nyata
+assert.equal(kosong.preventiveAssurance, null, 'preventiveAssurance harus null tanpa data')
+assert.equal(buildCockpitReadout({ weightKg: 70 }).preventiveAssurance, null, '1 sinyal tidak boleh menghasilkan skor preventiveAssurance')
+assert.ok(p.preventiveAssurance !== null)
+assert.equal(p.preventiveAssurance.recordedSignalCount, 4)
+assert.equal(p.preventiveAssurance.totalCoreSignals, 10)
+assert.equal(p.preventiveAssurance.coveragePct, 40)
+assert.equal(p.preventiveAssurance.triageStage, 'lifestyle-early-action') // diastolic 80 >= 80
+assert.equal(p.preventiveAssurance.assuranceClaimReadiness, 'verified-longitudinal-ready')
+assert.equal(p.preventiveAssurance.clinicallyReviewed, false)
+assert.ok(p.preventiveAssurance.dailyPreventionActions.length >= 1)
+
+// normal vs eskalasi berbasis nilai nyata
+const routine = buildCockpitReadout({ weightKg: 70, heightCm: 175, age: 30, sex: 'M', systolic: 115, diastolic: 75, restingHr: 60 })
+assert.equal(routine.preventiveAssurance?.triageStage, 'routine-preventive')
+const hypo = buildCockpitReadout({ spo2Pct: 92, restingHr: 70 })
+assert.equal(hypo.preventiveAssurance?.triageStage, 'clinician-review-recommended')
+const early = buildCockpitReadout({ systolic: 132, diastolic: 84, sleepH: 5.5 })
+assert.equal(early.preventiveAssurance?.triageStage, 'lifestyle-early-action')
+
 console.log('body-cockpit-readout: OK')

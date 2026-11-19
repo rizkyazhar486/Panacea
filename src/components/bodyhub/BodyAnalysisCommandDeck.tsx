@@ -209,6 +209,36 @@ function KernelTelemetryDrawer() {
         </div>
       </div>
 
+      {/* Fail-closed Preventive Surveillance, Outpatient Cost Model & Assurance Readiness */}
+      <div className="rounded-xl border border-emerald-400/20 bg-white/[0.03] px-3 py-2.5 text-[11px] text-slate-200">
+        {cockpit.preventiveAssurance ? (
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div className="space-y-0.5">
+              <div className="font-astro text-[10px] font-bold uppercase tracking-[0.14em] text-emerald-300">
+                Preventive Surveillance &amp; Assurance Readiness · {cockpit.preventiveAssurance.triageStage}
+              </div>
+              <div className="text-slate-200">{cockpit.preventiveAssurance.dailyPreventionActions[0]}</div>
+            </div>
+            <div className="font-astro-mono flex flex-wrap items-center gap-3 text-[11px]">
+              <span className="text-cyan-300">
+                Coverage {cockpit.preventiveAssurance.coveragePct}% ({cockpit.preventiveAssurance.recordedSignalCount}/10)
+              </span>
+              <span className="text-emerald-300">
+                Est. acute burden offset ~{cockpit.preventiveAssurance.preventableAcuteBurdenReductionEstPct}% (model)
+              </span>
+              <span className="text-amber-300">{cockpit.preventiveAssurance.assuranceClaimReadiness}</span>
+            </div>
+          </div>
+        ) : (
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <span className="font-astro text-[10px] font-bold uppercase tracking-[0.14em] text-cyan-300">
+              Preventive Surveillance &amp; Assurance Readiness
+            </span>
+            <span className="text-slate-300">Record at least 2 baseline signals (weight, height, BP, RHR, HRV, SpO2, or sleep) to compute readiness (no fabricated defaults).</span>
+          </div>
+        )}
+      </div>
+
       {/* Curated 4-Track Next-Gen Studios (replaces 24 chaotic rainbow pills) */}
       <div>
         <div className="flex flex-wrap gap-2" role="tablist" aria-label="Next-Gen Simulation & Hospital Tracks">
@@ -254,7 +284,7 @@ export function BodyAnalysisCommandDeck({ focusSystem }: { readonly focusSystem:
   return (
     <section
       aria-label="PanaceaMed Body Analysis Command System"
-      className="astro-surface astro-horizon-grid rounded-2xl p-3.5 text-white sm:p-4"
+      className="dark astro-surface astro-horizon-grid rounded-2xl p-3.5 text-white sm:p-4"
     >
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>

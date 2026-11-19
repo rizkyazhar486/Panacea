@@ -15,7 +15,7 @@ function classifyMotionKind(label: string): 'bp' | 'breath' | 'stretch' | 'cardi
 function MotionSchematic({ label }: { readonly label: string }) {
   const kind = classifyMotionKind(label)
   return (
-    <div className="astro-horizon-grid relative flex aspect-[16/10] w-full flex-col justify-between overflow-hidden bg-[#040911] p-3.5 text-white">
+    <div className="dark astro-horizon-grid relative flex aspect-[16/10] w-full flex-col justify-between overflow-hidden bg-[#040911] p-3.5 text-white">
       <div className="flex items-center justify-between gap-2">
         <span className="font-astro text-[10px] font-bold uppercase tracking-[0.16em] text-cyan-300">
           {kind === 'bp' ? 'HEMODYNAMIC PROTOCOL' : kind === 'breath' ? 'AUTONOMIC CADENCE 4·7·8' : kind === 'stretch' ? 'MYOFASCIAL ROM VECTOR' : 'KINEMATIC FORM GUIDE'}

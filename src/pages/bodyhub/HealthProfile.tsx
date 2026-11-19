@@ -9,8 +9,11 @@ import { simpanTeks } from '../../lib/unduh'
 import { bacaTeksBia, PERINTAH_BACA } from '../../lib/biaGambar'
 import { hariIni } from '../../lib/tanggal'
 import { Link } from 'react-router-dom'
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
 import { Card, SectionTitle, Field, inputClass, Button, Badge } from '../../components/ui'
+
+const HealthTrendRechart = lazy(() =>
+  import('./HealthTrendRechart').then((m) => ({ default: m.HealthTrendRechart })),
+)
 import { IconHeart, IconActivity, IconCheck, IconChevronRight } from '../../components/icons'
 import { api, backendEnabled, apiBaseUrl, type KatalogMetrik } from '../../lib/api'
 import { useStore } from '../../lib/store'
@@ -670,19 +673,9 @@ function TrendChart({ history }: { history: Snapshot[] }) {
   return (
     <Card className="!p-5">
       <SectionTitle icon={<IconActivity size={20} />} title="Trends" subtitle={`${history.length} records saved`} />
-      <div className="mt-3 h-56">
-        <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={data} margin={{ top: 5, right: 8, left: -18, bottom: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-            <XAxis dataKey="label" tick={{ fontSize: 10, fill: '#9ca3af' }} />
-            <YAxis tick={{ fontSize: 10, fill: '#9ca3af' }} />
-            <Tooltip contentStyle={{ fontSize: 12, borderRadius: 12, border: '1px solid #eee' }} />
-            {active.map((s) => (
-              <Line key={s.key} type="monotone" dataKey={s.key} name={s.name} stroke={s.color} strokeWidth={2} dot={{ r: 2 }} connectNulls />
-            ))}
-          </LineChart>
-        </ResponsiveContainer>
-      </div>
+      <Suspense fallback={<div className="mt-3 h-56 w-full rounded-xl bg-neutral-100/60 dark:bg-white/5" />}>
+        <HealthTrendRechart data={data as unknown as ReadonlyArray<Record<string, unknown>>} active={active} />
+      </Suspense>
       <div className="mt-2 flex flex-wrap justify-center gap-3">
         {active.map((s) => (
           <span key={s.key} className="flex items-center gap-1 text-[10px] font-semibold text-neutral-500">

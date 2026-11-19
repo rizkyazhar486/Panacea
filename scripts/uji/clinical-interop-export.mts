@@ -110,9 +110,9 @@ assert.ok(zoneNavSource.includes("'For You'"), 'ZoneNav must have For You')
 assert.ok(zoneNavSource.includes("'Open 3D'"), 'ZoneNav must have Open 3D')
 
 // 5. Cloudflare Pages & Static SPA Artifacts
-assert.ok(existsSync('public/_redirects'), 'public/_redirects must exist for Cloudflare Pages SPA routing')
-const redirectsContent = readFileSync('public/_redirects', 'utf8')
-assert.ok(redirectsContent.includes('/*    /index.html   200'), '_redirects must redirect all paths to index.html with 200')
+assert.ok(existsSync('wrangler.toml'), 'wrangler.toml must exist for Cloudflare SPA asset routing')
+const wranglerContent = readFileSync('wrangler.toml', 'utf8')
+assert.ok(wranglerContent.includes('not_found_handling = "single-page-application"'), 'wrangler.toml must enable single-page-application not_found_handling')
 
 assert.ok(existsSync('public/404.html'), 'public/404.html must exist for GitHub Pages SPA routing')
 const notFoundContent = readFileSync('public/404.html', 'utf8')
