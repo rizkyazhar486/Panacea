@@ -189,7 +189,7 @@ export function DeviceQuickSyncCard() {
 
         <InfoDisclosure title="Sync & Auto-Export Architecture" badge="SHA-256">
           <p>Supports Apple Health XML/JSON, WHOOP/Garmin/Oura CSV/JSON, and Web Bluetooth GATT HR/EEG.</p>
-          <p>Exports use synchronous gesture triggers, sanitized filenames, Object URL revocation, and SHA-256 deduplication. Offline Neon sync queues safely in local storage.</p>
+          <p>Gesture-safe exports with SHA-256 deduplication, Object URL cleanup, and offline Neon outbox queueing.</p>
         </InfoDisclosure>
       </header>
 
