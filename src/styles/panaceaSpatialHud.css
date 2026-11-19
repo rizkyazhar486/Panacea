@@ -1,0 +1,299 @@
+/*
+ * Panacea Oculus / AUGMA — Scoped Spatial Command HUD Design System
+ * Opt-in stylesheet imported exclusively by lazy-loaded Spatial OS surfaces.
+ * Pure scoped CSS tokens and rules; leaves Home.css and global v50 shell untouched.
+ */
+
+.panacea-spatial-hud {
+  --hud-void: #050608;
+  --hud-panel: rgba(10, 12, 16, 0.86);
+  --hud-panel-elevated: rgba(14, 18, 25, 0.92);
+  --hud-border: rgba(255, 255, 255, 0.12);
+  --hud-border-strong: rgba(255, 255, 255, 0.24);
+  --hud-crimson: #ff2d46;
+  --hud-cyan: #38bdf8;
+  --hud-cyan-bright: #22d3ee;
+  --hud-emerald: #10b981;
+  --hud-amber: #f59e0b;
+  --hud-ink: #f8fafc;
+  --hud-muted: #94a3b8;
+
+  position: relative;
+  color: var(--hud-ink);
+  background-color: var(--hud-void);
+  background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+  background-size: 24px 24px;
+  border: 1px solid var(--hud-border);
+  border-radius: 20px;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.panacea-spatial-hud *,
+.panacea-spatial-hud *::before,
+.panacea-spatial-hud *::after {
+  box-sizing: border-box;
+}
+
+.hud-micro-header {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 10px;
+  line-height: 1.3;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--hud-muted);
+}
+
+.hud-kpi-value {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+  color: var(--hud-ink);
+}
+
+.hud-tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+.hud-frame {
+  position: relative;
+  background: var(--hud-panel);
+  border: 1px solid var(--hud-border);
+  border-radius: 14px;
+  backdrop-filter: blur(10px);
+}
+
+/* Hairline corner reticle ticks */
+.hud-frame::before,
+.hud-frame::after {
+  content: '';
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  pointer-events: none;
+  border-color: rgba(56, 189, 248, 0.45);
+  border-style: solid;
+}
+
+.hud-frame::before {
+  top: -1px;
+  left: -1px;
+  border-width: 1px 0 0 1px;
+  border-top-left-radius: 14px;
+}
+
+.hud-frame::after {
+  right: -1px;
+  bottom: -1px;
+  border-width: 0 1px 1px 0;
+  border-bottom-right-radius: 14px;
+}
+
+.hud-frame-crimson::before,
+.hud-frame-crimson::after {
+  border-color: rgba(255, 45, 70, 0.72);
+}
+
+.hud-frame-amber::before,
+.hud-frame-amber::after {
+  border-color: rgba(245, 158, 11, 0.68);
+}
+
+.hud-frame-emerald::before,
+.hud-frame-emerald::after {
+  border-color: rgba(16, 185, 129, 0.68);
+}
+
+.hud-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 28px;
+  padding: 2px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--hud-border);
+  background: rgba(255, 255, 255, 0.04);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--hud-ink);
+}
+
+.hud-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 8px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--hud-border);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--hud-ink);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: border-color 160ms ease, background-color 160ms ease, color 160ms ease, transform 120ms ease;
+  text-decoration: none;
+}
+
+.hud-btn:hover {
+  border-color: rgba(56, 189, 248, 0.55);
+  background: rgba(56, 189, 248, 0.1);
+}
+
+.hud-btn:active {
+  transform: scale(0.98);
+}
+
+.hud-btn-active {
+  border-color: rgba(255, 45, 70, 0.78);
+  background: rgba(255, 45, 70, 0.16);
+  color: #fff1f2;
+}
+
+.hud-btn-cyan {
+  border-color: rgba(34, 211, 238, 0.52);
+  background: rgba(34, 211, 238, 0.12);
+  color: #cffafe;
+}
+
+.hud-btn-emerald {
+  border-color: rgba(16, 185, 129, 0.55);
+  background: rgba(16, 185, 129, 0.14);
+  color: #d1fae5;
+}
+
+.hud-btn-amber {
+  border-color: rgba(245, 158, 11, 0.58);
+  background: rgba(245, 158, 11, 0.14);
+  color: #fef3c7;
+}
+
+/* Optional 3D Perspective Floating Module Wall */
+.hud-perspective-stage {
+  perspective: 1400px;
+}
+
+.hud-perspective-wall {
+  display: grid;
+  gap: 12px;
+  transform-style: preserve-3d;
+  transition: transform 280ms ease;
+}
+
+.hud-perspective-wall-tilted {
+  transform: rotateX(4deg) rotateY(-4deg);
+}
+
+/* Radial Command Oculus Core */
+@keyframes hudOrbitSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes hudOrbitReverse {
+  from { transform: rotate(360deg); }
+  to { transform: rotate(0deg); }
+}
+
+@keyframes hudOculusPulse {
+  0%, 100% {
+    opacity: 0.78;
+    transform: scale(0.97);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.03);
+  }
+}
+
+.hud-orbit-slow {
+  transform-origin: center;
+  animation: hudOrbitSpin 32s linear infinite;
+}
+
+.hud-orbit-reverse {
+  transform-origin: center;
+  animation: hudOrbitReverse 22s linear infinite;
+}
+
+.hud-oculus-core {
+  background: radial-gradient(circle at 38% 35%, rgba(34, 211, 238, 0.45), rgba(255, 45, 70, 0.28) 54%, rgba(5, 6, 8, 0.94) 85%);
+  border: 1px solid rgba(56, 189, 248, 0.65);
+  animation: hudOculusPulse 3.6s ease-in-out infinite;
+}
+
+/* Holographic 3D Digital Twin Pedestal & Projection Ring */
+.hud-holo-stage {
+  position: relative;
+  background:
+    radial-gradient(ellipse 68% 32% at 50% 88%, rgba(34, 211, 238, 0.24), transparent 72%),
+    radial-gradient(circle at 50% 42%, rgba(56, 189, 248, 0.1), rgba(5, 6, 8, 0.96) 72%);
+  border: 1px solid rgba(56, 189, 248, 0.28);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.hud-holo-pedestal-ring {
+  position: absolute;
+  left: 50%;
+  bottom: 18px;
+  width: min(82%, 340px);
+  height: 54px;
+  transform: translateX(-50%);
+  border-radius: 999px;
+  border: 1px solid rgba(34, 211, 238, 0.52);
+  background: radial-gradient(ellipse at center, rgba(34, 211, 238, 0.2), rgba(56, 189, 248, 0.04) 65%, transparent 80%);
+  pointer-events: none;
+}
+
+.hud-holo-pedestal-ring::after {
+  content: '';
+  position: absolute;
+  inset: 8px 18px;
+  border-radius: 999px;
+  border: 1px dashed rgba(34, 211, 238, 0.44);
+}
+
+/* Holotable Amber Stage */
+.hud-amber-stage {
+  position: relative;
+  background:
+    radial-gradient(ellipse 74% 38% at 50% 86%, rgba(245, 158, 11, 0.2), transparent 70%),
+    radial-gradient(circle at 50% 35%, rgba(245, 158, 11, 0.07), rgba(5, 6, 8, 0.97) 75%);
+  border: 1px solid rgba(245, 158, 11, 0.34);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+/* Command Palette Backdrop */
+.hud-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  background: rgba(5, 6, 8, 0.82);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 64px 16px 24px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hud-orbit-slow,
+  .hud-orbit-reverse,
+  .hud-oculus-core {
+    animation: none;
+  }
+
+  .hud-perspective-wall-tilted {
+    transform: none;
+  }
+}

@@ -1,4 +1,5 @@
 import { lazy, Suspense, useMemo, useRef, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { useStore, uid, OWNER_EMAIL } from '../../lib/store'
 import { HealthSnapshot } from '../../components/HealthSnapshot'
 import { PostCard } from '../social/Feed'
@@ -364,6 +365,23 @@ function ProfileIsi({ account }: { account: NonNullable<ReturnType<typeof useSto
           </form>
         )}
       </section>
+
+      <div className="dark mt-3 flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-cyan-400/25 bg-[#050608] px-3.5 py-2.5 text-white">
+        <div className="min-w-0">
+          <div className="font-astro-mono text-[10px] font-bold uppercase tracking-[0.14em] text-cyan-300">
+            PANACEA OCULUS / AUGMA SPATIAL OS
+          </div>
+          <div className="text-xs text-slate-300">
+            Radial Command Deck · 3D Digital Twin Stage · Knowledge Constellation · Holotable
+          </div>
+        </div>
+        <Link
+          to="/command-os"
+          className="inline-flex min-h-[44px] items-center justify-center rounded-xl border border-rose-500/60 bg-rose-500/20 px-3.5 font-mono text-[11px] font-bold uppercase tracking-[0.1em] text-white no-underline transition hover:border-cyan-400/70 hover:bg-cyan-500/20"
+        >
+          Open Command OS →
+        </Link>
+      </div>
 
       <details className="dark mt-3 rounded-2xl border border-cyan-400/25 bg-[#050a10] px-3.5 py-2 text-white">
         <summary className="font-astro flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-2 text-[11px] font-bold uppercase tracking-[0.14em] text-cyan-200">
