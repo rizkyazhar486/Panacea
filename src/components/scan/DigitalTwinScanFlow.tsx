@@ -81,10 +81,10 @@ export function DigitalTwinScanFlow({ initialTab = 'builder' }: { readonly initi
   })
   const [skinCaptureNote, setSkinCaptureNote] = useState('Optical baseline')
 
-  // Neuro qEEG + OSA state
+  // Neuro qEEG + OSA state (raw text prevents blank inputs from silently coercing to 0)
   const [eegDevice, setEegDevice] = useState<EegDeviceVendor>('muse')
-  const [ahiInput, setAhiInput] = useState<number>(3.8)
-  const [spo2NadirInput, setSpo2NadirInput] = useState<number>(94)
+  const [ahiText, setAhiText] = useState<string>('3.8')
+  const [spo2NadirText, setSpo2NadirText] = useState<string>('94')
 
   // ANOVA mode
   const [anovaMode, setAnovaMode] = useState<'longitudinal' | 'bilateral'>('longitudinal')
@@ -253,16 +253,16 @@ export function DigitalTwinScanFlow({ initialTab = 'builder' }: { readonly initi
     [eegDevice],
   )
 
-  const osa = useMemo(
-    () =>
-      evaluateOsaSleepMonitor({
-        ahiEventsPerHour: ahiInput,
-        odiEventsPerHour: Number((ahiInput * 0.85).toFixed(1)),
-        spo2NadirPct: spo2NadirInput,
-        studySource: 'hsat',
-      }),
-    [ahiInput, spo2NadirInput],
-  )
+  const osa = useMemo(() => {
+    const ahiVal = ahiText.trim() === '' ? Number.NaN : Number(ahiText)
+    const spo2Val = spo2NadirText.trim() === '' ? Number.NaN : Number(spo2NadirText)
+    return evaluateOsaSleepMonitor({
+      ahiEventsPerHour: ahiVal,
+      odiEventsPerHour: Number.isFinite(ahiVal) ? Number((ahiVal * 0.85).toFixed(1)) : null,
+      spo2NadirPct: spo2Val,
+      studySource: 'hsat',
+    })
+  }, [ahiText, spo2NadirText])
 
   const anova = useMemo(() => {
     if (anovaMode === 'bilateral') {
@@ -693,7 +693,7 @@ export function DigitalTwinScanFlow({ initialTab = 'builder' }: { readonly initi
       )}
 
       {/* TAB 4: AI BRAIN (qEEG) & OSA SLEEP APNEA MONITOR */}
-      {tab === 'neuro' && qEeg.ok && osa.ok && (
+      {tab === 'neuro' && qEeg.ok && (
         <div className="mt-4 space-y-3">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div className="flex flex-wrap gap-1.5">
@@ -716,17 +716,17 @@ export function DigitalTwinScanFlow({ initialTab = 'builder' }: { readonly initi
 
             <InfoDisclosure
               title="qEEG & OSA Clinical Details"
-              badge={osa.clinicianReferralRequired ? 'Referral' : qEeg.truthClass}
+              badge={osa.ok && osa.clinicianReferralRequired ? 'Referral' : qEeg.truthClass}
             >
               <p>
                 Peer Percentile: <strong>{qEeg.peerPercentile}th</strong> · Cognitive Delta:{' '}
                 <strong>{qEeg.cognitiveDeltaYears > 0 ? `+${qEeg.cognitiveDeltaYears}` : qEeg.cognitiveDeltaYears} yrs</strong>
               </p>
               <p className="font-mono text-[10px] text-cyan-200">
-                θ/β {qEeg.ratios.thetaToBeta} · α/θ {qEeg.ratios.alphaToTheta} · SpO2 Nadir {osa.spo2NadirPct}% · ODI {osa.odiEventsPerHour ?? '—'}/hr
+                θ/β {qEeg.ratios.thetaToBeta} · α/θ {qEeg.ratios.alphaToTheta} · SpO2 Nadir {osa.ok ? `${osa.spo2NadirPct}%` : '—'} · ODI {osa.ok ? (osa.odiEventsPerHour ?? '—') : '—'}/hr
               </p>
-              <p className={osa.clinicianReferralRequired ? 'text-rose-300 font-semibold' : 'text-slate-300'}>
-                {osa.referralGuidance}
+              <p className={osa.ok && osa.clinicianReferralRequired ? 'text-rose-300 font-semibold' : 'text-slate-300'}>
+                {osa.ok ? osa.referralGuidance : osa.error}
               </p>
               <p className="text-[10px] text-slate-400">{qEeg.epistemicNotice}</p>
             </InfoDisclosure>
@@ -748,8 +748,8 @@ export function DigitalTwinScanFlow({ initialTab = 'builder' }: { readonly initi
             </div>
             <div className="rounded-2xl border border-white/10 bg-[#090d14] p-4">
               <div className="font-mono text-[10px] uppercase text-slate-400">OSA / AHI</div>
-              <div className={`mt-1 font-mono text-2xl font-black ${osa.clinicianReferralRequired ? 'text-rose-400' : 'text-emerald-300'}`}>
-                {osa.ahiEventsPerHour} · {osa.severity}
+              <div className={`mt-1 font-mono text-2xl font-black ${osa.ok && osa.clinicianReferralRequired ? 'text-rose-400' : 'text-emerald-300'}`}>
+                {osa.ok ? `${osa.ahiEventsPerHour} · ${osa.severity}` : '— · Unrecorded'}
               </div>
               <div className="mt-1 flex items-center gap-2">
                 <label className="font-mono text-[10px] text-slate-400">
@@ -759,8 +759,8 @@ export function DigitalTwinScanFlow({ initialTab = 'builder' }: { readonly initi
                     min={0}
                     max={80}
                     step={0.5}
-                    value={ahiInput}
-                    onChange={(e) => setAhiInput(Number(e.target.value) || 0)}
+                    value={ahiText}
+                    onChange={(e) => setAhiText(e.target.value)}
                     className="dark ml-1 w-14 rounded border border-white/15 bg-black px-1.5 py-0.5 text-white"
                   />
                 </label>
@@ -770,8 +770,8 @@ export function DigitalTwinScanFlow({ initialTab = 'builder' }: { readonly initi
                     type="number"
                     min={65}
                     max={100}
-                    value={spo2NadirInput}
-                    onChange={(e) => setSpo2NadirInput(Number(e.target.value) || 94)}
+                    value={spo2NadirText}
+                    onChange={(e) => setSpo2NadirText(e.target.value)}
                     className="dark ml-1 w-14 rounded border border-white/15 bg-black px-1.5 py-0.5 text-white"
                   />
                 </label>

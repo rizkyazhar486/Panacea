@@ -196,23 +196,36 @@ async function req<T>(path: string, init?: RequestInit): Promise<T> {
   const ensureCurrent = () => {
     if (requestIdentity() !== identity) throw new Error('Session changed; reload before retrying.')
   }
-  const res = await fetch(API + path, {
-    credentials: 'include',
-    headers: {
-      'content-type': 'application/json',
-      ...(authToken ? { authorization: `Bearer ${authToken}` } : {}),
-    },
-    ...init,
-  })
-  ensureCurrent()
-  if (!res.ok) {
-    const body = await res.json().catch(() => ({}))
+  const hasExternalSignal = Boolean(init?.signal)
+  const controller = !hasExternalSignal && typeof AbortController !== 'undefined' ? new AbortController() : null
+  const timer = controller ? setTimeout(() => controller.abort(), 10000) : null
+  try {
+    const res = await fetch(API + path, {
+      credentials: 'include',
+      headers: {
+        'content-type': 'application/json',
+        ...(authToken ? { authorization: `Bearer ${authToken}` } : {}),
+      },
+      ...init,
+      ...(controller ? { signal: controller.signal } : {}),
+    })
     ensureCurrent()
-    throw galatDariRespons(res.status, body, res.headers.get('x-request-id'))
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}))
+      ensureCurrent()
+      throw galatDariRespons(res.status, body, res.headers.get('x-request-id'))
+    }
+    const body = await res.json() as T
+    ensureCurrent()
+    return body
+  } catch (err) {
+    if ((err as { name?: string })?.name === 'AbortError' && !hasExternalSignal) {
+      throw galatDariRespons(503, { error: 'server_timeout' }, null)
+    }
+    throw err
+  } finally {
+    if (timer !== null) clearTimeout(timer)
   }
-  const body = await res.json() as T
-  ensureCurrent()
-  return body
 }
 
 
