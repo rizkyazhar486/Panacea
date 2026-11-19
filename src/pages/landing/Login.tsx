@@ -149,7 +149,7 @@ export function Login({ onBack }: { onBack?: () => void }) {
     if (!backendEnabled) return
     let batal = false
     const coba = async () => {
-      for (let i = 0; i < 3; i++) {
+      for (let i = 0; i < 2; i++) {
         try {
           const h = await api.health()
           if (batal) return
@@ -162,10 +162,8 @@ export function Login({ onBack }: { onBack?: () => void }) {
           return
         } catch {
           if (batal) return
-          setServerNotice(i === 0
-            ? 'Menghubungkan ke layanan server…'
-            : 'Masih menunggu respon server…')
-          await new Promise((r) => setTimeout(r, 8000))
+          setServerNotice('Menghubungkan ke layanan server (Mode Lokal Berdaulat siap dipakai)…')
+          if (i === 0) await new Promise((r) => setTimeout(r, 2000))
         }
       }
       if (!batal) setServerNotice('Layanan server belum terhubung — aplikasi berjalan dalam mode lokal.')
@@ -571,17 +569,14 @@ export function Login({ onBack }: { onBack?: () => void }) {
           {hasOptionalFields && (
             <details className="group rounded-2xl border border-neutral-200/70 bg-neutral-50/40 dark:border-white/10 dark:bg-white/[0.02] p-3 text-xs">
               <summary className="cursor-pointer font-bold text-neutral-600 dark:text-neutral-400 list-none flex items-center justify-between select-none hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
-                <span>▸ Lengkapi data profil opsional (dapat diisi nanti)</span>
+                <span>▸ Optional Profile</span>
                 <span className="text-[10px] text-neutral-400 transition-transform group-open:rotate-180">▼</span>
               </summary>
               <div className="mt-3 space-y-3 pt-3 border-t border-neutral-200/60 dark:border-white/10">
                 {/* Optional biological parameters */}
                 {!simple && (
                   <div>
-                    <p className="text-[11px] leading-relaxed text-neutral-500 dark:text-neutral-400">
-                      Usia dan jenis kelamin membantu kalibrasi estimasi denyut jantung maksimal dan energi harian.
-                    </p>
-                    <div className="mt-2 grid grid-cols-2 gap-2.5">
+                    <div className="mt-1 grid grid-cols-2 gap-2.5">
                       <div>
                         <label className="mb-1 block text-[11px] font-semibold text-neutral-500 dark:text-neutral-400">Jenis Kelamin</label>
                         <select

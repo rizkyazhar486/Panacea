@@ -216,7 +216,7 @@ function ProfileIsi({ account }: { account: NonNullable<ReturnType<typeof useSto
           {clinicalCategory && <div className="text-xs font-bold text-cyan-800 dark:text-cyan-300">{clinicalCategory}</div>}
           {(profile.bio || isCanonicalOwner) && (
             <p className="text-xs leading-relaxed text-neutral-700 dark:text-slate-200 sm:text-sm">
-              {profile.bio || 'Health, Made Visible — Longitudinal AI-EMR, 3D Body Exposure & Preventive Longevity OS.'}
+              {profile.bio || 'Health, made visible.'}
             </p>
           )}
           {(profile.sex || profile.location) && (
@@ -277,15 +277,15 @@ function ProfileIsi({ account }: { account: NonNullable<ReturnType<typeof useSto
       <section aria-label="Anggota Keluarga & Multi-Profil Nyata" className="mt-3 rounded-2xl border border-black/10 p-4 dark:border-white/15">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div>
-            <h2 className="text-sm font-black text-ink">Anggota Keluarga &amp; Multi-Profil Nyata</h2>
-            <p className="text-[11px] text-neutral-500">Profil terisolasi di bawah akun {account.email} ({state.patients.length} profil aktif).</p>
+            <h2 className="text-sm font-black text-ink">Family Profiles</h2>
+            <p className="text-[11px] text-neutral-500">{state.patients.length} active</p>
           </div>
           <button
             type="button"
             onClick={() => setFamilyOpen((v) => !v)}
             className="min-h-[44px] rounded-full bg-brand px-4 py-2 text-xs font-bold text-ink active:scale-95"
           >
-            {familyOpen ? 'Tutup Form' : '+ Tambah Anggota Keluarga'}
+            {familyOpen ? 'Close' : '+ Add Profile'}
           </button>
         </div>
 
@@ -367,8 +367,8 @@ function ProfileIsi({ account }: { account: NonNullable<ReturnType<typeof useSto
 
       <details className="dark mt-3 rounded-2xl border border-cyan-400/25 bg-[#050a10] px-3.5 py-2 text-white">
         <summary className="font-astro flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-2 text-[11px] font-bold uppercase tracking-[0.14em] text-cyan-200">
-          <span>1:1 GTA Character HUD · Longevium Digital Twin · Counterfactuals</span>
-          <span className="font-astro-mono text-[10px] text-emerald-300">EXPAND ▾</span>
+          <span>Digital Twin HUD</span>
+          <span className="font-astro-mono text-[10px] text-emerald-300">OPEN ▾</span>
         </summary>
         <WhenOpened>
           <div className="mt-3 pb-2">

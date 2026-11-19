@@ -29,11 +29,11 @@ interface StudioTrack {
 }
 
 const COMBINED_ROUTES = [
-  { to: '/body-exposure', label: '3D Body Exposure', code: '01' },
-  { to: '/med-study', label: 'MedStudyHub', code: '02' },
-  { to: '/fitness-hub?view=body', label: 'Body Comp & Fitness', code: '03' },
-  { to: '/for-you', label: 'For You', code: '04' },
-  { to: '/clinical-hub', label: 'Clinical & Visit OS', code: '05' },
+  { to: '/scan', label: 'Scan & Twin', code: '01' },
+  { to: '/body-exposure', label: '3D Atlas', code: '02' },
+  { to: '/sync', label: 'Sync & Export', code: '03' },
+  { to: '/med-study', label: 'MedStudy', code: '04' },
+  { to: '/clinical-hub', label: 'Clinical', code: '05' },
 ] as const
 
 const STUDIO_TRACKS: readonly StudioTrack[] = [
@@ -289,18 +289,18 @@ export function BodyAnalysisCommandDeck({ focusSystem }: { readonly focusSystem:
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
           <div className="font-astro text-[10px] font-bold uppercase tracking-[0.2em] text-cyan-300">
-            PANACEAMED OS · BODY ANALYSIS SYSTEM
+            BODY ANALYSIS OS
           </div>
           <div className="mt-0.5 text-[13px] font-bold text-white">
-            Combined 3D Body Exposure · MedStudyHub · Your Body · For You · Clinical
+            Digital Twin · CAD/CAE · Organ Board
             {focusSystem && <span className="font-astro-mono ml-2 text-[11px] text-emerald-300">[{focusSystem}]</span>}
           </div>
         </div>
         <Link
-          to="/tubuh?tab=pulih"
+          to="/scan"
           className="astro-chip inline-flex min-h-[44px] items-center rounded-xl px-3 text-[11px] font-bold no-underline"
         >
-          5-Modality Recovery →
+          Scan &amp; Build →
         </Link>
       </div>
 
