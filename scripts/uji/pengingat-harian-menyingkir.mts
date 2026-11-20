@@ -64,29 +64,58 @@ import {
 }
 
 // ── Komponennya harus BENAR-BENAR memasang pengatur waktu itu, dan menandai
-// hari yang sama sudah dilihat — spanduk yang menyingkir tetapi tidak dicatat
-// akan kembali pada muat halaman berikutnya di hari yang sama.
+// hari yang sama sudah dilihat — kutipan yang tidak dicatat akan kembali pada
+// muat halaman berikutnya di hari yang sama.
+//
+// PERUBAHAN 2026-11-16: pengatur waktu tidak lagi MENCABUT kartu. Masalah asalnya
+// (kartu melayang menutupi 34% layar pertama di setiap halaman) sudah selesai
+// dengan menaruh kartu di alur isi Beranda saja. Mencabutnya selagi tampil justru
+// melompatkan Beranda 116 px ke atas sekitar 13 dtk setelah dibuka, dan jeda 500 ms
+// sebelum muncul mendorongnya 116 px ke bawah ~1 dtk setelah dibuka (masing-masing
+// CLS 0,127 terukur pada 390x844). Yang dikunci sekarang adalah HASILnya.
+// Smoke peramban nyata: scripts/qa/daily-quote-shift-smoke.mjs.
+
+/** Alasan-alasan sumber DailyQuoteBanner melanggar kontrak; kosong = patuh. */
+export function pelanggaranSpanduk(src: string): string[] {
+  const alasan: string[] = []
+  if (!/durasiBacaMs/.test(src)) alasan.push('tidak memakai durasi baca')
+  const timer = src.match(/setTimeout\(\s*\(\)\s*=>\s*\{([^}]*)\}\s*,\s*durasiBacaMs\(/s)
+  if (!timer) alasan.push('pengatur waktu baca tidak ditemukan')
+  else {
+    if (!/tandaiSudahDilihat\(\)/.test(timer[1])) alasan.push('waktu baca tidak mencatat hari ini sudah dilihat')
+    if (/setVisible\(false\)/.test(timer[1])) alasan.push('waktu baca mencabut kartu selagi tampil')
+  }
+  if (!/return \(\) => clearTimeout\(t\)/.test(src)) alasan.push('pengatur waktu tidak dibersihkan saat dilepas')
+  if (!/useState\(belumDilihatHariIni\)/.test(src)) alasan.push('visibilitas tidak diputuskan pada render pertama')
+  if (/setVisible\(true\)/.test(src)) alasan.push('kartu dimunculkan belakangan')
+  if (!/function dismiss\(\)\s*\{[^}]*setVisible\(false\)[^}]*tandaiSudahDilihat\(\)/s.test(src)) alasan.push('× tidak menutup sekaligus mencatat')
+  return alasan
+}
+
 {
   const src = readFileSync(
     new URL('../../src/components/dashboard/DailyQuoteBanner.tsx', import.meta.url),
     'utf8',
   )
 
-  assert.match(
-    src,
-    /durasiBacaMs/,
-    'DailyQuoteBanner tidak lagi memakai durasi baca — spanduknya kembali abadi sampai ditekan',
-  )
-  assert.match(
-    src,
-    /setTimeout\(\s*\(\)\s*=>\s*\{[^}]*setVisible\(false\)[^}]*tandaiSudahDilihat\(\)/s,
-    'pengatur waktu tidak menyembunyikan spanduk sekaligus menandainya sudah dilihat',
-  )
-  assert.match(
-    src,
-    /return \(\) => clearTimeout\(t\)/,
-    'pengatur waktu tidak dibersihkan saat komponennya dilepas',
-  )
+  // Positif: sumber yang dikirim patuh.
+  assert.deepEqual(pelanggaranSpanduk(src), [], 'DailyQuoteBanner melanggar kontrak kutipan harian')
+
+  // Negatif berpasangan: tiap mutasi hanya berbeda pada satu aturan, dan aturan itulah yang menolaknya.
+  const timerAsli = /setTimeout\(\(\) => \{\s*tandaiSudahDilihat\(\)\s*\}/
+  assert.match(src, timerAsli, 'bentuk pengatur waktu baca berubah; perbarui mutasi uji ini')
+  const mutasi: Array<[string, string, string]> = [
+    ['timer mencabut kartu', src.replace(timerAsli, 'setTimeout(() => { setVisible(false); tandaiSudahDilihat() }'), 'waktu baca mencabut kartu selagi tampil'],
+    ['timer tanpa pencatatan', src.replace(timerAsli, 'setTimeout(() => { void 0 }'), 'waktu baca tidak mencatat hari ini sudah dilihat'],
+    ['jeda sebelum muncul', src.replace('useState(belumDilihatHariIni)', 'useState(false)'), 'visibilitas tidak diputuskan pada render pertama'],
+    ['muncul belakangan', src.replace('const quote = kutipanHariIni()', 'const quote = kutipanHariIni()\n  useEffect(() => { const d = setTimeout(() => setVisible(true), 500); return () => clearTimeout(d) }, [])'), 'kartu dimunculkan belakangan'],
+    ['timer tak dibersihkan', src.replaceAll('return () => clearTimeout(t)', 'return undefined'), 'pengatur waktu tidak dibersihkan saat dilepas'],
+    ['tanpa durasi baca', src.replaceAll('durasiBacaMs', 'durasiTetapMs'), 'tidak memakai durasi baca'],
+  ]
+  for (const [nama, sumber, harap] of mutasi) {
+    assert.notEqual(sumber, src, `mutasi "${nama}" tidak mengubah apa pun`)
+    assert.ok(pelanggaranSpanduk(sumber).includes(harap), `mutasi "${nama}" lolos: ${JSON.stringify(pelanggaranSpanduk(sumber))}`)
+  }
 
   // Ringkas: baris label dan bantalan besar yang mendorong kartunya melewati
   // sepertiga layar tidak boleh kembali.
@@ -105,4 +134,4 @@ import {
   )
 }
 
-console.log('pengingat-harian-menyingkir: spanduk kutipan menyingkir sendiri setelah waktu baca berpagar, dan tidak kembali di hari yang sama')
+console.log('pengingat-harian-menyingkir: kutipan diputuskan pada render pertama, dicatat setelah waktu baca berpagar tanpa dicabut dari bawah jari, × menutup dan mencatat; 6 mutasi ditolak oleh aturannya masing-masing')

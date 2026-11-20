@@ -46,6 +46,11 @@ try {
   // setelah DOM siap, lalu uji stacking saat banner benar-benar masih tampil.
   await page.goto(url, { waitUntil: 'domcontentloaded' })
   await page.waitForSelector('header.kaca', { state: 'visible' })
+  // Layar boot #pmd-splash (fixed, z 9999) menutupi SELURUH aplikasi sampai >= 500 ms setelah aplikasi melukis, lalu
+  // memudar dan dilepas (src/main.tsx). Yang dijaga di sini adalah aplikasi yang sudah siap, jadi tunggu splash terlepas;
+  // dulu jeda 500 ms DailyQuoteBanner kebetulan menutupi masa ini. Aplikasi yang gagal boot tidak pernah melepas splash,
+  // jadi gerbang tetap gagal di baris ini.
+  await page.waitForSelector('#pmd-splash', { state: 'detached', timeout: 15_000 })
   await page.waitForSelector('[data-daily-reminder]', { state: 'visible', timeout: 8_000 })
 
   // 1. Spanduk harian harus benar-benar TAMPIL -- kalau tidak, pemeriksaan ini

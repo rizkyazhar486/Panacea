@@ -6,7 +6,8 @@ import { IconX, IconFlame } from '../icons'
 // lokal pengguna, saat sesi pertama kali masuk aplikasi. Bukan dialog yang
 // memblokir (ini bukan onboarding), dan bukan achievement toast yang hilang
 // dalam hitungan detik (kutipannya perlu dibaca, bukan sekadar dilihat) —
-// jadi ia tetap sampai ditutup sendiri atau setelah waktu baca yang wajar.
+// jadi ia tetap sampai ditutup sendiri atau Beranda ditinggalkan, dan setelah
+// waktu baca yang wajar hari ini dicatat sudah dilihat.
 //
 // Desain: pelajaran dari .kaca yang membasahi SELURUH kartu dengan
 // gradasi penuh spektrum — begitu setiap piksel berwarna, tombol dan
@@ -27,26 +28,29 @@ function tandaiSudahDilihat() {
   try { localStorage.setItem(SEEN_KEY, todayKey()) } catch { /* ignore */ }
 }
 
+// Diputuskan pada render PERTAMA, bukan setelah jeda: kartu yang baru muncul
+// 500 ms kemudian menyisip di atas Beranda dan mendorong seluruh halaman 116 px
+// ke bawah tepat saat orang mulai mengetuk (CLS 0,127 terukur pada 390x844).
+function belumDilihatHariIni(): boolean {
+  try {
+    return localStorage.getItem(SEEN_KEY) !== todayKey()
+  } catch {
+    return true // localStorage tidak tersedia — tampilkan saja
+  }
+}
+
 export function DailyQuoteBanner() {
-  const [visible, setVisible] = useState(false)
+  const [visible, setVisible] = useState(belumDilihatHariIni)
   const quote = kutipanHariIni()
 
-  useEffect(() => {
-    try {
-      const seen = localStorage.getItem(SEEN_KEY)
-      if (seen === todayKey()) return
-    } catch { /* localStorage tidak tersedia — tampilkan saja */ }
-    const t = setTimeout(() => setVisible(true), 500)
-    return () => clearTimeout(t)
-  }, [])
-
-  // Menyingkir sendiri setelah waktu baca. Tanpa ini spanduknya menutupi
-  // sepertiga layar pertama SETIAP halaman sampai seseorang menekan ×, dan
-  // halaman yang baru dibuka kehilangan judulnya sendiri di balik kutipan.
+  // Setelah waktu baca, hari ini dicatat sudah dilihat sehingga kutipan tidak
+  // kembali pada kunjungan berikutnya ke Beranda hari ini. Kartunya TIDAK dicabut
+  // selagi tampil: ia berada di alur isi Beranda (tidak menutupi judul), dan
+  // mencabutnya melompatkan halaman 116 px ke atas di bawah jari pembaca
+  // (pergeseran kedua, ~13 dtk). Ia pergi saat × ditekan atau Beranda ditinggalkan.
   useEffect(() => {
     if (!visible) return
     const t = setTimeout(() => {
-      setVisible(false)
       tandaiSudahDilihat()
     }, durasiBacaMs(`${quote.quote} ${quote.source}`))
     return () => clearTimeout(t)
