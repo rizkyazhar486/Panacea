@@ -12,11 +12,12 @@
  */
 
 import type { SelectedStructureInfo } from './atlas-stage/structureInfo.ts'
+import type { BodySystemId } from '../data/bodySystems.ts'
 import type { OrganMechanicalId } from './softTissueBiomechanicsEngine.ts'
 import type { VisceralOrganKey } from './referredPainEngine.ts'
 import type { DiagnosticCtWindowPresetId } from './kaloLumenDicomEngine.ts'
 
-export type PhysiologySystem = 'cardiopulmonary' | 'soft_tissue' | 'neuro'
+export type PhysiologySystem = 'cardiopulmonary' | 'soft_tissue' | 'neuro' | 'whole_body'
 export type ClinicalTool = 'vascular' | 'referred_pain' | 'neuro_localizer' | 'diagnostic_imaging'
 
 export interface StructureCouplingContext {
@@ -25,6 +26,7 @@ export interface StructureCouplingContext {
   softTissueOrganId?: OrganMechanicalId
   softTissueTab?: 'palpation' | 'diaphragm_excursion' | 'peristalsis'
   neuroNerveId?: string
+  wholeBodySystem?: BodySystemId
   referredPainOrgan?: VisceralOrganKey
   coronarySegment?: number
   imagingPresetId?: DiagnosticCtWindowPresetId
