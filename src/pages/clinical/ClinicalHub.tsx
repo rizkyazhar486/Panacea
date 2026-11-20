@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { lazy, Suspense, useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { PanaceaZoneNav } from '../../components/PanaceaZoneNav'
 import { SuperPageCapabilityRail } from '../../components/SuperPageCapabilityRail'
@@ -12,16 +12,9 @@ import { SurfaceGuide } from '../../components/SurfaceGuide'
 import { MentalHealthClinicalResearchLab } from '../../components/MentalHealthClinicalResearchLab'
 import { Fold } from '../../shared/ui/Fold'
 import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
-import {
-  buildClinicalFhirBundle,
-  downloadClinicalFhirBundle,
-  downloadSoapSbarReport,
-  generateSoapSbarSummary,
-  printClinicalReport,
-  serializeClinicalFhirBundle,
-} from '../../domains/clinical-operations'
 import { readUnifiedLocalVitals } from '../../domains/identity/localRecovery'
-import { readRecoveryLedger } from '../../domains/personal-health/adapters/recoveryLedgerStorage'
+
+const ClinicalInteropSection = lazy(() => import('./ClinicalInteropSection'))
 
 export const GROUPS = [
   {
@@ -86,8 +79,8 @@ export function ClinicalHub() {
   const [lab, setLab] = useState('')
   const [low, setLow] = useState('')
   const [high, setHigh] = useState('')
-  const [interopFeedback, setInteropFeedback] = useState<'soap' | 'sbar' | 'fhir-copy' | 'fhir-dl' | 'summary-dl' | null>(null)
   const [rev, setRev] = useState(0)
+
 
   useEffect(() => {
     const refresh = () => setRev((x) => x + 1)
@@ -118,54 +111,6 @@ export function ClinicalHub() {
   }, [account, activePatient, state.vitals, state.sleepLogs, weight, height, sbp, dbp, rev])
 
   const emrCount = activePatient?.id && state.records[activePatient.id] ? 1 : 0
-  const recoveryLedger = useMemo(() => {
-    void rev
-    return readRecoveryLedger()
-  }, [rev])
-  const { soapText, sbarText } = useMemo(() => {
-    const base = generateSoapSbarSummary({ patient: activePatient, vitals, account, emrCount })
-    if (!recoveryLedger.length) return base
-    const latest = recoveryLedger[0]
-    const recoveryNote = `\nHolistic Recovery Ledger (${recoveryLedger.length} unreviewed draft session(s)): Latest ${latest.modalityName} · ${latest.doseLabel} (${latest.emvReceiptToken}).`
-    return {
-      soapText: `${base.soapText}${recoveryNote}`,
-      sbarText: `${base.sbarText}${recoveryNote}`,
-    }
-  }, [activePatient, vitals, account, emrCount, recoveryLedger])
-  const fhirBundle = useMemo(
-    () => buildClinicalFhirBundle({ vitals, patient: activePatient, account, now: new Date() }),
-    [vitals, activePatient, account],
-  )
-
-  const flashFeedback = (kind: 'soap' | 'sbar' | 'fhir-copy' | 'fhir-dl' | 'summary-dl') => {
-    setInteropFeedback(kind)
-    setTimeout(() => setInteropFeedback((cur) => (cur === kind ? null : cur)), 2500)
-  }
-
-  const handleCopySoap = () => {
-    navigator.clipboard?.writeText(soapText)
-    flashFeedback('soap')
-  }
-
-  const handleCopySbar = () => {
-    navigator.clipboard?.writeText(sbarText)
-    flashFeedback('sbar')
-  }
-
-  const handleCopyFhir = () => {
-    navigator.clipboard?.writeText(serializeClinicalFhirBundle(fhirBundle))
-    flashFeedback('fhir-copy')
-  }
-
-  const handleDownloadSoapSbar = () => {
-    downloadSoapSbarReport({ vitals, patient: activePatient, account, emrCount })
-    flashFeedback('summary-dl')
-  }
-
-  const handleDownloadFhir = () => {
-    downloadClinicalFhirBundle({ vitals, patient: activePatient, account })
-    flashFeedback('fhir-dl')
-  }
 
   const bmi = useMemo(() => {
     const kg = Number(weight)
@@ -359,71 +304,15 @@ export function ClinicalHub() {
           </div>
         </section>
 
-        <div className="mt-6 grid gap-4 border-t border-white/10 pt-4 sm:grid-cols-3" aria-label="Clinician workflow and interoperability readiness" data-surface="dark" data-testid="physician-workbench-actions">
-          <div className="border-l-2 border-emerald-400 pl-3">
-            <div className="text-[10px] font-black uppercase tracking-[.12em] text-emerald-300">Auto-SOAP / SBAR &amp; Consilium</div>
-            <p className="mt-1 text-xs text-white/70">
-              EMR: {emrCount ? '1 chart initialized' : 'None yet'} · HR {vitals.heartRate ?? vitals.restingHr ?? '—'} · SpO2 {vitals.spo2Pct ?? '—'}% · BP {vitals.systolic && vitals.diastolic ? `${vitals.systolic}/${vitals.diastolic}` : '—'}.
-            </p>
-            <div className="mt-1 flex flex-wrap gap-3">
-              {[
-                { label: interopFeedback === 'soap' ? '✓ SOAP Copied' : 'Copy SOAP', onClick: handleCopySoap, cls: 'text-emerald-300' },
-                { label: interopFeedback === 'sbar' ? '✓ SBAR Copied' : 'Copy SBAR', onClick: handleCopySbar, cls: 'text-white/75' },
-                { label: interopFeedback === 'summary-dl' ? '✓ Downloaded' : 'Export .txt', onClick: handleDownloadSoapSbar, cls: 'text-white/75' },
-              ].map((btn) => (
-                <button
-                  key={btn.label}
-                  type="button"
-                  onClick={btn.onClick}
-                  style={{ minHeight: 44, padding: '4px 12px', borderRadius: 999, border: '1px solid rgba(255,255,255,0.16)' }}
-                  className={`inline-flex items-center text-xs font-black ${btn.cls} hover:text-white`}
-                >
-                  {btn.label}
-                </button>
-              ))}
-            </div>
-            <div className="mt-1 flex flex-wrap gap-3">
-              <Link to="/emr" className="inline-flex min-h-[44px] items-center text-xs font-black text-emerald-300 hover:text-white">Open AI-EMR →</Link>
-              <Link to="/clinical-calculators" className="inline-flex min-h-[44px] items-center text-xs font-black text-white/75 hover:text-white">Dose &amp; Scores →</Link>
-            </div>
-          </div>
-          <div className="border-l-2 border-amber-400 pl-3">
-            <div className="text-[10px] font-black uppercase tracking-[.12em] text-amber-300">Allergy &amp; Drug Safety Check</div>
-            <p className="mt-1 text-xs text-white/70">
-              Allergies: {activePatient?.allergies?.length ? activePatient.allergies.join(', ') : 'None recorded'} · Risk flags: {activePatient?.riskFlags?.length ?? 0}. CYP2C19 / HLA-B*15:02 screening available in Drug Check.
-            </p>
-            <div className="mt-1 flex flex-wrap gap-3">
-              <Link to="/rujukan?t=obat" className="inline-flex min-h-[44px] items-center text-xs font-black text-amber-300 hover:text-white">Drug Check →</Link>
-              <Link to="/emergency" className="inline-flex min-h-[44px] items-center text-xs font-black text-rose-300 hover:text-white">Emergency →</Link>
-            </div>
-          </div>
-          <div className="border-l-2 border-cyan-400 pl-3">
-            <div className="text-[10px] font-black uppercase tracking-[.12em] text-cyan-300">SATUSEHAT FHIR R4 &amp; Radar</div>
-            <p className="mt-1 text-xs text-white/70">MRN: {activePatient?.mrn || '—'} · Permenkes 24/2022 bundle ({fhirBundle.entry.length} entries, draft unverified).</p>
-            <div className="mt-1 flex flex-wrap gap-3">
-              {[
-                { id: 'btn-export-fhir-pdf', label: interopFeedback === 'fhir-dl' ? '✓ FHIR Saved' : 'Export FHIR R4', onClick: handleDownloadFhir, cls: 'text-cyan-300' },
-                { label: interopFeedback === 'fhir-copy' ? '✓ Copied' : 'Copy JSON', onClick: handleCopyFhir, cls: 'text-white/75' },
-                { label: 'Print', onClick: printClinicalReport, cls: 'text-white/75' },
-              ].map((btn) => (
-                <button
-                  key={btn.label}
-                  id={btn.id}
-                  type="button"
-                  onClick={btn.onClick}
-                  style={{ minHeight: 44, padding: '4px 12px', borderRadius: 999, border: '1px solid rgba(255,255,255,0.16)' }}
-                  className={`inline-flex items-center text-xs font-black ${btn.cls} hover:text-white`}
-                >
-                  {btn.label}
-                </button>
-              ))}
-            </div>
-            <div className="mt-1 flex flex-wrap gap-3">
-              <Link to="/visit-os" className="inline-flex min-h-[44px] items-center text-xs font-black text-cyan-300 hover:text-white">Open Visit OS →</Link>
-              <Link to="/surveillance" className="inline-flex min-h-[44px] items-center text-xs font-black text-white/75 hover:text-white">Community Radar →</Link>
-            </div>
-          </div>
-        </div>
+        <Suspense fallback={<div className="mt-6 border-t border-white/10 pt-4 text-xs text-white/50">Loading clinical workbench…</div>}>
+          <ClinicalInteropSection
+            vitals={vitals}
+            activePatient={activePatient}
+            account={account}
+            emrCount={emrCount}
+            rev={rev}
+          />
+        </Suspense>
         </Fold>
 
         <Fold label="Research">
@@ -457,6 +346,44 @@ export function ClinicalHub() {
         </Fold>
 
         <PersonalBodyUnifiedSurface compact defaultFocus="clinical" shareable={false} cameraCapture={false} />
+
+        <Fold label="Frontier & Surgical OS">
+          <div className="space-y-3 border-t border-white/10 pt-3">
+            <p className="text-[11px] leading-snug text-white/65">
+              Clinician-in-loop workflow links: pre-arrival zero-queue triage, draft AI-EMR sign-off, 3D/4D anatomical &amp; surgical simulation, and low-bandwidth 2G/Starlink sync (simulation &amp; draft only; clinical authority remains with licensed doctors).
+            </p>
+            <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+              <Link
+                to="/doctor-review"
+                className="flex min-h-[48px] flex-col justify-center rounded-xl border border-emerald-400/35 bg-white/[0.03] px-3 py-2 text-xs font-bold text-white transition hover:border-emerald-400"
+              >
+                <span>AI + Human Doctor Step-In</span>
+                <span className="text-[10px] font-normal text-emerald-300">Review &amp; sign draft notes / labs →</span>
+              </Link>
+              <a
+                href="/panaceamed-frontier-civilization-superos.html"
+                className="flex min-h-[48px] flex-col justify-center rounded-xl border border-cyan-400/30 bg-white/[0.03] px-3 py-2 text-xs font-bold text-white transition hover:border-cyan-400"
+              >
+                <span>Zero-Queue Triage &amp; 2G/Starlink</span>
+                <span className="text-[10px] font-normal text-cyan-300">Pre-arrival routing &amp; binary mesh ↗</span>
+              </a>
+              <a
+                href="/panaceamed-robotaxi-surgical-hospital-os.html"
+                className="flex min-h-[48px] flex-col justify-center rounded-xl border border-white/15 bg-white/[0.03] px-3 py-2 text-xs font-bold text-white transition hover:border-emerald-400"
+              >
+                <span>Surgical Nav, 3D CT &amp; Blocks</span>
+                <span className="text-[10px] font-normal text-white/65">Educational simulation studio ↗</span>
+              </a>
+              <a
+                href="/cellular-spacetime-debugger-os.html"
+                className="flex min-h-[48px] flex-col justify-center rounded-xl border border-white/15 bg-white/[0.03] px-3 py-2 text-xs font-bold text-white transition hover:border-cyan-400"
+              >
+                <span>4D Cellular Bio-GDB &amp; Anatomy</span>
+                <span className="text-[10px] font-normal text-white/65">Multiscale physiology inspector ↗</span>
+              </a>
+            </div>
+          </div>
+        </Fold>
 
         <nav aria-label="Clinical references" className="border-y border-white/10">
           <div className="flex gap-6 overflow-x-auto py-1 no-scrollbar">

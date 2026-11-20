@@ -85,7 +85,7 @@ export function Connect() {
         <span className="grid h-11 w-11 place-items-center rounded-2xl bg-brand-50 text-2xl">🤝</span>
         <div>
           <h1 className="text-lg font-black text-ink dark:text-ink">Connect</h1>
-          <p className="text-xs text-neutral-500">Find a training partner or a match — women start the conversation</p>
+          <p className="text-xs text-neutral-500">Training partners &amp; matches</p>
         </div>
       </div>
 
@@ -137,9 +137,8 @@ export function Connect() {
                   </button>
                 ))}
               </div>
-              <p className="mt-1 text-[10px] leading-relaxed text-neutral-500">
-                Distance is always a band, never an exact point — a precise location on a dating
-                profile is how stalking happens.
+              <p className="mt-1 text-[10px] text-neutral-500">
+                Banded distance only for privacy.
               </p>
             </div>
             <label className="flex items-center gap-2 rounded-xl bg-neutral-50 px-3 py-2.5 dark:bg-white/5">

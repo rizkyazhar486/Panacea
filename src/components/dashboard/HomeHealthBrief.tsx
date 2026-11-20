@@ -158,22 +158,22 @@ export function HomeHealthBrief() {
             onClick={() => void handleQuickWearable()}
             disabled={bleBusy}
             data-testid="home-auto-connect-wearable"
-            className="text-emerald-700 dark:text-[#00BF63]"
             title={bleNote ?? '1-Click Auto-Connect Paired Bluetooth Wearable'}
             style={{
               font: 'inherit',
               fontSize: 11,
               fontWeight: 700,
-              padding: '5px 10px',
+              padding: '8px 12px',
               borderRadius: 999,
-              border: '1px solid rgba(0, 191, 99, 0.35)',
-              background: 'rgba(0, 191, 99, 0.12)',
+              border: '1px solid rgba(16, 185, 129, 0.55)',
+              background: '#065f46',
+              color: '#ecfdf5',
               cursor: 'pointer',
               minHeight: 44,
               whiteSpace: 'nowrap',
             }}
           >
-            {bleBusy ? 'Connecting…' : '⚡ Auto-Connect Wearable'}
+            {bleBusy ? 'Connecting…' : '⚡ Connect'}
           </button>
           <Link
             to="/health-data"

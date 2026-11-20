@@ -60,7 +60,12 @@ export function WideStage({ plate, depth, viewer, search, rail, regionChips, ref
               </a>
               <button
                 type="button"
-                onClick={() => document.getElementById('body-exposure-local-hub')?.scrollIntoView({ behavior: 'smooth' })}
+                onClick={() => {
+                  // On the Body Analyzer page the hub sits in a closed fold; opening it mounts the hub.
+                  const fold = document.getElementById('body-exposure-local-hub-fold')
+                  if (fold instanceof HTMLDetailsElement) fold.open = true
+                  ;(fold ?? document.getElementById('body-exposure-local-hub'))?.scrollIntoView({ behavior: 'smooth' })
+                }}
                 style={{ color: TONE.liveText, padding: '2px 8px', borderRadius: 6, border: `1px solid ${TONE.live}`, background: 'rgba(0, 191, 99, 0.12)', fontWeight: 700, cursor: 'pointer' }}
               >
                 Local Hub · QR

@@ -89,8 +89,7 @@ export function AppStatus() {
         <div data-surface="dark" className="fixed bottom-4 left-4 z-40 flex max-w-sm items-center gap-2.5 rounded-2xl border border-amber-300/20 bg-neutral-900/90 px-3.5 py-2 text-xs text-white shadow-xl backdrop-blur-md">
           <span className="h-2 w-2 shrink-0 rounded-full bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.6)]" />
           <div className="min-w-0 flex-1">
-            <span className="font-semibold text-amber-200">Sinkronisasi lokal tertunda</span>
-            <span className="ml-1 text-[11px] text-white/60">— data tersimpan aman</span>
+            <span className="font-semibold text-amber-200" title="Sync pending: your data is saved safely on this device">Unsynced</span>
           </div>
           <button
             onClick={() => {
@@ -101,7 +100,7 @@ export function AppStatus() {
             className="shrink-0 text-white/50 hover:text-white"
             aria-label="Tutup notifikasi sinkronisasi"
           >
-            ✕
+            <svg aria-hidden="true" viewBox="0 0 12 12" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"><path d="M2 2l8 8M10 2l-8 8" /></svg>
           </button>
         </div>
       )}

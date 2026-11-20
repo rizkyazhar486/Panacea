@@ -1,9 +1,13 @@
-import { useEffect, useMemo, useState } from 'react'
+import { lazy, Suspense, useEffect, useMemo, useState } from 'react'
 import { KolomAngka } from '../../components/KolomAngka'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../../components/ui'
 import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 import { IconSparkle, IconHeart, IconChartUp, IconActivity } from '../../components/icons'
 import { getHealthCache, pushBiometrics } from '../../lib/profile'
+
+const FasciaKineticTwinCard = lazy(() =>
+  import('../../components/FasciaKineticTwinCard').then((m) => ({ default: m.FasciaKineticTwinCard })),
+)
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Aesthetic Vitality — the science of "the pleasant, positive or artful
@@ -283,6 +287,11 @@ export function AestheticVitality() {
           Facial ratios are one small, uncertain factor among many — enter them only if curious. Measure from a straight-on photo with a ruler; face length ÷ width near φ ({PHI}) and inter-eye gap ≈ one eye width are the classic proportion/symmetry cues.
         </p>
       </Card>
+
+      {/* Feet-to-Face Myofascial Kinetic Chain Twin (lazy-loaded simulated biomechanics) */}
+      <Suspense fallback={null}>
+        <FasciaKineticTwinCard />
+      </Suspense>
 
       {/* Concept pillars */}
       <Card className="!p-5">

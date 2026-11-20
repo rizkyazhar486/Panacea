@@ -28,51 +28,65 @@ export function BrandFilmsSection() {
         </div>
       </div>
 
-      {/* ── FEATURED BRAND FILM (Black Video Glitch Safeguard) ──── */}
+      {/* ── FEATURED PLATFORM OVERVIEW & MULTISCALE TELEMETRY SHOWCASE ──── */}
       <section className="px-6 py-16 sm:px-10">
         <div className="mx-auto grid max-w-5xl gap-6 lg:grid-cols-2">
-          {/* Brand Intro Film Card with fallback gradient and poster */}
+          {/* Local Brand Intro — user-controlled playback (no forced uncanny auto-loop) */}
           <Reveal>
-            <div className="relative overflow-hidden rounded-[2rem] border border-black/5 bg-gradient-to-br from-[#02180e] via-[#042817] to-[#02120b] shadow-2xl shadow-brand/20 dark:border-white/10">
+            <div className="astro-surface relative overflow-hidden rounded-[2rem] text-white">
               <video
                 src={`${import.meta.env.BASE_URL}media/brand-intro.mp4`}
-                autoPlay
+                controls
                 muted
-                loop
                 playsInline
+                preload="metadata"
                 poster={BRAND_POSTER}
-                className="aspect-video w-full object-cover"
+                className="aspect-video w-full bg-[#040911] object-cover"
               />
-              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-              <div className="absolute bottom-0 left-0 right-0 p-5 text-white">
+              <div className="border-t border-cyan-400/20 p-5">
                 <div className="flex items-center gap-2">
-                  <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-                  <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-300">Sekilas Platform</span>
+                  <span className="h-2 w-2 rounded-full bg-cyan-400" />
+                  <span className="font-astro text-[10px] font-bold uppercase tracking-[0.2em] text-cyan-300">Platform Overview</span>
                 </div>
-                <h3 className="mt-1 text-lg font-bold sm:text-xl">Panaceamed: AI-EMR &amp; Longevity OS</h3>
+                <h3 className="font-astro mt-1 text-lg font-bold text-white sm:text-xl">Panaceamed: AI-EMR &amp; Body Exposure OS</h3>
               </div>
             </div>
           </Reveal>
 
-          {/* Higgsfield Nature Film */}
+          {/* Realistic Multiscale Bio-Telemetry Schematic Card (replaces synthetic AI nature video) */}
           <Reveal delay={80}>
-            <div className="relative overflow-hidden rounded-[2rem] border border-black/5 bg-gradient-to-br from-[#02180e] via-[#042817] to-[#02120b] shadow-2xl shadow-brand/20 dark:border-white/10">
-              <video
-                src="https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260702_023227_88b54135-7489-48de-9476-ca0657fc0d29.mp4"
-                autoPlay
-                muted
-                loop
-                playsInline
-                poster={BRAND_POSTER}
-                className="aspect-video w-full object-cover"
-              />
-              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-              <div className="absolute bottom-0 left-0 right-0 p-5 text-white">
-                <h2 className="text-xl font-extrabold sm:text-2xl">
-                  Alam. Kemanusiaan. <span className="font-serif-display italic text-emerald-300">Vitalitas.</span>
+            <div className="astro-surface astro-horizon-grid relative flex h-full flex-col justify-between overflow-hidden rounded-[2rem] p-6 text-white">
+              <div className="flex items-center justify-between gap-2">
+                <span className="font-astro text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-300">
+                  MULTISCALE BIOPHYSICS ENGINE
+                </span>
+                <span className="font-astro-mono rounded-full border border-cyan-400/35 bg-cyan-400/10 px-2.5 py-0.5 text-[10px] font-bold text-cyan-200">
+                  7 LAYERS · 3D/4D
+                </span>
+              </div>
+
+              <svg viewBox="0 0 420 150" className="my-4 w-full" role="img" aria-label="Multiscale longitudinal telemetry orbit">
+                <defs>
+                  <linearGradient id="panaceaNeonLine" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0%" stopColor="#22d3ee" />
+                    <stop offset="50%" stopColor="#10b981" />
+                    <stop offset="100%" stopColor="#c6ff34" />
+                  </linearGradient>
+                </defs>
+                <ellipse cx="210" cy="76" rx="172" ry="44" fill="none" stroke="rgba(34,211,238,0.26)" strokeWidth="1" strokeDasharray="4 4" />
+                <ellipse cx="210" cy="76" rx="116" ry="28" fill="none" stroke="rgba(16,185,129,0.34)" strokeWidth="1" />
+                <path d="M24 88 L88 88 L104 88 L116 34 L128 112 L144 68 L168 88 L244 88 L256 34 L268 112 L284 68 L308 88 L396 88" fill="none" stroke="url(#panaceaNeonLine)" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
+                <circle cx="116" cy="34" r="4" fill="#22d3ee" />
+                <circle cx="256" cy="34" r="4" fill="#c6ff34" />
+                <text x="24" y="20" fill="#94a3b8" fontSize="10" fontFamily="monospace">BODY EXPOSURE · AI-EMR · IOT WEARABLES · CLINICIAN-IN-LOOP</text>
+              </svg>
+
+              <div>
+                <h2 className="font-astro text-xl font-extrabold text-white sm:text-2xl">
+                  Precision Anatomy. <span className="text-emerald-300">Longitudinal Care.</span>
                 </h2>
-                <p className="mt-1 max-w-xl text-[13px] text-white/80">
-                  Memperpanjang healthspan berbasis sains — menambah kualitas hidup pada setiap tahun usia Anda.
+                <p className="mt-1.5 max-w-xl text-[13px] leading-relaxed text-slate-300">
+                  Satu rekaman kesehatan longitudinal dari sensor wearable, analisis komposisi tubuh, hingga verifikasi dokter berizin — tanpa data karangan.
                 </p>
               </div>
             </div>

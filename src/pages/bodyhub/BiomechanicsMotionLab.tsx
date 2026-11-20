@@ -1,6 +1,10 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import { AtlasViewer3D } from '../../components/AtlasViewer3D'
 import { WORKOUT_MUSCLE_GROUPS } from '../../lib/workoutMuscles'
+
+const FasciaKineticTwinCard = lazy(() =>
+  import('../../components/FasciaKineticTwinCard').then((m) => ({ default: m.FasciaKineticTwinCard })),
+)
 import {
   calculateSagittalKinematics,
   calculateVerticalGrf,
@@ -603,6 +607,13 @@ export default function BiomechanicsMotionLab() {
             <div>Citations: {GAIT_BIOMECHANICS_SOURCE.citation} (PMID: {GAIT_BIOMECHANICS_SOURCE.pmid}); Hicks JH. J Anat. 1954 (PMID: 13129168).</div>
           </div>
         </div>
+      </div>
+
+      {/* Feet-to-Face Myofascial Kinetic Chain Twin (lazy-loaded simulated biomechanics) */}
+      <div className="mt-4">
+        <Suspense fallback={null}>
+          <FasciaKineticTwinCard />
+        </Suspense>
       </div>
     </section>
   )

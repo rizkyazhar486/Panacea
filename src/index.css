@@ -2984,8 +2984,14 @@ html.dark.pmd-liquid-actions-v45 button.cta-banner-btn .cta-arrow-circle {
 
 /* Sections that are dark in BOTH themes: the light-mode remap of text-emerald-*
    (to #047857) makes their accent text dark-on-dark. Restore the light tints. */
-:root:not(.dark) .gelap-tetap .text-emerald-200 { color: #a7f3d0; }
-:root:not(.dark) .gelap-tetap .text-emerald-300 { color: #6ee7b7; }
+:root:not(.dark) :is(.gelap-tetap, .dark, .astro-surface) .text-emerald-200 { color: #a7f3d0; }
+:root:not(.dark) :is(.gelap-tetap, .dark, .astro-surface) .text-emerald-300 { color: #6ee7b7; }
+:root:not(.dark) :is(.gelap-tetap, .dark, .astro-surface) .text-cyan-200 { color: #a5f3fc; }
+:root:not(.dark) :is(.gelap-tetap, .dark, .astro-surface) .text-cyan-300 { color: #67e8f9; }
+:root:not(.dark) :is(.gelap-tetap, .dark, .astro-surface) .text-amber-200 { color: #fde68a; }
+:root:not(.dark) :is(.gelap-tetap, .dark, .astro-surface) .text-amber-300 { color: #fcd34d; }
+:root:not(.dark) :is(.gelap-tetap, .dark, .astro-surface) .text-rose-200 { color: #fecdd3; }
+:root:not(.dark) :is(.gelap-tetap, .dark, .astro-surface) .text-rose-300 { color: #fda4af; }
 
 /* Primary hero CTA: the global neumorphic control layer (v46/v48) forces every
    button to a white pill, which leaves the one primary action visually equal to
@@ -3057,3 +3063,37 @@ html:not(.dark) body button[data-cta="primary"] {
 :root:not(.dark) [data-surface="dark"] .text-amber-200:not(:hover) { color: #fde68a; }
 :root:not(.dark) [data-surface="dark"] .text-cyan-300:not(:hover) { color: #67e8f9; }
 :root:not(.dark) [data-surface="dark"] .text-rose-300:not(:hover) { color: #fda4af; }
+
+/* ── Astronomical Minimalist Neon Telemetry System (zero !important) ───────── */
+.font-astro {
+  font-family: var(--font-hero);
+  letter-spacing: 0.04em;
+}
+.font-astro-mono {
+  font-family: var(--font-angka);
+  font-variant-numeric: tabular-nums;
+}
+.astro-surface {
+  background: linear-gradient(165deg, rgba(6, 13, 22, 0.96) 0%, rgba(3, 8, 14, 0.98) 100%);
+  border: 1px solid rgba(34, 211, 238, 0.24);
+  box-shadow: 0 0 0 1px rgba(16, 185, 129, 0.08) inset, 0 18px 42px -24px rgba(0, 0, 0, 0.85);
+}
+.astro-chip {
+  background: rgba(8, 17, 29, 0.86);
+  border: 1px solid rgba(34, 211, 238, 0.22);
+  color: #e2f8ff;
+  transition: border-color 160ms ease, background-color 160ms ease, color 160ms ease;
+}
+.astro-chip:hover {
+  border-color: rgba(16, 185, 129, 0.65);
+  background: rgba(16, 185, 129, 0.14);
+  color: #ffffff;
+}
+.astro-horizon-grid {
+  background-image:
+    radial-gradient(circle at 22% 18%, rgba(34, 211, 238, 0.14), transparent 44%),
+    radial-gradient(circle at 80% 24%, rgba(16, 185, 129, 0.14), transparent 46%),
+    linear-gradient(rgba(148, 163, 184, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(148, 163, 184, 0.05) 1px, transparent 1px);
+  background-size: 100% 100%, 100% 100%, 36px 36px, 36px 36px;
+}

@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PanaceaMed · Whole-Body Exposure Operating System (Network Physiology & Circadian Kernel)</title>
+  <script src="/panacea-superos-bridge.js"></script>
+  <style>
+    :root {
+      --bg: #020617;
+      --surface: rgba(15, 23, 42, 0.88);
+      --border: rgba(148, 163, 184, 0.18);
+      --cyan: #38bdf8;
+      --emerald: #10b981;
+      --amber: #f59e0b;
+      --rose: #f43f5e;
+      --violet: #a855f7;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', system-ui, sans-serif;
+      min-height: 100vh;
+      padding: 16px;
+      line-height: 1.45;
+    }
+    .topbar {
+      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 12px 16px; margin-bottom: 14px;
+    }
+    .btn {
+      text-decoration: none; color: var(--text); background: rgba(30, 41, 59, 0.85);
+      border: 1px solid rgba(148, 163, 184, 0.25); border-radius: 8px;
+      padding: 6px 11px; font-size: 11px; font-weight: 600; cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .btn:hover, .btn.active { background: rgba(16, 185, 129, 0.18); border-color: var(--emerald); color: #34d399; }
+    .os-grid {
+      display: grid; grid-template-columns: 350px 1fr 370px; gap: 14px;
+    }
+    @media (max-width: 1200px) { .os-grid { grid-template-columns: 1fr; } }
+    .col { display: flex; flex-direction: column; gap: 14px; }
+    .card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 14px 16px;
+    }
+    .card-hdr {
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.6px;
+      color: var(--cyan); margin-bottom: 10px; padding-bottom: 6px;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+    }
+    .pill {
+      font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 999px;
+      background: rgba(16, 185, 129, 0.16); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.35);
+    }
+    .kv {
+      display: flex; justify-content: space-between; align-items: baseline;
+      font-size: 11.5px; padding: 5px 0; border-bottom: 1px dashed rgba(148, 163, 184, 0.1);
+    }
+    .kv span:first-child { color: var(--muted); }
+    .kv span:last-child { font-family: 'SF Mono', ui-monospace, monospace; font-weight: 700; color: #f1f5f9; }
+    .bus-row { margin: 7px 0; }
+    .bus-head { display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; margin-bottom: 3px; }
+    .bar-track { width: 100%; height: 6px; background: rgba(2, 6, 23, 0.9); border-radius: 999px; overflow: hidden; }
+    .bar-fill { height: 100%; border-radius: 999px; transition: width 0.3s ease; }
+    .slider-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 11px; margin: 6px 0; }
+    .slider-row input[type=range] { flex: 1; accent-color: var(--cyan); }
+    .matrix-grid {
+      display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 6px;
+    }
+    .matrix-cell {
+      background: rgba(2, 6, 23, 0.75); border: 1px solid rgba(148, 163, 184, 0.14);
+      border-radius: 8px; padding: 8px 10px;
+    }
+    .matrix-cell .m-title { font-size: 10.5px; color: var(--muted); }
+    .matrix-cell .m-val { font-family: 'SF Mono', ui-monospace, monospace; font-size: 13px; font-weight: 800; color: #38bdf8; margin-top: 2px; }
+    .directive-box {
+      background: rgba(2, 6, 23, 0.78); border-left: 3px solid var(--emerald);
+      border-radius: 7px; padding: 9px 11px; font-size: 11.5px; color: #e2e8f0; margin-top: 8px;
+    }
+    .svg-panel {
+      width: 100%; background: #020617; border: 1px solid rgba(148, 163, 184, 0.15);
+      border-radius: 9px; padding: 8px; margin-top: 6px;
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <a href="/#/body-exposure" class="btn">← Body Cockpit</a>
+      <div>
+        <strong style="font-size:14px;">🖥️ Whole-Body Exposure Operating System · Biological Kernel v5</strong>
+        <div style="font-size:11px;color:var(--muted);">Network Physiology Coupling · Borbély Circadian SCN Scheduler · Allostatic PID Controller</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;">
+      <a href="/numerical-body-exposure-clinical.html" class="btn">📊 Numerical Biophysics</a>
+      <a href="/hippocratic-clinical-os.html" class="btn">⚕️ Hippocratic Clinical OS</a>
+      <a href="/omniscience-natural-laws-engine.html" class="btn">⚛️ Omniscience Laws</a>
+      <a href="/personal-digital-self-1to1.html" class="btn">🎮 1:1 Digital Self</a>
+      <a href="/medscihub-4d-anatomy-emr.html" class="btn">🧬 4D Anatomy</a>
+    </div>
+  </header>
+
+  <main class="os-grid">
+    <!-- KOLOM 1: BIOLOGICAL KERNEL & 4 SYSTEM BUSES + EXPOSOME INPUTS -->
+    <div class="col">
+      <div class="card">
+        <div class="card-hdr">
+          <span>I. Biological Kernel · 4 Physiological Buses</span>
+          <span class="pill" id="kernel-uptime">Kernel Online · Synced</span>
+        </div>
+        <div class="bus-row">
+          <div class="bus-head"><span>1. Neural & Autonomic Vagal Bus (HRV/CNS)</span><span id="bus-neural-val" style="color:#34d399;">94%</span></div>
+          <div class="bar-track"><div class="bar-fill" id="bus-neural-bar" style="width:94%;background:#10b981;"></div></div>
+        </div>
+        <div class="bus-row">
+          <div class="bus-head"><span>2. Hemodynamic & Oxygen Bus ($DO_2$/Perfusion)</span><span id="bus-hemo-val" style="color:#38bdf8;">96%</span></div>
+          <div class="bar-track"><div class="bar-fill" id="bus-hemo-bar" style="width:96%;background:#38bdf8;"></div></div>
+        </div>
+        <div class="bus-row">
+          <div class="bus-head"><span>3. Metabolic & Mitochondrial ATP Bus</span><span id="bus-meta-val" style="color:#a855f7;">92%</span></div>
+          <div class="bar-track"><div class="bar-fill" id="bus-meta-bar" style="width:92%;background:#a855f7;"></div></div>
+        </div>
+        <div class="bus-row">
+          <div class="bus-head"><span>4. Immune, Lymphatic & Cellular Repair Bus</span><span id="bus-imm-val" style="color:#f59e0b;">91%</span></div>
+          <div class="bar-track"><div class="bar-fill" id="bus-imm-bar" style="width:91%;background:#f59e0b;"></div></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-hdr">
+          <span>II. Real-Time Whole-Body Exposure Modulators</span>
+          <span class="pill">Live Telemetry</span>
+        </div>
+        <div class="slider-row">
+          <span>Jam Sirkadian (0–24h)</span>
+          <input type="range" id="os-hour" min="0" max="23.5" step="0.5" value="15.0" />
+          <span id="val-hour">15:00</span>
+        </div>
+        <div class="slider-row">
+          <span>Tidur 24 Jam Terakhir (h)</span>
+          <input type="range" id="os-sleep" min="3.5" max="10.0" step="0.5" value="7.5" />
+          <span id="val-sleep">7.5h</span>
+        </div>
+        <div class="slider-row">
+          <span>Beban Fisik / Kognitif (%)</span>
+          <input type="range" id="os-strain" min="10" max="100" step="5" value="35" />
+          <span id="val-strain">35%</span>
+        </div>
+        <div class="slider-row">
+          <span>Paparan Lingkungan (ATA)</span>
+          <input type="range" id="os-ata" min="0.7" max="2.5" step="0.1" value="1.0" />
+          <span id="val-ata">1.0 ATA</span>
+        </div>
+        <div class="kv"><span>Heart Rate / HRV RMSSD</span><span id="os-vitals">62 bpm · 78 ms</span></div>
+        <div class="kv"><span>Body Composition (LBM / Fat)</span><span id="os-comp">44% SMM · 14% BF</span></div>
+      </div>
+    </div>
+
+    <!-- KOLOM 2: NETWORK PHYSIOLOGY COUPLING & 24-HOUR CIRCADIAN SCN SCHEDULER -->
+    <div class="col">
+      <div class="card">
+        <div class="card-hdr">
+          <span>III. Network Physiology · Organ-to-Organ Coupling Topology</span>
+          <span class="pill" id="coupling-coherence">Coherence: 0.93</span>
+        </div>
+        <div class="svg-panel">
+          <svg id="network-physiology-svg" width="100%" height="150" viewBox="0 0 480 150"></svg>
+        </div>
+        <div class="matrix-grid">
+          <div class="matrix-cell">
+            <div class="m-title">Brain ↔ Heart (Neuro-Vagal Axis)</div>
+            <div class="m-val" id="cpl-bh">0.94 · Synchronized</div>
+          </div>
+          <div class="matrix-cell">
+            <div class="m-title">Heart ↔ Lung (RSA Cardiorespiratory)</div>
+            <div class="m-val" id="cpl-hl">0.96 · Optimal $DO_2$</div>
+          </div>
+          <div class="matrix-cell">
+            <div class="m-title">Muscle ↔ Liver/Metabolic (Glycogen/ATP)</div>
+            <div class="m-val" id="cpl-mm">0.91 · Anabolic Ready</div>
+          </div>
+          <div class="matrix-cell">
+            <div class="m-title">Kidney ↔ Vascular (Autoregulation)</div>
+            <div class="m-val" id="cpl-kv">0.95 · Normotensive</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-hdr">
+          <span>IV. Chronobiological SCN Scheduler (Borbély Process C & Process S)</span>
+          <span class="pill" id="circadian-phase-badge">Afternoon Peak</span>
+        </div>
+        <div class="svg-panel">
+          <div style="font-size:10px;color:var(--muted);margin-bottom:4px;display:flex;justify-content:space-between;">
+            <span>Cyan = Circadian Drive (Process C) · Amber = Sleep Pressure (Process S)</span>
+            <span id="scn-clock-label" style="color:#38bdf8;">Phase 15:00 WIB</span>
+          </div>
+          <svg id="circadian-svg" width="100%" height="95" viewBox="0 0 480 95"></svg>
+        </div>
+        <div class="kv"><span>Hormonal Drive (Cortisol : Melatonin)</span><span id="res-hormone">Cortisol 68% : Melatonin 8%</span></div>
+        <div class="kv"><span>Core Body Temperature Estimate ($T_{	ext{core}}$)</span><span id="res-tcore">37.05 °C (Peak Conductance)</span></div>
+        <div class="kv"><span>Optimal OS Task Window Right Now</span><span id="res-task-window" style="color:#34d399;">High-Speed Motor Coordination & Strength</span></div>
+      </div>
+    </div>
+
+    <!-- KOLOM 3: ALLOSTATIC LOAD PID CONTROLLER & AUTONOMOUS DAILY OS PROTOCOL -->
+    <div class="col">
+      <div class="card">
+        <div class="card-hdr">
+          <span>V. Allostatic Load & Homeostatic PID Controller</span>
+          <span class="pill" id="allostatic-badge">Low Allostatic Strain</span>
+        </div>
+        <div class="kv"><span>Allostatic Load Index (McEwen 0–100)</span><span id="res-allostatic">14.2 / 100 (Resilient)</span></div>
+        <div class="kv"><span>Homeostatic Error Signal $e(t)$</span><span id="res-pid-err">-0.06 (Near-Zero Entropy)</span></div>
+        <div class="kv"><span>Proportional Correction ($K_p cdot e$)</span><span id="res-pid-p">Maintain Current Autonomic Tone</span></div>
+        <div class="kv"><span>Integral Accumulation ($K_i int e,dt$)</span><span id="res-pid-i">Zero Sleep/Metabolic Debt</span></div>
+        <div class="kv"><span>Derivative Damping ($K_d rac{de}{dt}$)</span><span id="res-pid-d">Vagal Rebound Protected</span></div>
+        <div class="directive-box" id="pid-directive"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-hdr">
+          <span>VI. Chronotherapy & 5-Modality OS Execution Queue</span>
+          <button class="btn active" style="padding:3px 8px;font-size:10px;" onclick="commitWholeBodyState()">⚡ Commit OS State</button>
+        </div>
+        <div class="kv"><span>1. HBOT Hyperbaric Window</span><span id="q-hbot">1.5 ATA · 45 min (Oxygenation)</span></div>
+        <div class="kv"><span>2. Whole-Body Cryotherapy</span><span id="q-cryo">-130°C · 180s (Post-Exertion Vagal)</span></div>
+        <div class="kv"><span>3. Red Light PBM (660/850nm)</span><span id="q-pbm">40 J/cm² · Mitochondrial Prime</span></div>
+        <div class="kv"><span>4. X-Tone & X-Cryo Neuromuscular</span><span id="q-xtone">45 Hz · Localized Tendon Care</span></div>
+        <div class="kv"><span>5. Chronopharmacology Guide</span><span id="q-meds">ACEi/Statin: Evening · Vit D/B: Morning</span></div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    let telemetry = { hr: 62, hrv: 78, spo2: 99, vo2max: 56.4, musclePct: 44, bodyFatPct: 14 };
+    try {
+      if (window.PanaceaSuperOSBridge) {
+        telemetry = window.PanaceaSuperOSBridge.readUnifiedTelemetry();
+      }
+      const nowH = new Date().getHours() + (new Date().getMinutes() >= 30 ? 0.5 : 0);
+      document.getElementById('os-hour').value = nowH;
+    } catch (e) {}
+
+    document.getElementById('os-vitals').textContent = telemetry.hr + ' bpm · ' + telemetry.hrv + ' ms RMSSD · SpO2 ' + telemetry.spo2 + '%';
+    document.getElementById('os-comp').textContent = telemetry.musclePct + '% SMM · ' + telemetry.bodyFatPct + '% Body Fat';
+
+    function drawNetworkPhysiology(coherence) {
+      const svg = document.getElementById('network-physiology-svg');
+      const nodes = [
+        { id: 'CNS', label: 'Brain / SCN', x: 240, y: 24, col: '#38bdf8' },
+        { id: 'HEART', label: 'Heart (HRV)', x: 110, y: 68, col: '#f43f5e' },
+        { id: 'LUNG', label: 'Lungs (DO₂)', x: 370, y: 68, col: '#10b981' },
+        { id: 'MET', label: 'Liver / Meta', x: 155, y: 128, col: '#a855f7' },
+        { id: 'REN', label: 'Renal / Vasc', x: 325, y: 128, col: '#f59e0b' }
+      ];
+      let html = '';
+      // Draw coupling links
+      for (let i = 0; i < nodes.length; i++) {
+        for (let j = i + 1; j < nodes.length; j++) {
+          const a = nodes[i], b = nodes[j];
+          html += '<line x1="' + a.x + '" y1="' + a.y + '" x2="' + b.x + '" y2="' + b.y + '" stroke="rgba(56,189,248,' + (coherence * 0.55).toFixed(2) + ')" stroke-width="1.8"/>';
+        }
+      }
+      nodes.forEach(n => {
+        html += '<circle cx="' + n.x + '" cy="' + n.y + '" r="15" fill="#020617" stroke="' + n.col + '" stroke-width="2.5"/>';
+        html += '<text x="' + n.x + '" y="' + (n.y + 4) + '" fill="#f8fafc" font-size="8.5" font-weight="700" text-anchor="middle">' + n.id + '</text>';
+        html += '<text x="' + n.x + '" y="' + (n.y - 20) + '" fill="#94a3b8" font-size="9" text-anchor="middle">' + n.label + '</text>';
+      });
+      svg.innerHTML = html;
+    }
+
+    function drawCircadianWave(currentHour, sleepHours) {
+      const svg = document.getElementById('circadian-svg');
+      const w = 480, h = 95;
+      let pathC = '', pathS = '';
+      const sleepDebtFactor = Math.max(0, (8 - sleepHours) * 0.08);
+      for (let x = 0; x <= w; x += 4) {
+        const hr = (x / w) * 24;
+        // Process C peaks around 16:00, nadir around 04:00
+        const procC = 0.5 + 0.42 * Math.sin(((hr - 10) / 24) * 2 * Math.PI);
+        // Process S builds during wakefulness (07:00 to 23:00), decays during sleep
+        let procS = hr >= 7 ? 0.2 + ((hr - 7) / 16) * 0.65 : 0.85 - ((hr + 1) / 8) * 0.65;
+        procS = Math.min(0.95, Math.max(0.1, procS + sleepDebtFactor));
+
+        const yC = h - 12 - procC * (h - 24);
+        const yS = h - 12 - procS * (h - 24);
+        pathC += (x === 0 ? 'M ' : ' L ') + x + ' ' + yC.toFixed(1);
+        pathS += (x === 0 ? 'M ' : ' L ') + x + ' ' + yS.toFixed(1);
+      }
+      const curX = (currentHour / 24) * w;
+      svg.innerHTML =
+        '<path d="' + pathC + '" fill="none" stroke="#38bdf8" stroke-width="2.2"/>' +
+        '<path d="' + pathS + '" fill="none" stroke="#f59e0b" stroke-width="2" stroke-dasharray="4,3"/>' +
+        '<line x1="' + curX.toFixed(1) + '" y1="6" x2="' + curX.toFixed(1) + '" y2="89" stroke="#10b981" stroke-width="2"/>';
+    }
+
+    function updateWholeBodyOS() {
+      const hour = parseFloat(document.getElementById('os-hour').value) || 15;
+      const sleep = parseFloat(document.getElementById('os-sleep').value) || 7.5;
+      const strain = parseFloat(document.getElementById('os-strain').value) || 35;
+      const ata = parseFloat(document.getElementById('os-ata').value) || 1.0;
+
+      const hh = Math.floor(hour).toString().padStart(2, '0');
+      const mm = (hour % 1) >= 0.5 ? '30' : '00';
+      document.getElementById('val-hour').textContent = hh + ':' + mm;
+      document.getElementById('val-sleep').textContent = sleep.toFixed(1) + 'h';
+      document.getElementById('val-strain').textContent = strain + '%';
+      document.getElementById('val-ata').textContent = ata.toFixed(1) + ' ATA';
+      document.getElementById('scn-clock-label').textContent = 'Phase ' + hh + ':' + mm + ' WIB';
+
+      // Bus Calculations
+      const sleepRatio = Math.min(1.05, sleep / 7.5);
+      const neuralBus = Math.round(Math.min(99, Math.max(55, (telemetry.hrv / 80) * 92 * sleepRatio - strain * 0.12)));
+      const hemoBus = Math.round(Math.min(99, Math.max(60, 92 + (ata - 1.0) * 6 - strain * 0.08)));
+      const metaBus = Math.round(Math.min(99, Math.max(58, 90 * sleepRatio - strain * 0.1)));
+      const immBus = Math.round(Math.min(99, Math.max(55, 89 * sleepRatio + (ata - 1.0) * 5 - strain * 0.09)));
+
+      document.getElementById('bus-neural-val').textContent = neuralBus + '%';
+      document.getElementById('bus-neural-bar').style.width = neuralBus + '%';
+      document.getElementById('bus-hemo-val').textContent = hemoBus + '%';
+      document.getElementById('bus-hemo-bar').style.width = hemoBus + '%';
+      document.getElementById('bus-meta-val').textContent = metaBus + '%';
+      document.getElementById('bus-meta-bar').style.width = metaBus + '%';
+      document.getElementById('bus-imm-val').textContent = immBus + '%';
+      document.getElementById('bus-imm-bar').style.width = immBus + '%';
+
+      const coherence = ((neuralBus + hemoBus + metaBus + immBus) / 400);
+      document.getElementById('coupling-coherence').textContent = 'Coherence: ' + coherence.toFixed(2);
+      document.getElementById('cpl-bh').textContent = (neuralBus / 100).toFixed(2) + ' · Vagal Locked';
+      document.getElementById('cpl-hl').textContent = (hemoBus / 100).toFixed(2) + ' · Optimal DO₂';
+      document.getElementById('cpl-mm').textContent = (metaBus / 100).toFixed(2) + ' · ATP Flux Ready';
+      document.getElementById('cpl-kv').textContent = (immBus / 100).toFixed(2) + ' · Homeostatic';
+
+      // Circadian SCN Phase
+      const tCore = 36.75 + 0.35 * Math.sin(((hour - 10) / 24) * 2 * Math.PI);
+      const cortisol = Math.max(10, Math.min(95, Math.round(52 + 40 * Math.cos(((hour - 8) / 24) * 2 * Math.PI))));
+      const melatonin = Math.max(5, Math.min(95, Math.round(48 + 44 * Math.cos(((hour - 2) / 24) * 2 * Math.PI))));
+      document.getElementById('res-tcore').textContent = tCore.toFixed(2) + ' °C';
+      document.getElementById('res-hormone').textContent = 'Cortisol ' + cortisol + '% : Melatonin ' + melatonin + '%';
+
+      let phaseName = 'Daytime Homeostasis';
+      let taskWindow = 'Executive Deep Work & Analytical Synthesis';
+      if (hour >= 6 && hour < 10) {
+        phaseName = 'Morning Cortisol Awakening (CAR)';
+        taskWindow = 'Sunlight Exposure, High-Focus Cognitive Architecture & Morning Mobility';
+      } else if (hour >= 10 && hour < 14) {
+        phaseName = 'High Alertness & Working Memory Peak';
+        taskWindow = 'Complex Clinical Decision-Making, Coding & Precision Surgery/Procedures';
+      } else if (hour >= 14 && hour < 18.5) {
+        phaseName = 'Peak Core Temp & Neuromuscular Output';
+        taskWindow = 'High-Intensity Running/Strength Workout + Post-Session Cryo / X-Tone';
+      } else if (hour >= 18.5 && hour < 22) {
+        phaseName = 'Dim-Light Melatonin Onset (DLMO) Transition';
+        taskWindow = 'Red Light PBM (660/850nm), HBOT Parasympathetic Session & Autonomic Downshift';
+      } else {
+        phaseName = 'Nocturnal Glymphatic Clearance & Slow-Wave Repair';
+        taskWindow = 'Deep Sleep Architecture, Growth Hormone Surge & Memory Consolidation';
+      }
+      document.getElementById('circadian-phase-badge').textContent = phaseName;
+      document.getElementById('res-task-window').textContent = taskWindow;
+
+      // Allostatic Load & PID Controller
+      const sleepDeficit = Math.max(0, 7.5 - sleep);
+      const allostatic = Math.min(98, Math.max(5, sleepDeficit * 9.5 + strain * 0.32 - (ata - 1.0) * 6));
+      const errSignal = (allostatic - 20) / 100;
+      document.getElementById('res-allostatic').textContent = allostatic.toFixed(1) + ' / 100';
+      document.getElementById('res-pid-err').textContent = (errSignal >= 0 ? '+' : '') + errSignal.toFixed(2);
+      document.getElementById('res-pid-p').textContent =
+        allostatic > 38 ? 'Increase Vagal Recovery (+20m PBM / Cryo)' : 'Maintain Current Autonomic Setpoint';
+      document.getElementById('res-pid-i').textContent =
+        sleepDeficit > 0.5 ? ('Accumulated Sleep Debt: ' + sleepDeficit.toFixed(1) + 'h (Add +45m Sleep Tonight)') : 'Zero Sleep or Metabolic Debt';
+      document.getElementById('res-pid-d').textContent =
+        strain > 60 ? 'Dampen Sympathetic Surge via 1.5–2.0 ATA HBOT' : 'Smooth Autonomic Trajectory';
+
+      document.getElementById('pid-directive').innerHTML =
+        '<strong>Kernel PID Directive (' + hh + ':' + mm + '):</strong> Koherensi jaringan organ ' + (coherence * 100).toFixed(0) + '% dengan beban alostatik ' + allostatic.toFixed(1) + '/100. Fokuskan sistem tubuh pada <em>' + taskWindow + '</em>.';
+
+      drawNetworkPhysiology(coherence);
+      drawCircadianWave(hour, sleep);
+    }
+
+    ['os-hour', 'os-sleep', 'os-strain', 'os-ata'].forEach(id => {
+      document.getElementById(id).addEventListener('input', updateWholeBodyOS);
+    });
+
+    window.commitWholeBodyState = function() {
+      try {
+        localStorage.setItem('pmd_whole_body_os_kernel_v1', JSON.stringify({
+          ts: Date.now(),
+          hour: document.getElementById('os-hour').value,
+          sleep: document.getElementById('os-sleep').value,
+          strain: document.getElementById('os-strain').value
+        }));
+        if (window.PanaceaSuperOSBridge) window.PanaceaSuperOSBridge.broadcastUpdate('whole-body-os-kernel');
+        document.getElementById('kernel-uptime').textContent = '✓ Kernel State Synced Across OS';
+      } catch (e) {}
+    };
+
+    updateWholeBodyOS();
+  </script>
+</body>
+</html>

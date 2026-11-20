@@ -5,12 +5,17 @@ import { lazy, Suspense, useEffect, useRef, useState } from 'react'
 import { Fold } from '../../shared/ui/Fold'
 import { Prosa } from '../../components/Prosa'
 import { KolomAngka } from '../../components/KolomAngka'
-import { simpanTeks } from '../../lib/unduh'
 import { bacaTeksBia, PERINTAH_BACA } from '../../lib/biaGambar'
 import { hariIni } from '../../lib/tanggal'
 import { Link } from 'react-router-dom'
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
 import { Card, SectionTitle, Field, inputClass, Button, Badge } from '../../components/ui'
+
+const HealthTrendRechart = lazy(() =>
+  import('./HealthTrendRechart').then((m) => ({ default: m.HealthTrendRechart })),
+)
+const DeviceQuickSyncCard = lazy(() =>
+  import('../../components/sync/DeviceQuickSyncCard').then((m) => ({ default: m.DeviceQuickSyncCard })),
+)
 import { IconHeart, IconActivity, IconCheck, IconChevronRight } from '../../components/icons'
 import { api, backendEnabled, apiBaseUrl, type KatalogMetrik } from '../../lib/api'
 import { useStore } from '../../lib/store'
@@ -18,7 +23,7 @@ import { mergeDemoStored } from '../../lib/profile'
 import { parseHealthFile, type ImportResult } from '../../lib/healthImport'
 import { getVitals, mergeVitals } from '../../lib/healthVitals'
 import { readUnifiedLocalVitals, recoverSameUserVitalsIntoScope } from '../../domains/identity/localRecovery'
-import { downloadClinicalFhirBundle, downloadSoapSbarReport } from '../../domains/clinical-operations'
+import { foldsOpenForSession } from '../../shared/ui/foldsPreference'
 import { deretMetrik } from '../../lib/riwayatVitals'
 import { parseWorkouts, parseHrNotifications } from '../../lib/workoutImport'
 import { mergeWorkouts, mergeHrNotifications } from '../../lib/workoutStore'
@@ -26,6 +31,7 @@ import { diagnose, type SyncDiagnosis } from '../../lib/syncDiagnostics'
 import { generateInsights } from '../../lib/healthInsights'
 import { benchmarkVo2max, benchmarkRestingHr, benchmarkSleep, BENCHMARK_DISCLAIMER, type BenchmarkItem } from '../../lib/benchmark'
 import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
+import { exportArtifactNow } from '../../components/sync/autoExportBrowserAdapter'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Health Profile — per-user health data saved on the SERVER (keyed by account,
@@ -84,6 +90,14 @@ export function HealthProfile() {
   const [p, setP] = useState<HealthProfile>(DEF)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [syncOpened, setSyncOpened] = useState(() => {
+    if (typeof window === 'undefined') return false
+    try {
+      return foldsOpenForSession(window.location.hash, window.sessionStorage)
+    } catch {
+      return false
+    }
+  })
   const [savedAt, setSavedAt] = useState<string | null>(null)
   const [err, setErr] = useState('')
   const [note, setNote] = useState('')
@@ -333,11 +347,43 @@ export function HealthProfile() {
     }
   }
 
-  function download(name: string, text: string, type: string) {
-    void simpanTeks(text, name, type, 'Panaceamed.id')
+  function buildCanonicalExport() {
+    const mv = mergedExportVitals()
+    const nowIso = new Date().toISOString()
+    const profileKey = account?.email ? account.email.split('@')[0] : 'rizkyazhar486'
+    return {
+      exportedAtIso: nowIso,
+      owner: {
+        profileKey,
+        fullName: account?.isOwner || profileKey.toLowerCase().includes('rizky') ? 'dr. Rizky Muhammad Azrissal' : account?.name || 'dr. Rizky Muhammad Azrissal',
+        username: `@${profileKey.replace(/[^a-zA-Z0-9_]/g, '') || 'rizkyazhar486'}`,
+        mrn: activePatient?.mrn || 'PMD-000486',
+      },
+      vitals: {
+        heightCm: mv.heightCm ?? null,
+        weightKg: mv.weightKg ?? null,
+        bodyFatPct: mv.bodyFatPct ?? null,
+        restingHrBpm: mv.restingHr ?? mv.heartRate ?? null,
+        hrvMs: mv.hrvMs ?? null,
+        vo2max: mv.vo2max ?? null,
+        sleepHours: mv.sleepH ?? null,
+        steps: mv.steps ?? null,
+        spo2Pct: mv.spo2Pct ?? null,
+      },
+      longitudinalRows: (p.history ?? []).map((h) => ({
+        date: h.date,
+        source: p.source,
+        vo2max: h.vo2max ?? null,
+        restingHrBpm: h.restingHr ?? null,
+        hrvMs: h.hrvMs ?? null,
+        sleepHours: h.sleepH ?? null,
+      })),
+      conditions: activePatient?.chronicConditions ?? [],
+    }
   }
   function exportJson() {
-    download(`health-data-${hariIni()}.json`, JSON.stringify(p, null, 2), 'application/json')
+    const res = exportArtifactNow('json', buildCanonicalExport())
+    setNote(res.status)
   }
   function mergedExportVitals() {
     const currentVitals = getVitals(account)
@@ -353,20 +399,19 @@ export function HealthProfile() {
       ...(p.steps > 0 ? { steps: p.steps } : {}),
     }
   }
-  function exportFhir() {
+  async function exportFhir() {
+    const { downloadClinicalFhirBundle } = await import('../../domains/clinical-operations')
     downloadClinicalFhirBundle({ vitals: mergedExportVitals(), patient: activePatient, account })
     setNote('Exported HL7 FHIR R4 SATUSEHAT bundle.')
   }
-  function exportSoapSbar() {
+  async function exportSoapSbar() {
+    const { downloadSoapSbarReport } = await import('../../domains/clinical-operations')
     downloadSoapSbarReport({ vitals: mergedExportVitals(), patient: activePatient, account })
     setNote('Exported patient health summary (SOAP/SBAR draft).')
   }
   function exportCsv() {
-    const rows = p.history ?? []
-    if (!rows.length) { setErr('No history to export yet — save your data first.'); return }
-    const cols: (keyof Snapshot)[] = ['date', 'vo2max', 'restingHr', 'hrvMs', 'recoveryPct', 'sleepH']
-    const csv = [cols.join(','), ...rows.map((r) => cols.map((c) => r[c] ?? '').join(','))].join('\n')
-    download(`health-history-${hariIni()}.csv`, csv, 'text/csv')
+    const res = exportArtifactNow('csv', buildCanonicalExport())
+    setNote(res.status)
   }
 
   const num = (label: string, key: keyof HealthProfile, step = 1, ph = '') => (
@@ -380,11 +425,14 @@ export function HealthProfile() {
 
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
+      <Suspense fallback={null}>
+        <DeviceQuickSyncCard />
+      </Suspense>
       <Card className="!p-5">
         <SectionTitle icon={<IconHeart size={20} />} title="My Health Data"
-          subtitle={backendEnabled ? 'Saved on the server per account — follows you across all devices' : 'Saved on this device (server not active)'} />
+          subtitle={backendEnabled ? 'Synced per account' : 'Saved on this device'} />
         <BatasKlaimKesehatan permukaan="wellness.health-profile" />
-        <Prosa kelas="mt-1 text-[11px] leading-relaxed text-neutral-500">Apple Watch syncs directly; Garmin and WHOOP are imported from a file you export and upload; everything else can be filled in by hand. Whatever you enter here flows straight into every fitness and longevity calculator in the app.</Prosa>
+        <Prosa kelas="mt-1 text-[11px] text-neutral-500">Sync wearables or enter metrics below.</Prosa>
         <div className="mt-3">
           <div className="text-xs font-semibold uppercase tracking-wide text-neutral-500">Data Source</div>
           <div className="mt-1.5 flex flex-wrap gap-1.5">
@@ -420,7 +468,7 @@ export function HealthProfile() {
               )
             }}
           >
-            ♻️ Recover &amp; Sync Local Logs
+            ♻️ Recover logs
           </Button>
         </div>
       </Card>
@@ -476,9 +524,21 @@ export function HealthProfile() {
       <Fold label="Sync">
       {backendEnabled && <AutoSyncCard />}
       <SyncDiagnosticsCard />
-      <Suspense fallback={null}>
-        <BodyExposureLocalHub initialTab="emv_pass" compact />
-      </Suspense>
+      {syncOpened ? (
+        <Suspense fallback={null}>
+          <BodyExposureLocalHub initialTab="emv_pass" compact />
+        </Suspense>
+      ) : (
+        <div className="mt-3 flex justify-center">
+          <button
+            type="button"
+            onClick={() => setSyncOpened(true)}
+            className="inline-flex min-h-[44px] items-center gap-2 rounded-xl border border-brand/30 bg-brand-50/60 px-4 py-2.5 text-xs font-bold text-brand-dark transition hover:bg-brand-50"
+          >
+            <span>⚡ Buka 25 Wearable Hub &amp; Health Pass</span>
+          </button>
+        </div>
+      )}
 
       {p.lastDeviceSyncAt && <DeviceSyncSummary profile={p} />}
       </Fold>
@@ -648,19 +708,9 @@ function TrendChart({ history }: { history: Snapshot[] }) {
   return (
     <Card className="!p-5">
       <SectionTitle icon={<IconActivity size={20} />} title="Trends" subtitle={`${history.length} records saved`} />
-      <div className="mt-3 h-56">
-        <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={data} margin={{ top: 5, right: 8, left: -18, bottom: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-            <XAxis dataKey="label" tick={{ fontSize: 10, fill: '#9ca3af' }} />
-            <YAxis tick={{ fontSize: 10, fill: '#9ca3af' }} />
-            <Tooltip contentStyle={{ fontSize: 12, borderRadius: 12, border: '1px solid #eee' }} />
-            {active.map((s) => (
-              <Line key={s.key} type="monotone" dataKey={s.key} name={s.name} stroke={s.color} strokeWidth={2} dot={{ r: 2 }} connectNulls />
-            ))}
-          </LineChart>
-        </ResponsiveContainer>
-      </div>
+      <Suspense fallback={<div className="mt-3 h-56 w-full rounded-xl bg-neutral-100/60 dark:bg-white/5" />}>
+        <HealthTrendRechart data={data as unknown as ReadonlyArray<Record<string, unknown>>} active={active} />
+      </Suspense>
       <div className="mt-2 flex flex-wrap justify-center gap-3">
         {active.map((s) => (
           <span key={s.key} className="flex items-center gap-1 text-[10px] font-semibold text-neutral-500">

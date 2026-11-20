@@ -18,7 +18,7 @@ const BodyExposureLocalHub = lazy(() =>
 /** The stage fills the box the home gives it; these utilities already exist in the compiled CSS. */
 const STAGE_CLASS = 'relative h-full w-full overflow-hidden'
 
-function AtlasViewer({ layers, dissect, highlighted, focusKeywords, homeFrame, onPick }: AtlasViewerProps) {
+export function AtlasViewer({ layers, dissect, highlighted, focusKeywords, homeFrame, onPick }: AtlasViewerProps) {
   const mounted = useMemo(() => new Set<AnatomyLayer['key']>(layers), [layers])
   const exact = useMemo(() => [...highlighted], [highlighted])
   const keywords = useMemo(() => [...focusKeywords], [focusKeywords])
@@ -42,7 +42,7 @@ function AtlasViewer({ layers, dissect, highlighted, focusKeywords, homeFrame, o
 }
 
 /** The viewer listens on this window event; BodyExplorer uses the same channel for its own buttons. */
-function sendCamera(command: AtlasCameraCommand) {
+export function sendCamera(command: AtlasCameraCommand) {
   window.dispatchEvent(new CustomEvent('panacea:body3d-camera', { detail: command }))
 }
 

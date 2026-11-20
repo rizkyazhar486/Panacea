@@ -85,16 +85,16 @@ export function HomeSocialWorkspace() {
           {/* Secondary Ecosystem Modules: 1-Column Full-Width Stacked Folds (Zero-Void, Exclusive Accordion) */}
           <FoldGroup name="home-secondary">
             <div className="mt-6 flex flex-col gap-3.5 w-full">
-              <Fold label="Widgets" subtitle="Ringkasan Alat & Ekosistem Terhubung">
+              <Fold label="Widgets" subtitle="Tools">
                 <RelWidgetRumah />
               </Fold>
-              <Fold label="Live" subtitle="Aliran Telemetri Langsung">
+              <Fold label="Live" subtitle="Vitals">
                 <HomeLiveWidgetRail />
               </Fold>
-              <Fold label="Stories" subtitle="Edukasi & Wawasan Longevity">
+              <Fold label="Stories" subtitle="Insights">
                 <PanaceaImageSlider />
               </Fold>
-              <Fold label="Deck" subtitle="Pusat Kendali Perintah">
+              <Fold label="Deck" subtitle="Commands">
                 <HomeCommandDeck />
               </Fold>
             </div>

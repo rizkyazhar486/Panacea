@@ -201,3 +201,4 @@ assert.equal(readRecoveryLedger().length, 1, 'recovery ledger persisted under ac
 
 bindPersonalHealthAccount(undefined)
 console.log('nextgen-auth-and-recovery: 5/5 TOTP, QR pairing, whole-system data/logs/devices recovery, backup & 5-modality holistic recovery PASS.')
+process.exit(0)

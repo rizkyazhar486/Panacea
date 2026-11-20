@@ -123,6 +123,8 @@ const nav: Nav[] = [
   { to: '/nutrition', label: 'Nutrition', icon: IconFood, roles: ['pasien', 'dokter', 'owner'], group: 'Your Body' },
   { to: '/body-explorer', label: 'Body Explorer', icon: IconActivity, roles: ['pasien', 'dokter', 'owner'], group: 'Your Body' },
   { to: '/body-exposure', label: 'Body Exposure 3D Atlas', icon: IconActivity, roles: ['pasien', 'dokter', 'owner'], group: 'Your Body' },
+  { to: '/scan', label: 'Scan & Digital Twin', icon: IconSparkle, roles: ['pasien', 'dokter', 'owner'], group: 'Your Body' },
+  { to: '/sync', label: 'Device Sync & Export', icon: IconActivity, roles: ['pasien', 'dokter', 'owner'], group: 'Your Body' },
   { to: '/radiology', label: 'Radiology Viewer', icon: IconSearch, roles: ['pasien', 'dokter', 'owner'], group: 'Your Body' },
   { to: '/electrophysiology', label: 'Arrhythmia Lab', icon: IconHeart, roles: ['pasien', 'dokter', 'owner'], group: 'Your Body' },
   { to: '/genome-lab', label: 'Genome Lab', icon: IconActivity, roles: ['pasien', 'dokter', 'owner'], group: 'Your Body' },
@@ -182,6 +184,8 @@ const KATALOG: Nav[] = [
   { to: '/body-exposure', label: 'Body Exposure 3D Atlas', icon: IconActivity, roles: ['pasien', 'dokter', 'owner'], group: 'Your Body' },
   { to: '/body-exposure/canonical', label: 'Canonical Human Bodies', icon: IconActivity, roles: ['pasien', 'dokter', 'owner'], group: 'Your Body' },
   { to: '/body-exposure/fetal-dataset', label: 'Fetal Segmentation Dataset', icon: IconActivity, roles: ['pasien', 'dokter', 'owner'], group: 'Your Body' },
+  { to: '/scan', label: 'Scan & Digital Twin', icon: IconSparkle, roles: ['pasien', 'dokter', 'owner'], group: 'Your Body' },
+  { to: '/sync', label: 'Device Sync & Export', icon: IconActivity, roles: ['pasien', 'dokter', 'owner'], group: 'Your Body' },
   { to: '/radiology', label: 'Radiology Viewer', icon: IconSearch, roles: ['pasien', 'dokter'], group: 'Health' },
   { to: '/emergency', label: 'Emergency Card & SOS', icon: IconShield, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
   { to: '/simple', label: 'Simple Screen', icon: IconShield, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
@@ -646,6 +650,33 @@ export function Shell({ children }: { children: ReactNode }) {
               <span className="hidden sm:inline">{judulBilah}</span>
             </h1>
           </div>
+
+          {/* 4 Clean Primary Speed Destinations: Home | Scan | Sync | Profile */}
+          <nav aria-label="Primary destinations" className="hidden items-center gap-1 md:flex">
+            {(
+              [
+                { to: '/', label: 'Home', end: true },
+                { to: '/scan', label: 'Scan', end: false },
+                { to: '/sync', label: 'Sync', end: false },
+                { to: '/profile', label: 'Profile', end: false },
+              ] as const
+            ).map((dest) => (
+              <NavLink
+                key={dest.to}
+                to={dest.to}
+                end={dest.end}
+                className={({ isActive }) =>
+                  `inline-flex min-h-[36px] items-center rounded-full px-3 text-xs font-bold transition ${
+                    isActive
+                      ? 'bg-emerald-100 text-emerald-900 dark:bg-emerald-500/20 dark:text-emerald-200'
+                      : 'text-neutral-700 hover:bg-black/5 hover:text-ink dark:text-slate-200 dark:hover:bg-white/10 dark:hover:text-white'
+                  }`
+                }
+              >
+                {dest.label}
+              </NavLink>
+            ))}
+          </nav>
 
           {spacesOpen && (
             <div className="pmd-command-spaces" aria-label="Panacea spaces">

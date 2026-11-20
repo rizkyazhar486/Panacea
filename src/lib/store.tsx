@@ -342,7 +342,7 @@ function loadSession(): Account | null {
         : (isOwner ? 'owner' : 'pasien')
       const targetName = typeof pmdProf?.name === 'string' && pmdProf.name.trim()
         ? pmdProf.name.trim()
-        : (isOwner ? 'Dr. Rizky Muhammad Asrizal' : email.split('@')[0])
+        : (isOwner ? 'Dr. Rizky Muhammad Azrissal' : email.split('@')[0])
       const fallbackAccount: Account = {
         id: `local:${encodeURIComponent(email)}`,
         email,

@@ -137,7 +137,7 @@ const SecondOpinion = lazy(() => import('./pages/clinical/SecondOpinion').then((
 const OrganDonorCard = lazy(() => import('./pages/clinical/OrganDonorCard').then((m) => ({ default: m.OrganDonorCard })))
 const FitnessHub = lazy(() => import('./pages/fitness/FitnessHub').then((m) => ({ default: m.FitnessHub })))
 const PusatLatihan = lazy(() => import('./pages/fitness/PusatLatihan').then((m) => ({ default: m.PusatLatihan })))
-const PusatTubuh = lazy(() => import('./pages/PusatTubuh').then((m) => ({ default: m.PusatTubuh })))
+const BodyAnalyzerPage = lazy(() => import('./app/BodyAnalyzerPage'))
 const Ikhtisar = lazy(() => import('./pages/bodyhub/Ikhtisar').then((m) => ({ default: m.Ikhtisar })))
 const Harian = lazy(() => import('./pages/bodyhub/Harian').then((m) => ({ default: m.Harian })))
 const CariSemua = lazy(() => import('./pages/CariSemua').then((m) => ({ default: m.CariSemua })))
@@ -160,6 +160,8 @@ const DataLabAdvanced = lazy(() => import('./pages/bodyhub/DataLabAdvanced').the
 const BioSimulators = lazy(() => import('./pages/longevity/BioSimulators').then((m) => ({ default: m.BioSimulators })))
 const DesignDemo = lazy(() => import('./pages/DesignDemo').then((m) => ({ default: m.DesignDemo })))
 const Storefront = lazy(() => import('./features/storefront/StorefrontPage').then((m) => ({ default: m.StorefrontPage })))
+const ScanStudio = lazy(() => import('./pages/ScanStudio').then((m) => ({ default: m.ScanStudio })))
+const DeviceSyncHub = lazy(() => import('./pages/DeviceSyncHub').then((m) => ({ default: m.DeviceSyncHub })))
 
 // Apply the saved appearance (theme, text size, motion) and language before first paint.
 applyAppearance()
@@ -288,7 +290,7 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/organ-donor" element={<OrganDonorCard />} />
               <Route path="/fitness-hub" element={<FitnessHub />} />
               <Route path="/latihan" element={<PusatLatihan />} />
-              <Route path="/tubuh" element={<PusatTubuh />} />
+              <Route path="/tubuh" element={<BodyAnalyzerPage />} />
               <Route path="/ikhtisar" element={<Ikhtisar />} />
               <Route path="/harian" element={<Harian />} />
               <Route path="/cari" element={<CariSemua />} />
@@ -454,6 +456,9 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/vault" element={<Navigate to="/store" replace />} />
               <Route path="/apothecary" element={<Navigate to="/store" replace />} />
               <Route path="/private-vault" element={<Navigate to="/store" replace />} />
+              {/* AAA Digital Twin Scan Studio & One-Tap Wearable Sync Hub */}
+              <Route path="/scan" element={<ScanStudio />} />
+              <Route path="/sync" element={<DeviceSyncHub />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspense>

@@ -23,25 +23,31 @@ const HealthProfile = lazy(() => import('./bodyhub/HealthProfile').then((m) => (
 const VitaPulse = lazy(() => import('./bodyhub/VitaPulse').then((m) => ({ default: m.VitaPulse })))
 const Longevity = lazy(() => import('./bodyhub/Longevity').then((m) => ({ default: m.Longevity })))
 const DataLab = lazy(() => import('./bodyhub/DataLab').then((m) => ({ default: m.DataLab })))
+const UniversalCompactBodyCockpit = lazy(() =>
+  import('../components/bodyhub/UniversalCompactBodyCockpit').then((m) => ({ default: m.UniversalCompactBodyCockpit })),
+)
+const DigitalTwinScanFlow = lazy(() =>
+  import('../components/scan/DigitalTwinScanFlow').then((m) => ({ default: m.DigitalTwinScanFlow })),
+)
 
 type BodyView = 'body' | 'body-exposure' | 'body-tools' | 'character' | 'training' | 'ranked' | 'workout' | 'recovery' | 'numbers' | 'nutrition' | 'health-data' | 'labs' | 'longevity' | 'vitapulse'
 type View = { key: BodyView; label: string; short: string; component: ComponentType; childTab?: string; description: string }
 
 const VIEWS: View[] = [
-  { key: 'body', label: 'Your Body', short: 'Body', component: BodyComposition, description: 'Body composition and the measurements that define your personal body context.' },
-  { key: 'body-exposure', label: 'Body Exposure', short: 'Body Exposure', component: BodyExposureOS, description: 'Whole-body anatomy first, then physiology, imaging, surgery, disease, cells and molecular detail in one continuous atlas.' },
-  { key: 'body-tools', label: 'Body & Skin Tools', short: 'Body Tools', component: BodyToolkit, description: 'Body-region symptom logging, skin routine tools and daily non-exercise activity tracking connected to the body workspace.' },
-  { key: 'character', label: '3D Character & Body Shaper', short: '3D Character', component: ShapeForming, description: 'Use your measurements and body/posture photo analysis to refine the same personal 3D character shown above.' },
-  { key: 'training', label: 'Training', short: 'Training', component: PusatLatihan, childTab: 'rencana', description: 'Plans, sport science and training progression in the same personal workspace.' },
-  { key: 'ranked', label: 'Ranked Season', short: 'League', component: HealthPerformanceLeague, description: 'A 90-day Health Rank and Sport Rank ladder driven by observed training, recovery, progression and evidence quality.' },
-  { key: 'workout', label: 'Workout', short: 'Workout', component: PusatLatihan, childTab: 'sesi', description: 'Daily sessions, strength and movement work.' },
-  { key: 'recovery', label: 'Sleep & Recovery', short: 'Recovery', component: PusatTubuh, childTab: 'pulih', description: 'Sleep, recovery and readiness context.' },
-  { key: 'numbers', label: 'Your Numbers', short: 'Numbers', component: PusatTubuh, childTab: 'energi', description: 'Your recorded signals and body metrics.' },
-  { key: 'nutrition', label: 'Nutrition', short: 'Nutrition', component: PusatGizi, childTab: 'makan', description: 'Food, hydration and nutrition context connected to the same person.' },
-  { key: 'health-data', label: 'Health Data', short: 'Data', component: HealthProfile, description: 'Imported and recorded health data with provenance.' },
-  { key: 'labs', label: 'Health Data Lab', short: 'Lab', component: DataLab, description: 'Explore your own structured data without turning it into an unsupported diagnosis.' },
-  { key: 'longevity', label: 'Longevity', short: 'Longevity', component: Longevity, description: 'Long-term health and healthy-aging context.' },
-  { key: 'vitapulse', label: 'VitaPulse', short: 'VitaPulse', component: VitaPulse, description: 'A compact vitality view tied to the rest of Your Body.' },
+  { key: 'body', label: 'Your Body', short: 'Body', component: BodyComposition, description: 'Body composition and core metrics.' },
+  { key: 'body-exposure', label: 'Body Exposure', short: 'Body Exposure', component: BodyExposureOS, description: '3D anatomy, CAD/CAE, and organ atlas.' },
+  { key: 'body-tools', label: 'Body & Skin Tools', short: 'Body Tools', component: BodyToolkit, description: 'Skin checks and body region logs.' },
+  { key: 'character', label: '3D Character', short: '3D Character', component: ShapeForming, description: 'Parametric 3D twin proportions.' },
+  { key: 'training', label: 'Training', short: 'Training', component: PusatLatihan, childTab: 'rencana', description: 'Plans and training progression.' },
+  { key: 'ranked', label: 'Ranked Season', short: 'League', component: HealthPerformanceLeague, description: '90-day health and sport rank.' },
+  { key: 'workout', label: 'Workout', short: 'Workout', component: PusatLatihan, childTab: 'sesi', description: 'Daily strength and cardio sessions.' },
+  { key: 'recovery', label: 'Recovery', short: 'Recovery', component: PusatTubuh, childTab: 'pulih', description: 'Sleep and recovery readiness.' },
+  { key: 'numbers', label: 'Numbers', short: 'Numbers', component: PusatTubuh, childTab: 'energi', description: 'Recorded body signals.' },
+  { key: 'nutrition', label: 'Nutrition', short: 'Nutrition', component: PusatGizi, childTab: 'makan', description: 'Fuel and hydration logs.' },
+  { key: 'health-data', label: 'Health Data', short: 'Data', component: HealthProfile, description: 'Wearable sync and exports.' },
+  { key: 'labs', label: 'Data Lab', short: 'Lab', component: DataLab, description: 'Structured biomarker trends.' },
+  { key: 'longevity', label: 'Longevity', short: 'Longevity', component: Longevity, description: 'Long-term healthspan metrics.' },
+  { key: 'vitapulse', label: 'VitaPulse', short: 'VitaPulse', component: VitaPulse, description: 'Compact vitality overview.' },
 ]
 const VALID = new Set(VIEWS.map((view) => view.key))
 const PRIMARY_VIEW_KEYS = new Set<BodyView>(['body', 'body-exposure', 'training', 'ranked', 'recovery', 'nutrition', 'health-data'])
@@ -214,7 +220,7 @@ export function UnifiedBodyWorkspace() {
               />
             </div>
           </details>
-          <BatasKlaimKesehatan permukaan="body.workspace" className="mt-2 text-[11px] leading-snug text-white/55" />
+          <BatasKlaimKesehatan permukaan="body.workspace" className="mt-2" />
         </div>
 
         {!isExposure && (
@@ -225,15 +231,33 @@ export function UnifiedBodyWorkspace() {
       </section>
 
       <section role="tabpanel" aria-label={active.label} className="min-w-0 space-y-3">
-        {['body', 'training', 'ranked', 'recovery', 'nutrition', 'health-data'].includes(activeKey) && (
-          <YourBodyDailyStrip activeKey={activeKey} />
-        )}
         {isExposure ? (
           <Suspense fallback={<Loader exposure />}><Active /></Suspense>
         ) : (
           <PersonalBodySurfaceShown>
             <Suspense fallback={<Loader />}><Active /></Suspense>
           </PersonalBodySurfaceShown>
+        )}
+        {activeKey === 'body' && (
+          <Suspense fallback={<div className="p-4 text-xs text-white/50">Loading cockpit…</div>}>
+            <UniversalCompactBodyCockpit />
+          </Suspense>
+        )}
+        {(activeKey === 'body' || activeKey === 'body-exposure') && (
+          <details className="rounded-2xl border border-cyan-400/20 bg-[#05070b] p-3 text-white">
+            <summary className="flex min-h-[44px] cursor-pointer list-none items-center justify-between font-mono text-[11px] font-bold uppercase tracking-[0.12em] text-cyan-300">
+              <span>Digital Twin · CAD/CAE · Skin · Brain/OSA · ANOVA</span>
+              <span>OPEN ▾</span>
+            </summary>
+            <div className="mt-3">
+              <Suspense fallback={<div className="p-4 text-xs text-slate-400">Loading studio…</div>}>
+                <DigitalTwinScanFlow />
+              </Suspense>
+            </div>
+          </details>
+        )}
+        {['body', 'training', 'ranked', 'recovery', 'nutrition', 'health-data'].includes(activeKey) && (
+          <YourBodyDailyStrip activeKey={activeKey} />
         )}
       </section>
 
@@ -272,7 +296,7 @@ function YourBodyDailyStrip({ activeKey }: { readonly activeKey: BodyView }) {
     : activeKey === 'ranked' ? { title: '90-Day League Evidence', detail: `Tracked signals: RHR ${rhr ?? '—'} · HRV ${hrv ?? '—'} · Sleep ${sleep ?? '—'} h`, to: '/fitness-hub?view=training', cta: 'Log Training' }
     : activeKey === 'recovery' ? { title: 'Autonomic Recovery Focus', detail: `HRV ${hrv ?? '—'} ms · Sleep ${sleep ?? '—'} h · Slow 0.1 Hz vagal pacing & wearable fusion ready`, to: '/body-exposure', cta: 'Open EMV & Local Hub' }
     : activeKey === 'nutrition' ? { title: 'Daily Fluid & Energy Context', detail: weight != null ? `Recorded Weight ${weight.toFixed(1)} kg · Baseline fluid ~${Math.round(weight * 30)} mL/day` : 'Enter weight on Body tab for fluid target', to: '/fitness-hub?view=body', cta: 'Update Body' }
-    : { title: 'Multi-Device Canonical Sync', detail: `Active channels: ${[rhr, hrv, sleep, steps, weight].filter((x) => x != null).length}/5 baseline signals populated`, to: '/body-exposure', cta: '25 Wearable Hub & QR' }
+    : { title: 'Devices', detail: `${[rhr, hrv, sleep, steps, weight].filter((x) => x != null).length}/5 signals`, to: '/body-exposure', cta: 'Open hub' }
 
   return (
     <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 10, padding: '10px 14px', borderRadius: 16, border: '1px solid rgba(0, 191, 99, 0.28)', background: 'rgba(6, 12, 16, 0.85)', color: '#eef4ff' }}>

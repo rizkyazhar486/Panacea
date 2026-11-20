@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { SuperPageCapabilityRail } from '../../components/SuperPageCapabilityRail'
 import { ForYouOmniFeed } from '../../components/ForYouOmniFeed'
+import { InfoDisclosure } from '../../components/ui/InfoDisclosure'
 import { useOptionalStore } from '../../lib/store'
 import { useOptionalLongitudinalState } from '../../lib/useLongitudinalState'
 import { getVitals } from '../../lib/healthVitals'
@@ -201,14 +202,19 @@ export function ForYouHub() {
 
       <section aria-label="Personalized preventive triage" className="border-t border-white/10 pt-4">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', color: triage.tone }}>{triage.badge} · PUBLIC READINESS &amp; 24H COMPANION (UNREVIEWED DRAFT)</span>
+          <div className="flex items-center gap-2">
+            <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', color: triage.tone }}>{triage.badge}</span>
+            <InfoDisclosure title="Preventive Summary Notice" badge="draft" align="left">
+              <p>{triage.action}</p>
+              <p className="text-[10px] text-amber-300">Draft summary (clinicallyReviewed: false). Not clinician-reviewed.</p>
+            </InfoDisclosure>
+          </div>
           <div className="flex flex-wrap items-center gap-3">
             <Link to={triage.to} className="inline-flex min-h-[44px] items-center text-xs font-black text-emerald-300 hover:text-white">{triage.cta} →</Link>
-            <Link to="/emergency" className="inline-flex min-h-[44px] items-center text-xs font-black text-rose-300 hover:text-white">Darurat 118/119 →</Link>
+            <Link to="/emergency" className="inline-flex min-h-[44px] items-center text-xs font-black text-rose-300 hover:text-white">SOS 118/119 →</Link>
           </div>
         </div>
         <h2 className="mt-1 text-base font-black text-white">{triage.title}</h2>
-        <p className="mt-1 text-xs leading-relaxed text-white/65">{triage.action}</p>
       </section>
 
       <ForYouOmniFeed />
