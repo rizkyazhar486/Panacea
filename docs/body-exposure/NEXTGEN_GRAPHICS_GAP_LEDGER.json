@@ -1,0 +1,229 @@
+{
+  "schema_version": 1,
+  "title": "PanaceaMed Body Exposure: next-gen graphics evidence and continuity ledger",
+  "policy": "github_first_no_blender_execution",
+  "policy_date": "2026-10-29",
+  "reviewed_main_sha": "8a3dc7d76382bdc4d1c531904aa3e8b126cd1f82",
+  "canonical_sources": [
+    "AGENTS.md",
+    "bodyexposure/README.md",
+    "bodyexposure/DELTA.md",
+    "bodyexposure/QA.md",
+    "bodyexposure/PROVENANCE.md",
+    "public/bodyexposure/body_matrix.json",
+    "src/domains/body-exposure/bodyExposureEnterpriseEngine.ts",
+    "docs/body-exposure/NEXTGEN_GRAPHICS_GITHUB_SOURCE_OF_TRUTH.md"
+  ],
+  "assertions": {
+    "external_blender_execution_permitted": false,
+    "existing_source_code_or_assets_may_be_deleted": false,
+    "unverified_aaa_claim_permitted": false,
+    "patient_data_may_be_committed_publicly": false,
+    "atlas_may_be_mislabeled_patient_specific": false,
+    "existing_blender_code_retained": true,
+    "pipeline_quality_proven": false,
+    "clinical_validation_proven": false
+  },
+  "manifest_snapshot": {
+    "path": "public/bodyexposure/body_matrix.json",
+    "sha256": null,
+    "git_blob_sha": "743e024c5d493a88e67ce6dfb9422594792f6ab7",
+    "body_system_entries": 208,
+    "inventories": [
+      {
+        "body_id": "HUMAN.ADULT.MALE",
+        "structures": 3877,
+        "status": "source_backed"
+      },
+      {
+        "body_id": "HUMAN.ADULT.FEMALE",
+        "structures": 841,
+        "status": "source_backed_partial"
+      },
+      {
+        "body_id": "HUMAN.PREGNANT",
+        "structures": 0,
+        "status": "placeholder"
+      },
+      {
+        "body_id": "FETUS",
+        "structures": 14,
+        "status": "source_backed_partial"
+      },
+      {
+        "body_id": "PEDIATRIC.TODDLER",
+        "structures": 0,
+        "status": "placeholder"
+      },
+      {
+        "body_id": "HUMAN.OLDER_ADULT",
+        "structures": 0,
+        "status": "source_backed_partial",
+        "note": "Variants exist: do not interpret parent zero as zero variant geometry."
+      },
+      {
+        "body_id": "ATLAS.NERVOUS.MNI152",
+        "structures": 556,
+        "status": "atlas_template"
+      }
+    ]
+  },
+  "required_asset_record_fields": [
+    "asset_id",
+    "asset_type",
+    "source_url_or_doi",
+    "source_license",
+    "redistribution_status",
+    "source_class",
+    "anatomical_structure_id",
+    "coordinate_frame",
+    "measurement_method",
+    "file_sha256",
+    "storage_locator",
+    "version",
+    "dimensions_or_triangle_count",
+    "quality_metrics",
+    "limitations",
+    "review_status"
+  ],
+  "work_items": [
+    {
+      "id": "NGFX-001",
+      "priority": "P0",
+      "topic": "Evidence gate for Directive 060",
+      "status": "gap_confirmed",
+      "evidence": [
+        "src/domains/body-exposure/bodyExposureEnterpriseEngine.ts",
+        "scripts/qa/directive060-body-exposure.test.mjs",
+        "https://github.com/rizkyazhar486/Panacea/pull/2899"
+      ],
+      "finding": "AAA and topology verdict are inferred from request parameters; renderer flags and provenance are not measured artifact evidence.",
+      "next_action": "Add evidence-backed evaluation preserving legacy API until consuming call sites are tested; replace random strings for new evidence records with real SHA-256 checksums.",
+      "acceptance": "A missing/invalid mesh or texture artifact must never receive an AAA verdict; exact-head tests include negative controls."
+    },
+    {
+      "id": "NGFX-002",
+      "priority": "P0",
+      "topic": "Git-backed, content-addressed original asset registry",
+      "status": "unverified",
+      "evidence": [
+        "bodyexposure/README.md",
+        "bodyexposure/PROVENANCE.md"
+      ],
+      "finding": "Source .blend and raw sources are explicitly not in git; a file name or registry alone is not an asset backup.",
+      "next_action": "Register lawful sources, sha256, non-PHI immutable locations and verified restore tests, without executing Blender.",
+      "acceptance": "Every release asset resolves to an immutable, verified object and licence record; unavailable items are flagged missing."
+    },
+    {
+      "id": "NGFX-003",
+      "priority": "P0",
+      "topic": "Real PBR maps and material accuracy",
+      "status": "not_proven",
+      "evidence": [
+        "bodyexposure/DELTA.md",
+        "bodyexposure/CINEMATIC_HANDOFF.md"
+      ],
+      "finding": "Procedural materials and 8K offline render profiles are documented, but evidence for comprehensive physically sourced 8K texture maps is not established.",
+      "next_action": "Inventory existing legal texture files via GitHub-hosted artifacts, validate dimensions, channels, color spaces and content hashes; derive compressed web variants without claims of measured skin detail.",
+      "acceptance": "Only real, independently readable texture artifacts receive a measured 8K/PBR label."
+    },
+    {
+      "id": "NGFX-004",
+      "priority": "P0",
+      "topic": "Topology and anatomical consistency",
+      "status": "known_defects",
+      "evidence": [
+        "bodyexposure/QA.md",
+        "bodyexposure/DELTA.md"
+      ],
+      "finding": "QA records known open vessel ends and non-manifold areas. These must be classified with anatomy-specific expectations, not blindly repaired.",
+      "next_action": "Extend GLB-native geometry, laterality, normals, winding and LOD deviation checks with source-specific tolerances.",
+      "acceptance": "Every flagged mesh has measured error, decision and provenance; no geometry is silently replaced."
+    },
+    {
+      "id": "NGFX-005",
+      "priority": "P0",
+      "topic": "Real individual-specific external avatar",
+      "status": "not_proven",
+      "evidence": [
+        "bodyexposure/README.md",
+        "public/bodyexposure/body_matrix.json"
+      ],
+      "finding": "Available manifest bodies are reference/atlas/individual source samples, not a consented personalized avatar of the viewer.",
+      "next_action": "Implement a consented external appearance and anthropometry data contract in non-public storage, with source classes and uncertainty.",
+      "acceptance": "Atlas and individual appearance cannot be conflated; no identifiable scan enters public git."
+    },
+    {
+      "id": "NGFX-006",
+      "priority": "P0",
+      "topic": "Personal internal anatomy",
+      "status": "not_proven",
+      "evidence": [
+        "bodyexposure/PROVENANCE.md",
+        "public/bodyexposure/body_matrix.json"
+      ],
+      "finding": "No evidence of individual patient internal anatomy inferred from suitable personal imaging for this feature.",
+      "next_action": "Create image registration and missing-data contracts with evidence tiers; never infer specific organs from face images.",
+      "acceptance": "Every individual-specific internal claim has consented imaging, registration quality and authorized review, else explicitly unknown."
+    },
+    {
+      "id": "NGFX-007",
+      "priority": "P1",
+      "topic": "Rigging and soft tissue deformation",
+      "status": "partial",
+      "evidence": [
+        "bodyexposure/DELTA.md",
+        "bodyexposure/WEB_STUDIO_HANDOFF.md"
+      ],
+      "finding": "Skeletal ROM and some motion clips exist; full muscle, fascia and skin deformation remains unresolved in documented work.",
+      "next_action": "Deepen mesh/rig metadata and motion QA on existing exported artifacts without requiring Blender.",
+      "acceptance": "Deformation tests record collisions, skeletal constraints, source provenance and real frame evidence."
+    },
+    {
+      "id": "NGFX-008",
+      "priority": "P1",
+      "topic": "Real-time high-fidelity performance",
+      "status": "partial",
+      "evidence": [
+        "bodyexposure/WEB_STUDIO_HANDOFF.md",
+        "bodyexposure/pipeline/check_web_budget.py"
+      ],
+      "finding": "Existing viewer is budgeted for light web LOD; documented studio checks do not prove 8K real-time or photorealism on target devices.",
+      "next_action": "Add reproducible browser/GPU-device frame-time, load-time, memory, KTX2 and mipmap evidence; keep adaptive quality and LOD.",
+      "acceptance": "Performance is reported by device and exact commit; no hardware-agnostic 8K/60fps promise."
+    },
+    {
+      "id": "NGFX-009",
+      "priority": "P1",
+      "topic": "Fidelity acceptance and reference comparisons",
+      "status": "not_proven",
+      "evidence": [
+        "bodyexposure/CINEMATIC_HANDOFF.md",
+        "bodyexposure/QA.md"
+      ],
+      "finding": "Cinematic preview exists, but style references from games are not a validated comparison benchmark.",
+      "next_action": "Define controlled source-linked view/lighting/textures screenshots and quantitative image/shape measures with human artistic review separate from clinical review.",
+      "acceptance": "Every fidelity claim links to exact-head raw captures, checksums, methodology and reviewer limitations."
+    },
+    {
+      "id": "NGFX-010",
+      "priority": "P1",
+      "topic": "Cross-agent persistent state",
+      "status": "implemented_as_docs",
+      "evidence": [
+        "docs/body-exposure/NEXTGEN_GRAPHICS_GITHUB_SOURCE_OF_TRUTH.md",
+        "docs/body-exposure/NEXTGEN_GRAPHICS_GAP_LEDGER.json"
+      ],
+      "finding": "Source-of-truth and gap ledger committed as version-controlled, additive documentation; no external binary backups are implied.",
+      "next_action": "At each PR update links, observations and exact-head proof; keep decisions permanently in repository.",
+      "acceptance": "A fresh agent can reconstruct the current priorities and claims from git without previous chat context."
+    }
+  ],
+  "update_rules": [
+    "Never mark a work item verified solely from generated text or configuration labels.",
+    "A change in status requires a commit SHA, real evidence artifact, and exact-head checks.",
+    "Review source rights and privacy before publishing any binary assets.",
+    "Unknown quantitative data is null, never guessed.",
+    "Preserve all existing code and assets; GitHub-first means no Blender execution, not removal of history."
+  ]
+}
