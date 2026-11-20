@@ -17,7 +17,7 @@ export async function verifyPoliPatientTemporalScope(page, url) {
   await page.goto(url)
   await page.locator('[data-poli-patient-flow]').waitFor({ timeout: 45_000 })
   await page.waitForFunction(() => Boolean(localStorage.getItem('panaceamed.state.v3')))
-  await page.evaluate(() => {
+  const seededState = await page.evaluate(() => {
     const state = JSON.parse(localStorage.getItem('panaceamed.state.v3'))
     const now = new Date(Date.now() - 60_000).toISOString()
     const future = new Date(Date.now() + 86_400_000).toISOString()
@@ -27,9 +27,16 @@ export async function verifyPoliPatientTemporalScope(page, url) {
     const vital = (id, takenAt, heartRate) => ({ id, takenAt, heartRate, systolic: 120, diastolic: 80, respRate: 16, tempC: 36.7, spo2: 98 })
     state.vitals = { 'qa-empty': [vital('future-only', future, 199)], 'qa-current': [vital('current', now, 71), vital('future', future, 199)] }
     state.supportive = { 'qa-flag': [{ id: 'qa-flag', takenAt: future, category: 'Lab', name: 'Synthetic future flag', value: 'QA', flag: 'critical' }] }
-    localStorage.setItem('panaceamed.state.v3', JSON.stringify(state))
     localStorage.setItem('pmd_vitals_v1', JSON.stringify({ subjectId: 'qa-self', ownerAccountId: 'qa-doctor', heartRate: 173, source: 'QA own wearable', measuredAt: now, syncedAt: now }))
+    return JSON.stringify(state)
   })
+  // The store flushes its in-memory state on pagehide/beforeunload, so writing localStorage and then reloading
+  // lets the empty in-memory state overwrite the synthetic records. Seed once, before the app boots, instead.
+  await page.context().addInitScript(json => {
+    if (sessionStorage.getItem('qa-poli-state-seeded')) return
+    sessionStorage.setItem('qa-poli-state-seeded', '1')
+    localStorage.setItem('panaceamed.state.v3', json)
+  }, seededState)
   await page.reload()
   const board = page.locator('[data-poli-patient-flow]')
   const center = page.locator('[data-visit-command-center]')
@@ -56,23 +63,30 @@ export async function verifyPoliPatientTemporalScope(page, url) {
       return JSON.parse(localStorage.getItem('panaceamed.state.v3') || '{}').activePatientId === 'qa-self'
     } catch { return false }
   }, null, { timeout: 15_000 })
-  // A prior account's cache and unbound legacy imports cannot become this patient's truth.
-  for (const ownership of [{ subjectId: 'qa-self', ownerAccountId: 'other-doctor' }, {}]) {
-    await page.evaluate(ownership => {
-      const cached = JSON.parse(localStorage.getItem('pmd_vitals_v1'))
-      delete cached.subjectId; delete cached.ownerAccountId
-      localStorage.setItem('pmd_vitals_v1', JSON.stringify({ ...cached, ...ownership }))
-    }, ownership)
+  // Personal vitals live in a per-account scoped bucket. A record stamped for another account, an unowned
+  // record and an unbound legacy snapshot must never become this patient's truth, while the same account's own
+  // record does. The four cases differ only in ownership, so the positive control proves the rule is what rejects.
+  const bucketKey = `pmd_vitals_scope_v1:${encodeURIComponent(JSON.stringify(['qa-doctor', 'qa-self']))}`
+  const measured = new Date(Date.now() - 60_000).toISOString()
+  const wearable = { heartRate: 173, source: 'QA own wearable', measuredAt: measured, syncedAt: measured }
+  const seedVitals = async ({ bucket, legacy }) => {
+    await page.evaluate(({ bucketKey, bucket, legacy }) => {
+      for (const k of Object.keys(localStorage)) if (k.startsWith('pmd_vitals_scope_v1:') || k === 'pmd_vitals_v1') localStorage.removeItem(k)
+      if (bucket) localStorage.setItem(bucketKey, JSON.stringify(bucket))
+      if (legacy) localStorage.setItem('pmd_vitals_v1', JSON.stringify(legacy))
+    }, { bucketKey, bucket, legacy })
     await page.reload()
     await center.getByText('QA Own wearable', { exact: true }).waitFor()
-    assert.doesNotMatch(await heartRate(), /173/)
   }
-  await page.evaluate(() => {
-    const cached = JSON.parse(localStorage.getItem('pmd_vitals_v1'))
-    localStorage.setItem('pmd_vitals_v1', JSON.stringify({ ...cached, subjectId: 'qa-self', ownerAccountId: 'qa-doctor' }))
-  })
-  await page.reload()
-  await center.getByText('QA Own wearable', { exact: true }).waitFor()
+  for (const { name, seed } of [
+    { name: 'record owned by another account', seed: { bucket: { ...wearable, subjectId: 'qa-self', ownerAccountId: 'other-doctor' } } },
+    { name: 'unowned record in the account bucket', seed: { bucket: { ...wearable } } },
+    { name: 'unbound legacy snapshot', seed: { legacy: { ...wearable } } },
+  ]) {
+    await seedVitals(seed)
+    assert.doesNotMatch(await heartRate(), /173/, `${name} became this patient's vitals`)
+  }
+  await seedVitals({ bucket: { ...wearable, subjectId: 'qa-self', ownerAccountId: 'qa-doctor' } })
   assert.match(await heartRate(), /173/)
   await center.getByRole('button', { name: 'Confirm consent', exact: true }).click()
   await center.getByRole('button', { name: 'Start visit', exact: true }).waitFor()
