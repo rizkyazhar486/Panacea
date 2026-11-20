@@ -305,13 +305,14 @@ export function deriveCareContinuityState(input: CareContinuityProjectionInput):
     input.vitals.forEach((vital, idx) => {
       if (isValidIsoTimestamp(vital.takenAt, nowMs)) {
         const isVerified = Boolean(vital.verifiedById?.trim())
+        const sourceId = typeof vital.source === 'string' ? vital.source.trim() : ''
         fragments.push({
           id: `vital-${input.patientId}-${idx}`,
           patientId: input.patientId,
-          sourceId: vital.source || 'vital-signs-monitor',
+          sourceId,
           dataClass: 'vital-signs',
           recordedAt: vital.takenAt,
-          provenancePresent: true,
+          provenancePresent: sourceId !== '',
           normalized: true,
           requiresClinicalReview: false,
           reviewState: isVerified ? 'verified' : 'not-required',
