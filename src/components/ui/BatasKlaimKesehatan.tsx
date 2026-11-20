@@ -7,14 +7,14 @@ import {
 } from '../../lib/clinicalClaimMaturity'
 
 /**
- * Compact (i) info-icon containment for the fail-closed clinical evidence boundary.
- * Preserves exact machine-readable data attributes and ARIA disclosure text
- * without dumping multi-line banner clutter onto the primary canvas.
+ * Icon-only SVG shield-pulse logo badge for the fail-closed clinical evidence
+ * boundary. Hides the verbose text pill on primary surfaces while preserving
+ * exact machine-readable data attributes, sr-only label, and 1-tap popover.
  */
 export function BatasKlaimKesehatan({
   permukaan,
   evidence,
-  className = 'mt-1.5 inline-block',
+  className = 'mt-1 inline-block',
 }: {
   permukaan: PermukaanKlaimKesehatan
   evidence?: ClinicalClaimEvidence
@@ -32,15 +32,14 @@ export function BatasKlaimKesehatan({
     >
       <summary
         aria-label={`${label} — clinical evidence notice`}
-        className="inline-flex min-h-[44px] lg:min-h-[28px] cursor-pointer list-none items-center gap-1.5 rounded-full border border-neutral-300 bg-neutral-100 px-2.5 py-1 font-mono text-[10px] font-semibold text-neutral-800 transition hover:text-ink dark:border-white/15 dark:bg-white/[0.08] dark:text-slate-100 dark:hover:text-white"
+        title={`${label}: ${disclosure}`}
+        className="inline-flex min-h-[44px] min-w-[44px] lg:min-h-[30px] lg:min-w-[30px] cursor-pointer list-none items-center justify-center rounded-full border border-neutral-300 bg-neutral-100 p-1.5 text-neutral-800 transition hover:text-ink dark:border-white/15 dark:bg-white/[0.08] dark:text-slate-100 dark:hover:text-white"
       >
-        <span
-          aria-hidden="true"
-          className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-current text-[9px] font-black"
-        >
-          i
-        </span>
-        <span>{label}</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <path d="M12 3 19 6v5.4c0 4.5-3 8.2-7 9.6-4-1.4-7-5.1-7-9.6V6l7-3Z" />
+          <path d="M8 12h2l1.2-2.2 1.8 4.4 1.2-2.2H16" />
+        </svg>
+        <span className="sr-only">{label}</span>
       </summary>
       <p
         role="note"

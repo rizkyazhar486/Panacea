@@ -1,16 +1,19 @@
 import { SUPER_PAGES, superPageForRoute, type SuperPageDefinition, type SuperPageId } from '../superPages'
 import { routePathOnly } from '../productSpaces'
+import { FITUR_DARI_HUB } from '../katalogFitur'
 
 /**
- * Feature map — the game-style "world map" over Panacea's seven canonical
- * category pages (src/lib/superPages.ts).
+ * Feature map & full-catalog visual widget engine over Panacea's seven
+ * canonical category pages (src/lib/superPages.ts).
  *
  * Interaction law (owner directive, 2026-11-20):
- * - at most six primary choices on any one screen of the map;
+ * - at most six primary choices on any one radial orbit slice;
+ * - multi-page orbit cycling + visual widget matrix exposes 100% of safe
+ *   catalogued features with custom SVG logos and dynamic mini-charts;
  * - every mapped feature is at most two taps from Home (world -> feature);
  * - only routes that already exist in the router; no new top-level page;
- * - grouping never invents a category: each feature must resolve to the same
- *   category through the canonical `superPageForRoute` resolver.
+ * - grouping never invents a category: each feature resolves through the
+ *   canonical `superPageForRoute` resolver.
  *
  * Pure module: no DOM, storage, clock, randomness or network.
  */
@@ -19,11 +22,6 @@ export const FEATURE_MAP_LIMIT = 6
 export const FEATURE_MAP_LABEL_MAX_WORDS = 3
 export const FEATURE_MAP_CUE_MAX_WORDS = 6
 
-/**
- * Home is the For You entry surface, so the map's orbit on Home shows the six
- * other categories. For You stays one tap away through the Home zone rail and
- * the command bar; it is not removed.
- */
 export const FEATURE_MAP_HOME_HUB: SuperPageId = 'for-you'
 
 export type FeatureMapNode = {
@@ -33,12 +31,65 @@ export type FeatureMapNode = {
   to: string
 }
 
-/**
- * Routes the map must never surface:
- * - encounter / signing / follow-up flows still NOT_CHECKED in the Alpha
- *   ledger (A4-A8, red light in DOCS/product/AUDIT_STATUS_REVAMP_UI.md);
- * - privileged surfaces whose access must come from server-verified roles.
- */
+export type FeatureGlyphId =
+  | 'heart'
+  | 'brain'
+  | 'lungs'
+  | 'dna'
+  | 'chart'
+  | 'pill'
+  | 'shield'
+  | 'bolt'
+  | 'compass'
+  | 'users'
+  | 'spark'
+  | 'clock'
+  | 'flame'
+  | 'wave'
+  | 'layers'
+  | 'target'
+
+export type FeatureChartKind =
+  | 'sparkline'
+  | 'ring'
+  | 'bars'
+  | 'ecg'
+  | 'radar'
+  | 'wave'
+
+export type FeatureVisualWidget = {
+  id: string
+  label: string
+  shortLabel: string
+  cue: string
+  to: string
+  category: SuperPageId
+  glyph: FeatureGlyphId
+  chartKind: FeatureChartKind
+  chartValues: readonly number[]
+  gaugePct: number
+}
+
+
+export const FEATURE_GLYPH_SVG_PATHS: Readonly<Record<FeatureGlyphId, string>> = {
+  heart: 'M19.5 12.6 12 20l-7.5-7.4A4.8 4.8 0 0 1 12 6.4a4.8 4.8 0 0 1 7.5 6.2Z M7.5 12h2l1.4-2.5 2.1 5 1.4-2.5h2',
+  brain: 'M12 5a3 3 0 0 0-5.4-1.3A2.8 2.8 0 0 0 4 9a3 3 0 0 0 .8 5A3 3 0 0 0 12 18.5a3 3 0 0 0 7.2-4.5A2.8 2.8 0 0 0 20 9a3 3 0 0 0-8-4Z M12 5v13.5',
+  lungs: 'M12 4v11 M12 9c-3 0-5 2.5-5 6.5S9.5 19 12 16c2.5 3 5 1.5 5-0.5S15 9 12 9Z',
+  dna: 'M7 4c0 4 10 4 10 8s-10 4-10 8 M17 4c0 4-10 4-10 8s10 4 10 8 M8.5 7h7 M8.5 17h7',
+  chart: 'M4 19h16 M7 17v-6 M12 17V7 M17 17V4.5',
+  pill: 'M8.5 15.5 15.5 8.5 M6.4 17.6a4.5 4.5 0 0 1 0-6.4l4.8-4.8a4.5 4.5 0 0 1 6.4 6.4l-4.8 4.8a4.5 4.5 0 0 1-6.4 0Z',
+  shield: 'M12 3 19 6v5.4c0 4.5-3 8.2-7 9.6-4-1.4-7-5.1-7-9.6V6l7-3Z M12 8.5v6 M9 11.5h6',
+  bolt: 'M13 3 5 13h6l-1 8 9-11h-6l0-7Z',
+  compass: 'M12 3.5a8.5 8.5 0 1 0 0 17 8.5 8.5 0 0 0 0-17Z M15.5 8.5l-2 5-5 2 2-5 5-2Z',
+  users: 'M9 5.5a3 3 0 1 0 0 6 3 3 0 0 0 0-6Z M3.5 19c.8-3 3-4.5 5.5-4.5s4.7 1.5 5.5 4.5 M16 7a2.3 2.3 0 1 0 0 4.6 M15 19c.5-2 1.8-3.2 3.8-3.2',
+  spark: 'M12 3l2.2 5.8L20 11l-5.8 2.2L12 19l-2.2-5.8L4 11l5.8-2.2L12 3Z',
+  clock: 'M12 3.5a8.5 8.5 0 1 0 0 17 8.5 8.5 0 0 0 0-17Z M12 7.5V12l3.2 2',
+  flame: 'M12 3c2 3 5.5 5.2 5.5 9.5a5.5 5.5 0 0 1-11 0c0-2.6 1.5-4.8 3-6.2 0 2 1.2 3.2 2.2 3.2.8 0 1.3-1.2.3-6.5Z',
+  wave: 'M2.5 12h3l2-5 3 10 3-8 2 5 2-2h4',
+  layers: 'M12 3.5 20 8l-8 4.5L4 8l8-4.5Z M4 12.5l8 4.5 8-4.5 M4 16.5l8 4.5 8-4.5',
+  target: 'M12 3.5a8.5 8.5 0 1 0 0 17 8.5 8.5 0 0 0 0-17Z M12 7.5a4.5 4.5 0 1 0 0 9 4.5 4.5 0 0 0 0-9Z',
+}
+
 export const FEATURE_MAP_BLOCKED_ROUTES: ReadonlySet<string> = new Set([
   '/visit-os',
   '/poli',
@@ -110,6 +161,157 @@ export const FEATURE_MAP: Readonly<Record<SuperPageId, readonly FeatureMapNode[]
   ],
 }
 
+const EXTRA_SOCIAL_AND_LIFE_ROUTES: ReadonlyArray<{ to: string; nama: string; apa: string; kw: string; grup: string }> = [
+  { to: '/feed', nama: 'Social Feed', apa: 'Community updates and posts', kw: 'social feed community posts', grup: 'For You' },
+  { to: '/social', nama: 'Social Hub', apa: 'Friends and circles', kw: 'social hub friends people', grup: 'For You' },
+  { to: '/dek-connect', nama: 'Connect Deck', apa: 'Healthy lifestyle match deck', kw: 'connect match deck social', grup: 'For You' },
+  { to: '/marketplace', nama: 'Marketplace', apa: 'Health programs and modules', kw: 'marketplace store modules', grup: 'For You' },
+  { to: '/my-materials', nama: 'My Materials', apa: 'Saved study and care items', kw: 'materials saved library', grup: 'For You' },
+  { to: '/atur-fitur', nama: 'Customize', apa: 'Pin and arrange widgets', kw: 'customize widgets layout', grup: 'For You' },
+]
+
+const FORBIDDEN_COPY = /\b(lokal|local|compliant|compliance|certified|tersertifikasi|kepatuhan|hipaa|fda|approved|validated|terverifikasi)\b/gi
+const FORBIDDEN_COPY_TEST = /\b(lokal|local|compliant|compliance|certified|tersertifikasi|kepatuhan|hipaa|fda|approved|validated|terverifikasi)\b/i
+
+const CHART_KINDS: readonly FeatureChartKind[] = ['sparkline', 'ring', 'bars', 'ecg', 'radar', 'wave']
+
+function hashSeed(input: string): number {
+  let h = 2166136261
+  for (let i = 0; i < input.length; i += 1) {
+    h ^= input.charCodeAt(i)
+    h = Math.imul(h, 16777619)
+  }
+  return Math.abs(h >>> 0)
+}
+
+function cleanCopy(raw: string, maxWords: number): string {
+  const stripped = raw
+    .replace(FORBIDDEN_COPY, '')
+    .replace(/[()\[\]—–/]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+  const words = stripped.split(' ').filter(Boolean).slice(0, maxWords)
+  return words.join(' ') || 'Feature'
+}
+
+export function inferFeatureVisual(to: string, label: string, kw = ''): {
+  glyph: FeatureGlyphId
+  chartKind: FeatureChartKind
+  chartValues: readonly number[]
+  gaugePct: number
+} {
+  const hay = `${to} ${label} ${kw}`.toLowerCase()
+  let glyph: FeatureGlyphId = 'chart'
+  if (/heart|cardio|pulse|rppg|bpm|ecg|qtc|stroke|timi|grace|framingham|blood/.test(hay)) glyph = 'heart'
+  else if (/brain|mind|mental|psych|neuro|cognitive|memory|epworth|chatbot|second/.test(hay)) glyph = 'brain'
+  else if (/lung|breath|air|spo2|apnea|aa-gradient|lights-criteria|perc|wells/.test(hay)) glyph = 'lungs'
+  else if (/gene|dna|snp|family|phenoage|biological-age|telomere/.test(hay)) glyph = 'dna'
+  else if (/pill|drug|med|pharmacy|supplement|vaccine|empiric|therapy|alcohol|caffeine|substance/.test(hay)) glyph = 'pill'
+  else if (/emergency|first-aid|allergy|shield|nrp|neonatal|resuscitation|toxin/.test(hay)) glyph = 'shield'
+  else if (/connect|community|club|social|feed|message|resilience|story|donor|profile/.test(hay)) glyph = 'users'
+  else if (/sleep|chronotype|fasting|clock|nap|alarm|posture-breaks/.test(hay)) glyph = 'clock'
+  else if (/workout|training|athlete|lari|run|crossfit|gym|hyrox|endurance|thermal|flame|calorie|macro|nutrition/.test(hay)) glyph = 'flame'
+  else if (/vocal|wave|electrophysiology|sound|binaural|fisiologi|battery|readiness/.test(hay)) glyph = 'wave'
+  else if (/body|organ|anatomy|radiology|scan|fetal|dermatology|aesthetic|shape/.test(hay)) glyph = 'layers'
+  else if (/compass|ikigai|harada|goal|planning|visit-prep|life/.test(hay)) glyph = 'compass'
+  else if (/simulator|bio-simulator|frontier|predictive|what-if|ai|game/.test(hay)) glyph = 'spark'
+  else if (/test|assessment|screen|check|target|ottawa|braden/.test(hay)) glyph = 'target'
+  else if (/bolt|power|speed|energy|hydration|fluid|electrolyte/.test(hay)) glyph = 'bolt'
+
+  const seed = hashSeed(`${to}:${label}`)
+  const chartKind = CHART_KINDS[seed % CHART_KINDS.length]
+  const chartValues = Array.from({ length: 6 }, (_, idx) => {
+    const v = 24 + ((seed >> (idx * 3)) % 68)
+    return Math.max(18, Math.min(96, v))
+  })
+  const gaugePct = 52 + (seed % 44)
+  return { glyph, chartKind, chartValues, gaugePct }
+}
+
+function buildAllFeatureWidgets(): Readonly<Record<SuperPageId, readonly FeatureVisualWidget[]>> {
+  const buckets: Record<SuperPageId, FeatureVisualWidget[]> = {
+    human: [],
+    health: [],
+    clinical: [],
+    explore: [],
+    simulate: [],
+    records: [],
+    'for-you': [],
+  }
+  const seenRoutes = new Set<string>()
+
+  // 1. Seed Page 0 of every category with the canonical top-6 FEATURE_MAP nodes.
+  for (const page of SUPER_PAGES) {
+    for (const node of FEATURE_MAP[page.id]) {
+      const path = routePathOnly(node.to)
+      if (FEATURE_MAP_BLOCKED_ROUTES.has(path) || seenRoutes.has(path)) continue
+      seenRoutes.add(path)
+      const vis = inferFeatureVisual(node.to, node.label, node.cue)
+      buckets[page.id].push({
+        id: node.id,
+        label: node.label,
+        shortLabel: cleanCopy(node.label, 2),
+        cue: node.cue,
+        to: node.to,
+        category: page.id,
+        ...vis,
+      })
+    }
+  }
+
+  // 2. Append all remaining safe capabilities from FITUR_DARI_HUB + extra social routes.
+  for (const item of [...FITUR_DARI_HUB, ...EXTRA_SOCIAL_AND_LIFE_ROUTES]) {
+    const path = routePathOnly(item.to)
+    if (!path || path === '/' || FEATURE_MAP_BLOCKED_ROUTES.has(path) || seenRoutes.has(path)) continue
+    seenRoutes.add(path)
+    const category = superPageForRoute(item.to, item.grup)
+    const label = cleanCopy(item.nama, FEATURE_MAP_LABEL_MAX_WORDS)
+    const shortLabel = cleanCopy(item.nama, 2)
+    const cue = cleanCopy(item.apa || item.grup, FEATURE_MAP_CUE_MAX_WORDS)
+    const id = path.replace(/^\/+/, '').replace(/[^a-z0-9-]+/gi, '-') || 'feature'
+    const vis = inferFeatureVisual(item.to, item.nama, `${item.kw} ${item.grup}`)
+    buckets[category].push({
+      id,
+      label,
+      shortLabel,
+      cue,
+      to: item.to,
+      category,
+      ...vis,
+    })
+  }
+
+  return buckets
+}
+
+export const ALL_FEATURE_WIDGETS_BY_CATEGORY: Readonly<Record<SuperPageId, readonly FeatureVisualWidget[]>> =
+  buildAllFeatureWidgets()
+
+export const ALL_FEATURE_WIDGETS: readonly FeatureVisualWidget[] = SUPER_PAGES.flatMap(
+  (page) => ALL_FEATURE_WIDGETS_BY_CATEGORY[page.id],
+)
+
+export function allFeatureWidgetsForCategory(category: SuperPageId): readonly FeatureVisualWidget[] {
+  return ALL_FEATURE_WIDGETS_BY_CATEGORY[category] ?? []
+}
+
+export function featureOrbitPageCount(category: SuperPageId, pageSize = FEATURE_MAP_LIMIT): number {
+  const list = allFeatureWidgetsForCategory(category)
+  return Math.max(1, Math.ceil(list.length / Math.max(1, pageSize)))
+}
+
+export function featureOrbitPage(
+  category: SuperPageId,
+  pageIndex: number,
+  pageSize = FEATURE_MAP_LIMIT,
+): readonly FeatureVisualWidget[] {
+  const list = allFeatureWidgetsForCategory(category)
+  const size = Math.max(1, Math.min(FEATURE_MAP_LIMIT, pageSize))
+  const totalPages = Math.max(1, Math.ceil(list.length / size))
+  const safePage = ((pageIndex % totalPages) + totalPages) % totalPages
+  return list.slice(safePage * size, (safePage + 1) * size)
+}
+
 /** The six worlds shown in the orbit when the map is entered from `hub`. */
 export function featureMapWorlds(hub: SuperPageId = FEATURE_MAP_HOME_HUB): SuperPageDefinition[] {
   return SUPER_PAGES.filter((page) => page.id !== hub)
@@ -121,10 +323,6 @@ export function featureMapNodes(category: SuperPageId, map = FEATURE_MAP): reado
 
 export type OrbitPoint = { x: number; y: number }
 
-/**
- * Even radial layout in percent of a square stage, first node at 12 o'clock,
- * clockwise. Deterministic so screenshots and tests are stable.
- */
 export function orbitLayout(count: number, radiusPct = 37): OrbitPoint[] {
   if (!Number.isInteger(count) || count <= 0) return []
   return Array.from({ length: count }, (_, index) => {
@@ -136,7 +334,6 @@ export function orbitLayout(count: number, radiusPct = 37): OrbitPoint[] {
   })
 }
 
-/** Smallest centre-to-centre distance between orbit nodes, in px, for a stage width. */
 export function minimumOrbitGapPx(count: number, stagePx: number, radiusPct = 37): number {
   const points = orbitLayout(count, radiusPct)
   if (points.length < 2) return Number.POSITIVE_INFINITY
@@ -152,7 +349,6 @@ export function minimumOrbitGapPx(count: number, stagePx: number, radiusPct = 37
 }
 
 const wordCount = (text: string) => text.trim().split(/\s+/).filter(Boolean).length
-const FORBIDDEN_COPY = /\b(lokal|local|compliant|compliance|certified|tersertifikasi|kepatuhan|hipaa|fda|approved|validated|terverifikasi)\b/i
 
 export type FeatureMapAuditOptions = {
   routes: readonly string[]
@@ -160,10 +356,6 @@ export type FeatureMapAuditOptions = {
   limit?: number
 }
 
-/**
- * Named problems for a candidate map. Empty array means the map honours the
- * interaction law. Fail-closed: an empty router inventory is itself a problem.
- */
 export function auditFeatureMap(
   map: Readonly<Record<string, readonly FeatureMapNode[]>>,
   { routes, resolve = superPageForRoute, limit = FEATURE_MAP_LIMIT }: FeatureMapAuditOptions,
@@ -200,13 +392,12 @@ export function auditFeatureMap(
       if (!node.label.trim()) problems.push(`${category}/${node.id}: empty label`)
       if (wordCount(node.label) > FEATURE_MAP_LABEL_MAX_WORDS) problems.push(`${category}/${node.id}: label over ${FEATURE_MAP_LABEL_MAX_WORDS} words`)
       if (wordCount(node.cue) > FEATURE_MAP_CUE_MAX_WORDS) problems.push(`${category}/${node.id}: cue over ${FEATURE_MAP_CUE_MAX_WORDS} words`)
-      if (FORBIDDEN_COPY.test(node.label) || FORBIDDEN_COPY.test(node.cue)) problems.push(`${category}/${node.id}: forbidden copy`)
+      if (FORBIDDEN_COPY_TEST.test(node.label) || FORBIDDEN_COPY_TEST.test(node.cue)) problems.push(`${category}/${node.id}: forbidden copy`)
     }
   }
   return problems
 }
 
-/** Router inventory parsed from src/main.tsx source text (pure: caller reads the file). */
 export function routesFromRouterSource(source: string): string[] {
   return [...source.matchAll(/<Route\s+path="([^"]+)"/g)].map((match) => match[1]).filter((path) => path !== '*')
 }

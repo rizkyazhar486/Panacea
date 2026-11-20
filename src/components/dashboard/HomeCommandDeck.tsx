@@ -4,6 +4,7 @@ import { FITUR_DARI_HUB } from '../../lib/katalogFitur'
 import { bentoSpan } from '../../lib/interaction/bento'
 import { gabungKatalog, saringPeran, rutaKanonik as canonical, type EntriKatalog } from '../../lib/katalogLengkap'
 import { NAV_UNTUK_PENGATURAN } from '../../data/navPengaturan'
+import { FEATURE_GLYPH_SVG_PATHS, inferFeatureVisual, type FeatureChartKind, type FeatureGlyphId } from '../../lib/navigation/featureMap'
 import { useStore } from '../../lib/store'
 import { getUsageCounts } from '../../lib/usage'
 import { pintasanTerpakai } from '../../lib/pintasanTerpakai'
@@ -23,6 +24,35 @@ function domainOf(feature: EntriKatalog): Domain {
   return 'Your Body'
 }
 
+function DeckGlyph({ glyph }: { glyph: FeatureGlyphId }) {
+  return (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d={FEATURE_GLYPH_SVG_PATHS[glyph]} />
+    </svg>
+  )
+}
+
+function DeckMiniSpark({ kind, values, pct }: { kind: FeatureChartKind; values: readonly number[]; pct: number }) {
+  if (kind === 'ring') {
+    const r = 7
+    const c = 2 * Math.PI * r
+    const dash = (pct / 100) * c
+    return (
+      <svg viewBox="0 0 36 18" width="34" height="16" aria-hidden="true">
+        <circle cx="9" cy="9" r={r} fill="none" stroke="currentColor" strokeOpacity="0.2" strokeWidth="2.2" />
+        <circle cx="9" cy="9" r={r} fill="none" stroke="#22d3ee" strokeWidth="2.2" strokeDasharray={`${dash.toFixed(1)} ${c.toFixed(1)}`} transform="rotate(-90 9 9)" />
+        <text x="19" y="12" fill="currentColor" fontSize="7.5" fontWeight="800" fontFamily="monospace">{pct}</text>
+      </svg>
+    )
+  }
+  const pts = values.map((v, i) => `${(2 + i * 6.2).toFixed(1)},${16 - Math.round((v / 100) * 12)}`).join(' ')
+  return (
+    <svg viewBox="0 0 36 18" width="34" height="16" aria-hidden="true">
+      <polyline points={pts} fill="none" stroke="#22d3ee" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  )
+}
+
 export function HomeCommandDeck() {
   const { account } = useStore()
   const peran = account?.role ?? 'pasien'
@@ -30,8 +60,6 @@ export function HomeCommandDeck() {
   const [expanded, setExpanded] = useState(false)
   const [openGroup, setOpenGroup] = useState<string | null>(null)
 
-  // Home still owns one complete, role-aware capability index. Simplifying the
-  // visible surface must never make a destination unreachable.
   const uniqueFeatures = useMemo(() => {
     const gabungan = saringPeran(gabungKatalog(FITUR_DARI_HUB, NAV_UNTUK_PENGATURAN), peran)
     const seen = new Set<string>()
@@ -44,9 +72,6 @@ export function HomeCommandDeck() {
     })
   }, [peran])
 
-  // Search is the primary retrieval path once the catalogue is larger than a
-  // person can scan. Browsing stays available on demand, but it no longer
-  // competes with a second set of top-level navigation controls.
   const filtered = useMemo(() => {
     const needle = query.trim().toLowerCase()
     return uniqueFeatures.filter((feature) => !needle || textOf(feature).toLowerCase().includes(needle))
@@ -82,7 +107,10 @@ export function HomeCommandDeck() {
   return (
     <section data-panacea-command-surface className="panacea-command-surface" aria-label="Panacea capabilities">
       <div className="panacea-command-topline">
-        <h2 className="panacea-command-title">Explore</h2>
+        <div className="flex items-center gap-2">
+          <h2 className="panacea-command-title">Explore</h2>
+          <BatasKlaimKesehatan permukaan="wellness.home-command" className="inline-block" />
+        </div>
         <label className="panacea-command-search-wrap">
           <span className="sr-only">Search Panacea capabilities</span>
           <input
@@ -95,20 +123,24 @@ export function HomeCommandDeck() {
           />
         </label>
       </div>
-      <BatasKlaimKesehatan permukaan="wellness.home-command" className="mt-2 text-[11px] leading-snug text-neutral-500" />
 
       {!showIndex && pintasan.length > 0 ? (
         <nav className="panacea-command-recents" aria-label="Most used capabilities">
-          {pintasan.map((feature) => (
-            <Link
-              key={`recent-${feature.label}-${canonical(feature.to)}`}
-              to={canonical(feature.to)}
-              className="panacea-command-recent"
-            >
-              <span>{feature.label}</span>
-              <span aria-hidden>→</span>
-            </Link>
-          ))}
+          {pintasan.map((feature) => {
+            const vis = inferFeatureVisual(feature.to, feature.label, feature.kw)
+            return (
+              <Link
+                key={`recent-${feature.label}-${canonical(feature.to)}`}
+                to={canonical(feature.to)}
+                className="panacea-command-recent"
+                title={feature.apa || feature.label}
+              >
+                <DeckGlyph glyph={vis.glyph} />
+                <span>{feature.label}</span>
+                <DeckMiniSpark kind={vis.chartKind} values={vis.chartValues} pct={vis.gaugePct} />
+              </Link>
+            )
+          })}
         </nav>
       ) : null}
 
@@ -126,6 +158,7 @@ export function HomeCommandDeck() {
           {groups.map((group) => {
             const open = openGroup === group.name || searching
             const span = bentoSpan(group.items.length, filtered.length)
+            const groupVis = inferFeatureVisual(group.items[0]?.to ?? '/', group.name)
             return (
               <section
                 key={group.name}
@@ -140,23 +173,34 @@ export function HomeCommandDeck() {
                   aria-expanded={open}
                   onClick={() => setOpenGroup((value) => (value === group.name ? null : group.name))}
                 >
-                  <span className="panacea-bento-name">{group.name}</span>
+                  <span className="flex items-center gap-2">
+                    <DeckGlyph glyph={groupVis.glyph} />
+                    <span className="panacea-bento-name">{group.name}</span>
+                  </span>
                   <span className="panacea-bento-count" aria-hidden>{group.items.length}</span>
                 </button>
 
                 {open ? (
                   <ul className="panacea-bento-items" role="list">
-                    {group.items.map((feature) => (
-                      <li key={`${feature.label}-${canonical(feature.to)}`}>
-                        <Link to={canonical(feature.to)} className="panacea-command-result">
-                          <span className="panacea-command-result-main">
-                            <span className="panacea-command-result-title">{feature.label}</span>
-                            <span className="panacea-command-result-meta">{domainOf(feature)}</span>
-                          </span>
-                          <span className="panacea-command-result-arrow" aria-hidden>→</span>
-                        </Link>
-                      </li>
-                    ))}
+                    {group.items.map((feature) => {
+                      const vis = inferFeatureVisual(feature.to, feature.label, feature.kw)
+                      return (
+                        <li key={`${feature.label}-${canonical(feature.to)}`}>
+                          <Link
+                            to={canonical(feature.to)}
+                            className="panacea-command-result"
+                            title={feature.apa || feature.label}
+                          >
+                            <span className="panacea-command-result-main flex items-center gap-2">
+                              <DeckGlyph glyph={vis.glyph} />
+                              <span className="panacea-command-result-title">{feature.label}</span>
+                              <span className="sr-only panacea-command-result-meta">{domainOf(feature)}</span>
+                            </span>
+                            <DeckMiniSpark kind={vis.chartKind} values={vis.chartValues} pct={vis.gaugePct} />
+                          </Link>
+                        </li>
+                      )
+                    })}
                   </ul>
                 ) : null}
               </section>

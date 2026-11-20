@@ -3,6 +3,36 @@ import { getSurfaceDepthContract, type PanaceaSurface } from '../../lib/surfaceS
 
 type RouteMap = Readonly<Partial<Record<string, string>>>
 
+function DepthStopLogo({ index }: { index: number }) {
+  const kind = index % 5
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      {kind === 0 && (
+        <>
+          <circle cx="12" cy="12" r="8" />
+          <circle cx="12" cy="12" r="2.5" fill="currentColor" />
+        </>
+      )}
+      {kind === 1 && <path d="M3 12h4l2.5-6 4 12 3-8 2 2h2.5" />}
+      {kind === 2 && (
+        <>
+          <polygon points="12,3.5 20,8 12,12.5 4,8" />
+          <path d="m4 13 8 4.5 8-4.5" />
+        </>
+      )}
+      {kind === 3 && (
+        <>
+          <path d="M4 19h16" />
+          <rect x="6" y="10" width="3" height="7" rx="1" />
+          <rect x="11" y="6" width="3" height="11" rx="1" />
+          <rect x="16" y="4" width="3" height="13" rx="1" />
+        </>
+      )}
+      {kind === 4 && <path d="M12 3 19 6v5.4c0 4.5-3 8.2-7 9.6-4-1.4-7-5.1-7-9.6V6l7-3Z" />}
+    </svg>
+  )
+}
+
 export function SurfaceDepthNavigator({
   surface,
   activeStopId,
@@ -31,7 +61,7 @@ export function SurfaceDepthNavigator({
         }`
         const content = (
           <>
-            <span className="hidden tabular-nums text-white/22 sm:inline">{String(index + 1).padStart(2, '0')}</span>
+            <DepthStopLogo index={index} />
             <span className="whitespace-nowrap">{stop.label}</span>
           </>
         )
