@@ -4,6 +4,7 @@
 
 import type { ReactNode } from 'react'
 import type { BodySystemId } from '../../data/bodySystems'
+import { VERTICAL_GAP_MARKER } from '../../engine/system-physiology/anatomyPhysiologyProvenance'
 import type { SystemPhysiologyView } from '../../engine/system-physiology/systemPhysiology'
 import type { StageSimulation } from '../../engine/system-physiology/systemSimulations'
 import type { PhysiologyMechanism } from '../../engine/system-physiology/physiologySources'
@@ -80,7 +81,11 @@ export function SystemCard({ view, simulations, labels, onBack, onSystem, onSimu
 
       <header style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
         <h4 id={titleId} tabIndex={-1} style={{ margin: 0, fontSize: 20, lineHeight: 1.2, fontWeight: 800, color: TONE.text, outline: 'none' }}>{view.label}</h4>
-        <div><Tag color={view.fidelity === 'contextual' ? TONE.faint : TONE.ref}>{FIDELITY_LABEL[view.fidelity]}</Tag></div>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+          <Tag color={view.fidelity === 'contextual' ? TONE.faint : TONE.ref}>{FIDELITY_LABEL[view.fidelity]}</Tag>
+          <Tag color={TONE.liveText}>truthClass: reference</Tag>
+          {simulations.length > 0 && <Tag color={TONE.sim}>truthClass: simulated</Tag>}
+        </div>
       </header>
 
       {view.fidelity === 'contextual' && <Note color={TONE.ref}>{view.bridgeNote}</Note>}
@@ -159,7 +164,9 @@ export function SystemCard({ view, simulations, labels, onBack, onSystem, onSimu
                 <span style={{ flex: 1, minWidth: 0 }}>{gap.subject}</span>
                 {gap.partial && <span style={{ flex: 'none', color: TONE.dim, fontSize: 11, fontWeight: 800 }}>partly sourced above</span>}
               </summary>
-              <div style={{ padding: '0 12px 12px' }}><Note color={TONE.faint}>{gap.boundary}</Note></div>
+              <div style={{ padding: '0 12px 12px' }}>
+                <Note color={TONE.faint}><b>{VERTICAL_GAP_MARKER}:</b> {gap.boundary}</Note>
+              </div>
             </details>
           ))}
         </Section>
