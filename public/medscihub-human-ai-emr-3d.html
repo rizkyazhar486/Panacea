@@ -1,0 +1,445 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<meta name="theme-color" content="#050911" />
+<title>PanaceaMed · Portable 1-File Human AI-EMR & MedSciHub 3D CAD/CAE OS</title>
+<style>
+  :root {
+    --bg: #050911;
+    --panel: rgba(12, 20, 34, 0.92);
+    --line: rgba(148, 163, 184, 0.2);
+    --txt: #f1f5f9;
+    --muted: #cbd5e1;
+    --brand: #047857;
+    --ok: #68fe9a;
+    --cyan: #67e8f9;
+    --warn: #fde68a;
+    --bad: #fda4af;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: radial-gradient(circle at top right, #0a1f2e 0%, var(--bg) 55%);
+    color: var(--txt);
+    font: 14px/1.5 ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  }
+  .wrap { max-width: 1320px; margin: 0 auto; padding: 14px; }
+  .top {
+    display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid var(--line); padding-bottom: 12px; margin-bottom: 14px;
+  }
+  .eyebrow { color: var(--ok); font-size: 11px; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; }
+  h1 { margin: 4px 0 0; font-size: clamp(18px, 2.5vw, 26px); letter-spacing: -0.02em; }
+  .banner {
+    background: rgba(120, 53, 15, 0.35); border: 1px solid rgba(251, 191, 36, 0.4);
+    border-radius: 12px; padding: 10px 12px; font-size: 12px; color: var(--warn); margin-bottom: 14px;
+  }
+  .grid { display: grid; gap: 14px; grid-template-columns: 1fr; }
+  @media (min-width: 1024px) { .grid { grid-template-columns: 1.15fr 1fr; } }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 18px; padding: 14px; }
+  .stageWrap { position: relative; height: 460px; background: #02050a; border: 1px solid var(--line); border-radius: 16px; overflow: hidden; }
+  canvas { display: block; width: 100%; height: 100%; touch-action: none; cursor: grab; }
+  .hud { position: absolute; left: 10px; top: 10px; display: flex; flex-wrap: wrap; gap: 6px; pointer-events: none; }
+  .badge { background: rgba(2, 6, 14, 0.85); border: 1px solid var(--line); border-radius: 999px; padding: 4px 10px; font-size: 11px; font-weight: 700; color: var(--cyan); }
+  .row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+  button, a.btn, select {
+    min-height: 44px; padding: 8px 12px; border-radius: 12px; border: 1px solid var(--line);
+    background: rgba(255, 255, 255, 0.06); color: var(--txt); font: 700 12px/1.2 inherit; cursor: pointer;
+    text-decoration: none; display: inline-flex; align-items: center; justify-content: center;
+  }
+  button.active, button[aria-selected="true"] { background: var(--brand); border-color: var(--brand); color: #fff; }
+  label.field { display: block; font-size: 12px; color: var(--muted); font-weight: 600; margin-top: 8px; }
+  input[type="range"] { width: 100%; height: 40px; accent-color: #10b981; }
+  .two { display: grid; gap: 8px; grid-template-columns: repeat(auto-fit, minmax(175px, 1fr)); }
+  .box { background: rgba(2, 6, 14, 0.7); border: 1px solid var(--line); border-radius: 12px; padding: 10px; font-size: 12px; }
+  .okTxt { color: var(--ok); font-weight: 800; }
+  .hidden { display: none; }
+  code { background: rgba(255,255,255,0.08); padding: 1px 5px; border-radius: 5px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <div class="eyebrow">Single-File Air-Gapped Edition · Zero External CDN · Offline 3T Ready</div>
+      <h1>PanaceaMed Human AI-EMR &amp; MedSciHub 3D CAD/CAE Studio</h1>
+    </div>
+    <div class="row" style="margin-top:0">
+      <a class="btn" href="./#/med-study?bagian=cad-cae-3d">Full Z-Anatomy Three.js WebGL Studio ↗</a>
+    </div>
+  </header>
+
+  <div class="banner">
+    <strong>EDUCATIONAL_AND_CAE_RESEARCH_ONLY (clinically_reviewed: false):</strong> Mechanistic first-principles &amp; CAD models. Not diagnostic, surgical guidance, wet-lab protocol, prescription, or consciousness upload/immortality.
+  </div>
+
+  <div class="grid">
+    <section class="card">
+      <div class="stageWrap">
+        <canvas id="cadCanvas" aria-label="Interactive 3D anatomical CAD canvas"></canvas>
+        <div class="hud">
+          <span class="badge" id="hudMode">Studio Shade</span>
+          <span class="badge" id="hudPicked">Tap structure or drag X/Y/Z</span>
+        </div>
+      </div>
+      <div class="row">
+        <button type="button" id="btnCombine">Snap Combine (0,0,0)</button>
+        <button type="button" id="btnProj">1-Projectile Burst</button>
+        <button type="button" id="btnWire">CAD Wireframe</button>
+        <button type="button" id="btnLaser">Laser Contour Scan</button>
+      </div>
+      <div class="two">
+        <label class="field">X-Axis Explode (<span id="valX">0.00</span>)
+          <input id="rngX" type="range" min="-1.5" max="1.5" step="0.05" value="0" />
+        </label>
+        <label class="field">Y-Axis Explode (<span id="valY">0.00</span>)
+          <input id="rngY" type="range" min="-1.5" max="1.5" step="0.05" value="0" />
+        </label>
+        <label class="field">Z-Axis Explode (<span id="valZ">0.00</span>)
+          <input id="rngZ" type="range" min="-1.5" max="1.5" step="0.05" value="0" />
+        </label>
+        <label class="field">Slice / Cross-Section (<span id="valSlice">1.00</span>)
+          <input id="rngSlice" type="range" min="-1" max="1" step="0.05" value="1" />
+        </label>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="row" role="tablist" style="margin-top:0; margin-bottom:10px;">
+        <button type="button" class="tabBtn" data-tab="scales" aria-selected="true">12 Scales &amp; 1st Principles</button>
+        <button type="button" class="tabBtn" data-tab="cabg" aria-selected="false">CABG &amp; Suture QA</button>
+        <button type="button" class="tabBtn" data-tab="bio" aria-selected="false">Drugs, Bio &amp; AI-EMR</button>
+        <button type="button" class="tabBtn" data-tab="net" aria-selected="false">3T Channel &amp; Dijkstra</button>
+      </div>
+
+      <div id="tab-scales" class="tabPane">
+        <label class="field">Select Biological Scale (1.7 m Whole Body → 0.5 Å Quantum State → Continuity)
+          <select id="selScale" style="width:100%;margin-top:4px;"></select>
+        </label>
+        <div class="box" id="scaleReadout" style="margin-top:8px;"></div>
+
+        <label class="field">First-Principles Case
+          <select id="selFp" style="width:100%;margin-top:4px;">
+            <option value="poiseuille">Poiseuille Hemodynamics &amp; Wall Shear (Q ∝ r⁴)</option>
+            <option value="nernst">Nernst Membrane Ion Equilibrium (E = RT/zF ln)</option>
+            <option value="laplaceAlv">Laplace Alveolar Collapse (P = 2γ/r) &amp; Fick O2</option>
+            <option value="laplaceLv">Laplace LV Myocardial Wall Stress (σ = P·r / 2h)</option>
+          </select>
+        </label>
+        <div class="two">
+          <label class="field">Primary Radius / Temp (<span id="fpRVal">1.8</span>)
+            <input id="fpR" type="range" min="0.5" max="140" step="0.5" value="1.8" />
+          </label>
+          <label class="field">Pressure / Conc A (<span id="fpAVal">95</span>)
+            <input id="fpA" type="range" min="5" max="200" step="1" value="95" />
+          </label>
+        </div>
+        <div class="box" id="fpOut" style="margin-top:8px;"></div>
+      </div>
+
+      <div id="tab-cabg" class="tabPane hidden">
+        <div class="two">
+          <label class="field">LIMA Radius mm (<span id="cabgRVal">1.5</span>)
+            <input id="cabgR" type="range" min="0.5" max="2.5" step="0.1" value="1.5" />
+          </label>
+          <label class="field">Suture Pitch mm (<span id="cabgPitchVal">1.2</span>)
+            <input id="cabgPitch" type="range" min="0.4" max="2.5" step="0.1" value="1.2" />
+          </label>
+          <label class="field">Anastomotic Gap mm (<span id="cabgGapVal">0.12</span>)
+            <input id="cabgGap" type="range" min="0" max="0.6" step="0.02" value="0.12" />
+          </label>
+          <label class="field">Phrenic Margin mm (<span id="cabgPhrVal">12</span>)
+            <input id="cabgPhr" type="range" min="2" max="20" step="1" value="12" />
+          </label>
+        </div>
+        <div class="box" id="cabgOut" style="margin-top:10px;"></div>
+      </div>
+
+      <div id="tab-bio" class="tabPane hidden">
+        <div class="two">
+          <label class="field">Reference Drug Agent
+            <select id="selDrug" style="width:100%;margin-top:4px;">
+              <option value="metoprolol">Metoprolol (ADRB1 EC50 47 nM)</option>
+              <option value="salbutamol">Salbutamol (ADRB2 EC50 120 nM)</option>
+              <option value="furosemide">Furosemide (SLC12A1 EC50 10 uM)</option>
+              <option value="lisinopril">Lisinopril (ACE EC50 1.2 nM)</option>
+            </select>
+          </label>
+          <label class="field">Concentration (<span id="drugCVal">47</span>)
+            <input id="drugC" type="range" min="1" max="300" step="1" value="47" />
+          </label>
+        </div>
+        <div class="box" id="bioOut" style="margin-top:10px;"></div>
+        <div class="row">
+          <button type="button" id="btnExportEmr" class="active">Export Offline AI-EMR Draft JSON</button>
+        </div>
+      </div>
+
+      <div id="tab-net" class="tabPane hidden">
+        <div class="two">
+          <label class="field">3T Environment &amp; Bearer
+            <select id="selBearer" style="width:100%;margin-top:4px;">
+              <option value="offline">Offline Store-and-Forward Queue (0G)</option>
+              <option value="ble">BLE Mesh (Local Edge)</option>
+              <option value="2g">2G EDGE (Rural / Sea)</option>
+              <option value="3g">3G UMTS</option>
+              <option value="4g">4G LTE</option>
+              <option value="5g">5G / Fiber Optic</option>
+              <option value="leo">LEO Satellite Relay</option>
+            </select>
+          </label>
+          <label class="field">Traffic Congestion Penalty (×<span id="trafVal">1.2</span>)
+            <input id="trafRng" type="range" min="1" max="4" step="0.2" value="1.2" />
+          </label>
+        </div>
+        <div class="box" id="netOut" style="margin-top:10px;"></div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<script>
+(() => {
+  const SCALES = [
+    { id: '1. Whole Body (1.7 m)', entity: 'Full Human Chassis & Gait', regime: 'Rigid-body statics & kinematics', boundary: 'Generic reference — not personal scan' },
+    { id: '2. Organ System (60 cm)', entity: 'Cardiopulmonary & Neural Loops', regime: 'Closed-loop autonomic homeostasis', boundary: 'Textbook system coupling' },
+    { id: '3. Organ (12 cm)', entity: 'Heart, Lungs, Liver, Brain, Kidneys', regime: 'Poiseuille resistance & Laplace wall stress', boundary: 'Reference geometry' },
+    { id: '4. Tissue (100 µm)', entity: 'Myocardium, Alveolar Barrier, Nephrons', regime: 'Krogh O2 diffusion & Starling exchange', boundary: 'Continuum tissue cylinder' },
+    { id: '5. Cell (12 µm)', entity: 'Cardiomyocyte, Pneumocyte, Neuron', regime: 'Nernst-Goldman membrane potential', boundary: 'Canonical Cell Ontology' },
+    { id: '6. Subcellular (2.5 µm)', entity: 'Dyadic Cleft, Sarcomere, Synapse', regime: 'Local Ca2+ signaling microdomains', boundary: 'Sub-diffraction abstraction' },
+    { id: '7. Organelle (1.0 µm)', entity: 'Mitochondria, SR Cisternae, ER', regime: 'Mitchell proton-motive ATP synthesis', boundary: 'Stoichiometric abstraction' },
+    { id: '8. DNA & RNA (2.0 nm)', entity: 'MYH7, RYR2, SFTPB, SCN5A, ADRB1', regime: 'Transcription & repair ratios (HDR/NHEJ)', boundary: 'Annotation only — zero sequence synthesis' },
+    { id: '9. Compound (0.8 nm)', entity: 'ATP, DPPC, Metoprolol, Lisinopril', regime: 'Hill-Langmuir occupancy θ = C/(EC50+C)', boundary: 'Reference pharmacodynamics — not dosing' },
+    { id: '10. Particle / Ion (1.5 Å)', entity: 'Na+, K+, Ca2+, Cl-, H+', regime: 'Ionic electrodiffusion & hydration', boundary: 'Electrochemical continuum' },
+    { id: '11. Chemical Quantum (0.5 Å)', entity: 'Heme Fe2+-O2 & Proton Tunneling', regime: 'Educational spin/tunneling barrier kinetics', boundary: 'Educational research model only' },
+    { id: '12. Longitudinal Continuity (OS)', entity: 'Signed-Consent Health State Trajectory', regime: 'Encrypted store-and-forward record state', boundary: 'NOT consciousness upload or immortality' }
+  ];
+
+  // Lightweight separable 3D human structural parts projected with WebGL-style depth sorting
+  const PARTS = [
+    { name: 'Skin Envelope (FMA:7163)', color: '#94a3b8', pos: [0, 0.25, 0.14], size: [0.32, 0.92, 0.22], dir: [0, 0.25, 0.85], wire: true },
+    { name: 'Cranium & Cortex (FMA:50801)', color: '#c084fc', pos: [0, 0.72, 0], size: [0.16, 0.19, 0.18], dir: [0, 0.75, -0.35] },
+    { name: 'Cervical–Thoracic Spine (FMA:7574)', color: '#fde68a', pos: [0, 0.28, -0.09], size: [0.1, 0.62, 0.1], dir: [-0.55, 0.1, -0.5] },
+    { name: 'Ribcage Thorax Frame', color: '#e2e8f0', pos: [0, 0.34, 0.02], size: [0.28, 0.34, 0.2], dir: [-0.65, 0.2, 0.25], wire: true },
+    { name: 'Left/Right Lungs (FMA:7195)', color: '#38bdf8', pos: [-0.07, 0.36, 0.01], size: [0.12, 0.25, 0.14], dir: [0.55, 0.2, -0.25] },
+    { name: 'Heart & LAD Coronary (FMA:7088)', color: '#f43f5e', pos: [0.05, 0.32, 0.05], size: [0.11, 0.14, 0.12], dir: [-0.25, 0.25, 0.55] },
+    { name: 'Aortic Arch & Conduit', color: '#fb7185', pos: [0.02, 0.15, -0.02], size: [0.05, 0.5, 0.05], dir: [-0.35, -0.1, -0.4] },
+    { name: 'Liver & Portal Axis (FMA:7197)', color: '#f97316', pos: [-0.06, 0.12, 0.03], size: [0.16, 0.12, 0.13], dir: [0.45, -0.2, 0.35] },
+    { name: 'Bilateral Kidneys (FMA:7203)', color: '#10b981', pos: [0, 0.06, -0.05], size: [0.2, 0.09, 0.08], dir: [0.3, -0.35, -0.55] },
+    { name: 'Pelvis & Lower Limb Axis (FMA:9611)', color: '#cbd5e1', pos: [0, -0.35, 0], size: [0.25, 0.68, 0.15], dir: [0, -0.7, 0.15] }
+  ];
+
+  const canvas = document.getElementById('cadCanvas');
+  const ctx = canvas.getContext('2d');
+  let yaw = 0.4, pitch = 0.15, zoom = 1.0, ex = 0, ey = 0, ez = 0, proj = 0, sliceVal = 1.0;
+  let wireframeMode = false, laserMode = false, drag = false, px = 0, py = 0, scanT = 0;
+
+  function resize() {
+    const r = canvas.parentElement.getBoundingClientRect();
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = Math.max(200, Math.floor(r.width * dpr));
+    canvas.height = Math.max(200, Math.floor(r.height * dpr));
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  function rotY(p, a) { const c = Math.cos(a), s = Math.sin(a); return [p[0]*c + p[2]*s, p[1], -p[0]*s + p[2]*c]; }
+  function rotX(p, a) { const c = Math.cos(a), s = Math.sin(a); return [p[0], p[1]*c - p[2]*s, p[1]*s + p[2]*c]; }
+
+  function render() {
+    requestAnimationFrame(render);
+    scanT += 0.025;
+    const w = canvas.width, h = canvas.height;
+    ctx.fillStyle = '#02050a';
+    ctx.fillRect(0, 0, w, h);
+
+    // Coordinate CAD ground grid
+    ctx.strokeStyle = wireframeMode || laserMode ? 'rgba(34,211,238,0.18)' : 'rgba(148,163,184,0.08)';
+    ctx.lineWidth = 1;
+    for (let i = -5; i <= 5; i++) {
+      const x1 = w/2 + (i * 0.25) * h * 0.35 * zoom;
+      ctx.beginPath(); ctx.moveTo(x1, h*0.15); ctx.lineTo(x1, h*0.88); ctx.stroke();
+    }
+
+    const projected = PARTS.map((part) => {
+      const cx = part.pos[0] + part.dir[0] * (ex + proj * 0.75);
+      const cy = part.pos[1] + part.dir[1] * (ey + proj * 0.65);
+      const cz = part.pos[2] + part.dir[2] * (ez + proj * 0.75);
+      if (cy > sliceVal * 0.9) return null;
+      let p = rotX(rotY([cx, cy, cz], yaw), pitch);
+      const scale = (h * 0.42 * zoom) / (2.4 - p[2]);
+      return { part, sx: w/2 + p[0]*scale, sy: h*0.54 - p[1]*scale, z: p[2], rw: part.size[0]*scale, rh: part.size[1]*scale };
+    }).filter(Boolean).sort((a, b) => a.z - b.z);
+
+    for (const item of projected) {
+      const { part, sx, sy, rw, rh } = item;
+      ctx.save();
+      ctx.translate(sx, sy);
+      ctx.beginPath();
+      ctx.roundRect(-rw/2, -rh/2, rw, rh, Math.min(rw, rh)*0.28);
+      if (wireframeMode || part.wire) {
+        ctx.strokeStyle = laserMode ? '#10b981' : part.color;
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        ctx.fillStyle = 'rgba(15,23,42,0.2)';
+        ctx.fill();
+      } else {
+        const g = ctx.createLinearGradient(-rw/2, -rh/2, rw/2, rh/2);
+        g.addColorStop(0, part.color);
+        g.addColorStop(1, '#0f172a');
+        ctx.fillStyle = g;
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(255,255,255,0.22)';
+        ctx.lineWidth = 1.2;
+        ctx.stroke();
+      }
+      if (laserMode) {
+        ctx.strokeStyle = 'rgba(16,185,129,0.55)';
+        ctx.lineWidth = 1;
+        for (let ly = -rh/2 + 6; ly < rh/2; ly += 8) {
+          ctx.beginPath(); ctx.moveTo(-rw/2 + 2, ly); ctx.lineTo(rw/2 - 2, ly); ctx.stroke();
+        }
+      }
+      ctx.restore();
+    }
+
+    if (laserMode) {
+      const scanY = h * 0.5 + Math.sin(scanT) * (h * 0.36);
+      ctx.strokeStyle = '#68fe9a';
+      ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(w*0.18, scanY); ctx.lineTo(w*0.82, scanY); ctx.stroke();
+    }
+    window.__cadState = projected.map((p) => ({ name: p.part.name, sx: p.sx, sy: p.sy }));
+  }
+  requestAnimationFrame(render);
+
+  canvas.addEventListener('pointerdown', (e) => { drag = true; px = e.clientX; py = e.clientY; });
+  window.addEventListener('pointerup', (e) => {
+    if (drag && Math.hypot(e.clientX - px, e.clientY - py) < 5) {
+      const rect = canvas.getBoundingClientRect();
+      const dpr = canvas.width / Math.max(1, rect.width);
+      const mx = (e.clientX - rect.left) * dpr, my = (e.clientY - rect.top) * dpr;
+      const hit = [...(window.__cadState || [])].reverse().find((i) => Math.hypot(i.sx - mx, i.sy - my) < 42);
+      if (hit) document.getElementById('hudPicked').textContent = hit.name;
+    }
+    drag = false;
+  });
+  canvas.addEventListener('pointermove', (e) => {
+    if (!drag) return;
+    yaw += (e.clientX - px) * 0.01;
+    pitch = Math.max(-1.1, Math.min(1.1, pitch + (e.clientY - py) * 0.01));
+    px = e.clientX; py = e.clientY;
+  });
+  canvas.addEventListener('wheel', (e) => { e.preventDefault(); zoom = Math.max(0.5, Math.min(2.2, zoom - e.deltaY * 0.001)); }, { passive: false });
+
+  const syncSliders = () => {
+    ex = +document.getElementById('rngX').value;
+    ey = +document.getElementById('rngY').value;
+    ez = +document.getElementById('rngZ').value;
+    sliceVal = +document.getElementById('rngSlice').value;
+    document.getElementById('valX').textContent = ex.toFixed(2);
+    document.getElementById('valY').textContent = ey.toFixed(2);
+    document.getElementById('valZ').textContent = ez.toFixed(2);
+    document.getElementById('valSlice').textContent = sliceVal.toFixed(2);
+  };
+  ['rngX','rngY','rngZ','rngSlice'].forEach((id) => document.getElementById(id).addEventListener('input', syncSliders));
+  document.getElementById('btnCombine').addEventListener('click', () => {
+    ['rngX','rngY','rngZ'].forEach((id) => { document.getElementById(id).value = '0'; });
+    proj = 0; syncSliders();
+  });
+  document.getElementById('btnProj').addEventListener('click', () => { proj = proj > 0 ? 0 : 0.75; });
+  document.getElementById('btnWire').addEventListener('click', () => {
+    wireframeMode = !wireframeMode;
+    document.getElementById('hudMode').textContent = wireframeMode ? 'CAD Wireframe' : (laserMode ? 'Laser Contour' : 'Studio Shade');
+  });
+  document.getElementById('btnLaser').addEventListener('click', () => {
+    laserMode = !laserMode;
+    document.getElementById('hudMode').textContent = laserMode ? 'Laser Contour' : (wireframeMode ? 'CAD Wireframe' : 'Studio Shade');
+  });
+
+  // Tab switcher
+  document.querySelectorAll('.tabBtn').forEach((btn) => btn.addEventListener('click', () => {
+    document.querySelectorAll('.tabBtn').forEach((b) => b.setAttribute('aria-selected', b === btn ? 'true' : 'false'));
+    document.querySelectorAll('.tabPane').forEach((p) => p.classList.add('hidden'));
+    document.getElementById('tab-' + btn.dataset.tab).classList.remove('hidden');
+  }));
+
+  // Scales & First Principles
+  const selScale = document.getElementById('selScale');
+  SCALES.forEach((s, i) => { const o = document.createElement('option'); o.value = i; o.textContent = s.id; selScale.appendChild(o); });
+  const updateScales = () => {
+    const s = SCALES[+selScale.value || 0];
+    document.getElementById('scaleReadout').textContent = `${s.entity} | ${s.regime} | Boundary: ${s.boundary}`;
+  };
+  selScale.addEventListener('change', updateScales);
+  updateScales();
+
+  const updateFp = () => {
+    const mode = document.getElementById('selFp').value;
+    const r = +document.getElementById('fpR').value;
+    const a = +document.getElementById('fpA').value;
+    document.getElementById('fpRVal').textContent = r;
+    document.getElementById('fpAVal').textContent = a;
+    let msg = '';
+    if (mode === 'poiseuille') {
+      const rM = r/1000, dPPa = Math.max(5, a - 25)*133.322, q = (Math.PI*dPPa*Math.pow(rM,4))/(8*0.0035*0.065);
+      msg = `Strip: non-linear flow. Axioms: Navier-Stokes + No-slip -> Flow Q=${(q*6e7).toFixed(1)} mL/min, Shear τ=${((4*0.0035*q)/(Math.PI*Math.pow(rM,3))).toFixed(2)} Pa.`;
+    } else if (mode === 'nernst') {
+      const E = ((8.314*(273.15+37))/96485)*Math.log(Math.max(1,a)/Math.max(1,r))*1000;
+      msg = `Axioms: RT ln(out/in) = zFE -> Nernst E_eq=${E.toFixed(1)} mV (at 37°C, z=+1).`;
+    } else if (mode === 'laplaceAlv') {
+      const p = (2*(a*1e-3))/(Math.max(10,r)*1e-6)/133.322;
+      msg = `Axioms: Young-Laplace P=2γ/r -> Collapse pressure ${p.toFixed(2)} mmHg.`;
+    } else {
+      const sigma = ((a*0.133322)*(r/1000))/(2*0.01);
+      msg = `Axioms: Force equilibrium -> LV Laplace stress σ=${sigma.toFixed(2)} kPa (h=10 mm).`;
+    }
+    document.getElementById('fpOut').textContent = msg;
+  };
+  ['selFp','fpR','fpA'].forEach((id) => document.getElementById(id).addEventListener('input', updateFp));
+  updateFp();
+
+  const updateCabg = () => {
+    const r = +document.getElementById('cabgR').value, pitch = +document.getElementById('cabgPitch').value, gap = +document.getElementById('cabgGap').value, phr = +document.getElementById('cabgPhr').value;
+    document.getElementById('cabgRVal').textContent = r; document.getElementById('cabgPitchVal').textContent = pitch;
+    document.getElementById('cabgGapVal').textContent = gap; document.getElementById('cabgPhrVal').textContent = phr;
+    const pat = Math.max(0.15, 1 - gap*0.45), rM = (r*pat)/1000;
+    const flow = ((Math.PI*(88-30)*133.322*Math.pow(rM,4))/(8*0.0035*0.14)*6e7*0.08).toFixed(1);
+    const ok = pitch >= 0.7 && pitch <= 1.8 && gap <= 0.25 && phr >= 5;
+    document.getElementById('cabgOut').textContent = `CABG LIMA Flow: ${flow} mL/min | Phrenic margin: ${phr >= 5 ? 'SAFE' : 'PROXIMITY WARNING (<5mm)'} | Suture CV Verdict: ${ok ? 'PASS' : 'ANOMALY_REVIEW'} (Educational only)`;
+  };
+  ['cabgR','cabgPitch','cabgGap','cabgPhr'].forEach((id) => document.getElementById(id).addEventListener('input', updateCabg));
+  updateCabg();
+
+  const updateBio = () => {
+    const ec50 = { metoprolol: 47, salbutamol: 120, furosemide: 10, lisinopril: 1.2 }[document.getElementById('selDrug').value];
+    const c = +document.getElementById('drugC').value;
+    document.getElementById('drugCVal').textContent = c;
+    const occ = ((c / (ec50 + c)) * 100).toFixed(1);
+    document.getElementById('bioOut').textContent = `Hill Receptor Occupancy θ=${occ}% | Vaccine T½ 120d decay model @ 90d=54.7% | NGS Q30 base error=1.00e-3 (Educational math only)`;
+  };
+  ['selDrug','drugC'].forEach((id) => document.getElementById(id).addEventListener('input', updateBio));
+  updateBio();
+
+  document.getElementById('btnExportEmr').addEventListener('click', () => {
+    const data = { schema: 'panacea.portable.emr.cae.v1', clinically_reviewed: false, note: document.getElementById('fpOut').textContent };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'panacea-portable-cae-draft.json'; a.click();
+  });
+
+  const updateNet = () => {
+    const b = document.getElementById('selBearer').value, pen = +document.getElementById('trafRng').value;
+    document.getElementById('trafVal').textContent = pen.toFixed(1);
+    const tier = { offline: 'STORE_AND_FORWARD_DELTA (0 kbps)', ble: 'VITALS_JSON_COMPACT (~42 kbps)', '2g': 'VITALS_JSON_COMPACT (~65 kbps)', '3g': 'GLB_LOD2_PROGRESSIVE (~480 kbps)', '4g': 'GLB_LOD2_PROGRESSIVE (~2.1 Mbps)', '5g': 'FULL_UHD_STREAM (>20 Mbps)', leo: 'GLB_LOD2_PROGRESSIVE (~1.8 Mbps)' }[b];
+    const cost1 = (12*1.15) + (18*1.4*pen), cost2 = (9*1.1) + (16*1.2*pen);
+    const bestPath = cost2 <= cost1 ? `Village_Clinic_A -> Mountain_Pass -> Regional_Hospital (${cost2.toFixed(1)} weighted km)` : `Village_Clinic_A -> Coastal_Hub -> Regional_Hospital (${cost1.toFixed(1)} weighted km)`;
+    document.getElementById('netOut').textContent = `Source->Channel->Dest Policy: ${tier} | Dijkstra Shortest Corridor: ${bestPath}`;
+  };
+  ['selBearer','trafRng'].forEach((id) => document.getElementById(id).addEventListener('input', updateNet));
+  updateNet();
+})();
+</script>
+</body>
+</html>
