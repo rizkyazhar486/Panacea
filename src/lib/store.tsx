@@ -1351,8 +1351,18 @@ export function StoreProvider({ children, visibilityDocument }: { children: Reac
       updateProduct: (id, partial) =>
         setState((st) => ({ ...st, products: st.products.map((p) => (p.id === id ? { ...p, ...partial } : p)) })),
       removeProduct: (id) => setState((st) => ({ ...st, products: st.products.filter((p) => p.id !== id) })),
-      updateProfile: (email, partial) =>
-        setState((st) => ({ ...st, profiles: { ...st.profiles, [email]: { ...st.profiles[email], ...partial } } })),
+      updateProfile: (email, partial) => {
+        // The header, greetings and records read account.name, so a rename must reach it (and the remembered
+        // session) or the profile page and the rest of the app disagree about who the user is.
+        const renamed = typeof partial.name === 'string' ? partial.name.trim() : ''
+        const current = stateRef.current.account
+        if (renamed && current && current.email === email && current.name !== renamed) saveSession({ ...current, name: renamed })
+        setState((st) => ({
+          ...st,
+          profiles: { ...st.profiles, [email]: { ...st.profiles[email], ...partial } },
+          account: renamed && st.account && st.account.email === email ? { ...st.account, name: renamed } : st.account,
+        }))
+      },
       bookConsult: (c) =>
         setState((st) => ({
           ...st,
