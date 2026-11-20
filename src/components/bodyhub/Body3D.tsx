@@ -8,6 +8,9 @@ import { applyBakedAoToLayer } from '../../domains/body-exposure/adapters/bakedA
 import { stepTween, viewPose, type CameraPose, type CameraTween, type Vec3 } from '../../domains/body-exposure/engine/cameraViews.ts'
 import { firstPickableIndex, type PickCandidate } from '../../domains/body-exposure/engine/atlas-stage/pickPolicy.ts'
 import type { RegionFrame } from '../../domains/body-exposure/engine/atlas-stage/regionFraming.ts'
+import type { AtlasLayerId } from '../../domains/body-exposure/engine/atlas-stage/stageLayers.ts'
+import { bodyMotionFrame, type BodyMotionPlan } from '../../domains/body-exposure/engine/body-motion/bodyMotion.ts'
+import { applyMotionLight, tagMotionMeshes } from '../../domains/body-exposure/adapters/motionLight.ts'
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js'
 import { keburaman, geserBuka, KEDALAMAN, type KunciLapisan } from '../../lib/dissection'
 import {
@@ -290,6 +293,11 @@ interface Props {
    * actual screen shape (portrait or landscape) instead of the default three-quarter presentation pose.
    */
   homeFrame?: RegionFrame
+  /**
+   * Whole-body simulation shown as LIGHT on the curated heart, lung, kidney and great-vessel meshes (never as
+   * deformation). Absent/null, or reduced motion, leaves the atlas still and unlit.
+   */
+  bodyMotion?: BodyMotionPlan | null
 }
 
 function latarGradasi(atas: number, bawah: number): THREE.Texture {
@@ -380,6 +388,7 @@ export function Body3D({
   onPick,
   stageClassName,
   homeFrame,
+  bodyMotion = null,
 }: Props) {
   const containerRef = useRef<HTMLDivElement>(null)
   const homeFrameRef = useRef(homeFrame)
@@ -404,6 +413,8 @@ export function Body3D({
   const highlightedMeshesRef = useRef<Map<THREE.Mesh, { baseMaterial: THREE.Material; matchedName: string }>>(new Map())
   const onPickRef = useRef(onPick)
   onPickRef.current = onPick
+  const bodyMotionRef = useRef<BodyMotionPlan | null>(bodyMotion)
+  bodyMotionRef.current = bodyMotion
   const [loadingLayers, setLoadingLayers] = useState<Set<string>>(new Set())
   const [failedLayers, setFailedLayers] = useState<Set<string>>(new Set())
   const [retryNonce, setRetryNonce] = useState(0)
@@ -503,13 +514,27 @@ export function Body3D({
     // runtime. The scheduler coalesces bursty invalidations into one frame and
     // never owns a permanent RAF loop.
     let contextLifecycle!: ReturnType<typeof createBodyWebglContextLifecycle>
+    // Simulated light keeps frames coming only while a plan is active, the stage is visible and motion is not
+    // reduced; the scheduler's canRender gate still stops it off-screen or in a hidden tab.
+    const motionEpoch = performance.now()
+    let motionLit = false
+    const terapkanCahayaGerak = (): boolean => {
+      const plan = bodyMotionRef.current
+      const frame = plan && !gerakDikurangi() ? bodyMotionFrame(plan, (performance.now() - motionEpoch) / 1000) : null
+      if (!frame && !motionLit) return false
+      for (const g of Object.values(groupsRef.current)) if (g) applyMotionLight(g, frame)
+      motionLit = frame !== null
+      return motionLit
+    }
     const renderScheduler = createBodyRenderScheduler({
       canRender: () => inViewport && documentVisible && !contextLifecycle.isLost(),
       renderFrame: () => {
         majukanPenerbangan()
+        const bergerak = terapkanCahayaGerak()
         controls.update()
         renderer.render(scene, camera)
         if (penerbangan) renderScheduler.request()
+        else if (bergerak) renderScheduler.request()
       },
       requestFrame: (callback) => requestAnimationFrame(callback),
       cancelFrame: (frameId) => cancelAnimationFrame(frameId),
@@ -772,6 +797,7 @@ export function Body3D({
 
             const clone = group.clone(true)
             cloneLayerMaterials(clone)
+            tagMotionMeshes(def.key as AtlasLayerId, clone)
             const sourceNodeNames: string[] = []
             clone.traverse((obj) => {
               const name = obj.userData.originalName as string | undefined
@@ -983,6 +1009,10 @@ export function Body3D({
     }
     requestRenderRef.current()
   }, [unfold, dissect, layers, loadingLayers, renderMode])
+
+  // Rencana gerak berganti (skenario, jeda): satu bingkai cukup untuk memulai atau memadamkan cahaya; selama
+  // rencana aktif, renderFrame meminta bingkai berikutnya sendiri.
+  useEffect(() => { requestRenderRef.current() }, [bodyMotion])
 
   // Sorot struktur pilihan dengan material clone lokal. Saat sorotan dilepas,
   // material dasar dipasang kembali dan clone langsung didispose.

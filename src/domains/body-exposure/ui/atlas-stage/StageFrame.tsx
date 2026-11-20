@@ -27,6 +27,8 @@ interface StageSlots {
   tabs: ReactNode
   inspectorHeader: ReactNode
   inspectorBody: ReactNode
+  /** Whole-body simulation dial; absent = no simulation control on the stage. */
+  simulation?: ReactNode
 }
 
 export interface WideStageProps extends StageSlots {
@@ -37,7 +39,7 @@ export interface WideStageProps extends StageSlots {
   onTogglePanel: () => void
 }
 
-export function WideStage({ plate, depth, viewer, search, rail, regionChips, referenceChip, tabs, inspectorHeader, inspectorBody, title, caption, cameraButtons, panelOpen, onTogglePanel }: WideStageProps) {
+export function WideStage({ plate, depth, viewer, search, rail, regionChips, referenceChip, tabs, inspectorHeader, inspectorBody, simulation, title, caption, cameraButtons, panelOpen, onTogglePanel }: WideStageProps) {
   return (
     <section data-atlas-stage="v2" data-atlas-projection="wide" data-atlas-plate={plate} data-atlas-depth={depth} data-pmd-body-exposure="true" data-pmd-unclamped="true" data-pmd-liquid="off" aria-label="Body Exposure 3D atlas" style={{ color: TONE.text }}>
       <style>{STAGE_CSS}</style>
@@ -99,6 +101,7 @@ export function WideStage({ plate, depth, viewer, search, rail, regionChips, ref
             <div style={{ position: 'absolute', left: 14, top: 72, bottom: WIDE_STRIP + 8, display: 'flex', alignItems: 'center', pointerEvents: 'none' }}>
               <div style={{ pointerEvents: 'auto' }}>{rail}</div>
             </div>
+            {simulation && <div style={{ position: 'absolute', right: 14, top: 72, pointerEvents: 'auto', maxWidth: 'calc(100% - 220px)' }}>{simulation}</div>}
             <div style={{ position: 'absolute', left: 14, right: 14, bottom: 14, display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 12, pointerEvents: 'none' }}>
               <div style={{ ...glass, borderRadius: 12, padding: '6px 10px', pointerEvents: 'auto' }}>{referenceChip}</div>
               <div style={{ pointerEvents: 'auto', minWidth: 0 }}>{regionChips}</div>
@@ -128,7 +131,7 @@ export interface PhoneStageProps extends StageSlots {
   onSheet: (next: SheetSnap) => void
 }
 
-export function PhoneStage({ plate, depth, viewer, search, rail, regionChips, referenceChip, tabs, inspectorHeader, inspectorBody, resetButton, depthBadge, peekTitle, peekAction, sheet, onSheet }: PhoneStageProps) {
+export function PhoneStage({ plate, depth, viewer, search, rail, regionChips, referenceChip, tabs, inspectorHeader, inspectorBody, simulation, resetButton, depthBadge, peekTitle, peekAction, sheet, onSheet }: PhoneStageProps) {
   const stageRef = useRef<HTMLDivElement | null>(null)
   const [stageHeight, setStageHeight] = useState(640)
   const drag = useRef<{ startY: number; from: SheetSnap; moved: number } | null>(null)
@@ -177,6 +180,7 @@ export function PhoneStage({ plate, depth, viewer, search, rail, regionChips, re
             <div style={{ pointerEvents: 'auto' }}>{rail}</div>
           </div>
           <div style={{ position: 'absolute', right: 10, top: 64, pointerEvents: 'none' }}>{depthBadge}</div>
+          {simulation && <div style={{ position: 'absolute', left: 72, right: 10, bottom: 62, display: 'flex', justifyContent: 'flex-end', pointerEvents: 'none' }}><div style={{ pointerEvents: 'auto', maxWidth: '100%' }}>{simulation}</div></div>}
           <div style={{ position: 'absolute', left: 10, right: 10, bottom: 8, pointerEvents: 'auto' }}>{regionChips}</div>
         </div>
 
