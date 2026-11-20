@@ -5,6 +5,7 @@
 //   - week comparison: last 7 vs the 7 before, each half needs 4 recorded days (boundary 3/4);
 //   - the words carry their numbers and never judge health.
 import assert from 'node:assert/strict'
+import { readFileSync } from 'node:fs'
 import { GLANCE_METRICS, glanceMetric } from '../../src/domains/personal-health/engine/glance/glanceMetrics.ts'
 import {
   dateOfDay,
@@ -219,5 +220,14 @@ gagal('registri_empat_sinyal_beku_dan_masuk_akal', () => {
     assert.match(m.deepLink, /^\//)
   }
 })
+
+// One range rule for the whole app: the "usual" sentence from lib/riwayatVitals and this sheet must never state
+// different numbers for the same days, so riwayatVitals may not carry a percentile formula of its own.
+{
+  const riwayat = readFileSync(new URL('../../src/lib/riwayatVitals.ts', import.meta.url), 'utf8')
+  assert.match(riwayat, /import \{[^}]*\bpersonalRange\b[^}]*\} from '\.\.\/domains\/personal-health\/engine\/glance\/metricInsight\.ts'/,
+    'rentangPribadi no longer uses the shared personalRange')
+  assert.doesNotMatch(riwayat, /Math\.round\(\(\w+\.length - 1\) \* p\)/, 'riwayatVitals grew its own percentile formula again')
+}
 
 console.log('metric insight: empty days stay null; every refusal paired; usual range from 14 of 90 days and week comparison from 4+4 days at their boundaries; sentences carry numbers and never judge health')
