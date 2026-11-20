@@ -3,9 +3,11 @@
 // not a clinical range: it says nothing about health, and nothing inside it is called good or bad.
 
 export type GlanceMetricId = 'steps' | 'sleepH' | 'restingHr' | 'vo2max'
+/** Signals the Health Data analyzer reads beyond the four Home tiles; same contract, same honesty rules. */
+export type AnalyzerMetricId = GlanceMetricId | 'hrvMs' | 'spo2Pct' | 'respRate' | 'systolic' | 'weightKg'
 
 export interface GlanceMetric {
-  id: GlanceMetricId
+  id: AnalyzerMetricId
   label: string
   /** Shown after the number; empty when the count needs none. */
   unit: string
@@ -45,6 +47,39 @@ export const GLANCE_METRICS: readonly GlanceMetric[] = [
   },
 ]
 
+/**
+ * Every signal the analyzer can read: the Home four plus five more devices commonly send. The plausible spans are
+ * corrupt-import guards (a watch reporting HRV 0 or SpO2 140), not clinical limits, exactly as above.
+ */
+export const ANALYZER_METRICS: readonly GlanceMetric[] = [
+  ...GLANCE_METRICS,
+  {
+    id: 'hrvMs', label: 'HRV', unit: 'ms', digits: 0, mark: 'line',
+    hue: { light: '#7c4dff', dark: '#9a77ff' }, plausible: { min: 1, max: 300 },
+    deepLink: '/tubuh?t=jantung', about: 'Heart-rate variability your device estimated (usually overnight RMSSD or SDNN).',
+  },
+  {
+    id: 'spo2Pct', label: 'SpO₂', unit: '%', digits: 0, mark: 'line',
+    hue: { light: '#0b8f6f', dark: '#1aa784' }, plausible: { min: 50, max: 100 },
+    deepLink: '/tubuh?t=napas', about: 'Blood-oxygen saturation from a finger or wrist sensor — wrist readings vary more.',
+  },
+  {
+    id: 'respRate', label: 'Breathing', unit: '/min', digits: 0, mark: 'line',
+    hue: { light: '#1877c9', dark: '#3b93e0' }, plausible: { min: 3, max: 80 },
+    deepLink: '/tubuh?t=napas', about: 'Breaths per minute your device estimated, usually during sleep.',
+  },
+  {
+    id: 'systolic', label: 'Systolic', unit: 'mmHg', digits: 0, mark: 'line',
+    hue: { light: '#c2410c', dark: '#ea6a2a' }, plausible: { min: 50, max: 260 },
+    deepLink: '/tubuh?t=jantung', about: 'The upper blood-pressure number from a cuff you used.',
+  },
+  {
+    id: 'weightKg', label: 'Weight', unit: 'kg', digits: 1, mark: 'line',
+    hue: { light: '#8a6d1f', dark: '#c09a3a' }, plausible: { min: 20, max: 400 },
+    deepLink: '/health-data', about: 'Body weight from a scale or an entry you made.',
+  },
+]
+
 export function glanceMetric(id: string): GlanceMetric | null {
-  return GLANCE_METRICS.find((metric) => metric.id === id) ?? null
+  return ANALYZER_METRICS.find((metric) => metric.id === id) ?? null
 }

@@ -1,0 +1,3 @@
+/* Base for every shared chart mark: fills its box, never overflows the page, inherits text colour for currentColor
+   strokes. Surfaces size it further with their own class. */
+.pc-svg { width: 100%; height: 86px; display: block; overflow: visible; }

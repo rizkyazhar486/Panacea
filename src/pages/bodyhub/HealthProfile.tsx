@@ -30,6 +30,11 @@ import { diagnose, type SyncDiagnosis } from '../../lib/syncDiagnostics'
 import { generateInsights } from '../../lib/healthInsights'
 import { benchmarkVo2max, benchmarkRestingHr, benchmarkSleep, BENCHMARK_DISCLAIMER, type BenchmarkItem } from '../../lib/benchmark'
 import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
+import { localDayOf } from '../../domains/personal-health/engine/glance/weekGlance.ts'
+
+// The analyzer (charts, every signal against the person's own record) loads after the page, not with it.
+const HealthAnalyzer = lazy(() => import('../../domains/personal-health/ui/glance/HealthAnalyzer.tsx'))
+const readDailySeries = (id: string) => deretMetrik(id, 120).map((d) => ({ date: d.tanggal, value: d.nilai }))
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Health Profile — per-user health data saved on the SERVER (keyed by account,
@@ -441,6 +446,16 @@ export function HealthProfile() {
       </Card>
 
       <Card className="!p-5">
+        <SectionTitle icon={<IconActivity size={20} />} title="Analyzer" subtitle="Every signal against your own record" />
+        <div className="mt-3">
+          <Suspense fallback={<div className="h-40" aria-hidden />}>
+            <HealthAnalyzer readSeries={readDailySeries} today={localDayOf(new Date())} />
+          </Suspense>
+        </div>
+      </Card>
+
+      <div id="hd-bluetooth">
+      <Card className="!p-5">
         <SectionTitle icon={<IconHeart size={20} />} title="Bluetooth heart rate" subtitle="From your own strap or band" />
         <div className="mt-2">
           <Suspense fallback={null}>
@@ -449,7 +464,9 @@ export function HealthProfile() {
           </Suspense>
         </div>
       </Card>
+      </div>
 
+      <div id="hd-import">
       <Fold label="Import">
       {/* Import from / export to a file */}
       <Card className="!p-5">
@@ -488,6 +505,9 @@ export function HealthProfile() {
       </Card>
       </Fold>
 
+      </div>
+
+      <div id="hd-sync">
       <Fold label="Sync">
       {backendEnabled && <AutoSyncCard />}
       <SyncDiagnosticsCard />
@@ -509,6 +529,7 @@ export function HealthProfile() {
 
       {p.lastDeviceSyncAt && <DeviceSyncSummary profile={p} />}
       </Fold>
+      </div>
 
       <Fold label="Metrics">
       <Card className="!p-5">

@@ -194,6 +194,13 @@ gagal('grouped-menolak-grup-tak-seragam-dan-maksimum-nol', () => {
   assert.deepEqual(groupedBars([{ key: 'a', values: [-1] }], B), [])
 })
 
+gagal('heatmap-domain-tetap', () => {
+  assert.deepEqual(heatCells([[0, 0], [0, 0]], B, 2, [0, 1]).map((c) => c.t), [0, 0, 0, 0], 'semua kosong tetap 0, bukan tengah')
+  assert.deepEqual(heatCells([[1, 1]], B, 2, [0, 1]).map((c) => c.t), [1, 1])
+  assert.deepEqual(heatCells([[5]], B, 2, [0, 1]).map((c) => c.t), [1], 'dijepit ke domain')
+  assert.deepEqual(heatCells([[0]], B, 2, [1, 1]), [], 'domain tanpa rentang ditolak')
+})
+
 // ── kuantil, histogram, box plot ─────────────────────────────────────────────────────────────────────────────
 gagal('kuantil-tipe-7', () => {
   assert.equal(quantile([1, 2, 3, 4], 0.5), 2.5); assert.equal(quantile([1, 2, 3, 4], 0.25), 1.75)
