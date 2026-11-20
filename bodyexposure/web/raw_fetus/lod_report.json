@@ -1,0 +1,332 @@
+{
+ "lods": {
+  "LOD0": {
+   "target_ratio": 0.5,
+   "min_tris": 400
+  },
+  "LOD1": {
+   "target_ratio": 0.25,
+   "min_tris": 200
+  },
+  "LOD2": {
+   "target_ratio": 0.1,
+   "min_tris": 120
+  },
+  "LOD3": {
+   "target_ratio": 0.04,
+   "min_tris": 60
+  },
+  "LOD4": {
+   "system_budget_tris": {
+    "skeletal": 20000,
+    "cardiovascular": 38000,
+    "surface": 6000,
+    "digestive": 6000,
+    "respiratory": 3500,
+    "urinary": 2000,
+    "reproductive": 2000,
+    "muscular": 24000,
+    "nervous": 12000,
+    "joint": 8000,
+    "lymphatic": 3000,
+    "fascia": 3000,
+    "sensory": 3000,
+    "endocrine": 1500,
+    "visceral_unclassified": 1000
+   },
+   "body_overrides": {
+    "HUMAN.ADULT.MALE": {
+     "skeletal": 16000,
+     "surface": 5000,
+     "digestive": 5000,
+     "respiratory": 3000,
+     "urinary": 1800,
+     "reproductive": 1800
+    }
+   },
+   "min_tris": 8,
+   "initial_load_systems": [
+    "cardiovascular",
+    "digestive",
+    "reproductive",
+    "respiratory",
+    "skeletal",
+    "surface",
+    "urinary"
+   ],
+   "allocation": "per system: floor + remainder proportional to surface area"
+  }
+ },
+ "files": [
+  {
+   "body": "FETUS",
+   "system": "digestive",
+   "lod": "LOD2",
+   "file": "fetus.digestive.LOD2.glb",
+   "structures": 3,
+   "tris_master": 66564,
+   "tris_lod": 6654,
+   "bytes_raw": 127588,
+   "error_mm_largest_structures": [
+    [
+     "FETUS.DIGESTIVE.LIVER",
+     0.03,
+     0.157
+    ],
+    [
+     "FETUS.DIGESTIVE.STOMACH",
+     0.036,
+     0.169
+    ],
+    [
+     "FETUS.DIGESTIVE.GALLBLADDER",
+     0.051,
+     0.22
+    ]
+   ],
+   "bbox_escape_fixed": []
+  },
+  {
+   "body": "FETUS",
+   "system": "endocrine",
+   "lod": "LOD2",
+   "file": "fetus.endocrine.LOD2.glb",
+   "structures": 2,
+   "tris_master": 1780,
+   "tris_lod": 240,
+   "bytes_raw": 9340,
+   "error_mm_largest_structures": [
+    [
+     "FETUS.ENDOCRINE.ADRENAL_GLAND.R",
+     0.069,
+     0.344
+    ],
+    [
+     "FETUS.ENDOCRINE.ADRENAL_GLAND.L",
+     0.049,
+     0.169
+    ]
+   ],
+   "bbox_escape_fixed": []
+  },
+  {
+   "body": "FETUS",
+   "system": "lymphatic",
+   "lod": "LOD2",
+   "file": "fetus.lymphatic.LOD2.glb",
+   "structures": 2,
+   "tris_master": 11324,
+   "tris_lod": 1132,
+   "bytes_raw": 25308,
+   "error_mm_largest_structures": [
+    [
+     "FETUS.LYMPHATIC.THYMUS",
+     0.038,
+     0.184
+    ],
+    [
+     "FETUS.LYMPHATIC.SPLEEN",
+     0.043,
+     0.24
+    ]
+   ],
+   "bbox_escape_fixed": []
+  },
+  {
+   "body": "FETUS",
+   "system": "respiratory",
+   "lod": "LOD2",
+   "file": "fetus.respiratory.LOD2.glb",
+   "structures": 2,
+   "tris_master": 52668,
+   "tris_lod": 5266,
+   "bytes_raw": 99844,
+   "error_mm_largest_structures": [
+    [
+     "FETUS.RESPIRATORY.LUNG.R",
+     0.038,
+     0.175
+    ],
+    [
+     "FETUS.RESPIRATORY.LUNG.L",
+     0.041,
+     0.215
+    ]
+   ],
+   "bbox_escape_fixed": []
+  },
+  {
+   "body": "FETUS",
+   "system": "urinary",
+   "lod": "LOD2",
+   "file": "fetus.urinary.LOD2.glb",
+   "structures": 5,
+   "tris_master": 31512,
+   "tris_lod": 3146,
+   "bytes_raw": 68528,
+   "error_mm_largest_structures": [
+    [
+     "FETUS.URINARY.RENAL_PARENCHYMA.R",
+     0.041,
+     0.239
+    ],
+    [
+     "FETUS.URINARY.RENAL_PARENCHYMA.L",
+     0.036,
+     0.166
+    ],
+    [
+     "FETUS.URINARY.BLADDER",
+     0.033,
+     0.179
+    ],
+    [
+     "FETUS.URINARY.RENAL_PELVIS.R",
+     0.05,
+     0.225
+    ],
+    [
+     "FETUS.URINARY.RENAL_PELVIS.L",
+     0.053,
+     0.241
+    ]
+   ],
+   "bbox_escape_fixed": []
+  },
+  {
+   "body": "FETUS",
+   "system": "digestive",
+   "lod": "LOD3",
+   "file": "fetus.digestive.LOD3.glb",
+   "structures": 3,
+   "tris_master": 66564,
+   "tris_lod": 2662,
+   "bytes_raw": 55728,
+   "error_mm_largest_structures": [
+    [
+     "FETUS.DIGESTIVE.LIVER",
+     0.087,
+     0.531
+    ],
+    [
+     "FETUS.DIGESTIVE.STOMACH",
+     0.091,
+     0.465
+    ],
+    [
+     "FETUS.DIGESTIVE.GALLBLADDER",
+     0.137,
+     0.675
+    ]
+   ],
+   "bbox_escape_fixed": []
+  },
+  {
+   "body": "FETUS",
+   "system": "endocrine",
+   "lod": "LOD3",
+   "file": "fetus.endocrine.LOD3.glb",
+   "structures": 2,
+   "tris_master": 1780,
+   "tris_lod": 120,
+   "bytes_raw": 7184,
+   "error_mm_largest_structures": [
+    [
+     "FETUS.ENDOCRINE.ADRENAL_GLAND.R",
+     0.145,
+     0.519
+    ],
+    [
+     "FETUS.ENDOCRINE.ADRENAL_GLAND.L",
+     0.086,
+     0.391
+    ]
+   ],
+   "bbox_escape_fixed": []
+  },
+  {
+   "body": "FETUS",
+   "system": "lymphatic",
+   "lod": "LOD3",
+   "file": "fetus.lymphatic.LOD3.glb",
+   "structures": 2,
+   "tris_master": 11324,
+   "tris_lod": 452,
+   "bytes_raw": 13064,
+   "error_mm_largest_structures": [
+    [
+     "FETUS.LYMPHATIC.THYMUS",
+     0.101,
+     0.559
+    ],
+    [
+     "FETUS.LYMPHATIC.SPLEEN",
+     0.109,
+     0.457
+    ]
+   ],
+   "bbox_escape_fixed": []
+  },
+  {
+   "body": "FETUS",
+   "system": "respiratory",
+   "lod": "LOD3",
+   "file": "fetus.respiratory.LOD3.glb",
+   "structures": 2,
+   "tris_master": 52668,
+   "tris_lod": 2104,
+   "bytes_raw": 42920,
+   "error_mm_largest_structures": [
+    [
+     "FETUS.RESPIRATORY.LUNG.R",
+     0.097,
+     0.453
+    ],
+    [
+     "FETUS.RESPIRATORY.LUNG.L",
+     0.106,
+     0.595
+    ]
+   ],
+   "bbox_escape_fixed": []
+  },
+  {
+   "body": "FETUS",
+   "system": "urinary",
+   "lod": "LOD3",
+   "file": "fetus.urinary.LOD3.glb",
+   "structures": 5,
+   "tris_master": 31512,
+   "tris_lod": 1256,
+   "bytes_raw": 34504,
+   "error_mm_largest_structures": [
+    [
+     "FETUS.URINARY.RENAL_PARENCHYMA.R",
+     0.104,
+     0.47
+    ],
+    [
+     "FETUS.URINARY.RENAL_PARENCHYMA.L",
+     0.099,
+     0.447
+    ],
+    [
+     "FETUS.URINARY.BLADDER",
+     0.083,
+     0.399
+    ],
+    [
+     "FETUS.URINARY.RENAL_PELVIS.R",
+     0.145,
+     0.564
+    ],
+    [
+     "FETUS.URINARY.RENAL_PELVIS.L",
+     0.139,
+     0.69
+    ]
+   ],
+   "bbox_escape_fixed": []
+  }
+ ]
+}
