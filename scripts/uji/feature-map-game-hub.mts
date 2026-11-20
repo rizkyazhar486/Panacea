@@ -1,12 +1,16 @@
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import {
+  ALL_FEATURE_WIDGETS,
   FEATURE_MAP,
   FEATURE_MAP_BLOCKED_ROUTES,
   FEATURE_MAP_LIMIT,
+  allFeatureWidgetsForCategory,
   auditFeatureMap,
   featureMapNodes,
   featureMapWorlds,
+  featureOrbitPage,
+  featureOrbitPageCount,
   minimumOrbitGapPx,
   orbitLayout,
   routesFromRouterSource,
@@ -62,8 +66,9 @@ export function auditFeatureMapUiSources({
   return problems
 }
 
-// ── 1. POSITIVE: canonical map & real router inventory pass completely.
+// ── 1. POSITIVE: canonical map, full-catalog visual widgets & real router inventory pass completely.
 const realRoutes = routesFromRouterSource(mainSource)
+const realRouteSet = new Set(realRoutes)
 assert.ok(realRoutes.length >= 200, `router inventory unexpectedly small (${realRoutes.length})`)
 assert.deepEqual(auditFeatureMap(FEATURE_MAP, { routes: realRoutes }), [])
 
@@ -73,6 +78,22 @@ assert.equal(Object.keys(FEATURE_MAP).length, SUPER_PAGES.length, 'every canonic
 for (const page of SUPER_PAGES) {
   const nodes = featureMapNodes(page.id)
   assert.ok(nodes.length >= 1 && nodes.length <= FEATURE_MAP_LIMIT, `${page.id} has ${nodes.length} nodes`)
+  const allWidgets = allFeatureWidgetsForCategory(page.id)
+  assert.ok(allWidgets.length >= nodes.length, `${page.id} widget catalog smaller than orbit nodes`)
+  const pages = featureOrbitPageCount(page.id)
+  for (let p = 0; p < pages; p += 1) {
+    const slice = featureOrbitPage(page.id, p)
+    assert.ok(slice.length >= 1 && slice.length <= FEATURE_MAP_LIMIT, `${page.id} page ${p} exceeds ${FEATURE_MAP_LIMIT}`)
+  }
+}
+
+assert.ok(ALL_FEATURE_WIDGETS.length >= 150, `expected >= 150 visual feature widgets, got ${ALL_FEATURE_WIDGETS.length}`)
+for (const widget of ALL_FEATURE_WIDGETS) {
+  const path = widget.to.split('?')[0]
+  assert.ok(realRouteSet.has(path), `widget route ${path} missing from main.tsx`)
+  assert.ok(!FEATURE_MAP_BLOCKED_ROUTES.has(path), `blocked route ${path} leaked into widget catalog`)
+  assert.equal(widget.chartValues.length, 6, `widget ${widget.id} must carry 6 chart points`)
+  assert.ok(!FORBIDDEN_UI_COPY.test(widget.label) && !FORBIDDEN_UI_COPY.test(widget.cue), `widget ${widget.id} has forbidden copy`)
 }
 
 assert.deepEqual(
@@ -118,12 +139,10 @@ const cloneMap = (): Record<SuperPageId, FeatureMapNode[]> =>
 
 // ── 3. NEGATIVE (PAIRED): every rule must reject its exact violation by name.
 {
-  // >6 choices on one screen
   const sevenNodes = cloneMap()
   sevenNodes.human.push({ id: 'extra', label: 'Extra', cue: 'Too many', to: '/gene-info' })
   assert.ok(auditFeatureMap(sevenNodes, { routes: realRoutes }).some((p) => p.includes('7 choices > 6')))
 
-  // Red-light / privileged route surfaced
   for (const blocked of ['/visit-os', '/poli', '/owner', '/doctor-review']) {
     assert.ok(FEATURE_MAP_BLOCKED_ROUTES.has(blocked))
     const withBlocked = cloneMap()
@@ -134,22 +153,18 @@ const cloneMap = (): Record<SuperPageId, FeatureMapNode[]> =>
     )
   }
 
-  // Non-existent / invented top-level route
   const invented = cloneMap()
   invented.records[0] = { id: 'ghost', label: 'Ghost', cue: 'Missing route', to: '/new-top-page' }
   assert.ok(auditFeatureMap(invented, { routes: realRoutes }).some((p) => p.includes('does not exist in the router')))
 
-  // Wrong canonical category
   const wrongCat = cloneMap()
   wrongCat.human[0] = { id: 'misplaced', label: 'Record', cue: 'Wrong group', to: '/emr' }
   assert.ok(auditFeatureMap(wrongCat, { routes: realRoutes }).some((p) => p.includes('resolves to records')))
 
-  // Duplicate route across categories
   const duplicate = cloneMap()
   duplicate.records.push({ id: 'dup', label: 'Body', cue: 'Dup route', to: '/body-explorer' })
   assert.ok(auditFeatureMap(duplicate, { routes: realRoutes }).some((p) => p.includes('already mapped')))
 
-  // Forbidden wording
   for (const word of ['Mode lokal', 'HIPAA ready', 'Certified medical']) {
     const badCopy = cloneMap()
     badCopy.records[0] = { id: 'health-data', label: 'Data', cue: word, to: '/health-data' }
@@ -159,7 +174,6 @@ const cloneMap = (): Record<SuperPageId, FeatureMapNode[]> =>
     )
   }
 
-  // Unknown category & fail-closed empty router
   const unknownCat = { ...cloneMap(), magic: [{ id: 'x', label: 'X', cue: 'Y', to: '/emr' }] }
   assert.ok(auditFeatureMap(unknownCat, { routes: realRoutes }).some((p) => p.includes('not a canonical category')))
   assert.ok(auditFeatureMap(FEATURE_MAP, { routes: [] }).includes('router inventory is empty'))
@@ -187,7 +201,7 @@ const cloneMap = (): Record<SuperPageId, FeatureMapNode[]> =>
     'sabotage stripping dark marker was not caught',
   )
 
-  const withLokal = orbitSource.replace('Pick a world', 'Mode lokal')
+  const withLokal = orbitSource.replace('Panacea worlds', 'Mode lokal')
   assert.notEqual(withLokal, orbitSource)
   assert.ok(
     auditFeatureMapUiSources({ launcher: launcherSource, orbit: withLokal, css: orbitCss }).some((p) => p.includes('forbidden')),
@@ -195,4 +209,4 @@ const cloneMap = (): Record<SuperPageId, FeatureMapNode[]> =>
   )
 }
 
-console.log(`feature-map-game-hub: 7 canonical worlds (6 orbit + hub), ${realRoutes.length} real routes verified, mobile gap ${mobileGap.toFixed(1)}px, positive+negative+boundary+sabotage PASS`)
+console.log(`feature-map-game-hub: 7 canonical worlds, ${ALL_FEATURE_WIDGETS.length} visual widgets, ${realRoutes.length} real routes verified, mobile gap ${mobileGap.toFixed(1)}px, positive+negative+boundary+sabotage PASS`)
