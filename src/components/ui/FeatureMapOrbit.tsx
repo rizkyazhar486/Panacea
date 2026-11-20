@@ -16,11 +16,29 @@ export type FeatureMapOrbitProps = {
   hub?: SuperPageId
 }
 
+const SPARK_PATHS: readonly string[] = [
+  'M4 16 L9 12 L14 14 L19 7 L24 10 L28 5',
+  'M4 15 Q10 6 16 12 T28 7',
+  'M4 14 L8 14 L11 6 L15 18 L18 11 L28 11',
+  'M4 17 L10 13 L16 9 L22 11 L28 4',
+  'M4 12 C9 5, 19 19, 28 8',
+  'M4 16 L12 8 L18 13 L28 5',
+]
+
+function FeatureEmblem({ index }: { index: number }) {
+  const path = SPARK_PATHS[index % SPARK_PATHS.length]
+  return (
+    <svg viewBox="0 0 32 22" width="26" height="18" aria-hidden="true" focusable="false">
+      <path d={path} fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx="28" cy="6" r="2.2" fill="#fde68a" />
+    </svg>
+  )
+}
+
 /**
- * Interactive game-style world map: six worlds orbit the person hub, one tap
- * zooms into a world (<=6 choices per screen), a second tap opens any feature.
- * Pure DOM + SVG (no WebGL required) with CSS-only motion and reduced-motion
- * fallback.
+ * Visual-first game world map: six worlds orbit the central pulse hub, one tap
+ * zooms into a world (<=6 choices per screen), a second tap opens the feature.
+ * Bottom icon dock switches worlds in 1 tap with zero text clutter.
  */
 export function FeatureMapOrbit({ icons, hub = FEATURE_MAP_HOME_HUB }: FeatureMapOrbitProps) {
   const [world, setWorld] = useState<SuperPageId | null>(null)
@@ -58,17 +76,6 @@ export function FeatureMapOrbit({ icons, hub = FEATURE_MAP_HOME_HUB }: FeatureMa
     setWorld(null)
   }
 
-  const preview = (() => {
-    if (activeWorld) {
-      const hovered = focusedIndex !== null ? features[focusedIndex] : null
-      if (hovered) return { tag: hovered.label, detail: hovered.cue }
-      return { tag: activeWorld.label, detail: activeWorld.cue }
-    }
-    const hovered = focusedIndex !== null ? worlds[focusedIndex] : null
-    if (hovered) return { tag: hovered.label, detail: hovered.cue }
-    return { tag: 'World Map', detail: 'Pick a world · 2 taps to any feature' }
-  })()
-
   return (
     <div
       ref={stageRef}
@@ -86,8 +93,15 @@ export function FeatureMapOrbit({ icons, hub = FEATURE_MAP_HOME_HUB }: FeatureMa
         <svg className="pmd-feature-map__rings" viewBox="0 0 100 100" aria-hidden="true" focusable="false">
           <circle cx="50" cy="50" r="46" />
           <circle cx="50" cy="50" r="37" />
+          <circle cx="50" cy="50" r="24" strokeDasharray="0.8 2.2" />
           <circle cx="50" cy="50" r="18" />
           <path className="pmd-feature-map__tick" d="M50 2v3 M50 95v3 M2 50h3 M95 50h3" />
+          <polygon
+            points="50,23 73,37 70,63 50,75 28,62 30,36"
+            fill="rgba(34, 211, 238, 0.08)"
+            stroke="rgba(103, 232, 249, 0.35)"
+            strokeWidth="0.4"
+          />
           {points.map((point, index) => (
             <line
               key={index}
@@ -111,7 +125,7 @@ export function FeatureMapOrbit({ icons, hub = FEATURE_MAP_HOME_HUB }: FeatureMa
                 onClick={close}
                 aria-label="Back to all worlds"
               >
-                ← Map
+                ←
               </button>
             </>
           ) : (
@@ -125,7 +139,16 @@ export function FeatureMapOrbit({ icons, hub = FEATURE_MAP_HOME_HUB }: FeatureMa
               onFocus={() => setFocusedIndex(null)}
               aria-label={`${hubPage.label}: ${hubPage.cue}`}
             >
-              <span className="pmd-feature-map__core-kicker">You</span>
+              <svg viewBox="0 0 44 20" width="40" height="18" aria-hidden="true">
+                <path
+                  d="M2 11 L11 11 L15 4 L20 17 L25 8 L29 11 L42 11"
+                  fill="none"
+                  stroke="#67e8f9"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
               <strong className="pmd-feature-map__core-title">{hubPage.shortLabel}</strong>
             </button>
           )}
@@ -147,7 +170,9 @@ export function FeatureMapOrbit({ icons, hub = FEATURE_MAP_HOME_HUB }: FeatureMa
                 onFocus={() => setFocusedIndex(index)}
                 onBlur={() => setFocusedIndex(null)}
               >
-                <span className="pmd-feature-map__blip" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
+                <span className="pmd-feature-map__blip" aria-hidden="true">
+                  <FeatureEmblem index={index} />
+                </span>
                 <span className="pmd-feature-map__label">{feature.label}</span>
               </Link>
             ))}
@@ -181,9 +206,35 @@ export function FeatureMapOrbit({ icons, hub = FEATURE_MAP_HOME_HUB }: FeatureMa
         )}
       </div>
 
-      <div className="pmd-feature-map__hud" aria-live="polite">
-        <span className="pmd-feature-map__hud-tag">{preview.tag}</span>
-        <span className="pmd-feature-map__hud-detail">{preview.detail}</span>
+      {/* 1-Tap Visual Icon Dock — switch any world directly by logo without text menus */}
+      <div className="pmd-feature-map__hud" role="toolbar" aria-label="Quick world switcher">
+        {SUPER_PAGES.map((page) => {
+          const Icon = icons[page.id]
+          const isCurrent = activeWorld?.id === page.id
+          return (
+            <button
+              key={page.id}
+              type="button"
+              onClick={() => openWorld(page.id)}
+              aria-pressed={isCurrent}
+              aria-label={`Switch to ${page.label}`}
+              data-dock-world={page.id}
+              style={{
+                minWidth: 44,
+                minHeight: 44,
+                borderRadius: 12,
+                border: isCurrent ? '1px solid #fde68a' : '1px solid rgba(103, 232, 249, 0.22)',
+                background: isCurrent ? 'rgba(253, 230, 138, 0.16)' : 'rgba(5, 12, 22, 0.85)',
+                color: isCurrent ? '#fef3c7' : '#a5f3fc',
+                display: 'grid',
+                placeItems: 'center',
+                cursor: 'pointer',
+              }}
+            >
+              <Icon size={18} />
+            </button>
+          )
+        })}
       </div>
     </div>
   )
