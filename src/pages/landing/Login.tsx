@@ -11,6 +11,7 @@ import type { Account, Role } from '../../lib/types'
 import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 import { listRememberedAccounts } from '../../domains/identity/bootVitals'
 import { DEVICE_GUEST_STORAGE_KEY, deviceGuestProfile } from '../../domains/identity/deviceGuest'
+import { readCachedGoogleClientId, rememberGoogleClientId, resolveGoogleClientId } from '../../domains/identity/googleClientId'
 import { STR_ROLES, ROLES, LOGIN_PILLS } from './loginData'
 import './login.css'
 import { Prosa } from '../../components/Prosa'
@@ -69,6 +70,10 @@ export function Login({ onBack }: { onBack?: () => void }) {
   const [accessModal, setAccessModal] = useState<'authenticator' | 'qr' | null>(null)
   const [theme, setTheme] = useState<Theme>(getTheme)
   const [health, setHealth] = useState<Health | null>(null)
+  // The button no longer waits for the backend: built-in ID or the last confirmed one render it at once.
+  const [cachedGoogleId] = useState(() => readCachedGoogleClientId(typeof window === 'undefined' ? null : window.localStorage))
+  const googleClient = resolveGoogleClientId({ server: health?.googleClientId, build: import.meta.env.VITE_GOOGLE_CLIENT_ID, cache: cachedGoogleId })
+  const googleClientId = googleClient?.id ?? null
   const [googleStatus, setGoogleStatus] = useState<'idle' | 'connecting' | 'ready' | 'unavailable'>(
     backendEnabled ? 'connecting' : 'idle',
   )
@@ -161,6 +166,7 @@ export function Login({ onBack }: { onBack?: () => void }) {
           const h = await api.health()
           if (batal) return
           setHealth(h)
+          if (h?.features?.google) rememberGoogleClientId(window.localStorage, h?.googleClientId)
           setGoogleStatus(h?.features?.google && h?.googleClientId ? 'ready' : 'unavailable')
           return
         } catch {
@@ -174,10 +180,10 @@ export function Login({ onBack }: { onBack?: () => void }) {
   }, [healthRetrySeed])
 
   useEffect(() => {
-    if (!health?.googleClientId || !gbtn.current) return
+    if (!googleClientId || !gbtn.current) return
     renderGoogleButton(
       gbtn.current,
-      health.googleClientId,
+      googleClientId,
       cred => {
         if (!consentRef.current) {
           setError('Harap setujui Syarat Layanan & Kebijakan Privasi terlebih dahulu.')
@@ -192,11 +198,13 @@ export function Login({ onBack }: { onBack?: () => void }) {
             consentAt: new Date().toISOString(),
             strStatus: STR_ROLES.includes(a.role) ? 'pending' : 'none',
           }))
-          .catch(() => setError('Verifikasi Google OAuth gagal atau origin belum terdaftar. Masuk dengan email di bawah.'))
+          .catch(() => setError(health
+            ? 'Verifikasi Google OAuth gagal atau origin belum terdaftar. Masuk dengan email di bawah.'
+            : 'Server sedang bangun. Coba tombol Google lagi dalam beberapa detik.'))
       },
       { theme: theme === 'dark' ? 'filled_black' : 'outline' },
     ).catch(() => setError('Tombol Google Sign-In tidak dapat dimuat (periksa origin/koneksi). Masuk dengan email di bawah.'))
-  }, [health, login, theme])
+  }, [googleClientId, health, login, theme])
 
   function consentOk() {
     if (!consent) {
@@ -468,7 +476,7 @@ export function Login({ onBack }: { onBack?: () => void }) {
               </div>
             )}
 
-            {health?.googleClientId ? (
+            {googleClientId ? (
               <div className="space-y-1.5" data-testid="google-signin-slot">
                 <div ref={gbtn} className="flex min-h-[44px] w-full justify-center" />
                 {!consent && (
