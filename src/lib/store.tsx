@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactNode } from 'react'
+import { createContext, useCallback, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactNode } from 'react'
 import { parseWithdrawAmount, checkTokenAmount } from '../domains/wallet/index.ts'
 import { bindPersonalHealthAccount } from '../shared/kernel/personalHealthStorageScope.ts'
 import { resolveAutoResumeAccount, resolveLegacySessionAccount, rememberAccountProfile } from '../domains/identity/bootVitals.ts'
@@ -6,7 +6,7 @@ import { normalisasiDaftarPasien } from './normalisasiPasien'
 import { hariIni } from './tanggal'
 import { api, backendEnabled, type BackendPost } from './api'
 import { kirimAtauAntre, kurasAntrean, PERISTIWA_SINKRON, type JenisOperasi, type OperasiKlinis, type TerimaBalasan } from './antreanKlinis'
-import { buildPersistedSnapshot } from './state/storePersistScope'
+import { buildPersistedSnapshot, persistFingerprint } from './state/storePersistScope'
 import { createListenerSet } from './state/storeSnapshotScope'
 import type {
   AppState,
@@ -533,6 +533,9 @@ export function StoreProvider({ children, visibilityDocument }: { children: Reac
     const acc = state.account
     if (!acc) return
     rememberAccountProfile(acc)
+    // Pemulihan otomatis saat boot hanya untuk akun pemilik. Akun lain tidak disalin otomatis dari cache
+    // perangkat (data kesehatan lintas akun di perangkat bersama); mereka memulihkan lewat impor eksplisit.
+    if (!acc.isOwner) return
     const patient = state.patients.find((p) => p.id === state.activePatientId) ?? null
     const patientVitals = patient ? state.vitals[patient.id] : undefined
     const sleepLogs = state.sleepLogs
@@ -573,34 +576,56 @@ export function StoreProvider({ children, visibilityDocument }: { children: Reac
   // only on quota-exceeded retry: it's server-backed when a backend is configured
   // (re-pulled by the posts poll below) and was never safe to treat as the local
   // source of truth for that data — see AUDIT_STATUS_REVAMP_UI.md.
-  useEffect(() => {
-    const flush = () => {
-      const { account: _account, ...rest } = stateRef.current
-      const persist = buildPersistedSnapshot(rest)
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(persist))
-      } catch {
-        /* quota exceeded even without media — give up persisting this update */
-      }
+  // Dua efek terpisah: (1) tiap perubahan state hanya menandai "kotor" dan menjadwalkan satu penulisan
+  // 400 ms; (2) pendengar pagehide/beforeunload/visibilitychange dipasang SEKALI, bukan dipasang-lepas
+  // pada setiap perubahan state. Penulisan dilewati bila tab ini tidak mengubah apa pun (tidak menimpa data
+  // lebih baru dari tab lain) atau isinya sama persis dengan penulisan terakhir.
+  const dirtyRef = useRef(false)
+  const lastWrittenRef = useRef<string | null>(null)
+  const flushPersist = useCallback(() => {
+    if (!dirtyRef.current) return
+    const { account: _account, ...rest } = stateRef.current
+    let json: string
+    try {
+      json = JSON.stringify(buildPersistedSnapshot(rest))
+    } catch {
+      return
     }
-    const t = setTimeout(flush, 400)
+    const fingerprint = persistFingerprint(json)
+    if (fingerprint === lastWrittenRef.current) {
+      dirtyRef.current = false
+      return
+    }
+    try {
+      localStorage.setItem(STORAGE_KEY, json)
+      lastWrittenRef.current = fingerprint
+      dirtyRef.current = false
+    } catch {
+      /* quota exceeded even without media — give up persisting this update */
+    }
+  }, [])
+  useEffect(() => {
+    dirtyRef.current = true
+    const t = setTimeout(flushPersist, 400)
+    return () => clearTimeout(t)
+  }, [state, flushPersist])
+  useEffect(() => {
     const onHidden = () => {
-      if (!visibilityDocument || visibilityDocument.visibilityState === 'hidden') flush()
+      if (!visibilityDocument || visibilityDocument.visibilityState === 'hidden') flushPersist()
     }
     if (typeof window !== 'undefined') {
-      window.addEventListener('pagehide', flush)
-      window.addEventListener('beforeunload', flush)
+      window.addEventListener('pagehide', flushPersist)
+      window.addEventListener('beforeunload', flushPersist)
     }
     visibilityDocument?.addEventListener('visibilitychange', onHidden)
     return () => {
-      clearTimeout(t)
       if (typeof window !== 'undefined') {
-        window.removeEventListener('pagehide', flush)
-        window.removeEventListener('beforeunload', flush)
+        window.removeEventListener('pagehide', flushPersist)
+        window.removeEventListener('beforeunload', flushPersist)
       }
       visibilityDocument?.removeEventListener('visibilitychange', onHidden)
     }
-  }, [state, visibilityDocument])
+  }, [visibilityDocument, flushPersist])
 
   // Auto-login DISABLED by request: the app always starts at the landing/login,
   // even if a backend session cookie exists. Users sign in explicitly each visit.

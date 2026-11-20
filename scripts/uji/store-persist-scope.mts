@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { buildPersistedSnapshot, stripHeavyPostMedia } from '../../src/lib/state/storePersistScope.ts'
+import { buildPersistedSnapshot, persistFingerprint, stripHeavyPostMedia } from '../../src/lib/state/storePersistScope.ts'
 import type { SocialPost } from '../../src/lib/types.ts'
 
 const base: Partial<SocialPost> = {
@@ -26,5 +26,13 @@ assert.deepEqual(strippedNoMedia, noMedia, 'post tanpa media tidak boleh ikut di
 const snapshot = buildPersistedSnapshot({ posts: [withMedia], settings: { lang: 'en' } })
 assert.equal(snapshot.settings.lang, 'en')
 assert.equal(snapshot.posts[0].photos, undefined)
+
+// Sidik penulisan: isi sama → sidik sama (penulisan dilewati); satu karakter atau satu panjang berbeda → sidik berbeda.
+const a = JSON.stringify({ steps: 1000, hr: 64 })
+assert.equal(persistFingerprint(a), persistFingerprint(a), 'teks identik harus bersidik identik (deterministik)')
+assert.notEqual(persistFingerprint(a), persistFingerprint(JSON.stringify({ steps: 1001, hr: 64 })), 'satu digit berbeda harus bersidik beda')
+assert.notEqual(persistFingerprint(a), persistFingerprint(a + ' '), 'panjang berbeda harus bersidik beda')
+assert.notEqual(persistFingerprint(''), persistFingerprint('0'), 'kosong berbeda dari satu karakter')
+assert.match(persistFingerprint(''), /^0:/, 'teks kosong: panjang 0')
 
 console.log('store-persist-scope: heavy post media (photos/videoUrl) dibuang sebelum localStorage.setItem, field lain utuh.')
