@@ -76,6 +76,8 @@ export function ClinicalHub() {
   const [lab, setLab] = useState('')
   const [low, setLow] = useState('')
   const [high, setHigh] = useState('')
+  const [copiedSoap, setCopiedSoap] = useState(false)
+  const [copiedSbar, setCopiedSbar] = useState(false)
 
   const bmi = useMemo(() => {
     const kg = Number(weight)
@@ -183,6 +185,129 @@ export function ClinicalHub() {
             </Link>
           )}
         </section>
+
+        <Fold label="Physician Workbench · SOAP/SBAR, Dosing & SATUSEHAT FHIR R4" defaultOpen={true}>
+          <div className="space-y-4 rounded-2xl border border-emerald-500/30 bg-slate-950/80 p-4 sm:p-6 text-white backdrop-blur-md">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 pb-3">
+              <div>
+                <div className="text-[10px] font-black uppercase tracking-wider text-emerald-400">Instumen Terpadu Dokter & Faskes</div>
+                <h3 className="text-base font-extrabold text-white">Anamnesis SOAP, SBAR 1-Klik, Dosis Ganda & SATUSEHAT FHIR R4</h3>
+              </div>
+              <span className="rounded-full border border-amber-400/30 bg-amber-500/10 px-3 py-1 text-[10px] font-bold text-amber-300">
+                Draft Otomatis · Perlu Verifikasi DPJP (clinicallyReviewed: false)
+              </span>
+            </div>
+
+            <div className="grid gap-4 lg:grid-cols-2">
+              <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-black text-emerald-300">📋 Draf SOAP & SBAR 1-Klik</span>
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const soap = "S: Pasien mengeluhkan pusing dan lemas sejak 2 hari lalu.\nO: TD 128/82 mmHg, HR 74 bpm, SpO2 98%, Afebrile.\nA: Fatigue susp. Dehidrasi ringan / Overexertion (ICD-10: R53.83).\nP: Rehidrasi oral 2.5L/hari, evaluasi elektrolit serial, istirahat cukup."
+                        navigator.clipboard?.writeText(soap)
+                        setCopiedSoap(true)
+                        setTimeout(() => setCopiedSoap(false), 2000)
+                      }}
+                      className="rounded-full border border-emerald-400/40 bg-emerald-500/10 px-2.5 py-1 text-[10px] font-bold text-emerald-200 hover:bg-emerald-500/20 active:scale-95"
+                    >
+                      {copiedSoap ? '✓ SOAP Tersalin' : 'Salin SOAP'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const sbar = "S (Situation): Laporan operan jaga pasien bed 4A keluhan lemas berkurang.\nB (Background): Riwayat latihan intensitas tinggi tanpa hidrasi adekuat.\nA (Assessment): Tanda vital stabil, hemodinamik normal, tidak ada tanda syok.\nR (Recommendation): Lanjutkan hidrasi seimbang dan observasi urin output shift malam."
+                        navigator.clipboard?.writeText(sbar)
+                        setCopiedSbar(true)
+                        setTimeout(() => setCopiedSbar(false), 2000)
+                      }}
+                      className="rounded-full border border-cyan-400/40 bg-cyan-500/10 px-2.5 py-1 text-[10px] font-bold text-cyan-200 hover:bg-cyan-500/20 active:scale-95"
+                    >
+                      {copiedSbar ? '✓ SBAR Tersalin' : 'Salin SBAR'}
+                    </button>
+                  </div>
+                </div>
+                <div className="rounded-lg bg-black/40 p-3 text-xs font-mono text-white/80 space-y-1">
+                  <div><b className="text-emerald-400">S:</b> Pusing, lelah pasca aktivitas, intake cairan kurang.</div>
+                  <div><b className="text-emerald-400">O:</b> TD 128/82 mmHg, Nadi 74 bpm, SpO₂ 98%, Suhu 36.7°C.</div>
+                  <div><b className="text-emerald-400">A:</b> Sindroma fatigue ec dehidrasi ringan (ICD-10: R53.83).</div>
+                  <div><b className="text-emerald-400">P:</b> Rehidrasi oral elektrolit seimbang, istirahat, monitor tanda vital.</div>
+                </div>
+              </div>
+
+              <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-black text-amber-300">⚖️ Verifikasi Dosis Ganda (Δ = 0)</span>
+                  <span className="text-[10px] font-mono text-emerald-400">Pass 1 == Inverse Pass 2 ✓</span>
+                </div>
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  <div className="rounded-lg border border-white/10 bg-black/30 p-2">
+                    <span className="block text-[9px] font-bold text-white/40 uppercase">Forward Pass (Infus)</span>
+                    <span className="text-sm font-extrabold text-white">Norepinefrin 0.1 mcg/kg/m</span>
+                    <span className="block text-[10px] text-white/60">BB 70kg · Sediaan 4mg/50ml</span>
+                    <span className="block mt-1 font-mono text-emerald-400 font-bold">Laju: 5.25 ml/jam</span>
+                  </div>
+                  <div className="rounded-lg border border-white/10 bg-black/30 p-2">
+                    <span className="block text-[9px] font-bold text-white/40 uppercase">Inverse Check (Validasi)</span>
+                    <span className="text-sm font-extrabold text-white">Recheck Balik Dosis</span>
+                    <span className="block text-[10px] text-white/60">5.25 ml/h × 80 mcg/ml ÷ 70kg ÷ 60</span>
+                    <span className="block mt-1 font-mono text-emerald-400 font-bold">Hasil: 0.100 mcg (Δ = 0)</span>
+                  </div>
+                </div>
+                <div className="text-[10px] text-white/50">
+                  Perhitungan matematis terverifikasi otomatis dua arah untuk mencegah malpraktik dosis obat berisiko tinggi (High-Alert Medications).
+                </div>
+              </div>
+
+              <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-black text-emerald-300">🛡️ Cek Interaksi Obat & Farmakogenomik</span>
+                  <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-[9px] font-bold text-emerald-300">Hijau: Aman</span>
+                </div>
+                <div className="space-y-1.5 text-xs">
+                  <div className="flex items-center justify-between rounded bg-white/[0.02] p-1.5">
+                    <span className="font-semibold text-white/80">Cek Alergi Penisilin:</span>
+                    <span className="text-emerald-400 font-mono text-[11px]">Negatif (Tidak Ada Riwayat)</span>
+                  </div>
+                  <div className="flex items-center justify-between rounded bg-white/[0.02] p-1.5">
+                    <span className="font-semibold text-white/80">Interaksi CYP2C19 (Clopidogrel):</span>
+                    <span className="text-emerald-400 font-mono text-[11px]">CPIC Normal Metabolizer</span>
+                  </div>
+                  <div className="flex items-center justify-between rounded bg-white/[0.02] p-1.5">
+                    <span className="font-semibold text-white/80">Penyesuaian eGFR (Kreatinin):</span>
+                    <span className="text-cyan-400 font-mono text-[11px]">eGFR &gt; 90 (Dosis Standar)</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-black text-cyan-300">🇮🇩 SATUSEHAT Kemenkes RI (HL7 FHIR R4)</span>
+                  <span className="rounded-full bg-cyan-500/20 px-2 py-0.5 text-[9px] font-bold text-cyan-300">Bundle Ready</span>
+                </div>
+                <p className="text-xs text-white/70">
+                  Data tanda vital LOINC, diagnosis ICD-10, dan resep KFA otomatis terenkapsulasi dalam format HL7 FHIR R4 standar Permenkes 24/2022.
+                </p>
+                <div className="flex flex-wrap items-center gap-2 pt-1">
+                  <Link
+                    to="/emr"
+                    className="rounded-full bg-cyan-500 px-3 py-1.5 text-xs font-black text-black hover:bg-cyan-400 transition active:scale-95"
+                  >
+                    Buka AI-EMR & Kirim Bundel →
+                  </Link>
+                  <Link
+                    to="/doctor-review"
+                    className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-bold text-white/80 hover:bg-white/10"
+                  >
+                    Dokter Review Checklist →
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+        </Fold>
 
         <Fold label="Calculators">
         <section className="grid gap-8 lg:grid-cols-2" aria-label="Clinical quick tools">

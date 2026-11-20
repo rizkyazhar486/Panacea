@@ -12,6 +12,7 @@ import { Fold } from '../../shared/ui/Fold'
 const UnifiedHumanSimulationProjector = lazy(() => import('./UnifiedHumanSimulationProjector'))
 const PanelKoplingMultiSkala = lazy(() => import('../../components/digital-twin/PanelKoplingMultiSkala'))
 const PanelUbiquitin = lazy(() => import('../../components/digital-twin/PanelUbiquitin'))
+const LocalWearablesVitalityHub = lazy(() => import('../../domains/body-exposure/ui/LocalWearablesVitalityHub').then((m) => ({ default: m.LocalWearablesVitalityHub })))
 
 type ExposureMode = 'identity' | 'atlas' | 'localization' | 'physiology' | 'imaging' | 'endoscopy' | 'surgery' | 'molecular' | 'clinical'
 
@@ -222,6 +223,12 @@ export function BodyExposureOS() {
           />
         </Suspense>
       </div>
+
+      <Fold label="Wearables Hub & EMV Dynamic Medical Pass" defaultOpen={false} className="relative z-[2] mt-3">
+        <Suspense fallback={<div className="grid min-h-32 place-items-center text-xs font-bold text-white/40">Loading wearable hub…</div>}>
+          <LocalWearablesVitalityHub />
+        </Suspense>
+      </Fold>
 
       <Fold label="Multiscale" className="relative z-[2] mt-3">
         <Suspense fallback={null}>

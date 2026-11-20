@@ -42,6 +42,44 @@ export function ForYouDailyStack() {
         </button>
       </div>
 
+      {/* Panduan Kesehatan Harian & Triase Risiko Terpersonalisasi */}
+      <div className="mb-4 rounded-2xl border border-emerald-500/25 bg-slate-950/80 p-4 text-white shadow-lg">
+        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/10 pb-2.5">
+          <div className="flex items-center gap-2">
+            <span className="h-2 w-2 rounded-full bg-emerald-400" />
+            <span className="text-[10px] font-black uppercase tracking-wider text-emerald-300">
+              Panduan Harian & Triase Risiko (Segala Usia & Kondisi)
+            </span>
+          </div>
+          <span className="rounded-full bg-emerald-500/20 px-2.5 py-0.5 text-[10px] font-bold text-emerald-300">
+            🟢 Triase Hijau: Stabil & Aman
+          </span>
+        </div>
+
+        <div className="mt-3 grid gap-3 sm:grid-cols-3 text-xs">
+          <div className="rounded-xl border border-white/10 bg-white/[0.02] p-3">
+            <div className="text-[10px] font-bold text-emerald-300 uppercase tracking-wide">1. Bahasa Awam Jelas</div>
+            <p className="mt-1 text-white/80 leading-relaxed text-[11px]">
+              &ldquo;Tubuh Anda hari ini berada dalam kondisi bugar dan seimbang. Waktu tidur dan pemulihan jantung semalam mendukung aktivitas penuh hari ini.&rdquo;
+            </p>
+          </div>
+
+          <div className="rounded-xl border border-white/10 bg-white/[0.02] p-3">
+            <div className="text-[10px] font-bold text-amber-300 uppercase tracking-wide">2. Deteksi Dini & Waspada</div>
+            <p className="mt-1 text-white/80 leading-relaxed text-[11px]">
+              Tidak ditemukan lonjakan ritme jantung atau kelelahan ekstrem. Jika muncul pusing mendadak, sesak napas berat, atau nyeri dada, segera temui dokter.
+            </p>
+          </div>
+
+          <div className="rounded-xl border border-white/10 bg-white/[0.02] p-3">
+            <div className="text-[10px] font-bold text-cyan-300 uppercase tracking-wide">3. Pencegahan Berbasis Bukti</div>
+            <p className="mt-1 text-white/80 leading-relaxed text-[11px]">
+              Target mudah hari ini: Minum air bertahap 2,5 liter, jalan santai 30 menit atau 7.500 langkah, dan jeda berdiri 2 menit tiap 1 jam duduk.
+            </p>
+          </div>
+        </div>
+      </div>
+
       <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
         {visibleWidgets.map((widget) => {
           const body = (

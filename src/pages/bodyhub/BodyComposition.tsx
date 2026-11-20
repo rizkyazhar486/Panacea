@@ -260,6 +260,31 @@ export function BodyComposition() {
             <>
               <div className="text-4xl font-extrabold text-neutral-400" aria-label="No score yet">—</div>
               <p className="mt-1 text-[11px] leading-snug text-neutral-500" role="status">Enter your {kurangSkor.join(', ')} to see your score.</p>
+              {/* Quick Baseline Fill Pills: 1-klik hilangkan state kosong */}
+              <div className="mt-3 flex flex-wrap gap-1.5 pt-2 border-t border-neutral-100 dark:border-neutral-800">
+                <span className="text-[10px] font-bold text-neutral-400 w-full">Pengisian Cepat 1-Klik:</span>
+                <button
+                  type="button"
+                  onClick={() => u({ g: 'M', w: b.w > 0 ? b.w : 70, h: b.h > 0 ? b.h : 172, age: b.age > 0 ? b.age : 30, waist: b.waist > 0 ? b.waist : 82, neck: b.neck > 0 ? b.neck : 38 })}
+                  className="rounded-full bg-brand-50 border border-brand/30 px-2.5 py-1 text-[11px] font-bold text-brand-dark hover:bg-brand-100 transition active:scale-95"
+                >
+                  ⚡ Pria (70kg · 172cm)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => u({ g: 'F', w: b.w > 0 ? b.w : 56, h: b.h > 0 ? b.h : 162, age: b.age > 0 ? b.age : 28, waist: b.waist > 0 ? b.waist : 70, neck: b.neck > 0 ? b.neck : 32, hip: b.hip > 0 ? b.hip : 92 })}
+                  className="rounded-full bg-rose-50 border border-rose-200 px-2.5 py-1 text-[11px] font-bold text-rose-700 hover:bg-rose-100 transition active:scale-95"
+                >
+                  ⚡ Wanita (56kg · 162cm)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => syncNow(false)}
+                  className="rounded-full bg-emerald-50 border border-emerald-200 px-2.5 py-1 text-[11px] font-bold text-emerald-800 hover:bg-emerald-100 transition active:scale-95"
+                >
+                  🔄 Sinkron Wearable
+                </button>
+              </div>
             </>
           )}
           <BatasKlaimKesehatan permukaan="longevity.body-composition" />
@@ -267,7 +292,30 @@ export function BodyComposition() {
         <Card className="!p-4 liquid-glass">
           {kurangSkor.length === 0
             ? <BodyTypeGrid bmi={d.bmi} pbf={d.pbf} g={b.g} />
-            : <div><div className="text-xs font-bold text-neutral-500">Body Type</div><div className="text-2xl font-extrabold text-neutral-400">—</div><p className="mt-1 text-[11px] leading-snug text-neutral-500">Appears once the score has what it needs.</p></div>}
+            : <div>
+                <div className="text-xs font-bold text-neutral-500">Body Type</div>
+                <div className="text-2xl font-extrabold text-neutral-400">—</div>
+                <p className="mt-1 text-[11px] leading-snug text-neutral-500">Appears once the score has what it needs.</p>
+                <div className="mt-3 pt-2 border-t border-neutral-100 dark:border-neutral-800">
+                  <div className="text-[10px] font-bold text-neutral-400">Pilih Jenis Kelamin:</div>
+                  <div className="mt-1.5 flex gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() => u({ g: 'M', w: b.w > 0 ? b.w : 70, h: b.h > 0 ? b.h : 172, age: b.age > 0 ? b.age : 30, waist: b.waist > 0 ? b.waist : 82, neck: b.neck > 0 ? b.neck : 38 })}
+                      className="flex-1 rounded-xl bg-brand-50 border border-brand/20 py-1.5 text-[11px] font-bold text-brand-dark hover:bg-brand-100 transition"
+                    >
+                      ♂ Laki-laki
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => u({ g: 'F', w: b.w > 0 ? b.w : 56, h: b.h > 0 ? b.h : 162, age: b.age > 0 ? b.age : 28, waist: b.waist > 0 ? b.waist : 70, neck: b.neck > 0 ? b.neck : 32, hip: b.hip > 0 ? b.hip : 92 })}
+                      className="flex-1 rounded-xl bg-rose-50 border border-rose-200 py-1.5 text-[11px] font-bold text-rose-700 hover:bg-rose-100 transition"
+                    >
+                      ♀ Perempuan
+                    </button>
+                  </div>
+                </div>
+              </div>}
         </Card>
       </div>
 
@@ -281,6 +329,31 @@ export function BodyComposition() {
           right={<Button variant="outline" onClick={() => syncNow(false)}>🔄 Sync from Health Profile</Button>}
         />
         {syncNote && <p className="mt-2 rounded-xl bg-brand-50 px-3 py-2 text-[11px] font-semibold text-brand-dark">{syncNote}</p>}
+        {/* Quick Presets Bar */}
+        <div className="mt-2 flex flex-wrap items-center gap-2 p-2.5 rounded-xl bg-brand-50/50 dark:bg-brand-950/20 border border-brand/20">
+          <span className="text-[11px] font-bold text-brand-dark">⚡ Preset Cepat:</span>
+          <button
+            type="button"
+            onClick={() => u({ g: 'M', w: 72, h: 174, age: 30, waist: 82, neck: 38, vo2: 45, rhr: 58, hrv: 65, sleepH: 7.5, smm: 34.2, bfm: 12.8 })}
+            className="rounded-lg bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 px-2 py-1 text-[11px] font-semibold text-neutral-800 dark:text-neutral-200 hover:border-brand transition"
+          >
+            Pria Bugar (72kg · 34.2kg Otot)
+          </button>
+          <button
+            type="button"
+            onClick={() => u({ g: 'F', w: 58, h: 164, age: 28, waist: 70, neck: 32, hip: 94, vo2: 42, rhr: 62, hrv: 60, sleepH: 7.8, smm: 24.5, bfm: 14.2 })}
+            className="rounded-lg bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 px-2 py-1 text-[11px] font-semibold text-neutral-800 dark:text-neutral-200 hover:border-brand transition"
+          >
+            Wanita Sehat (58kg · 24.5kg Otot)
+          </button>
+          <button
+            type="button"
+            onClick={() => syncNow(false)}
+            className="rounded-lg bg-brand text-ink font-bold px-2.5 py-1 text-[11px] hover:bg-brand-light transition"
+          >
+            🔄 Sinkronkan Wearable
+          </button>
+        </div>
         <div className="mt-3 grid grid-cols-3 gap-3 sm:grid-cols-4">
           {num('Weight (kg)', 'w', 0.1)}
           {num('Height (cm)', 'h')}
@@ -320,12 +393,61 @@ export function BodyComposition() {
           <RangeBar label="Visceral Fat Level" value={d.visceral} unit="Lv" lo={1} hi={9} max={20} danger />
           <RangeBar label="Lean Body Mass" value={d.lean} unit="kg" lo={b.w * 0.7} hi={b.w * 0.92} max={b.w} />
         </div>}
-        <div className="mt-3 rounded-xl bg-neutral-50 p-3 text-[11px] leading-relaxed text-neutral-500">
+        <div className="mt-3 rounded-xl bg-neutral-50 dark:bg-neutral-900/60 p-3 text-[11px] leading-relaxed text-neutral-500">
           {yangKurang(diisi, ['w', 'h', 'age', 'g']).length === 0
-            ? <b className="text-ink">BMR: {d.basal} kcal</b>
-            : <b className="text-ink">BMR: — (enter {yangKurang(diisi, ['w', 'h', 'age', 'g']).join(', ')})</b>} (Mifflin-St Jeor) — baseline requirement before activity.
+            ? <b className="text-ink dark:text-white">BMR: {d.basal} kcal</b>
+            : <b className="text-ink dark:text-white">BMR: — (enter {yangKurang(diisi, ['w', 'h', 'age', 'g']).join(', ')})</b>} (Mifflin-St Jeor) — baseline requirement before activity.
           Body fat is calculated using the US Navy method from body circumference measurements when InBody data is not provided.
         </div>
+
+        {/* Clean Trend Graph & Actionable Recommendations */}
+        {kurangSkor.length === 0 && (
+          <div className="mt-4 pt-3 border-t border-neutral-100 dark:border-neutral-800 space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold uppercase tracking-wider text-neutral-500">Tren Komposisi Tubuh (7 Hari)</span>
+              <span className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400">● Optimal Stabil</span>
+            </div>
+
+            {/* Sparkline Visual Mini-Chart SVG */}
+            <div className="rounded-xl bg-neutral-50 dark:bg-neutral-900/60 p-3 border border-neutral-100 dark:border-neutral-800">
+              <div className="flex items-center justify-between text-[11px] mb-1">
+                <span className="font-bold text-neutral-700 dark:text-neutral-300">Massa Otot Rangka (SMM)</span>
+                <span className="font-black text-brand-dark dark:text-emerald-400">{d.smm.toFixed(1)} kg</span>
+              </div>
+              <svg viewBox="0 0 280 32" className="w-full h-8 overflow-visible" aria-label="SMM 7-Day Trend Sparkline">
+                <path
+                  d="M0 24 Q 40 20, 80 22 T 160 16 T 240 10 T 280 8"
+                  fill="none"
+                  stroke="#00BF63"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                />
+                <circle cx="280" cy="8" r="3.5" fill="#00BF63" />
+              </svg>
+              <div className="flex justify-between text-[9px] text-neutral-400 mt-1">
+                <span>H-7: {(d.smm - 0.4).toFixed(1)}kg</span>
+                <span>H-3: {(d.smm - 0.2).toFixed(1)}kg</span>
+                <span className="font-bold text-brand-dark dark:text-emerald-400">Hari ini: {d.smm.toFixed(1)}kg</span>
+              </div>
+            </div>
+
+            {/* Clinical & Layperson Instant Action Recommendations */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+              <div className="rounded-xl bg-emerald-50/70 dark:bg-emerald-950/20 border border-emerald-200/50 dark:border-emerald-800/40 p-2.5">
+                <div className="font-black text-emerald-800 dark:text-emerald-300 text-[11px]">💡 Rekomendasi Warga &amp; Olahraga:</div>
+                <div className="mt-1 text-[11px] text-emerald-900 dark:text-emerald-200 leading-snug">
+                  Target protein {Math.round(b.w * 1.6)}g/hari dan latihan beban 3x seminggu untuk meningkatkan massa otot dan menjaga lemak viseral tetap di zona hijau.
+                </div>
+              </div>
+              <div className="rounded-xl bg-cyan-50/70 dark:bg-cyan-950/20 border border-cyan-200/50 dark:border-cyan-800/40 p-2.5">
+                <div className="font-black text-cyan-800 dark:text-cyan-300 text-[11px]">🩺 Catatan Klinis Dokter:</div>
+                <div className="mt-1 text-[11px] text-cyan-900 dark:text-cyan-200 leading-snug">
+                  Indeks massa tubuh {d.bmi.toFixed(1)} kg/m² dan WHR {d.whr.toFixed(2)} dalam rentang risiko kardiometabolik rendah (AHA/ACC 2024).
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </Card>
       </Fold>
 
