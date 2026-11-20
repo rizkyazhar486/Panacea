@@ -107,7 +107,8 @@ export function LivingBodyHero() {
   )
 
   return (
-    <section className="lbh" aria-label="Body analysis" data-living-body-hero>
+    // data-pmd-unclamped: the site-wide tap-to-explain script must not turn orb and tag labels into tiny buttons.
+    <section className="lbh" aria-label="Body analysis" data-living-body-hero data-pmd-unclamped="true">
       <div className="lbh-aura" aria-hidden><i /><i /><i /></div>
       <header className="lbh-head">
         <h2 className="lbh-kicker"><b aria-hidden /><span className="sr-only">Body analysis</span><span aria-hidden>LIVE</span></h2>
@@ -144,19 +145,20 @@ export function LivingBodyHero() {
             />
             <span className="lbh-scan" aria-hidden />
             {HOME_SYSTEMS.map((s) => (
-              <button
+              // Some organs sit ~13 px apart on a phone, too close to be separate tap targets. The dots are a pointer
+              // shortcut only; the glass dock is the accessible control for the same choice.
+              <span
                 key={s.id}
-                type="button"
                 className="lbh-spot"
                 data-spot={s.id}
                 data-gap={s.inAtlas ? undefined : 'true'}
-                aria-label={s.label}
-                aria-pressed={s.id === selected}
+                data-active={s.id === selected ? 'true' : undefined}
+                aria-hidden
                 onClick={() => setSelected(s.id)}
                 style={{ left: `${s.x * 100}%`, top: `${s.y * 100}%`, ['--tone' as string]: s.tone }}
               >
-                <span aria-hidden />
-              </button>
+                <span />
+              </span>
             ))}
           </div>
 
