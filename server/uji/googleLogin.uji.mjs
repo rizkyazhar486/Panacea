@@ -30,7 +30,7 @@ for (const fixture of cases) {
   let body
   const context = createContext({
     process: { env: {} },
-    config: { googleClientId: 'test-client' },
+    config: { googleClientId: 'test-client', ownerEmail: 'owner@localhost.test' },
     features: { googleLive: true },
     OAuth2Client: class {
       async verifyIdToken(options) {
@@ -48,6 +48,9 @@ for (const fixture of cases) {
     createHash: () => { throw new Error('tidak boleh dipakai oleh login') },
     cabutToken() { effects.push(['revoke']) },
     tokenDicabut() { return false },
+    countUsers: () => 0,
+    isConfiguredOwner: () => false,
+    checkNewAccountAllowed: () => ({ allowed: true }),
     jwt: { sign() { effects.push(['sign']); return 'session-token' } },
   })
   runInContext(source, context)
