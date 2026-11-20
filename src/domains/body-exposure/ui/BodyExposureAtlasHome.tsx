@@ -28,6 +28,8 @@ import { DepthRail } from './atlas-stage/DepthRail'
 import { PhoneStage, WideStage } from './atlas-stage/StageFrame'
 import { CameraButton, CouplingBadge, DepthBadge, Note, ReferenceChip, RegionChips, ResetGlyph, Segmented, StageTabs, type SegmentOption } from './atlas-stage/StagePieces'
 import { StageSearch, type StageSearchHit } from './atlas-stage/StageSearch'
+import { SimulationDial } from './atlas-stage/SimulationDial'
+import { planScenarioMotion } from '../engine/body-motion/bodyMotion'
 import { TONE, TOUCH, eyebrow, paragraph, primaryButton, subtleButton } from './atlas-stage/stageTokens'
 import { ATLAS_LAYERS, ANATOMICAL_REGIONS, type AtlasStage, type SelectedStructureInfo } from '../engine/atlasHomeConfig'
 import { planStageLayers, plateShows, type AtlasLayerId, type AtlasLayerOverrides, type AtlasPlateMode } from '../engine/atlas-stage/stageLayers'
@@ -111,6 +113,14 @@ export function BodyExposureAtlasHome({ Viewer, sendCamera, focusSystem = null }
   /** A self-check is a focus mode: while one runs, the stage's own next-step button steps aside. */
   const [selfCheckOpen, setSelfCheckOpen] = useState(false)
   const [clinicalTool, setClinicalTool] = useState<ClinicalTool>('vascular')
+  // Whole-body simulation lit on the anatomy. Starts at rest and running; the viewer keeps it still under reduced motion.
+  const [simScenario, setSimScenario] = useState('normal')
+  const [simRunning, setSimRunning] = useState(true)
+  /** The viewer stopped the light because this device could not keep up; Play tries again. */
+  const [simStalled, setSimStalled] = useState(false)
+  const handleMotionStall = useCallback(() => { setSimRunning(false); setSimStalled(true) }, [])
+  const simResult = useMemo(() => planScenarioMotion(simScenario), [simScenario])
+  const motion = simRunning && simResult.ok ? simResult : null
 
   const plan = useMemo(() => planStageLayers({ depth, mode, overrides }), [depth, mode, overrides])
   const mountKey = plan.ok ? plan.mount.join('|') : ''
@@ -331,12 +341,20 @@ export function BodyExposureAtlasHome({ Viewer, sendCamera, focusSystem = null }
         The atlas stage could not be prepared, so nothing is shown rather than a wrong body.
       </div>
     ) : (
-      <Viewer layers={layers} dissect={plan.dissect} highlighted={highlighted} focusKeywords={focusKeywords} homeFrame={homeFrame} onPick={handlePick} />
+      <Viewer layers={layers} dissect={plan.dissect} highlighted={highlighted} focusKeywords={focusKeywords} homeFrame={homeFrame} onPick={handlePick} motion={motion} onMotionStall={handleMotionStall} />
     ),
     search: <StageSearch compact={!isDesktop} layers={ATLAS_LAYERS} onSelect={handleSearch} />,
     rail: <DepthRail layers={ATLAS_LAYERS} depth={depth} labelled={isDesktop} onDepth={changeDepth} />,
     regionChips: <RegionChips regions={ANATOMICAL_REGIONS} active={regionId} onRegion={frameRegion} />,
     referenceChip: <ReferenceChip tight={!isDesktop} />,
+    simulation: (
+      <SimulationDial
+        scenario={simScenario} onScenario={setSimScenario} running={simRunning} stalled={simStalled} onToggle={() => { setSimStalled(false); setSimRunning((r) => !r) }}
+        result={simResult} compact={!isDesktop}
+        insideHidden={!layers.has('cardiovascular') && !layers.has('visceral')}
+        onSeeInside={() => changeDepth(ATLAS_LAYERS.findIndex((l) => l.id === 'cardiovascular'))}
+      />
+    ),
     tabs: <StageTabs tabs={STAGES} value={stage} compact={!isDesktop} onChange={openStage} />,
     inspectorHeader,
     inspectorBody: (
