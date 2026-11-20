@@ -1,0 +1,140 @@
+/* Home's body-analysis hero. Clinical and calm: a light clinical surface by day, deep slate at night, one accent
+   per body system, and motion limited to a slow scan and the heart sweep. */
+.lbh {
+  --lbh-surface: #f6f9fb;
+  --lbh-panel: #ffffff;
+  --lbh-line: rgba(14, 35, 48, 0.1);
+  --lbh-ink: #0d1f2a;
+  --lbh-dim: #5a7183;
+  --lbh-accent: #0e8f8f;
+  --lbh-stage-a: #eef5f8;
+  --lbh-stage-b: #dfeaf0;
+  --lbh-shadow: 0 18px 44px -28px rgba(13, 31, 42, 0.5);
+  position: relative;
+  margin: 2px 0 16px;
+  padding: 14px;
+  border-radius: 24px;
+  color: var(--lbh-ink);
+  background: var(--lbh-surface);
+  border: 1px solid var(--lbh-line);
+  box-shadow: var(--lbh-shadow);
+}
+.dark .lbh {
+  --lbh-surface: #0a151c;
+  --lbh-panel: #0f1f29;
+  --lbh-line: rgba(140, 200, 220, 0.14);
+  --lbh-ink: #e8f6fb;
+  --lbh-dim: #92adbd;
+  --lbh-accent: #4fd6cf;
+  --lbh-stage-a: #0d2029;
+  --lbh-stage-b: #071219;
+  --lbh-shadow: 0 24px 60px -34px rgba(0, 0, 0, 0.9);
+}
+
+.lbh-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+.lbh-kicker { display: inline-flex; align-items: center; gap: 7px; font-size: 10px; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; color: var(--lbh-dim); }
+.lbh-kicker b { width: 7px; height: 7px; border-radius: 50%; background: #ef4459; animation: lbh-pulse 1.714s ease-out infinite; }
+@keyframes lbh-pulse { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 89, 0.55); } 70% { box-shadow: 0 0 0 7px rgba(239, 68, 89, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 89, 0); } }
+.lbh-title { margin: 3px 0 0; font-size: clamp(19px, 5vw, 26px); font-weight: 800; letter-spacing: -0.02em; line-height: 1.15; }
+
+.lbh-cta { display: inline-flex; align-items: center; gap: 9px; min-height: 44px; padding: 0 16px; border-radius: 999px; font-size: 13px; font-weight: 800; text-decoration: none; color: #04171a; background: linear-gradient(100deg, #5ae7cf, #37b6e6); box-shadow: 0 10px 24px -14px rgba(55, 182, 230, 0.9); white-space: nowrap; transition: transform 0.18s ease, box-shadow 0.18s ease; }
+.lbh-cta:hover { transform: translateY(-1px); box-shadow: 0 16px 30px -14px rgba(55, 182, 230, 1); }
+.lbh-cta:active { transform: scale(0.97); }
+.lbh-cta:focus-visible { outline: 2px solid var(--lbh-ink); outline-offset: 3px; }
+.lbh-cta-orb { width: 18px; height: 18px; border-radius: 50%; background: radial-gradient(circle at 34% 30%, #fff, #37b6e6 55%, #0b4a5c); }
+
+.lbh-layout { display: grid; gap: 12px; }
+.lbh-rail { display: grid; gap: 8px; align-content: start; min-width: 0; }
+.lbh-rail-head { font-size: 10px; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; color: var(--lbh-dim); }
+.lbh-vitals { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.lbh-vital { display: grid; gap: 2px; padding: 9px 10px; border-radius: 13px; background: var(--lbh-panel); border: 1px solid var(--lbh-line); border-top: 2px solid var(--tone); min-width: 0; }
+.lbh-vital-label { font-size: 10px; font-weight: 700; color: var(--lbh-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lbh-vital-value { font-size: 19px; font-weight: 800; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; line-height: 1.1; }
+.lbh-vital-value small { font-size: 10px; font-weight: 700; color: var(--lbh-dim); margin-left: 3px; }
+.lbh-stage {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  border-radius: 18px;
+  overflow: hidden;
+  padding: 12px 0;
+  /* An explicit height: the body box resolves its own width from this, so the figure can never grow the page. */
+  height: clamp(380px, 68vh, 520px);
+  background: radial-gradient(70% 55% at 50% 38%, var(--lbh-stage-a), var(--lbh-stage-b) 72%);
+  border: 1px solid var(--lbh-line);
+}
+.lbh-stage::before { content: ''; position: absolute; inset: 0; background-image: linear-gradient(var(--lbh-line) 1px, transparent 1px), linear-gradient(90deg, var(--lbh-line) 1px, transparent 1px); background-size: 34px 34px; opacity: 0.5; mask-image: radial-gradient(70% 60% at 50% 45%, #000 20%, transparent 85%); }
+.lbh-bodybox { position: relative; height: 100%; aspect-ratio: 1 / 2; flex: none; }
+/* The atlas render is raw muscle; the grade cools and calms it so it reads as a clinical reference, not a specimen. */
+.lbh-body { width: 100%; height: 100%; object-fit: contain; display: block; filter: saturate(0.42) contrast(1.04) brightness(1.04) drop-shadow(0 18px 30px rgba(10, 30, 45, 0.3)); }
+.dark .lbh-body { filter: saturate(0.38) contrast(1.06) brightness(0.92) drop-shadow(0 18px 34px rgba(0, 0, 0, 0.6)); }
+.lbh-bodybox::after { content: ''; position: absolute; inset: 0; pointer-events: none; mix-blend-mode: overlay; background: linear-gradient(170deg, rgba(79, 214, 207, 0.5), transparent 45%, rgba(100, 160, 220, 0.4)); mask-image: var(--lbh-mask); -webkit-mask-image: var(--lbh-mask); mask-size: 100% 100%; -webkit-mask-size: 100% 100%; mask-repeat: no-repeat; -webkit-mask-repeat: no-repeat; }
+/* The sweep moves its BACKGROUND, never the element: transforming a masked box drags the body-shaped mask with it. */
+.lbh-scan {
+  position: absolute; inset: 0; pointer-events: none;
+  mask-size: 100% 100%; mask-repeat: no-repeat; -webkit-mask-size: 100% 100%; -webkit-mask-repeat: no-repeat;
+  background-image: linear-gradient(180deg, transparent 42%, rgba(120, 232, 255, 0.5) 50%, transparent 58%);
+  background-size: 100% 300%; background-repeat: no-repeat;
+  animation: lbh-scan 7s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+@keyframes lbh-scan { from { background-position: 0 -100%; } to { background-position: 0 200%; } }
+
+.lbh-spot { position: absolute; width: 44px; height: 44px; margin: -22px 0 0 -22px; padding: 0; border: 0; background: none; cursor: pointer; border-radius: 50%; }
+/* A small precise dot, like a marker on a chart; selection adds a ring instead of making the dot fat. */
+.lbh-spot > span { position: absolute; inset: 19px; border-radius: 50%; background: var(--tone); box-shadow: 0 0 0 1.5px rgba(255, 255, 255, 0.9), 0 0 10px var(--tone); transition: inset 0.18s ease, box-shadow 0.18s ease; }
+.dark .lbh-spot > span { box-shadow: 0 0 0 1.5px rgba(8, 22, 30, 0.95), 0 0 12px var(--tone); }
+.lbh-spot[data-gap='true'] > span { opacity: 0.5; }
+.lbh-spot:hover > span { inset: 17px; }
+.lbh-spot[aria-pressed='true'] > span { inset: 17px; box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.95), 0 0 0 7px color-mix(in srgb, var(--tone) 28%, transparent), 0 0 18px var(--tone); }
+.dark .lbh-spot[aria-pressed='true'] > span { box-shadow: 0 0 0 2px rgba(8, 22, 30, 0.95), 0 0 0 7px color-mix(in srgb, var(--tone) 32%, transparent), 0 0 18px var(--tone); }
+.lbh-spot:focus-visible { outline: 2px solid var(--tone); outline-offset: -4px; }
+
+.lbh-link { position: absolute; inset: 0; pointer-events: none; }
+.lbh-link line { stroke-width: 1; stroke-dasharray: 3 3; opacity: 0.75; }
+
+.lbh-tag { position: absolute; z-index: 2; display: inline-flex; align-items: center; gap: 6px; padding: 6px 11px; border-radius: 999px; font-size: 12px; font-weight: 800; white-space: nowrap; background: color-mix(in srgb, var(--lbh-panel) 93%, transparent); border: 1px solid var(--lbh-line); box-shadow: 0 10px 22px -16px rgba(10, 30, 45, 0.8); backdrop-filter: blur(6px); }
+.lbh-tag i { width: 8px; height: 8px; border-radius: 50%; background: var(--tone); flex: none; }
+
+.lbh-detail { display: grid; gap: 8px; padding: 12px 13px 13px; border-radius: 16px; background: var(--lbh-panel); border: 1px solid var(--lbh-line); border-left: 3px solid var(--tone); }
+.lbh-detail-head { display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 800; }
+.lbh-detail-head i { width: 10px; height: 10px; border-radius: 3px; background: var(--tone); flex: none; }
+.lbh-detail-note { font-size: 11px; font-weight: 650; color: var(--lbh-dim); }
+.lbh-detail-open { display: inline-flex; align-items: center; gap: 6px; justify-self: start; min-height: 40px; padding: 0 14px; border-radius: 999px; font-size: 12px; font-weight: 800; text-decoration: none; color: var(--lbh-ink); border: 1px solid var(--lbh-line); background: color-mix(in srgb, var(--tone) 16%, transparent); transition: background 0.18s ease; }
+.lbh-detail-open:hover { background: color-mix(in srgb, var(--tone) 30%, transparent); }
+.lbh-detail-open:focus-visible { outline: 2px solid var(--tone); outline-offset: 2px; }
+
+.lbh-trace { display: flex; flex-direction: column; gap: 3px; }
+.lbh-trace svg { width: 100%; height: 44px; display: block; }
+.lbh-trace-base { fill: none; stroke: var(--lbh-dim); stroke-width: 1; opacity: 0.35; vector-effect: non-scaling-stroke; }
+.lbh-trace-sweep { fill: none; stroke: #ef4459; stroke-width: 1.6; vector-effect: non-scaling-stroke; stroke-dasharray: 0.12 1; animation: lbh-sweep var(--lbh-sweep, 1.714s) linear infinite; }
+@keyframes lbh-sweep { from { stroke-dashoffset: 0.12; } to { stroke-dashoffset: -1; } }
+.lbh-meta { font: 600 10px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace; color: var(--lbh-dim); font-variant-numeric: tabular-nums; }
+.lbh-meta em { font-style: normal; color: var(--lbh-accent); font-weight: 800; }
+
+.lbh-side { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+
+.lbh-systems { display: flex; flex-wrap: wrap; gap: 6px; }
+.lbh-chip { display: inline-flex; align-items: center; gap: 7px; min-height: 40px; padding: 0 12px; border-radius: 999px; font-size: 12px; font-weight: 750; color: var(--lbh-ink); background: var(--lbh-panel); border: 1px solid var(--lbh-line); cursor: pointer; transition: border-color 0.16s ease, background 0.16s ease; }
+.lbh-chip i { width: 8px; height: 8px; border-radius: 50%; background: var(--tone); flex: none; }
+.lbh-chip:hover { border-color: var(--tone); }
+.lbh-chip[aria-pressed='true'] { border-color: var(--tone); background: color-mix(in srgb, var(--tone) 16%, var(--lbh-panel)); }
+.lbh-chip:focus-visible { outline: 2px solid var(--tone); outline-offset: 2px; }
+
+.lbh-lenses { display: flex; flex-wrap: wrap; gap: 6px; }
+.lbh-lenses a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 14px; border-radius: 12px; font-size: 13px; font-weight: 750; text-decoration: none; color: var(--lbh-ink); border: 1px solid var(--lbh-line); background: var(--lbh-panel); transition: border-color 0.16s ease; }
+.lbh-lenses a:hover, .lbh-lenses a:focus-visible { border-color: var(--lbh-accent); }
+
+.lbh-credit { display: block; margin-top: 8px; font-size: 10px; color: var(--lbh-dim); text-align: right; }
+
+@media (min-width: 1024px) {
+  .lbh { padding: 20px 22px 18px; margin-bottom: 24px; }
+  .lbh-layout { grid-template-columns: 220px minmax(0, 1fr) 290px; align-items: stretch; }
+  .lbh-stage { height: clamp(480px, 64vh, 600px); }
+  .lbh-vitals { grid-template-columns: minmax(0, 1fr); }
+  .lbh-vital-value { font-size: 22px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lbh *, .lbh *::before, .lbh *::after { animation: none !important; transition: none !important; }
+}
+:root.reduce-motion .lbh *, :root.reduce-motion .lbh *::before { animation: none !important; transition: none !important; }
