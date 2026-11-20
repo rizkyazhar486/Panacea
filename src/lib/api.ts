@@ -105,9 +105,14 @@ export interface MarketQuote {
 import type { Role, Account, Patient, VitalSign, SupportiveResult, EMRRecord, EducationSheet, MedReminder } from './types'
 
 import { galatDariRespons } from './galatApi'
+import { resolveApiOrigin } from '../domains/identity/apiOrigin'
 export { GalatApi, galatDariRespons } from './galatApi'
 
-const API = (import.meta.env.VITE_API_URL as string | undefined)?.replace(/\/$/, '') || ''
+const BROWSER_HOST =
+  typeof globalThis !== 'undefined' && 'location' in globalThis
+    ? String((globalThis as { location?: { hostname?: string } }).location?.hostname ?? '')
+    : ''
+const API = resolveApiOrigin(import.meta.env.VITE_API_URL as string | undefined, BROWSER_HOST)
 export const API_BASE = API
 export const backendEnabled = Boolean(API)
 
@@ -938,7 +943,11 @@ function loadGis(): Promise<void> {
     s.src = 'https://accounts.google.com/gsi/client'
     s.async = true
     s.onload = () => resolve()
-    s.onerror = () => reject(new Error('gis_load_failed'))
+    s.onerror = () => {
+      gisPromise = null
+      s.remove()
+      reject(new Error('gis_load_failed'))
+    }
     document.head.appendChild(s)
   })
   return gisPromise
@@ -948,12 +957,20 @@ export async function renderGoogleButton(
   el: HTMLElement,
   clientId: string,
   onCredential: (credential: string) => void,
+  options: { theme?: 'outline' | 'filled_black' | 'filled_blue' } = {},
 ) {
   await loadGis()
   const g = (window as any).google
+  el.innerHTML = ''
   g.accounts.id.initialize({
     client_id: clientId,
     callback: (resp: { credential: string }) => onCredential(resp.credential),
   })
-  g.accounts.id.renderButton(el, { theme: 'outline', size: 'large', width: 320, text: 'signin_with' })
+  const width = Math.max(240, Math.min(320, Math.floor(el.clientWidth || 300)))
+  g.accounts.id.renderButton(el, {
+    theme: options.theme ?? 'outline',
+    size: 'large',
+    width,
+    text: 'signin_with',
+  })
 }
