@@ -63,3 +63,4 @@ console.log('rekamKlinis: tanda tangan tidak dapat dipalsukan, dicap server, ver
 
 // A5: real HTTP persisted AI draft and explicit clinician approval boundary.
 await import('./aiDraftApprovalHttp.uji.js')
+await import('./clinical/careOutcomeProvenance.uji.js')
