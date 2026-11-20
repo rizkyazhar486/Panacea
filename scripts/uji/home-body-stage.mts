@@ -6,7 +6,9 @@ import { NORMAL, simulate } from '../../src/lib/bodySim.ts'
 import { DEFAULT_PARAMS } from '../../src/domains/body-exposure/engine/cardiacCycle.ts'
 import { BODY_SYSTEM_SOURCE_WAVE } from '../../src/domains/body-exposure/data/bodySystems.ts'
 import { HOME_BODY_ANCHORS, HOME_BODY_IMAGE } from '../../src/domains/body-exposure/data/homeBodyAnchors.ts'
-import { HOME_SYSTEMS, cardPlacement, restingVitals, ventricleVolumeTrace } from '../../src/domains/body-exposure/engine/home-hero/homeBodyStage.ts'
+import { HOME_SYSTEMS, cardPlacement } from '../../src/domains/body-exposure/engine/home-hero/homeBodyStage.ts'
+import { restingVitals, ventricleVolumeTrace } from '../../src/domains/body-exposure/engine/home-hero/homeBodyModels.ts'
+import { snapshotSource } from '../bangun/home-body-snapshot.mts'
 
 const gagal = (nama: string, f: () => void) => { try { f() } catch (e) { throw new Error(`[${nama}] ${(e as Error).message}`) } }
 const STAGE = { w: 400, h: 500 }, CARD = { w: 120, h: 60 }
@@ -73,6 +75,19 @@ gagal('vital-istirahat-dibaca-dari-simulator', () => {
   assert.equal(v.hr, String(NORMAL.heartRate)); assert.equal(v.rr, String(NORMAL.respRate))
   assert.equal(v.co, o.cardiacOutput.toFixed(1)); assert.equal(v.bp, `${o.systolic.toFixed(0)}/${o.diastolic.toFixed(0)}`)
   assert.equal(v.sao2, o.sao2.toFixed(0)); assert.equal(v.urine, o.urineOutput.toFixed(0))
+})
+
+gagal('snapshot-home-sama-dengan-model-sekarang', () => {
+  assert.equal(readFileSync('src/domains/body-exposure/data/homeBodySnapshot.ts', 'utf8'), snapshotSource(),
+    'jalankan: npx tsx scripts/bangun/home-body-snapshot.mts')
+})
+gagal('home-tidak-memuat-simulator-saat-jalan', () => {
+  const hero = readFileSync('src/domains/body-exposure/ui/home-hero/LivingBodyHero.tsx', 'utf8')
+  const stage = readFileSync('src/domains/body-exposure/engine/home-hero/homeBodyStage.ts', 'utf8')
+  const snap = readFileSync('src/domains/body-exposure/data/homeBodySnapshot.ts', 'utf8')
+  // Hanya impor nilai yang dihitung; impor `type` hilang saat kompilasi.
+  const muat = /^import (?!type )[^\n]*from '[^']*(bodySim|cardiacCycle|homeBodyModels)[^']*'/m
+  for (const src of [hero, stage, snap]) assert.doesNotMatch(src, muat, 'Home memuat model saat jalan')
 })
 
 console.log('home-body-stage: OK')

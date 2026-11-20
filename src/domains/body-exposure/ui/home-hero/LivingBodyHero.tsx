@@ -9,13 +9,13 @@ import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import type { BodySystemId } from '../../data/bodySystems.ts'
 import { HOME_BODY_IMAGE } from '../../data/homeBodyAnchors.ts'
-import { DEFAULT_PARAMS } from '../../engine/cardiacCycle.ts'
-import { HOME_SYSTEMS, cardPlacement, restingVitals, ventricleVolumeTrace, type HomeSystem } from '../../engine/home-hero/homeBodyStage.ts'
+import { HOME_RESTING_VITALS, HOME_VENTRICLE_TRACE } from '../../data/homeBodySnapshot.ts'
+import { HOME_SYSTEMS, cardPlacement, type HomeSystem } from '../../engine/home-hero/homeBodyStage.ts'
 import { SystemGlyph } from '../SystemGlyph.tsx'
 import './livingBodyHero.css'
 
-const TRACE = ventricleVolumeTrace(DEFAULT_PARAMS, 2, 160, 44)
-const VITALS = restingVitals()
+const TRACE = HOME_VENTRICLE_TRACE
+const VITALS = HOME_RESTING_VITALS
 const IMAGE_SRC = `${import.meta.env.BASE_URL ?? '/'}${HOME_BODY_IMAGE.src}`
 
 function HeartTrace() {

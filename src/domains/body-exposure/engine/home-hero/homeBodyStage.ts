@@ -1,11 +1,9 @@
-// Home's body-analysis stage: the shipped atlas body with a hotspot per body system, a floating card beside the
-// selected one, and for the heart a left-ventricular volume trace from the Wiggers cycle model. Pure and
-// deterministic; the hotspot positions come from scripts/bangun/bake-home-body.mjs (projected from atlas meshes).
+// Home's body-analysis stage: the shipped atlas body with a hotspot per body system and a tag beside the selected
+// one. Pure and deterministic; the hotspot positions come from scripts/bangun/bake-home-body.mjs (projected from
+// atlas meshes). The model numbers live in homeBodyModels.ts so Home never loads the simulator at runtime.
 
-import { NORMAL, simulate } from '../../../../lib/bodySim.ts'
 import type { BodySystemId } from '../../data/bodySystems.ts'
 import { HOME_BODY_ANCHORS } from '../../data/homeBodyAnchors.ts'
-import { cardiacStateAt, validateParams, type CardiacParams } from '../cardiacCycle.ts'
 
 export interface HomeSystem {
   readonly id: BodySystemId
@@ -55,59 +53,3 @@ export function cardPlacement(x: number, y: number, card: Box, stage: Box, gap =
   const top = Math.min(stage.h - margin - card.h, Math.max(margin, y - card.h / 2))
   return { left, top, side }
 }
-
-export interface VolumeTrace {
-  /** SVG path in a w×h box, time left to right, volume up. */
-  readonly d: string
-  readonly edvMl: number
-  readonly esvMl: number
-  readonly ejectionFractionPct: number
-  readonly beatS: number
-}
-
-/**
- * Left-ventricular volume over `beats` cardiac cycles from the Wiggers model, as an SVG path. Invalid parameters,
- * box or sample count → null.
- */
-export function ventricleVolumeTrace(p: CardiacParams, beats: number, w: number, h: number, samples = 160): VolumeTrace | null {
-  if (validateParams(p) !== null) return null
-  if (!Number.isInteger(beats) || beats < 1 || beats > 8 || !(w > 0) || !(h > 0) || !Number.isInteger(samples) || samples < 8) return null
-  const beatS = 60 / p.hrBpm
-  const span = p.edvMl - p.esvMl
-  if (!(span > 0)) return null
-  let d = ''
-  for (let i = 0; i <= samples; i++) {
-    const t = (i / samples) * beats * beatS
-    const v = cardiacStateAt(p, t).ventricleMl
-    const px = Math.round(((i / samples) * w) * 10) / 10
-    const py = Math.round((h - ((v - p.esvMl) / span) * h) * 10) / 10
-    d += `${i === 0 ? 'M' : 'L'}${px} ${py}`
-  }
-  return { d, edvMl: p.edvMl, esvMl: p.esvMl, ejectionFractionPct: Math.round((span / p.edvMl) * 100), beatS }
-}
-
-export interface RestingVital {
-  readonly key: string
-  readonly label: string
-  readonly value: string
-  readonly unit: string
-  readonly tone: string
-}
-
-/**
- * The resting whole-body state as the simulator computes it from NORMAL: a worked reference, never a measurement of
- * the viewer. Every number is read back from simulate() or its own input, so nothing here is a hand-written figure.
- */
-export function restingVitals(): readonly RestingVital[] {
-  const o = simulate(NORMAL)
-  const r = (v: number, d = 0) => v.toFixed(d)
-  return [
-    { key: 'hr', label: 'Heart rate', value: r(NORMAL.heartRate), unit: 'bpm', tone: '#ef4459' },
-    { key: 'co', label: 'Cardiac output', value: r(o.cardiacOutput, 1), unit: 'L/min', tone: '#e5739a' },
-    { key: 'bp', label: 'Blood pressure', value: `${r(o.systolic)}/${r(o.diastolic)}`, unit: 'mmHg', tone: '#f08a3c' },
-    { key: 'rr', label: 'Breaths', value: r(NORMAL.respRate), unit: '/min', tone: '#2fb8e6' },
-    { key: 'sao2', label: 'O\u2082 saturation', value: r(o.sao2), unit: '%', tone: '#4cbf6b' },
-    { key: 'urine', label: 'Urine output', value: r(o.urineOutput), unit: 'mL/h', tone: '#d9a72f' },
-  ]
-}
-
