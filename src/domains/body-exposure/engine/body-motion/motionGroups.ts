@@ -1,4 +1,5 @@
-// Which atlas meshes move with which part of the whole-body simulation. Pure data and one lookup.
+// Which atlas meshes light up with which part of the whole-body simulation. Pure data and one lookup.
+// The meshes are never deformed (see bodyMotion.ts and the MotionState note in Body3D); only their light changes.
 //
 // Curated by EXACT atlas node name, per source layer, never by keyword: "lung" also appears in bronchus and
 // segmental-artery names, and a pleura or a pulmonary vein must not breathe as if it were parenchyma. Several
