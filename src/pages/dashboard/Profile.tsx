@@ -8,6 +8,7 @@ import { api, backendEnabled } from '../../lib/api'
 import { Portal } from '../../components/Portal'
 import { PersonalBodyUnifiedSurface } from '../../components/PersonalBodyUnifiedSurface'
 import { SurfaceGuide } from '../../components/SurfaceGuide'
+import { initialsOf, sanitizeDisplayName, sanitizeUsername } from '../../domains/identity/profileEdit'
 import type { ProfileEdit } from '../../lib/types'
 import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 import { WhenOpened } from '../../shared/ui/WhenOpened'
@@ -58,6 +59,8 @@ function ProfileIsi({ account }: { account: NonNullable<ReturnType<typeof useSto
   const [shareNote, setShareNote] = useState('')
   const [draft, setDraft] = useState<ProfileEdit>({})
   const [busy, setBusy] = useState(false)
+  const [fieldErrors, setFieldErrors] = useState<{ name?: string; username?: string }>({})
+  const savingRef = useRef(false)
   const [familyOpen, setFamilyOpen] = useState(false)
   const [famName, setFamName] = useState('')
   const [famSex, setFamSex] = useState<'L' | 'P'>('L')
@@ -74,7 +77,7 @@ function ProfileIsi({ account }: { account: NonNullable<ReturnType<typeof useSto
   const verifiedClinician = Boolean(account.role === 'dokter' || account.isOwner || isCanonicalOwner)
   const clinicalCategory = profile.profession?.trim() || (verifiedClinician ? 'Doctor · Digital Twin & Longevity' : '')
   const displayLink = profile.link?.trim() || (isCanonicalOwner ? 'panaceamed.id' : '')
-  const initials = isCanonicalOwner ? 'DR' : displayName.slice(0, 2).toUpperCase()
+  const initials = initialsOf(displayName)
 
   const openEdit = () => {
     setDraft({
@@ -87,15 +90,21 @@ function ProfileIsi({ account }: { account: NonNullable<ReturnType<typeof useSto
       link: displayLink,
       avatar: profile.avatar,
     })
+    setFieldErrors({})
     setEditing(true)
   }
 
   const saveProfile = () => {
-    const cleaned: ProfileEdit = {
-      ...draft,
-      name: draft.name?.trim() || displayName,
-      username: draft.username?.trim().replace(/^@+/, '') || usernameClean,
+    if (savingRef.current) return
+    const name = sanitizeDisplayName(draft.name)
+    const username = sanitizeUsername(draft.username)
+    if (!name.ok || !username.ok) {
+      setFieldErrors({ name: name.ok ? undefined : name.reason, username: username.ok ? undefined : username.reason })
+      return
     }
+    savingRef.current = true
+    setFieldErrors({})
+    const cleaned: ProfileEdit = { ...draft, name: name.value, username: username.value }
     updateProfile(email, cleaned)
     try {
       const ev = buildNeonOutboxEvent({
@@ -117,6 +126,7 @@ function ProfileIsi({ account }: { account: NonNullable<ReturnType<typeof useSto
     } catch {
       setShareNote('Profile saved locally.')
     }
+    savingRef.current = false
     setEditing(false)
   }
 
@@ -405,11 +415,13 @@ function ProfileIsi({ account }: { account: NonNullable<ReturnType<typeof useSto
             <div className="space-y-3">
               <label className="block">
                 <span className="text-xs font-bold text-neutral-500">Full Name</span>
-                <input value={draft.name ?? ''} onChange={(e) => setDraft((d) => ({ ...d, name: e.target.value }))} placeholder="dr. Rizky Muhammad Azrissal" className="mt-1 w-full rounded-xl border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-brand" />
+                <input value={draft.name ?? ''} onChange={(e) => { setDraft((d) => ({ ...d, name: e.target.value })); setFieldErrors((x) => ({ ...x, name: undefined })) }} placeholder="Your name" maxLength={80} autoComplete="name" aria-invalid={Boolean(fieldErrors.name)} className="mt-1 w-full rounded-xl border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-brand" />
+                {fieldErrors.name && <span role="alert" className="mt-1 block text-[11px] font-semibold text-red-600">{fieldErrors.name}</span>}
               </label>
               <label className="block">
                 <span className="text-xs font-bold text-neutral-500">Username</span>
-                <input value={draft.username ?? ''} onChange={(e) => setDraft((d) => ({ ...d, username: e.target.value }))} placeholder="rizkyazhar486" className="mt-1 w-full rounded-xl border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-brand" />
+                <input value={draft.username ?? ''} onChange={(e) => { setDraft((d) => ({ ...d, username: e.target.value })); setFieldErrors((x) => ({ ...x, username: undefined })) }} placeholder="username" maxLength={31} autoCapitalize="none" autoCorrect="off" spellCheck={false} aria-invalid={Boolean(fieldErrors.username)} className="mt-1 w-full rounded-xl border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-brand" />
+                {fieldErrors.username && <span role="alert" className="mt-1 block text-[11px] font-semibold text-red-600">{fieldErrors.username}</span>}
               </label>
               <label className="block">
                 <span className="text-xs font-bold text-neutral-500">Avatar Photo URL (optional)</span>
