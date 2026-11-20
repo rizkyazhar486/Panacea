@@ -5,6 +5,7 @@ import { lazy, Suspense, useEffect, useRef, useState } from 'react'
 import { Fold } from '../../shared/ui/Fold'
 import { Prosa } from '../../components/Prosa'
 import { KolomAngka } from '../../components/KolomAngka'
+import { simpanTeks } from '../../lib/unduh'
 import { bacaTeksBia, PERINTAH_BACA } from '../../lib/biaGambar'
 import { hariIni } from '../../lib/tanggal'
 import { Link } from 'react-router-dom'
@@ -12,9 +13,6 @@ import { Card, SectionTitle, Field, inputClass, Button, Badge } from '../../comp
 
 const HealthTrendRechart = lazy(() =>
   import('./HealthTrendRechart').then((m) => ({ default: m.HealthTrendRechart })),
-)
-const DeviceQuickSyncCard = lazy(() =>
-  import('../../components/sync/DeviceQuickSyncCard').then((m) => ({ default: m.DeviceQuickSyncCard })),
 )
 import { IconHeart, IconActivity, IconCheck, IconChevronRight } from '../../components/icons'
 import { api, backendEnabled, apiBaseUrl, type KatalogMetrik } from '../../lib/api'
@@ -31,7 +29,6 @@ import { diagnose, type SyncDiagnosis } from '../../lib/syncDiagnostics'
 import { generateInsights } from '../../lib/healthInsights'
 import { benchmarkVo2max, benchmarkRestingHr, benchmarkSleep, BENCHMARK_DISCLAIMER, type BenchmarkItem } from '../../lib/benchmark'
 import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
-import { exportArtifactNow } from '../../components/sync/autoExportBrowserAdapter'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Health Profile — per-user health data saved on the SERVER (keyed by account,
@@ -347,43 +344,11 @@ export function HealthProfile() {
     }
   }
 
-  function buildCanonicalExport() {
-    const mv = mergedExportVitals()
-    const nowIso = new Date().toISOString()
-    const profileKey = account?.email ? account.email.split('@')[0] : 'rizkyazhar486'
-    return {
-      exportedAtIso: nowIso,
-      owner: {
-        profileKey,
-        fullName: account?.isOwner || profileKey.toLowerCase().includes('rizky') ? 'dr. Rizky Muhammad Azrissal' : account?.name || 'dr. Rizky Muhammad Azrissal',
-        username: `@${profileKey.replace(/[^a-zA-Z0-9_]/g, '') || 'rizkyazhar486'}`,
-        mrn: activePatient?.mrn || 'PMD-000486',
-      },
-      vitals: {
-        heightCm: mv.heightCm ?? null,
-        weightKg: mv.weightKg ?? null,
-        bodyFatPct: mv.bodyFatPct ?? null,
-        restingHrBpm: mv.restingHr ?? mv.heartRate ?? null,
-        hrvMs: mv.hrvMs ?? null,
-        vo2max: mv.vo2max ?? null,
-        sleepHours: mv.sleepH ?? null,
-        steps: mv.steps ?? null,
-        spo2Pct: mv.spo2Pct ?? null,
-      },
-      longitudinalRows: (p.history ?? []).map((h) => ({
-        date: h.date,
-        source: p.source,
-        vo2max: h.vo2max ?? null,
-        restingHrBpm: h.restingHr ?? null,
-        hrvMs: h.hrvMs ?? null,
-        sleepHours: h.sleepH ?? null,
-      })),
-      conditions: activePatient?.chronicConditions ?? [],
-    }
+  function download(name: string, text: string, type: string) {
+    void simpanTeks(text, name, type, 'Panaceamed.id')
   }
   function exportJson() {
-    const res = exportArtifactNow('json', buildCanonicalExport())
-    setNote(res.status)
+    download(`health-data-${hariIni()}.json`, JSON.stringify(p, null, 2), 'application/json')
   }
   function mergedExportVitals() {
     const currentVitals = getVitals(account)
@@ -410,8 +375,11 @@ export function HealthProfile() {
     setNote('Exported patient health summary (SOAP/SBAR draft).')
   }
   function exportCsv() {
-    const res = exportArtifactNow('csv', buildCanonicalExport())
-    setNote(res.status)
+    const rows = p.history ?? []
+    if (!rows.length) { setErr('No history to export yet — save your data first.'); return }
+    const cols: (keyof Snapshot)[] = ['date', 'vo2max', 'restingHr', 'hrvMs', 'recoveryPct', 'sleepH']
+    const csv = [cols.join(','), ...rows.map((r) => cols.map((c) => r[c] ?? '').join(','))].join('\n')
+    download(`health-history-${hariIni()}.csv`, csv, 'text/csv')
   }
 
   const num = (label: string, key: keyof HealthProfile, step = 1, ph = '') => (
@@ -425,9 +393,6 @@ export function HealthProfile() {
 
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
-      <Suspense fallback={null}>
-        <DeviceQuickSyncCard />
-      </Suspense>
       <Card className="!p-5">
         <SectionTitle icon={<IconHeart size={20} />} title="My Health Data"
           subtitle={backendEnabled ? 'Synced per account' : 'Saved on this device'} />

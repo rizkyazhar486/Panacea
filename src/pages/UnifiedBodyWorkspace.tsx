@@ -244,13 +244,16 @@ export function UnifiedBodyWorkspace() {
           </Suspense>
         )}
         {(activeKey === 'body' || activeKey === 'body-exposure') && (
-          <details className="rounded-2xl border border-cyan-400/20 bg-[#05070b] p-3 text-white">
-            <summary className="flex min-h-[44px] cursor-pointer list-none items-center justify-between font-mono text-[11px] font-bold uppercase tracking-[0.12em] text-cyan-300">
+          <details className="dark rounded-2xl border border-cyan-400/20 bg-[#05070b] p-3 text-white">
+            <summary
+              className="flex min-h-[44px] cursor-pointer list-none items-center justify-between font-mono text-[11px] font-bold uppercase tracking-[0.12em]"
+              style={{ color: '#a5f3fc' }}
+            >
               <span>Digital Twin · CAD/CAE · Skin · Brain/OSA · ANOVA</span>
               <span>OPEN ▾</span>
             </summary>
             <div className="mt-3">
-              <Suspense fallback={<div className="p-4 text-xs text-slate-400">Loading studio…</div>}>
+              <Suspense fallback={<div className="p-4 text-xs text-slate-200">Loading studio…</div>}>
                 <DigitalTwinScanFlow />
               </Suspense>
             </div>
