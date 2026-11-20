@@ -11,6 +11,8 @@ import type { BodySystemId } from '../../data/bodySystems.ts'
 import { HOME_BODY_IMAGE } from '../../data/homeBodyAnchors.ts'
 import { DEFAULT_PARAMS } from '../../engine/cardiacCycle.ts'
 import { HOME_SYSTEMS, cardPlacement, restingVitals, ventricleVolumeTrace, type HomeSystem } from '../../engine/home-hero/homeBodyStage.ts'
+import { SystemGlyph } from '../SystemGlyph.tsx'
+import { SimulatorBoard } from './SimulatorBoard.tsx'
 import './livingBodyHero.css'
 
 const TRACE = ventricleVolumeTrace(DEFAULT_PARAMS, 2, 160, 44)
@@ -34,15 +36,13 @@ function Detail({ system }: { system: HomeSystem }) {
   return (
     <div className="lbh-detail" data-detail={system.id} style={{ ['--tone' as string]: system.tone }}>
       <span className="lbh-detail-head">
-        <i aria-hidden />
+        <SystemGlyph system={system.id} size={26} />
         <strong>{system.label}</strong>
       </span>
       {system.id === 'cardiovascular' && <HeartTrace />}
-      <span className="lbh-detail-note">
-        {system.inAtlas ? 'Reference anatomy in the 3D atlas.' : 'Region marker only · not yet in the 3D atlas.'}
-      </span>
+      {!system.inAtlas && <span className="lbh-detail-note" title="Region marker only; this system is not yet in the 3D atlas">◌ 3D</span>}
       <Link to={`/tubuh?system=${system.id}`} className="lbh-detail-open" data-open-system={system.id}>
-        Open {system.label} <span aria-hidden>→</span>
+        <span aria-hidden>→</span><span className="sr-only">Open {system.label}</span>
       </Link>
     </div>
   )
@@ -77,23 +77,19 @@ export function LivingBodyHero() {
   return (
     <section className="lbh" aria-label="Body analysis" data-living-body-hero>
       <header className="lbh-head">
-        <div>
-          <span className="lbh-kicker"><b aria-hidden />Body analysis</span>
-          <h2 className="lbh-title">Your body, every system</h2>
-        </div>
+        <h2 className="lbh-kicker"><b aria-hidden /><span className="sr-only">Body analysis</span><span aria-hidden>LIVE</span></h2>
         <Link to="/body-exposure" className="lbh-cta" data-hero-cta>
           <span aria-hidden className="lbh-cta-orb" />
-          Enter 3D
+          3D
         </Link>
       </header>
 
       <div className="lbh-layout">
         <aside className="lbh-rail" aria-label="Resting whole-body state (simulated)">
-          <span className="lbh-rail-head">At rest · simulated</span>
+          <span className="lbh-rail-head" title="Simulated resting state, not your measurements">SIM</span>
           <div className="lbh-vitals">
             {VITALS.map((v) => (
-              <div key={v.key} className="lbh-vital" style={{ ['--tone' as string]: v.tone }}>
-                <span className="lbh-vital-label">{v.label}</span>
+              <div key={v.key} className="lbh-vital" style={{ ['--tone' as string]: v.tone }} title={v.label} aria-label={`${v.label} ${v.value} ${v.unit}`}>
                 <span className="lbh-vital-value">{v.value}<small>{v.unit}</small></span>
               </div>
             ))}
@@ -153,11 +149,12 @@ export function LivingBodyHero() {
                 className="lbh-chip"
                 data-chip={s.id}
                 aria-pressed={s.id === selected}
+                aria-label={s.label}
+                title={s.label}
                 onClick={() => setSelected(s.id)}
                 style={{ ['--tone' as string]: s.tone }}
               >
-                <i aria-hidden />
-                {s.label}
+                <SystemGlyph system={s.id} size={22} />
               </button>
             ))}
           </div>
@@ -168,7 +165,8 @@ export function LivingBodyHero() {
           </nav>
         </aside>
       </div>
-      <small className="lbh-credit">Reference atlas: Z-Anatomy (CC BY-SA 4.0) · simulated resting state, not your measurements</small>
+      <SimulatorBoard />
+      <small className="lbh-credit">Z-Anatomy · CC BY-SA 4.0</small>
     </section>
   )
 }
