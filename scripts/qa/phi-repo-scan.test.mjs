@@ -7,7 +7,65 @@ import { execFileSync, spawnSync } from 'node:child_process'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { pindaiTeks, bandingkan, pindaiRepo, pindaiNamaBerkas, muatDaftarIzin, BERKAS_FIXTURE, daftarBerkas, BATAS_PINDAI_KARAKTER, ringkasKegagalanTanpaPHI, refBerkasAman } from './phi-repo-scan.mjs'
+import { crc32, deflateRawSync } from 'node:zlib'
+import { pindaiTeks, bandingkan, pindaiRepo, pindaiNamaBerkas, muatDaftarIzin, BERKAS_FIXTURE, daftarBerkas, BATAS_PINDAI_KARAKTER, ringkasKegagalanTanpaPHI, refBerkasAman, teksArsipXlsx } from './phi-repo-scan.mjs'
+
+// Fixture ZIP kecil dibuat di memori; tidak memakai workbook atau identitas pasien nyata.
+function workbookZip(entries = [], { method = 8, flags = 0, declaredSize } = {}) {
+  const files = [['[Content_Types].xml', '<Types/>'], ['xl/workbook.xml', '<workbook/>'], ...entries]
+  const locals = [], directory = []
+  let offset = 0
+  for (const [name, value] of files) {
+    const label = Buffer.from(name), content = Buffer.isBuffer(value) ? value : Buffer.from(value)
+    const packed = method === 0 ? content : deflateRawSync(content)
+    const original = name === 'xl/sharedStrings.xml' ? declaredSize ?? content.length : content.length
+    const local = Buffer.alloc(30)
+    local.writeUInt32LE(0x04034b50); local.writeUInt16LE(20, 4); local.writeUInt16LE(flags, 6); local.writeUInt16LE(method, 8)
+    local.writeUInt32LE(crc32(content), 14); local.writeUInt32LE(packed.length, 18); local.writeUInt32LE(original, 22); local.writeUInt16LE(label.length, 26)
+    const central = Buffer.alloc(46)
+    central.writeUInt32LE(0x02014b50); central.writeUInt16LE(20, 4); central.writeUInt16LE(20, 6)
+    central.writeUInt16LE(flags, 8); central.writeUInt16LE(method, 10); central.writeUInt32LE(crc32(content), 16)
+    central.writeUInt32LE(packed.length, 20); central.writeUInt32LE(original, 24); central.writeUInt16LE(label.length, 28); central.writeUInt32LE(offset, 42)
+    locals.push(local, label, packed); directory.push(central, label)
+    offset += local.length + label.length + packed.length
+  }
+  const index = Buffer.concat(directory), end = Buffer.alloc(22)
+  end.writeUInt32LE(0x06054b50); end.writeUInt16LE(files.length, 8); end.writeUInt16LE(files.length, 10)
+  end.writeUInt32LE(index.length, 12); end.writeUInt32LE(offset, 16)
+  return Buffer.concat([...locals, index, end])
+}
+
+test('E4: workbook text is scanned after bounded store or DEFLATE extraction', () => {
+  const secret = ['317101', '150590', '0001'].join('')
+  for (const method of [0, 8]) {
+    const clean = teksArsipXlsx(workbookZip([['xl/', ''], ['xl/metadata', '<metadata/>'], ['xl/sharedStrings.xml', '<t>informasi café 日本語</t>']], { method }))
+    assert.equal(pindaiTeks(clean).length, 0)
+    const unsafe = teksArsipXlsx(workbookZip([['xl/sharedStrings.xml', `<t>${secret}</t>`]], { method }))
+    assert.ok(pindaiTeks(unsafe).some(finding => finding.jenis === 'nik'), 'compressed workbook text must not bypass patterns')
+  }
+})
+
+test('E4: malformed, encrypted, duplicate or non-text workbook members fail closed', () => {
+  const valid = workbookZip([['xl/sharedStrings.xml', '<t>synthetic</t>']])
+  const checksumMismatch = Buffer.from(valid)
+  checksumMismatch.writeUInt32LE(checksumMismatch.readUInt32LE(14) ^ 1, 14)
+  // Ubah payload tersimpan agar pemeriksaan CRC menolak isi yang rusak.
+  const corruptStored = workbookZip([], { method: 0 })
+  corruptStored[30 + Buffer.byteLength('[Content_Types].xml')] ^= 1
+  for (const bytes of [
+    Buffer.alloc(0), valid.subarray(0, -1), Buffer.concat([valid, Buffer.from('tail')]),
+    workbookZip([], { flags: 1 }), workbookZip([], { method: 12 }),
+    workbookZip([['xl/workbook.xml', '<duplicate/>']]), workbookZip([['xl/binary.bin', Buffer.from([0xff, 0])]]),
+    workbookZip([['xl/sharedStrings.xml', Buffer.from([0xc3, 0x28])]]),
+    workbookZip([['xl/sharedStrings.xml', 'synthetic\0text']]), checksumMismatch, corruptStored,
+  ]) assert.throws(() => teksArsipXlsx(bytes), 'invalid workbook must never produce a clean text scan')
+})
+
+test('E4: workbook decompression rejects oversized output even when declared size lies', () => {
+  const bomb = workbookZip([['xl/sharedStrings.xml', Buffer.alloc(BATAS_PINDAI_KARAKTER + 1, 65)]], { declaredSize: 1 })
+  assert.throws(() => teksArsipXlsx(bomb), error => error.code === 'ERR_BUFFER_TOO_LARGE', 'actual expanded bytes must be bounded independently of metadata')
+  assert.throws(() => teksArsipXlsx(Buffer.alloc(BATAS_PINDAI_KARAKTER + 1)), 'archive input is bounded too')
+})
 
 test('E4: filename identifiers are detected across arbitrary and compound extensions', () => {
   for (const suffix of ['', '.ts', '.csv', '.zip', '.tar.gz', '.2026']) {
@@ -183,6 +241,63 @@ test('E4: unreadable tracked file fails closed rather than being skipped', () =>
 
 test('E4: non-text reader result cannot certify a clean repository', () => {
   assert.throws(() => pindaiRepo(['kosong.ts'], () => undefined), /konten bukan teks: ref=[0-9a-f]{16}/)
+})
+
+test('E4: NUL-separated text cannot certify a clean repository', () => {
+  const secret = ['317101', '150590', '0001'].join('')
+  const contents = [...secret].join('\0')
+  assert.throws(() => pindaiRepo(['synthetic.txt'], () => contents), error =>
+    /karakter NUL.*ref=[0-9a-f]{16}/.test(error.message) && !error.message.includes(secret),
+  )
+})
+
+test('E4: CLI and mandatory gate reject unsupported text encodings without leaking identifiers', () => {
+  const root = mkdtempSync(join(tmpdir(), 'phi-encoding-'))
+  const secret = ['317101', '150590', '0001'].join('')
+  const utf16 = Buffer.from(`synthetic ${secret}`, 'utf16le')
+  const cases = [
+    ['utf8', Buffer.from('Synthetic UTF-8: informasi, café, 日本語'), 0],
+    ['utf8-bom', Buffer.concat([Buffer.from([0xef, 0xbb, 0xbf]), Buffer.from('Synthetic UTF-8')]), 0],
+    ['utf8-identifier', Buffer.from(`synthetic ${secret}`), 1],
+    ['utf16le', utf16, 1],
+    ['utf16le-bom', Buffer.concat([Buffer.from([0xff, 0xfe]), utf16]), 1],
+    ['utf16be-bom', Buffer.concat([Buffer.from([0xfe, 0xff]), Buffer.from(utf16).swap16()]), 1],
+    ['invalid-utf8', Buffer.from([0xc3, 0x28]), 1],
+    ['xlsx-clean', workbookZip([['xl/sharedStrings.xml', '<t>synthetic</t>']]), 0, '.xlsx'],
+    ['xlsx-identifier', workbookZip([['xl/sharedStrings.xml', `<t>${secret}</t>`]]), 1, '.xlsx'],
+    ['xlsx-truncated', workbookZip().subarray(0, -1), 1, '.xlsx'],
+  ]
+  try {
+    const qa = join(root, 'scripts', 'qa')
+    mkdirSync(qa, { recursive: true })
+    mkdirSync(join(root, 'governance'))
+    for (const name of ['phi-repo-scan.mjs', 'phi-repo-scan.test.mjs']) {
+      writeFileSync(join(qa, name), readFileSync(new URL(name, import.meta.url)))
+    }
+    writeFileSync(join(root, 'governance', 'PHI_SCAN_ALLOWLIST.json'), '{"entri":[]}')
+    const fixture = join(root, 'synthetic.txt')
+    const workbook = join(root, 'synthetic.xlsx')
+    writeFileSync(fixture, '')
+    writeFileSync(workbook, workbookZip())
+    for (const args of [['init', '--quiet'], ['add', '.']]) execFileSync('git', args, { cwd: root, stdio: 'pipe' })
+    const env = { ...process.env }
+    delete env.NODE_TEST_CONTEXT
+    for (const [name, bytes, expected, extension = '.txt'] of cases) {
+      writeFileSync(fixture, '')
+      writeFileSync(workbook, workbookZip())
+      writeFileSync(extension === '.xlsx' ? workbook : fixture, bytes)
+      const cli = spawnSync(process.execPath, ['scripts/qa/phi-repo-scan.mjs'], { cwd: root, encoding: 'utf8', env })
+      assert.equal(cli.status, expected, `${name}: unsupported encoding must fail closed`)
+      assert.equal((cli.stdout + cli.stderr).includes(secret), false, 'logs must omit synthetic identifier')
+      assert.equal((cli.stdout + cli.stderr).includes(fixture), false, 'logs must omit fixture path')
+      if (name === 'utf16le' || name === 'xlsx-identifier') {
+        // Gerbang yang dipanggil build harus menolak berkas yang sama, bukan CLI saja.
+        const gate = spawnSync(process.execPath, ['--test', '--test-name-pattern=^repo_nyata_', 'scripts/qa/phi-repo-scan.test.mjs'], { cwd: root, encoding: 'utf8', env })
+        assert.equal(gate.status, 1, 'mandatory repository gate must reject unsupported encoding')
+        assert.equal((gate.stdout + gate.stderr).includes(secret), false)
+      }
+    }
+  } finally { rmSync(root, { recursive: true, force: true }) }
 })
 
 test('E4: real-world source larger than old 2M boundary is scanned fully', () => {
