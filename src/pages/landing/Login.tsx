@@ -9,8 +9,8 @@ import { getTheme, toggleTheme, type Theme } from '../../lib/theme'
 import { ageFromDob } from '../../lib/anthro'
 import type { Account, Role } from '../../lib/types'
 import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
-import { GoogleG } from './loginSvgs'
 import { listRememberedAccounts } from '../../domains/identity/bootVitals'
+import { DEVICE_GUEST_STORAGE_KEY, deviceGuestProfile } from '../../domains/identity/deviceGuest'
 import { STR_ROLES, ROLES, LOGIN_PILLS } from './loginData'
 import './login.css'
 import { Prosa } from '../../components/Prosa'
@@ -77,14 +77,6 @@ export function Login({ onBack }: { onBack?: () => void }) {
     ownerEmail: OWNER_EMAIL,
   })
 
-  const hasExistingLocalVault =
-    rememberedAccounts.length > 0 ||
-    state.patients.length > 0 ||
-    Boolean(
-      typeof localStorage !== 'undefined' &&
-        (localStorage.getItem('pmd_health_profile') || localStorage.getItem('pm_bodycomp_v1')),
-    )
-
   const completeQuickSignIn = (profile: { email: string; name?: string; role?: Role; patientId?: string }) => {
     const cleanEmail = profile.email.trim().toLowerCase()
     const targetRole = profile.role ?? role
@@ -107,21 +99,26 @@ export function Login({ onBack }: { onBack?: () => void }) {
     })
   }
 
-  const handleOneClickGoogle = () => {
-    const typedEmail = f.email.trim().toLowerCase()
-    if (typedEmail && typedEmail.includes('@') && typedEmail.includes('.')) {
-      completeQuickSignIn({ email: typedEmail, name: f.name, role })
+  // "Continue on this device": works when Google or the server is unavailable. Always a plain patient session with a
+  // device-scoped identity (never the owner, an admin or a named clinician), and it needs the same privacy consent.
+  const continueOnThisDevice = () => {
+    if (!consentOk()) return
+    let deviceId = ''
+    try {
+      deviceId = localStorage.getItem(DEVICE_GUEST_STORAGE_KEY) || ''
+      if (deviceId.length < 8) {
+        deviceId = `${uid()}${Date.now().toString(36)}`
+        localStorage.setItem(DEVICE_GUEST_STORAGE_KEY, deviceId)
+      }
+    } catch {
+      deviceId = `${uid()}${Date.now().toString(36)}`
+    }
+    const guest = deviceGuestProfile(deviceId)
+    if (!guest) {
+      setError('Tidak dapat membuat sesi di perangkat ini. Masuk dengan email di bawah.')
       return
     }
-    if (rememberedAccounts.length > 0) {
-      completeQuickSignIn(rememberedAccounts[0])
-      return
-    }
-    if (hasExistingLocalVault) {
-      completeQuickSignIn({ email: OWNER_EMAIL, name: OWNER_EMAIL.split('@')[0], role: 'owner' })
-      return
-    }
-    setError('Ketik alamat email Google Anda sekali di bawah, lalu ketuk Masuk dengan Google (tersimpan otomatis untuk 1-klik berikutnya).')
+    completeQuickSignIn(guest)
   }
 
   const roleRef = useRef<Role>('pasien')
@@ -162,7 +159,7 @@ export function Login({ onBack }: { onBack?: () => void }) {
           return
         } catch {
           if (batal) return
-          setServerNotice('Menghubungkan ke layanan server (Mode Lokal Berdaulat siap dipakai)…')
+          setServerNotice('Menghubungkan ke layanan server… Anda tetap bisa lanjut di perangkat ini.')
           if (i === 0) await new Promise((r) => setTimeout(r, 2000))
         }
       }
@@ -188,8 +185,8 @@ export function Login({ onBack }: { onBack?: () => void }) {
           consentAt: new Date().toISOString(),
           strStatus: STR_ROLES.includes(a.role) ? 'pending' : 'none',
         }))
-        .catch(() => setError('Verifikasi Google OAuth gagal atau origin belum terdaftar. Gunakan Mode Lokal Berdaulat (Local-First) di bawah agar tidak terhambat.'))
-    }).catch(() => setError('Tombol Google Sign-In tidak dapat dimuat (periksa origin/koneksi). Gunakan Mode Lokal Berdaulat (Local-First) di bawah.'))
+        .catch(() => setError('Verifikasi Google OAuth gagal atau origin belum terdaftar. Lanjutkan di perangkat ini atau masuk dengan email di bawah.'))
+    }).catch(() => setError('Tombol Google Sign-In tidak dapat dimuat (periksa origin/koneksi). Lanjutkan di perangkat ini atau masuk dengan email di bawah.'))
   }, [health, login])
 
   function consentOk() {
@@ -462,19 +459,7 @@ export function Login({ onBack }: { onBack?: () => void }) {
               </div>
             )}
 
-            {health?.googleClientId ? (
-              <div ref={gbtn} className="flex justify-center" />
-            ) : (
-              <button
-                type="button"
-                onClick={handleOneClickGoogle}
-                data-testid="google-signin-btn"
-                className="flex min-h-[44px] w-full items-center justify-center gap-2.5 rounded-full border border-neutral-200 bg-white px-4 py-2.5 text-xs font-bold text-neutral-800 shadow-xs dark:border-white/15 dark:bg-neutral-900 dark:text-white"
-              >
-                <GoogleG />
-                <span>Lanjutkan dengan Google</span>
-              </button>
-            )}
+            {health?.googleClientId && <div ref={gbtn} className="flex justify-center" />}
 
             <div className="grid grid-cols-2 gap-2">
               <button
@@ -699,21 +684,15 @@ export function Login({ onBack }: { onBack?: () => void }) {
               : `Daftar sebagai ${cur.title} →`}
           </button>
 
-          {/* ── Zero-Downtime Local-First Sovereign Fallback (absorbs Render 503 / OAuth origin failures) ─ */}
+          {/* ── Always-available fallback: Google or the server can be down, the device session still works ─ */}
           <div className="pt-1">
             <button
               type="button"
-              onClick={() =>
-                completeQuickSignIn({
-                  email: OWNER_EMAIL,
-                  name: 'dr. Rizky Muhammad Azrissal',
-                  role: 'owner',
-                })
-              }
-              className="astro-chip flex min-h-[44px] w-full items-center justify-center gap-2 rounded-full px-4 py-2.5 text-xs font-bold"
+              onClick={continueOnThisDevice}
+              data-testid="device-session-btn"
+              className="astro-chip flex min-h-[44px] w-full items-center justify-center rounded-full px-4 py-2.5 text-xs font-bold"
             >
-              <span>⚡</span>
-              <span>Continue as dr. Rizky Muhammad Azrissal (Local-First Sovereign Mode)</span>
+              Continue on this device (no account needed)
             </button>
           </div>
 

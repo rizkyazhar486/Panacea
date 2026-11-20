@@ -91,15 +91,7 @@ export function listRememberedAccounts(options?: {
       put({ email, name: email.split('@')[0], role: email.toLowerCase() === options.ownerEmail?.toLowerCase() ? 'owner' : 'pasien', lastLoginAt: new Date(0).toISOString() })
     }
   }
-  if (options?.ownerEmail && options.patients && options.patients.length > 0 && seen.size === 0) {
-    put({
-      email: options.ownerEmail,
-      name: options.patients[0].name || options.ownerEmail.split('@')[0],
-      role: 'owner',
-      patientId: options.patients[0].id,
-      lastLoginAt: new Date(0).toISOString(),
-    })
-  }
+  // No identity is invented here: only accounts actually stored on this device are offered for 1-tap return.
   return [...seen.values()].sort((a, b) => (a.lastLoginAt < b.lastLoginAt ? 1 : -1))
 }
 
@@ -244,6 +236,56 @@ export function readUnifiedLocalVitals(
   return merged
 }
 
+const EXPLICIT_LOGOUT_KEY = 'panacea.explicit_logout.v1'
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+/** Roles a browser-stored (self-asserted) record may carry. Owner/admin power is never read from storage. */
+const STORED_ROLES: readonly Role[] = ['pasien', 'dokter', 'perawat']
+
+/** A role read from browser storage is self-asserted: owner only for the owner's own email, otherwise a plain role or `pasien`. */
+export function clampStoredRole(role: unknown, email: string, ownerEmail: string): Role {
+  if (email.trim().toLowerCase() === ownerEmail.trim().toLowerCase()) return 'owner'
+  return STORED_ROLES.includes(role as Role) ? (role as Role) : 'pasien'
+}
+
+/**
+ * Adopt the identity a previous visit left in this browser (`pmd_profile`) when the 7-day session lapsed.
+ * Fail closed: without a stored, well-formed email nobody is adopted (the login screen shows instead), and an
+ * explicit logout is respected. The owner identity is never used as a default.
+ */
+export function resolveLegacySessionAccount(ownerEmail: string, nowIso: string = new Date().toISOString()): Account | null {
+  if (typeof localStorage === 'undefined') return null
+  try {
+    if (localStorage.getItem(EXPLICIT_LOGOUT_KEY) === '1') return null
+    const used =
+      Boolean(localStorage.getItem('pmd_health_profile')) ||
+      Boolean(localStorage.getItem(BODYCOMP_KEY)) ||
+      localStorage.getItem('panacea_onboarded_v1') === '1'
+    if (!used) return null
+    let stored: Record<string, unknown> = {}
+    try {
+      const parsed = JSON.parse(localStorage.getItem('pmd_profile') || '{}')
+      if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) stored = parsed as Record<string, unknown>
+    } catch { /* unreadable profile = no identity */ }
+    const email = typeof stored.email === 'string' ? stored.email.trim().toLowerCase() : ''
+    if (!EMAIL_RE.test(email)) return null
+    const isOwner = email === ownerEmail.trim().toLowerCase()
+    const name = typeof stored.name === 'string' && stored.name.trim() ? stored.name.trim().slice(0, 80) : email.split('@')[0]
+    return {
+      id: `local:${encodeURIComponent(email)}`,
+      email,
+      name,
+      role: clampStoredRole(stored.role, email, ownerEmail),
+      isOwner,
+      isSubscriber: isOwner,
+      loggedAt: nowIso,
+      patientId: `self-u-local%3A${encodeURIComponent(email)}`,
+      consentAt: nowIso,
+    }
+  } catch {
+    return null
+  }
+}
+
 export function resolveAutoResumeAccount(options: {
   readonly ownerEmail: string
   readonly profiles?: Readonly<Record<string, ProfileEdit>>
@@ -251,7 +293,7 @@ export function resolveAutoResumeAccount(options: {
 }): Account | null {
   if (typeof localStorage === 'undefined') return null
   try {
-    if (localStorage.getItem('panacea.explicit_logout.v1') === '1') return null
+    if (localStorage.getItem(EXPLICIT_LOGOUT_KEY) === '1') return null
     const onboarded = Boolean(localStorage.getItem('panacea_onboarded_v1'))
     const hasHp = Boolean(localStorage.getItem('pmd_health_profile') && localStorage.getItem('pmd_health_profile') !== '{}')
     const hasBc = Boolean(localStorage.getItem('pm_bodycomp_v1'))
@@ -265,17 +307,20 @@ export function resolveAutoResumeAccount(options: {
       ownerEmail: options.ownerEmail,
     })
     const primary = remembered[0]
-    const email = (primary?.email || options.ownerEmail).trim().toLowerCase()
+    // Fail closed: with no stored account there is nobody to resume. Never fall back to the owner identity.
+    if (!primary) return null
+    const email = primary.email.trim().toLowerCase()
     const id = `local:${encodeURIComponent(email)}`
-    const role: Role = primary?.role ?? (email === options.ownerEmail.toLowerCase() ? 'owner' : 'pasien')
+    const isOwner = email === options.ownerEmail.trim().toLowerCase()
+    const role = clampStoredRole(primary.role, email, options.ownerEmail)
     return {
       id,
       email,
-      name: primary?.name || email.split('@')[0],
+      name: primary.name || email.split('@')[0],
       role,
-      patientId: primary?.patientId || `self-u-${id}`,
-      isOwner: email === options.ownerEmail.toLowerCase(),
-      isSubscriber: role === 'owner' || email === options.ownerEmail.toLowerCase(),
+      patientId: primary.patientId || `self-u-${id}`,
+      isOwner,
+      isSubscriber: isOwner,
       loggedAt: new Date().toISOString(),
     }
   } catch {

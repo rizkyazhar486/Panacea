@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactNode } from 'react'
 import { parseWithdrawAmount, checkTokenAmount } from '../domains/wallet/index.ts'
 import { bindPersonalHealthAccount } from '../shared/kernel/personalHealthStorageScope.ts'
-import { resolveAutoResumeAccount, rememberAccountProfile } from '../domains/identity/bootVitals.ts'
+import { resolveAutoResumeAccount, resolveLegacySessionAccount, rememberAccountProfile } from '../domains/identity/bootVitals.ts'
 import { normalisasiDaftarPasien } from './normalisasiPasien'
 import { hariIni } from './tanggal'
 import { api, backendEnabled, type BackendPost } from './api'
@@ -324,38 +324,12 @@ function loadSession(): Account | null {
         return normalized
       }
     }
-    // Auto-reconciliation fallback: if user already has completed onboarding,
-    // or has health profile / biometric telemetry / workout logs in localStorage,
-    // adopt seamlessly into their active account without forcing a re-login.
-    const hpRaw = localStorage.getItem('pmd_health_profile')
-    const bcRaw = localStorage.getItem('pm_bodycomp_v1')
-    const onboarded = localStorage.getItem('panacea_onboarded_v1') === '1'
-    if (hpRaw || bcRaw || onboarded) {
-      let pmdProf: Record<string, unknown> = {}
-      try { pmdProf = JSON.parse(localStorage.getItem('pmd_profile') || '{}') } catch { /* ignore */ }
-      const email = typeof pmdProf?.email === 'string' && pmdProf.email.includes('@')
-        ? pmdProf.email.trim().toLowerCase()
-        : OWNER_EMAIL.trim().toLowerCase()
-      const isOwner = email === OWNER_EMAIL.trim().toLowerCase()
-      const targetRole: Role = (typeof pmdProf?.role === 'string' && ['owner', 'dokter', 'pasien', 'perawat', 'admin'].includes(pmdProf.role))
-        ? (pmdProf.role as Role)
-        : (isOwner ? 'owner' : 'pasien')
-      const targetName = typeof pmdProf?.name === 'string' && pmdProf.name.trim()
-        ? pmdProf.name.trim()
-        : (isOwner ? 'Dr. Rizky Muhammad Azrissal' : email.split('@')[0])
-      const fallbackAccount: Account = {
-        id: `local:${encodeURIComponent(email)}`,
-        email,
-        name: targetName,
-        role: targetRole,
-        isOwner,
-        isSubscriber: isOwner || targetRole === 'owner',
-        loggedAt: new Date().toISOString(),
-        patientId: `self-u-local%3A${encodeURIComponent(email)}`,
-        consentAt: new Date().toISOString(),
-      }
-      saveSession(fallbackAccount)
-      return fallbackAccount
+    // Session lapsed: recover the identity this browser already knows (pmd_profile) so old local data is kept.
+    // Fail closed: no stored email, or an explicit logout, means the login screen; the owner is never a default.
+    const resumed = resolveLegacySessionAccount(OWNER_EMAIL)
+    if (resumed) {
+      saveSession(resumed)
+      return resumed
     }
     return null
   } catch { return null }
