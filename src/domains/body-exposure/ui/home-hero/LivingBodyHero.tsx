@@ -96,7 +96,7 @@ export function LivingBodyHero() {
         </aside>
 
         <div ref={stageRef} className="lbh-stage">
-          <div className="lbh-bodybox" style={{ ['--lbh-mask' as string]: `url(${IMAGE_SRC})` }}>
+          <div className="lbh-bodybox">
             <img
               src={IMAGE_SRC}
               width={HOME_BODY_IMAGE.width}
@@ -105,7 +105,7 @@ export function LivingBodyHero() {
               decoding="async"
               className="lbh-body"
             />
-            <span className="lbh-scan" aria-hidden style={{ maskImage: `url(${IMAGE_SRC})`, WebkitMaskImage: `url(${IMAGE_SRC})` }} />
+            <span className="lbh-scan" aria-hidden />
             {HOME_SYSTEMS.map((s) => (
               <button
                 key={s.id}

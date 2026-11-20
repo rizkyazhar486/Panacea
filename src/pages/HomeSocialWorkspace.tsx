@@ -13,6 +13,7 @@ import { ThinkingOrb } from '../components/ThinkingOrb'
 import { SimpleModeInvite } from '../domains/simple-mode'
 import { PanaceaZoneNav } from '../components/PanaceaZoneNav'
 import { Fold, FoldGroup } from '../shared/ui/Fold'
+import { WhenOpened } from '../shared/ui/WhenOpened'
 import { LivingBodyHero } from '../domains/body-exposure/ui/home-hero/LivingBodyHero'
 
 const Feed = lazy(() => import('./social/Feed'))
@@ -94,7 +95,10 @@ export function HomeSocialWorkspace() {
                 <HomeLiveWidgetRail />
               </Fold>
               <Fold label="Stories" subtitle="Insights">
-                <PanaceaImageSlider />
+                {/* Six organ photos: fetched when the fold is opened, not on every Home visit. */}
+                <WhenOpened>
+                  <PanaceaImageSlider />
+                </WhenOpened>
               </Fold>
               <Fold label="Deck" subtitle="Commands">
                 <HomeCommandDeck />
