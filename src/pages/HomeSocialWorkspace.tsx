@@ -13,6 +13,8 @@ import { ThinkingOrb } from '../components/ThinkingOrb'
 import { SimpleModeInvite } from '../domains/simple-mode'
 import { PanaceaZoneNav } from '../components/PanaceaZoneNav'
 import { Fold, FoldGroup } from '../shared/ui/Fold'
+import { WhenOpened } from '../shared/ui/WhenOpened'
+import { LivingBodyHero } from '../domains/body-exposure/ui/home-hero/LivingBodyHero'
 
 const Feed = lazy(() => import('./social/Feed'))
 const Community = lazy(() => import('./social/Community').then((m) => ({ default: m.Community })))
@@ -63,6 +65,7 @@ export function HomeSocialWorkspace() {
       </div>
       {activeKey === 'home' ? (
         <div className="panacea-human-home">
+          <LivingBodyHero />
           <SimpleModeInvite />
           {/* Balanced 2-Column Bento Grid on Desktop */}
           <div className="grid grid-cols-1 items-stretch gap-6 lg:grid-cols-12">
@@ -92,7 +95,10 @@ export function HomeSocialWorkspace() {
                 <HomeLiveWidgetRail />
               </Fold>
               <Fold label="Stories" subtitle="Insights">
-                <PanaceaImageSlider />
+                {/* Six organ photos: fetched when the fold is opened, not on every Home visit. */}
+                <WhenOpened>
+                  <PanaceaImageSlider />
+                </WhenOpened>
               </Fold>
               <Fold label="Deck" subtitle="Commands">
                 <HomeCommandDeck />

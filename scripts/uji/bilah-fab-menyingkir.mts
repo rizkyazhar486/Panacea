@@ -98,4 +98,20 @@ const shell = readFileSync(new URL('../../src/components/layout/Shell.tsx', impo
 assert.match(shell, /tersembunyi=\{keadaanBilah === 'hidden'\}/,
   'Shell no longer passes the command-bar state to the orb, so the two stopped moving together')
 
+// ── 7. Navigasi (Back/Forward) memulai halaman dengan bilah terlihat ─────
+// Terukur di peramban 390x844: Home → Ask Panacea → Back memulihkan gulir 0 → 1492 px; tanpa sinyal navigasi lompatan
+// itu dibaca sebagai gulir turun dan Notifications hilang tepat saat pengguna tiba.
+const PULIH = { scrollY: 1492, previousScrollY: 0, pointerY: null, focusWithin: false }
+assert.equal(nextCommandBarState('shown', { ...PULIH, navigated: true }), 'shown',
+  'the browser restoring the scroll position after Back hides the command bar — a page you arrive at starts without navigation')
+assert.equal(nextCommandBarState('hidden', { ...PULIH, navigated: true }), 'shown',
+  'arriving on a page through Back/Forward does not bring a hidden command bar back')
+// Pasangan negatif: lompatan yang SAMA tanpa navigasi tetap gulir turun → menyingkir (aturannya tidak dilonggarkan).
+assert.equal(nextCommandBarState('shown', { ...PULIH, navigated: false }), 'hidden',
+  'without a navigation, a large downward scroll no longer hides the bar — the navigation signal has leaked into normal scrolling')
+assert.equal(nextCommandBarState('shown', { ...PULIH }), 'hidden', 'an absent navigation flag must behave as false')
+assert.match(hook, /addEventListener\('popstate', padaNavigasi\)/, 'the hook no longer listens for Back/Forward')
+assert.match(hook, /addEventListener\('hashchange', padaNavigasi\)/, 'the hook no longer listens for hash navigation')
+assert.match(hook, /navigated: performance\.now\(\) < navigasiSampai\.current/, 'the hook no longer feeds the navigation window to the decision function')
+
 console.log('bilah-fab-menyingkir: ok (ketuk tepi atas memanggil bilah; orb ikut menyingkir tanpa membatalkan gerakan)')

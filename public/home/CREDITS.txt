@@ -1,0 +1,10 @@
+atlas-body-front.webp, atlas-body-holo.webp
+
+Source: Z-Anatomy atlas, the same meshes shipped in public/anatomy (skeletal.glb and muscular.glb).
+Licence: CC BY-SA 4.0 (see public/anatomy/CREDITS.txt for the full attribution of the source atlas).
+How it was made: rendered by scripts/bangun/bake-home-body.mjs, one anterior view, transparent background,
+no geometry edited. The hotspot positions in src/domains/body-exposure/data/homeBodyAnchors.ts are projected
+from the named atlas meshes with the same camera.
+Truth class: reference anatomy. It is not the viewer's body and not a patient image.
+atlas-body-holo.webp is the same render pass with a Fresnel rim material per layer (bone, muscle, cardiovascular,
+nervous); geometry unchanged.
