@@ -69,6 +69,10 @@ export function Login({ onBack }: { onBack?: () => void }) {
   const [accessModal, setAccessModal] = useState<'authenticator' | 'qr' | null>(null)
   const [theme, setTheme] = useState<Theme>(getTheme)
   const [health, setHealth] = useState<Health | null>(null)
+  const [googleStatus, setGoogleStatus] = useState<'idle' | 'connecting' | 'ready' | 'unavailable'>(
+    backendEnabled ? 'connecting' : 'idle',
+  )
+  const [healthRetrySeed, setHealthRetrySeed] = useState(0)
 
   const rememberedAccounts = listRememberedAccounts({
     profiles: state.profiles,
@@ -142,44 +146,57 @@ export function Login({ onBack }: { onBack?: () => void }) {
   useEffect(() => { consentRef.current = consent }, [consent])
 
   useEffect(() => {
-    if (!backendEnabled) return
+    if (!backendEnabled) {
+      setGoogleStatus('idle')
+      return
+    }
     let batal = false
+    setGoogleStatus('connecting')
+    const delaysMs = [0, 2500, 5000, 8000]
     const coba = async () => {
-      for (let i = 0; i < 2; i++) {
+      for (let i = 0; i < delaysMs.length; i++) {
+        if (delaysMs[i] > 0) await new Promise((r) => setTimeout(r, delaysMs[i]))
+        if (batal) return
         try {
           const h = await api.health()
           if (batal) return
           setHealth(h)
+          setGoogleStatus(h?.features?.google && h?.googleClientId ? 'ready' : 'unavailable')
           return
         } catch {
           if (batal) return
-          if (i === 0) await new Promise((r) => setTimeout(r, 2000))
         }
       }
+      if (!batal) setGoogleStatus('unavailable')
     }
     void coba()
     return () => { batal = true }
-  }, [])
+  }, [healthRetrySeed])
 
   useEffect(() => {
     if (!health?.googleClientId || !gbtn.current) return
-    renderGoogleButton(gbtn.current, health.googleClientId, cred => {
-      if (!consentRef.current) {
-        setError('Harap setujui Syarat Layanan & Kebijakan Privasi terlebih dahulu.')
-        return
-      }
-      setError('')
-      api.googleLogin(cred, roleRef.current)
-        .then(a => login({
-          ...a,
-          isOwner: a.email.toLowerCase() === OWNER_EMAIL,
-          isSubscriber: a.role === 'owner',
-          consentAt: new Date().toISOString(),
-          strStatus: STR_ROLES.includes(a.role) ? 'pending' : 'none',
-        }))
-        .catch(() => setError('Verifikasi Google OAuth gagal atau origin belum terdaftar. Masuk dengan email di bawah.'))
-    }).catch(() => setError('Tombol Google Sign-In tidak dapat dimuat (periksa origin/koneksi). Masuk dengan email di bawah.'))
-  }, [health, login])
+    renderGoogleButton(
+      gbtn.current,
+      health.googleClientId,
+      cred => {
+        if (!consentRef.current) {
+          setError('Harap setujui Syarat Layanan & Kebijakan Privasi terlebih dahulu.')
+          return
+        }
+        setError('')
+        api.googleLogin(cred, roleRef.current)
+          .then(a => login({
+            ...a,
+            isOwner: a.email.toLowerCase() === OWNER_EMAIL,
+            isSubscriber: a.role === 'owner',
+            consentAt: new Date().toISOString(),
+            strStatus: STR_ROLES.includes(a.role) ? 'pending' : 'none',
+          }))
+          .catch(() => setError('Verifikasi Google OAuth gagal atau origin belum terdaftar. Masuk dengan email di bawah.'))
+      },
+      { theme: theme === 'dark' ? 'filled_black' : 'outline' },
+    ).catch(() => setError('Tombol Google Sign-In tidak dapat dimuat (periksa origin/koneksi). Masuk dengan email di bawah.'))
+  }, [health, login, theme])
 
   function consentOk() {
     if (!consent) {
@@ -451,14 +468,41 @@ export function Login({ onBack }: { onBack?: () => void }) {
               </div>
             )}
 
-            {health?.googleClientId && <div ref={gbtn} className="flex justify-center" />}
+            {health?.googleClientId ? (
+              <div className="space-y-1.5" data-testid="google-signin-slot">
+                <div ref={gbtn} className="flex min-h-[44px] w-full justify-center" />
+                {!consent && (
+                  <p className="text-center text-[11px] font-medium text-neutral-600 dark:text-neutral-300">
+                    Centang persetujuan privasi di bawah sebelum masuk dengan Google.
+                  </p>
+                )}
+              </div>
+            ) : backendEnabled && googleStatus === 'connecting' ? (
+              <div
+                data-testid="google-signin-connecting"
+                className="flex min-h-[44px] items-center justify-center rounded-xl border border-neutral-200/80 bg-neutral-50/70 px-3 text-xs font-semibold text-neutral-600 dark:border-white/10 dark:bg-white/[0.04] dark:text-neutral-300"
+                role="status"
+                aria-live="polite"
+              >
+                Menghubungkan Google Sign-In…
+              </div>
+            ) : backendEnabled && googleStatus === 'unavailable' ? (
+              <button
+                type="button"
+                data-testid="google-signin-retry"
+                onClick={() => setHealthRetrySeed((n) => n + 1)}
+                className="flex min-h-[44px] w-full items-center justify-center rounded-xl border border-neutral-300 bg-white px-3 text-xs font-bold text-neutral-800 hover:bg-neutral-50 dark:border-white/15 dark:bg-neutral-900 dark:text-neutral-100 dark:hover:bg-neutral-800"
+              >
+                Muat ulang Google Sign-In
+              </button>
+            ) : null}
 
             <div className="grid grid-cols-2 gap-2">
               <button
                 type="button"
                 onClick={() => setAccessModal('authenticator')}
                 data-testid="open-passkey-modal-btn"
-                className="flex min-h-[42px] items-center justify-center gap-1.5 rounded-xl border border-neutral-200 bg-neutral-50 px-3 py-2 text-xs font-bold text-neutral-700 dark:border-white/10 dark:bg-neutral-900 dark:text-neutral-200"
+                className="flex min-h-[44px] items-center justify-center gap-1.5 rounded-xl border border-neutral-200 bg-neutral-50 px-3 py-2 text-xs font-bold text-neutral-700 dark:border-white/10 dark:bg-neutral-900 dark:text-neutral-200"
                 title="Authenticator / Passkey (TouchID / FaceID / 6-Digit)"
               >
                 <span>🔐</span>
@@ -468,7 +512,7 @@ export function Login({ onBack }: { onBack?: () => void }) {
                 type="button"
                 onClick={() => setAccessModal('qr')}
                 data-testid="open-qr-modal-btn"
-                className="flex min-h-[42px] items-center justify-center gap-1.5 rounded-xl border border-neutral-200 bg-neutral-50 px-3 py-2 text-xs font-bold text-neutral-700 dark:border-white/10 dark:bg-neutral-900 dark:text-neutral-200"
+                className="flex min-h-[44px] items-center justify-center gap-1.5 rounded-xl border border-neutral-200 bg-neutral-50 px-3 py-2 text-xs font-bold text-neutral-700 dark:border-white/10 dark:bg-neutral-900 dark:text-neutral-200"
                 title="Scan EMV QR / Code-128 Barcode Health Pass"
               >
                 <span>📱</span>
