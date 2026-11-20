@@ -1,11 +1,15 @@
-// Menerjemahkan keadaan simulator faal seluruh tubuh (lib/bodySim) menjadi GERAK pada tubuh 3D: jantung berdenyut
-// mengikuti denyut nadi dan isi sekuncup, paru mengembang mengikuti laju napas dan volume tidal, pembuluh berdenyut
-// sesuai curah jantung, ginjal bercahaya sesuai perfusinya.
+// Menerjemahkan keadaan simulator faal seluruh tubuh (lib/bodySim) menjadi INTENSITAS CAHAYA pada tubuh 3D: jantung
+// menyala setiap kontraksi pada laju denyut hasil simulasi, paru berpendar mengikuti napas dan volume tidal, pembuluh
+// berdenyut saat ejeksi sebanding curah jantung, ginjal bercahaya sesuai perfusinya.
+//
+// Geometri TIDAK diubah. Mesh atlas adalah anatomi rujukan bersumber (lihat catatan MotionState di Body3D): jantung,
+// paru, pembuluh, usus dan otot tidak di-scale untuk menyimulasikan faal. Gerak hanya dinyatakan sebagai cahaya pada
+// anatomi yang tetap utuh, sampai ada rig/morph target yang dibuat dan divalidasi untuk struktur itu.
 //
 // Ini lapisan penghubung, BUKAN simulator baru. Setiap angka fisiologi berasal dari simulate() (persamaan baku yang
 // didokumentasikan di lib/bodySim.ts) dan dari cardiacStateAt() (siklus Wiggers prosedural). Satu-satunya konstanta
-// yang ditulis di sini adalah PENGUAT VISUAL (seberapa besar skala mesh berubah di layar); itu keputusan tampilan,
-// bukan besaran tubuh, dan tidak pernah ditampilkan sebagai angka.
+// yang ditulis di sini adalah batas tampilan (rasio terhadap istirahat dibatasi 3×); itu keputusan tampilan, bukan
+// besaran tubuh, dan tidak pernah ditampilkan sebagai angka.
 //
 // Kelas kebenaran: 'simulated'. Model keadaan tunak untuk pengajaran arah dan besaran, bukan model pasien.
 // Murni & deterministik: waktu disuntikkan pemanggil. Gagal tertutup: masukan atau keluaran tak sah → tanpa gerak.
@@ -13,9 +17,6 @@
 import { NORMAL, SKENARIO, simulate, type SimInput, type SimOutput } from '../../../../lib/bodySim.ts'
 import { DEFAULT_PARAMS, HR_MAX, HR_MIN, cardiacStateAt, phaseDurations, type CardiacPhase } from '../cardiacCycle.ts'
 
-/** Penguat visual (tampilan saja). Jantung & paru: perubahan skala maksimum relatif ukuran atlas. */
-const HEART_VISUAL_GAIN = 0.08
-const LUNG_VISUAL_GAIN = 0.06
 /** Batas rasio terhadap keadaan istirahat agar mesh tidak "meledak"; hanya membatasi tampilan, angka tetap apa adanya. */
 const VISUAL_RATIO_CAP = 3
 /** Inspirasi : ekspirasi 1 : 2 pada napas tenang (konvensi buku teks fisiologi pernapasan). */
@@ -45,10 +46,10 @@ export type BodyMotionResult = BodyMotionPlan | { readonly ok: false; readonly r
 
 export interface BodyMotionFrame {
   readonly cardiacPhase: CardiacPhase
-  /** Skala isotropik mesh jantung (1 = ukuran atlas). */
-  readonly heartScale: number
-  /** Skala isotropik mesh paru (1 = ukuran atlas, akhir ekspirasi). */
-  readonly lungScale: number
+  /** 0..1 cahaya jantung: 0 akhir diastol (penuh), 1 akhir sistol (kontraksi maksimal). */
+  readonly heartGlow: number
+  /** 0..1 cahaya paru: naik saat inspirasi, setinggi volume tidal relatif. */
+  readonly lungGlow: number
   /** 0..1 posisi dalam satu napas, 0 = awal inspirasi. */
   readonly breath01: number
   /** 0..1 intensitas denyut pada pembuluh, puncak saat ejeksi, diskalakan curah jantung relatif. */
@@ -123,9 +124,8 @@ export function bodyMotionFrame(plan: BodyMotionPlan, timeS: number): BodyMotion
   // Isi sekuncup dari simulator; volume akhir sistol tetap pada nilai bawaan siklus prosedural.
   const esv = DEFAULT_PARAMS.esvMl
   const heart = cardiacStateAt({ ...DEFAULT_PARAMS, hrBpm: plan.heartRateBpm, esvMl: esv, edvMl: esv + plan.strokeVolumeMl }, timeS)
-  const restEdv = esv + restOutput().strokeVolume
-  // Skala jantung: ukuran ruang terhadap ukuran istirahat akhir-diastol, dibatasi agar tetap terbaca.
-  const heartScale = 1 + HEART_VISUAL_GAIN * (Math.cbrt(Math.min(heart.ventricleMl / restEdv, VISUAL_RATIO_CAP)) - 1)
+  // Cahaya jantung: seberapa jauh ventrikel sudah mengosongkan isi sekuncupnya pada saat ini.
+  const heartGlow = Math.min(1, Math.max(0, (esv + plan.strokeVolumeMl - heart.ventricleMl) / plan.strokeVolumeMl))
 
   const breathPeriod = 60 / plan.respRatePerMin
   const breath01 = (((timeS % breathPeriod) + breathPeriod) % breathPeriod) / breathPeriod
@@ -133,7 +133,7 @@ export function bodyMotionFrame(plan: BodyMotionPlan, timeS: number): BodyMotion
     ? 0.5 - 0.5 * Math.cos(Math.PI * (breath01 / INSPIRATION_FRACTION))
     : 0.5 + 0.5 * Math.cos(Math.PI * ((breath01 - INSPIRATION_FRACTION) / (1 - INSPIRATION_FRACTION)))
   const tidalRatio = cap(plan.tidalVolumeMl / NORMAL.tidalVolume)
-  const lungScale = 1 + LUNG_VISUAL_GAIN * inflate * (tidalRatio / VISUAL_RATIO_CAP)
+  const lungGlow = inflate * (tidalRatio / VISUAL_RATIO_CAP)
 
   // Denyut pembuluh: setengah gelombang sinus selama fase ejeksi, tingginya sebanding curah jantung relatif.
   const dur = phaseDurations(plan.heartRateBpm)
@@ -143,5 +143,5 @@ export function bodyMotionFrame(plan: BodyMotionPlan, timeS: number): BodyMotion
   const vesselPulse = ejecting * (cap(plan.relative.cardiacOutput) / VISUAL_RATIO_CAP)
   const renalGlow = cap(plan.relative.renalPerfusion) / VISUAL_RATIO_CAP
 
-  return { cardiacPhase: heart.phase, heartScale, lungScale, breath01, vesselPulse, renalGlow }
+  return { cardiacPhase: heart.phase, heartGlow, lungGlow, breath01, vesselPulse, renalGlow }
 }

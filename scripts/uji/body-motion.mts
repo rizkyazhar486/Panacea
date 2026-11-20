@@ -44,21 +44,25 @@ for (const s of SKENARIO) ok(planScenarioMotion(s.key))
 const f0 = bodyMotionFrame(rest, 0)!
 assert.equal(f0.cardiacPhase, 'isovolumic_contraction', 't=0 adalah awal sistol')
 near(f0.breath01, 0)
-near(f0.lungScale, 1, 1e-12) // awal inspirasi = akhir ekspirasi
+near(f0.lungGlow, 0, 1e-12) // awal inspirasi = akhir ekspirasi
+near(f0.heartGlow, 0, 1e-12) // kontraksi isovolumik: ventrikel masih penuh
 assert.equal(f0.vesselPulse, 0, 'tanpa ejeksi tidak ada denyut pembuluh')
 
 // Satu periode denyut kemudian keadaannya sama (periodik), periode napas juga.
 const period = 60 / 70
 const fp = bodyMotionFrame(rest, period * 3)!
-near(fp.heartScale, f0.heartScale, 1e-9)
+near(fp.heartGlow, f0.heartGlow, 1e-9)
 const breathPeriod = 60 / 14
 near(bodyMotionFrame(rest, breathPeriod * 2)!.breath01, 0, 1e-9)
 
 // Paru mengembang maksimal di akhir inspirasi (1/3 napas) dan lebih besar saat olahraga (volume tidal lebih besar).
-const peakRest = bodyMotionFrame(rest, breathPeriod / 3)!.lungScale
-const peakEx = bodyMotionFrame(ex, (60 / exInput.respRate) / 3)!.lungScale
-assert.ok(peakRest > 1, 'paru mengembang saat inspirasi')
-assert.ok(peakEx > peakRest, 'volume tidal olahraga lebih besar → paru mengembang lebih besar')
+const peakRest = bodyMotionFrame(rest, breathPeriod / 3)!.lungGlow
+const peakEx = bodyMotionFrame(ex, (60 / exInput.respRate) / 3)!.lungGlow
+assert.ok(peakRest > 0, 'paru berpendar saat inspirasi')
+assert.ok(peakEx > peakRest, 'volume tidal olahraga lebih besar → paru berpendar lebih terang')
+// Jantung paling terang tepat di akhir ejeksi (ventrikel sudah mengosongkan seluruh isi sekuncup).
+const endSystole = (() => { let best = 0; for (let i = 0; i < 400; i++) best = Math.max(best, bodyMotionFrame(rest, (i / 400) * period)!.heartGlow); return best })()
+near(endSystole, 1, 0.01)
 
 // Denyut pembuluh muncul selama ejeksi dan lebih kuat saat curah jantung lebih tinggi.
 const sample = (plan: BodyMotionPlan) => {
@@ -76,7 +80,8 @@ for (const s of SKENARIO) {
   for (let i = 0; i < 50; i++) {
     const f = bodyMotionFrame(p, i * 0.137)!
     assert.ok(f.vesselPulse >= 0 && f.vesselPulse <= 1 && f.renalGlow >= 0 && f.renalGlow <= 1, `${s.key}: intensitas di luar 0..1`)
-    assert.ok(f.heartScale > 0.8 && f.heartScale < 1.2 && f.lungScale >= 1 && f.lungScale < 1.1, `${s.key}: skala mesh di luar batas tampilan`)
+    assert.ok(f.heartGlow >= 0 && f.heartGlow <= 1 && f.lungGlow >= 0 && f.lungGlow <= 1, `${s.key}: cahaya di luar 0..1`)
+    assert.equal(Object.keys(f).some((k) => /scale/i.test(k)), false, 'gerak tidak boleh mengubah skala geometri atlas')
   }
 }
 // Perdarahan menurunkan perfusi ginjal → ginjal lebih redup daripada istirahat.
