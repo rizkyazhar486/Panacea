@@ -19,7 +19,6 @@ import { ErrorBoundary } from './components/ErrorBoundary'
 import { RouteErrorBoundary } from './components/RouteErrorBoundary'
 import { QaCrashProbe } from './components/QaCrashProbe'
 import { AppStatus } from './components/AppStatus'
-import { OfflineBanner } from './components/OfflineBanner'
 const OsceUkmppd = lazy(() => import('./pages/OsceUkmppd').then((m) => ({ default: m.OsceUkmppd })))
 const HumanReview = lazy(() => import('./pages/HumanReview').then((m) => ({ default: m.HumanReview })))
 const Home = lazy(() => import('./pages/Home').then((m) => ({ default: m.Home })))
@@ -205,7 +204,6 @@ createRoot(document.getElementById('root')!).render(
     <StoreProvider visibilityDocument={document}>
     <LongitudinalStateProvider>
       <AppStatus />
-      <OfflineBanner />
       <HashRouter>
         <Shell>
           <RouteErrorBoundary>

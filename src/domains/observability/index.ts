@@ -5,3 +5,28 @@ export {
   type EmbodiedPerceptionStream,
   type PerceptionContinuityGap,
 } from './adapters/embodiedPerceptionAdapter.ts'
+
+export {
+  DIAGNOSTIC_EVENTS_MAX,
+  DIAGNOSTIC_MESSAGE_MAX,
+  DIAGNOSTIC_ROUTE_MAX,
+  DIAGNOSTICS_OPEN_EVENT,
+  SERVER_WAKE_EVENT,
+  ROUTE_ERROR_EVENT,
+  HEALTH_PROBE_TIMEOUT_MS,
+  redactSensitiveText,
+  sanitizeDiagnosticRoute,
+  extractApiHostLabel,
+  appendDiagnosticEvent,
+  resolveAmbientStatus,
+  isDiagnosticsShortcut,
+  formatDiagnosticReport,
+  type DiagnosticSeverity,
+  type DiagnosticEventKind,
+  type DiagnosticEvent,
+  type ServerWakeNotice,
+  type AmbientStatusKind,
+  type AmbientStatusBanner,
+  type HealthProbeSummary,
+  type DiagnosticSnapshot,
+} from './uiDiagnostics.ts'
