@@ -18,7 +18,7 @@ const BodyExposureLocalHub = lazy(() =>
 /** The stage fills the box the home gives it; these utilities already exist in the compiled CSS. */
 const STAGE_CLASS = 'relative h-full w-full overflow-hidden'
 
-export function AtlasViewer({ layers, dissect, highlighted, focusKeywords, homeFrame, onPick, motion }: AtlasViewerProps) {
+export function AtlasViewer({ layers, dissect, highlighted, focusKeywords, homeFrame, onPick, motion, onMotionStall }: AtlasViewerProps) {
   const mounted = useMemo(() => new Set<AnatomyLayer['key']>(layers), [layers])
   const exact = useMemo(() => [...highlighted], [highlighted])
   const keywords = useMemo(() => [...focusKeywords], [focusKeywords])
@@ -38,6 +38,7 @@ export function AtlasViewer({ layers, dissect, highlighted, focusKeywords, homeF
       stageClassName={STAGE_CLASS}
       homeFrame={homeFrame}
       bodyMotion={motion ?? null}
+      onBodyMotionStall={onMotionStall}
     />
   )
 }

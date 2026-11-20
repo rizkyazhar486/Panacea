@@ -41,6 +41,10 @@ gagal('kendali-menampilkan-angka-simulator', () => {
   for (const s of SKENARIO) assert.ok(html.includes(`>${s.label}</option>`), `skenario "${s.label}" hilang dari pilihan`)
   assert.equal((html.match(/<option /g) ?? []).length, SKENARIO.length, 'tidak ada skenario karangan di luar simulator')
 })
+gagal('penampil-menerima-penerima-jeda-otomatis', () => {
+  assert.equal(typeof diterima[0]?.onMotionStall, 'function', 'panggung harus bisa diberi tahu bila perangkat tak sanggup')
+  assert.doesNotMatch(html, /data-sim-stalled/, 'awal: belum ada jeda otomatis')
+})
 gagal('lapisan-awal-kulit-menawarkan-lihat-ke-dalam', () => {
   assert.match(html, /data-sim-see-inside/, 'pada kedalaman kulit organ yang menyala belum terpasang')
 })
@@ -57,6 +61,12 @@ const dial = (props: Record<string, unknown>) => renderToStaticMarkup(createElem
 gagal('jeda-mengganti-label-dan-status', () => {
   const h = dial({ running: false })
   assert.match(h, /aria-label="Play simulation"/); assert.match(h, /aria-pressed="false"/)
+})
+gagal('jeda-otomatis-memberi-alasan-hanya-saat-terjeda', () => {
+  assert.match(dial({ running: false, stalled: true }), /role="status"[^>]*data-sim-stalled[^>]*>Paused to keep this device responsive\./)
+  assert.doesNotMatch(dial({ running: true, stalled: true }), /data-sim-stalled/, 'berjalan lagi → alasan hilang')
+  assert.doesNotMatch(dial({ running: false, stalled: false }), /data-sim-stalled/, 'jeda oleh pengguna tidak butuh alasan')
+  assert.doesNotMatch(dial({ running: false, stalled: true, result: planScenarioMotion('not-a-scenario') }), /data-sim-stalled/)
 })
 gagal('hasil-tak-sah-tanpa-angka-dan-tombol-mati', () => {
   const h = dial({ result: planScenarioMotion('not-a-scenario') })
@@ -83,15 +93,24 @@ const kontrak = readFileSync('src/domains/body-exposure/engine/atlas-stage/viewe
 gagal('body3d-menandai-mesh-setelah-material-lokal', () => {
   assert.match(body3d, /cloneLayerMaterials\(clone\)\n\s+tagMotionMeshes\(def\.key as AtlasLayerId, clone\)/)
 })
-gagal('body3d-cahaya-hanya-saat-gerak-tidak-dikurangi-dan-ada-yang-menyala', () => {
-  assert.match(body3d, /plan && !gerakDikurangi\(\) && adaYangMenyala\(\) \? bodyMotionFrame\(plan,/)
+gagal('body3d-cahaya-hanya-saat-tidak-terhenti-gerak-tidak-dikurangi-dan-ada-yang-menyala', () => {
+  assert.match(body3d, /plan && !motionStalled && !gerakDikurangi\(\) && adaYangMenyala\(\) \? bodyMotionFrame\(plan,/)
 })
 gagal('body3d-timer-gerak-dibersihkan', () => {
   assert.equal((body3d.match(/if \(motionTimer\) \{ clearTimeout\(motionTimer\); motionTimer = null \}/g) ?? []).length, 2, 'timer dibersihkan saat berhenti dan saat dilepas')
 })
+gagal('body3d-laju-cahaya-dari-keterlambatan-nyata', () => {
+  assert.match(body3d, /const terlambat = motionDue && !motionTimer \? performance\.now\(\) - motionDue : null/, 'keterlambatan hanya dari bingkai yang diminta timer cahaya')
+  assert.match(body3d, /const laju = nextMotionPace\(motionInterval, terlambat, lamaRender\)\n\s+motionInterval = laju\.intervalMs/)
+  assert.match(body3d, /motionDue = performance\.now\(\) \+ motionInterval\n\s+motionTimer = setTimeout\(\(\) => \{ motionTimer = null; renderScheduler\.request\(\) \}, motionInterval\)/)
+  assert.match(body3d, /const stopRendering = \(\) => \{\n[^\n]*clearTimeout\(motionTimer\)[^\n]*\n\s+motionDue = 0/, 'jeda di luar layar tidak dihitung sebagai keterlambatan')
+})
+gagal('body3d-terhenti-memadamkan-cahaya-dan-melapor', () => {
+  assert.match(body3d, /if \(laju\.stalled\) \{[\s\S]{0,200}?motionStalled = true\n\s+renderScheduler\.request\(\)\n\s+onBodyMotionStallRef\.current\?\.\(\)\n\s+return/)
+  assert.match(body3d, /useEffect\(\(\) => \{ motionResetRef\.current\(\); requestRenderRef\.current\(\) \}, \[bodyMotion\]\)/, 'rencana baru mencoba lagi')
+  assert.match(body3d, /motionResetRef\.current = \(\) => \{ motionStalled = false; motionInterval = MOTION_PACE\.minMs; motionDue = 0 \}/)
+})
 gagal('body3d-bingkai-gerak-lewat-penjadwal-bersama', () => {
-  assert.match(body3d, /else if \(bergerak && !motionTimer\) \{\n\s+motionTimer = setTimeout\(\(\) => \{ motionTimer = null; renderScheduler\.request\(\) \}, Math\.max\(1000 \/ MOTION_FPS_MAX, lamaRender \* MOTION_DUTY\)\)/)
-  assert.match(body3d, /const MOTION_FPS_MAX = 20\n\s+const MOTION_DUTY = 4/, 'batas beban gerak')
   assert.equal((body3d.match(/requestAnimationFrame\(/g) ?? []).length, 1, 'tidak boleh ada RAF kedua untuk gerak')
 })
 gagal('body3d-gerak-tanpa-ubah-geometri', () => {
@@ -102,6 +121,8 @@ gagal('body3d-gerak-tanpa-ubah-geometri', () => {
 gagal('rute-dan-kontrak-meneruskan-rencana', () => {
   assert.match(kontrak, /motion\?: BodyMotionPlan \| null/)
   assert.match(rute, /bodyMotion=\{motion \?\? null\}/)
+  assert.match(kontrak, /onMotionStall\?: \(\) => void/)
+  assert.match(rute, /onBodyMotionStall=\{onMotionStall\}/)
 })
 
 console.log('body-motion-stage: OK')

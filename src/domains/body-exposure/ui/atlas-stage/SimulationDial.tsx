@@ -9,6 +9,8 @@ export interface SimulationDialProps {
   scenario: string
   onScenario: (key: string) => void
   running: boolean
+  /** The viewer paused the light itself because this device could not keep up. */
+  stalled?: boolean
   onToggle: () => void
   result: BodyMotionResult
   compact: boolean
@@ -19,7 +21,7 @@ export interface SimulationDialProps {
 
 const fixed = (v: number, digits: number) => v.toFixed(digits)
 
-export function SimulationDial({ scenario, onScenario, running, onToggle, result, compact, insideHidden, onSeeInside }: SimulationDialProps) {
+export function SimulationDial({ scenario, onScenario, running, stalled = false, onToggle, result, compact, insideHidden, onSeeInside }: SimulationDialProps) {
   return (
     <div
       role="group"
@@ -54,6 +56,10 @@ export function SimulationDial({ scenario, onScenario, running, onToggle, result
         </div>
       ) : (
         <span role="status" style={{ fontSize: 12, color: TONE.gate }}>Simulation unavailable for this state.</span>
+      )}
+
+      {stalled && !running && result.ok && (
+        <span role="status" data-sim-stalled style={{ fontSize: 11, color: TONE.dim, maxWidth: compact ? 140 : 180 }}>Paused to keep this device responsive.</span>
       )}
 
       {insideHidden && result.ok && (

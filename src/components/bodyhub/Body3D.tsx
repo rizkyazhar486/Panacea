@@ -11,6 +11,7 @@ import type { RegionFrame } from '../../domains/body-exposure/engine/atlas-stage
 import type { AtlasLayerId } from '../../domains/body-exposure/engine/atlas-stage/stageLayers.ts'
 import { bodyMotionFrame, type BodyMotionPlan } from '../../domains/body-exposure/engine/body-motion/bodyMotion.ts'
 import { applyMotionLight, tagMotionMeshes } from '../../domains/body-exposure/adapters/motionLight.ts'
+import { MOTION_PACE, nextMotionPace } from '../../domains/body-exposure/engine/body-motion/motionPacing.ts'
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js'
 import { keburaman, geserBuka, KEDALAMAN, type KunciLapisan } from '../../lib/dissection'
 import {
@@ -298,6 +299,8 @@ interface Props {
    * deformation). Absent/null, or reduced motion, leaves the atlas still and unlit.
    */
   bodyMotion?: BodyMotionPlan | null
+  /** The device could not keep up with the simulation light even at its slowest pace, so the light was stopped. */
+  onBodyMotionStall?: () => void
 }
 
 function latarGradasi(atas: number, bawah: number): THREE.Texture {
@@ -389,6 +392,7 @@ export function Body3D({
   stageClassName,
   homeFrame,
   bodyMotion = null,
+  onBodyMotionStall,
 }: Props) {
   const containerRef = useRef<HTMLDivElement>(null)
   const homeFrameRef = useRef(homeFrame)
@@ -415,6 +419,9 @@ export function Body3D({
   onPickRef.current = onPick
   const bodyMotionRef = useRef<BodyMotionPlan | null>(bodyMotion)
   bodyMotionRef.current = bodyMotion
+  const onBodyMotionStallRef = useRef(onBodyMotionStall)
+  onBodyMotionStallRef.current = onBodyMotionStall
+  const motionResetRef = useRef<() => void>(() => undefined)
   const [loadingLayers, setLoadingLayers] = useState<Set<string>>(new Set())
   const [failedLayers, setFailedLayers] = useState<Set<string>>(new Set())
   const [retryNonce, setRetryNonce] = useState(0)
@@ -518,16 +525,19 @@ export function Body3D({
     // reduced; the scheduler's canRender gate still stops it off-screen or in a hidden tab.
     const motionEpoch = performance.now()
     let motionLit = false
-    // Cahaya tidak butuh 60 fps. Setiap bingkai gerak menggambar ulang seluruh tubuh, jadi jedanya paling sedikit
-    // 1/MOTION_FPS_MAX detik dan paling sedikit MOTION_DUTY × lama render terakhir: render gerak tidak pernah memakan
-    // lebih dari ~1/MOTION_DUTY waktu thread utama, di GPU kuat maupun renderer perangkat lunak.
-    const MOTION_FPS_MAX = 20
-    const MOTION_DUTY = 4
+    // Cahaya tidak butuh 60 fps, dan setiap bingkai gerak menggambar ulang seluruh tubuh. Lama renderer.render() di
+    // CPU tidak menangkap biayanya (GPU/rasteriser perangkat lunak bekerja sesudahnya dan menahan bingkai berikut),
+    // jadi lajunya diatur oleh KETERLAMBATAN nyata bingkai cahaya (motionPacing): tepat waktu → kembali ke 20 fps,
+    // terlambat → melambat, tetap terlambat di laju paling lambat → cahaya berhenti dan simulasi dilaporkan dijeda.
     let motionTimer: ReturnType<typeof setTimeout> | null = null
+    let motionInterval: number = MOTION_PACE.minMs
+    let motionDue = 0
+    let motionStalled = false
+    motionResetRef.current = () => { motionStalled = false; motionInterval = MOTION_PACE.minMs; motionDue = 0 }
     const adaYangMenyala = () => Object.values(groupsRef.current).some((g) => ((g?.userData.body3dMotionMaterials as unknown[] | undefined)?.length ?? 0) > 0)
     const terapkanCahayaGerak = (): boolean => {
       const plan = bodyMotionRef.current
-      const frame = plan && !gerakDikurangi() && adaYangMenyala() ? bodyMotionFrame(plan, (performance.now() - motionEpoch) / 1000) : null
+      const frame = plan && !motionStalled && !gerakDikurangi() && adaYangMenyala() ? bodyMotionFrame(plan, (performance.now() - motionEpoch) / 1000) : null
       if (!frame && !motionLit) return false
       for (const g of Object.values(groupsRef.current)) if (g) applyMotionLight(g, frame)
       motionLit = frame !== null
@@ -536,6 +546,9 @@ export function Body3D({
     const renderScheduler = createBodyRenderScheduler({
       canRender: () => inViewport && documentVisible && !contextLifecycle.isLost(),
       renderFrame: () => {
+        // Keterlambatan hanya diukur pada bingkai yang diminta timer cahaya (timer sudah berbunyi, jatuh tempo tercatat).
+        const terlambat = motionDue && !motionTimer ? performance.now() - motionDue : null
+        if (terlambat !== null) motionDue = 0
         majukanPenerbangan()
         const bergerak = terapkanCahayaGerak()
         controls.update()
@@ -544,7 +557,19 @@ export function Body3D({
         const lamaRender = performance.now() - mulaiRender
         if (penerbangan) renderScheduler.request()
         else if (bergerak && !motionTimer) {
-          motionTimer = setTimeout(() => { motionTimer = null; renderScheduler.request() }, Math.max(1000 / MOTION_FPS_MAX, lamaRender * MOTION_DUTY))
+          if (terlambat !== null) {
+            const laju = nextMotionPace(motionInterval, terlambat, lamaRender)
+            motionInterval = laju.intervalMs
+            if (laju.stalled) {
+              // Satu bingkai lagi memadamkan cahaya; induk diberi tahu agar kendali menampilkan simulasi dijeda.
+              motionStalled = true
+              renderScheduler.request()
+              onBodyMotionStallRef.current?.()
+              return
+            }
+          }
+          motionDue = performance.now() + motionInterval
+          motionTimer = setTimeout(() => { motionTimer = null; renderScheduler.request() }, motionInterval)
         }
       },
       requestFrame: (callback) => requestAnimationFrame(callback),
@@ -564,6 +589,7 @@ export function Body3D({
     const requestRender = () => renderScheduler.request()
     const stopRendering = () => {
       if (motionTimer) { clearTimeout(motionTimer); motionTimer = null }
+      motionDue = 0
       renderScheduler.stop()
     }
 
@@ -739,6 +765,7 @@ export function Body3D({
       flyToRef.current = () => undefined
       penerbangan = null
       if (motionTimer) { clearTimeout(motionTimer); motionTimer = null }
+      motionResetRef.current = () => undefined
       renderScheduler.dispose()
       contextLifecycle.dispose()
       controls.removeEventListener('change', requestRender)
@@ -1027,7 +1054,8 @@ export function Body3D({
 
   // Rencana gerak berganti (skenario, jeda): satu bingkai cukup untuk memulai atau memadamkan cahaya; selama
   // rencana aktif, renderFrame meminta bingkai berikutnya sendiri.
-  useEffect(() => { requestRenderRef.current() }, [bodyMotion])
+  // Rencana baru (termasuk Play setelah jeda otomatis) mencoba lagi dari laju tercepat.
+  useEffect(() => { motionResetRef.current(); requestRenderRef.current() }, [bodyMotion])
 
   // Sorot struktur pilihan dengan material clone lokal. Saat sorotan dilepas,
   // material dasar dipasang kembali dan clone langsung didispose.

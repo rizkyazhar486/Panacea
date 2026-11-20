@@ -28,6 +28,8 @@ export interface AtlasViewerProps {
   onPick: (rawName: string, layer: AtlasLayerId | null) => void
   /** Whole-body simulation shown as light on the anatomy; null/absent = still atlas. Never deforms geometry. */
   motion?: BodyMotionPlan | null
+  /** The device could not keep up with the light even at its slowest pace; the viewer stopped it. */
+  onMotionStall?: () => void
 }
 
 export type AtlasViewerComponent = ComponentType<AtlasViewerProps>

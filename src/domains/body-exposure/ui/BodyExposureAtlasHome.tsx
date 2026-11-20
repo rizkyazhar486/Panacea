@@ -114,6 +114,9 @@ export function BodyExposureAtlasHome({ Viewer, sendCamera, focusSystem = null }
   // Whole-body simulation lit on the anatomy. Starts at rest and running; the viewer keeps it still under reduced motion.
   const [simScenario, setSimScenario] = useState('normal')
   const [simRunning, setSimRunning] = useState(true)
+  /** The viewer stopped the light because this device could not keep up; Play tries again. */
+  const [simStalled, setSimStalled] = useState(false)
+  const handleMotionStall = useCallback(() => { setSimRunning(false); setSimStalled(true) }, [])
   const simResult = useMemo(() => planScenarioMotion(simScenario), [simScenario])
   const motion = simRunning && simResult.ok ? simResult : null
 
@@ -331,7 +334,7 @@ export function BodyExposureAtlasHome({ Viewer, sendCamera, focusSystem = null }
         The atlas stage could not be prepared, so nothing is shown rather than a wrong body.
       </div>
     ) : (
-      <Viewer layers={layers} dissect={plan.dissect} highlighted={highlighted} focusKeywords={focusKeywords} homeFrame={homeFrame} onPick={handlePick} motion={motion} />
+      <Viewer layers={layers} dissect={plan.dissect} highlighted={highlighted} focusKeywords={focusKeywords} homeFrame={homeFrame} onPick={handlePick} motion={motion} onMotionStall={handleMotionStall} />
     ),
     search: <StageSearch compact={!isDesktop} layers={ATLAS_LAYERS} onSelect={handleSearch} />,
     rail: <DepthRail layers={ATLAS_LAYERS} depth={depth} labelled={isDesktop} onDepth={changeDepth} />,
@@ -339,7 +342,7 @@ export function BodyExposureAtlasHome({ Viewer, sendCamera, focusSystem = null }
     referenceChip: <ReferenceChip tight={!isDesktop} />,
     simulation: (
       <SimulationDial
-        scenario={simScenario} onScenario={setSimScenario} running={simRunning} onToggle={() => setSimRunning((r) => !r)}
+        scenario={simScenario} onScenario={setSimScenario} running={simRunning} stalled={simStalled} onToggle={() => { setSimStalled(false); setSimRunning((r) => !r) }}
         result={simResult} compact={!isDesktop}
         insideHidden={!layers.has('cardiovascular') && !layers.has('visceral')}
         onSeeInside={() => changeDepth(ATLAS_LAYERS.findIndex((l) => l.id === 'cardiovascular'))}
