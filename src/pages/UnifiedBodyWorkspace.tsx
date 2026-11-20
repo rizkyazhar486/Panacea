@@ -97,6 +97,7 @@ export function UnifiedBodyWorkspace() {
   const secondaryViews = VIEWS.filter((view) => !PRIMARY_VIEW_KEYS.has(view.key))
   const secondaryValue = secondaryViews.some((view) => view.key === activeKey) ? activeKey : ''
   const workspaceRailRef = useRef<HTMLDivElement | null>(null)
+  const [twinPanelOpen, setTwinPanelOpen] = useState(false)
 
   useLayoutEffect(() => {
     const rail = workspaceRailRef.current
@@ -244,15 +245,20 @@ export function UnifiedBodyWorkspace() {
           </Suspense>
         )}
         {(activeKey === 'body' || activeKey === 'body-exposure') && (
-          <details className="rounded-2xl border border-cyan-400/20 bg-[#05070b] p-3 text-white">
+          <details
+            onToggle={(e) => setTwinPanelOpen(e.currentTarget.open)}
+            className="dark rounded-2xl border border-cyan-400/20 bg-[#05070b] p-3 text-white"
+          >
             <summary className="flex min-h-[44px] cursor-pointer list-none items-center justify-between font-mono text-[11px] font-bold uppercase tracking-[0.12em] text-cyan-300">
               <span>Digital Twin · CAD/CAE · Skin · Brain/OSA · ANOVA</span>
               <span>OPEN ▾</span>
             </summary>
             <div className="mt-3">
-              <Suspense fallback={<div className="p-4 text-xs text-slate-400">Loading studio…</div>}>
-                <DigitalTwinScanFlow />
-              </Suspense>
+              {twinPanelOpen && (
+                <Suspense fallback={<div className="p-4 text-xs text-slate-400">Loading studio…</div>}>
+                  <DigitalTwinScanFlow />
+                </Suspense>
+              )}
             </div>
           </details>
         )}

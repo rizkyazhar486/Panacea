@@ -57,11 +57,8 @@ export function DeviceQuickSyncCard() {
     return readUnifiedLocalVitals(account, { patient })
   }, [account, patient, rev])
 
-  const profileKey = account?.email ? account.email.split('@')[0] : 'rizkyazhar486'
-  const canonicalName =
-    account?.isOwner || profileKey.toLowerCase().includes('rizky')
-      ? 'dr. Rizky Muhammad Azrissal'
-      : account?.name || 'dr. Rizky Muhammad Azrissal'
+  const profileKey = account?.email ? account.email.split('@')[0] : 'guest-device'
+  const canonicalName = account?.name || 'Guest Device'
 
   const buildExportInput = (): CanonicalExportBundleInput => {
     const nowIso = new Date().toISOString()
@@ -70,8 +67,8 @@ export function DeviceQuickSyncCard() {
       owner: {
         profileKey,
         fullName: canonicalName,
-        username: `@${profileKey.replace(/[^a-zA-Z0-9_]/g, '') || 'rizkyazhar486'}`,
-        mrn: patient?.mrn || 'PMD-000486',
+        username: `@${profileKey.replace(/[^a-zA-Z0-9_]/g, '') || 'guest_device'}`,
+        mrn: patient?.mrn || 'UNASSIGNED',
       },
       vitals: {
         heightCm: vitals.heightCm ?? null,
@@ -188,8 +185,7 @@ export function DeviceQuickSyncCard() {
         </div>
 
         <InfoDisclosure title="Sync & Auto-Export Architecture" badge="SHA-256">
-          <p>Supports Apple Health XML/JSON, WHOOP/Garmin/Oura CSV/JSON, and Web Bluetooth GATT HR/EEG.</p>
-          <p>Exports use synchronous gesture triggers, sanitized filenames, Object URL revocation, and SHA-256 deduplication. Offline Neon sync queues safely in local storage.</p>
+          <p>Apple Health XML/JSON, WHOOP/Garmin/Oura CSV/JSON, and Web Bluetooth GATT with SHA-256 deduplicated exports.</p>
         </InfoDisclosure>
       </header>
 
