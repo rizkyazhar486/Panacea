@@ -33,7 +33,7 @@ function HeartTrace() {
 
 function Detail({ system }: { system: HomeSystem }) {
   return (
-    <div className="lbh-detail" data-detail={system.id} style={{ ['--tone' as string]: system.tone }}>
+    <div className="lbh-detail lbh-glass" data-detail={system.id} style={{ ['--tone' as string]: system.tone }}>
       <span className="lbh-detail-head">
         <SystemGlyph system={system.id} size={26} />
         <strong>{system.label}</strong>
@@ -73,10 +73,36 @@ export function LivingBodyHero() {
   const system = HOME_SYSTEMS.find((s) => s.id === selected) ?? HOME_SYSTEMS[0]
   const place = geom ? cardPlacement(geom.px, geom.py, geom.tag, geom.stage, 14) : null
 
+  const dock = (
+    <nav className="lbh-dock" aria-label="Body systems">
+      {HOME_SYSTEMS.map((s) => (
+        <button
+          key={s.id}
+          type="button"
+          className="lbh-dock-btn"
+          data-chip={s.id}
+          aria-pressed={s.id === selected}
+          aria-label={s.label}
+          title={s.label}
+          onClick={() => setSelected(s.id)}
+          style={{ ['--tone' as string]: s.tone }}
+        >
+          <SystemGlyph system={s.id} size={20} />
+        </button>
+      ))}
+    </nav>
+  )
+
   return (
     <section className="lbh" aria-label="Body analysis" data-living-body-hero>
+      <div className="lbh-aura" aria-hidden><i /><i /><i /></div>
       <header className="lbh-head">
         <h2 className="lbh-kicker"><b aria-hidden /><span className="sr-only">Body analysis</span><span aria-hidden>LIVE</span></h2>
+        <nav aria-label="Lenses" className="lbh-lenses lbh-glass">
+          <Link to="/fitness-hub">Your Body</Link>
+          <Link to="/clinical-hub">Clinical</Link>
+          <Link to="/?t=for-you">For You</Link>
+        </nav>
         <Link to="/body-exposure" className="lbh-cta" data-hero-cta>
           <span aria-hidden className="lbh-cta-orb" />
           3D
@@ -84,19 +110,9 @@ export function LivingBodyHero() {
       </header>
 
       <div className="lbh-layout">
-        <aside className="lbh-rail" aria-label="Resting whole-body state (simulated)">
-          <span className="lbh-rail-head" title="Simulated resting state, not your measurements">SIM</span>
-          <div className="lbh-vitals">
-            {VITALS.map((v) => (
-              <div key={v.key} className="lbh-vital" style={{ ['--tone' as string]: v.tone }} aria-label={`${v.label} ${v.value} ${v.unit}`}>
-                <span className="lbh-vital-label" aria-hidden>{v.label}</span>
-                <span className="lbh-vital-value">{v.value}<small>{v.unit}</small></span>
-              </div>
-            ))}
-          </div>
-        </aside>
+        {dock}
 
-        <div ref={stageRef} className="lbh-stage">
+        <div ref={stageRef} className="lbh-stage lbh-glass">
           <div className="lbh-bodybox">
             <img
               src={IMAGE_SRC}
@@ -141,29 +157,15 @@ export function LivingBodyHero() {
 
         <aside className="lbh-side">
           <Detail system={system} />
-          <div className="lbh-systems" role="group" aria-label="Body systems">
-            {HOME_SYSTEMS.map((s) => (
-              <button
-                key={s.id}
-                type="button"
-                className="lbh-chip"
-                data-chip={s.id}
-                aria-pressed={s.id === selected}
-                aria-label={s.label}
-                title={s.label}
-                onClick={() => setSelected(s.id)}
-                style={{ ['--tone' as string]: s.tone }}
-              >
-                <SystemGlyph system={s.id} size={22} />
-                <span className="lbh-chip-name" aria-hidden>{s.label}</span>
-              </button>
+          <div className="lbh-vitals lbh-glass" aria-label="Resting whole-body state (simulated)">
+            {VITALS.map((v) => (
+              <div key={v.key} className="lbh-vital" style={{ ['--tone' as string]: v.tone }} aria-label={`${v.label} ${v.value} ${v.unit}`}>
+                <span className="lbh-vital-label" aria-hidden>{v.label}</span>
+                <span className="lbh-vital-value">{v.value}<small>{v.unit}</small></span>
+              </div>
             ))}
+            <span className="lbh-sim" title="Simulated resting state, not your measurements">SIM</span>
           </div>
-          <nav aria-label="Lenses" className="lbh-lenses">
-            <Link to="/fitness-hub">Your Body</Link>
-            <Link to="/clinical-hub">Clinical</Link>
-            <Link to="/?t=for-you">For You</Link>
-          </nav>
         </aside>
       </div>
       <small className="lbh-credit">Z-Anatomy · CC BY-SA 4.0</small>
