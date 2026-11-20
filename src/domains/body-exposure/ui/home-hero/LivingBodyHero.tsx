@@ -41,7 +41,7 @@ function Detail({ system }: { system: HomeSystem }) {
       {system.id === 'cardiovascular' && <HeartTrace />}
       {!system.inAtlas && <span className="lbh-detail-note" title="Region marker only; this system is not yet in the 3D atlas">◌ 3D</span>}
       <Link to={`/tubuh?system=${system.id}`} className="lbh-detail-open" data-open-system={system.id}>
-        <span aria-hidden>→</span><span className="sr-only">Open {system.label}</span>
+        Open <span className="sr-only">{system.label}</span><span aria-hidden>→</span>
       </Link>
     </div>
   )
@@ -88,7 +88,8 @@ export function LivingBodyHero() {
           <span className="lbh-rail-head" title="Simulated resting state, not your measurements">SIM</span>
           <div className="lbh-vitals">
             {VITALS.map((v) => (
-              <div key={v.key} className="lbh-vital" style={{ ['--tone' as string]: v.tone }} title={v.label} aria-label={`${v.label} ${v.value} ${v.unit}`}>
+              <div key={v.key} className="lbh-vital" style={{ ['--tone' as string]: v.tone }} aria-label={`${v.label} ${v.value} ${v.unit}`}>
+                <span className="lbh-vital-label" aria-hidden>{v.label}</span>
                 <span className="lbh-vital-value">{v.value}<small>{v.unit}</small></span>
               </div>
             ))}
@@ -154,6 +155,7 @@ export function LivingBodyHero() {
                 style={{ ['--tone' as string]: s.tone }}
               >
                 <SystemGlyph system={s.id} size={22} />
+                <span className="lbh-chip-name" aria-hidden>{s.label}</span>
               </button>
             ))}
           </div>

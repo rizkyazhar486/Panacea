@@ -18,17 +18,17 @@ export interface HomeSystem {
 }
 
 const STYLE: Readonly<Record<BodySystemId, { label: string; tone: string }>> = {
-  'nervous': { label: 'Brain & nerves', tone: '#8b6cff' },
-  'sensory-ent': { label: 'Eyes & ears', tone: '#f2b84b' },
+  'nervous': { label: 'Brain', tone: '#8b6cff' },
+  'sensory-ent': { label: 'Senses', tone: '#f2b84b' },
   'endocrine': { label: 'Hormones', tone: '#e86fb4' },
   'respiratory': { label: 'Lungs', tone: '#2fb8e6' },
   'cardiovascular': { label: 'Heart', tone: '#ef4459' },
   'lymphatic-immune': { label: 'Immune', tone: '#4cbf6b' },
   'digestive': { label: 'Digestion', tone: '#f08a3c' },
   'urinary': { label: 'Kidneys', tone: '#d9a72f' },
-  'reproductive': { label: 'Reproductive', tone: '#e5739a' },
+  'reproductive': { label: 'Fertility', tone: '#e5739a' },
   'integumentary-surface': { label: 'Skin', tone: '#c99a74' },
-  'musculoskeletal': { label: 'Muscle & bone', tone: '#19a88b' },
+  'musculoskeletal': { label: 'Muscles', tone: '#19a88b' },
 }
 
 /** Every body system, ordered head to toe, with its hotspot. */
