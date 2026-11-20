@@ -12,6 +12,7 @@ import {
 } from '../icons'
 import { SUPER_PAGES, type SuperPageId } from '../../lib/superPages'
 
+const AstralOrbit360Hub = lazy(() => import('./AstralOrbit360Hub'))
 const FeatureMapOrbit = lazy(() => import('./FeatureMapOrbit'))
 
 const ICONS = {
@@ -63,43 +64,53 @@ function CategoryGrid() {
 }
 
 export function SuperPageLauncher() {
-  const [view, setView] = useState<'map' | 'grid'>('map')
+  const [view, setView] = useState<'360' | 'map' | 'grid'>('360')
 
   return (
     <section className="pmd-superpage-launcher pmd-scroll-section" aria-label="Panacea category pages">
       <div className="pmd-section-heading">
-        <span className="pmd-section-kicker">Feature map</span>
+        <span className="pmd-section-kicker">Astral 360°</span>
         <strong className="pmd-one-line">One human state, seven connected lenses</strong>
       </div>
 
-      <div className="mb-2 flex items-center justify-end gap-2" role="group" aria-label="Feature map view">
+      <div className="mb-2 flex items-center justify-end gap-2" role="radiogroup" aria-label="Feature map view">
         <button
           type="button"
+          role="radio"
+          aria-checked={view === '360'}
+          data-variant={view === '360' ? 'primary' : undefined}
+          onClick={() => setView('360')}
+          className="min-h-[44px] min-w-[60px] rounded-full border border-black/15 px-3.5 text-[12px] font-bold dark:border-white/20"
+        >
+          360° Orbit
+        </button>
+        <button
+          type="button"
+          role="radio"
+          aria-checked={view === 'map'}
+          data-variant={view === 'map' ? 'primary' : undefined}
           onClick={() => setView('map')}
-          aria-pressed={view === 'map'}
-          className={
-            view === 'map'
-              ? 'min-h-[44px] min-w-[60px] rounded-full bg-neutral-950 px-3.5 text-[12px] font-bold text-white dark:bg-cyan-300 dark:text-neutral-950'
-              : 'min-h-[44px] min-w-[60px] rounded-full border border-black/15 bg-white px-3.5 text-[12px] font-bold text-neutral-900 dark:border-white/20 dark:bg-neutral-900 dark:text-neutral-100'
-          }
+          className="min-h-[44px] min-w-[60px] rounded-full border border-black/15 px-3.5 text-[12px] font-bold dark:border-white/20"
         >
           Map
         </button>
         <button
           type="button"
+          role="radio"
+          aria-checked={view === 'grid'}
+          data-variant={view === 'grid' ? 'primary' : undefined}
           onClick={() => setView('grid')}
-          aria-pressed={view === 'grid'}
-          className={
-            view === 'grid'
-              ? 'min-h-[44px] min-w-[60px] rounded-full bg-neutral-950 px-3.5 text-[12px] font-bold text-white dark:bg-cyan-300 dark:text-neutral-950'
-              : 'min-h-[44px] min-w-[60px] rounded-full border border-black/15 bg-white px-3.5 text-[12px] font-bold text-neutral-900 dark:border-white/20 dark:bg-neutral-900 dark:text-neutral-100'
-          }
+          className="min-h-[44px] min-w-[60px] rounded-full border border-black/15 px-3.5 text-[12px] font-bold dark:border-white/20"
         >
           Grid
         </button>
       </div>
 
-      {view === 'map' ? (
+      {view === '360' ? (
+        <Suspense fallback={<CategoryGrid />}>
+          <AstralOrbit360Hub icons={ICONS} />
+        </Suspense>
+      ) : view === 'map' ? (
         <Suspense fallback={<CategoryGrid />}>
           <FeatureMapOrbit icons={ICONS} />
         </Suspense>

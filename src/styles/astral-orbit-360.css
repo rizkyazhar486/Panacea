@@ -1,0 +1,606 @@
+/* Panacea Astral 360° & Sporty Biometric Widget Hub — chunk-scoped styles.
+ * Loaded lazily with AstralOrbit360Hub so initial bundle CSS stays untouched.
+ * Explicit dark cosmic-natural surface across both themes (>= 7:1 contrast). */
+
+.pmd-astral-360 {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-radius: 28px;
+  padding: 16px;
+  color: #ebfff7;
+  background:
+    radial-gradient(64rem 36rem at 12% -10%, rgba(0, 191, 99, 0.18), transparent 58%),
+    radial-gradient(52rem 32rem at 92% 8%, rgba(34, 211, 238, 0.16), transparent 56%),
+    radial-gradient(48rem 30rem at 50% 112%, rgba(129, 140, 248, 0.18), transparent 62%),
+    linear-gradient(165deg, #040d11 0%, #03070c 52%, #050a15 100%);
+  border: 1px solid rgba(52, 211, 153, 0.26);
+  box-shadow:
+    inset 0 1px 0 rgba(167, 243, 208, 0.18),
+    0 26px 68px rgba(1, 8, 12, 0.48);
+}
+
+.pmd-astral-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  opacity: 0.78;
+}
+
+.pmd-astral-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.pmd-astral-hud {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.pmd-astral-hud-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.pmd-astral-lenses {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.pmd-astral-lens-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 44px;
+  padding: 0 14px;
+  border-radius: 9999px;
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  background: rgba(9, 20, 26, 0.9);
+  color: #dff8ee;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform 150ms ease, border-color 180ms ease, background-color 180ms ease, color 180ms ease;
+}
+
+.pmd-astral-lens-btn:hover {
+  border-color: rgba(52, 211, 153, 0.68);
+  color: #ffffff;
+}
+
+.pmd-astral-lens-btn[aria-checked='true'] {
+  border-color: rgba(110, 231, 183, 0.9);
+  background: linear-gradient(135deg, #25d162, #06b6d4);
+  color: #03150e;
+  box-shadow: 0 0 22px rgba(37, 209, 98, 0.36);
+}
+
+.pmd-astral-telemetry {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.pmd-astral-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 0 11px;
+  border-radius: 9999px;
+  border: 1px solid rgba(56, 189, 248, 0.28);
+  background: rgba(6, 18, 26, 0.86);
+  color: #cffafe;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+}
+
+.pmd-astral-step-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  min-width: 44px;
+  padding: 0 12px;
+  border-radius: 9999px;
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  background: rgba(9, 20, 26, 0.9);
+  color: #eefcf6;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: border-color 160ms ease, background-color 160ms ease;
+}
+
+.pmd-astral-step-btn:hover {
+  border-color: rgba(103, 232, 249, 0.75);
+}
+
+.pmd-astral-step-btn[data-active='true'] {
+  border-color: rgba(52, 211, 153, 0.85);
+  background: rgba(6, 78, 59, 0.9);
+  color: #ecfdf5;
+}
+
+.pmd-astral-search-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.pmd-astral-search-input {
+  width: 100%;
+  min-height: 44px;
+  padding: 8px 44px 8px 16px;
+  border-radius: 9999px;
+  border: 1px solid rgba(52, 211, 153, 0.32);
+  background: rgba(4, 15, 20, 0.92);
+  color: #f0fdf8;
+  font-size: 14px;
+  font-weight: 600;
+  outline: none;
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.pmd-astral-search-input::placeholder {
+  color: rgba(203, 213, 225, 0.76);
+}
+
+.pmd-astral-search-input:focus {
+  border-color: rgba(34, 211, 238, 0.85);
+  box-shadow: 0 0 0 2px rgba(34, 211, 238, 0.22);
+}
+
+.pmd-astral-clear-btn {
+  position: absolute;
+  right: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: grid;
+  place-items: center;
+  min-width: 44px;
+  min-height: 44px;
+  border: 0;
+  background: transparent;
+  color: #cbd5e1;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* 4-Card Live Visual Chart & Biometric Widget Bento Strip */
+.pmd-astral-bento {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+@media (min-width: 960px) {
+  .pmd-astral-bento {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.pmd-astral-widget {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 6px;
+  min-height: 118px;
+  padding: 10px 12px;
+  border-radius: 18px;
+  border: 1px solid rgba(56, 189, 248, 0.22);
+  background:
+    radial-gradient(120% 100% at 15% 0%, rgba(34, 211, 238, 0.1), transparent 55%),
+    rgba(6, 16, 23, 0.9);
+  color: #f0fdf8;
+  text-decoration: none;
+  overflow: hidden;
+  transition: transform 150ms ease, border-color 160ms ease;
+}
+
+.pmd-astral-widget:hover {
+  transform: translateY(-2px);
+  border-color: rgba(52, 211, 153, 0.72);
+}
+
+.pmd-astral-widget-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.pmd-astral-widget-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 800;
+  color: #cbd5e1;
+  letter-spacing: 0.02em;
+}
+
+.pmd-astral-widget-val {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 13px;
+  font-weight: 900;
+  color: #6ee7b7;
+}
+
+.pmd-astral-widget-chart {
+  width: 100%;
+  height: 62px;
+  display: block;
+}
+
+/* Interactive 360 orbital stage */
+.pmd-astral-stage {
+  position: relative;
+  width: 100%;
+  min-height: 360px;
+  height: clamp(360px, 50vw, 450px);
+  border-radius: 24px;
+  overflow: hidden;
+  border: 1px solid rgba(34, 211, 238, 0.24);
+  background:
+    radial-gradient(circle at 50% 48%, rgba(16, 185, 129, 0.16), transparent 54%),
+    radial-gradient(circle at 50% 52%, rgba(56, 189, 248, 0.12), transparent 72%),
+    rgba(2, 8, 12, 0.82);
+  touch-action: pan-y;
+  user-select: none;
+  cursor: grab;
+  outline: none;
+}
+
+.pmd-astral-stage:active {
+  cursor: grabbing;
+}
+
+.pmd-astral-stage:focus-visible {
+  box-shadow: 0 0 0 2px rgba(103, 232, 249, 0.85);
+}
+
+.pmd-astral-rings {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* Central 3D Pedestal Body Mediator Core */
+.pmd-astral-core {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 25;
+  transform: translate(-50%, -50%);
+  width: clamp(138px, 33vw, 194px);
+  aspect-ratio: 1 / 1;
+  border-radius: 9999px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(52, 211, 153, 0.48);
+  background: radial-gradient(circle at 50% 42%, rgba(6, 78, 59, 0.58), rgba(3, 9, 14, 0.95));
+  box-shadow:
+    inset 0 0 32px rgba(34, 211, 238, 0.2),
+    0 0 46px rgba(16, 185, 129, 0.28);
+}
+
+.pmd-astral-core-actions {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 60;
+  display: flex;
+  justify-content: center;
+}
+
+.pmd-astral-core-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-height: 44px;
+  padding: 0 12px;
+  border-radius: 9999px;
+  border: 1px solid rgba(103, 232, 249, 0.6);
+  background: rgba(4, 17, 24, 0.94);
+  color: #ecfeff;
+  font-size: 11px;
+  font-weight: 800;
+  white-space: nowrap;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
+}
+
+.pmd-astral-core-toggle:hover {
+  border-color: #34d399;
+}
+
+/* 3D Projected Orbit Nodes with Custom Emblem Logos */
+.pmd-astral-node {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  min-width: 82px !important;
+  min-height: 56px !important;
+  padding: 6px 11px;
+  border-radius: 18px;
+  border: 1px solid rgba(148, 163, 184, 0.34);
+  background: rgba(6, 16, 24, 0.92);
+  color: #eefcf8;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.pmd-astral-node[data-front='true'] {
+  border-color: rgba(52, 211, 153, 0.95);
+  background: linear-gradient(155deg, rgba(6, 62, 49, 0.96), rgba(8, 28, 42, 0.96));
+  color: #ffffff;
+  box-shadow:
+    0 0 0 1px rgba(52, 211, 153, 0.45),
+    0 12px 30px rgba(16, 185, 129, 0.34);
+}
+
+.pmd-astral-node-title {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.15;
+  white-space: nowrap;
+}
+
+.pmd-astral-node-count {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 1px 6px;
+  border-radius: 9999px;
+  background: rgba(16, 185, 129, 0.16);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 10px;
+  font-weight: 800;
+  color: #6ee7b7;
+}
+
+/* BodyExposure / BodyAnalysis 4-Mediator Visual Portal Widgets */
+.pmd-astral-portals {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+@media (min-width: 640px) {
+  .pmd-astral-portals {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.pmd-astral-portal-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 52px;
+  padding: 8px 11px;
+  border-radius: 16px;
+  border: 1px solid rgba(52, 211, 153, 0.3);
+  background: rgba(7, 19, 25, 0.9);
+  color: #ecfdf5;
+  text-decoration: none;
+  transition: transform 150ms ease, border-color 160ms ease, background-color 160ms ease;
+}
+
+.pmd-astral-portal-link:hover {
+  transform: translateY(-1px);
+  border-color: rgba(103, 232, 249, 0.78);
+  background: rgba(9, 28, 36, 0.96);
+}
+
+.pmd-astral-portal-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.pmd-astral-logo-orb {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  border-radius: 11px;
+  border: 1px solid rgba(52, 211, 153, 0.35);
+  background: radial-gradient(circle at 30% 25%, rgba(52, 211, 153, 0.24), rgba(6, 24, 32, 0.92));
+  color: #6ee7b7;
+}
+
+.pmd-astral-portal-label {
+  font-size: 12px;
+  font-weight: 800;
+  color: #ffffff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Constellation Visual Widget Feature Dock (Zero Prose Sentences!) */
+.pmd-astral-dock {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(148, 163, 184, 0.18);
+}
+
+.pmd-astral-dock-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.pmd-astral-feature-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 8px;
+}
+
+@media (min-width: 640px) {
+  .pmd-astral-feature-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .pmd-astral-feature-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.pmd-astral-feature-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 56px;
+  padding: 8px 12px;
+  border-radius: 16px;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  background: rgba(8, 18, 26, 0.88);
+  color: #f1f5f9;
+  text-decoration: none;
+  transition: transform 140ms ease, border-color 150ms ease, background-color 150ms ease;
+}
+
+.pmd-astral-feature-card:hover {
+  transform: translateY(-1px);
+  border-color: rgba(52, 211, 153, 0.78);
+  background: rgba(11, 27, 36, 0.96);
+}
+
+.pmd-astral-feature-main {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+  flex: 1;
+}
+
+.pmd-astral-feature-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.pmd-astral-feature-title {
+  display: block;
+  font-size: 12.5px;
+  font-weight: 800;
+  color: #ffffff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pmd-astral-feature-chip {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  padding: 1px 6px;
+  border-radius: 6px;
+  background: rgba(56, 189, 248, 0.14);
+  font-size: 9.5px;
+  font-weight: 700;
+  color: #a5f3fc;
+  letter-spacing: 0.02em;
+}
+
+.pmd-astral-feature-viz {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.pmd-astral-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 46px !important;
+  padding: 0 16px;
+  border-radius: 9999px;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  background: rgba(10, 22, 30, 0.92);
+  color: #ecfdf5;
+  font-size: 12px;
+  font-weight: 800;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.pmd-astral-btn--accent {
+  border-color: rgba(52, 211, 153, 0.78);
+  background: rgba(6, 78, 59, 0.9);
+  color: #ffffff;
+}
+
+@media (max-width: 639px) {
+  .pmd-astral-360 {
+    padding: 12px;
+    border-radius: 20px;
+  }
+
+  .pmd-astral-stage {
+    min-height: 320px;
+    height: 330px;
+  }
+
+  .pmd-astral-node {
+    min-width: 74px;
+    padding: 5px 9px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pmd-astral-node,
+  .pmd-astral-portal-link,
+  .pmd-astral-feature-card,
+  .pmd-astral-widget,
+  .pmd-astral-lens-btn {
+    transition: none;
+  }
+}
