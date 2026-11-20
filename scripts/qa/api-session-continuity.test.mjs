@@ -156,3 +156,49 @@ test('same-token cross-tab remembered login replacement is not erased by old log
   await assert.rejects(running, /Session/)
   assert.equal(memory.get('pmd-token'), 'token-A')
 })
+
+test('GET retries cold-start 503 and emits waking -> ready status before succeeding', async () => {
+  client.setAuthToken(null)
+  memory.delete('panaceamed.session.v1')
+  const seenStates = []
+  const unsub = client.onServerWakeStatusChange((s) => seenStates.push(s.state))
+  let attempts = 0
+  globalThis.fetch = async () => {
+    attempts += 1
+    if (attempts === 1) return response({ error: 'waking' }, 503)
+    return response({ ok: true })
+  }
+  const res = await client.api.health()
+  unsub()
+  assert.deepEqual(res, { ok: true })
+  assert.equal(attempts, 2)
+  assert.equal(seenStates.includes('waking'), true)
+  assert.equal(client.getServerWakeStatus().state, 'ready')
+  assert.equal(client.getServerWakeStatus().message, null)
+})
+
+test('POST does not auto-retry on 503 and exhausted timeout emits clear waking timeout error', async () => {
+  let postAttempts = 0
+  globalThis.fetch = async () => {
+    postAttempts += 1
+    return response({ error: 'service_unavailable' }, 503)
+  }
+  await assert.rejects(client.api.logout(), (err) => err.status === 503)
+  assert.equal(postAttempts, 1)
+
+  client.setAuthToken(null)
+  memory.delete('panaceamed.session.v1')
+  let abortAttempts = 0
+  globalThis.fetch = async () => {
+    abortAttempts += 1
+    const err = new Error('aborted')
+    err.name = 'AbortError'
+    throw err
+  }
+  await assert.rejects(
+    client.api.health(),
+    (err) => err.status === 503 && err.message === client.SERVER_WAKE_TIMEOUT_MESSAGE,
+  )
+  assert.equal(abortAttempts, 3)
+  assert.equal(client.getServerWakeStatus().state, 'timeout')
+})

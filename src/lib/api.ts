@@ -99,15 +99,39 @@ export interface MarketQuote {
   source: string
 }
 // Frontend client for the Panaceamed backend (real Google login + Midtrans
-// payments). When VITE_API_URL is unset (e.g. the GitHub Pages demo), the app
-// falls back to its in-browser simulation and none of this is used.
+// payments). On panaceamed.id, if VITE_API_URL was omitted at build time,
+// resolveApiBaseUrl routes directly to the live online cloud backend instead
+// of falling back to local-only mode.
 
 import type { Role, Account, Patient, VitalSign, SupportiveResult, EMRRecord, EducationSheet, MedReminder } from './types'
 
+import {
+  COLD_START_RETRY_DELAYS_MS,
+  COLD_START_TIMEOUT_MS,
+  SERVER_WAKING_MESSAGE,
+  SERVER_WAKE_TIMEOUT_MESSAGE,
+  WAKE_NOTICE_THRESHOLD_MS,
+  describeServerWakeStatus,
+  normalizeColdStartTimeoutMs,
+  resolveApiBaseUrl,
+  shouldRetryColdStart,
+  type ServerWakeState,
+  type ServerWakeStatus,
+} from '../domains/identity/apiOrigin.ts'
 import { galatDariRespons } from './galatApi'
 export { GalatApi, galatDariRespons } from './galatApi'
+export {
+  COLD_START_TIMEOUT_MS,
+  SERVER_WAKING_MESSAGE,
+  SERVER_WAKE_TIMEOUT_MESSAGE,
+  type ServerWakeState,
+  type ServerWakeStatus,
+}
 
-const API = (import.meta.env.VITE_API_URL as string | undefined)?.replace(/\/$/, '') || ''
+const API = resolveApiBaseUrl(
+  import.meta.env.VITE_API_URL as string | undefined,
+  typeof globalThis.location !== 'undefined' ? globalThis.location.hostname : undefined,
+)
 export const API_BASE = API
 export const backendEnabled = Boolean(API)
 
@@ -141,7 +165,7 @@ export interface Health {
    * Tidak ada pada server versi lama; ketiadaannya berarti tidak diketahui,
    * bukan berarti aman.
    */
-  penyimpanan?: 'mongo' | 'berkas'
+  penyimpanan?: 'postgres' | 'mongo' | 'berkas'
   aiConsultPnc?: number
   tokenToIdr: number
   midtransClientKey: string | null
@@ -191,28 +215,112 @@ function requestIdentity(): string {
   }
 }
 
-async function req<T>(path: string, init?: RequestInit): Promise<T> {
+let currentWakeState: ServerWakeState = 'idle'
+const wakeListeners = new Set<(status: ServerWakeStatus) => void>()
+
+function setServerWakeState(next: ServerWakeState) {
+  if (currentWakeState === next) return
+  currentWakeState = next
+  const snapshot = describeServerWakeStatus(next)
+  for (const listener of wakeListeners) {
+    try {
+      listener(snapshot)
+    } catch {
+      /* ignore listener failure */
+    }
+  }
+}
+
+export function getServerWakeStatus(): ServerWakeStatus {
+  return describeServerWakeStatus(currentWakeState)
+}
+
+export function onServerWakeStatusChange(listener: (status: ServerWakeStatus) => void): () => void {
+  wakeListeners.add(listener)
+  return () => {
+    wakeListeners.delete(listener)
+  }
+}
+
+function sleepDelay(ms: number): Promise<void> {
+  return new Promise((resolve) => {
+    const t = setTimeout(resolve, ms) as unknown as { unref?: () => void }
+    if (typeof t?.unref === 'function') t.unref()
+  })
+}
+
+async function req<T>(path: string, init?: RequestInit & { timeoutMs?: number }): Promise<T> {
   const identity = requestIdentity()
   const ensureCurrent = () => {
     if (requestIdentity() !== identity) throw new Error('Session changed; reload before retrying.')
   }
-  const res = await fetch(API + path, {
-    credentials: 'include',
-    headers: {
-      'content-type': 'application/json',
-      ...(authToken ? { authorization: `Bearer ${authToken}` } : {}),
-    },
-    ...init,
-  })
-  ensureCurrent()
-  if (!res.ok) {
-    const body = await res.json().catch(() => ({}))
-    ensureCurrent()
-    throw galatDariRespons(res.status, body, res.headers.get('x-request-id'))
+  const hasExternalSignal = Boolean(init?.signal)
+  const timeoutMs = normalizeColdStartTimeoutMs(init?.timeoutMs)
+  const method = (init?.method || 'GET').trim().toUpperCase()
+  const maxAttempts = COLD_START_RETRY_DELAYS_MS.length + 1
+
+  const wakeTimer = setTimeout(() => {
+    setServerWakeState('waking')
+  }, WAKE_NOTICE_THRESHOLD_MS) as unknown as { unref?: () => void }
+  if (typeof wakeTimer?.unref === 'function') wakeTimer.unref()
+
+  try {
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      ensureCurrent()
+      const controller = !hasExternalSignal && typeof AbortController !== 'undefined' ? new AbortController() : null
+      const attemptTimer = controller
+        ? (setTimeout(() => controller.abort(), timeoutMs) as unknown as { unref?: () => void })
+        : null
+      if (attemptTimer && typeof attemptTimer.unref === 'function') attemptTimer.unref()
+
+      try {
+        const res = await fetch(API + path, {
+          credentials: 'include',
+          headers: {
+            'content-type': 'application/json',
+            ...(authToken ? { authorization: `Bearer ${authToken}` } : {}),
+          },
+          ...init,
+          ...(controller ? { signal: controller.signal } : {}),
+        })
+        ensureCurrent()
+        if (!res.ok) {
+          const body = await res.json().catch(() => ({}))
+          ensureCurrent()
+          if (shouldRetryColdStart({ method, attempt, maxAttempts, status: res.status, isTimeout: false })) {
+            setServerWakeState('waking')
+            await sleepDelay(COLD_START_RETRY_DELAYS_MS[attempt - 1] ?? COLD_START_RETRY_DELAYS_MS[0])
+            ensureCurrent()
+            continue
+          }
+          setServerWakeState('ready')
+          throw galatDariRespons(res.status, body, res.headers.get('x-request-id'))
+        }
+        const body = await res.json() as T
+        ensureCurrent()
+        setServerWakeState('ready')
+        return body
+      } catch (err) {
+        if ((err as { name?: string })?.name === 'AbortError' && !hasExternalSignal) {
+          if (shouldRetryColdStart({ method, attempt, maxAttempts, status: null, isTimeout: true })) {
+            setServerWakeState('waking')
+            await sleepDelay(COLD_START_RETRY_DELAYS_MS[attempt - 1] ?? COLD_START_RETRY_DELAYS_MS[0])
+            ensureCurrent()
+            continue
+          }
+          setServerWakeState('timeout')
+          throw galatDariRespons(503, { error: SERVER_WAKE_TIMEOUT_MESSAGE }, null)
+        }
+        throw err
+      } finally {
+        if (attemptTimer !== null) clearTimeout(attemptTimer as unknown as ReturnType<typeof setTimeout>)
+      }
+    }
+    setServerWakeState('timeout')
+    throw galatDariRespons(503, { error: SERVER_WAKE_TIMEOUT_MESSAGE }, null)
+  } finally {
+    clearTimeout(wakeTimer as unknown as ReturnType<typeof setTimeout>)
   }
-  const body = await res.json() as T
-  ensureCurrent()
-  return body
 }
 
 

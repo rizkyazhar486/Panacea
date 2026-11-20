@@ -1,9 +1,13 @@
+# Jalur deploy produksi tunggal aktif adalah Cloudflare Workers (`panacea`, wrangler.toml) + Render backend.
+# Pemicu push otomatis ke GitHub Pages dinonaktifkan lebih dulu sambil menunggu persetujuan pemilik untuk menghapus berkas ini.
+# Dashboard Worker wajib diisi build variable: VITE_API_URL=https://panaceamed-backend.onrender.com
 name: Deploy to GitHub Pages
 
 on:
-  push:
-    branches:
-      - main
+  # Dinonaktifkan sementara agar tidak berjalan paralel dengan Cloudflare Workers (`panacea`):
+  # push:
+  #   branches:
+  #     - main
   workflow_dispatch:
 
 permissions:
