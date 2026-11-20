@@ -2992,6 +2992,10 @@ html.dark.pmd-liquid-actions-v45 button.cta-banner-btn .cta-arrow-circle {
 :root:not(.dark) :is(.gelap-tetap, .dark, .astro-surface) .text-amber-300 { color: #fcd34d; }
 :root:not(.dark) :is(.gelap-tetap, .dark, .astro-surface) .text-rose-200 { color: #fecdd3; }
 :root:not(.dark) :is(.gelap-tetap, .dark, .astro-surface) .text-rose-300 { color: #fda4af; }
+:root:not(.dark) :is(.gelap-tetap, .dark, .astro-surface) .text-emerald-100 { color: #d1fae5; }
+:root:not(.dark) :is(.gelap-tetap, .dark, .astro-surface) .text-slate-200 { color: #e2e8f0; }
+:root:not(.dark) :is(.gelap-tetap, .dark, .astro-surface) .text-slate-300 { color: #cbd5e1; }
+:root:not(.dark) :is(.gelap-tetap, .dark, .astro-surface) .text-slate-400 { color: #94a3b8; }
 
 /* Primary hero CTA: the global neumorphic control layer (v46/v48) forces every
    button to a white pill, which leaves the one primary action visually equal to

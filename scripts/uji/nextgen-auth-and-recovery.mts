@@ -21,6 +21,10 @@ import {
   restoreFullLocalVault,
 } from '../../src/domains/identity/localRecovery.ts'
 
+// Same isolation as data-sync.mts: a live BroadcastChannel (opened lazily by publishDataUpdate) keeps Node alive after the
+// assertions pass and hangs the uji runner, which is why CI stalled on this file.
+Object.defineProperty(globalThis, 'BroadcastChannel', { value: undefined, configurable: true })
+
 // Install isolated localStorage mock for pure contract execution
 const mem = new Map<string, string>()
 globalThis.localStorage = {

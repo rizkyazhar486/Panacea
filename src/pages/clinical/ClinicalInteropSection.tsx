@@ -83,7 +83,7 @@ export default function ClinicalInteropSection({
 
   return (
     <div
-      className="mt-6 grid gap-4 border-t border-white/10 pt-4 sm:grid-cols-3"
+      className="dark mt-6 grid gap-4 border-t border-white/10 pt-4 sm:grid-cols-3"
       aria-label="Clinician workflow and interoperability readiness"
       data-testid="physician-workbench-actions"
     >
