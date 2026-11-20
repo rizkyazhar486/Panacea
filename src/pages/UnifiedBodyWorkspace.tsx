@@ -1,4 +1,4 @@
-import { lazy, Suspense, useLayoutEffect, useRef, type ComponentType } from 'react'
+import { lazy, Suspense, useLayoutEffect, useRef, useState, type ComponentType } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { PanaceaZoneNav } from '../components/PanaceaZoneNav'
 import { OneShape } from '../components/OneShape'
@@ -7,6 +7,8 @@ import { PersonalBodyUnifiedSurface, PersonalBodySurfaceShown } from '../compone
 import { SurfaceDepthNavigator } from '../components/SurfaceDepthNavigator'
 import { hitungScrollAgarTerlihat } from '../lib/railViewport'
 import { BatasKlaimKesehatan } from '../components/BatasKlaimKesehatan'
+import { getVitals } from '../lib/healthVitals'
+import { getDemoTersimpan } from '../lib/profile'
 
 const BodyComposition = lazy(() => import('./bodyhub/BodyComposition').then((m) => ({ default: m.BodyComposition })))
 const BodyExposureOS = lazy(() => import('./bodyhub/BodyExposureOS').then((m) => ({ default: m.BodyExposureOS })))
@@ -73,6 +75,113 @@ function Loader({ exposure = false }: { exposure?: boolean }) {
   return (
     <div className={`grid min-h-[34vh] place-items-center rounded-[28px] border text-sm font-bold ${exposure ? 'border-cyan-300/10 bg-black text-white/45' : 'border-white/10 bg-black/10 text-neutral-500'}`} role="status">
       {exposure ? 'Opening Body Exposure…' : 'Loading Your Body…'}
+    </div>
+  )
+}
+
+function DailyReadinessTargetBar({ onSelectView }: { onSelectView: (key: BodyView) => void }) {
+  const [synced, setSynced] = useState(false)
+  const vitals = getVitals()
+  const demo = getDemoTersimpan()
+
+  const rhr = typeof vitals.restingHr === 'number' && vitals.restingHr > 0 ? vitals.restingHr : 48
+  const hrv = typeof vitals.hrvMs === 'number' && vitals.hrvMs > 0 ? vitals.hrvMs : 76
+  const rec = typeof vitals.recoveryPct === 'number' && vitals.recoveryPct > 0 ? vitals.recoveryPct : 88
+  const wt = typeof demo.weightKg === 'number' && demo.weightKg > 0 ? demo.weightKg : 70
+  const targetProtein = Math.round(wt * 1.8)
+
+  const handleQuickSync = () => {
+    setSynced(true)
+    window.dispatchEvent(new Event('panacea:health-updated'))
+    setTimeout(() => setSynced(false), 2000)
+  }
+
+  return (
+    <div className="mb-4 rounded-2xl border border-emerald-500/25 bg-slate-950/80 p-3.5 backdrop-blur-md sm:p-4 text-white">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 pb-3">
+        <div className="flex items-center gap-2">
+          <span className="h-2.5 w-2.5 rounded-full bg-emerald-400 animate-pulse" />
+          <span className="text-[11px] font-black uppercase tracking-wider text-emerald-300">Target Harian & Kesiapan Tubuh Terpadu</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={handleQuickSync}
+            className="rounded-full border border-emerald-400/40 bg-emerald-500/10 px-3 py-1 text-[11px] font-black text-emerald-200 transition hover:bg-emerald-500/20 active:scale-95"
+          >
+            {synced ? '✓ Tersinkron' : '🔄 Sinkronisasi 1-Klik'}
+          </button>
+          <button
+            type="button"
+            onClick={() => onSelectView('health-data')}
+            className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[11px] font-bold text-white/70 hover:bg-white/10"
+          >
+            Hub Data Wearable →
+          </button>
+        </div>
+      </div>
+
+      <div className="mt-3 grid gap-3 sm:grid-cols-3">
+        <div className="rounded-xl border border-white/10 bg-white/[0.02] p-2.5">
+          <div className="text-[10px] font-bold uppercase tracking-wider text-white/50">Skor Kesiapan & HRV</div>
+          <div className="mt-1 flex items-baseline gap-2">
+            <span className="text-xl font-extrabold text-emerald-400">{rec}%</span>
+            <span className="text-xs text-white/60">rMSSD {hrv} ms · Nadi {rhr} bpm</span>
+          </div>
+          <div className="mt-2 flex items-center justify-between">
+            <span className="text-[10px] text-emerald-300/80 font-medium">Sistem vagal siap adaptasi</span>
+            <button
+              type="button"
+              onClick={() => onSelectView('recovery')}
+              className="text-[10px] font-bold text-cyan-300 underline"
+            >
+              Protokol Pemulihan →
+            </button>
+          </div>
+        </div>
+
+        <div className="rounded-xl border border-white/10 bg-white/[0.02] p-2.5">
+          <div className="text-[10px] font-bold uppercase tracking-wider text-white/50">Makronutrisi & Hidrasi</div>
+          <div className="mt-1 flex items-baseline gap-2">
+            <span className="text-xl font-extrabold text-cyan-400">2.5 L</span>
+            <span className="text-xs text-white/60">Protein ~{targetProtein}g · Karbo kompleks</span>
+          </div>
+          <div className="mt-2 flex items-center justify-between">
+            <span className="text-[10px] text-cyan-300/80 font-medium">1.8g/kg BB ({wt} kg)</span>
+            <button
+              type="button"
+              onClick={() => onSelectView('nutrition')}
+              className="text-[10px] font-bold text-cyan-300 underline"
+            >
+              Atur Menu Gizi →
+            </button>
+          </div>
+        </div>
+
+        <div className="rounded-xl border border-white/10 bg-white/[0.02] p-2.5">
+          <div className="text-[10px] font-bold uppercase tracking-wider text-white/50">Musim Liga & Latihan</div>
+          <div className="mt-1 flex items-baseline gap-2">
+            <span className="text-xl font-extrabold text-amber-400">Ranked S1</span>
+            <span className="text-xs text-white/60">Target: Beban Progresif Terjaga</span>
+          </div>
+          <div className="mt-2 flex items-center justify-between">
+            <button
+              type="button"
+              onClick={() => onSelectView('training')}
+              className="text-[10px] font-bold text-emerald-300 underline"
+            >
+              Rencana Latihan →
+            </button>
+            <button
+              type="button"
+              onClick={() => onSelectView('ranked')}
+              className="text-[10px] font-bold text-amber-300 underline"
+            >
+              Papan Musim Liga →
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }
@@ -226,6 +335,10 @@ export function UnifiedBodyWorkspace() {
           <Suspense fallback={<Loader exposure />}><Active /></Suspense>
         ) : (
           <PersonalBodySurfaceShown>
+            <DailyReadinessTargetBar onSelectView={(k) => {
+              const target = VIEWS.find((v) => v.key === k)
+              if (target) select(target)
+            }} />
             <Suspense fallback={<Loader />}><Active /></Suspense>
           </PersonalBodySurfaceShown>
         )}

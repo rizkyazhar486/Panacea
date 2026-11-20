@@ -68,6 +68,7 @@ const LKEY = 'pmd_health_profile'
 
 // The Bluetooth panel is React plus the radio code: loaded only when this page renders it.
 const BluetoothWearablePanel = lazy(loadBluetoothWearablePanel)
+const LocalWearablesVitalityHub = lazy(() => import('../../domains/body-exposure/ui/LocalWearablesVitalityHub').then((m) => ({ default: m.LocalWearablesVitalityHub })))
 
 /** A reading from the person's own Bluetooth band joins their health data like any other sync. */
 const saveBluetoothReading = (patch: WearableSavePatch) => { mergeVitals(patch) }
@@ -310,6 +311,12 @@ export function HealthProfile() {
           </Suspense>
         </div>
       </Card>
+
+      <Fold label="Universal Wearable Hub & Dynamic Medical Pass (25+ BLE/Wi-Fi Devices)" defaultOpen={true} className="mt-4">
+        <Suspense fallback={<div className="p-4 text-xs font-semibold text-neutral-400">Loading universal wearable hub…</div>}>
+          <LocalWearablesVitalityHub />
+        </Suspense>
+      </Fold>
 
       <Fold label="Import">
       {/* Import from / export to a file */}

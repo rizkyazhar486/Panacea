@@ -1,4 +1,6 @@
-import React, { useState, type CSSProperties } from 'react';
+import React, { useEffect, useState, type CSSProperties } from 'react';
+import { getVitals } from '../../lib/healthVitals';
+import { getDemoTersimpan } from '../../lib/profile';
 
 export interface PersonalBodyGlassTelemetryProps {
   readonly userName?: string;
@@ -35,20 +37,51 @@ const tileBase: CSSProperties = {
 
 export const PersonalBodyGlassTelemetry: React.FC<PersonalBodyGlassTelemetryProps> = ({
   userName = 'You',
-  recoveryScore = 86,
-  strainScore = 14.2,
-  sleepScore = 89,
-  restingHeartRate = 48,
-  rmssdMs = 76,
+  recoveryScore: propRecovery,
+  strainScore: propStrain,
+  sleepScore: propSleep,
+  restingHeartRate: propRhr,
+  rmssdMs: propRmssd,
   hrr60Bpm = 36,
-  bodyWeightKg = 70.4,
-  bodyFatPercent = 12.6,
-  leanMassKg = 61.5,
-  biologicalAgeDeltaYears = -2.8,
+  bodyWeightKg: propWeight,
+  bodyFatPercent: propFat,
+  leanMassKg: propLean,
+  biologicalAgeDeltaYears: propBioAge,
   longitudinalId = 'PANACEA-LID-2026-X889',
 }) => {
+  const [, setTick] = useState(0);
   const [activePillar, setActivePillar] = useState<'CARDIO' | 'METABOLIC' | 'NEURO' | 'ORTHO' | 'ENDOCRINE'>('CARDIO');
   const [showCathedralOath, setShowCathedralOath] = useState<boolean>(false);
+
+  useEffect(() => {
+    const handleUpdate = () => setTick((t) => t + 1);
+    window.addEventListener('panacea:health-updated', handleUpdate);
+    window.addEventListener('panacea:body-character-updated', handleUpdate);
+    window.addEventListener('storage', handleUpdate);
+    return () => {
+      window.removeEventListener('panacea:health-updated', handleUpdate);
+      window.removeEventListener('panacea:body-character-updated', handleUpdate);
+      window.removeEventListener('storage', handleUpdate);
+    };
+  }, []);
+
+  const vitals = getVitals();
+  const demo = getDemoTersimpan();
+
+  const recoveryScore = propRecovery ?? (typeof vitals.recoveryPct === 'number' && vitals.recoveryPct > 0 ? vitals.recoveryPct : 86);
+  const strainScore = propStrain ?? (typeof vitals.strain === 'number' && vitals.strain > 0 ? vitals.strain : 14.2);
+  const sleepScore = propSleep ?? (typeof vitals.sleepH === 'number' && vitals.sleepH > 0 ? Math.min(100, Math.round((vitals.sleepH / 8) * 100)) : 89);
+  const restingHeartRate = propRhr ?? (typeof vitals.restingHr === 'number' && vitals.restingHr > 0 ? vitals.restingHr : (typeof vitals.heartRate === 'number' && vitals.heartRate > 0 ? vitals.heartRate : 48));
+  const rmssdMs = propRmssd ?? (typeof vitals.hrvMs === 'number' && vitals.hrvMs > 0 ? vitals.hrvMs : 76);
+  const bodyWeightKg = propWeight ?? (typeof demo.weightKg === 'number' && demo.weightKg > 0 ? demo.weightKg : (typeof vitals.weightKg === 'number' && vitals.weightKg > 0 ? vitals.weightKg : 70.4));
+  const bodyFatPercent = propFat ?? (typeof vitals.bodyFatPct === 'number' && vitals.bodyFatPct > 0 ? vitals.bodyFatPct : 12.6);
+  const leanMassKg = propLean ?? (typeof vitals.leanMassKg === 'number' && vitals.leanMassKg > 0 ? vitals.leanMassKg : Math.round(bodyWeightKg * (1 - bodyFatPercent / 100) * 10) / 10);
+  const biologicalAgeDeltaYears = propBioAge ?? -2.8;
+
+  const spo2 = typeof vitals.spo2Pct === 'number' && vitals.spo2Pct > 0 ? vitals.spo2Pct : 98;
+  const respRate = typeof vitals.respRate === 'number' && vitals.respRate > 0 ? vitals.respRate : 14;
+  const tempC = typeof vitals.bodyTempC === 'number' && vitals.bodyTempC > 0 ? vitals.bodyTempC : 36.6;
+  const sleepHours = typeof vitals.sleepH === 'number' && vitals.sleepH > 0 ? vitals.sleepH : 7.8;
 
   const C = 226.2;
   const recoveryOffset = C - (recoveryScore / 100) * C;
@@ -110,6 +143,29 @@ export const PersonalBodyGlassTelemetry: React.FC<PersonalBodyGlassTelemetryProp
           </p>
         </div>
       )}
+
+      {/* Live Wearable Telemetry & Vitality Ribbon */}
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '16px' }}>
+        <div style={{ padding: '6px 12px', borderRadius: '9999px', background: 'rgba(0, 191, 99, 0.08)', border: '1px solid rgba(0, 191, 99, 0.25)', fontSize: '11px', fontFamily: 'monospace', color: '#6EE7B7', display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <span style={{ width: '6px', height: '6px', borderRadius: '9999px', backgroundColor: '#00BF63' }} />
+          <span>SpO₂: <b>{spo2}%</b></span>
+        </div>
+        <div style={{ padding: '6px 12px', borderRadius: '9999px', background: 'rgba(10, 132, 255, 0.08)', border: '1px solid rgba(10, 132, 255, 0.25)', fontSize: '11px', fontFamily: 'monospace', color: '#93C5FD', display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <span style={{ width: '6px', height: '6px', borderRadius: '9999px', backgroundColor: '#0A84FF' }} />
+          <span>Laju Napas: <b>{respRate} /min</b></span>
+        </div>
+        <div style={{ padding: '6px 12px', borderRadius: '9999px', background: 'rgba(255, 159, 10, 0.08)', border: '1px solid rgba(255, 159, 10, 0.25)', fontSize: '11px', fontFamily: 'monospace', color: '#FCD34D', display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <span style={{ width: '6px', height: '6px', borderRadius: '9999px', backgroundColor: '#FF9F0A' }} />
+          <span>Suhu Inti: <b>{tempC}°C</b></span>
+        </div>
+        <div style={{ padding: '6px 12px', borderRadius: '9999px', background: 'rgba(175, 82, 222, 0.08)', border: '1px solid rgba(175, 82, 222, 0.25)', fontSize: '11px', fontFamily: 'monospace', color: '#D8B4FE', display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <span style={{ width: '6px', height: '6px', borderRadius: '9999px', backgroundColor: '#AF52DE' }} />
+          <span>Tidur: <b>{sleepHours} jam</b></span>
+        </div>
+        <div style={{ padding: '6px 12px', borderRadius: '9999px', background: 'rgba(255, 255, 255, 0.04)', border: '1px solid rgba(255, 255, 255, 0.1)', fontSize: '11px', fontFamily: 'monospace', color: '#D1D5DB', display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <span>🔄 Telemetri BLE Aktif</span>
+        </div>
+      </div>
 
       {/* 3 Jewel-Tone Stained Glass Luminous Rings */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '16px', marginTop: '20px' }}>

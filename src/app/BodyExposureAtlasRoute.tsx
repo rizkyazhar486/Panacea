@@ -10,6 +10,7 @@ import { Body3D, CT_WINDOWS, MOTION_OFF, type AnatomyLayer } from '../components
 // directly, as src/app may (only domain-to-domain imports must go through an index).
 import { BodyExposureAtlasHome } from '../domains/body-exposure/ui/BodyExposureAtlasHome.tsx'
 import type { AtlasCameraCommand, AtlasViewerProps } from '../domains/body-exposure/engine/atlas-stage/viewerContract.ts'
+import { LocalWearablesVitalityHub } from '../domains/body-exposure/ui/LocalWearablesVitalityHub.tsx'
 
 /** The stage fills the box the home gives it; these utilities already exist in the compiled CSS. */
 const STAGE_CLASS = 'relative h-full w-full overflow-hidden'
@@ -43,5 +44,10 @@ function sendCamera(command: AtlasCameraCommand) {
 }
 
 export default function BodyExposureAtlasRoute() {
-  return <BodyExposureAtlasHome Viewer={AtlasViewer} sendCamera={sendCamera} />
+  return (
+    <div className="relative w-full min-h-screen bg-[#060a12] text-[#eef4ff] flex flex-col gap-6 p-2 sm:p-4">
+      <BodyExposureAtlasHome Viewer={AtlasViewer} sendCamera={sendCamera} />
+      <LocalWearablesVitalityHub />
+    </div>
+  )
 }

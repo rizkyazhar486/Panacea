@@ -5,6 +5,8 @@ import { buildMarker } from './scripts/vite/buildMarker.mjs'
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  server: { allowedHosts: true },
+  preview: { allowedHosts: true },
   // Relative base so the build works under any path (e.g. GitHub Pages subfolder).
   base: './',
   plugins: [react(), tailwindcss(), buildMarker()],
