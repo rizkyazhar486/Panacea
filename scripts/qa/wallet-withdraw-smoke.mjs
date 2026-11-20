@@ -15,6 +15,13 @@ try {
     localStorage.setItem('panacea_onboarded_v1', '1')
     localStorage.setItem('panacea_assessment_prompt_v1', '1')
   })
+  // The store flushes its in-memory state on pagehide/beforeunload, so a plain reload would overwrite the seeded
+  // wallet with the empty in-memory state. Seed once, before the app boots.
+  await page.addInitScript(() => {
+    if (sessionStorage.getItem('wallet-seeded')) return
+    sessionStorage.setItem('wallet-seeded', '1')
+    localStorage.setItem('panaceamed.state.v3', JSON.stringify({ wallet: { balance: 100, transactions: [] } }))
+  })
   await page.goto(`${origin}/#/billing`, { waitUntil: 'domcontentloaded' })
   await page.reload({ waitUntil: 'domcontentloaded' })
   const box = page.getByText('Demo withdrawal', { exact: true }).locator('..')

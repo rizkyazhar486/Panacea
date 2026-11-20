@@ -28,8 +28,9 @@ try {
     } catch { /* evidence is best effort; the original error is still thrown */ }
   }
   await page.goto(origin, { waitUntil: 'domcontentloaded' })
+  let seedCount = 0
   const open = async (foodValues, workoutValues) => {
-    await page.evaluate(({ foodValues, workoutValues }) => {
+    const seededState = await page.evaluate(({ foodValues, workoutValues }) => {
       localStorage.clear()
       const id = 'calorie-test', subject = 'self-calorie-test', now = new Date()
       const day = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`
@@ -39,7 +40,16 @@ try {
       localStorage.setItem(`pmd_workouts_v1:scope_v1:${encodeURIComponent(JSON.stringify([id,subject]))}`, JSON.stringify({ version: 1, ownerAccountId: id, subjectId: subject, items: workoutValues.map((kcal,i) => ({ id:`workout-${i}`, nama:'Synthetic workout', mulai:now.toISOString(), selesai:now.toISOString(), durasi:0, kcal, hr:[], pemulihan:[] })) }))
       localStorage.setItem('panacea_onboarded_v1','1'); localStorage.setItem('panacea_assessment_prompt_v1','1')
       localStorage.setItem('pmd-home-widgets', JSON.stringify(['kaloriBanding']))
+      return localStorage.getItem('panaceamed.state.v3')
     }, { foodValues, workoutValues })
+    // The store flushes its in-memory state on pagehide/beforeunload, so a plain reload lets the empty in-memory state
+    // overwrite the synthetic foods. Seed once, before the app boots; the token keeps each open() call independent.
+    const seedToken = `calorie-seed-${++seedCount}`
+    await page.addInitScript(({ json, token }) => {
+      if (sessionStorage.getItem(token)) return
+      sessionStorage.setItem(token, '1')
+      localStorage.setItem('panaceamed.state.v3', json)
+    }, { json: seededState, token: seedToken })
     await page.goto(`${origin}/#/`, { waitUntil: 'domcontentloaded' }); await page.reload({ waitUntil: 'domcontentloaded' })
     const fold = page.locator('details.fold', { has: page.getByText('Widgets', { exact: true }) }).first()
     try { await fold.waitFor({ timeout: Number(process.env.LOGGED_CALORIE_QA_FOLD_TIMEOUT_MS) || 30000 }) } catch (error) { await keepFailureEvidence(error); throw error }
