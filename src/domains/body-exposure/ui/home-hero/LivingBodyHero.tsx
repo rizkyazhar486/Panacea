@@ -5,15 +5,18 @@
 // rendered by scripts/bangun/bake-home-body.mjs), and every number comes from the whole-body simulator at rest and
 // is labelled "simulated". Nothing here is a measurement of the person looking at it.
 
-import { useEffect, useRef, useState } from 'react'
+import { Suspense, lazy, useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import type { BodySystemId } from '../../data/bodySystems.ts'
 import { HOME_BODY_IMAGE } from '../../data/homeBodyAnchors.ts'
 import { DEFAULT_PARAMS } from '../../engine/cardiacCycle.ts'
 import { HOME_SYSTEMS, cardPlacement, restingVitals, ventricleVolumeTrace, type HomeSystem } from '../../engine/home-hero/homeBodyStage.ts'
 import { SystemGlyph } from '../SystemGlyph.tsx'
-import { SimulatorBoard } from './SimulatorBoard.tsx'
+import { WhenNear } from '../../../../shared/ui/WhenNear.tsx'
 import './livingBodyHero.css'
+
+// The board sits below the fold; its charts and simulator runs load only when it scrolls near.
+const SimulatorBoard = lazy(() => import('./SimulatorBoard.tsx').then((m) => ({ default: m.SimulatorBoard })))
 
 const TRACE = ventricleVolumeTrace(DEFAULT_PARAMS, 2, 160, 44)
 const VITALS = restingVitals()
@@ -165,7 +168,11 @@ export function LivingBodyHero() {
           </nav>
         </aside>
       </div>
-      <SimulatorBoard />
+      <WhenNear minHeight={520} margin={120}>
+        <Suspense fallback={<div style={{ minHeight: 520 }} aria-hidden />}>
+          <SimulatorBoard />
+        </Suspense>
+      </WhenNear>
       <small className="lbh-credit">Z-Anatomy · CC BY-SA 4.0</small>
     </section>
   )

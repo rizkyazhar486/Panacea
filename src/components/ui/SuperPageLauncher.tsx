@@ -11,6 +11,7 @@ import {
   IconUser,
 } from '../icons'
 import { SUPER_PAGES, type SuperPageId } from '../../lib/superPages'
+import { WhenNear } from '../../shared/ui/WhenNear'
 
 const FeatureMapOrbit = lazy(() => import('./FeatureMapOrbit'))
 
@@ -100,9 +101,12 @@ export function SuperPageLauncher() {
       </div>
 
       {view === 'map' ? (
-        <Suspense fallback={<CategoryGrid />}>
-          <FeatureMapOrbit icons={ICONS} />
-        </Suspense>
+        // The orbit is the heaviest part of Home and sits below the fold: load it when it scrolls near.
+        <WhenNear minHeight={420}>
+          <Suspense fallback={<CategoryGrid />}>
+            <FeatureMapOrbit icons={ICONS} />
+          </Suspense>
+        </WhenNear>
       ) : (
         <CategoryGrid />
       )}

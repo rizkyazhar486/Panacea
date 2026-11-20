@@ -99,7 +99,7 @@
 .lbh-detail-head { display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 800; }
 .lbh-detail-head i { width: 10px; height: 10px; border-radius: 3px; background: var(--tone); flex: none; }
 .lbh-detail-note { font-size: 11px; font-weight: 650; color: var(--lbh-dim); }
-.lbh-detail-open { display: inline-flex; align-items: center; gap: 6px; justify-self: start; min-height: 40px; padding: 0 14px; border-radius: 999px; font-size: 12px; font-weight: 800; text-decoration: none; color: var(--lbh-ink); border: 1px solid var(--lbh-line); background: color-mix(in srgb, var(--tone) 16%, transparent); transition: background 0.18s ease; }
+.lbh-detail-open { display: inline-flex; align-items: center; gap: 6px; justify-self: start; min-height: 44px; min-width: 44px; justify-content: center; padding: 0 14px; border-radius: 999px; font-size: 14px; font-weight: 800; text-decoration: none; color: var(--lbh-ink); border: 1px solid var(--lbh-line); background: color-mix(in srgb, var(--tone) 16%, transparent); transition: background 0.18s ease; }
 .lbh-detail-open:hover { background: color-mix(in srgb, var(--tone) 30%, transparent); }
 .lbh-detail-open:focus-visible { outline: 2px solid var(--tone); outline-offset: 2px; }
 
@@ -114,8 +114,8 @@
 .lbh-side { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
 
 .lbh-systems { display: flex; flex-wrap: wrap; gap: 6px; }
-.lbh-chip { display: inline-flex; align-items: center; gap: 7px; min-height: 40px; padding: 0 12px; border-radius: 999px; font-size: 12px; font-weight: 750; color: var(--lbh-ink); background: var(--lbh-panel); border: 1px solid var(--lbh-line); cursor: pointer; transition: border-color 0.16s ease, background 0.16s ease; }
-.lbh-chip i { width: 8px; height: 8px; border-radius: 50%; background: var(--tone); flex: none; }
+.lbh-chip { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 44px; min-width: 44px; padding: 0 10px; border-radius: 999px; font-size: 12px; font-weight: 750; color: var(--lbh-ink); background: var(--lbh-panel); border: 1px solid var(--lbh-line); cursor: pointer; transition: border-color 0.16s ease, background 0.16s ease; }
+.lbh-chip svg { color: var(--tone); flex: none; }
 .lbh-chip:hover { border-color: var(--tone); }
 .lbh-chip[aria-pressed='true'] { border-color: var(--tone); background: color-mix(in srgb, var(--tone) 16%, var(--lbh-panel)); }
 .lbh-chip:focus-visible { outline: 2px solid var(--tone); outline-offset: 2px; }
@@ -134,7 +134,11 @@
   .lbh-vital-value { font-size: 22px; }
 }
 
+/* Reduced motion: name each animated part instead of a blanket override. */
 @media (prefers-reduced-motion: reduce) {
-  .lbh *, .lbh *::before, .lbh *::after { animation: none !important; transition: none !important; }
+  .lbh .lbh-scan, .lbh .lbh-kicker b, .lbh .lbh-trace-sweep { animation: none; }
 }
-:root.reduce-motion .lbh *, :root.reduce-motion .lbh *::before { animation: none !important; transition: none !important; }
+:root.reduce-motion .lbh .lbh-scan, :root.reduce-motion .lbh .lbh-kicker b, :root.reduce-motion .lbh .lbh-trace-sweep { animation: none; }
+
+/* Every link and button on the hero is at least a 44 px target, whatever global link styles apply. */
+.lbh .lbh-cta, .lbh .lbh-detail-open, .lbh .lbh-lenses a { box-sizing: border-box; height: 44px; min-height: 44px; }
