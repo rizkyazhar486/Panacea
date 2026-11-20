@@ -179,7 +179,7 @@ function ProfileIsi({ account }: { account: NonNullable<ReturnType<typeof useSto
                 ? <img src={profile.avatar} alt="" className="h-full w-full rounded-full object-cover" />
                 : <span className="font-astro grid h-full w-full place-items-center rounded-full bg-emerald-100 text-xl font-black text-emerald-900 dark:bg-emerald-500/20 dark:text-emerald-200 sm:text-2xl">{initials}</span>}
             </span>
-            <span className="absolute bottom-0 right-0 grid h-6 w-6 place-items-center rounded-full border-2 border-white bg-emerald-600 text-[11px] font-bold text-white dark:border-[#050a10] dark:bg-emerald-500 dark:text-[#050a10]">✎</span>
+            <span style={{ color: '#031a10' }} className="absolute bottom-0 right-0 grid h-6 w-6 place-items-center rounded-full border-2 border-white bg-emerald-600 text-[11px] font-bold dark:border-[#050a10] dark:bg-emerald-500 dark:text-[#050a10]">✎</span>
           </button>
 
           <div className="min-w-0 flex-1">

@@ -140,7 +140,7 @@ function KernelTelemetryDrawer() {
   const { cockpit, bioKernel, wellsRiley, packet } = snapshot
 
   return (
-    <div className="mt-3 space-y-4 border-t border-cyan-400/20 pt-3.5 text-white">
+    <div className="dark mt-3 space-y-4 border-t border-cyan-400/20 pt-3.5 text-white">
       {/* Whole-Body OS Kernel: Ivanov 4-Bus, Borbely Circadian, Allostatic PID & Bio-GDB */}
       <div className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-4">
         <div className="rounded-xl border border-cyan-400/20 bg-white/[0.03] p-3">

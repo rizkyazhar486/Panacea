@@ -209,7 +209,7 @@ export function DeviceQuickSyncCard() {
                   : 'border-white/10 bg-[#090d14] hover:border-cyan-400/60'
               }`}
             >
-              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-white/10 bg-black font-mono text-base font-black text-cyan-300">
+              <span style={{ color: '#67e8f9' }} className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-white/10 bg-black font-mono text-base font-black text-cyan-300">
                 {d.glyph}
               </span>
               <span className="min-w-0">
