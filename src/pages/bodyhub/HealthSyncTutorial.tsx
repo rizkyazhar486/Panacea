@@ -5,7 +5,7 @@ import {
   IconHeart, IconActivity, IconDownload, IconKey, IconShield, IconCheck,
   IconTimer, IconGauge, IconChevronRight,
 } from '../../components/icons'
-import { api, backendEnabled, type SyncFinding } from '../../lib/api'
+import { api, apiBaseUrl, backendEnabled, type SyncFinding } from '../../lib/api'
 import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -121,13 +121,17 @@ const FAQ: { q: string; a: string }[] = [
   },
 ]
 
+import { healthWebhookUrl } from '../../domains/devices/engine/healthWebhookUrl'
+
 export function HealthSyncTutorial() {
   const [url, setUrl] = useState<string | null>(null)
 
   useEffect(() => {
     if (!backendEnabled) return
     api.getHealthWebhookToken()
-      .then((token) => setUrl(`${(import.meta.env.VITE_API_URL as string)?.replace(/\/$/, '') || ''}/api/health-webhook/${token}`))
+      // Same origin the rest of the app talks to. VITE_API_URL is empty in production since the edge origin moved
+      // into apiOrigin, and a relative link would send Apple Watch data to the website instead of the backend.
+      .then((token) => setUrl(healthWebhookUrl(apiBaseUrl, token)))
       .catch(() => {})
   }, [])
 
