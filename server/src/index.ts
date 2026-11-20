@@ -198,7 +198,7 @@ import { mountVisitRoutes } from './modules/visits/visits.js'
 import { validasiPengingatBaru, validasiTambalPengingat } from './domains/medication-reminders/pengingatObat.js'
 import { postUntukPemirsa } from './domains/social-feed/postPrivacy.js'
 import { validasiLanggananPush, type LanggananPush } from './domains/push/pushSubscription.js'
-import { MAKS_AKTIVITAS_POS, MAKS_CAPTION_POS, statistikTulisMongo, countUsers, listPrivacyConsents, recordPrivacyConsent, exportUserPersonalData, deleteUserAccountData, addSystemAudit } from './store.js'
+import { MAKS_AKTIVITAS_POS, MAKS_CAPTION_POS, statistikTulisMongo, statistikTulisPostgres, saveRolloutConfig, countUsers, listPrivacyConsents, recordPrivacyConsent, exportUserPersonalData, deleteUserAccountData, addSystemAudit } from './store.js'
 import { enforceReadOnlyMode, getRolloutConfig, updateRolloutConfig } from './modules/rollout/rolloutGuard.js'
 import { penandaLog } from './domains/observability/logIdentity.js'
 
@@ -299,7 +299,7 @@ app.get('/api/health', (_req, res) => {
     // Ringkasan HTTP dalam proses (tanpa isi permintaan): jumlah per kelas status dan latensi p50/p95.
     http: ringkasanObservabilitas(),
     // Byte keluar sejak proses mulai: respons per templat rute (batas atas) dan panggilan server ke vendor per host.
-    egress: { rute: egressPerRute(), vendor: ringkasanEgressKeluar(), mongo: statistikTulisMongo() },
+    egress: { rute: egressPerRute(), vendor: ringkasanEgressKeluar(), mongo: statistikTulisMongo(), postgres: statistikTulisPostgres() },
     galatKlien: ringkasanGalatKlien(),
     simpan: { terakhirBerhasil: statusSimpan.terakhirBerhasil, gagalBeruntun: statusSimpan.gagalBeruntun, mendekatiBatas: statusSimpan.mendekatiBatas },
     features: { google: features.googleLive, payments: features.paymentsLive, ai: features.aiLive, push: features.pushLive, email: features.emailLive, payout: features.payoutLive, otpEmail: emailOtpLive },
@@ -2307,6 +2307,7 @@ app.post('/api/owner/rollout', requireAuth, (req, res) => {
   if (!isOwner(u)) return res.status(403).json({ error: 'forbidden' })
   const r = updateRolloutConfig((req.body ?? {}) as Record<string, unknown>)
   if (!r.ok) return res.status(400).json({ error: r.error })
+  saveRolloutConfig(r.config)
   addSystemAudit(penandaLog(config.jwtSecret, u.email), 'owner_rollout_updated', `${r.config.stage}:cap=${r.config.maxAccounts}:kill=${r.config.signupKillSwitch}:ro=${r.config.readOnlyMode}`)
   res.json({ ...r.config, currentAccountCount: countUsers() })
 })

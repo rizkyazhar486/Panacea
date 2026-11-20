@@ -61,6 +61,14 @@ try {
   assert.equal(recovered.status, 200)
   assert.equal((await call('PUT', '/api/health-profile', u1.body.token, { profile: { restingHr: 60 } })).status, 200)
 
+  // Persisted rollout config survives process restart
+  await call('POST', '/api/owner/rollout', owner.body.token, { stage: 'stage-200', maxAccounts: 200, signupKillSwitch: true })
+  await running.restart()
+  const afterRestart = await running.call('GET', '/api/owner/rollout', owner.body.token)
+  assert.equal(afterRestart.status, 200)
+  assert.equal(afterRestart.body.stage, 'stage-200')
+  assert.equal(afterRestart.body.signupKillSwitch, true)
+
   console.log('rolloutKillSwitchHttp: status alerts, stage caps, signup kill switch, read-only recovery passed')
 } finally {
   await running.stop()

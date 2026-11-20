@@ -42,7 +42,7 @@ export async function startIsolatedServer(prefix: string, ownerEmail: string, op
       cwd: serverRoot, stdio: options.captureLogs ? ['ignore', 'pipe', 'pipe'] : 'ignore', env: {
         ...process.env, NODE_ENV: 'development', PORT: String(port), JWT_SECRET: secret,
         ALLOW_DEV_LOGIN: 'true', OWNER_EMAIL: ownerEmail, COOKIE_SECURE: 'false',
-        PANACEA_DATA_FILE: dataFile, PANACEA_ARCHIVE_DIR: join(directory, 'archive'), MONGODB_URI: '',
+        PANACEA_DATA_FILE: dataFile, PANACEA_ARCHIVE_DIR: join(directory, 'archive'), MONGODB_URI: '', DATABASE_URL: '', PANACEA_STORAGE_BACKEND: '',
         GOOGLE_CLIENT_ID: '', RESEND_API_KEY: '', SMTP_HOST: '', SMTP_USER: '',
         VAPID_PUBLIC_KEY: '', VAPID_PRIVATE_KEY: '', MIDTRANS_SERVER_KEY: '', MIDTRANS_CLIENT_KEY: '',
         IRIS_API_KEY: '', IRIS_CREATOR_KEY: '', ANTHROPIC_API_KEY: '', OPENROUTER_API_KEY: '',

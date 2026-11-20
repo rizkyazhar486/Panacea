@@ -1,11 +1,20 @@
 #!/usr/bin/env node
 import crypto from 'node:crypto'
 import fs from 'node:fs'
+import { createRequire } from 'node:module'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import pg from 'pg'
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..')
+
+export function loadPg(root = ROOT) {
+  const candidates = [path.join(root, 'package.json'), path.join(root, 'server', 'package.json')]
+  for (const pkgPath of candidates) {
+    if (!fs.existsSync(pkgPath)) continue
+    try { return createRequire(pkgPath)('pg') } catch { /* try next */ }
+  }
+  throw new Error('pg package not found in root or server/node_modules')
+}
 
 export function loadDatabaseUrl(root = ROOT) {
   if (process.env.DATABASE_URL?.trim()) return process.env.DATABASE_URL.trim()
@@ -64,6 +73,7 @@ async function run() {
   }
 
   const target = describePoolTarget(databaseUrl)
+  const pg = loadPg()
   const pool = new pg.Pool({
     connectionString: databaseUrl,
     max: target.poolMax,

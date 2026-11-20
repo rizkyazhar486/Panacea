@@ -11,6 +11,8 @@ import { tulisAtomik, amankanBerkasRusak, catatBerhasil, catatGagal, BATAS_DOKUM
 import { dokumenInti, muatIrisan, pasangIrisan, pastikanIndeksIrisan, simpanIrisan, VERSI_IRISAN, statistikTulisIrisan, semaiSidikTulis, semaiSidikInti, kanonLengkap } from './irisanPenyimpanan.js'
 import { ambilEncounter, daftarEncounter, daftarRiwayatEncounter, simpanEncounter } from './domains/clinical-records/rekamEncounter.js'
 import { tambahkanLangganan, type LanggananPush } from './domains/push/pushSubscription.js'
+import { createPostgresStore, type PostgresStore, type PostgresWriteStats } from './postgresStore.js'
+import { hydrateRolloutConfig, type RolloutConfig } from './modules/rollout/rolloutGuard.js'
 
 // Batas kewajaran masukan teks pos (bukan aturan klinis): cukup longgar untuk teks nyata, cukup ketat agar satu akun tak menggembungkan berkas data.
 export const MAKS_CAPTION_POS = 5000
@@ -176,6 +178,7 @@ interface DB {
   facilityPrices?: FacilityPriceSubmission[] // crowd-sourced provider price board — real submissions, no fabricated numbers
   visitMemberships?: Record<string, VisitMembership> // canonical Visit OS patient/clinician authorization registry
   privacyConsents?: Record<string, PrivacyConsentRecord[]> // userId -> explicit UU PDP consent ledger
+  rolloutConfig?: RolloutConfig // persisted staged rollout & kill-switch state across restarts
 }
 
 // A real patient/doctor-submitted price for a facility, optionally scoped to
@@ -366,6 +369,44 @@ let saveTimer: ReturnType<typeof setTimeout> | null = null
 let mongoSaveTail: Promise<void> = Promise.resolve()
 let irisanAktif = false
 let sidikIntiTertulis: string | null = null
+let pgStore: PostgresStore | null = null
+let pgSaveTimer: ReturnType<typeof setTimeout> | null = null
+let pgSaveTail: Promise<void> = Promise.resolve()
+
+function postgresAktif(): boolean { return pgStore !== null }
+export function statistikTulisPostgres(): PostgresWriteStats | null {
+  return pgStore ? pgStore.stats() : null
+}
+export function saveRolloutConfig(cfg: RolloutConfig) {
+  db.rolloutConfig = structuredClone(cfg)
+  save()
+}
+function antrikanSimpanPostgres(): Promise<void> {
+  pgSaveTail = pgSaveTail.then(async () => {
+    if (!pgStore) return
+    const snap = JSON.parse(JSON.stringify(db)) as Record<string, unknown>
+    await pgStore.saveState(snap)
+    catatBerhasil(Buffer.byteLength(JSON.stringify(snap)))
+  }).catch((e: unknown) => {
+    catatGagal(e)
+    console.error('[store] Postgres save queue failed:', (e as Error).message)
+  })
+  return pgSaveTail
+}
+function jadwalkanSimpanPostgres() {
+  if (pgSaveTimer) clearTimeout(pgSaveTimer)
+  pgSaveTimer = setTimeout(() => { pgSaveTimer = null; void antrikanSimpanPostgres() }, 200)
+}
+async function flushPostgres(): Promise<void> {
+  if (!pgStore) return
+  while (true) {
+    if (pgSaveTimer) { clearTimeout(pgSaveTimer); pgSaveTimer = null; void antrikanSimpanPostgres() }
+    const pending = pgSaveTail
+    await pending
+    flushSimpan()
+    if (!pgSaveTimer && pending === pgSaveTail) return
+  }
+}
 // Hitungan tulis dokumen inti (dikirim vs dilewati karena sama). Bersama statistikTulisIrisan, inilah satu-satunya
 // angka trafik ke MongoDB: driver Mongo tidak lewat fetch sehingga tidak tercatat di egress vendor.
 const statistikTulisInti = { ditulis: 0, dilewati: 0, byteDitulis: 0 }
@@ -422,11 +463,16 @@ function simpanSekarang() {
   try { db.connect = isiConnect() } catch { /* modul belum siap */ }
   // Local file (harmless; ephemeral on hosts like Render).
   const teks = JSON.stringify(db, null, 2)
+  const tulisLokal = !mongoCol && !(typeof postgresAktif === 'function' && postgresAktif())
   try {
     tulisAtomik(DB_PATH, teks)
-    if (!mongoCol) catatBerhasil(Buffer.byteLength(teks))
+    if (tulisLokal) catatBerhasil(Buffer.byteLength(teks))
   } catch (e) {
-    if (!mongoCol) { catatGagal(e); console.error('[store] file save failed:', (e as Error).message) }
+    if (tulisLokal) { catatGagal(e); console.error('[store] file save failed:', (e as Error).message) }
+  }
+  // Postgres (Neon), coalesced & queued cleanly without blocking request latency.
+  if (typeof postgresAktif === 'function' && postgresAktif() && typeof jadwalkanSimpanPostgres === 'function') {
+    jadwalkanSimpanPostgres()
   }
   // Mongo (permanent), debounced to coalesce rapid writes.
   if (mongoCol) {
@@ -501,6 +547,7 @@ async function simpanMongo(): Promise<void> {
 /** Tulis segera simpan yang masih tertunda (dipanggil saat SIGTERM/deploy). */
 export async function flushStore(): Promise<void> {
   flushSimpan()
+  if (typeof flushPostgres === 'function') await flushPostgres()
   if (!mongoCol) return
   while (true) {
     if (saveTimer) { clearTimeout(saveTimer); saveTimer = null; antrikanSimpanMongo() }
@@ -514,17 +561,38 @@ export async function flushStore(): Promise<void> {
 
 // Call once at boot before serving requests.
 export async function initStore() {
-  // Connect menyunting keadaannya sendiri di memori dan tidak boleh mengimpor
-  // modul ini (store sudah mengimpor Connect, jadi arah sebaliknya melingkar).
-  // Fungsi simpan dititipkan ke sana supaya setiap perubahan di Connect —
-  // pengajuan verifikasi, radius, blokir, laporan, penghapusan terjadwal —
-  // benar-benar sampai ke penyimpanan, bukan hanya yang kebetulan juga
-  // menulis catatan audit.
   pasangPenyimpan(save)
+  const dbUrl = process.env.DATABASE_URL?.trim() || ''
   const uri = process.env.MONGODB_URI
+  const usePostgres = Boolean(dbUrl) && (
+    process.env.PANACEA_STORAGE_BACKEND === 'postgres' || (!uri && !process.env.PANACEA_DATA_FILE)
+  )
+  if (usePostgres) {
+    try {
+      const store = createPostgresStore({ connectionString: dbUrl, schema: process.env.PANACEA_PG_SCHEMA || 'public' })
+      await store.ensureSchema()
+      const loaded = await store.loadState()
+      pgStore = store
+      if (loaded) {
+        db = loaded as unknown as DB
+        muatConnect(db.connect)
+      } else {
+        await store.saveState(JSON.parse(JSON.stringify(db)) as Record<string, unknown>)
+      }
+      if (db.rolloutConfig) hydrateRolloutConfig(db.rolloutConfig)
+      catatBerhasil(Buffer.byteLength(JSON.stringify(db)))
+      console.log(`[store] Neon Postgres connected (schema=${store.schema})`)
+      return
+    } catch (e) {
+      pgStore = null
+      const msg = (e instanceof Error ? e.message : String(e)).replace(/postgres(?:ql)?:\/\/[^@\s]+@/gi, 'postgres://[redacted]@')
+      console.error('[store] Postgres failed, falling back:', msg)
+    }
+  }
   if (!uri) {
     loadFile()
-    console.log('[store] file mode (set MONGODB_URI for permanent storage)')
+    if (db.rolloutConfig) hydrateRolloutConfig(db.rolloutConfig)
+    console.log('[store] file mode (set DATABASE_URL or MONGODB_URI for permanent storage)')
     return
   }
   try {
@@ -555,6 +623,7 @@ export async function initStore() {
       irisanAktif = irisan.lengkap
     }
     if (!irisanAktif) await antrikanSimpanMongo()
+    if (db.rolloutConfig) hydrateRolloutConfig(db.rolloutConfig)
     console.log(irisanAktif
       ? '[store] MongoDB connected — every stored collection is outside the core document'
       : '[store] MongoDB connected — full split did not commit; core document still holds the remainder')
@@ -563,23 +632,20 @@ export async function initStore() {
     mongoDb = null
     irisanAktif = false
     loadFile()
+    if (db.rolloutConfig) hydrateRolloutConfig(db.rolloutConfig)
     console.error('[store] MongoDB failed, using file mode:', (e as Error).message)
   }
 }
 
 /**
- * Bentuk penyimpanan yang SEDANG dipakai — 'mongo' atau 'berkas'.
+ * Bentuk penyimpanan yang SEDANG dipakai — 'postgres', 'mongo', atau 'berkas'.
  *
- * MENGAPA INI HARUS DAPAT DILIHAT DARI LUAR. Tanpa MONGODB_URI, seluruh
- * keadaan hanya hidup di data.json, dan cakram Render bersifat sementara:
- * setiap deploy ulang atau restart menghapusnya. Yang dialami pemakainya
- * bukan "penyimpanan sementara" melainkan AKUNNYA HILANG — ia tidak dapat
- * masuk lagi dengan surel yang sama, dan catatan yang sudah tersinkron lenyap.
- * Selama ini keadaan itu hanya tertulis di catatan log server, yang tidak
- * pernah dilihat siapa pun. Sekarang ia ikut dalam /api/health supaya
- * aplikasinya dapat mengatakannya dengan jujur.
+ * MENGAPA INI HARUS DAPAT DILIHAT DARI LUAR. Tanpa DATABASE_URL/MONGODB_URI,
+ * seluruh keadaan hanya hidup di data.json, dan cakram Render bersifat
+ * sementara: setiap deploy ulang atau restart menghapusnya.
  */
-export function modePenyimpanan(): 'mongo' | 'berkas' {
+export function modePenyimpanan(): 'postgres' | 'mongo' | 'berkas' {
+  if (pgStore) return 'postgres'
   return mongoCol ? 'mongo' : 'berkas'
 }
 
