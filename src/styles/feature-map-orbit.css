@@ -1,0 +1,319 @@
+/* Feature map — game-style interactive world orbit on Home.
+ * Loaded with the lazy FeatureMapOrbit chunk so it never adds render-blocking
+ * CSS. The stage is dark in both themes; every text colour is calibrated for
+ * >= 7:1 contrast against #03060c. Pure DOM + SVG (no WebGL required). */
+
+.pmd-feature-map {
+  position: relative;
+  width: min(100%, 400px);
+  margin: 10px auto 2px;
+  border-radius: 28px;
+  overflow: hidden;
+  isolation: isolate;
+  color: #e6fbff;
+  background:
+    radial-gradient(circle at 50% 42%, rgba(34, 211, 238, .17), transparent 44%),
+    radial-gradient(circle at 50% 112%, rgba(167, 139, 250, .16), transparent 56%),
+    linear-gradient(180deg, #060c16, #03060c);
+  box-shadow: inset 0 0 0 1px rgba(103, 232, 249, .22), 0 20px 52px rgba(2, 6, 12, .42);
+}
+
+.pmd-feature-map::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image: radial-gradient(rgba(165, 243, 252, .16) 1px, transparent 1px);
+  background-size: 14px 14px;
+  mask-image: radial-gradient(circle at 50% 45%, #000 32%, transparent 74%);
+}
+
+.pmd-feature-map__stage {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+}
+
+.pmd-feature-map__rings {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.pmd-feature-map__rings circle {
+  fill: none;
+  stroke: rgba(103, 232, 249, .26);
+  stroke-width: .35;
+}
+
+.pmd-feature-map__rings circle:nth-child(2) {
+  stroke: rgba(103, 232, 249, .44);
+  stroke-dasharray: 1.2 1.6;
+}
+
+.pmd-feature-map__tick {
+  fill: none;
+  stroke: rgba(253, 230, 138, .55);
+  stroke-width: .55;
+  stroke-linecap: round;
+}
+
+.pmd-feature-map__rings line {
+  stroke: rgba(103, 232, 249, .2);
+  stroke-width: .3;
+  transition: stroke .18s ease, stroke-width .18s ease;
+}
+
+.pmd-feature-map__rings line.pmd-feature-map__spoke--active {
+  stroke: rgba(253, 230, 138, .82);
+  stroke-width: .65;
+}
+
+.pmd-feature-map__core {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 34%;
+  aspect-ratio: 1 / 1;
+  transform: translate(-50%, -50%);
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 4px;
+  border-radius: 999px;
+  text-align: center;
+  background: radial-gradient(circle, rgba(8, 47, 73, .96), rgba(3, 7, 14, .98));
+  box-shadow: 0 0 0 1px rgba(103, 232, 249, .48), 0 0 32px rgba(34, 211, 238, .28);
+}
+
+.pmd-feature-map__hub-btn {
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 3px;
+  width: 100%;
+  height: 100%;
+  min-width: 88px;
+  min-height: 88px;
+  padding: 6px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+
+.pmd-feature-map__hub-btn:hover,
+.pmd-feature-map__hub-btn:focus-visible {
+  transform: scale(1.04);
+  box-shadow: 0 0 0 2px rgba(253, 230, 138, .75), 0 0 24px rgba(253, 230, 138, .28);
+  outline: none;
+}
+
+.pmd-feature-map__core-kicker {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: #a5f3fc;
+}
+
+.pmd-feature-map__core-title {
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.15;
+  color: #f8feff;
+}
+
+.pmd-feature-map__back {
+  min-width: 68px;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 1px solid rgba(253, 230, 138, .72);
+  border-radius: 999px;
+  background: rgba(3, 7, 14, .92);
+  color: #fef3c7;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.pmd-feature-map__orbit {
+  position: absolute;
+  inset: 0;
+}
+
+.pmd-feature-map__node {
+  --pmd-accent-ring: rgba(103, 232, 249, .58);
+  --pmd-accent-fill: rgba(34, 211, 238, .28);
+  --pmd-accent-ink: #a5f3fc;
+  position: absolute;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  width: 88px;
+  min-height: 76px;
+  padding: 2px;
+  border: 0;
+  border-radius: 18px;
+  background: transparent;
+  color: #e6fbff;
+  text-decoration: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  animation: pmd-feature-map-in .4s cubic-bezier(.22, 1, .36, 1) both;
+  animation-delay: calc(var(--pmd-node-i, 0) * 42ms);
+}
+
+.pmd-feature-map__node[data-world-accent='health'] {
+  --pmd-accent-ring: rgba(110, 231, 183, .62);
+  --pmd-accent-fill: rgba(16, 185, 129, .28);
+  --pmd-accent-ink: #a7f3d0;
+}
+
+.pmd-feature-map__node[data-world-accent='clinical'] {
+  --pmd-accent-ring: rgba(253, 164, 175, .64);
+  --pmd-accent-fill: rgba(244, 63, 94, .26);
+  --pmd-accent-ink: #fecdd3;
+}
+
+.pmd-feature-map__node[data-world-accent='explore'] {
+  --pmd-accent-ring: rgba(196, 181, 253, .64);
+  --pmd-accent-fill: rgba(139, 92, 246, .28);
+  --pmd-accent-ink: #ede9fe;
+}
+
+.pmd-feature-map__node[data-world-accent='simulate'] {
+  --pmd-accent-ring: rgba(252, 211, 77, .64);
+  --pmd-accent-fill: rgba(245, 158, 11, .28);
+  --pmd-accent-ink: #fef3c7;
+}
+
+.pmd-feature-map__node[data-world-accent='records'] {
+  --pmd-accent-ring: rgba(125, 211, 252, .62);
+  --pmd-accent-fill: rgba(14, 165, 233, .28);
+  --pmd-accent-ink: #e0f2fe;
+}
+
+.pmd-feature-map__node[data-world-accent='for-you'] {
+  --pmd-accent-ring: rgba(253, 230, 138, .66);
+  --pmd-accent-fill: rgba(234, 179, 8, .26);
+  --pmd-accent-ink: #fef9c3;
+}
+
+.pmd-feature-map__blip {
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  border-radius: 999px;
+  border: 1px solid var(--pmd-accent-ring);
+  background: radial-gradient(circle at 35% 30%, var(--pmd-accent-fill), rgba(5, 12, 22, .96) 70%);
+  color: var(--pmd-accent-ink);
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: .04em;
+  box-shadow: 0 0 18px rgba(34, 211, 238, .2);
+  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+
+.pmd-feature-map__label {
+  max-width: 100%;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.15;
+  text-align: center;
+  color: #f0fdff;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, .88);
+}
+
+.pmd-feature-map__node:hover .pmd-feature-map__blip,
+.pmd-feature-map__node:focus-visible .pmd-feature-map__blip {
+  transform: scale(1.09);
+  border-color: #fde68a;
+  box-shadow: 0 0 26px rgba(253, 230, 138, .38);
+}
+
+.pmd-feature-map__node:focus-visible,
+.pmd-feature-map__back:focus-visible {
+  outline: 2px solid #fde68a;
+  outline-offset: 2px;
+}
+
+.pmd-feature-map__node:active .pmd-feature-map__blip {
+  transform: scale(.95);
+}
+
+.pmd-feature-map__hud {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 44px;
+  padding: 10px 16px;
+  border-top: 1px solid rgba(103, 232, 249, .18);
+  background: rgba(2, 6, 12, .92);
+}
+
+.pmd-feature-map__hud-tag {
+  flex: 0 0 auto;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: #a5f3fc;
+}
+
+.pmd-feature-map__hud-detail {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12px;
+  font-weight: 600;
+  color: #f0fdff;
+}
+
+@keyframes pmd-feature-map-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(.64);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+@media (min-width: 1024px) {
+  .pmd-feature-map {
+    width: min(100%, 440px);
+  }
+
+  .pmd-feature-map__node {
+    width: 104px;
+  }
+
+  .pmd-feature-map__blip {
+    width: 60px;
+    height: 60px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pmd-feature-map__node {
+    animation: none;
+  }
+
+  .pmd-feature-map__blip,
+  .pmd-feature-map__hub-btn,
+  .pmd-feature-map__rings line {
+    transition: none;
+  }
+}
