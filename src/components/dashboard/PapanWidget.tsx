@@ -25,7 +25,11 @@ import { UbinPantauan } from '../UbinPantauan'
 import { Tumpukan } from '../Tumpukan'
 import { UbinPelatihLebar, hitungPelatih } from '../UbinLangsung'
 import { UbinSalat } from '../UbinSalat'
-import { UbinObat, UbinKalkulator, UbinStasiun } from '../UbinKerja'
+// These three tiles read the full SKDI therapy table and OSCE history (~86 kB). They appear only when the user
+// picked them, so they load on demand instead of riding along with every Home visit.
+const UbinObat = lazy(() => import('../UbinKerja').then((m) => ({ default: m.UbinObat })))
+const UbinKalkulator = lazy(() => import('../UbinKerja').then((m) => ({ default: m.UbinKalkulator })))
+const UbinStasiun = lazy(() => import('../UbinKerja').then((m) => ({ default: m.UbinStasiun })))
 import { UbinMotivasi } from '../UbinMotivasi'
 import { UbinSkor } from '../UbinSkor'
 import { UbinInspirasi, UbinKartuBelajar, UbinSoal, UbinRingkasanKarya } from '../UbinBelajar'
@@ -674,9 +678,9 @@ export function PapanWidget({ pratinjau, tanggalCatatan }: { pratinjau: Pratinja
         ...(pilihan.includes('ringkasanKarya') ? [{ kunci: 'ringkasanKarya', isi: <UbinRingkasanKarya /> }] : []),
         ...(pilihan.includes('soalHarian') ? [{ kunci: 'soalHarian', isi: <UbinSoal /> }] : []),
         ...(pilihan.includes('kartuBelajar') ? [{ kunci: 'kartuBelajar', isi: <UbinKartuBelajar /> }] : []),
-        ...(pilihan.includes('obatCepat') ? [{ kunci: 'obatCepat', isi: <UbinObat /> }] : []),
-        ...(pilihan.includes('kalkulatorCepat') ? [{ kunci: 'kalkulatorCepat', isi: <UbinKalkulator /> }] : []),
-        ...(pilihan.includes('stasiunSering') ? [{ kunci: 'stasiunSering', isi: <UbinStasiun /> }] : []),
+        ...(pilihan.includes('obatCepat') ? [{ kunci: 'obatCepat', isi: <Suspense fallback={null}><UbinObat /></Suspense> }] : []),
+        ...(pilihan.includes('kalkulatorCepat') ? [{ kunci: 'kalkulatorCepat', isi: <Suspense fallback={null}><UbinKalkulator /></Suspense> }] : []),
+        ...(pilihan.includes('stasiunSering') ? [{ kunci: 'stasiunSering', isi: <Suspense fallback={null}><UbinStasiun /></Suspense> }] : []),
         ...(pilihan.includes('konsistensi') && adaJejak
           ? [{ kunci: 'konsistensi', isi: <PetaKonsistensi /> }] : []),
         ...((state.wallet?.balance ?? 0) > 0

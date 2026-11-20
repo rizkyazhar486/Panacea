@@ -52,6 +52,15 @@ export interface CommandBarInput {
    * bawah berikutnya menyembunyikannya lagi seperti biasa.
    */
   tapAtTop?: boolean
+  /**
+   * Benar selama jeda singkat sesudah perpindahan halaman (Back/Forward, tautan hash).
+   *
+   * Peramban MEMULIHKAN posisi gulir halaman yang dikunjungi kembali — lompatan dari 0 ke 1492 px pada 390x844. Itu
+   * bukan pengguna yang menggulir ke bawah; tanpa sinyal ini lompatan tersebut dibaca sebagai gulir turun dan bilah
+   * (beserta Notifications) menyingkir tepat ketika pengguna baru tiba. Halaman baru selalu dimulai dengan navigasi
+   * terlihat.
+   */
+  navigated?: boolean
 }
 
 /**
@@ -67,6 +76,7 @@ export function nextCommandBarState(
 ): CommandBarState {
   if (input.focusWithin) return 'shown'
   if (input.tapAtTop) return 'shown'
+  if (input.navigated) return 'shown'
   if (input.scrollY <= thresholds.alwaysVisibleBelowPx) return 'shown'
   if (input.pointerY !== null && input.pointerY <= thresholds.revealZonePx) return 'shown'
 

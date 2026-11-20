@@ -1,0 +1,145 @@
+/* Home body-analysis hero. Glass over a slow aurora: frosted panels, a single icon dock, one accent per system.
+   Motion is transform/opacity/background only and stops under reduced motion. */
+.lbh {
+  /* One deliberate look in both app themes: deep space, so the holographic body always reads. */
+  --lbh-ink: #eef3ff;
+  --lbh-dim: rgba(222, 232, 255, 0.62);
+  --lbh-glass: rgba(140, 170, 255, 0.07);
+  --lbh-glass-strong: rgba(170, 195, 255, 0.14);
+  --lbh-edge: rgba(170, 200, 255, 0.18);
+  --lbh-line: rgba(170, 200, 255, 0.12);
+  --lbh-shine: rgba(255, 255, 255, 0.18);
+  --lbh-accent: #7fe3ff;
+  --lbh-a1: #1b2fb8;
+  --lbh-a2: #5a26a8;
+  --lbh-a3: #a8233a;
+  --lbh-base: #04060f;
+  --lbh-shadow: 0 30px 80px -40px rgba(0, 0, 0, 0.9);
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  margin: 2px 0 16px;
+  padding: 14px;
+  border-radius: 30px;
+  color: var(--lbh-ink);
+  color-scheme: dark;
+  background: radial-gradient(90% 60% at 50% 40%, #0b1430 0%, var(--lbh-base) 70%);
+  box-shadow: var(--lbh-shadow);
+}
+.lbh::before { content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none; background-image: radial-gradient(rgba(200, 220, 255, 0.5) 0.6px, transparent 0.8px), radial-gradient(rgba(200, 220, 255, 0.25) 0.5px, transparent 0.7px); background-size: 46px 46px, 23px 23px; background-position: 0 0, 11px 17px; opacity: 0.35; mask-image: radial-gradient(70% 70% at 50% 45%, #000 30%, transparent 85%); }
+
+/* Aurora: three soft colour fields drifting behind the glass. */
+.lbh-aura { position: absolute; inset: -20%; z-index: -1; filter: blur(60px); pointer-events: none; }
+.lbh-aura i { position: absolute; display: block; border-radius: 50%; opacity: 0.75; }
+.lbh-aura i:nth-child(1) { width: 60%; height: 55%; left: -5%; top: 5%; background: radial-gradient(circle, var(--lbh-a1), transparent 68%); animation: lbh-drift 22s ease-in-out infinite alternate; }
+.lbh-aura i:nth-child(2) { width: 55%; height: 55%; right: -8%; top: 15%; background: radial-gradient(circle, var(--lbh-a2), transparent 68%); animation: lbh-drift 28s ease-in-out infinite alternate-reverse; }
+.lbh-aura i:nth-child(3) { width: 70%; height: 45%; left: 15%; bottom: -12%; background: radial-gradient(circle, var(--lbh-a3), transparent 70%); opacity: 0.55; animation: lbh-drift 34s ease-in-out infinite alternate; }
+@keyframes lbh-drift { from { transform: translate3d(-4%, -2%, 0) scale(1); } to { transform: translate3d(6%, 4%, 0) scale(1.12); } }
+
+/* Frosted glass, shared by every panel. */
+.lbh-glass {
+  background: var(--lbh-glass);
+  border: 1px solid var(--lbh-edge);
+  box-shadow: inset 0 1px 0 var(--lbh-shine), 0 18px 40px -30px rgba(20, 30, 80, 0.6);
+  backdrop-filter: blur(22px) saturate(150%);
+  -webkit-backdrop-filter: blur(22px) saturate(150%);
+}
+
+.lbh-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 12px; }
+.lbh-kicker { margin: 0; display: inline-flex; align-items: center; gap: 7px; font-size: 10px; font-weight: 800; letter-spacing: 0.18em; color: var(--lbh-dim); }
+.lbh-kicker b { width: 7px; height: 7px; border-radius: 50%; background: #ff5d73; animation: lbh-pulse 1.714s ease-out infinite; }
+@keyframes lbh-pulse { 0% { box-shadow: 0 0 0 0 rgba(255, 93, 115, 0.55); } 70% { box-shadow: 0 0 0 7px rgba(255, 93, 115, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 93, 115, 0); } }
+
+.lbh-lenses { display: none; padding: 4px; gap: 2px; border-radius: 999px; }
+.lbh-lenses a { display: inline-flex; align-items: center; height: 36px; padding: 0 14px; border-radius: 999px; font-size: 12px; font-weight: 700; text-decoration: none; color: var(--lbh-dim); transition: background 0.2s ease, color 0.2s ease; }
+.lbh-lenses a:hover, .lbh-lenses a:focus-visible { color: var(--lbh-ink); background: var(--lbh-glass-strong); outline: none; }
+
+.lbh-cta { display: inline-flex; align-items: center; gap: 8px; box-sizing: border-box; height: 44px; padding: 0 18px 0 8px; border-radius: 999px; font-size: 13px; font-weight: 800; text-decoration: none; color: #fff; background: linear-gradient(135deg, #5b6bff, #9a5cff); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45), 0 12px 28px -14px rgba(91, 107, 255, 0.95); transition: transform 0.18s ease; }
+.lbh-cta:hover { transform: translateY(-1px); }
+.lbh-cta:active { transform: scale(0.97); }
+.lbh-cta:focus-visible { outline: 2px solid var(--lbh-ink); outline-offset: 3px; }
+.lbh-cta-orb { width: 28px; height: 28px; border-radius: 50%; background: radial-gradient(circle at 34% 30%, #fff, rgba(255, 255, 255, 0.35) 45%, transparent 70%); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.5); }
+
+.lbh-layout { display: grid; gap: 12px; }
+
+/* One glass dock for every system: icons only, the active one becomes a solid disc. */
+.lbh-dock { order: 2; display: flex; gap: 4px; padding: 6px; border-radius: 999px; overflow-x: auto; scrollbar-width: none; background: var(--lbh-glass); border: 1px solid var(--lbh-edge); box-shadow: inset 0 1px 0 var(--lbh-shine); backdrop-filter: blur(22px) saturate(150%); -webkit-backdrop-filter: blur(22px) saturate(150%); }
+.lbh-dock::-webkit-scrollbar { display: none; }
+.lbh-dock-btn { flex: none; display: grid; place-items: center; width: 44px; height: 44px; border: 0; border-radius: 50%; background: transparent; color: var(--lbh-dim); cursor: pointer; transition: background 0.22s ease, color 0.22s ease, transform 0.22s ease, box-shadow 0.22s ease; }
+.lbh-dock-btn:hover { color: var(--lbh-ink); background: var(--lbh-glass-strong); }
+.lbh-dock-btn[aria-pressed='true'] { color: var(--tone); background: var(--lbh-glass-strong); box-shadow: inset 0 1px 0 var(--lbh-shine), 0 0 0 1px var(--lbh-edge), 0 8px 18px -10px var(--tone); transform: scale(1.06); }
+.lbh-dock-btn[aria-pressed='true'] { background: #fff; background-image: none; color: #070b1a; }
+.lbh-dock-btn, .lbh-detail-open, .lbh-cta { background-image: none; }
+.lbh-cta { background-image: linear-gradient(135deg, #5b6bff, #9a5cff); }
+.lbh-dock-btn:focus-visible { outline: 2px solid var(--lbh-accent); outline-offset: 1px; }
+
+.lbh-stage { order: 1; position: relative; display: flex; justify-content: center; overflow: visible; padding: 8px 0 18px; height: clamp(400px, 68vh, 540px); }
+/* HUD behind the torso: slow rings, one turning, nothing that competes with the body. */
+.lbh-hud { position: absolute; left: 50%; top: 34%; width: min(92%, 440px); aspect-ratio: 1; transform: translate(-50%, -50%); pointer-events: none; overflow: visible; }
+.lbh-hud-ring { fill: none; stroke: rgba(127, 227, 255, 0.16); stroke-width: 0.5; }
+.lbh-hud-dash { stroke-dasharray: 1.5 3.5; stroke: rgba(127, 227, 255, 0.28); }
+.lbh-hud-spin { stroke: rgba(180, 140, 255, 0.35); stroke-dasharray: 40 18 6 18; transform-box: fill-box; transform-origin: center; animation: lbh-spin 40s linear infinite; }
+.lbh-hud-tick { stroke: rgba(127, 227, 255, 0.45); stroke-width: 0.8; fill: none; }
+@keyframes lbh-spin { to { transform: rotate(360deg); } }
+.lbh-pedestal { position: absolute; left: 50%; bottom: 4px; width: min(58%, 260px); height: 34px; transform: translateX(-50%); border-radius: 50%; background: radial-gradient(closest-side, rgba(127, 227, 255, 0.55), rgba(127, 227, 255, 0.08) 70%, transparent); box-shadow: 0 0 40px 6px rgba(80, 160, 255, 0.25); }
+.lbh-pedestal::after { content: ''; position: absolute; inset: 8px 18%; border-radius: 50%; border: 1px solid rgba(160, 230, 255, 0.5); }
+.lbh-bodybox { position: relative; height: 100%; aspect-ratio: 1 / 2; flex: none; }
+.lbh-body { position: relative; width: 100%; height: 100%; object-fit: contain; display: block; filter: drop-shadow(0 0 18px rgba(79, 216, 255, 0.35)); animation: lbh-breathe 4.286s ease-in-out infinite; }
+@keyframes lbh-breathe { 0%, 100% { filter: drop-shadow(0 0 14px rgba(79, 216, 255, 0.28)); } 33% { filter: drop-shadow(0 0 26px rgba(79, 216, 255, 0.5)); } }
+.lbh-scan { position: absolute; inset: 0 12%; pointer-events: none; mix-blend-mode: screen; opacity: 0.5; background-image: linear-gradient(180deg, transparent 42%, rgba(170, 180, 255, 0.55) 50%, transparent 58%); background-size: 100% 300%; background-repeat: no-repeat; animation: lbh-scan 7s cubic-bezier(0.45, 0, 0.55, 1) infinite; }
+@keyframes lbh-scan { from { background-position: 0 -100%; } to { background-position: 0 200%; } }
+
+.lbh-spot { position: absolute; width: 28px; height: 28px; margin: -14px 0 0 -14px; cursor: pointer; border-radius: 50%; }
+.lbh-spot > span { position: absolute; inset: 11px; border-radius: 50%; background: var(--tone); box-shadow: 0 0 0 1.5px rgba(255, 255, 255, 0.9), 0 0 10px var(--tone); transition: inset 0.18s ease, box-shadow 0.18s ease; }
+.lbh-spot[data-gap='true'] > span { opacity: 0.5; }
+.lbh-spot:hover > span { inset: 9px; }
+.lbh-spot[data-active='true'] > span { inset: 9px; box-shadow: 0 0 0 2px #fff, 0 0 0 8px color-mix(in srgb, var(--tone) 30%, transparent), 0 0 20px var(--tone); }
+
+.lbh-link { position: absolute; inset: 0; pointer-events: none; }
+.lbh-link line { stroke-width: 1; stroke-dasharray: 3 3; opacity: 0.75; }
+.lbh-tag { position: absolute; z-index: 2; display: inline-flex; align-items: center; gap: 6px; padding: 7px 12px; border-radius: 999px; font-size: 12px; font-weight: 800; white-space: nowrap; color: var(--lbh-ink); background: var(--lbh-glass-strong); border: 1px solid var(--lbh-edge); box-shadow: inset 0 1px 0 var(--lbh-shine), 0 10px 22px -16px rgba(10, 20, 60, 0.8); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+.lbh-tag i { width: 8px; height: 8px; border-radius: 50%; background: var(--tone); flex: none; }
+
+.lbh-side { order: 3; display: grid; gap: 10px; align-content: start; min-width: 0; }
+.lbh-detail { display: grid; gap: 8px; padding: 14px 16px; border-radius: 22px; }
+.lbh-detail-head { display: flex; align-items: center; gap: 10px; font-size: 16px; font-weight: 800; }
+.lbh-detail-head svg { color: var(--tone); }
+.lbh-detail-note { font-size: 11px; font-weight: 650; color: var(--lbh-dim); }
+.lbh-detail-open { display: inline-flex; align-items: center; justify-content: center; gap: 6px; justify-self: start; box-sizing: border-box; height: 44px; min-width: 44px; padding: 0 16px; border-radius: 999px; font-size: 13px; font-weight: 800; text-decoration: none; color: var(--lbh-ink); background: var(--lbh-glass-strong); border: 1px solid var(--lbh-edge); box-shadow: inset 0 1px 0 var(--lbh-shine); transition: transform 0.18s ease; }
+.lbh-detail-open:hover { transform: translateX(2px); }
+.lbh-detail-open:focus-visible { outline: 2px solid var(--tone); outline-offset: 2px; }
+
+.lbh-trace { display: flex; flex-direction: column; gap: 3px; }
+.lbh-trace svg { width: 100%; height: 48px; display: block; }
+.lbh-trace-base { fill: none; stroke: var(--lbh-dim); stroke-width: 1; opacity: 0.35; vector-effect: non-scaling-stroke; }
+.lbh-trace-sweep { fill: none; stroke: #ff5d73; stroke-width: 1.8; vector-effect: non-scaling-stroke; stroke-dasharray: 0.12 1; animation: lbh-sweep var(--lbh-sweep, 1.714s) linear infinite; }
+@keyframes lbh-sweep { from { stroke-dashoffset: 0.12; } to { stroke-dashoffset: -1; } }
+.lbh-meta { font: 600 10px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace; color: var(--lbh-dim); font-variant-numeric: tabular-nums; }
+
+.lbh-orbs { position: relative; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; padding: 14px 6px 4px; }
+/* Orb gauge: a blurred colour halo, a ring filled to the value on its dial, a dark core with the number. */
+.lbh-orb { position: relative; aspect-ratio: 1; border-radius: 50%; display: grid; place-items: center; background: conic-gradient(from -90deg, var(--tone) var(--fill), rgba(170, 200, 255, 0.1) var(--fill)); }
+.lbh-orb::before { content: ''; position: absolute; inset: -14%; z-index: -1; border-radius: 50%; background: radial-gradient(circle, color-mix(in srgb, var(--tone) 55%, transparent), transparent 68%); filter: blur(10px); opacity: 0.8; }
+.lbh-orb-core { position: absolute; inset: 7%; border-radius: 50%; display: grid; place-content: center; text-align: center; gap: 1px; background: radial-gradient(circle at 50% 35%, #141a2e, #070a14 75%); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12); }
+.lbh-orb-core small { font-size: 8.5px; font-weight: 700; letter-spacing: 0.02em; color: var(--lbh-dim); white-space: nowrap; }
+.lbh-orb-core b { font-size: clamp(15px, 4.6vw, 22px); font-weight: 300; letter-spacing: -0.02em; line-height: 1; font-variant-numeric: tabular-nums; color: #fff; }
+.lbh-orb-core i { font-style: normal; font-size: 9px; font-weight: 700; color: var(--lbh-dim); }
+.lbh-sim { position: absolute; top: -8px; right: 14px; padding: 2px 8px; border-radius: 999px; font: 800 9px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: 0.12em; color: var(--lbh-accent); background: var(--lbh-glass-strong); border: 1px solid var(--lbh-edge); }
+
+.lbh-credit { display: block; margin-top: 8px; font-size: 10px; color: var(--lbh-dim); text-align: right; }
+
+@media (min-width: 1024px) {
+  .lbh { padding: 20px 22px 16px; margin-bottom: 24px; }
+  .lbh-lenses { display: inline-flex; margin-left: auto; }
+  .lbh-layout { grid-template-columns: 64px minmax(0, 1fr) 300px; align-items: stretch; }
+  .lbh-dock { order: 0; flex-direction: column; align-self: center; border-radius: 34px; overflow: visible; padding: 8px 6px; }
+  .lbh-stage { order: 0; height: clamp(480px, 64vh, 600px); }
+  .lbh-side { order: 0; }
+  .lbh-orbs { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+  .lbh-orb-core b { font-size: 20px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lbh .lbh-aura i, .lbh .lbh-scan, .lbh .lbh-kicker b, .lbh .lbh-trace-sweep, .lbh .lbh-hud-spin, .lbh .lbh-body { animation: none; }
+}
+:root.reduce-motion .lbh .lbh-aura i, :root.reduce-motion .lbh .lbh-scan, :root.reduce-motion .lbh .lbh-kicker b, :root.reduce-motion .lbh .lbh-trace-sweep, :root.reduce-motion .lbh .lbh-hud-spin, :root.reduce-motion .lbh .lbh-body { animation: none; }

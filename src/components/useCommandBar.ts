@@ -17,6 +17,9 @@ import {
  * bilah membuatnya tidak akan pernah kembali — pita tangkap di tepi atas
  * viewport-lah yang memanggilnya.
  */
+/** Lama jeda sesudah navigasi di mana lompatan gulir dianggap pemulihan peramban, bukan gulir pengguna. */
+const NAVIGASI_JEDA_MS = 1500
+
 export function useCommandBar(
   ref: React.RefObject<HTMLElement | null>,
   thresholds: CommandBarThresholds = DEFAULT_COMMAND_BAR_THRESHOLDS,
@@ -25,6 +28,8 @@ export function useCommandBar(
   const previousScrollY = useRef(0)
   const pointerY = useRef<number | null>(null)
   const ketukanAtas = useRef(false)
+  // Batas waktu (performance.now) jeda sesudah navigasi; lihat `navigated` di lib/interaction/commandBar.
+  const navigasiSampai = useRef(0)
 
   useEffect(() => {
     // Gerak dikumpulkan dalam satu bingkai: gulir dan gerak penunjuk keduanya
@@ -57,6 +62,7 @@ export function useCommandBar(
         pointerY: pointerY.current,
         focusWithin,
         tapAtTop,
+        navigated: performance.now() < navigasiSampai.current,
       }
       previousScrollY.current = scrollY
       setState((current) => nextCommandBarState(current, masukan, thresholds))
@@ -104,6 +110,16 @@ export function useCommandBar(
       jadwalkan()
     }
 
+    // Pemulihan gulir datang SESUDAH popstate/hashchange, dan pada halaman yang memuat isi secara bertahap bisa
+    // menyusul beberapa ratus milidetik kemudian (terukur: 404 → 936 px pada 1440x900). Selama jeda ini setiap
+    // lompatan gulir hanya menggeser titik acuan, tidak menyembunyikan bilah.
+    const padaNavigasi = () => {
+      navigasiSampai.current = performance.now() + NAVIGASI_JEDA_MS
+      jadwalkan()
+    }
+
+    window.addEventListener('popstate', padaNavigasi)
+    window.addEventListener('hashchange', padaNavigasi)
     window.addEventListener('scroll', jadwalkan, { passive: true })
     window.addEventListener('pointermove', padaPenunjuk, { passive: true })
     window.addEventListener('pointerleave', padaPenunjukKeluar, { passive: true })
@@ -113,6 +129,8 @@ export function useCommandBar(
     jadwalkan()
 
     return () => {
+      window.removeEventListener('popstate', padaNavigasi)
+      window.removeEventListener('hashchange', padaNavigasi)
       window.removeEventListener('scroll', jadwalkan)
       window.removeEventListener('pointermove', padaPenunjuk)
       window.removeEventListener('pointerleave', padaPenunjukKeluar)
