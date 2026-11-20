@@ -16,6 +16,7 @@ const HealthTrendRechart = lazy(() =>
 )
 import { IconHeart, IconActivity, IconCheck, IconChevronRight } from '../../components/icons'
 import { api, backendEnabled, apiBaseUrl, type KatalogMetrik } from '../../lib/api'
+import { healthWebhookUrl } from '../../domains/devices/engine/healthWebhookUrl'
 import { useStore } from '../../lib/store'
 import { mergeDemoStored } from '../../lib/profile'
 import { parseHealthFile, type ImportResult } from '../../lib/healthImport'
@@ -814,7 +815,7 @@ function AutoSyncCard() {
       .catch(() => {})
   }, [])
 
-  const url = token ? `${apiBaseUrl}/api/health-webhook/${token}` : ''
+  const url = token ? (healthWebhookUrl(apiBaseUrl, token) ?? '') : ''
   // Rotating silently swaps the token and breaks the phone until the new link is
   // pasted over the old one. That consequence has to be on screen, not implied.
   const [baruDiputar, setBaruDiputar] = useState(false)
