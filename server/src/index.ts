@@ -1,5 +1,6 @@
 import { randomUUID } from 'node:crypto'
 import { middlewareObservabilitas, ringkasanObservabilitas, jalurAman, egressPerRute } from './domains/observability/observabilitas.js'
+import { evaluateServiceAlerts } from './domains/observability/alertEvaluator.js'
 import { pasangHealthRingan } from './domains/observability/healthRingan.js'
 import { bungkusFetch, ringkasanEgressKeluar } from './domains/observability/egressKeluar.js'
 import { bersihkanGalatKlien, catatGalatKlien, ringkasanGalatKlien, daftarGalatKlien } from './domains/observability/galatKlien.js'
@@ -197,7 +198,8 @@ import { mountVisitRoutes } from './modules/visits/visits.js'
 import { validasiPengingatBaru, validasiTambalPengingat } from './domains/medication-reminders/pengingatObat.js'
 import { postUntukPemirsa } from './domains/social-feed/postPrivacy.js'
 import { validasiLanggananPush, type LanggananPush } from './domains/push/pushSubscription.js'
-import { MAKS_AKTIVITAS_POS, MAKS_CAPTION_POS, statistikTulisMongo } from './store.js'
+import { MAKS_AKTIVITAS_POS, MAKS_CAPTION_POS, statistikTulisMongo, countUsers, listPrivacyConsents, recordPrivacyConsent, exportUserPersonalData, deleteUserAccountData, addSystemAudit } from './store.js'
+import { enforceReadOnlyMode, getRolloutConfig, updateRolloutConfig } from './modules/rollout/rolloutGuard.js'
 import { penandaLog } from './domains/observability/logIdentity.js'
 
 const app = express()
@@ -263,7 +265,7 @@ app.use(
 // so uptime monitors don't get throttled.
 const globalLimiter = rateLimit({
   windowMs: 60_000, max: 300, standardHeaders: true, legacyHeaders: false,
-  skip: (req) => req.path === '/api/health',
+  skip: (req) => req.path === '/api/health' || req.path === '/health' || req.path === '/api/status' || req.path === '/status',
   message: { error: 'rate_limited' },
 })
 const authLimiter = rateLimit({
@@ -278,6 +280,7 @@ mountHttpMcp(app)
 app.use(express.json({ limit: '12mb' })) // allow base64 images for AI vision
 mountVisitRoutes(app)
 app.use(['/api/auth', '/api/login', '/api/dev-login'], authLimiter)
+app.use(enforceReadOnlyMode)
 
 // --- health / capability discovery ---
 pasangHealthRingan(app) // probe 2 byte untuk healthCheckPath Render; /api/health di bawah tetap penuh
@@ -322,6 +325,39 @@ app.get('/api/health', (_req, res) => {
     midtransClientKey: features.paymentsLive ? config.midtrans.clientKey : null,
     googleClientId: features.googleLive ? config.googleClientId : null,
     promo: earlyAdopterInfo(),
+  })
+})
+
+app.get('/api/status', (_req, res) => {
+  const httpSummary = ringkasanObservabilitas()
+  const rollout = getRolloutConfig()
+  const evaluation = evaluateServiceAlerts({
+    storageHealthy: penyimpananSehat(),
+    consecutiveSaveFailures: statusSimpan.gagalBeruntun,
+    http: httpSummary,
+    readOnlyMode: rollout.readOnlyMode,
+    signupKillSwitch: rollout.signupKillSwitch,
+  })
+  res.set('Cache-Control', 'no-store').json({
+    status: evaluation.status,
+    uptimeSec: Math.round(process.uptime()),
+    buildCommit: readBuildCommit(process.env),
+    storageMode: modePenyimpanan(),
+    storageHealthy: penyimpananSehat(),
+    http: { ...httpSummary, errorRate5xxPct: evaluation.errorRate5xxPct },
+    alerts: evaluation.alerts,
+    rollout: {
+      stage: rollout.stage,
+      maxAccounts: rollout.maxAccounts,
+      signupKillSwitch: rollout.signupKillSwitch,
+      readOnlyMode: rollout.readOnlyMode,
+    },
+    support: {
+      email: process.env.PANACEA_SUPPORT_EMAIL || 'support@panaceamed.id',
+      statusEndpoint: '/api/status',
+      feedbackEndpoint: '/api/feedback',
+    },
+    checkedAt: new Date().toISOString(),
   })
 })
 
@@ -2258,6 +2294,61 @@ app.get('/api/owner/users', requireAuth, (req, res) => {
   const u = (req as express.Request & { user: User }).user
   if (!isOwner(u)) return res.status(403).json({ error: 'forbidden' })
   res.json({ users: userDirectory() })
+})
+
+app.get('/api/owner/rollout', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  if (!isOwner(u)) return res.status(403).json({ error: 'forbidden' })
+  res.json({ ...getRolloutConfig(), currentAccountCount: countUsers() })
+})
+
+app.post('/api/owner/rollout', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  if (!isOwner(u)) return res.status(403).json({ error: 'forbidden' })
+  const r = updateRolloutConfig((req.body ?? {}) as Record<string, unknown>)
+  if (!r.ok) return res.status(400).json({ error: r.error })
+  addSystemAudit(penandaLog(config.jwtSecret, u.email), 'owner_rollout_updated', `${r.config.stage}:cap=${r.config.maxAccounts}:kill=${r.config.signupKillSwitch}:ro=${r.config.readOnlyMode}`)
+  res.json({ ...r.config, currentAccountCount: countUsers() })
+})
+
+// --- Privasi UU PDP No. 27/2022: persetujuan eksplisit, ekspor & penghapusan akun ---
+app.get('/api/privacy/consent', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  res.json({ consents: listPrivacyConsents(u.id), legalReviewRequired: true })
+})
+
+app.post('/api/privacy/consent', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  const body = (req.body ?? {}) as { purpose?: unknown; policyVersion?: unknown; granted?: unknown }
+  const purpose = typeof body.purpose === 'string' ? body.purpose.trim() : ''
+  const policyVersion = typeof body.policyVersion === 'string' ? body.policyVersion.trim() : ''
+  if (purpose.length < 2 || purpose.length > 64 || policyVersion.length < 1 || policyVersion.length > 32 || typeof body.granted !== 'boolean') {
+    return res.status(400).json({ error: 'invalid_consent_payload' })
+  }
+  const record = recordPrivacyConsent(u.id, { purpose, policyVersion, granted: body.granted })
+  addAudit(u, body.granted ? 'privacy_consent_granted' : 'privacy_consent_withdrawn', `${purpose}:${policyVersion}`)
+  res.status(201).json({ record })
+})
+
+app.get('/api/privacy/export', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  const pkg = exportUserPersonalData(u.id)
+  if (!pkg) return res.status(404).json({ error: 'user_not_found' })
+  addAudit(u, 'privacy_data_exported', 'self')
+  res.json(pkg)
+})
+
+app.delete('/api/privacy/account', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  if ((req.body as { confirm?: unknown } | undefined)?.confirm !== 'HAPUS_AKUN_SAYA') {
+    return res.status(400).json({ error: 'confirmation_required' })
+  }
+  const opaque = penandaLog(config.jwtSecret, u.email)
+  revokeSessionToken(req)
+  clearSession(res)
+  const deleted = deleteUserAccountData(u.id)
+  addSystemAudit(opaque, 'privacy_account_deleted', 'self')
+  res.json({ ok: deleted.deleted, removed: deleted.removed, deletedAt: new Date().toISOString() })
 })
 
 // --- "Pesan & Saran" — in-app feedback delivered to the owner only ---
