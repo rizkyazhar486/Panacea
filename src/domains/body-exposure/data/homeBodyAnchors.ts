@@ -6,6 +6,8 @@ import type { BodySystemId } from './bodySystems.ts'
 
 export const HOME_BODY_IMAGE = { src: 'home/atlas-body-front.webp', width: 720, height: 1440 } as const
 export const HOME_BODY_HOLO = { src: 'home/atlas-body-holo.webp', width: 720, height: 1440 } as const
+/** Turntable sprite: `frames` views left to right, frame i turned i×360/frames degrees about the body's vertical axis. */
+export const HOME_BODY_TURN = { src: 'home/atlas-body-turn.webp', frames: 24, width: 240, height: 480 } as const
 
 export const HOME_BODY_ANCHORS: ReadonlyArray<{ readonly id: BodySystemId; readonly x: number; readonly y: number; readonly inAtlas: boolean }> = [
   { id: 'nervous', x: 0.4664, y: 0.0617, inAtlas: true },
