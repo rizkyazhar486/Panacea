@@ -1,0 +1,34 @@
+name: Production status monitor
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-status-monitor
+  cancel-in-progress: false
+
+jobs:
+  probe:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            scripts/ops/check-production-status.mjs
+          sparse-checkout-cone-mode: false
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Probe backend and frontend availability
+        env:
+          BACKEND_URL: ${{ vars.VITE_API_URL || 'https://panaceamed-backend.onrender.com' }}
+          FRONTEND_URL: 'https://panaceamed.id'
+          ALERT_WEBHOOK_URL: ${{ secrets.ALERT_WEBHOOK_URL }}
+        run: node scripts/ops/check-production-status.mjs

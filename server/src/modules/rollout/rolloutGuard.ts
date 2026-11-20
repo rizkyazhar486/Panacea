@@ -53,6 +53,24 @@ export function resetRolloutConfigFromEnv(): RolloutConfig {
   return getRolloutConfig()
 }
 
+/** Restores persisted owner rollout overrides after boot/restart when valid. */
+export function hydrateRolloutConfig(saved: unknown): RolloutConfig {
+  if (!saved || typeof saved !== 'object' || Array.isArray(saved)) return getRolloutConfig()
+  const s = saved as Record<string, unknown>
+  const patch: Record<string, unknown> = {}
+  if (s.stage === 'stage-50' || s.stage === 'stage-200' || s.stage === 'stage-1000' || s.stage === 'open') patch.stage = s.stage
+  if (typeof s.maxAccounts === 'number' && Number.isInteger(s.maxAccounts) && s.maxAccounts >= 0 && s.maxAccounts <= 1_000_000) {
+    patch.maxAccounts = s.maxAccounts
+  }
+  if (typeof s.signupKillSwitch === 'boolean') patch.signupKillSwitch = s.signupKillSwitch
+  if (typeof s.readOnlyMode === 'boolean') patch.readOnlyMode = s.readOnlyMode
+  if (Object.keys(patch).length > 0) updateRolloutConfig(patch)
+  if (typeof s.updatedAt === 'string' && !Number.isNaN(Date.parse(s.updatedAt))) {
+    currentConfig = { ...currentConfig, updatedAt: s.updatedAt }
+  }
+  return getRolloutConfig()
+}
+
 export function updateRolloutConfig(patch: {
   stage?: unknown
   maxAccounts?: unknown

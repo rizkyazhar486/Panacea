@@ -7,6 +7,7 @@ import net from 'node:net'
 import os from 'node:os'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { loadDatabaseUrl, loadPg } from '../db/migrate-neon.mjs'
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..')
 const SERVER_DIR = path.join(ROOT, 'server')
@@ -115,13 +116,20 @@ async function runStage(base, count, offset) {
 
 async function main() {
   if (!fs.existsSync(SERVER_ENTRY)) throw new Error('server/dist/index.js missing; run cd server && npm run build first')
+  const usePostgres = process.argv.includes('--postgres')
+  const dbUrl = usePostgres ? loadDatabaseUrl(ROOT) : ''
+  if (usePostgres && !dbUrl) throw new Error('DATABASE_URL required for --postgres load test')
+
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'panacea-load1000-'))
   const dataFile = path.join(tmpDir, 'data.json')
   const ownerEmail = 'load-owner@localhost.test'
+  const isoSchema = usePostgres ? `panacea_load_verify_${Date.now()}` : ''
+  const pgPool = usePostgres ? new (loadPg(ROOT)).Pool({ connectionString: dbUrl, max: 3, connectionTimeoutMillis: 10_000 }) : null
   const env = {
     ...process.env, NODE_ENV: 'development', PORT: '0', JWT_SECRET: crypto.randomBytes(32).toString('hex'),
     ALLOW_DEV_LOGIN: 'true', OWNER_EMAIL: ownerEmail, COOKIE_SECURE: 'false',
     PANACEA_ROLLOUT_STAGE: 'open', PANACEA_DATA_FILE: dataFile, PANACEA_ARCHIVE_DIR: path.join(tmpDir, 'archive'),
+    DATABASE_URL: dbUrl, PANACEA_STORAGE_BACKEND: usePostgres ? 'postgres' : '', PANACEA_PG_SCHEMA: isoSchema || 'public',
     MONGODB_URI: '', GOOGLE_CLIENT_ID: '', RESEND_API_KEY: '', VAPID_PUBLIC_KEY: '', MIDTRANS_SERVER_KEY: '',
   }
 
@@ -130,6 +138,9 @@ async function main() {
     const port1 = await freePort()
     proc = await startServer(port1, { ...env, PORT: String(port1) })
     const initialColdStartMs = proc.coldStartMs
+    const healthRes = await timedReq(proc.base, 'GET', '/api/health', { 'x-forwarded-for': '10.42.0.0' })
+    assert.equal(healthRes.ok, true)
+    assert.equal(healthRes.json?.penyimpanan, usePostgres ? 'postgres' : 'berkas', 'storage mode mismatch')
     const ownerRes = await timedReq(proc.base, 'POST', '/api/auth/dev-login', { 'x-forwarded-for': '10.42.0.1' }, { email: ownerEmail, name: 'Load Owner', role: 'pasien' })
     assert.equal(ownerRes.ok, true)
 
@@ -141,33 +152,49 @@ async function main() {
       stages.push(res)
     }
 
-    // Restart durability verification on exact same data file
+    const statsBeforeStop = (await timedReq(proc.base, 'GET', '/api/health', { 'x-forwarded-for': '10.42.0.4' })).json?.egress?.postgres ?? null
+    // Restart durability verification (if postgres, wipe local file to prove full DB recovery)
     await stopServer(proc)
+    if (usePostgres) fs.rmSync(dataFile, { force: true })
     const port2 = await freePort()
-    proc = await startServer(port2, { ...env, PORT: String(port2) })
+    const env2 = { ...env, PORT: String(port2), PANACEA_DATA_FILE: usePostgres ? path.join(tmpDir, 'restart.json') : dataFile }
+    proc = await startServer(port2, env2)
     const rolloutAfter = await timedReq(proc.base, 'GET', '/api/owner/rollout', { 'x-forwarded-for': '10.42.0.2', authorization: `Bearer ${ownerRes.json.token}` })
     assert.equal(rolloutAfter.ok, true)
     const expectedAccounts = 1 + STAGES.reduce((a, b) => a + b, 0)
     const persistedAccounts = rolloutAfter.json.currentAccountCount
+    let pgRelationalAccounts = null
+    if (pgPool) {
+      const r = await pgPool.query(`SELECT count(*)::int AS n FROM "${isoSchema}"."panacea_app_accounts"`)
+      pgRelationalAccounts = r.rows[0]?.n ?? 0
+    }
     let sampleMismatch = 0
     for (const st of stages) {
       for (const s of st.samples) {
-        const prof = await timedReq(proc.base, 'GET', '/api/health-profile', { authorization: `Bearer ${s.token}` })
+        const prof = await timedReq(proc.base, 'GET', '/api/health-profile', { 'x-forwarded-for': '10.42.0.5', authorization: `Bearer ${s.token}` })
         if (!prof.ok || prof.json?.profile?.restingHr !== s.expectedHr) sampleMismatch++
       }
     }
-    const lostUsers = Math.max(0, expectedAccounts - persistedAccounts) + sampleMismatch
+    const lostUsers = Math.max(0, expectedAccounts - persistedAccounts)
+      + (pgRelationalAccounts !== null ? Math.max(0, expectedAccounts - pgRelationalAccounts) : 0)
+      + sampleMismatch
     const pass = stages.every((s) => s.errorRatePct < 1 && s.p95Ms < 1500) && lostUsers === 0
     console.log(JSON.stringify({
       status: pass ? 'LOAD_TEST_PASSED' : 'LOAD_TEST_FAILED',
+      mode: usePostgres ? 'postgres' : 'berkas',
       initialColdStartMs,
       restartColdStartMs: proc.coldStartMs,
+      postgresWriteStats: statsBeforeStop,
       stages: stages.map(({ samples: _s, ...rest }) => rest),
-      durability: { expectedAccounts, persistedAccounts, sampleMismatch, lostUsers },
+      durability: { expectedAccounts, persistedAccounts, pgRelationalAccounts, sampleMismatch, lostUsers },
     }, null, 2))
     if (!pass) process.exitCode = 1
   } finally {
     if (proc) await stopServer(proc)
+    if (pgPool) {
+      await pgPool.query(`DROP SCHEMA IF EXISTS "${isoSchema}" CASCADE`).catch(() => {})
+      await pgPool.end()
+    }
     fs.rmSync(tmpDir, { recursive: true, force: true })
   }
 }

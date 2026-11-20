@@ -4,8 +4,7 @@ import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import pg from 'pg'
-import { describePoolTarget, loadDatabaseUrl } from './migrate-neon.mjs'
+import { describePoolTarget, loadDatabaseUrl, loadPg } from './migrate-neon.mjs'
 
 const qIdent = (s) => `"${String(s).replace(/"/g, '""')}"`
 
@@ -26,6 +25,7 @@ async function run() {
   const databaseUrl = loadDatabaseUrl()
   if (!databaseUrl) throw new Error('DATABASE_URL not available in env or .env.local')
   const target = describePoolTarget(databaseUrl)
+  const pg = loadPg()
   const pool = new pg.Pool({
     connectionString: databaseUrl,
     max: 4,
