@@ -219,19 +219,19 @@ gagal('katalog_bawaan_semua_sitasi_terverifikasi_ledger', () => {
       assert.equal(citation.url, kanonik)
     }
   }
-  assert.equal(jumlah, 46, 'jumlah sitasi yang ditampilkan (terukur: 24 mekanisme, 46 sitasi; 11 dari empat kopling fisiologi, 8 dari fisiologi muskuloskeletal dan indra)')
+  assert.equal(jumlah, 64, 'jumlah sitasi yang ditampilkan (terukur: 35 mekanisme, 64 sitasi; termasuk 11 mekanisme tambahan kardiopulmonal, renal, digestif, limfatik-imun, dan barier epidermal)')
 })
 gagal('katalog_bawaan_jumlah_terukur', () => {
   // Diukur dari data saat mesin ini dibuat. Menambah fisiologi bersumber menaikkan angka ini — ubah secara sadar.
-  assert.equal(katalog.mechanisms.length, 24)
+  assert.equal(katalog.mechanisms.length, 35)
   assert.equal(katalog.gaps.length, 17)
   const index = planSystemIndex(katalog)
   assert.equal(index.ok, true)
   if (!index.ok) return
   assert.deepEqual(index.rows.map((row) => [row.id, row.mechanismCount, row.gapCount, row.sourced]), [
-    ['cardiovascular', 4, 0, true], ['nervous', 2, 0, true], ['respiratory', 5, 1, true], ['digestive', 3, 7, true],
-    ['urinary', 3, 2, true], ['endocrine', 5, 2, true], ['reproductive', 1, 3, true], ['lymphatic-immune', 1, 2, true],
-    ['musculoskeletal', 2, 0, true], ['sensory-ent', 2, 0, true], ['integumentary-surface', 1, 0, true],
+    ['cardiovascular', 7, 0, true], ['nervous', 3, 0, true], ['respiratory', 7, 1, true], ['digestive', 6, 7, true],
+    ['urinary', 5, 2, true], ['endocrine', 5, 2, true], ['reproductive', 1, 3, true], ['lymphatic-immune', 3, 2, true],
+    ['musculoskeletal', 2, 0, true], ['sensory-ent', 2, 0, true], ['integumentary-surface', 2, 0, true],
   ])
   // Dek latihan mengingat sebuah baris indeks = mekanisme kartu sistem yang sama, dalam urutan yang sama.
   for (const row of index.rows) {
@@ -291,10 +291,31 @@ gagal('mekanisme_bersama_muncul_di_kedua_sistem', () => {
 })
 gagal('kopling_fisiologi_tampil_di_setiap_sistem_yang_digabungkannya', () => {
   const ids = (id: BodySystemId) => tampilan(id).mechanisms.map((m) => m.id)
-  assert.deepEqual(ids('cardiovascular'), ['arterial-baroreflex', 'pressure-flow-chain', 'cerebral-perfusion-pressure', 'fick-oxygen-mass-balance'])
-  assert.deepEqual(ids('nervous'), ['arterial-baroreflex', 'cerebral-perfusion-pressure'])
-  assert.deepEqual(ids('respiratory').slice(-2), ['acid-base-bicarbonate-buffer', 'fick-oxygen-mass-balance'])
-  assert.deepEqual(ids('urinary').slice(-1), ['acid-base-bicarbonate-buffer'])
+  assert.deepEqual(ids('cardiovascular'), [
+    'arterial-baroreflex',
+    'pressure-flow-chain',
+    'cerebral-perfusion-pressure',
+    'fick-oxygen-mass-balance',
+    'cardiac-excitation-contraction-coupling',
+    'heart-rate-variability-autonomic-coupling',
+    'hypoxic-pulmonary-vasoconstriction',
+  ])
+  assert.deepEqual(ids('nervous'), [
+    'arterial-baroreflex',
+    'cerebral-perfusion-pressure',
+    'heart-rate-variability-autonomic-coupling',
+  ])
+  assert.deepEqual(ids('respiratory').slice(-4), [
+    'acid-base-bicarbonate-buffer',
+    'fick-oxygen-mass-balance',
+    'hypoxic-pulmonary-vasoconstriction',
+    'transpulmonary-ventilation-mechanics',
+  ])
+  assert.deepEqual(ids('urinary').slice(-3), [
+    'acid-base-bicarbonate-buffer',
+    'tubuloglomerular-feedback-autoregulation',
+    'renal-ammoniagenesis-acid-excretion',
+  ])
   const sumber = (id: string) => katalog.mechanisms.find((m) => m.id === id)!.citations.map((c) => c.id)
   assert.deepEqual(sumber('pressure-flow-chain'), ['NBK556075', 'NBK470455', 'NBK538226', 'NBK537271'])
   assert.deepEqual(sumber('cerebral-perfusion-pressure'), ['NBK537271', 'NBK482119'])
@@ -308,12 +329,18 @@ gagal('kopling_fisiologi_tampil_di_setiap_sistem_yang_digabungkannya', () => {
 gagal('celah_organ_parsial_bila_sebagian_bersumber', () => {
   const urinarius = tampilan('urinary')
   assert.deepEqual(urinarius.organGaps.map((g) => [g.subject, g.partial]), [['Kidney', true], ['Urinary bladder', false]])
-  assert.deepEqual(urinarius.mechanisms.map((m: PhysiologyMechanism) => m.id), ['renal-autoregulation-context', 'kidney-glomerulus-filtration', 'acid-base-bicarbonate-buffer'])
+  assert.deepEqual(urinarius.mechanisms.map((m: PhysiologyMechanism) => m.id), [
+    'renal-autoregulation-context',
+    'kidney-glomerulus-filtration',
+    'acid-base-bicarbonate-buffer',
+    'tubuloglomerular-feedback-autoregulation',
+    'renal-ammoniagenesis-acid-excretion',
+  ])
 })
 gagal('fisiologi_domain_terbaca_utuh_kata_demi_kata', () => {
   // Setiap entri data/education terbaca tanpa ditolak, dari berkasnya sendiri, dengan ringkasan dan sumber persis datanya.
   const entri = DOMAIN_PHYSIOLOGY.flatMap(({ origin, entries }) => entries.map((entry) => ({ origin, entry })))
-  assert.equal(entri.length, 4)
+  assert.equal(entri.length, 15)
   for (const { origin, entry } of entri) {
     const m = katalog.mechanisms.find((x) => x.id === entry.id)
     assert.ok(m, `${entry.id} tidak terbaca`)
