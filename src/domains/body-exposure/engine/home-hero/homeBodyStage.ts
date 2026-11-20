@@ -2,8 +2,7 @@
 // selected one, and for the heart a left-ventricular volume trace from the Wiggers cycle model. Pure and
 // deterministic; the hotspot positions come from scripts/bangun/bake-home-body.mjs (projected from atlas meshes).
 
-import { NORMAL, SKENARIO, simulate, type SimInput, type SimOutput } from '../../../../lib/bodySim.ts'
-import { DEFAULT_OXYGEN_CONTENT_CONVENTION, oxygenContentConvention } from '../../../../lib/physiology/oxygenContentConventions.ts'
+import { NORMAL, simulate } from '../../../../lib/bodySim.ts'
 import type { BodySystemId } from '../../data/bodySystems.ts'
 import { HOME_BODY_ANCHORS } from '../../data/homeBodyAnchors.ts'
 import { cardiacStateAt, validateParams, type CardiacParams } from '../cardiacCycle.ts'
@@ -112,80 +111,3 @@ export function restingVitals(): readonly RestingVital[] {
   ]
 }
 
-// ── Scenario board ────────────────────────────────────────────────────────────────────────────────────────────
-// Everything below is read back from simulate() for each scenario in lib/bodySim. No figure is written by hand, and
-// nothing is a measurement of any person: these are the model's answers for a textbook adult in that state.
-
-export interface ScenarioRow {
-  readonly key: string
-  readonly label: string
-  readonly input: SimInput
-  readonly out: SimOutput
-}
-
-/** Every scenario the simulator ships, solved once. */
-export function scenarioRows(): readonly ScenarioRow[] {
-  return SKENARIO.map((s) => ({ key: s.key, label: s.label, input: s.input, out: simulate(s.input) }))
-}
-
-/** The metrics compared across scenarios, each read straight off SimOutput. */
-export const BOARD_METRICS: ReadonlyArray<{ readonly key: string; readonly label: string; readonly pick: (o: SimOutput) => number }> = [
-  { key: 'co', label: 'Cardiac output', pick: (o) => o.cardiacOutput },
-  { key: 'map', label: 'Mean pressure', pick: (o) => o.map },
-  { key: 'do2', label: 'O₂ delivery', pick: (o) => o.do2 },
-  { key: 'sao2', label: 'O₂ saturation', pick: (o) => o.sao2 },
-  { key: 'gfr', label: 'Filtration', pick: (o) => o.gfr },
-  { key: 'urine', label: 'Urine output', pick: (o) => o.urineOutput },
-]
-
-/** Each metric as a ratio of the same metric at rest; the rest row itself is all ones. Unknown scenario → empty. */
-export function ratiosVsRest(rows: readonly ScenarioRow[], key: string): readonly number[] {
-  const rest = rows.find((r) => r.key === 'normal')
-  const row = rows.find((r) => r.key === key)
-  if (!rest || !row) return []
-  return BOARD_METRICS.map((m) => {
-    const base = m.pick(rest.out)
-    return base > 0 ? m.pick(row.out) / base : 0
-  })
-}
-
-/** Oxygen in one decilitre of arterial blood, split into the part bound to haemoglobin and the part dissolved. */
-export function oxygenSplit(row: ScenarioRow): { readonly bound: number; readonly dissolved: number } {
-  const { hufnerMlO2PerGHb, dissolvedMlO2PerDlPerMmHg } = oxygenContentConvention(DEFAULT_OXYGEN_CONTENT_CONVENTION)
-  return {
-    bound: hufnerMlO2PerGHb * row.input.hemoglobin * (row.out.sao2 / 100),
-    dissolved: dissolvedMlO2PerDlPerMmHg * row.out.pao2,
-  }
-}
-
-/** Minute ventilation split into the part that reaches alveoli and the part that only fills dead space. */
-export function ventilationSplit(row: ScenarioRow): { readonly alveolar: number; readonly deadSpace: number } {
-  const minute = (row.input.respRate * row.input.tidalVolume) / 1000
-  const deadSpace = minute * row.input.deadSpaceFraction
-  return { alveolar: minute - deadSpace, deadSpace }
-}
-
-/** Dry-gas constants of the alveolar gas equation, as a textbook states them. */
-const ATMOSPHERIC_MMHG = 760
-const WATER_VAPOUR_MMHG = 47
-const RESPIRATORY_QUOTIENT = 0.8
-
-export interface CascadeStep { readonly key: string; readonly delta: number; readonly total?: boolean }
-
-/**
- * The oxygen cascade for one scenario: inspired partial pressure, what carbon dioxide displaces in the alveolus,
- * then the drop across the lung to arterial blood. The last bar is the arterial value the simulator reports.
- */
-export function oxygenCascade(row: ScenarioRow): { readonly base: number; readonly steps: readonly CascadeStep[] } {
-  const pio2 = row.input.fio2 * (ATMOSPHERIC_MMHG - WATER_VAPOUR_MMHG)
-  const pao2Alveolar = pio2 - row.out.paco2 / RESPIRATORY_QUOTIENT
-  return {
-    base: pio2,
-    steps: [
-      { key: 'inspired', delta: 0 },
-      { key: 'co2', delta: pao2Alveolar - pio2 },
-      { key: 'lung', delta: row.out.pao2 - pao2Alveolar },
-      { key: 'arterial', delta: 0, total: true },
-    ],
-  }
-}
