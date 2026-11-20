@@ -33,4 +33,10 @@ assert.doesNotMatch(dev, /OWNER_EMAIL|'owner'/, 'jalur perangkat menyentuh owner
 assert.match(src, /data-testid="device-session-btn"/)
 assert.match(src, /onClick=\{continueOnThisDevice\}/)
 
+// 6. Tampilan minimal: tanpa kata "lokal"/klaim kepatuhan di layar login; opsi tamu tersembunyi di dalam <details>.
+assert.doesNotMatch(src, /Mode lokal|mode lokal|Penyimpanan Lokal|Patuh UU PDP|Continue on this device/, 'teks "lokal"/klaim kepatuhan kembali di login')
+const btnAt = src.indexOf('data-testid="device-session-btn"')
+const det = src.slice(src.lastIndexOf('<details', btnAt), src.indexOf('</details>', btnAt))
+assert.ok(det.startsWith('<details') && det.includes('device-session-btn'), 'tombol sesi tamu tidak berada di dalam <details> (harus tersembunyi)')
+
 console.log('login-no-owner-shortcut: OK')

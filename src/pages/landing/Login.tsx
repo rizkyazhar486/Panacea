@@ -64,7 +64,6 @@ export function Login({ onBack }: { onBack?: () => void }) {
     tahunLulus: '', spesialis: '', subspesialis: '', pdfName: '',
   })
   const [error, setError] = useState('')
-  const [serverNotice, setServerNotice] = useState('')
   const [consent, setConsent] = useState(false)
   const [showLegal, setShowLegal] = useState(false)
   const [accessModal, setAccessModal] = useState<'authenticator' | 'qr' | null>(null)
@@ -99,7 +98,7 @@ export function Login({ onBack }: { onBack?: () => void }) {
     })
   }
 
-  // "Continue on this device": works when Google or the server is unavailable. Always a plain patient session with a
+  // Sesi tamu: works when Google or the server is unavailable. Always a plain patient session with a
   // device-scoped identity (never the owner, an admin or a named clinician), and it needs the same privacy consent.
   const continueOnThisDevice = () => {
     if (!consentOk()) return
@@ -151,19 +150,12 @@ export function Login({ onBack }: { onBack?: () => void }) {
           const h = await api.health()
           if (batal) return
           setHealth(h)
-          if (h.penyimpanan === 'berkas') {
-            setServerNotice('Sesi aktif dalam mode penyimpanan berkas/lokal.')
-          } else {
-            setServerNotice('')
-          }
           return
         } catch {
           if (batal) return
-          setServerNotice('Menghubungkan ke layanan server… Anda tetap bisa lanjut di perangkat ini.')
           if (i === 0) await new Promise((r) => setTimeout(r, 2000))
         }
       }
-      if (!batal) setServerNotice('Layanan server belum terhubung — aplikasi berjalan dalam mode lokal.')
     }
     void coba()
     return () => { batal = true }
@@ -185,8 +177,8 @@ export function Login({ onBack }: { onBack?: () => void }) {
           consentAt: new Date().toISOString(),
           strStatus: STR_ROLES.includes(a.role) ? 'pending' : 'none',
         }))
-        .catch(() => setError('Verifikasi Google OAuth gagal atau origin belum terdaftar. Lanjutkan di perangkat ini atau masuk dengan email di bawah.'))
-    }).catch(() => setError('Tombol Google Sign-In tidak dapat dimuat (periksa origin/koneksi). Lanjutkan di perangkat ini atau masuk dengan email di bawah.'))
+        .catch(() => setError('Verifikasi Google OAuth gagal atau origin belum terdaftar. Masuk dengan email di bawah.'))
+    }).catch(() => setError('Tombol Google Sign-In tidak dapat dimuat (periksa origin/koneksi). Masuk dengan email di bawah.'))
   }, [health, login])
 
   function consentOk() {
@@ -684,37 +676,18 @@ export function Login({ onBack }: { onBack?: () => void }) {
               : `Daftar sebagai ${cur.title} →`}
           </button>
 
-          {/* ── Always-available fallback: Google or the server can be down, the device session still works ─ */}
-          <div className="pt-1">
+          {/* Opsi sekunder disembunyikan: sesi tamu tetap tersedia bila Google/server tidak aktif. */}
+          <details className="pt-1 text-center">
+            <summary className="cursor-pointer text-[11px] text-neutral-500 dark:text-neutral-400">Opsi lain</summary>
             <button
               type="button"
               onClick={continueOnThisDevice}
               data-testid="device-session-btn"
-              className="astro-chip flex min-h-[44px] w-full items-center justify-center rounded-full px-4 py-2.5 text-xs font-bold"
+              className="astro-chip mt-2 flex min-h-[44px] w-full items-center justify-center rounded-full px-4 py-2.5 text-xs font-bold"
             >
-              Continue on this device (no account needed)
+              Lanjut sebagai tamu
             </button>
-          </div>
-
-          {/* ── Footer Micro-Badges & Status (Clean, Non-Disruptive) ─ */}
-          <div className="pt-2 text-center space-y-1">
-            <p className="text-[11px] text-neutral-500 dark:text-neutral-400">
-              🔒 Mode lokal aman · Terenkripsi &amp; Patuh UU PDP No. 27/2022
-            </p>
-            {backendEnabled && (
-              <div className="inline-flex items-center gap-1.5 text-[10px] font-semibold text-emerald-700 dark:text-emerald-400">
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                <span>
-                  Layanan Server Aktif{health?.features.ai ? ' · AI' : ''}{health?.features.google ? ' · Google' : ''}
-                </span>
-                {serverNotice && (
-                  <span className="text-neutral-400" title={serverNotice}>
-                    (Penyimpanan Lokal Aman)
-                  </span>
-                )}
-              </div>
-            )}
-          </div>
+          </details>
         </div>
         </div>
 
