@@ -323,11 +323,11 @@ export function LivingBodyHero() {
 
         <aside className="lbh-side">
           <Detail key={system.id} system={system} />
-          <div className="lbh-orbs" aria-label="Resting whole-body state (simulated)">
+          <div className="lbh-orbs" role="group" aria-label="Resting whole-body state (simulated)">
             {VITALS.map((v, i) => {
               const t = orbFill(v.key, Number.parseFloat(v.value))
               return (
-                <div key={v.key} className="lbh-orb" style={{ ['--tone' as string]: v.tone, ['--fill' as string]: `${Math.round(t * 360)}deg`, ['--i' as string]: i }} aria-label={`${v.label} ${v.value} ${v.unit}`}>
+                <div key={v.key} className="lbh-orb" style={{ ['--tone' as string]: v.tone, ['--fill' as string]: `${Math.round(t * 360)}deg`, ['--i' as string]: i }} role="img" aria-label={`${v.label} ${v.value} ${v.unit}`}>
                   <span className="lbh-orb-core" aria-hidden>
                     <small>{ORB_NAME[v.key] ?? v.label}</small>
                     <b>{v.value}</b>
