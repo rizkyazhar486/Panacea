@@ -46,8 +46,10 @@ import { PRESSURE_FLOW_BOUNDARY, PRESSURE_FLOW_EVIDENCE } from '../../../../lib/
 import { CEREBRAL_PERFUSION_BOUNDARY, CEREBRAL_PERFUSION_EVIDENCE } from '../../../../lib/physiology/cerebralPerfusionCoupling.ts'
 import { ACID_BASE_COUPLING_BOUNDARY, ACID_BASE_COUPLING_EVIDENCE } from '../../../../lib/physiology/acidBaseCoupling.ts'
 import { FICK_OXYGEN_EXTRACTION_BOUNDARY, FICK_OXYGEN_EXTRACTION_EVIDENCE } from '../../../../lib/physiology/fickOxygenExtraction.ts'
+import { CARDIORENAL_PHYSIOLOGY } from '../../data/education/cardiorenalPhysiology.ts'
 import { MUSCULOSKELETAL_PHYSIOLOGY } from '../../data/education/musculoskeletalPhysiology.ts'
 import { SENSORY_PHYSIOLOGY } from '../../data/education/sensoryPhysiology.ts'
+import { VISCERAL_PHYSIOLOGY } from '../../data/education/visceralPhysiology.ts'
 import type { SourcedPhysiology } from '../../data/education/sourcedPhysiology.ts'
 import {
   readEducationNetwork,
@@ -175,10 +177,12 @@ export function couplingMechanismInputs(): ReferencedMechanismInput[] {
   ]
 }
 
-/** Physiology written for the systems the older graphs left without any source; read like every other mechanism. */
+/** Physiology written for the systems the older graphs left with thin or missing sources; read like every other mechanism. */
 export const DOMAIN_PHYSIOLOGY: readonly { origin: string; entries: readonly SourcedPhysiology[] }[] = [
   { origin: domainData('musculoskeletalPhysiology.ts'), entries: MUSCULOSKELETAL_PHYSIOLOGY },
   { origin: domainData('sensoryPhysiology.ts'), entries: SENSORY_PHYSIOLOGY },
+  { origin: domainData('cardiorenalPhysiology.ts'), entries: CARDIORENAL_PHYSIOLOGY },
+  { origin: domainData('visceralPhysiology.ts'), entries: VISCERAL_PHYSIOLOGY },
 ]
 
 function build(): SystemPhysiologyCatalog {
