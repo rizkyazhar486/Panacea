@@ -1,0 +1,17 @@
+{
+  "directive": "PANACEAMED_DIRECTIVE_067_R_CANONICAL_RECOVERY",
+  "remediatedPr": 2906,
+  "status": "EMPIRICAL_BINARY_VERIFICATION_ACTIVE",
+  "evidenceGatesEnforced": true,
+  "remediatedDefectsFromPr2906": [
+    "Removed hardcoded 45,200 vertex and 90,400 triangle counts; replaced with real glTF accessor count extraction.",
+    "Removed unconditional hasValidMesh: true on invalid structures; enforced fail-closed negative controls.",
+    "Removed empty-string SHA-256 (e3b0c442...) and Math.random() provenance strings; enforced real crypto.createHash('sha256') over file buffers.",
+    "Removed unverified 8K texture claims; implemented binary PNG/JPEG/KTX2 header dimension inspection."
+  ],
+  "remainingGaps": [
+    "High-resolution 8K KTX2 organ textures require licensed external binary assets via Git LFS before 8K tier is claimed in production.",
+    "Patient-specific internal organ geometry remains explicitly marked UNAVAILABLE without individual DICOM/NIfTI imaging."
+  ],
+  "lastUpdated": "2026-10-29T23:30:00Z"
+}

@@ -31,6 +31,12 @@ export interface OmniTelemetryUnifiedReport {
   holisticHumanEnvironmentQuotient: number;
   consequentialAnatomicalTargets: string[];
   sportMedicalInsight: string;
+  safetyAndValidationBoundary: {
+    clinicalValidationState: 'UNVALIDATED_MATHEMATICAL_MODEL_NOT_PATIENT_SPECIFIC';
+    deviceActuationPermitted: false;
+    digitalTwinRepresentationStatus: 'THEORETICAL_TELEMETRY_PROJECTION_NOT_INDIVIDUAL_TWIN';
+    unverifiedAssumptions: string[];
+  };
   provenanceHash: string;
   isClinicallyAuthoritative: false;
 }
@@ -40,23 +46,28 @@ export function evaluateOmniDeviceTelemetry(input: OmniTelemetryInput): OmniTele
   const fio2 = Math.min(1.0, Math.max(0.21, input.inspiredOxygenFractionFio2 ?? 0.21));
   const bsa = Math.max(0.5, input.bodySurfaceAreaM2 ?? 1.85);
 
-  // Alveolar Gas Equation: PAO2 = FiO2 * (Patm_mmHg - PH2O_47) - (PaCO2_40 / RQ_0.8)
   const patmMmHg = pressureAtm * 760;
   const estimatedAlveolarPo2MmHg = Number(Math.max(0, fio2 * (patmMmHg - 47) - 40 / 0.8).toFixed(2));
 
-  // Hydrostatic / barometric nitrogen loading ratio relative to sea-level 0.79 atm N2
   const inspiredN2Atm = pressureAtm * (1 - fio2);
   const buhlmannDecompressionGradientFactor = Number((inspiredN2Atm / 0.79).toFixed(3));
 
   let status: OmniTelemetryUnifiedReport['environmentalAdaptationStatus'] = 'HOMEOSTASIS_OPTIMAL';
-  let insight = 'Physiological homeostasis maintained within normobaric and normoxic boundaries.';
+  let insight = 'Theoretical normobaric/normoxic calculation within nominal bounds (non-diagnostic).';
   const targets: string[] = ['CARDIOVASCULAR_SYSTEM', 'AUTONOMIC_NERVOUS_SYSTEM'];
+
+  const unverifiedAssumptions: string[] = [
+    'Assumes fixed arterial PaCO2 of 40 mmHg and respiratory quotient (RQ) of 0.8 without ABG measurement.',
+    'Assumes water vapor pressure of 47 mmHg at 37.0°C core temperature.',
+    'Does not account for patient-specific intrapulmonary shunt, V/Q mismatch, or membrane oxygenator oxygen transfer efficiency.',
+    'Mathematical output is an illustrative physiological calculation and MUST NOT be used for clinical diagnosis or ECMO/ventilator actuation.'
+  ];
 
   if (input.sourceType === 'ECMO_MACHINE') {
     const cardiacIndexEquivalent = input.primaryBiometricValue / bsa;
     if (cardiacIndexEquivalent < 1.8 || input.primaryBiometricValue < 2.2) {
       status = 'CRITICAL_HARDWARE_INTERVENTION_REQUIRED';
-      insight = `Critical ECMO perfusion deficit (flow=${input.primaryBiometricValue} L/min, index=${cardiacIndexEquivalent.toFixed(2)} L/min/m2). Immediate clinician review required.`;
+      insight = `Unvalidated low-flow alert threshold triggered (flow=${input.primaryBiometricValue} L/min, index=${cardiacIndexEquivalent.toFixed(2)} L/min/m2). Human clinician verification required; automated pump actuation is prohibited.`;
       targets.push('MYOCARDIAL_PERFUSION', 'RENAL_CORTEX_OXYGENATION', 'CEREBRAL_HEMODYNAMICS');
     }
   } else if (
@@ -65,7 +76,7 @@ export function evaluateOmniDeviceTelemetry(input: OmniTelemetryInput): OmniTele
     estimatedAlveolarPo2MmHg < 60
   ) {
     status = 'ENVIRONMENTAL_STRESS_DETECTED';
-    insight = `Hyperbaric/hypobaric stress detected (PAO2=${estimatedAlveolarPo2MmHg} mmHg, N2-load=${buhlmannDecompressionGradientFactor}x, alt=${input.gpsSpatialCoordinates.altitudeMeters}m).`;
+    insight = `Theoretical barometric/hydrostatic stress threshold crossed (PAO2=${estimatedAlveolarPo2MmHg} mmHg, N2-ratio=${buhlmannDecompressionGradientFactor}x, alt=${input.gpsSpatialCoordinates.altitudeMeters}m).`;
     targets.push('PULMONARY_ALVEOLAR_MEMBRANE', 'INNER_EAR_LABYRINTH_THT', 'PERIPHERAL_VASCULAR_BED');
   }
 
@@ -97,6 +108,12 @@ export function evaluateOmniDeviceTelemetry(input: OmniTelemetryInput): OmniTele
     holisticHumanEnvironmentQuotient: quotient,
     consequentialAnatomicalTargets: targets,
     sportMedicalInsight: insight,
+    safetyAndValidationBoundary: {
+      clinicalValidationState: 'UNVALIDATED_MATHEMATICAL_MODEL_NOT_PATIENT_SPECIFIC',
+      deviceActuationPermitted: false,
+      digitalTwinRepresentationStatus: 'THEORETICAL_TELEMETRY_PROJECTION_NOT_INDIVIDUAL_TWIN',
+      unverifiedAssumptions
+    },
     provenanceHash,
     isClinicallyAuthoritative: false
   };

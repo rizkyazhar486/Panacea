@@ -1,5 +1,5 @@
 import crypto from 'node:crypto';
-import { evaluateBodyExposureEvidence } from '../body-exposure-evidence/bodyExposureEvidenceEngine.ts';
+import { evaluateBodyExposureEvidence, type EvidenceGateReport } from '../body-exposure-evidence/bodyExposureEvidenceEngine.ts';
 
 export interface BodyExposureConfigInput {
   entityId: string;
@@ -7,9 +7,12 @@ export interface BodyExposureConfigInput {
   subsurfaceScatteringIndex: number;
   pbrTextureResolution: '8K' | '4K' | '2K';
   enableDynamicLighting: boolean;
-  /** Required empirical evidence fields to prevent config-only fake verdicts */
   verifiedMeshTriangleCount?: number;
   verifiedArtifactSha256?: string;
+  expectedManifestSha256?: string;
+  actualAssetBytes?: Buffer;
+  verifiedTextureWidthPx?: number;
+  verifiedTextureHeightPx?: number;
   meshFileExistsOnDisk?: boolean;
 }
 
@@ -19,7 +22,7 @@ export interface BodyExposureSyncReport {
   topologyStatus: 'OPTIMIZED_AUTO_SMOOTH_ACTIVE' | 'UNOPTIMIZED' | 'UNVERIFIED_CONFIG_ONLY';
   renderedEngineMode: 'WEBGPU_OR_WEBGL_PBR' | 'REALTIME_FALLBACK';
   graphicsQualityVerdict: 'VERIFIED_HIGH_FIDELITY' | 'CONFIG_REQUESTED_UNVERIFIED_ASSET' | 'STANDARD';
-  evidenceGateStatus: 'VERIFIED_AAA_EVIDENCE_PASSED' | 'EVIDENCE_INSUFFICIENT' | 'ARTIFACT_HASH_MISMATCH';
+  evidenceGateStatus: EvidenceGateReport['evidenceStatus'];
   provenanceHash: string;
   isClinicallyAuthoritative: false;
 }
@@ -31,24 +34,34 @@ export function evaluateBodyExposureSync(input: BodyExposureConfigInput): BodyEx
     triangleCount: input.verifiedMeshTriangleCount ?? 0,
     textureResolution: input.pbrTextureResolution,
     sha256Hash: input.verifiedArtifactSha256 ?? '',
-    subsurfaceScatteringVerified: input.subsurfaceScatteringIndex >= 0.5 && Boolean(input.meshFileExistsOnDisk)
+    expectedManifestSha256: input.expectedManifestSha256,
+    actualAssetBytes: input.actualAssetBytes,
+    verifiedTextureWidthPx: input.verifiedTextureWidthPx ?? null,
+    verifiedTextureHeightPx: input.verifiedTextureHeightPx ?? null,
+    subsurfaceScatteringVerified:
+      input.subsurfaceScatteringIndex >= 0.5 && Boolean(input.meshFileExistsOnDisk)
   });
 
   let qualityVerdict: BodyExposureSyncReport['graphicsQualityVerdict'] = 'STANDARD';
   let topologyStatus: BodyExposureSyncReport['topologyStatus'] = 'UNOPTIMIZED';
 
-  if (evidenceReport.evidenceStatus === 'VERIFIED_AAA_EVIDENCE_PASSED') {
+  if (evidenceReport.evidenceStatus === 'VERIFIED_EMPIRICAL_EVIDENCE_PASSED') {
     qualityVerdict = 'VERIFIED_HIGH_FIDELITY';
     topologyStatus = 'OPTIMIZED_AUTO_SMOOTH_ACTIVE';
   } else if (input.meshPolycountTarget === 'ULTRA_AAA' && input.pbrTextureResolution === '8K') {
-    // Config requested 8K/ULTRA_AAA, but no real asset hash/geometry was supplied -> DO NOT claim AAA!
     qualityVerdict = 'CONFIG_REQUESTED_UNVERIFIED_ASSET';
     topologyStatus = 'UNVERIFIED_CONFIG_ONLY';
   }
 
   const provenanceHash = crypto
     .createHash('sha256')
-    .update(JSON.stringify({ input, evidenceStatus: evidenceReport.evidenceStatus, qualityVerdict }))
+    .update(
+      JSON.stringify({
+        entityId: input.entityId,
+        evidenceStatus: evidenceReport.evidenceStatus,
+        qualityVerdict
+      })
+    )
     .digest('hex');
 
   return {
