@@ -8,7 +8,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import type { BodySystemId } from '../../data/bodySystems.ts'
-import { HOME_BODY_IMAGE } from '../../data/homeBodyAnchors.ts'
+import { HOME_BODY_HOLO } from '../../data/homeBodyAnchors.ts'
 import { HOME_RESTING_VITALS, HOME_VENTRICLE_TRACE } from '../../data/homeBodySnapshot.ts'
 import { HOME_SYSTEMS, cardPlacement, type HomeSystem } from '../../engine/home-hero/homeBodyStage.ts'
 import { SystemGlyph } from '../SystemGlyph.tsx'
@@ -16,7 +16,20 @@ import './livingBodyHero.css'
 
 const TRACE = HOME_VENTRICLE_TRACE
 const VITALS = HOME_RESTING_VITALS
-const IMAGE_SRC = `${import.meta.env.BASE_URL ?? '/'}${HOME_BODY_IMAGE.src}`
+const IMAGE_SRC = `${import.meta.env.BASE_URL ?? '/'}${HOME_BODY_HOLO.src}`
+
+/** Dial scale per vital for the orb ring: display only, no clinical threshold. Unknown or invalid → empty ring. */
+const ORB_SCALE: Readonly<Record<string, readonly [number, number]>> = {
+  hr: [30, 200], co: [0, 25], bp: [40, 200], rr: [0, 60], sao2: [70, 100], urine: [0, 200],
+}
+/** Short names that fit inside an orb; the full name stays in the accessible label. */
+const ORB_NAME: Readonly<Record<string, string>> = { hr: 'Heart', co: 'Output', bp: 'Pressure', rr: 'Breaths', sao2: 'O\u2082 sat', urine: 'Urine' }
+
+function orbFill(key: string, value: number): number {
+  const s = ORB_SCALE[key]
+  if (!s || !Number.isFinite(value)) return 0
+  return Math.min(1, Math.max(0, (value - s[0]) / (s[1] - s[0])))
+}
 
 function HeartTrace() {
   if (!TRACE) return null
@@ -112,13 +125,20 @@ export function LivingBodyHero() {
       <div className="lbh-layout">
         {dock}
 
-        <div ref={stageRef} className="lbh-stage lbh-glass">
+        <div ref={stageRef} className="lbh-stage">
+          <svg className="lbh-hud" viewBox="-100 -100 200 200" aria-hidden>
+            <circle r="92" className="lbh-hud-ring" />
+            <circle r="78" className="lbh-hud-ring lbh-hud-dash" />
+            <circle r="62" className="lbh-hud-ring lbh-hud-spin" />
+            <path d="M-92 0h12M80 0h12M0 -92v12M0 80v12" className="lbh-hud-tick" />
+          </svg>
+          <span className="lbh-pedestal" aria-hidden />
           <div className="lbh-bodybox">
             <img
               src={IMAGE_SRC}
-              width={HOME_BODY_IMAGE.width}
-              height={HOME_BODY_IMAGE.height}
-              alt="Reference human body, Z-Anatomy atlas"
+              width={HOME_BODY_HOLO.width}
+              height={HOME_BODY_HOLO.height}
+              alt="Reference human body, Z-Anatomy atlas: bone, muscle, vessels and nerves"
               decoding="async"
               className="lbh-body"
             />
@@ -157,13 +177,19 @@ export function LivingBodyHero() {
 
         <aside className="lbh-side">
           <Detail system={system} />
-          <div className="lbh-vitals lbh-glass" aria-label="Resting whole-body state (simulated)">
-            {VITALS.map((v) => (
-              <div key={v.key} className="lbh-vital" style={{ ['--tone' as string]: v.tone }} aria-label={`${v.label} ${v.value} ${v.unit}`}>
-                <span className="lbh-vital-label" aria-hidden>{v.label}</span>
-                <span className="lbh-vital-value">{v.value}<small>{v.unit}</small></span>
-              </div>
-            ))}
+          <div className="lbh-orbs" aria-label="Resting whole-body state (simulated)">
+            {VITALS.map((v) => {
+              const t = orbFill(v.key, Number.parseFloat(v.value))
+              return (
+                <div key={v.key} className="lbh-orb" style={{ ['--tone' as string]: v.tone, ['--fill' as string]: `${Math.round(t * 360)}deg` }} aria-label={`${v.label} ${v.value} ${v.unit}`}>
+                  <span className="lbh-orb-core" aria-hidden>
+                    <small>{ORB_NAME[v.key] ?? v.label}</small>
+                    <b>{v.value}</b>
+                    <i>{v.unit}</i>
+                  </span>
+                </div>
+              )
+            })}
             <span className="lbh-sim" title="Simulated resting state, not your measurements">SIM</span>
           </div>
         </aside>

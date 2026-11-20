@@ -5,6 +5,7 @@
 import type { BodySystemId } from './bodySystems.ts'
 
 export const HOME_BODY_IMAGE = { src: 'home/atlas-body-front.webp', width: 720, height: 1440 } as const
+export const HOME_BODY_HOLO = { src: 'home/atlas-body-holo.webp', width: 720, height: 1440 } as const
 
 export const HOME_BODY_ANCHORS: ReadonlyArray<{ readonly id: BodySystemId; readonly x: number; readonly y: number; readonly inAtlas: boolean }> = [
   { id: 'nervous', x: 0.4664, y: 0.0617, inAtlas: true },
