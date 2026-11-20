@@ -444,7 +444,7 @@ gagal('simulasi_setiap_sistem_terdaftar_dan_valid', () => {
   for (const [id, daftar] of Object.entries(SYSTEM_SIMULATIONS)) {
     assert.equal(new Set(daftar.map((s) => s.id)).size, daftar.length, `${id}: id unik`)
     for (const s of daftar) {
-      assert.ok(['cardiopulmonary', 'soft_tissue', 'neuro'].includes(s.deck), `${id}/${s.id}: dek dikenal`)
+      assert.ok(['cardiopulmonary', 'soft_tissue', 'neuro', 'whole_body'].includes(s.deck), `${id}/${s.id}: dek dikenal`)
       assert.ok(s.label.trim().length > 0, `${id}/${s.id}: berlabel`)
       if (s.softTissueTab !== undefined) {
         assert.equal(s.deck, 'soft_tissue', `${id}/${s.id}: tab jaringan lunak hanya untuk dek jaringan lunak`)
@@ -452,13 +452,13 @@ gagal('simulasi_setiap_sistem_terdaftar_dan_valid', () => {
       }
     }
   }
-  // Terukur: lima sistem punya dek; enam tidak, dan kartunya berkata begitu.
-  assert.deepEqual(SISTEM.filter((id) => SYSTEM_SIMULATIONS[id].length > 0), ['cardiovascular', 'nervous', 'respiratory', 'digestive', 'sensory-ent'])
-  assert.deepEqual(SYSTEM_SIMULATIONS.respiratory.map((s) => [s.deck, s.softTissueTab]), [['cardiopulmonary', undefined], ['soft_tissue', 'diaphragm_excursion']])
+  // Terukur: seluruh 11 sistem atlas kini punya simulasi mekanistik interaktif.
+  assert.deepEqual(SISTEM.filter((id) => SYSTEM_SIMULATIONS[id].length > 0), [...SISTEM])
+  assert.deepEqual(SYSTEM_SIMULATIONS.respiratory.slice(0, 2).map((s) => [s.deck, s.softTissueTab]), [['cardiopulmonary', undefined], ['soft_tissue', 'diaphragm_excursion']])
 })
 gagal('simulasi_id_asing_tanpa_tebakan', () => {
   for (const buruk of ['kidney', 'toString', '__proto__', 'constructor', '', null, undefined, 3]) assert.deepEqual(simulationsFor(buruk), [], String(buruk))
-  assert.equal(simulationsFor('digestive').length, 1, 'berpasangan: sistem atlas diterima')
+  assert.equal(simulationsFor('digestive').length, 2, 'berpasangan: sistem atlas diterima')
   assert.equal(simulationsFor('digestive'), SYSTEM_SIMULATIONS.digestive, 'daftar yang sama, bukan salinan')
 })
 

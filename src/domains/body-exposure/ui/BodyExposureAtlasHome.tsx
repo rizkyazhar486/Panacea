@@ -47,6 +47,7 @@ import type { StageSimulation } from '../engine/system-physiology/systemSimulati
 
 // Every body system's physiology, with the text of its sources: loaded only when the Systems view opens.
 const SystemPhysiologyExplorer = lazy(() => import('./system-physiology/SystemPhysiologyExplorer'))
+const WholeBody11SystemLab = lazy(() => import('./WholeBody11SystemLab'))
 
 interface BodyExposureAtlasHomeProps {
   /** The 3D viewer, supplied by the composition root. */
@@ -76,6 +77,7 @@ const PHYSIOLOGY: readonly SegmentOption<PhysiologyView>[] = [
   { id: 'cardiopulmonary', label: 'Heart–Lung: Cardiopulmonary PV', short: 'Heart–Lung' },
   { id: 'soft_tissue', label: 'Soft Tissue Biomechanics', short: 'Soft Tissue' },
   { id: 'neuro', label: 'Neuro Reflexes', short: 'Neuro' },
+  { id: 'whole_body', label: 'Whole-Body 11-System Lab', short: '11-System' },
 ]
 const CLINICAL: readonly SegmentOption<ClinicalTool>[] = [
   { id: 'vascular', label: 'Vascular Perfusion', short: 'Vascular' },
@@ -189,7 +191,7 @@ export function BodyExposureAtlasHome({ Viewer, sendCamera, focusSystem = null }
   useEffect(() => { if (focusSystem) { setStage('physiology'); openSystem(focusSystem) } }, [focusSystem, openSystem])
   // A system card's "Simulate" hands its tab to the deck through the same context a structure pick uses.
   const simulate = useCallback((simulation: StageSimulation) => {
-    setCouplingContext((current) => ({ ...(current ?? { physiology: simulation.deck, clinical: clinicalTool }), physiology: simulation.deck, softTissueTab: simulation.softTissueTab }))
+    setCouplingContext((current) => ({ ...(current ?? { physiology: simulation.deck, clinical: clinicalTool }), physiology: simulation.deck, softTissueTab: simulation.softTissueTab, wholeBodySystem: simulation.wholeBodySystem }))
     setPhysiologyView(simulation.deck)
   }, [clinicalTool])
 
@@ -269,6 +271,11 @@ export function BodyExposureAtlasHome({ Viewer, sendCamera, focusSystem = null }
       )}
       {physiologyView === 'neuro' && (
         <NeuroFascicularReflexDeck initialTab="reflexes" initialNerveId={couplingContext?.neuroNerveId} />
+      )}
+      {physiologyView === 'whole_body' && (
+        <Suspense fallback={<Note color={TONE.sim}>Loading 11-system simulator…</Note>}>
+          <WholeBody11SystemLab initialSystem={couplingContext?.wholeBodySystem ?? systemFocus} onSelectSystem={setSystemFocus} />
+        </Suspense>
       )}
       {physiologyView !== 'systems' && (
         <Note color={TONE.sim}>
