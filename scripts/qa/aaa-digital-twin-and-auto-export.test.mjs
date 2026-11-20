@@ -276,3 +276,64 @@ test('all 5 new pure engines obey strict purity boundary (zero DOM, storage, clo
     }
   }
 })
+
+function auditP1UiContracts({ scanSrc, syncSrc, bodySrc, healthSrc, profileSrc }) {
+  const failures = []
+  if (/Number\(e\.target\.value\)\s*\|\|\s*0/.test(scanSrc)) {
+    failures.push('DigitalTwinScanFlow: blank-to-zero coercion detected')
+  }
+  if (/:\s*['"]rizkyazhar486['"]/.test(scanSrc) || /:\s*['"]rizkyazhar486['"]/.test(syncSrc)) {
+    failures.push('Guest fallback defaulted to named owner handle')
+  }
+  if (/bg-\[#05070b\]/.test(bodySrc) && !/<details[^>]*\bdark\b[^>]*bg-\[#05070b\]/.test(bodySrc)) {
+    failures.push('UnifiedBodyWorkspace: dark surface missing dark marker')
+  }
+  if (/<DeviceQuickSyncCard/.test(healthSrc)) {
+    failures.push('HealthProfile: DeviceQuickSyncCard hijacks first file input and light-mode contrast')
+  }
+  if (!/function download\(name: string, text: string, type: string\)/.test(healthSrc)) {
+    failures.push('HealthProfile: missing explicit download boundary')
+  }
+  if (/bg-emerald-600[^>]*>✎/.test(profileSrc)) {
+    failures.push('Profile: low-contrast emerald badge behind avatar edit glyph')
+  }
+  return failures
+}
+
+test('P1 root-cause guardrails pass on shipped sources and fail by name under sabotage', () => {
+  const sources = {
+    scanSrc: readFileSync(join(ROOT, 'src/components/scan/DigitalTwinScanFlow.tsx'), 'utf8'),
+    syncSrc: readFileSync(join(ROOT, 'src/components/sync/DeviceQuickSyncCard.tsx'), 'utf8'),
+    bodySrc: readFileSync(join(ROOT, 'src/pages/UnifiedBodyWorkspace.tsx'), 'utf8'),
+    healthSrc: readFileSync(join(ROOT, 'src/pages/bodyhub/HealthProfile.tsx'), 'utf8'),
+    profileSrc: readFileSync(join(ROOT, 'src/pages/dashboard/Profile.tsx'), 'utf8'),
+  }
+  assert.deepEqual(auditP1UiContracts(sources), [])
+
+  // Sabotage controls: each mutant must fail with its specific named rule
+  assert.ok(
+    auditP1UiContracts({ ...sources, scanSrc: 'Number(e.target.value) || 0' }).some((m) =>
+      m.includes('blank-to-zero'),
+    ),
+  )
+  assert.ok(
+    auditP1UiContracts({ ...sources, syncSrc: "const k = x ? x : 'rizkyazhar486'" }).some((m) =>
+      m.includes('named owner handle'),
+    ),
+  )
+  assert.ok(
+    auditP1UiContracts({ ...sources, bodySrc: '<details className="rounded bg-[#05070b]">' }).some((m) =>
+      m.includes('missing dark marker'),
+    ),
+  )
+  assert.ok(
+    auditP1UiContracts({ ...sources, healthSrc: '<DeviceQuickSyncCard />' }).some((m) =>
+      m.includes('DeviceQuickSyncCard hijacks'),
+    ),
+  )
+  assert.ok(
+    auditP1UiContracts({ ...sources, profileSrc: '<span className="bg-emerald-600">✎</span>' }).some((m) =>
+      m.includes('low-contrast emerald badge'),
+    ),
+  )
+})
