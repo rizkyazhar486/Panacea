@@ -20,6 +20,7 @@ import {
   resolveAutoResumeAccount,
   restoreFullLocalVault,
 } from '../../src/domains/identity/localRecovery.ts'
+import { rememberAccountProfile } from '../../src/domains/identity/bootVitals.ts'
 
 // Install isolated localStorage mock for pure contract execution
 const mem = new Map<string, string>()
@@ -143,8 +144,15 @@ assert.ok(discovered.some((d) => d.name === 'WHOOP 4.0'))
 assert.ok(discovered.some((d) => d.id === 'sync:auto-health-bridge'), 'pmd_auto_sync_status_v2 surfaced in connected devices')
 
 // Auto-resume respects onboarded telemetry presence AND explicit logout flag
+// Fail closed: telemetry alone is not an identity, so with no account stored on this device nobody is resumed
+// (previously the owner was used as the default, which put a stranger's data under the owner's account).
+assert.equal(resolveAutoResumeAccount({ ownerEmail: 'owner.qa@example.invalid' }), null, 'no stored account => no auto-resume as owner')
+rememberAccountProfile({ email: myEmail, name: acc.name, role: acc.role, patientId: acc.patientId })
 const autoResumed = resolveAutoResumeAccount({ ownerEmail: 'owner.qa@example.invalid' })
 assert.ok(autoResumed && autoResumed.id && autoResumed.patientId)
+assert.equal(autoResumed.email, myEmail, 'resumes the account that is actually stored on this device')
+assert.equal(autoResumed.role, 'pasien', 'a stored owner role for a non-owner email is not honoured')
+assert.equal(autoResumed.isOwner, false)
 mem.set('panacea.explicit_logout.v1', '1')
 assert.equal(resolveAutoResumeAccount({ ownerEmail: 'owner.qa@example.invalid' }), null, 'explicit logout prevents unwanted auto-login')
 mem.delete('panacea.explicit_logout.v1')
