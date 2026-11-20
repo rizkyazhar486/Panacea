@@ -82,7 +82,7 @@ export function DigitalTwinScanFlow({ initialTab = 'builder' }: { readonly initi
   })
   const [skinCaptureNote, setSkinCaptureNote] = useState('Optical baseline')
 
-  // Neuro qEEG + OSA state
+  // Neuro qEEG + OSA state (raw strings: blank never coerced to 0)
   const [eegDevice, setEegDevice] = useState<EegDeviceVendor>('muse')
   // Raw text, empty by default: a blank field is "not entered", never 0 and never a stand-in normal value.
   const [ahiText, setAhiText] = useState('')
@@ -91,8 +91,8 @@ export function DigitalTwinScanFlow({ initialTab = 'builder' }: { readonly initi
   // ANOVA mode
   const [anovaMode, setAnovaMode] = useState<'longitudinal' | 'bilateral'>('longitudinal')
 
-  const profileKey = account?.email ? account.email.split('@')[0] : 'rizkyazhar486'
-  const mrn = patient?.mrn || 'PMD-000486'
+  const profileKey = account?.email ? account.email.split('@')[0] : 'guest'
+  const mrn = patient?.mrn || 'LOCAL'
 
   // Stop camera stream on unmount
   useEffect(() => {
@@ -386,7 +386,7 @@ export function DigitalTwinScanFlow({ initialTab = 'builder' }: { readonly initi
               <span className="font-mono text-[11px] font-bold uppercase tracking-[0.12em] text-cyan-300">
                 {SCAN_STEPS[step].label}
               </span>
-              <span className="font-mono text-[10px] text-slate-400">
+              <span className="font-mono text-[10px] text-slate-200">
                 {capturedSteps.length}/4 · {cameraStatus}
               </span>
             </div>
@@ -453,7 +453,7 @@ export function DigitalTwinScanFlow({ initialTab = 'builder' }: { readonly initi
                 ].map((c) => (
                   <div key={c.label} className="rounded-xl border border-white/10 bg-black/50 py-2">
                     <div className={`font-mono text-sm font-black ${c.color}`}>{c.val}</div>
-                    <div className="font-mono text-[9px] uppercase text-slate-400">{c.label}</div>
+                    <div className="font-mono text-[9px] uppercase text-slate-200">{c.label}</div>
                   </div>
                 ))}
               </div>
@@ -542,7 +542,7 @@ export function DigitalTwinScanFlow({ initialTab = 'builder' }: { readonly initi
                   const delta = tgt - cur
                   return (
                     <div key={lbl} className="rounded-xl border border-white/10 bg-black/50 p-2.5">
-                      <div className="font-mono text-[10px] font-bold text-slate-400">{lbl}</div>
+                      <div className="font-mono text-[10px] font-bold text-slate-200">{lbl}</div>
                       <div className="mt-0.5 flex items-baseline justify-between">
                         <span className="font-mono text-lg font-black text-white">{cur}</span>
                         {compareTarget && (
@@ -631,19 +631,19 @@ export function DigitalTwinScanFlow({ initialTab = 'builder' }: { readonly initi
             {/* Strictly 3 compact KPI numbers on primary canvas */}
             <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-3">
               <div className="rounded-2xl border border-white/10 bg-[#090d14] p-4">
-                <div className="font-mono text-[10px] uppercase text-slate-400">Knee Load</div>
+                <div className="font-mono text-[10px] uppercase text-slate-200">Knee Load</div>
                 <div className="mt-1 font-mono text-2xl font-black text-amber-300">
                   {cae.jointCompressiveLoad.kneeCompressionBw}× BW
                 </div>
               </div>
               <div className="rounded-2xl border border-white/10 bg-[#090d14] p-4">
-                <div className="font-mono text-[10px] uppercase text-slate-400">Plantar Peak</div>
+                <div className="font-mono text-[10px] uppercase text-slate-200">Plantar Peak</div>
                 <div className="mt-1 font-mono text-2xl font-black text-cyan-300">
                   {cae.plantarTripodStress.peakStressKpa} kPa
                 </div>
               </div>
               <div className="rounded-2xl border border-white/10 bg-[#090d14] p-4">
-                <div className="font-mono text-[10px] uppercase text-slate-400">Wall Shear</div>
+                <div className="font-mono text-[10px] uppercase text-slate-200">Wall Shear</div>
                 <div className="mt-1 font-mono text-2xl font-black text-emerald-300">
                   {cae.vascularWallShearPa} Pa
                 </div>
@@ -665,7 +665,7 @@ export function DigitalTwinScanFlow({ initialTab = 'builder' }: { readonly initi
               >
                 Analyze Skin ROI
               </button>
-              <span className="font-mono text-[11px] text-slate-400">{skinCaptureNote}</span>
+              <span className="font-mono text-[11px] text-slate-200">{skinCaptureNote}</span>
             </div>
             <InfoDisclosure title="Optical Skin Boundary" badge={skin.truthClass}>
               <p>{skin.epistemicNotice}</p>
@@ -678,19 +678,19 @@ export function DigitalTwinScanFlow({ initialTab = 'builder' }: { readonly initi
           {/* Strictly 4 crisp score pills */}
           <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4">
             <div className="rounded-2xl border border-white/10 bg-[#090d14] p-4">
-              <div className="font-mono text-[10px] uppercase text-slate-400">Tone</div>
+              <div className="font-mono text-[10px] uppercase text-slate-200">Tone</div>
               <div className="mt-1 font-mono text-2xl font-black text-white">{skin.scores.toneUniformity}</div>
             </div>
             <div className="rounded-2xl border border-white/10 bg-[#090d14] p-4">
-              <div className="font-mono text-[10px] uppercase text-slate-400">Texture</div>
+              <div className="font-mono text-[10px] uppercase text-slate-200">Texture</div>
               <div className="mt-1 font-mono text-2xl font-black text-cyan-300">{skin.scores.textureSmoothness}</div>
             </div>
             <div className="rounded-2xl border border-white/10 bg-[#090d14] p-4">
-              <div className="font-mono text-[10px] uppercase text-slate-400">Barrier</div>
+              <div className="font-mono text-[10px] uppercase text-slate-200">Barrier</div>
               <div className="mt-1 font-mono text-2xl font-black text-emerald-300">{skin.scores.barrierHydration}</div>
             </div>
             <div className="rounded-2xl border border-white/10 bg-[#090d14] p-4">
-              <div className="font-mono text-[10px] uppercase text-slate-400">Skin Age</div>
+              <div className="font-mono text-[10px] uppercase text-slate-200">Skin Age</div>
               <div className="mt-1 font-mono text-2xl font-black text-amber-300">
                 {skin.scores.estimatedOpticalSkinAgeYears}y
               </div>
@@ -713,7 +713,7 @@ export function DigitalTwinScanFlow({ initialTab = 'builder' }: { readonly initi
                   className={`min-h-[44px] lg:min-h-[38px] rounded-lg border px-2.5 font-mono text-[10px] font-bold ${
                     eegDevice === d.id
                       ? 'border-cyan-400 bg-cyan-500/20 text-white'
-                      : 'border-white/10 bg-black/40 text-slate-300'
+                      : 'border-white/10 bg-black/40 text-slate-200'
                   }`}
                 >
                   {d.label}
@@ -732,40 +732,37 @@ export function DigitalTwinScanFlow({ initialTab = 'builder' }: { readonly initi
               <p className="font-mono text-[10px] text-cyan-200">
                 θ/β {qEeg.ratios.thetaToBeta} · α/θ {qEeg.ratios.alphaToTheta} · SpO2 Nadir {osa.ok ? `${osa.spo2NadirPct}%` : '—'} · ODI {osa.ok ? (osa.odiEventsPerHour ?? '—') : '—'}/hr
               </p>
-              <p role="status" className={osa.ok && osa.clinicianReferralRequired ? 'text-rose-300 font-semibold' : 'text-slate-300'}>
+              <p role="status" className={osa.ok && osa.clinicianReferralRequired ? 'text-rose-300 font-semibold' : 'text-slate-200'}>
                 {osa.ok ? osa.referralGuidance : osaNotice}
               </p>
-              <p className="text-[10px] text-slate-400">{qEeg.epistemicNotice}</p>
+              <p className="text-[10px] text-slate-200">{qEeg.epistemicNotice}</p>
             </InfoDisclosure>
           </div>
 
           {/* Strictly 3 compact tiles */}
           <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-3">
             <div className="rounded-2xl border border-white/10 bg-[#090d14] p-4">
-              <div className="font-mono text-[10px] uppercase text-slate-400">Brain Age</div>
+              <div className="font-mono text-[10px] uppercase text-slate-200">Brain Age</div>
               <div className="mt-1 font-mono text-2xl font-black text-cyan-300">{qEeg.cognitiveAgeYears}y</div>
               <div className="mt-0.5 font-mono text-[10px] text-emerald-300">
                 {qEeg.peerPercentile}th pct · {qEeg.cognitiveDeltaYears}y
               </div>
             </div>
             <div className="rounded-2xl border border-white/10 bg-[#090d14] p-4">
-              <div className="font-mono text-[10px] uppercase text-slate-400">Focus Band</div>
+              <div className="font-mono text-[10px] uppercase text-slate-200">Focus Band</div>
               <div className="mt-1 font-mono text-2xl font-black text-white uppercase">{qEeg.dominantBand}</div>
-              <div className="mt-0.5 font-mono text-[10px] text-slate-400">Index {qEeg.focusIndex}/100</div>
+              <div className="mt-0.5 font-mono text-[10px] text-slate-200">Index {qEeg.focusIndex}/100</div>
             </div>
             <div className="rounded-2xl border border-white/10 bg-[#090d14] p-4">
-              <div className="font-mono text-[10px] uppercase text-slate-400">OSA / AHI</div>
-              <div className={`mt-1 font-mono text-2xl font-black ${osa.ok ? (osa.clinicianReferralRequired ? 'text-rose-400' : 'text-emerald-300') : 'text-slate-400'}`}>
+              <div className="font-mono text-[10px] uppercase text-slate-200">OSA / AHI</div>
+              <div className={`mt-1 font-mono text-2xl font-black ${osa.ok ? (osa.clinicianReferralRequired ? 'text-rose-400' : 'text-emerald-300') : 'text-slate-200'}`}>
                 {osa.ok ? `${osa.ahiEventsPerHour} · ${osa.severity}` : 'AHI —'}
               </div>
               <div className="mt-1 flex items-center gap-2">
-                <label className="font-mono text-[10px] text-slate-400">
+                <label className="font-mono text-[10px] text-slate-200">
                   AHI
                   <input
-                    type="number"
-                    min={0}
-                    max={80}
-                    step={0.5}
+                    type="text"
                     inputMode="decimal"
                     placeholder="—"
                     aria-label="AHI, apnea-hypopnea events per hour"
@@ -774,12 +771,10 @@ export function DigitalTwinScanFlow({ initialTab = 'builder' }: { readonly initi
                     className="dark ml-1 w-14 rounded border border-white/15 bg-black px-1.5 py-0.5 text-white"
                   />
                 </label>
-                <label className="font-mono text-[10px] text-slate-400">
+                <label className="font-mono text-[10px] text-slate-200">
                   SpO2
                   <input
-                    type="number"
-                    min={65}
-                    max={100}
+                    type="text"
                     inputMode="decimal"
                     placeholder="—"
                     aria-label="Lowest SpO2 during sleep, percent"
@@ -829,7 +824,7 @@ export function DigitalTwinScanFlow({ initialTab = 'builder' }: { readonly initi
               ) : (
                 <p>Insufficient samples (fail-closed).</p>
               )}
-              <p className="text-[10px] text-slate-400">{anova.epistemicNotice}</p>
+              <p className="text-[10px] text-slate-200">{anova.epistemicNotice}</p>
             </InfoDisclosure>
           </div>
 

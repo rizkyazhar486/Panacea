@@ -57,11 +57,8 @@ export function DeviceQuickSyncCard() {
     return readUnifiedLocalVitals(account, { patient })
   }, [account, patient, rev])
 
-  const profileKey = account?.email ? account.email.split('@')[0] : 'rizkyazhar486'
-  const canonicalName =
-    account?.isOwner || profileKey.toLowerCase().includes('rizky')
-      ? 'dr. Rizky Muhammad Azrissal'
-      : account?.name || 'dr. Rizky Muhammad Azrissal'
+  const profileKey = account?.email ? account.email.split('@')[0] : 'guest'
+  const canonicalName = account?.name?.trim() || 'Guest'
 
   const buildExportInput = (): CanonicalExportBundleInput => {
     const nowIso = new Date().toISOString()
@@ -184,12 +181,12 @@ export function DeviceQuickSyncCard() {
       <header className="flex items-center justify-between gap-2 border-b border-white/10 pb-3">
         <div>
           <h2 className="text-base font-black tracking-tight text-white">Device Sync</h2>
-          <p className="font-mono text-[11px] text-slate-400">Tap device · Import · Auto-Export</p>
+          <p className="font-mono text-[11px] text-slate-200">Tap device · Import · Auto-Export</p>
         </div>
 
-        <InfoDisclosure title="Sync & Auto-Export Architecture" badge="SHA-256">
-          <p>Supports Apple Health XML/JSON, WHOOP/Garmin/Oura CSV/JSON, and Web Bluetooth GATT HR/EEG.</p>
-          <p>Exports use synchronous gesture triggers, sanitized filenames, Object URL revocation, and SHA-256 deduplication. Offline Neon sync queues safely in local storage.</p>
+        <InfoDisclosure title="Sync & Auto-Export" badge="SHA-256">
+          <p>Apple Health XML/JSON, WHOOP/Garmin/Oura CSV/JSON, and Web Bluetooth GATT.</p>
+          <p>SHA-256 deduplicated exports with offline local outbox queue.</p>
         </InfoDisclosure>
       </header>
 
@@ -209,12 +206,15 @@ export function DeviceQuickSyncCard() {
                   : 'border-white/10 bg-[#090d14] hover:border-cyan-400/60'
               }`}
             >
-              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-white/10 bg-black font-mono text-base font-black text-cyan-300">
+              <span
+                className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-white/10 bg-black font-mono text-base font-black"
+                style={{ color: '#67e8f9' }}
+              >
                 {d.glyph}
               </span>
               <span className="min-w-0">
                 <span className="block truncate text-xs font-black text-white">{d.name}</span>
-                <span className={`block font-mono text-[10px] font-bold ${connected ? 'text-emerald-300' : 'text-slate-400'}`}>
+                <span className={`block font-mono text-[10px] font-bold ${connected ? 'text-emerald-300' : 'text-slate-200'}`}>
                   {connected ? 'Connected' : 'Tap to Pair'}
                 </span>
               </span>
