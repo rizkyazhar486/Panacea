@@ -736,7 +736,7 @@ export function Shell({ children }: { children: ReactNode }) {
             <button
               type="button"
               onClick={() => setQrModalOpen('qr')}
-              className="grid h-9 w-9 place-items-center rounded-full border border-black/10 bg-white text-neutral-600 transition-colors hover:text-brand-dark dark:border-white/15 dark:bg-neutral-900 dark:text-neutral-200"
+              className="hidden h-9 w-9 place-items-center rounded-full border border-black/10 bg-white text-neutral-600 transition-colors hover:text-brand-dark dark:border-white/15 dark:bg-neutral-900 dark:text-neutral-200 sm:grid"
               title="QR Health Pass, Code-128 Barcode, Passkey & Data Vault"
               aria-label="Open QR Health Pass and Authenticator"
               data-testid="header-qr-pass-btn"
@@ -802,7 +802,7 @@ export function Shell({ children }: { children: ReactNode }) {
                 ref={userBtnRef}
                 type="button"
                 onClick={() => setUserMenuBuka((prev) => !prev)}
-                className={`group flex items-center gap-2 rounded-full border bg-white py-1 pl-1.5 pr-3 text-xs font-bold shadow-xs transition-all duration-200 hover:border-brand/60 hover:shadow-md hover:ring-2 hover:ring-brand/20 dark:bg-neutral-900 ${
+                className={`group flex h-11 w-11 items-center justify-center gap-2 rounded-full border bg-white p-0 text-xs font-bold shadow-xs sm:h-auto sm:w-auto sm:justify-start sm:py-1 sm:pl-1.5 sm:pr-3 transition-all duration-200 hover:border-brand/60 hover:shadow-md hover:ring-2 hover:ring-brand/20 dark:bg-neutral-900 ${
                   userMenuBuka
                     ? 'border-brand ring-2 ring-brand/30 dark:border-brand/70'
                     : 'border-black/10 hover:border-black/20 dark:border-white/15 dark:hover:border-white/30'
@@ -822,7 +822,8 @@ export function Shell({ children }: { children: ReactNode }) {
                   <span className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-emerald-500 ring-2 ring-white dark:ring-neutral-900" />
                 </div>
 
-                <div className="flex flex-col items-start text-left leading-none">
+                {/* Di bawah sm hanya avatar: nama + chevron membuat tombol 104 px dan mendorong judul halaman menjadi 72 px di 390 px. */}
+                <div className="hidden flex-col items-start text-left leading-none sm:flex">
                   <span className="max-w-[84px] truncate font-bold text-neutral-800 dark:text-neutral-100 sm:max-w-[110px]">
                     {account.name.split(' ')[0]}
                   </span>
@@ -840,7 +841,7 @@ export function Shell({ children }: { children: ReactNode }) {
                   strokeWidth="2.5"
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  className={`text-neutral-400 transition-transform duration-200 group-hover:text-neutral-600 dark:group-hover:text-neutral-200 ${
+                  className={`hidden sm:block text-neutral-400 transition-transform duration-200 group-hover:text-neutral-600 dark:group-hover:text-neutral-200 ${
                     userMenuBuka ? 'rotate-180 text-brand' : ''
                   }`}
                 >

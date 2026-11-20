@@ -61,14 +61,17 @@ header.kaca::after {
   opacity: .78;
 }
 
+/* basis 0: judul memakai SISA ruang setelah kendali kanan terpasang penuh.
+   Dengan basis auto, judul panjang ("For You > Today > Profile") menang dan
+   mendorong avatar akun keluar dari bilah 390 px. */
 header.kaca > div:first-child {
   min-width: 0;
-  flex: 1 1 auto;
+  flex: 1 1 0;
   gap: .35rem;
 }
 
 header.kaca > div:last-child {
-  flex: 0 1 auto;
+  flex: 0 0 auto;
   gap: .35rem;
   overscroll-behavior-x: contain;
   scrollbar-width: none;
