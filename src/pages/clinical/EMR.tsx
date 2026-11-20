@@ -29,6 +29,7 @@ import { clinicalClaimDisclosure, clinicalClaimLabel, clinicalClaimMaturity } fr
 import { TerbitkanKodeTaut } from '../../components/TautanRekamPraktik'
 import { labelAsalIsian, labelAsalMasalah, labelAsalRencana } from '../../lib/asalButirEmr'
 import type { Anamnesis, EMRRecord, PhysicalExam, StatusSistemFisik, VitalSign } from '../../lib/types'
+import { supportiveDefaults } from '../../domains/clinical-operations/model/supportiveDefaults.ts'
 
 // Send the current EMR to SATUSEHAT as a FHIR R4 Bundle (dokter/owner only).
 function SatusehatButton({ patient, record, vitals }: { patient: unknown; record: EMRRecord; vitals: unknown[] }) {
@@ -101,18 +102,6 @@ function LabPanel({ results }: { results: import('../../lib/types').SupportiveRe
       </div>
     </div>
   )
-}
-
-function supportiveDefaults(weightKg: number) {
-  const w = weightKg || 60
-  const maint = w > 20 ? 1500 + 20 * (w - 20) : w > 10 ? 1000 + 50 * (w - 10) : 100 * w
-  return {
-    resusitasi: 'Assess ABC; crystalloids (RL/NaCl 0.9%) per status; target MAP ≥65 mmHg.',
-    balansCairan: `Maintenance ±${Math.round(maint)} mL/24 h (${Math.round(maint / 24)} mL/h, Holliday-Segar); adjust for deficit/loss.`,
-    kebutuhanKalori: `${Math.round(w * 25)}–${Math.round(w * 30)} kcal/day (25–30 kcal/kg).`,
-    // Ambang 0,5 mL/kg/jam mengikuti kriteria KDIGO 2012 untuk cedera ginjal akut.
-    urineOutput: `> ${(0.5 * w).toFixed(1)} mL/h (0.5 mL/kg/h, KDIGO 2012).`,
-  }
 }
 
 function buildFindings(exam: PhysicalExam): SystemFinding[] {
