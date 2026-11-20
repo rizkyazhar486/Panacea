@@ -5,6 +5,10 @@
 > Where process text below conflicts with it, `docs/governance/` wins. Product doctrine and safety rules below are unchanged.
 
 
+## T-CLIN simulation maturity and agent specialization
+
+For any T-CLIN, mechanistic physiology, Body Exposure simulation, molecular digital-twin or simulation claim, read [docs/governance/T_CLIN_SIMULATION_AGENT_GUIDANCE.md](docs/governance/T_CLIN_SIMULATION_AGENT_GUIDANCE.md) and the role-specific [Kimi](docs/governance/prompts/KIMI_TCLIN_SIMULATION.md) / [Claude Sonnet](docs/governance/prompts/SONNET_TCLIN_SIMULATION.md) adapters. A simulation truth class or explanatory projection does not by itself establish executable quantitative dynamics, anatomical fidelity, independent research validation or clinical authorization. Existing governance, patient-state truth boundaries, red-main stop and branch/PR ownership remain controlling.
+
 ## Frontier biomedical discovery directive — mandatory (owner, 2026-10-13)
 
 Every current and future agent must read and apply [`PANACEA_FRONTIER_BIOMEDICAL_DISCOVERY_DIRECTIVE.md`](PANACEA_FRONTIER_BIOMEDICAL_DISCOVERY_DIRECTIVE.md) for long-horizon strategy, scientific research, physiology modeling, vision restoration, neurotechnology, regenerative medicine, AI discovery, and broad autonomous continuation. PanaceaMed's ambition is **verified clinical outcome delivery today plus original, independently validated biomedical science tomorrow**. Its scientific discovery mission is an evidence-gated parallel lane, **not** permission to destabilize the clinical wedge, perform unapproved experiments, claim treatment efficacy, or multiply shallow features. Follow its falsifiable-hypothesis, permissioned-data, reproducibility, external-validation, partnership and translational stage gates. Preserve all Constitution and exact-head CI/review requirements.
