@@ -83,11 +83,15 @@ const kontrak = readFileSync('src/domains/body-exposure/engine/atlas-stage/viewe
 gagal('body3d-menandai-mesh-setelah-material-lokal', () => {
   assert.match(body3d, /cloneLayerMaterials\(clone\)\n\s+tagMotionMeshes\(def\.key as AtlasLayerId, clone\)/)
 })
-gagal('body3d-cahaya-hanya-saat-gerak-tidak-dikurangi', () => {
-  assert.match(body3d, /plan && !gerakDikurangi\(\) \? bodyMotionFrame\(plan,/)
+gagal('body3d-cahaya-hanya-saat-gerak-tidak-dikurangi-dan-ada-yang-menyala', () => {
+  assert.match(body3d, /plan && !gerakDikurangi\(\) && adaYangMenyala\(\) \? bodyMotionFrame\(plan,/)
+})
+gagal('body3d-timer-gerak-dibersihkan', () => {
+  assert.equal((body3d.match(/if \(motionTimer\) \{ clearTimeout\(motionTimer\); motionTimer = null \}/g) ?? []).length, 2, 'timer dibersihkan saat berhenti dan saat dilepas')
 })
 gagal('body3d-bingkai-gerak-lewat-penjadwal-bersama', () => {
-  assert.match(body3d, /else if \(bergerak\) renderScheduler\.request\(\)/)
+  assert.match(body3d, /else if \(bergerak && !motionTimer\) \{\n\s+motionTimer = setTimeout\(\(\) => \{ motionTimer = null; renderScheduler\.request\(\) \}, Math\.max\(1000 \/ MOTION_FPS_MAX, lamaRender \* MOTION_DUTY\)\)/)
+  assert.match(body3d, /const MOTION_FPS_MAX = 20\n\s+const MOTION_DUTY = 4/, 'batas beban gerak')
   assert.equal((body3d.match(/requestAnimationFrame\(/g) ?? []).length, 1, 'tidak boleh ada RAF kedua untuk gerak')
 })
 gagal('body3d-gerak-tanpa-ubah-geometri', () => {
