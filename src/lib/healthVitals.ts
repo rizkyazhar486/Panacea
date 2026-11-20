@@ -150,7 +150,23 @@ export function getVitals(expected?: { id?: string; patientId?: string } | null)
  * Merges newly received vitals in. Only finite positive numbers are accepted,
  * so a partial export never wipes previously known good values with undefined.
  */
-export function mergeVitals(patch: Vitals): Vitals {
+/** True when a sync timestamp falls on the person's local `now` day: only then are its values today's readings. */
+export function syncedToday(at: string | undefined, now: Date = new Date()): boolean {
+  if (!at) return false
+  const t = new Date(at)
+  return t.getFullYear() === now.getFullYear() && t.getMonth() === now.getMonth() && t.getDate() === now.getDate()
+}
+
+export interface MergeVitalsOptions {
+  /**
+   * Whether these values ARRIVED now and belong in today's history row. Default true. Pass false when a screen only
+   * re-hydrates values it already had (a stored profile, a placeholder): copying those into today's row made a
+   * months-old weight read as a fresh measurement on every visit.
+   */
+  readonly record?: boolean
+}
+
+export function mergeVitals(patch: Vitals, options: MergeVitalsOptions = {}): Vitals {
   const scope = personalHealthStorageScope()
   if (!allowsPersonalHealthStorageScope(scope) || scope.kind === 'invalid') return {}
   const clean: Vitals = {}
@@ -189,8 +205,10 @@ export function mergeVitals(patch: Vitals): Vitals {
    *
    * Impor dinamis supaya berkas ini tidak saling mengimpor dengan riwayatVitals.
    */
-  const arrived: Vitals = { ...clean, subjectId, ownerAccountId }
-  import('./riwayatVitals').then((m) => m.catatRiwayat(arrived)).catch(() => { /* abaikan */ })
+  if (options.record !== false) {
+    const arrived: Vitals = { ...clean, subjectId, ownerAccountId }
+    import('./riwayatVitals').then((m) => m.catatRiwayat(arrived)).catch(() => { /* abaikan */ })
+  }
   broadcastHealthUpdate()
   return next
 }

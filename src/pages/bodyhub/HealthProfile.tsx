@@ -20,7 +20,7 @@ import { healthWebhookUrl } from '../../domains/devices/engine/healthWebhookUrl'
 import { useStore } from '../../lib/store'
 import { mergeDemoStored } from '../../lib/profile'
 import { parseHealthFile, type ImportResult } from '../../lib/healthImport'
-import { getVitals, mergeVitals } from '../../lib/healthVitals'
+import { getVitals, mergeVitals, syncedToday } from '../../lib/healthVitals'
 import { readUnifiedLocalVitals, recoverSameUserVitalsIntoScope } from '../../domains/identity/localRecovery'
 import { foldsOpenForSession } from '../../shared/ui/foldsPreference'
 import { deretMetrik } from '../../lib/riwayatVitals'
@@ -131,13 +131,14 @@ export function HealthProfile() {
 
       if (initial) {
         const hydrated = buildHydrated(data)
+        // Re-hydration of values this browser already held: they update the snapshot, never today's history row.
         mergeVitals({
           weightKg: hydrated.weightKg ?? data.weightKg, heightCm: hydrated.heightCm ?? data.heightCm, bodyFatPct: hydrated.bodyFatPct ?? data.bodyFatPct,
           vo2max: hydrated.vo2max ?? data.vo2max, restingHr: hydrated.restingHr ?? data.restingHr, hrvMs: hydrated.hrvMs ?? data.hrvMs,
           recoveryPct: data.recoveryPct, strain: data.strain, sleepH: hydrated.sleepH ?? data.sleepH,
           steps: hydrated.steps ?? data.steps, activeKcal: data.activeKcal,
           source: data.deviceSyncSource ?? data.source, measuredAt: data.lastDeviceSyncAt,
-        })
+        }, { record: false })
         setP({
           ...DEF,
           ...data,
@@ -167,7 +168,7 @@ export function HealthProfile() {
             recoveryPct: merged.recoveryPct, strain: merged.strain, sleepH: merged.sleepH,
             steps: merged.steps, activeKcal: merged.activeKcal,
             source: merged.deviceSyncSource ?? merged.source, measuredAt: merged.lastDeviceSyncAt,
-          })
+          }, { record: syncedToday(merged.lastDeviceSyncAt) })
           setP((cur) => {
             const next = { ...cur, ...remoteData }
             return JSON.stringify(next) === JSON.stringify(cur) ? cur : next

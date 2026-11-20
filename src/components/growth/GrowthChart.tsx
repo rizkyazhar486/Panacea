@@ -64,6 +64,15 @@ function PediatricChart({ patient, ageYears }: { patient: Patient; ageYears: num
         ? patient.heightCm
         : computeBmi(patient.weightKg, patient.heightCm).bmi
 
+  // Not recorded is not zero: a missing measurement gets no z-score (it would read as "severely low").
+  if (!(patientValue > 0)) {
+    return (
+      <div>
+        <BatasKlaimKesehatan permukaan="pediatrics.growth-chart" />
+        <p className="text-sm text-neutral-500">Height and weight are not recorded for this patient yet.</p>
+      </div>
+    )
+  }
   const inRange = ageYears >= xMin && ageYears <= xMax
   const lms = lmsAt(set, metric, ageYears, patient.sex)
   const z = zscore(patientValue, lms)
