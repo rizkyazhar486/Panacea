@@ -25,13 +25,19 @@ export {
 } from './engine/liveSession.ts'
 export type { LiveSample, LiveSession, LiveSummary, HrvProgress, WearableVitalsPatch, WearableSavePatch } from './engine/liveSession.ts'
 
+export { measurementSaveDecision } from './engine/measurementPatch.ts'
+export type {
+  MeasurementKind, MeasurementReading, MeasurementVitalsPatch, MeasurementSaveRefusal, MeasurementSaveDecision,
+} from './engine/measurementPatch.ts'
+
 export { tracePoints } from './engine/traceGeometry.ts'
 export type { TracePoint } from './engine/traceGeometry.ts'
 
 // ── ADAPTERS ──
-export { bluetoothAvailability, connectHeartRateWearable } from './adapters/webBluetooth.ts'
+export { bluetoothAvailability, connectHeartRateWearable, connectMeasurementDevice } from './adapters/webBluetooth.ts'
 export type {
   BluetoothAvailability, BluetoothLike, ConnectedWearable, ConnectOutcome, ConnectRefusal, WearableHandlers,
+  ConnectedMeasurementDevice, MeasurementRefusal, MeasurementConnectOutcome, MeasurementHandlers,
 } from './adapters/webBluetooth.ts'
 
 // ── UI (loaded on demand: the panel is React and only the health-data page shows it) ──
