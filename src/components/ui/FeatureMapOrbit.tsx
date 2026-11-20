@@ -14,7 +14,25 @@ import {
   type FeatureGlyphId,
   type FeatureVisualWidget,
 } from '../../lib/navigation/featureMap'
+import { AstralChartMatrix } from './AstralChartMatrix'
 import '../../styles/feature-map-orbit.css'
+function radialWedgePath(index: number, count: number, rInner = 20, rOuter = 45): string {
+  if (count <= 1) return ''
+  const step = (2 * Math.PI) / count
+  const pad = 0.045
+  const a0 = -Math.PI / 2 + index * step - step / 2 + pad
+  const a1 = -Math.PI / 2 + (index + 1) * step - step / 2 - pad
+  const x0 = (50 + rOuter * Math.cos(a0)).toFixed(2)
+  const y0 = (50 + rOuter * Math.sin(a0)).toFixed(2)
+  const x1 = (50 + rOuter * Math.cos(a1)).toFixed(2)
+  const y1 = (50 + rOuter * Math.sin(a1)).toFixed(2)
+  const x2 = (50 + rInner * Math.cos(a1)).toFixed(2)
+  const y2 = (50 + rInner * Math.sin(a1)).toFixed(2)
+  const x3 = (50 + rInner * Math.cos(a0)).toFixed(2)
+  const y3 = (50 + rInner * Math.sin(a0)).toFixed(2)
+  return `M ${x0} ${y0} A ${rOuter} ${rOuter} 0 0 1 ${x1} ${y1} L ${x2} ${y2} A ${rInner} ${rInner} 0 0 0 ${x3} ${y3} Z`
+}
+
 
 type IconComponent = ComponentType<{ size?: number }>
 export type FeatureMapOrbitProps = { icons: Readonly<Record<SuperPageId, IconComponent>>; hub?: SuperPageId }
@@ -96,6 +114,7 @@ export function FeatureMapOrbit({ icons, hub = FEATURE_MAP_HOME_HUB }: FeatureMa
   const [world, setWorld] = useState<SuperPageId | null>(null)
   const [pageIndex, setPageIndex] = useState(0)
   const [deckOpen, setDeckOpen] = useState(false)
+  const [chartsOpen, setChartsOpen] = useState(false)
   const [deckCategory, setDeckCategory] = useState<SuperPageId | 'all'>('all')
   const [search, setSearch] = useState('')
   const [focusedIndex, setFocusedIndex] = useState<number | null>(null)
@@ -155,7 +174,15 @@ export function FeatureMapOrbit({ icons, hub = FEATURE_MAP_HOME_HUB }: FeatureMa
           <path className="pmd-feature-map__tick" d="M50 2v3 M50 95v3 M2 50h3 M95 50h3" />
           <polygon points="50,23 73,37 70,63 50,75 28,62 30,36" fill="rgba(34, 211, 238, 0.08)" stroke="rgba(103, 232, 249, 0.35)" strokeWidth="0.4" />
           {points.map((point, index) => (
-            <line key={index} x1="50" y1="50" x2={point.x} y2={point.y} className={focusedIndex === index ? 'pmd-feature-map__spoke--active' : undefined} />
+            <g key={index}>
+              <path
+                d={radialWedgePath(index, points.length)}
+                fill={focusedIndex === index ? 'rgba(253, 230, 138, 0.18)' : 'rgba(34, 211, 238, 0.05)'}
+                stroke={focusedIndex === index ? 'rgba(253, 230, 138, 0.65)' : 'rgba(103, 232, 249, 0.18)'}
+                strokeWidth="0.35"
+              />
+              <line x1="50" y1="50" x2={point.x} y2={point.y} className={focusedIndex === index ? 'pmd-feature-map__spoke--active' : undefined} />
+            </g>
           ))}
         </svg>
 
@@ -258,6 +285,18 @@ export function FeatureMapOrbit({ icons, hub = FEATURE_MAP_HOME_HUB }: FeatureMa
         <button type="button" onClick={() => stepOrbit(1)} aria-label="Next orbit page" className="pmd-feature-map__dock-btn">▶</button>
         <button
           type="button"
+          onClick={() => setChartsOpen((open) => !open)}
+          aria-expanded={chartsOpen}
+          aria-label="Toggle 12-chart telemetry studio"
+          data-astral-chart-toggle
+          className={chartsOpen ? 'pmd-feature-map__dock-btn pmd-feature-map__dock-btn--active' : 'pmd-feature-map__dock-btn'}
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.1" aria-hidden="true">
+            <path d="M4 19h16 M7 16v-5 M12 16V8 M17 16V5" />
+          </svg>
+        </button>
+        <button
+          type="button"
           onClick={() => setDeckOpen((open) => !open)}
           aria-expanded={deckOpen}
           aria-label="Toggle all feature widgets"
@@ -267,6 +306,12 @@ export function FeatureMapOrbit({ icons, hub = FEATURE_MAP_HOME_HUB }: FeatureMa
           ⊞
         </button>
       </div>
+
+      {chartsOpen && (
+        <div className="p-2.5 border-t border-cyan-400/20">
+          <AstralChartMatrix />
+        </div>
+      )}
 
       {deckOpen && (
         <div className="pmd-feature-map__deck" data-feature-widget-deck>

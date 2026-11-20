@@ -209,4 +209,14 @@ const cloneMap = (): Record<SuperPageId, FeatureMapNode[]> =>
   )
 }
 
+
+const astralSource = readFileSync(new URL('../../src/components/ui/AstralChartMatrix.tsx', import.meta.url), 'utf8')
+for (const chartType of ['donut', 'gauge', 'waterfall', 'comparison', 'vein', 'heatmap', 'stacked', 'bubble', 'area', 'radar', 'diverging']) {
+  assert.ok(astralSource.includes(`data-chart-type="${chartType}"`), `AstralChartMatrix missing ${chartType} chart`)
+}
+for (const bridgeRoute of ['/fitness-hub', '/clinical-hub', '/?t=for-you', '/body-exposure', '/body-explorer']) {
+  assert.ok(astralSource.includes(`to: '${bridgeRoute}'`), `AstralChartMatrix missing BodyExposure bridge ${bridgeRoute}`)
+}
+assert.ok(orbitSource.includes('radialWedgePath('), 'FeatureMapOrbit missing concentric segmented radial action wheel wedges')
+
 console.log(`feature-map-game-hub: 7 canonical worlds, ${ALL_FEATURE_WIDGETS.length} visual widgets, ${realRoutes.length} real routes verified, mobile gap ${mobileGap.toFixed(1)}px, positive+negative+boundary+sabotage PASS`)

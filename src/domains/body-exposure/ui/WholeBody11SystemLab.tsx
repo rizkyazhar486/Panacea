@@ -3,6 +3,7 @@
 // radial gauges. All reference prose sits inside a compact ⓘ disclosure.
 
 import { useEffect, useMemo, useState } from 'react'
+import { AstralChartMatrix } from '../../../components/ui/AstralChartMatrix'
 import type { BodySystemId } from '../data/bodySystems'
 import {
   WHOLE_BODY_11_SPECS,
@@ -451,6 +452,25 @@ export function WholeBody11SystemLab({ initialSystem = null, onSelectSystem }: W
           ))}
         </div>
       )}
+
+      {/* 12-Chart Dynamic Astral Telemetry & Anatomical Body Hotspot Studio */}
+      <div>
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 6 }}>
+          <button
+            type="button"
+            onClick={() => setShowChartMatrix((v) => !v)}
+            aria-expanded={showChartMatrix}
+            aria-label="Toggle 12-chart telemetry studio"
+            style={{ ...subtleButton(showChartMatrix), minHeight: TOUCH }}
+          >
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+              <path d="M4 19h16 M7 16v-5 M12 16V8 M17 16V5" />
+            </svg>
+            <span>12-Chart Studio</span>
+          </button>
+        </div>
+        {showChartMatrix && <AstralChartMatrix />}
+      </div>
 
       {/* Compact ⓘ Disclosure hides all text formulas, citations, and vertical-gap prose */}
       {sim.ok && (
