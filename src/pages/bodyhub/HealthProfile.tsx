@@ -862,6 +862,11 @@ function AutoSyncCard() {
   const loadPrivateSyncToken = useCallback(async () => {
     setTokenLoading(true)
     setTokenError(false)
+    if (!backendEnabled) {
+      setToken(null)
+      setTokenLoading(false)
+      return
+    }
     try {
       const nextToken = await api.getHealthWebhookToken()
       if (!healthWebhookUrl(apiBaseUrl, nextToken)) throw new Error('Invalid API origin or sync token')
