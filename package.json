@@ -76,6 +76,7 @@
     "test:clinical-response-contract": "node --test scripts/qa/clinical-response-contract.test.mjs"
   },
   "dependencies": {
+    "@mediapipe/tasks-vision": "1.2.2",
     "framer-motion": "^13.2.0",
     "html2canvas-pro": "^2.4.2",
     "leaflet": "^1.9.4",

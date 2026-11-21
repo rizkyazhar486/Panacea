@@ -12,7 +12,9 @@ const { build } = await import('esbuild')
 const out = await build({
   stdin: { contents: "export { FaceCapture } from './src/domains/body-exposure/ui/face-capture/FaceCapture.tsx'", resolveDir: process.cwd(), loader: 'ts' },
   bundle: true, write: false, format: 'esm', platform: 'node', jsx: 'automatic',
-  external: ['react', 'react/jsx-runtime', 'react-dom'], loader: { '.css': 'empty' }, logLevel: 'silent',
+  external: ['react', 'react/jsx-runtime', 'react-dom', 'three', 'three/*', '@mediapipe/*'], loader: { '.css': 'empty' }, logLevel: 'silent',
+  // Vite's `?url` asset imports (the MediaPipe runtime) have no meaning in an SSR test; stub them.
+  plugins: [{ name: 'url-stub', setup(b) { b.onResolve({ filter: /\?url$/ }, (a) => ({ path: a.path, namespace: 'url-stub' })); b.onLoad({ filter: /.*/, namespace: 'url-stub' }, () => ({ contents: 'export default ""', loader: 'js' })) } }],
 })
 mkdirSync('node_modules/.cache', { recursive: true })
 writeFileSync('node_modules/.cache/face-capture-ui.uji.mjs', out.outputFiles[0]!.text)
