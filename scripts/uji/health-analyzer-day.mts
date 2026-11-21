@@ -46,4 +46,19 @@ await gagal('tanpa-jam-tanpa-ubin', () => {
   assert.doesNotMatch(render({ source: 'w.csv', hours: { steps: jam } }), /ha-day/, 'jam untuk sinyal lain tidak dipakai')
   assert.doesNotMatch(render({ source: 'w.csv', hours: { restingHr: Array(24).fill(null) } }), /ha-day/, 'profil kosong: tidak ada dial kosong')
 })
+await gagal('lanskap-3d-dari-kisi-impor', () => {
+  const kisi = { days: ['2026-11-19', '2026-11-20'], cells: [jam, jam.map((v) => (v === null ? null : v + 1))] }
+  const html = render({ source: 'watch.csv', hours: { restingHr: jam }, grids: { restingHr: kisi } })
+  assert.deepEqual(audit(html), [], 'temuan aksesibilitas')
+  assert.match(html, /Your days in 3D · watch\.csv/)
+  const tile = html.slice(html.indexOf('ha-terrain'), html.indexOf('ha-day '))
+  assert.equal((tile.match(/<polygon /g) ?? []).length, 8 * 3, '8 jam terekam × 3 muka')
+  assert.equal((tile.match(/class="ha-terrain-gap"/g) ?? []).length, 40)
+  assert.match(tile, /<input type="range" min="-80" max="80" step="1" aria-label="Turn the 3D landscape" value="-35"\/>/)
+  assert.match(tile, /Across 2 days: highest 60 bpm at 09:00 on Nov 20; 8 of 48 hours have readings\./)
+})
+await gagal('tanpa-kisi-tanpa-lanskap', () => {
+  assert.doesNotMatch(render({ source: 'w.csv', hours: { restingHr: jam } }), /ha-terrain/)
+  assert.doesNotMatch(render({ source: 'w.csv', hours: {}, grids: { steps: { days: ['2026-11-20'], cells: [jam] } } }), /ha-terrain/, 'kisi sinyal lain')
+})
 console.log('health-analyzer-day: OK')

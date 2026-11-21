@@ -5,7 +5,7 @@
 
 import type { GlanceMetric } from './glanceMetrics.ts'
 import { formatValue } from './insightText.ts'
-import { dateOfDay, dayNumber, metricInsight, type DayValue } from './metricInsight.ts'
+import { dateOfDay, dayNumber, metricInsight, RANGE_MIN_DAYS, type DayValue, type RangePosition } from './metricInsight.ts'
 
 const WEEKDAY = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] as const
 /** Readings a weekday needs before it gets a box; fewer would draw a box from one or two nights. */
@@ -158,4 +158,48 @@ export function typicalDay(metric: GlanceMetric, hours: readonly (number | null)
     ? `Only ${hh(known[0].hour)} has readings so far (${fmt(known[0].v, metric.digits)} ${metric.unit}).`
     : `Highest around ${hh(hi.hour)} (${fmt(hi.v, metric.digits)} ${metric.unit}), lowest around ${hh(lo.hour)} (${fmt(lo.v, metric.digits)}); ${known.length} of 24 hours have readings.`
   return { size, inner, outer, spokes, empty, labels: [0, 6, 12, 18].map((hour) => ({ hour, ...at(hour, outer + 12) })), sentence }
+}
+
+export interface RangeRow {
+  readonly id: string
+  readonly label: string
+  /** Latest reading with its unit. */
+  readonly value: string
+  /** Where the latest reading sits on a scale where the usual range is always the middle third (1/3..2/3), clamped 0..1. */
+  readonly at: number
+  readonly position: RangePosition
+}
+
+export interface RangeBoard {
+  readonly rows: readonly RangeRow[]
+  /** Signals with a latest reading but under RANGE_MIN_DAYS of history, so no usual range yet. */
+  readonly building: ReadonlyArray<{ readonly id: string; readonly label: string; readonly days: number }>
+  readonly sentence: string
+}
+
+/**
+ * Every signal against its own usual range on one shared scale — the body-analyzer "all bars at once" view. The usual
+ * range is drawn as the middle third of each bar, with one range-width either side, so bars of different units line up
+ * and a reading outside the band reads as outside at a glance. No value is judged good or bad: above is not worse.
+ */
+export function rangeBoard(metrics: readonly GlanceMetric[], seriesById: Readonly<Record<string, readonly DayValue[]>>, today: string): RangeBoard {
+  const rows: RangeRow[] = []
+  const building: Array<{ id: string; label: string; days: number }> = []
+  for (const metric of metrics) {
+    const r = metricInsight({ metric, series: seriesById[metric.id] ?? [], today, window: 90 })
+    const latest = r.ok ? r.stats?.latest : undefined
+    if (!r.ok || !latest) continue
+    if (!r.range || !r.position) { building.push({ id: metric.id, label: metric.label, days: r.rangeDays }); continue }
+    const w = r.range.high - r.range.low
+    // A flat usual range has no width to scale by; any reading inside it is the centre, outside it the matching edge.
+    const at = w > 0 ? (latest.value - (r.range.low - w)) / (3 * w) : r.position === 'within' ? 0.5 : r.position === 'above' ? 1 : 0
+    rows.push({ id: metric.id, label: metric.label, value: `${formatValue(latest.value, metric.digits)} ${metric.unit}`.trim(), at: Math.max(0, Math.min(1, at)), position: r.position })
+  }
+  const count = (p: RangePosition) => rows.filter((row) => row.position === p).length
+  const sentence = rows.length
+    ? `${count('within')} of ${rows.length} signals sit within your usual range${count('above') ? `; ${count('above')} above` : ''}${count('below') ? `; ${count('below')} below` : ''}.`
+    : building.length
+      ? `A usual range appears after ${RANGE_MIN_DAYS} recorded days of a signal.`
+      : 'No signal has a reading yet.'
+  return { rows, building, sentence }
 }

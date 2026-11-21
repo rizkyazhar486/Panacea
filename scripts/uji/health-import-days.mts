@@ -93,9 +93,9 @@ await gagal('jam-khas-apple-satu-baca-hari-dan-jam', async () => {
   assert.equal(r.days[0]?.values.restingHr, 52); assert.equal(r.hours.restingHr?.[6], 52)
 })
 await gagal('jam-khas-berkas-tak-terbaca-kosong', async () => {
-  assert.deepEqual(await parseHealthFileSeries('notes.txt', 'tidak ada angka', 420), { days: [], hours: {}, read: [] })
-  assert.deepEqual(await parseHealthFileSeries('export.xml', '<HealthData/>', 420), { days: [], hours: {}, read: [] })
-  assert.deepEqual(await parseHealthFileSeries('watch.csv', 'time,hrv\n2026-11-18T06:10:00,52', 9999), { days: [], hours: {}, read: [] }, 'offset mustahil')
+  assert.deepEqual(await parseHealthFileSeries('notes.txt', 'tidak ada angka', 420), { days: [], hours: {}, grids: {}, read: [] })
+  assert.deepEqual(await parseHealthFileSeries('export.xml', '<HealthData/>', 420), { days: [], hours: {}, grids: {}, read: [] })
+  assert.deepEqual(await parseHealthFileSeries('watch.csv', 'time,hrv\n2026-11-18T06:10:00,52', 9999), { days: [], hours: {}, grids: {}, read: [] }, 'offset mustahil')
 })
 
 console.log('health-import-days: OK')

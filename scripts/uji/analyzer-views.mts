@@ -3,7 +3,7 @@
 // pernah menilai sehat/sakit, dan masukan tak sah gagal tertutup.
 import assert from 'node:assert/strict'
 import { ANALYZER_METRICS, GLANCE_METRICS, glanceMetric } from '../../src/domains/personal-health/engine/glance/glanceMetrics.ts'
-import { WEEKDAY_MIN_READINGS, coverage, spread, typicalDay, weekdayPattern } from '../../src/domains/personal-health/engine/glance/analyzerViews.ts'
+import { WEEKDAY_MIN_READINGS, coverage, rangeBoard, spread, typicalDay, weekdayPattern } from '../../src/domains/personal-health/engine/glance/analyzerViews.ts'
 import { dateOfDay, dayNumber } from '../../src/domains/personal-health/engine/glance/metricInsight.ts'
 
 const gagal = (nama: string, f: () => void) => { try { f() } catch (e) { throw new Error(`[${nama}] ${(e as Error).message}`) } }
@@ -133,4 +133,21 @@ gagal('hari-khas-menolak-profil-tak-sah', () => {
   assert.equal(typicalDay(RHR, jam((h) => (h ? null : Number.NaN))), null, 'NaN bukan bacaan')
 })
 
+// ── Papan rentang: semua sinyal di skala bersama ─────────────────────────────────────────────────────────────
+gagal('papan-rentang-posisi-pada-skala-sepertiga', () => {
+  const b = rangeBoard(ANALYZER_METRICS, { restingHr: deret(20, (i) => 50 + i), hrvMs: deret(20, () => 40), steps: deret(5, () => 5000) }, HARI)
+  assert.deepEqual(b.rows.map((r) => [r.id, r.position, r.value]), [['restingHr', 'above', '69 bpm'], ['hrvMs', 'within', '40 ms']])
+  assert.ok(Math.abs(b.rows[0]!.at - 32 / 45) < 1e-9, 'rentang 52–67: (69−37)/45')
+  assert.equal(b.rows[1]!.at, 0.5, 'rentang datar, di dalam = tengah')
+  assert.deepEqual(b.building, [{ id: 'steps', label: 'Steps', days: 5 }])
+  assert.equal(b.sentence, '1 of 2 signals sit within your usual range; 1 above.')
+  assert.doesNotMatch(b.sentence, TANPA_PENILAIAN)
+})
+gagal('papan-rentang-dijepit-dan-kosong', () => {
+  const jauh = rangeBoard(ANALYZER_METRICS, { restingHr: [...deret(19, (i) => 50 + (i % 5)), { date: HARI, value: 120 }] }, HARI)
+  assert.equal(jauh.rows[0]!.at, 1, 'jauh di atas dijepit ke 1')
+  assert.deepEqual(rangeBoard(ANALYZER_METRICS, {}, HARI), { rows: [], building: [], sentence: 'No signal has a reading yet.' })
+  assert.equal(rangeBoard(ANALYZER_METRICS, { steps: deret(3, () => 4000) }, HARI).sentence, 'A usual range appears after 14 recorded days of a signal.')
+  assert.deepEqual(rangeBoard(ANALYZER_METRICS, { restingHr: deret(20, (i) => 50 + i) }, 'bukan-tanggal'), { rows: [], building: [], sentence: 'No signal has a reading yet.' })
+})
 console.log('analyzer-views: OK')

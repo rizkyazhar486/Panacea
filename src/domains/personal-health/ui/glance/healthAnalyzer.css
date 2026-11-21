@@ -54,7 +54,24 @@
 
 /* Typical day: 24 spokes around a dial; a missing hour is a dot, never a zero spoke. Full width so the sentence
    fits the site's three-line prose limit; stacked under the dial on a phone. */
-.ha-grid > .ha-day { grid-column: 1 / -1; }
+.ha-grid > .ha-day, .ha-grid > .ha-terrain { grid-column: 1 / -1; }
+
+/* 3D day landscape: drag to turn (touch-action keeps vertical page scroll, takes horizontal drags). */
+.ha-terrain svg { width: 100%; height: auto; max-height: 340px; touch-action: pan-y; cursor: grab; user-select: none; }
+.ha-terrain svg:active { cursor: grabbing; }
+.ha-terrain polygon { stroke: var(--ha-card); stroke-width: 0.35; stroke-linejoin: round; }
+.ha-terrain polygon.is-peak { stroke: var(--ha-ink); stroke-width: 1.2; }
+.ha-terrain text { font-size: 8px; font-weight: 700; fill: var(--ha-dim); }
+.ha-terrain-gap { fill: var(--ha-dim); opacity: 0.55; }
+.ha-terrain-foot { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px 14px; align-items: center; }
+.ha-terrain-foot p { font-size: 14px; font-weight: 600; line-height: 1.4; }
+.ha-terrain-foot .ha-day-key { grid-column: 1 / -1; }
+.ha-terrain-turn { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; font-size: 11px; font-weight: 700; color: var(--ha-dim); }
+.ha-terrain-turn input { width: 120px; accent-color: var(--ha-accent); }
+@media (max-width: 479px) {
+  .ha-terrain-foot { grid-template-columns: minmax(0, 1fr); }
+  .ha-terrain-turn input { flex: 1; width: auto; }
+}
 .ha-day-body { display: grid; grid-template-columns: minmax(0, 220px) minmax(0, 1fr); gap: 16px; align-items: center; }
 .ha-day svg { width: 100%; height: auto; max-width: 220px; justify-self: center; }
 .ha-day-ring { fill: none; stroke: var(--ha-line); }
@@ -66,7 +83,7 @@
 .ha-day-text p { font-size: 15px; font-weight: 600; line-height: 1.4; }
 .ha-day-key { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; color: var(--ha-dim); }
 .ha-day-key i { width: 5px; height: 5px; border-radius: 50%; background: var(--ha-dim); }
-@media (max-width: 479px) {
+@media (max-width: 639px) {
   .ha-day-body { grid-template-columns: minmax(0, 1fr); }
   .ha-day svg { max-width: 200px; }
 }
@@ -81,3 +98,23 @@
   .ha-connect-btn, .ha-chip { transition: none; }
   .ha-day line { animation: none; }
 }
+
+/* All signals at once: radar whose shaded ring is the usual band, and bars whose middle third is the usual band. */
+.ha-board { margin-bottom: 12px; }
+.ha-board-body { display: grid; grid-template-columns: minmax(0, 180px) minmax(0, 1fr); gap: 16px; align-items: center; }
+.ha-board svg { width: 100%; height: auto; max-width: 180px; justify-self: center; }
+.ha-board-grid { fill: none; stroke: var(--ha-line); stroke-width: 0.8; }
+.ha-board-usual { fill: color-mix(in oklab, var(--ha-accent) 14%, transparent); stroke: none; }
+.ha-board-shape { fill: color-mix(in oklab, var(--ha-accent) 22%, transparent); stroke: var(--ha-accent); stroke-width: 1.5; stroke-linejoin: round; animation: ha-board-in 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) both; transform-origin: 90px 90px; }
+.ha-board-bars { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; min-width: 0; }
+.ha-board-bars li { display: grid; grid-template-columns: 76px minmax(48px, 1fr) 84px; gap: 10px; align-items: center; font-size: 12px; }
+.ha-board-name { font-weight: 700; color: var(--ha-dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ha-board-value { font-weight: 700; font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
+.ha-board-track { position: relative; height: 8px; border-radius: 4px; background: var(--ha-gap); }
+.ha-board-band { position: absolute; left: 33.33%; width: 33.34%; top: 0; bottom: 0; background: color-mix(in oklab, var(--ha-accent) 30%, transparent); }
+.ha-board-track b { position: absolute; top: 50%; width: 12px; height: 12px; margin: -6px 0 0 -6px; border-radius: 50%; box-shadow: 0 0 0 2px var(--ha-card); transition: left 0.5s ease; }
+.ha-board-filling i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 4px; background: var(--ha-dim); opacity: 0.45; }
+.ha-board > p { margin-top: 10px; font-size: 14px; font-weight: 600; }
+@keyframes ha-board-in { from { transform: scale(0.3); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .ha-board-shape { animation: none; } .ha-board-track b { transition: none; } }
+@media (max-width: 639px) { .ha-board-body { grid-template-columns: minmax(0, 1fr); } .ha-board svg { max-width: 170px; } }

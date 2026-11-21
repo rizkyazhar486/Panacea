@@ -20,7 +20,7 @@ import { api, backendEnabled, apiBaseUrl, type KatalogMetrik } from '../../lib/a
 import { healthWebhookUrl } from '../../domains/devices/engine/healthWebhookUrl'
 import { useStore } from '../../lib/store'
 import { mergeDemoStored } from '../../lib/profile'
-import { latestOfDays, parseHealthFile, parseHealthFileSeries, type HourProfiles, type ImportResult } from '../../lib/healthImport'
+import { latestOfDays, parseHealthFile, parseHealthFileSeries, type DayHourGrids, type HourProfiles, type ImportResult } from '../../lib/healthImport'
 import { getVitals, mergeVitals, syncedToday } from '../../lib/healthVitals'
 import { readUnifiedLocalVitals, recoverSameUserVitalsIntoScope } from '../../domains/identity/localRecovery'
 import { foldsOpenForSession } from '../../shared/ui/foldsPreference'
@@ -92,7 +92,7 @@ const saveBluetoothReading = (patch: WearableSavePatch) => {
 export function HealthProfile() {
   const { account, activePatient } = useStore()
   const analyzerSlot = useNearViewport('200px 0px')
-  const [typicalDays, setTypicalDays] = useState<{ source: string; hours: HourProfiles } | null>(null)
+  const [typicalDays, setTypicalDays] = useState<{ source: string; hours: HourProfiles; grids: DayHourGrids } | null>(null)
   // Bumped after each import so the analyzer re-reads the history it just received.
   const [importRev, setImportRev] = useState(0)
   const [p, setP] = useState<HealthProfile>(DEF)
@@ -319,7 +319,7 @@ export function HealthProfile() {
       // every value being filed under today. A file without dates (or an image) records the latest values as today.
       const days = fallback ? series.read : series?.days ?? []
       // The typical day needs each reading's time, which daily history does not keep: shown for this import only.
-      setTypicalDays(series && Object.keys(series.hours).length ? { source: file.name, hours: series.hours } : null)
+      setTypicalDays(series && Object.keys(series.hours).length ? { source: file.name, hours: series.hours, grids: series.grids } : null)
       // Read before any state is written, so leaving the page mid-read changes nothing.
       setP((x) => ({
         ...x,
