@@ -110,7 +110,7 @@ export function HealthAnalyzer({ readSeries, today }: HealthAnalyzerProps) {
       ) : (
         <>
           <div className="ha-deep">
-            <MetricInsightContent key={metric.id} metricId={metric.id} series={series} today={today} dark={dark} initialDays={30} />
+            <MetricInsightContent key={metric.id} metricId={metric.id} series={series} today={today} dark={dark} initialDays={30} autoFocus={false} />
           </div>
           <div className="ha-grid">
             <figure className="ha-tile">

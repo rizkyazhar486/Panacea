@@ -1,8 +1,9 @@
 import { capturePersonalHealthOperation, readPersonalHealthFile, readPersonalHealthImage } from '../../domains/personal-health'
 import { loadBluetoothWearablePanel, recordConnectedDevice, type WearableSavePatch } from '../../domains/devices'
 import { loadBodyExposureLocalHub } from '../../domains/body-exposure'
-import { lazy, Suspense, useEffect, useRef, useState } from 'react'
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import { useNearViewport } from '../../shared/hooks/useNearViewport'
+import { subscribeDataUpdates } from '../../lib/dataSync'
 import { Fold } from '../../shared/ui/Fold'
 import { Prosa } from '../../components/Prosa'
 import { KolomAngka } from '../../components/KolomAngka'
@@ -92,6 +93,12 @@ const saveBluetoothReading = (patch: WearableSavePatch) => {
 export function HealthProfile() {
   const { account, activePatient } = useStore()
   const analyzerSlot = useNearViewport('200px 0px')
+  // The analyzer reads history through this function and recomputes only when its identity changes. Any health write
+  // (an import, a Bluetooth save, a device sync) publishes on the data bus; a new function per write makes the card
+  // show what just arrived instead of the empty state it had on first paint.
+  const [historyRev, setHistoryRev] = useState(0)
+  useEffect(() => subscribeDataUpdates(() => setHistoryRev((v) => v + 1)), [])
+  const readSeries = useMemo(() => (id: string) => readDailySeries(id), [historyRev])
   const [p, setP] = useState<HealthProfile>(DEF)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -460,7 +467,7 @@ export function HealthProfile() {
         <div className="mt-3 min-h-40" ref={analyzerSlot.ref}>
           {analyzerSlot.ready && (
             <Suspense fallback={<div className="h-40" aria-hidden />}>
-              <HealthAnalyzer readSeries={readDailySeries} today={localDayOf(new Date())} />
+              <HealthAnalyzer readSeries={readSeries} today={localDayOf(new Date())} />
             </Suspense>
           )}
         </div>
