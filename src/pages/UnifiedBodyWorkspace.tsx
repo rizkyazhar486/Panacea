@@ -172,7 +172,6 @@ export function UnifiedBodyWorkspace() {
                   }`}
                 >
                   {view.short}
-                  {exposureTab && !selected && <span className="ml-2 text-[8px] uppercase tracking-[.16em] text-cyan-200/50">OS</span>}
                 </button>
               )
             })}
