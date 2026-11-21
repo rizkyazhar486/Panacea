@@ -165,17 +165,88 @@ function haeValue(sample: Record<string, unknown>): number | undefined {
   return pick('qty') ?? pick('avg') ?? pick('max') ?? pick('min')
 }
 
-export function parseHealthAutoExport(text: string): ImportResult {
+/**
+ * One Health Auto Export sample of one metric, converted to ImportResult fields with the declared units honoured.
+ * The single conversion rule for both the latest-value import and the per-day history import, so one night or one
+ * day can never read differently between the two.
+ */
+function haeSampleFields(name: string, unitsRaw: unknown, sample: Record<string, unknown>): Partial<Record<keyof ImportResult, number>> {
+  const out: Partial<Record<keyof ImportResult, number>> = {}
+  const units = typeof unitsRaw === 'string' ? unitsRaw.toLowerCase() : ''
+  // Sleep carries its own field names rather than qty/Avg, AND its unit
+  // varies between app versions — hours on some, minutes on others. Trust the
+  // declared `units`, then fall back to magnitude, because nobody sleeps more
+  // than 24 hours. The server-side webhook parser applies the identical rule
+  // so the same night yields the same number by either delivery path.
+  if (name.startsWith('sleep')) {
+    // Treat 0 as "not recorded", not as a value: current exports write
+    // asleep:0 alongside a real totalSleep, and `??` would have accepted the
+    // zero and thrown the actual night away.
+    const num = (k: string) => {
+      const v = sample[k]
+      return typeof v === 'number' && Number.isFinite(v) && v > 0 ? v : undefined
+    }
+    const raw = num('asleep') ?? num('totalSleep') ?? num('core')
+    const toH = (v: number) =>
+      units.startsWith('hr') || units.startsWith('hour') ? +v.toFixed(1)
+        : units.startsWith('min') ? +(v / 60).toFixed(1)
+        : +(v > 24 ? v / 60 : v).toFixed(1)
+    if (raw != null) out.sleepH = toH(raw)
+    // Stages, when the watch recorded them. Total hours alone hides the
+    // thing that actually matters after night shifts — whether deep and REM
+    // were reached at all — so keep them rather than collapsing to one number.
+    const deep = num('deep'); if (deep != null) out.sleepDeepH = toH(deep)
+    const rem = num('rem'); if (rem != null) out.sleepRemH = toH(rem)
+    const core = num('core'); if (core != null) out.sleepCoreH = toH(core)
+    const awake = num('awake'); if (awake != null) out.sleepAwakeH = toH(awake)
+    return out
+  }
+
+  const field = HAE_FIELD[name]
+  if (!field) return out
+  let raw = haeValue(sample)
+  if (raw == null) return out
+
+  // UNITS ARE NOT FIXED. Apple exports energy in kilojoules on a metric
+  // locale and kilocalories elsewhere, and height in metres. Storing the raw
+  // number meant a 931 kJ run was recorded as 931 kcal — more than four times
+  // the real figure. Trust the declared `units` rather than the field name.
+  if ((field === 'activeKcal' || field === 'basalKcal') && units.startsWith('kj')) raw = raw / 4.184
+  if (field === 'heightCm' && (units === 'm' || units.startsWith('metre') || units.startsWith('meter'))) raw = raw * 100
+  if (field === 'distanceKm' && units === 'm') raw = raw / 1000
+
+  // Apple stores proportions (0.98 = 98%) for saturation and body fat.
+  if (field === 'spo2Pct' || field === 'bodyFatPct') out[field] = pct(raw)
+  else if (INTEGER_FIELDS.has(field)) out[field] = round(raw)
+  else out[field] = +raw.toFixed(2)
+  return out
+}
+
+const INTEGER_FIELDS = new Set<keyof ImportResult>([
+  'hrvMs', 'restingHr', 'heartRate', 'systolic', 'diastolic', 'steps', 'activeKcal', 'basalKcal', 'exerciseMin',
+  'heightCm', 'flightsClimbed', 'standHours', 'daylightMin', 'sixMinWalkM', 'cardioRecoveryBpm', 'runningPowerW',
+  'runningGroundContactMs',
+])
+
+/** Health Auto Export sample date "2026-11-19 00:00:00 +0700" → epoch ms, or NaN. */
+const haeTime = (s: Record<string, unknown>) => (typeof s?.date === 'string' ? Date.parse(s.date.replace(' +', '+')) : NaN)
+
+function haeMetrics(text: string): Record<string, unknown>[] | null {
   let root: unknown
-  try { root = JSON.parse(text) } catch { return {} }
+  try { root = JSON.parse(text) } catch { return null }
   const data = (root as { data?: unknown })?.data ?? root
   const metrics = (data as { metrics?: unknown })?.metrics
-  if (!Array.isArray(metrics)) return {}
+  return Array.isArray(metrics) ? (metrics as Record<string, unknown>[]) : null
+}
+
+export function parseHealthAutoExport(text: string): ImportResult {
+  const metrics = haeMetrics(text)
+  if (!metrics) return {}
 
   const out: ImportResult = { source: 'Apple Watch' }
   let newest = -Infinity
 
-  for (const m of metrics as Record<string, unknown>[]) {
+  for (const m of metrics) {
     const name = typeof m?.name === 'string' ? m.name.toLowerCase() : ''
     const samples = Array.isArray(m?.data) ? (m.data as Record<string, unknown>[]) : []
     if (!name || !samples.length) continue
@@ -184,70 +255,71 @@ export function parseHealthAutoExport(text: string): ImportResult {
     let best: Record<string, unknown> | undefined
     let bestT = -Infinity
     for (const s of samples) {
-      const t = typeof s?.date === 'string' ? Date.parse(s.date.replace(' +', '+')) : NaN
+      const t = haeTime(s)
       const key = Number.isNaN(t) ? bestT : t
       if (!best || key >= bestT) { bestT = key; best = s }
     }
     if (!best) continue
+    const fields = haeSampleFields(name, m?.units, best)
+    if (!Object.keys(fields).length) continue
     if (Number.isFinite(bestT) && bestT > newest) newest = bestT
-
-    // Sleep carries its own field names rather than qty/Avg, AND its unit
-    // varies between app versions — hours on some, minutes on others. Trust the
-    // declared `units`, then fall back to magnitude, because nobody sleeps more
-    // than 24 hours. The server-side webhook parser applies the identical rule
-    // so the same night yields the same number by either delivery path.
-    if (name.startsWith('sleep')) {
-      // Treat 0 as "not recorded", not as a value: current exports write
-      // asleep:0 alongside a real totalSleep, and `??` would have accepted the
-      // zero and thrown the actual night away.
-      const num = (k: string) => {
-        const v = best![k]
-        return typeof v === 'number' && Number.isFinite(v) && v > 0 ? v : undefined
-      }
-      const raw = num('asleep') ?? num('totalSleep') ?? num('core')
-      const units = typeof m?.units === 'string' ? m.units.toLowerCase() : ''
-      const toH = (v: number) =>
-        units.startsWith('hr') || units.startsWith('hour') ? +v.toFixed(1)
-          : units.startsWith('min') ? +(v / 60).toFixed(1)
-          : +(v > 24 ? v / 60 : v).toFixed(1)
-      if (raw != null) out.sleepH = toH(raw)
-      // Stages, when the watch recorded them. Total hours alone hides the
-      // thing that actually matters after night shifts — whether deep and REM
-      // were reached at all — so keep them rather than collapsing to one number.
-      const deep = num('deep'); if (deep != null) out.sleepDeepH = toH(deep)
-      const rem = num('rem'); if (rem != null) out.sleepRemH = toH(rem)
-      const core = num('core'); if (core != null) out.sleepCoreH = toH(core)
-      const awake = num('awake'); if (awake != null) out.sleepAwakeH = toH(awake)
-      continue
-    }
-
-    const field = HAE_FIELD[name]
-    if (!field) continue
-    let raw = haeValue(best)
-    if (raw == null) continue
-
-    // UNITS ARE NOT FIXED. Apple exports energy in kilojoules on a metric
-    // locale and kilocalories elsewhere, and height in metres. Storing the raw
-    // number meant a 931 kJ run was recorded as 931 kcal — more than four times
-    // the real figure. Trust the declared `units` rather than the field name.
-    const units = typeof m?.units === 'string' ? m.units.toLowerCase() : ''
-    if ((field === 'activeKcal' || field === 'basalKcal') && units.startsWith('kj')) raw = raw / 4.184
-    if (field === 'heightCm' && (units === 'm' || units.startsWith('metre') || units.startsWith('meter'))) raw = raw * 100
-    if (field === 'distanceKm' && units === 'm') raw = raw / 1000
-
-    // Apple stores proportions (0.98 = 98%) for saturation and body fat.
-    if (field === 'spo2Pct' || field === 'bodyFatPct') out[field] = pct(raw) as never
-    else if (field === 'hrvMs' || field === 'restingHr' || field === 'heartRate' || field === 'systolic'
-      || field === 'diastolic' || field === 'steps' || field === 'activeKcal' || field === 'basalKcal'
-      || field === 'exerciseMin' || field === 'heightCm' || field === 'flightsClimbed' || field === 'standHours'
-      || field === 'daylightMin' || field === 'sixMinWalkM' || field === 'cardioRecoveryBpm'
-      || field === 'runningPowerW' || field === 'runningGroundContactMs') {
-      out[field] = round(raw) as never
-    } else out[field] = (+raw.toFixed(2)) as never
+    Object.assign(out, fields)
   }
 
   if (Number.isFinite(newest) && newest > 0) out.measuredAt = new Date(newest).toISOString()
   return prune(out)
+}
+
+/** Signals a day's samples ADD UP to (an hourly export splits them); every other signal is a level and is averaged. */
+const CUMULATIVE_FIELDS = new Set<keyof ImportResult>([
+  'steps', 'activeKcal', 'basalKcal', 'exerciseMin', 'distanceKm', 'flightsClimbed', 'standHours', 'daylightMin',
+])
+
+export interface ImportedDay {
+  /** The calendar day as the exporting phone wrote it, YYYY-MM-DD (no timezone shift). */
+  readonly date: string
+  readonly values: Readonly<Record<string, number>>
+}
+
+/**
+ * Every day a Health Auto Export file covers, oldest first, each with the signals recorded that day. A day exported
+ * hour by hour is folded into one: cumulative signals summed, levels averaged. Undated or unparseable samples, and
+ * values that are not finite and positive, are skipped rather than guessed. Not a Health Auto Export file → [].
+ */
+export function parseHealthAutoExportDays(text: string): ImportedDay[] {
+  const metrics = haeMetrics(text)
+  if (!metrics) return []
+  const acc = new Map<string, Map<string, { sum: number; n: number; cumulative: boolean; integer: boolean }>>()
+  for (const m of metrics) {
+    const name = typeof m?.name === 'string' ? m.name.toLowerCase() : ''
+    const samples = Array.isArray(m?.data) ? (m.data as Record<string, unknown>[]) : []
+    if (!name) continue
+    for (const s of samples) {
+      const day = typeof s?.date === 'string' ? s.date.slice(0, 10) : ''
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(day) || Number.isNaN(haeTime(s))) continue
+      for (const [k, v] of Object.entries(haeSampleFields(name, m?.units, s))) {
+        if (typeof v !== 'number' || !Number.isFinite(v) || v <= 0) continue
+        const row = acc.get(day) ?? new Map()
+        const cell = row.get(k) ?? { sum: 0, n: 0, cumulative: CUMULATIVE_FIELDS.has(k as keyof ImportResult), integer: INTEGER_FIELDS.has(k as keyof ImportResult) }
+        cell.sum += v; cell.n += 1
+        row.set(k, cell); acc.set(day, row)
+      }
+    }
+  }
+  return [...acc.entries()].sort(([a], [b]) => (a < b ? -1 : 1)).map(([date, row]) => ({
+    date,
+    values: Object.fromEntries([...row.entries()].map(([k, c]) => {
+      const v = c.cumulative ? c.sum : c.sum / c.n
+      return [k, c.integer ? Math.round(v) : +v.toFixed(2)]
+    })),
+  }))
+}
+
+/** Dated daily rows for formats that carry them (Health Auto Export today); every other format → []. */
+export function parseHealthFileDays(name: string, text: string): ImportedDay[] {
+  const lower = name.toLowerCase()
+  if (!(lower.endsWith('.json') || /^\s*[[{]/.test(text))) return []
+  return parseHealthAutoExportDays(text)
 }
 
 // Apple Health export.xml — records are written chronologically, so the LAST

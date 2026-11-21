@@ -7,7 +7,7 @@ import { test, mock } from 'node:test'
 import assert from 'node:assert/strict'
 import '../uji/typescript-resolver.mjs'
 
-const { ambilRiwayat, deretMetrik } = await import('../../src/lib/riwayatVitals.ts')
+const { ambilRiwayat, deretMetrik, catatRiwayatHarian } = await import('../../src/lib/riwayatVitals.ts')
 const { getVitals, mergeVitals, syncedToday } = await import('../../src/lib/healthVitals.ts')
 const { bindPersonalHealthAccount } = await import('../../src/shared/kernel/personalHealthStorageScope.ts')
 
@@ -114,4 +114,49 @@ test('a_registration_patient_contributes_no_height_or_weight', async () => {
   assert.equal(v.weightKg, undefined); assert.equal(v.heightCm, undefined)
   // Twin: a clinician-entered weight on a patient record is still used.
   assert.equal(readUnifiedLocalVitals(null, { patient: { ...placeholder, weightKg: 71, heightCm: 172 } }).weightKg, 71)
+})
+
+// A dated export lands on its own days. Before, only the file's newest values were recorded, and as TODAY: a 90-day
+// Health Auto Export gave the analyzer one day.
+const signIn = (id = 'A') => {
+  memory.set('panaceamed.session.v1', JSON.stringify({ account: { id, patientId: id }, loginAt: Date.now() }))
+  bindPersonalHealthAccount({ id, patientId: id })
+}
+
+test('a_dated_import_writes_each_day_on_its_own_date', () => {
+  signIn()
+  const n = catatRiwayatHarian([
+    { date: '2026-10-01', values: { restingHr: 55, steps: 8000 } },
+    { date: '2026-10-03', values: { restingHr: 57 } },
+  ], '2026-10-05')
+  assert.equal(n, 2)
+  assert.deepEqual(ambilRiwayat(), [
+    { tanggal: '2026-10-01', nilai: { restingHr: 55, steps: 8000 } },
+    { tanggal: '2026-10-03', nilai: { restingHr: 57 } },
+  ], 'no row for 10-02: a day without readings stays a gap')
+})
+
+test('an_imported_day_replaces_that_signal_and_keeps_the_others', () => {
+  signIn()
+  catatRiwayatHarian([{ date: '2026-10-01', values: { restingHr: 55, hrvMs: 40 } }], '2026-10-05')
+  catatRiwayatHarian([{ date: '2026-10-01', values: { restingHr: 52 } }], '2026-10-05')
+  assert.deepEqual(rows(), [{ restingHr: 52, hrvMs: 40 }])
+})
+
+test('future_days_bad_dates_and_non_positive_values_are_not_recorded', () => {
+  signIn()
+  const n = catatRiwayatHarian([
+    { date: '2026-10-06', values: { restingHr: 55 } },
+    { date: '05/10/2026', values: { restingHr: 55 } },
+    { date: '2026-10-04', values: { restingHr: 0, steps: -3, hrvMs: Number.NaN } },
+    { date: '2026-10-05', values: { restingHr: 58 } },
+  ], '2026-10-05')
+  assert.equal(n, 1); assert.deepEqual(ambilRiwayat(), [{ tanggal: '2026-10-05', nilai: { restingHr: 58 } }])
+})
+
+test('another_accounts_session_cannot_receive_the_import', () => {
+  signIn('A')
+  bindPersonalHealthAccount({ id: 'B', patientId: 'B' }) // the page mounted for B, the stored session is A
+  assert.equal(catatRiwayatHarian([{ date: '2026-10-01', values: { restingHr: 55 } }], '2026-10-05'), 0)
+  assert.deepEqual(ambilRiwayat(), [], 'nothing written for anyone')
 })
