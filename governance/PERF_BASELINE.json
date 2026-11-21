@@ -1,15 +1,15 @@
 {
-  "_catatan": "Gerbang ratchet performa F2 (scripts/qa/perf-ratchet.mjs, dipakai perf-audit.mjs dengan PERF_BASELINE di CI job perf-audit). Mengukur median byte JS (encodedBodySize, build produksi lewat vite preview tanpa kompresi) dan jumlah request yang benar-benar dimuat tiap halaman x viewport setelah settle 2,5 dtk. Diukur lokal pada main 732c10440 (VITE_API_URL=http://127.0.0.1:18790 npx vite build), N=5 x 2 run: byte JS identik di 20 sampel per halaman (deterministik terhadap build), request bervariasi paling banyak 1 (chatbot desktop 46/47), KECUALI beranda-pasien: enam thumbnail lazy /organs/{heart,brain,lungs,kidneys,liver,skin}/organ.webp termuat atau tidak dalam jendela settle tergantung timing (lokal mobile 73 di 5/5 sampel, desktop 73/79/79/79/79; CI run 43716679822 mobile median 79). Batas request beranda mobile dikoreksi 73 -> 79 agar sama dengan desktop (nilai bimodal atas, gambar konten sah, bukan regresi); toleransi +2 tidak diubah. health-data dinaikkan 389266/54 -> 401149/57 (CI run perf-audit job 133079796195, median N=5, identik mobile/desktop) karena fitur sengaja #3064 (kartu Bluetooth heart rate di /health-data, +11,9 KB JS, +3 request); toleransi tidak diubah. Batas byte = terukur x 1,03 (dibulatkan ke bawah); request = terukur + 2. Ratchet: turunkan batas saat terukur jauh di bawahnya; jangan naikkan tanpa alasan tertulis di PR. TBT/LCP/CLS TIDAK digerbang (waktu runner berderau; TBT mobile masih melebihi 200 ms di keenam halaman) sehingga gerbang ini bukan klaim anggaran Web Vitals terpenuhi. 2026-11-16 (fix/restore-green-main-lazy-panels), DISETUJUI pemilik di sesi: main 71957cd86 merah di perf-audit karena commit pemilik langsung ke main tanpa CI. Diukur lokal N=5, API aktif data segar (API mati menurunkan request secara palsu). NAIK: (1) Landing dibuat lazy di Shell.tsx (chunk Landing/payment/BatasKlaimKesehatan/CSS + 4 request video hero): landing 33 -> 42 request, tetapi byte rute login turun (beranda 505481 -> 482614, harian 262749 -> 235263, chatbot 279638 -> 252119); Landing kembali ke impor langsung diuji dan ditolak (rute login +12..17 request). (2) Chunk boot localRecovery + deviceRegistry dan sinkron API tambahan health-profile/hr-notifications/workouts (+8 di rute login). (3) health-data/clinical-hub: impor statis clinical-operations (Pantheon, FHIR, interop) lewat HealthProfile/ClinicalHub; panel BodyExposureLocalHub ditunda lewat WhenOpened. TURUN: semua byteJs mengikuti terukur. UTANG: pecah clinical-operations agar health-data/clinical-hub kembali ke ~57/~63 request. Setelah (b): ekspor FHIR/SOAP di HealthProfile dimuat saat klik, ClinicalHub memakai modul spesifik bukan barrel clinical-operations: health-data 399042/77 -> 376268/72, clinical-hub 533174/78 -> 515895/75 (mobile), 698312/90 -> 681038/87 (desktop). CI run 43911949393: beranda-pasien mobile median 87 (bimodal thumbnail organ, lihat catatan awal); batas request mobile disamakan dengan desktop (87), sama seperti koreksi 73 -> 79 sebelumnya. Setelah merge main 4219319 (ClinicalHub dipecah pemilik ke ClinicalInteropSection lazy; ekspor FHIR/SOAP dimuat saat klik): clinical-hub diukur ulang N=5 = 534185/79 mobile, 699321/91 desktop; batas disesuaikan ke angka itu (supersede catatan clinical-hub sebelumnya). health-data 376568/72 tetap.",
+  "_catatan": "Gerbang ratchet performa F2 (scripts/qa/perf-ratchet.mjs, dipakai perf-audit.mjs dengan PERF_BASELINE di CI job perf-audit). Mengukur median byte JS (encodedBodySize, build produksi lewat vite preview tanpa kompresi) dan jumlah request yang benar-benar dimuat tiap halaman x viewport setelah settle 2,5 dtk. Diukur lokal pada main 732c10440 (VITE_API_URL=http://127.0.0.1:18790 npx vite build), N=5 x 2 run: byte JS identik di 20 sampel per halaman (deterministik terhadap build), request bervariasi paling banyak 1 (chatbot desktop 46/47), KECUALI beranda-pasien: enam thumbnail lazy /organs/{heart,brain,lungs,kidneys,liver,skin}/organ.webp termuat atau tidak dalam jendela settle tergantung timing (lokal mobile 73 di 5/5 sampel, desktop 73/79/79/79/79; CI run 43716679822 mobile median 79). Batas request beranda mobile dikoreksi 73 -> 79 agar sama dengan desktop (nilai bimodal atas, gambar konten sah, bukan regresi); toleransi +2 tidak diubah. health-data dinaikkan 389266/54 -> 401149/57 (CI run perf-audit job 133079796195, median N=5, identik mobile/desktop) karena fitur sengaja #3064 (kartu Bluetooth heart rate di /health-data, +11,9 KB JS, +3 request); toleransi tidak diubah. Batas byte = terukur x 1,03 (dibulatkan ke bawah); request = terukur + 2. Ratchet: turunkan batas saat terukur jauh di bawahnya; jangan naikkan tanpa alasan tertulis di PR. TBT/LCP/CLS TIDAK digerbang (waktu runner berderau; TBT mobile masih melebihi 200 ms di keenam halaman) sehingga gerbang ini bukan klaim anggaran Web Vitals terpenuhi. 2026-11-16 (fix/restore-green-main-lazy-panels), DISETUJUI pemilik di sesi: main 71957cd86 merah di perf-audit karena commit pemilik langsung ke main tanpa CI. Diukur lokal N=5, API aktif data segar (API mati menurunkan request secara palsu). NAIK: (1) Landing dibuat lazy di Shell.tsx (chunk Landing/payment/BatasKlaimKesehatan/CSS + 4 request video hero): landing 33 -> 42 request, tetapi byte rute login turun (beranda 505481 -> 482614, harian 262749 -> 235263, chatbot 279638 -> 252119); Landing kembali ke impor langsung diuji dan ditolak (rute login +12..17 request). (2) Chunk boot localRecovery + deviceRegistry dan sinkron API tambahan health-profile/hr-notifications/workouts (+8 di rute login). (3) health-data/clinical-hub: impor statis clinical-operations (Pantheon, FHIR, interop) lewat HealthProfile/ClinicalHub; panel BodyExposureLocalHub ditunda lewat WhenOpened. TURUN: semua byteJs mengikuti terukur. UTANG: pecah clinical-operations agar health-data/clinical-hub kembali ke ~57/~63 request. Setelah (b): ekspor FHIR/SOAP di HealthProfile dimuat saat klik, ClinicalHub memakai modul spesifik bukan barrel clinical-operations: health-data 399042/77 -> 376268/72, clinical-hub 533174/78 -> 515895/75 (mobile), 698312/90 -> 681038/87 (desktop). CI run 43911949393: beranda-pasien mobile median 87 (bimodal thumbnail organ, lihat catatan awal); batas request mobile disamakan dengan desktop (87), sama seperti koreksi 73 -> 79 sebelumnya. Setelah merge main 4219319 (ClinicalHub dipecah pemilik ke ClinicalInteropSection lazy; ekspor FHIR/SOAP dimuat saat klik): clinical-hub diukur ulang N=5 = 534185/79 mobile, 699321/91 desktop; batas disesuaikan ke angka itu (supersede catatan clinical-hub sebelumnya). health-data 376568/72 tetap. 2026-11-20 (agent/cloud-f1-perf-ratchet) TURUN saja (ratchet, tanpa kenaikan): CI perf-audit run 44759459481 pada main 6268a5052 (median N=5, identik mobile/desktop) mengukur health-data 269094 B JS / 69 request (sebelumnya batas 376268/72) dan landing-anonim 39 request (batas 42); batas diturunkan ke angka terukur agar penurunan ~107 KB terkunci. beranda-pasien TIDAK diubah: main melebihi batas (498248 B / 90 req) dan perbaikannya ada di PR #3117, bukan dengan menaikkan baseline. Pembaruan 2026-11-20 setelah #3117 masuk main: CI perf-audit job 136437967246 pada main 1705c2a (median N=5, identik mobile/desktop) mengukur beranda-pasien 404282 B / 81 request (batas lama 482614/87) dan health-data 269609 B / 70 request; batas beranda-pasien diturunkan ke angka itu, health-data disetel ke angka main terbaru (masih di bawah batas lama 376268/72). Thumbnail organ bimodal: 81 diukur di kedua viewport pada run ini; toleransi +2 tetap. Koreksi 2026-11-21 setelah merge main 74b715a: #3125 (kartu Analyzer) dan #3128 (Apple Health harian) sengaja menambah kode di /health-data; CI perf-audit job 136769633976 (median N=5, identik mobile/desktop) mengukur 285368 B / 74 request. bytesJs health-data disetel ke angka itu (tetap turun dari 376268 di main); requests health-data DIBIARKAN 72 seperti main (tidak dinaikkan; 74 masuk toleransi +2).",
   "toleransiByte": 0.03,
   "toleransiRequest": 2,
   "batas": {
     "mobile-390x844/landing-anonim": {
       "bytesJs": 256964,
-      "requests": 42
+      "requests": 39
     },
     "mobile-390x844/beranda-pasien": {
-      "bytesJs": 482614,
-      "requests": 87
+      "bytesJs": 404282,
+      "requests": 81
     },
     "mobile-390x844/harian": {
       "bytesJs": 235263,
@@ -24,16 +24,16 @@
       "requests": 79
     },
     "mobile-390x844/health-data": {
-      "bytesJs": 376268,
+      "bytesJs": 285368,
       "requests": 72
     },
     "desktop-1440x900/landing-anonim": {
       "bytesJs": 256964,
-      "requests": 42
+      "requests": 39
     },
     "desktop-1440x900/beranda-pasien": {
-      "bytesJs": 482614,
-      "requests": 87
+      "bytesJs": 404282,
+      "requests": 81
     },
     "desktop-1440x900/harian": {
       "bytesJs": 235263,
@@ -48,7 +48,7 @@
       "requests": 91
     },
     "desktop-1440x900/health-data": {
-      "bytesJs": 376268,
+      "bytesJs": 285368,
       "requests": 72
     }
   }
