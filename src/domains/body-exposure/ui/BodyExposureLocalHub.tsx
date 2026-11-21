@@ -36,14 +36,16 @@ import { deretMetrik } from '../../../lib/riwayatVitals'
 import { downloadClinicalFhirBundle, printClinicalReport } from '../../clinical-operations'
 
 const BluetoothWearablePanel = lazy(loadBluetoothWearablePanel)
+const FaceCapture = lazy(() => import('./face-capture/FaceCapture.tsx').then((m) => ({ default: m.FaceCapture })))
 
-export type HubTab = 'vitality' | 'wearables' | 'emv_pass'
+export type HubTab = 'vitality' | 'wearables' | 'emv_pass' | 'face'
 type FilterCategory = 'all' | WearableCategory
 
 const HUB_TABS: readonly { readonly id: HubTab; readonly label: string }[] = [
   { id: 'vitality', label: 'Vitality Bio-Scrolling' },
   { id: 'wearables', label: '25 Wearable Hub' },
   { id: 'emv_pass', label: 'EMV QR & Barcode' },
+  { id: 'face', label: 'Face from photo' },
 ]
 
 function QrSvg({ payload }: { readonly payload: string }) {
@@ -635,6 +637,12 @@ export function BodyExposureLocalHub({
             ))}
           </div>
         </div>
+      )}
+
+      {tab === 'face' && (
+        <Suspense fallback={<div style={{ marginTop: 14, fontSize: 12, color: TONE.dim }}>Loading face capture…</div>}>
+          <FaceCapture />
+        </Suspense>
       )}
 
       {tab === 'emv_pass' && (
