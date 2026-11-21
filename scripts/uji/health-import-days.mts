@@ -59,7 +59,7 @@ gagal('sampel-tanpa-tanggal-atau-nilai-tak-sah-dibuang', () => {
 })
 gagal('bukan-health-auto-export-kosong', () => {
   assert.deepEqual(parseHealthAutoExportDays('bukan json'), []); assert.deepEqual(parseHealthAutoExportDays('{"a":1}'), [])
-  assert.deepEqual(parseHealthFileDays('cycles.csv', 'a,b\n1,2'), []); assert.deepEqual(parseHealthFileDays('export.xml', '<HealthData/>'), [])
+  assert.deepEqual(parseHealthFileDays('cycles.csv', 'a,b\n1,2'), []); assert.deepEqual(parseHealthFileDays('export.xml', '<HealthData/>'), [], 'ekspor tanpa rekaman')
   assert.deepEqual(parseHealthAutoExportDays(hae([{ name: 'unknown_metric', data: [{ date: d('2026-11-19'), qty: 3 }] }])), [], 'metrik tak dikenal tidak membuat hari kosong')
 })
 gagal('deterministik', () => { assert.deepEqual(parseHealthAutoExportDays(HARIAN), parseHealthAutoExportDays(HARIAN)) })
