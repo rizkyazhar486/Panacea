@@ -6,7 +6,7 @@
 // app does, so for those two the flow is: export from the app, upload the
 // file here. Everything runs client-side — no file ever leaves the device
 // during parsing.
-import { dailyValues, parseDeviceSeries, SERIES, type Reading, type SeriesId } from '../domains/personal-health/engine/glance/deviceSeries.ts'
+import type { Reading, SeriesId } from '../domains/personal-health/engine/glance/deviceSeries.ts'
 
 export interface ImportResult {
   vo2max?: number
@@ -333,10 +333,12 @@ const SERIES_FIELD: Readonly<Record<SeriesId, keyof ImportResult | null>> = {
  * Every day an Apple Health export.xml covers, oldest first, read by the one device-series reader
  * (domains/personal-health/engine/glance/deviceSeries): units converted or the record rejected, implausible values
  * dropped, two sources never added together, days cut at the wearer's UTC offset. Sleep is not read here: its records
- * are intervals that cross midnight. Not an export, or nothing usable → [].
+ * are intervals that cross midnight. Not an export, or nothing usable → []. The reader is loaded on demand, so Health
+ * Data does not fetch it until someone imports a file.
  */
-export function parseAppleHealthDays(xml: string, utcOffsetMin = 0): ImportedDay[] {
+export async function parseAppleHealthDays(xml: string, utcOffsetMin = 0): Promise<ImportedDay[]> {
   if (!xml.includes('<HealthData')) return []
+  const { dailyValues, parseDeviceSeries, SERIES } = await import('../domains/personal-health/engine/glance/deviceSeries.ts')
   const r = parseDeviceSeries('export.xml', xml, utcOffsetMin)
   if (!r.ok) return []
   const acc: DayCells = new Map()
@@ -356,7 +358,7 @@ export function parseAppleHealthDays(xml: string, utcOffsetMin = 0): ImportedDay
  * Dated daily rows for formats that carry them (Health Auto Export JSON, Apple Health XML); every other format → [].
  * `utcOffsetMin` is the wearer's offset, used where a time must be cut into days (Apple Health XML).
  */
-export function parseHealthFileDays(name: string, text: string, utcOffsetMin = 0): ImportedDay[] {
+export async function parseHealthFileDays(name: string, text: string, utcOffsetMin = 0): Promise<ImportedDay[]> {
   const lower = name.toLowerCase()
   if (lower.endsWith('.xml') || text.includes('<HealthData')) return parseAppleHealthDays(text, utcOffsetMin)
   if (!(lower.endsWith('.json') || /^\s*[[{]/.test(text))) return []

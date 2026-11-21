@@ -305,6 +305,11 @@ export function HealthProfile() {
           : 'No recognizable data found in that file. Try export.xml (Apple Health), physiological_cycles.csv (WHOOP), or a JSON export from WHOOP/Garmin Connect.')
         return
       }
+      // A dated export writes one history row per day it covers, so the analyzer gets real past days instead of
+      // every value being filed under today. A file without dates (or an image) records the latest values as today.
+      const days = gambar ? [] : await parseHealthFileDays(file.name, text, -new Date().getTimezoneOffset())
+      if (!current()) return
+      // Read before any state is written, so leaving the page mid-read changes nothing.
       setP((x) => ({
         ...x,
         source: (r.source as Src) ?? x.source,
@@ -321,9 +326,6 @@ export function HealthProfile() {
       // dropped each newly-parsed metric until someone remembered to add it
       // here too — which is how gait, running form and sleep stages stayed
       // invisible after they were already being parsed correctly.
-      // A dated export writes one history row per day it covers, so the analyzer gets real past days instead of
-      // every value being filed under today. A file without dates (or an image) records the latest values as today.
-      const days = gambar ? [] : parseHealthFileDays(file.name, text, -new Date().getTimezoneOffset())
       const daysRecorded = catatRiwayatHarian(days)
       mergeVitals({ ...r, source: r.source, measuredAt: r.measuredAt }, { record: days.length === 0 })
 
