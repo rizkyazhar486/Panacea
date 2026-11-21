@@ -1,8 +1,9 @@
 import { capturePersonalHealthOperation, readPersonalHealthFile, readPersonalHealthImage } from '../../domains/personal-health'
 import { loadBluetoothWearablePanel, recordConnectedDevice, type WearableSavePatch } from '../../domains/devices'
 import { loadBodyExposureLocalHub } from '../../domains/body-exposure'
-import { lazy, Suspense, useEffect, useRef, useState } from 'react'
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import { useNearViewport } from '../../shared/hooks/useNearViewport'
+import { subscribeDataUpdates } from '../../lib/dataSync'
 import { Fold } from '../../shared/ui/Fold'
 import { Prosa } from '../../components/Prosa'
 import { KolomAngka } from '../../components/KolomAngka'
@@ -93,8 +94,12 @@ export function HealthProfile() {
   const { account, activePatient } = useStore()
   const analyzerSlot = useNearViewport('200px 0px')
   const [typicalDays, setTypicalDays] = useState<{ source: string; hours: HourProfiles; grids: DayHourGrids } | null>(null)
-  // Bumped after each import so the analyzer re-reads the history it just received.
-  const [importRev, setImportRev] = useState(0)
+  // The analyzer reads history through this function and recomputes only when its identity changes. Any health write
+  // (an import, a Bluetooth save, a device sync) publishes on the data bus; a new function per write makes the card
+  // show what just arrived instead of the empty state it had on first paint.
+  const [historyRev, setHistoryRev] = useState(0)
+  useEffect(() => subscribeDataUpdates(() => setHistoryRev((v) => v + 1)), [])
+  const readSeries = useMemo(() => (id: string) => readDailySeries(id), [historyRev])
   const [p, setP] = useState<HealthProfile>(DEF)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -339,7 +344,6 @@ export function HealthProfile() {
       // invisible after they were already being parsed correctly.
       const daysRecorded = catatRiwayatHarian(days)
       mergeVitals({ ...r, source: r.source, measuredAt: r.measuredAt }, { record: days.length === 0 })
-      setImportRev((n) => n + 1)
 
       // Workouts and heart-rate notifications live in the same file but are not
       // "latest value of a metric", so they go to their own store instead of
@@ -472,7 +476,7 @@ export function HealthProfile() {
         <div className="mt-3 min-h-40" ref={analyzerSlot.ref}>
           {analyzerSlot.ready && (
             <Suspense fallback={<div className="h-40" aria-hidden />}>
-              <HealthAnalyzer key={importRev} readSeries={readDailySeries} today={localDayOf(new Date())} typicalDays={typicalDays} />
+              <HealthAnalyzer readSeries={readSeries} today={localDayOf(new Date())} typicalDays={typicalDays} />
             </Suspense>
           )}
         </div>
