@@ -52,6 +52,20 @@ try {
     assert.ok(await page.locator('.ha-deep svg').count() > 0, 'a chart is drawn')
   })
 
+  await gagal('memilih_sinyal_tidak_mencuri_fokus', async () => {
+    // Picking another signal remounts the detail view. It must leave focus on the chip that was pressed (keyboard users
+    // keep their place) and must not leave a focus ring on the large reading.
+    const hr = page.locator('.ha-chip', { hasText: 'Resting HR' })
+    await hr.focus(); await hr.press('Enter')
+    await page.locator('.ha-deep').getByText('bpm', { exact: false }).first().waitFor({ state: 'visible', timeout: 15_000 })
+    const where = await page.evaluate(() => {
+      const a = document.activeElement
+      return { onChip: !!a?.classList?.contains('ha-chip'), label: a?.textContent?.trim().slice(0, 24) ?? '', insideDetail: !!a?.closest?.('.ha-deep') }
+    })
+    assert.equal(where.insideDetail, false, `focus moved into the detail view (${where.label})`)
+    assert.equal(where.onChip, true, `focus left the chip (now on: ${where.label || 'body'})`)
+  })
+
   await gagal('tanpa_luapan_horizontal', async () => {
     const over = await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)
     assert.equal(over, 0, `horizontal overflow ${over}px`)

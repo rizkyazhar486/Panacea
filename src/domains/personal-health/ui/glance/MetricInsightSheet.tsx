@@ -45,10 +45,16 @@ export interface MetricInsightContentProps extends Omit<MetricInsightSheetProps,
   initialDays?: InsightWindow
   /** Theme override (tests render without a document). */
   dark?: boolean
+  /**
+   * Move focus to the reading when this mounts. Right for the sheet, which opens on top of the page; wrong inline,
+   * where the content remounts as the person picks another signal and would take focus (and a scroll) from the
+   * control they just used.
+   */
+  autoFocus?: boolean
 }
 
 /** The sheet's body, without the dialog around it: everything the person reads, renderable on its own. */
-export function MetricInsightContent({ metricId, series, today, boundary, onNavigate, initialDays = 7, dark: darkOverride }: MetricInsightContentProps) {
+export function MetricInsightContent({ metricId, series, today, boundary, onNavigate, initialDays = 7, dark: darkOverride, autoFocus = true }: MetricInsightContentProps) {
   const metric = glanceMetric(metricId)
   const darkClass = useDarkClass()
   const dark = darkOverride ?? darkClass
@@ -58,7 +64,7 @@ export function MetricInsightContent({ metricId, series, today, boundary, onNavi
   const longest = useMemo(() => (metric ? metricInsight({ metric, series, today, window: 90 }) : null), [metric, series, today])
   const heroRef = useRef<HTMLDivElement>(null)
   const readingTitle = useId()
-  useEffect(() => { heroRef.current?.focus() }, [])
+  useEffect(() => { if (autoFocus) heroRef.current?.focus() }, [autoFocus])
 
   if (!metric || !insight || !insight.ok || !longest || !longest.ok) {
     return <p role="alert" style={{ margin: 0 }}>This signal cannot be shown: its date or name was not recognised.</p>
