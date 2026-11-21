@@ -313,7 +313,8 @@ export function BodyComposition() {
     <div className="mx-auto max-w-3xl space-y-5 pb-24">
       {/* Score + bento header */}
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-        <Card className="!p-4 liquid-glass">
+        {/* Nothing to score yet: one compact card across the row, so the form that fills it stays on the first screen. */}
+        <Card className={`!p-4 liquid-glass ${kurangSkor.length > 0 ? 'sm:col-span-2' : ''}`}>
           <div className="flex items-center justify-between gap-2">
             <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-500">Composition Score</div>
             {kurangSkor.length === 0 && (
@@ -334,18 +335,17 @@ export function BodyComposition() {
               </div>
             </>
           ) : (
-            <>
-              <div className="text-4xl font-extrabold text-neutral-400" aria-label="No score yet">—</div>
-              <p className="mt-1 text-[11px] leading-snug text-neutral-500" role="status">Enter your {kurangSkor.join(', ')} to see your score.</p>
-            </>
+            <div className="mt-2 flex items-center gap-3">
+              <div className="grid h-11 w-11 shrink-0 place-items-center rounded-full border border-dashed border-white/25 text-xl font-extrabold text-neutral-400" aria-label="No score yet">—</div>
+              <p className="text-[12px] leading-snug text-neutral-500" role="status">Enter your {kurangSkor.join(', ')} to see your score.</p>
+            </div>
           )}
           <BatasKlaimKesehatan permukaan="longevity.body-composition" />
         </Card>
-        <Card className="!p-4 liquid-glass">
-          {kurangSkor.length === 0
-            ? <BodyTypeGrid bmi={d.bmi} pbf={d.pbf} g={b.g} />
-            : <div><div className="text-xs font-bold text-neutral-500">Body Type</div><div className="text-2xl font-extrabold text-neutral-400">—</div><p className="mt-1 text-[11px] leading-snug text-neutral-500">Appears once the score has what it needs.</p></div>}
-        </Card>
+        {/* The body type needs the same inputs as the score; until then it has nothing to say, so it takes no space. */}
+        {kurangSkor.length === 0
+          ? <Card className="!p-4 liquid-glass"><BodyTypeGrid bmi={d.bmi} pbf={d.pbf} g={b.g} /></Card>
+          : null}
       </div>
 
       {/* Quick Baseline 1-Klik Pill right in hero (zero route switch required) */}
