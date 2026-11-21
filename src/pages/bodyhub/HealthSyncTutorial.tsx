@@ -125,15 +125,28 @@ import { healthWebhookUrl } from '../../domains/devices/engine/healthWebhookUrl'
 
 export function HealthSyncTutorial() {
   const [url, setUrl] = useState<string | null>(null)
+  const [linkStatus, setLinkStatus] = useState<'loading' | 'ready' | 'error' | 'unavailable'>(backendEnabled ? 'loading' : 'unavailable')
 
-  useEffect(() => {
-    if (!backendEnabled) return
-    api.getHealthWebhookToken()
-      // Same origin the rest of the app talks to. VITE_API_URL is empty in production since the edge origin moved
-      // into apiOrigin, and a relative link would send Apple Watch data to the website instead of the backend.
-      .then((token) => setUrl(healthWebhookUrl(apiBaseUrl, token)))
-      .catch(() => {})
+  const loadPrivateSyncLink = useCallback(async () => {
+    if (!backendEnabled) {
+      setUrl(null)
+      setLinkStatus('unavailable')
+      return
+    }
+    setLinkStatus('loading')
+    try {
+      const token = await api.getHealthWebhookToken()
+      const nextUrl = healthWebhookUrl(apiBaseUrl, token)
+      if (!nextUrl) throw new Error('Invalid API origin or sync token')
+      setUrl(nextUrl)
+      setLinkStatus('ready')
+    } catch {
+      setUrl(null)
+      setLinkStatus('error')
+    }
   }, [])
+
+  useEffect(() => { void loadPrivateSyncLink() }, [loadPrivateSyncLink])
 
   // Diagnosis of what has ACTUALLY been arriving. Without this the only way to
   // find a wrong exporter setting is to read the config file by hand — the
@@ -276,8 +289,17 @@ export function HealthSyncTutorial() {
         <Card className="!p-5">
           <SectionTitle icon={<IconKey size={20} />} title="Your Private Sync Link" subtitle="For step 2 — copy this into the app" />
           <div className="mt-2 rounded-xl bg-neutral-50 p-3 font-mono text-[11px] text-neutral-600 break-all">
-            {url ?? 'Loading…'}
+            {url ?? (linkStatus === 'loading' ? 'Loading…' : linkStatus === 'error' ? 'Unable to load Private Sync Link' : 'Backend connection is not configured')}
           </div>
+          {linkStatus === 'error' && (
+            <div role="alert" className="mt-2 rounded-xl border border-rose-200 bg-rose-50 p-3 text-[12px] text-rose-700">
+              Panaceamed could not retrieve your account's sync token. Confirm that you are signed in, then try again.
+              <button onClick={() => void loadPrivateSyncLink()} className="ml-2 font-bold underline">Try again</button>
+            </div>
+          )}
+          {linkStatus === 'unavailable' && (
+            <p className="mt-2 text-[12px] text-amber-700">The backend API is not configured for this site, so a private link cannot be generated.</p>
+          )}
           <Link to="/health-data">
             <Button className="mt-3 w-full">Open the Health Data Page <IconChevronRight size={16} /></Button>
           </Link>
