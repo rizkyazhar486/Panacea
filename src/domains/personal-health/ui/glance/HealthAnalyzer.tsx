@@ -59,16 +59,31 @@ export function HealthAnalyzer({ readSeries, today }: HealthAnalyzerProps) {
   const wkValues = wk?.days.flatMap((d) => d.values) ?? []
   const wkDomain: [number, number] | null = wkValues.length ? [Math.min(...wkValues), Math.max(...wkValues)] : null
 
+  const connect = (
+    <nav className="ha-connect" aria-label="Add data">
+      {CONNECT.map((c) => (
+        <button key={c.id} type="button" className="ha-connect-btn" onClick={() => goTo(c.id)}>
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden><path d={c.icon} fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>
+          <span>{c.label}</span>
+        </button>
+      ))}
+    </nav>
+  )
+
+  // Nothing has arrived yet: nine blank chips and an empty coverage grid would only repeat "no data" twice.
+  // Show the ways in and one sentence instead.
+  if (withData.length === 0) {
+    return (
+      <section className="ha" aria-label="Health data analyzer">
+        {connect}
+        <p className="ha-empty">{cov.sentence}</p>
+      </section>
+    )
+  }
+
   return (
     <section className="ha" aria-label="Health data analyzer">
-      <nav className="ha-connect" aria-label="Add data">
-        {CONNECT.map((c) => (
-          <button key={c.id} type="button" className="ha-connect-btn" onClick={() => goTo(c.id)}>
-            <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden><path d={c.icon} fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>
-            <span>{c.label}</span>
-          </button>
-        ))}
-      </nav>
+      {connect}
 
       <div className="ha-chips" role="group" aria-label="Signals">
         {chips.map(({ metric: m, latest, position }) => (
