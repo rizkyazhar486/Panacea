@@ -2,6 +2,7 @@ import { capturePersonalHealthOperation, readPersonalHealthFile, readPersonalHea
 import { loadBluetoothWearablePanel, recordConnectedDevice, type WearableSavePatch } from '../../domains/devices'
 import { loadBodyExposureLocalHub } from '../../domains/body-exposure'
 import { lazy, Suspense, useEffect, useRef, useState } from 'react'
+import { useNearViewport } from '../../shared/hooks/useNearViewport'
 import { Fold } from '../../shared/ui/Fold'
 import { Prosa } from '../../components/Prosa'
 import { KolomAngka } from '../../components/KolomAngka'
@@ -30,6 +31,11 @@ import { diagnose, type SyncDiagnosis } from '../../lib/syncDiagnostics'
 import { generateInsights } from '../../lib/healthInsights'
 import { benchmarkVo2max, benchmarkRestingHr, benchmarkSleep, BENCHMARK_DISCLAIMER, type BenchmarkItem } from '../../lib/benchmark'
 import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
+import { localDayOf } from '../../domains/personal-health/engine/glance/weekGlance.ts'
+
+// The analyzer (charts, every signal against the person's own record) loads after the page, not with it.
+const HealthAnalyzer = lazy(() => import('../../domains/personal-health/ui/glance/HealthAnalyzer.tsx'))
+const readDailySeries = (id: string) => deretMetrik(id, 120).map((d) => ({ date: d.tanggal, value: d.nilai }))
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Health Profile — per-user health data saved on the SERVER (keyed by account,
@@ -85,6 +91,7 @@ const saveBluetoothReading = (patch: WearableSavePatch) => {
 
 export function HealthProfile() {
   const { account, activePatient } = useStore()
+  const analyzerSlot = useNearViewport('200px 0px')
   const [p, setP] = useState<HealthProfile>(DEF)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -441,6 +448,19 @@ export function HealthProfile() {
       </Card>
 
       <Card className="!p-5">
+        <SectionTitle icon={<IconActivity size={20} />} title="Analyzer" subtitle="Every signal against your own record" />
+        {/* The analyzer and its charts load only when the reader scrolls near them, not on first paint. */}
+        <div className="mt-3 min-h-40" ref={analyzerSlot.ref}>
+          {analyzerSlot.ready && (
+            <Suspense fallback={<div className="h-40" aria-hidden />}>
+              <HealthAnalyzer readSeries={readDailySeries} today={localDayOf(new Date())} />
+            </Suspense>
+          )}
+        </div>
+      </Card>
+
+      <div id="hd-bluetooth">
+      <Card className="!p-5">
         <SectionTitle icon={<IconHeart size={20} />} title="Bluetooth heart rate" subtitle="From your own strap or band" />
         <div className="mt-2">
           <Suspense fallback={null}>
@@ -449,7 +469,9 @@ export function HealthProfile() {
           </Suspense>
         </div>
       </Card>
+      </div>
 
+      <div id="hd-import">
       <Fold label="Import">
       {/* Import from / export to a file */}
       <Card className="!p-5">
@@ -488,6 +510,9 @@ export function HealthProfile() {
       </Card>
       </Fold>
 
+      </div>
+
+      <div id="hd-sync">
       <Fold label="Sync">
       {backendEnabled && <AutoSyncCard />}
       <SyncDiagnosticsCard />
@@ -509,6 +534,7 @@ export function HealthProfile() {
 
       {p.lastDeviceSyncAt && <DeviceSyncSummary profile={p} />}
       </Fold>
+      </div>
 
       <Fold label="Metrics">
       <Card className="!p-5">

@@ -1,32 +1,10 @@
-import { lazy, Suspense, useEffect, useRef, useState } from 'react'
+import { lazy, Suspense, useState } from 'react'
+import { useNearViewport } from '../../shared/hooks/useNearViewport'
 import { Link } from 'react-router-dom'
 
 const FeatureUniverse = lazy(() => import('./HomeFeatureUniverse').then((m) => ({ default: m.HomeFeatureUniverse })))
 const LearningRail = lazy(() => import('./PanaceaLearningRail').then((m) => ({ default: m.PanaceaLearningRail })))
 const BodyExposure = lazy(() => import('./BodyExposureWidget').then((m) => ({ default: m.BodyExposureWidget })))
-
-function useNearViewport(rootMargin = '900px 0px') {
-  const ref = useRef<HTMLDivElement>(null)
-  const [ready, setReady] = useState(false)
-
-  useEffect(() => {
-    if (ready) return
-    const node = ref.current
-    if (!node || typeof IntersectionObserver === 'undefined') {
-      setReady(true)
-      return
-    }
-    const observer = new IntersectionObserver(([entry]) => {
-      if (!entry.isIntersecting) return
-      setReady(true)
-      observer.disconnect()
-    }, { rootMargin })
-    observer.observe(node)
-    return () => observer.disconnect()
-  }, [ready, rootMargin])
-
-  return { ref, ready }
-}
 
 function Placeholder({ label, tall = false }: { label: string; tall?: boolean }) {
   return (
