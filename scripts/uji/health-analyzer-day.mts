@@ -37,7 +37,9 @@ await gagal('ubin-hari-khas-dari-impor', () => {
   assert.equal((tile.match(/<line /g) ?? []).length, 4, 'hanya jam terekam')
   assert.equal((tile.match(/class="ha-day-gap"/g) ?? []).length, 20, 'jam kosong = titik')
   assert.match(html, /aria-label="Resting HR by hour of day\. Highest around 09:00 \(59 bpm\), lowest around 06:00 \(56\); 4 of 24 hours have readings\."/)
-  assert.match(html, /<p data-pmd-unclamped="true">[^<]*not a zero\.<\/p>/)
+  assert.match(html, /<p>Highest around 09:00 \(59 bpm\)[^<]*<\/p><span class="ha-day-key"><i aria-hidden="true"><\/i> no reading that hour — not a zero<\/span>/, 'kalimat pendek + legenda titik, bukan prosa panjang yang terpotong')
+  assert.equal((tile.match(/class="is-peak"/g) ?? []).length, 1, 'satu jam puncak ditonjolkan')
+  assert.match(tile, /viewBox="-12 -12 224 224"/, 'label jam tidak terpotong di tepi')
 })
 await gagal('tanpa-jam-tanpa-ubin', () => {
   assert.doesNotMatch(render(null), /ha-day/, 'tanpa impor: tidak ada ubin')

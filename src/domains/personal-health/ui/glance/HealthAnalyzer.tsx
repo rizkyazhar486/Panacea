@@ -44,27 +44,32 @@ function goTo(id: string) {
   el.scrollIntoView({ behavior: 'smooth', block: 'start' })
 }
 
-/** The typical day as a dial: spokes grow once on arrival, longest = the hour with the most. */
+/** The typical day as a dial: spokes grow once on arrival, the highest hour drawn strongest. */
 function DayTile({ day, tone, label, source }: { day: TypicalDay; tone: string; label: string; source: string }) {
   const c = day.size / 2
+  const peak = day.spokes.reduce((b, s) => (s.value > b.value ? s : b), day.spokes[0])
+  // The hour labels sit just outside the outer ring; pad the view box so they are never cut at the edge.
+  const pad = 12
   return (
-    <figure className="ha-tile ha-day">
+    <figure className="ha-tile ha-tile-wide ha-day">
       <figcaption>Typical day · {source}</figcaption>
       <div className="ha-day-body">
-        <svg viewBox={`0 0 ${day.size} ${day.size}`} role="img" aria-label={`${label} by hour of day. ${day.sentence}`}>
+        <svg viewBox={`${-pad} ${-pad} ${day.size + pad * 2} ${day.size + pad * 2}`} role="img" aria-label={`${label} by hour of day. ${day.sentence}`}>
           <circle cx={c} cy={c} r={day.outer} className="ha-day-ring" />
           <circle cx={c} cy={c} r={day.inner} className="ha-day-ring" />
           {day.empty.map((h) => {
             const a = (h / 24) * 2 * Math.PI - Math.PI / 2
-            return <circle key={h} cx={c + day.inner * Math.cos(a)} cy={c + day.inner * Math.sin(a)} r={1.5} className="ha-day-gap" />
+            return <circle key={h} cx={c + day.inner * Math.cos(a)} cy={c + day.inner * Math.sin(a)} r={2} className="ha-day-gap" />
           })}
           {day.spokes.map((s) => (
-            <line key={s.hour} x1={s.x1} y1={s.y1} x2={s.x2} y2={s.y2} stroke={tone} style={{ animationDelay: `${s.hour * 20}ms` }} />
+            <line key={s.hour} x1={s.x1} y1={s.y1} x2={s.x2} y2={s.y2} stroke={tone} className={s === peak ? 'is-peak' : undefined} style={{ animationDelay: `${s.hour * 20}ms` }} />
           ))}
           {day.labels.map((l) => <text key={l.hour} x={l.x} y={l.y + 3.5} textAnchor="middle">{String(l.hour).padStart(2, '0')}</text>)}
         </svg>
-        {/* data-pmd-unclamped: the site-wide clamp would cut "not a zero" off the missing-hour note. */}
-        <p data-pmd-unclamped="true">{day.sentence} A dot on the inner ring is an hour with no reading, not a zero.</p>
+        <div className="ha-day-text">
+          <p>{day.sentence}</p>
+          <span className="ha-day-key"><i aria-hidden /> no reading that hour — not a zero</span>
+        </div>
       </div>
     </figure>
   )

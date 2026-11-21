@@ -348,9 +348,11 @@ export type HourProfiles = Readonly<Record<string, readonly (number | null)[]>>
  * Dated daily rows and each signal's typical day from one read of the file. Days come from formats that carry them
  * (Health Auto Export JSON, Apple Health XML); every other format gives no days, as before. The typical day needs
  * the readings' own times, which daily history does not keep, so it is computed here, from any file the
- * device-series reader accepts (CSV, JSON, GPX, Apple Health). Not a readable file → no days, no hours.
+ * device-series reader accepts (CSV, JSON, GPX, Apple Health). `read` is the device-series reader's own daily fold
+ * of any such file: the page falls back to it when no named-app parser (WHOOP, InBody, Garmin…) recognised the file,
+ * so a plain timestamped watch export still fills history instead of being rejected. Not a readable file → all empty.
  */
-export async function parseHealthFileSeries(name: string, text: string, utcOffsetMin = 0): Promise<{ days: ImportedDay[]; hours: HourProfiles }> {
+export async function parseHealthFileSeries(name: string, text: string, utcOffsetMin = 0): Promise<{ days: ImportedDay[]; hours: HourProfiles; read: ImportedDay[] }> {
   const lower = name.toLowerCase()
   // An .xml that is not an Apple export gives no days, as before.
   const apple = text.includes('<HealthData')
@@ -364,7 +366,6 @@ export async function parseHealthFileSeries(name: string, text: string, utcOffse
       const field = SERIES_FIELD[id]
       if (!field) continue
       hours[field] = hourProfile(readings, SERIES[id].aggregate, utcOffsetMin)
-      if (!apple) continue
       for (const { date, value } of dailyValues(readings, SERIES[id].aggregate, utcOffsetMin)) {
         const row = acc.get(date) ?? new Map()
         row.set(field, { sum: value, n: 1, cumulative: false, integer: INTEGER_FIELDS.has(field) })
@@ -372,8 +373,16 @@ export async function parseHealthFileSeries(name: string, text: string, utcOffse
       }
     }
   }
-  const days = apple ? foldDays(acc) : json ? parseHealthAutoExportDays(text) : []
-  return { days, hours }
+  const read = foldDays(acc)
+  const days = apple ? read : json ? parseHealthAutoExportDays(text) : []
+  return { days, hours, read }
+}
+
+/** Each field's value on the newest day it appears in, for the form and shared vitals. No days → {}. */
+export function latestOfDays(days: readonly ImportedDay[]): Record<string, number> {
+  const out: Record<string, number> = {}
+  for (const d of days) Object.assign(out, d.values)
+  return out
 }
 
 /**
