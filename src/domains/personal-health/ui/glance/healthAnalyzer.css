@@ -1,0 +1,62 @@
+/* Health Data analyzer. Follows the app theme (light and .dark); every colour is a token on .ha. Touch targets are
+   44px; the chip row scrolls sideways inside itself, never the page. */
+.ha {
+  --ha-ink: #0f172a; --ha-dim: #5b6475; --ha-line: rgba(15, 23, 42, 0.1); --ha-card: #ffffff; --ha-soft: #f4f6fb;
+  --ha-gap: #e6e9f2; --ha-accent: #4f6bed;
+  display: grid; gap: 12px; color: var(--ha-ink);
+}
+.dark .ha {
+  --ha-ink: #e8edf7; --ha-dim: #9aa4b8; --ha-line: rgba(232, 237, 247, 0.12); --ha-card: #0d1220; --ha-soft: #141a2b;
+  --ha-gap: #1b2236; --ha-accent: #6f86f2;
+}
+
+.ha-connect { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.ha-connect-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 0 10px;
+  border-radius: 14px; border: 1px solid var(--ha-line); background: var(--ha-soft); color: var(--ha-ink);
+  font-size: 12px; font-weight: 800; cursor: pointer; transition: transform 0.15s ease, border-color 0.15s ease;
+}
+.ha-connect-btn svg { color: var(--ha-accent); flex: none; }
+.ha-connect-btn:hover { border-color: var(--ha-accent); }
+.ha-connect-btn:active { transform: scale(0.97); }
+.ha-connect-btn:focus-visible, .ha-chip:focus-visible { outline: 2px solid var(--ha-accent); outline-offset: 2px; }
+
+.ha-chips { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; padding: 2px; margin: 0 -2px; }
+.ha-chips::-webkit-scrollbar { display: none; }
+.ha-chip {
+  flex: none; display: grid; gap: 2px; min-width: 84px; min-height: 56px; padding: 8px 12px; text-align: left;
+  border-radius: 16px; border: 1px solid var(--ha-line); background: var(--ha-card); color: var(--ha-ink); cursor: pointer;
+  box-shadow: inset 3px 0 0 var(--tone); transition: transform 0.15s ease, box-shadow 0.2s ease;
+}
+.ha-chip[aria-pressed='true'] { background: var(--ha-soft); box-shadow: inset 3px 0 0 var(--tone), 0 0 0 1.5px var(--tone); }
+.ha-chip:disabled { cursor: default; opacity: 0.45; box-shadow: none; }
+.ha-chip-name { font-size: 11px; font-weight: 700; color: var(--ha-dim); white-space: nowrap; }
+.ha-chip-value { display: inline-flex; align-items: baseline; gap: 4px; font-size: 18px; font-weight: 800; font-variant-numeric: tabular-nums; }
+.ha-chip-value i { font-style: normal; font-size: 13px; color: var(--tone); }
+/* The app paints every pressed button with its own selected fill and white text (liquid actions). Inside it, the label
+   and arrow take that text colour; their resting greys and tints would fall below contrast on the fill. */
+.ha-chip[aria-pressed='true'] .ha-chip-name, .ha-chip[aria-pressed='true'] .ha-chip-value i { color: inherit; }
+.ha-chip[aria-pressed='true'] .ha-chip-name { opacity: 0.88; }
+
+.ha-deep { border-radius: 20px; border: 1px solid var(--ha-line); background: var(--ha-card); padding: 14px; min-width: 0; }
+
+.ha-grid { display: grid; gap: 12px; }
+.ha-tile { margin: 0; display: grid; gap: 8px; padding: 14px; border-radius: 20px; border: 1px solid var(--ha-line); background: var(--ha-card); min-width: 0; }
+.ha-tile figcaption { font-size: 11px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ha-dim); }
+.ha-tile p { margin: 0; font-size: 13px; line-height: 1.45; color: var(--ha-ink); }
+.ha-tile .pc-svg { color: var(--ha-ink); }
+
+.ha-week, .ha-cov { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 8px; align-items: stretch; }
+.ha-week > span, .ha-cov > span { display: grid; align-content: space-around; }
+.ha-week b, .ha-cov b { font-size: 10px; font-weight: 700; color: var(--ha-dim); white-space: nowrap; line-height: 1; }
+.ha-week .pc-svg { height: 112px; }
+.ha-cov .pc-svg { height: auto; aspect-ratio: 160 / 126; max-height: 170px; }
+
+.ha-empty, .ha-boundary { margin: 0; font-size: 12px; color: var(--ha-dim); }
+
+@media (min-width: 640px) {
+  .ha-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ha-connect-btn, .ha-chip { transition: none; }
+}

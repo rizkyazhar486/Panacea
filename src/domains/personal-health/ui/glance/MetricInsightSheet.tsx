@@ -6,14 +6,14 @@
 import { useEffect, useId, useMemo, useRef, useState, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { AdaptiveDialog } from '../../../../shared/adaptive/AdaptiveDialog'
-import { glanceMetric, type GlanceMetricId } from '../../engine/glance/glanceMetrics.ts'
+import { glanceMetric, type AnalyzerMetricId } from '../../engine/glance/glanceMetrics.ts'
 import { INSIGHT_BOUNDARY, insightLines, POSITION_LABEL, shortDate, withUnit } from '../../engine/glance/insightText.ts'
 import { INSIGHT_WINDOWS, metricInsight, type DayValue, type InsightWindow, type RangePosition } from '../../engine/glance/metricInsight.ts'
 import { InsightChart } from './InsightChart.tsx'
 import { INK, useDarkClass } from './useDarkClass.ts'
 
 export interface MetricInsightSheetProps {
-  metricId: GlanceMetricId
+  metricId: AnalyzerMetricId
   /** Daily history, oldest first (one value per day). */
   series: readonly DayValue[]
   /** The person's calendar day, YYYY-MM-DD. */

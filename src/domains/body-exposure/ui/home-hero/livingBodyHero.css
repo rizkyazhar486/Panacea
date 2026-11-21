@@ -65,6 +65,8 @@
 /* One glass dock for every system: icons only, the active one becomes a solid disc. */
 .lbh-dock { order: 2; display: flex; gap: 4px; padding: 6px; border-radius: 999px; overflow-x: auto; scrollbar-width: none; background: var(--lbh-glass); border: 1px solid var(--lbh-edge); box-shadow: inset 0 1px 0 var(--lbh-shine); backdrop-filter: blur(22px) saturate(150%); -webkit-backdrop-filter: blur(22px) saturate(150%); }
 .lbh-dock::-webkit-scrollbar { display: none; }
+.lbh-dock-btn { animation: lbh-rise 0.55s cubic-bezier(0.2, 0.8, 0.2, 1) backwards; animation-delay: calc(var(--i, 0) * 40ms); }
+@keyframes lbh-rise { from { opacity: 0; transform: translateY(10px) scale(0.7); } }
 .lbh-dock-btn { flex: none; display: grid; place-items: center; width: 44px; height: 44px; border: 0; border-radius: 50%; background: transparent; color: var(--lbh-dim); cursor: pointer; transition: background 0.22s ease, color 0.22s ease, transform 0.22s ease, box-shadow 0.22s ease; }
 .lbh-dock-btn:hover { color: var(--lbh-ink); background: var(--lbh-glass-strong); }
 .lbh-dock-btn[aria-pressed='true'] { color: var(--tone); background: var(--lbh-glass-strong); box-shadow: inset 0 1px 0 var(--lbh-shine), 0 0 0 1px var(--lbh-edge), 0 8px 18px -10px var(--tone); transform: scale(1.06); }
@@ -73,23 +75,43 @@
 .lbh-cta { background-image: linear-gradient(135deg, #5b6bff, #9a5cff); }
 .lbh-dock-btn:focus-visible { outline: 2px solid var(--lbh-accent); outline-offset: 1px; }
 
-.lbh-stage { order: 1; position: relative; display: flex; justify-content: center; overflow: visible; padding: 8px 0 18px; height: clamp(400px, 68vh, 540px); }
+.lbh-stage { order: 1; position: relative; overflow: visible; height: clamp(400px, 68vh, 540px); perspective: 1100px; perspective-origin: 50% 40%; }
+/* Depth layer: rings, pedestal, body and tag tilt together towards a mouse; each sits at its own depth (translateZ) so
+   the tilt reads as parallax, not a flat card turning. */
+.lbh-depth { position: absolute; inset: 0; box-sizing: border-box; padding: 8px 0 18px; display: flex; justify-content: center; transform-style: preserve-3d; transform: rotateX(var(--lbh-rx, 0deg)) rotateY(var(--lbh-ry, 0deg)); transition: transform 0.6s cubic-bezier(0.2, 0.7, 0.2, 1); }
 /* HUD behind the torso: slow rings, one turning, nothing that competes with the body. */
-.lbh-hud { position: absolute; left: 50%; top: 34%; width: min(92%, 440px); aspect-ratio: 1; transform: translate(-50%, -50%); pointer-events: none; overflow: visible; }
+.lbh-hud { position: absolute; left: 50%; top: 34%; width: min(92%, 440px); aspect-ratio: 1; transform: translate(-50%, -50%) translateZ(-70px); pointer-events: none; overflow: visible; }
+.lbh-hud-needle { fill: #7fe3ff; transform-box: view-box; transform-origin: 0 0; filter: drop-shadow(0 0 3px #7fe3ff); opacity: 0; transition: opacity 0.25s ease; }
+.lbh-hud-needle[data-shown='true'] { opacity: 1; }
 .lbh-hud-ring { fill: none; stroke: rgba(127, 227, 255, 0.16); stroke-width: 0.5; }
 .lbh-hud-dash { stroke-dasharray: 1.5 3.5; stroke: rgba(127, 227, 255, 0.28); }
 .lbh-hud-spin { stroke: rgba(180, 140, 255, 0.35); stroke-dasharray: 40 18 6 18; transform-box: fill-box; transform-origin: center; animation: lbh-spin 40s linear infinite; }
 .lbh-hud-tick { stroke: rgba(127, 227, 255, 0.45); stroke-width: 0.8; fill: none; }
 @keyframes lbh-spin { to { transform: rotate(360deg); } }
-.lbh-pedestal { position: absolute; left: 50%; bottom: 4px; width: min(58%, 260px); height: 34px; transform: translateX(-50%); border-radius: 50%; background: radial-gradient(closest-side, rgba(127, 227, 255, 0.55), rgba(127, 227, 255, 0.08) 70%, transparent); box-shadow: 0 0 40px 6px rgba(80, 160, 255, 0.25); }
+.lbh-pedestal { position: absolute; left: 50%; bottom: 4px; width: min(58%, 260px); height: 34px; transform: translateX(-50%) translateZ(-24px) rotateX(8deg); border-radius: 50%; background: radial-gradient(closest-side, rgba(127, 227, 255, 0.55), rgba(127, 227, 255, 0.08) 70%, transparent); box-shadow: 0 0 40px 6px rgba(80, 160, 255, 0.25); }
 .lbh-pedestal::after { content: ''; position: absolute; inset: 8px 18%; border-radius: 50%; border: 1px solid rgba(160, 230, 255, 0.5); }
-.lbh-bodybox { position: relative; height: 100%; aspect-ratio: 1 / 2; flex: none; }
+.lbh-bodybox { position: relative; height: 100%; aspect-ratio: 1 / 2; flex: none; transform: translateZ(36px); cursor: grab; touch-action: pan-y; user-select: none; -webkit-user-select: none; animation: lbh-materialize 1.2s cubic-bezier(0.2, 0.7, 0.2, 1) backwards; }
+.lbh-bodybox:active { cursor: grabbing; }
+/* Arrival: the body is scanned in from the feet up, overexposed, then settles. */
+@keyframes lbh-materialize { 0% { clip-path: inset(100% 0 0 0); filter: brightness(2.2) blur(4px); } 60% { clip-path: inset(0 0 0 0); filter: brightness(1.5) blur(1px); } 100% { clip-path: inset(0 0 0 0); filter: none; } }
+.lbh-body[data-hidden='true'] { opacity: 0; }
+.lbh-turn { position: absolute; inset: 0; background-repeat: no-repeat; opacity: 0; pointer-events: none; filter: drop-shadow(0 0 18px rgba(79, 216, 255, 0.4)); }
+.lbh-turn[data-shown='true'] { opacity: 1; }
+.lbh-bodybox[data-turning='true'] .lbh-spot { opacity: 0; pointer-events: none; transform: scale(0.4); }
+.lbh-spin { position: absolute; right: 4px; bottom: 6px; z-index: 3; display: inline-flex; align-items: center; gap: 6px; box-sizing: border-box; height: 44px; padding: 0 14px; border-radius: 999px; font-size: 12px; font-weight: 800; color: var(--lbh-ink); cursor: pointer; background: var(--lbh-glass-strong); border: 1px solid var(--lbh-edge); box-shadow: inset 0 1px 0 var(--lbh-shine), 0 10px 24px -14px rgba(79, 216, 255, 0.8); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); transition: transform 0.2s ease; }
+.lbh-spin:hover svg { transform: rotate(180deg); }
+.lbh-spin svg { transition: transform 0.5s cubic-bezier(0.2, 0.7, 0.2, 1); }
+.lbh-spin:active { transform: scale(0.95); }
+.lbh-spin:focus-visible { outline: 2px solid var(--lbh-accent); outline-offset: 2px; }
 .lbh-body { position: relative; width: 100%; height: 100%; object-fit: contain; display: block; filter: drop-shadow(0 0 18px rgba(79, 216, 255, 0.35)); animation: lbh-breathe 4.286s ease-in-out infinite; }
 @keyframes lbh-breathe { 0%, 100% { filter: drop-shadow(0 0 14px rgba(79, 216, 255, 0.28)); } 33% { filter: drop-shadow(0 0 26px rgba(79, 216, 255, 0.5)); } }
 .lbh-scan { position: absolute; inset: 0 12%; pointer-events: none; mix-blend-mode: screen; opacity: 0.5; background-image: linear-gradient(180deg, transparent 42%, rgba(170, 180, 255, 0.55) 50%, transparent 58%); background-size: 100% 300%; background-repeat: no-repeat; animation: lbh-scan 7s cubic-bezier(0.45, 0, 0.55, 1) infinite; }
 @keyframes lbh-scan { from { background-position: 0 -100%; } to { background-position: 0 200%; } }
 
-.lbh-spot { position: absolute; width: 28px; height: 28px; margin: -14px 0 0 -14px; cursor: pointer; border-radius: 50%; }
+.lbh-spot { position: absolute; width: 28px; height: 28px; margin: -14px 0 0 -14px; cursor: pointer; border-radius: 50%; transition: opacity 0.2s ease, transform 0.25s cubic-bezier(0.3, 1.6, 0.5, 1); animation: lbh-pop 0.5s cubic-bezier(0.3, 1.6, 0.5, 1) backwards; animation-delay: calc(900ms + var(--i, 0) * 60ms); }
+@keyframes lbh-pop { from { opacity: 0; transform: scale(0); } }
+.lbh-spot[data-active='true']::after { content: ''; position: absolute; inset: 4px; border-radius: 50%; border: 1.5px solid var(--tone); animation: lbh-ripple 1.714s ease-out infinite; }
+@keyframes lbh-ripple { from { transform: scale(0.6); opacity: 0.9; } to { transform: scale(2.4); opacity: 0; } }
 .lbh-spot > span { position: absolute; inset: 11px; border-radius: 50%; background: var(--tone); box-shadow: 0 0 0 1.5px rgba(255, 255, 255, 0.9), 0 0 10px var(--tone); transition: inset 0.18s ease, box-shadow 0.18s ease; }
 .lbh-spot[data-gap='true'] > span { opacity: 0.5; }
 .lbh-spot:hover > span { inset: 9px; }
@@ -97,11 +119,15 @@
 
 .lbh-link { position: absolute; inset: 0; pointer-events: none; }
 .lbh-link line { stroke-width: 1; stroke-dasharray: 3 3; opacity: 0.75; }
-.lbh-tag { position: absolute; z-index: 2; display: inline-flex; align-items: center; gap: 6px; padding: 7px 12px; border-radius: 999px; font-size: 12px; font-weight: 800; white-space: nowrap; color: var(--lbh-ink); background: var(--lbh-glass-strong); border: 1px solid var(--lbh-edge); box-shadow: inset 0 1px 0 var(--lbh-shine), 0 10px 22px -16px rgba(10, 20, 60, 0.8); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+.lbh-tag { position: absolute; z-index: 2; transform: translateZ(60px); animation: lbh-tag-in 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) backwards; display: inline-flex; align-items: center; gap: 6px; padding: 7px 12px; border-radius: 999px; font-size: 12px; font-weight: 800; white-space: nowrap; color: var(--lbh-ink); background: var(--lbh-glass-strong); border: 1px solid var(--lbh-edge); box-shadow: inset 0 1px 0 var(--lbh-shine), 0 10px 22px -16px rgba(10, 20, 60, 0.8); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+@keyframes lbh-tag-in { from { opacity: 0; transform: translateZ(60px) translateY(6px) scale(0.92); } }
+.lbh-link line { animation: lbh-draw 0.5s ease-out backwards; }
+@keyframes lbh-draw { from { opacity: 0; } }
 .lbh-tag i { width: 8px; height: 8px; border-radius: 50%; background: var(--tone); flex: none; }
 
 .lbh-side { order: 3; display: grid; gap: 10px; align-content: start; min-width: 0; }
-.lbh-detail { display: grid; gap: 8px; padding: 14px 16px; border-radius: 22px; }
+.lbh-detail { display: grid; gap: 8px; padding: 14px 16px; border-radius: 22px; animation: lbh-card-in 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) backwards; }
+@keyframes lbh-card-in { from { opacity: 0; transform: translateY(10px) scale(0.97); filter: blur(4px); } }
 .lbh-detail-head { display: flex; align-items: center; gap: 10px; font-size: 16px; font-weight: 800; }
 .lbh-detail-head svg { color: var(--tone); }
 .lbh-detail-note { font-size: 11px; font-weight: 650; color: var(--lbh-dim); }
@@ -118,6 +144,10 @@
 
 .lbh-orbs { position: relative; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; padding: 14px 6px 4px; }
 /* Orb gauge: a blurred colour halo, a ring filled to the value on its dial, a dark core with the number. */
+/* The ring fill is a registered angle, so the gauges sweep up to their value on arrival instead of appearing full. */
+@property --fill { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
+@keyframes lbh-fill { from { --fill: 0deg; } }
+.lbh-orb { animation: lbh-fill 1.3s cubic-bezier(0.2, 0.8, 0.2, 1) backwards, lbh-rise 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) backwards; animation-delay: calc(400ms + var(--i, 0) * 90ms); }
 .lbh-orb { position: relative; aspect-ratio: 1; border-radius: 50%; display: grid; place-items: center; background: conic-gradient(from -90deg, var(--tone) var(--fill), rgba(170, 200, 255, 0.1) var(--fill)); }
 .lbh-orb::before { content: ''; position: absolute; inset: -14%; z-index: -1; border-radius: 50%; background: radial-gradient(circle, color-mix(in srgb, var(--tone) 55%, transparent), transparent 68%); filter: blur(10px); opacity: 0.8; }
 .lbh-orb-core { position: absolute; inset: 7%; border-radius: 50%; display: grid; place-content: center; text-align: center; gap: 1px; background: radial-gradient(circle at 50% 35%, #141a2e, #070a14 75%); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12); }
@@ -141,5 +171,9 @@
 
 @media (prefers-reduced-motion: reduce) {
   .lbh .lbh-aura i, .lbh .lbh-scan, .lbh .lbh-kicker b, .lbh .lbh-trace-sweep, .lbh .lbh-hud-spin, .lbh .lbh-body { animation: none; }
+  .lbh .lbh-bodybox, .lbh .lbh-spot, .lbh .lbh-spot::after, .lbh .lbh-tag, .lbh .lbh-link line, .lbh .lbh-detail, .lbh .lbh-dock-btn, .lbh .lbh-orb { animation: none; }
+  .lbh .lbh-depth { transition: none; }
 }
 :root.reduce-motion .lbh .lbh-aura i, :root.reduce-motion .lbh .lbh-scan, :root.reduce-motion .lbh .lbh-kicker b, :root.reduce-motion .lbh .lbh-trace-sweep, :root.reduce-motion .lbh .lbh-hud-spin, :root.reduce-motion .lbh .lbh-body { animation: none; }
+:root.reduce-motion .lbh .lbh-bodybox, :root.reduce-motion .lbh .lbh-spot, :root.reduce-motion .lbh .lbh-spot::after, :root.reduce-motion .lbh .lbh-tag, :root.reduce-motion .lbh .lbh-link line, :root.reduce-motion .lbh .lbh-detail, :root.reduce-motion .lbh .lbh-dock-btn, :root.reduce-motion .lbh .lbh-orb { animation: none; }
+:root.reduce-motion .lbh .lbh-depth { transition: none; }

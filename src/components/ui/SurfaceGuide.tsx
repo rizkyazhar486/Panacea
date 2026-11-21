@@ -21,7 +21,9 @@ export function SurfaceGuide({ summary, steps, label = 'Guide' }: SurfaceGuidePr
         </svg>
         <span className="sr-only">{label}</span>
       </summary>
-      <div className="mt-2 max-w-md rounded-2xl border border-neutral-200 bg-white/95 p-3 text-ink shadow-lg dark:border-white/15 dark:bg-[#090d14]/95 dark:text-white">
+      {/* The <details> is inline-block so the closed icon sits in its row; without its own width the open panel
+          would shrink to the 44px icon and wrap every word into a 22px column. */}
+      <div className="mt-2 w-[min(28rem,calc(100vw-3rem))] rounded-2xl border border-neutral-200 bg-white/95 p-3 text-ink shadow-lg dark:border-white/15 dark:bg-[#090d14]/95 dark:text-white">
         <p className="text-[11px] font-bold text-ink dark:text-cyan-200">{summary}</p>
         <ol className="mt-1.5 space-y-1 text-[11px] leading-snug text-neutral-600 dark:text-slate-300">
           {steps.map((step, index) => (
