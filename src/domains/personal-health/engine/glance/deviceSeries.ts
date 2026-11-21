@@ -6,7 +6,6 @@
 // counted as rejected — never clamped, never guessed. The span says a value is a device error, not that it is
 // unhealthy. A file with no readable reading is an error with a reason, not an empty success.
 
-import { ANALYZER_METRICS } from './glanceMetrics.ts'
 import type { DayValue } from './metricInsight.ts'
 
 export type SeriesId = 'heartRate' | 'restingHr' | 'hrv' | 'spo2' | 'respRate' | 'steps' | 'activeKcal' | 'bodyTempC' | 'elevationM' | 'weightKg'
@@ -20,12 +19,12 @@ export interface SeriesSpec {
   plausible: { min: number; max: number }
 }
 
-/** The analyzer's own device-error span for a signal, so a reading is judged the same way here and on screen. */
-const analyzerSpan = (id: 'restingHr' | 'weightKg') => ANALYZER_METRICS.find((m) => m.id === id)!.plausible
-
+// restingHr and weightKg use the analyzer's spans (ANALYZER_METRICS) so a reading is judged the same here and on screen;
+// scripts/uji/device-series.mts holds them equal. They are written out rather than imported to keep this reader
+// out of the analyzer's chunk graph: it is loaded on demand when a file is imported.
 export const SERIES: Readonly<Record<SeriesId, SeriesSpec>> = {
   heartRate: { label: 'Heart rate', unit: 'bpm', digits: 0, aggregate: 'mean', plausible: { min: 20, max: 250 } },
-  restingHr: { label: 'Resting heart rate', unit: 'bpm', digits: 0, aggregate: 'mean', plausible: analyzerSpan('restingHr') },
+  restingHr: { label: 'Resting heart rate', unit: 'bpm', digits: 0, aggregate: 'mean', plausible: { min: 20, max: 250 } },
   hrv: { label: 'HRV', unit: 'ms', digits: 0, aggregate: 'mean', plausible: { min: 1, max: 400 } },
   spo2: { label: 'SpO₂', unit: '%', digits: 1, aggregate: 'mean', plausible: { min: 50, max: 100 } },
   respRate: { label: 'Breathing rate', unit: '/min', digits: 1, aggregate: 'mean', plausible: { min: 3, max: 80 } },
@@ -33,7 +32,7 @@ export const SERIES: Readonly<Record<SeriesId, SeriesSpec>> = {
   activeKcal: { label: 'Active energy', unit: 'kcal', digits: 0, aggregate: 'sum', plausible: { min: 0, max: 20_000 } },
   bodyTempC: { label: 'Body temperature', unit: '°C', digits: 1, aggregate: 'mean', plausible: { min: 30, max: 45 } },
   elevationM: { label: 'Elevation', unit: 'm', digits: 0, aggregate: 'mean', plausible: { min: -500, max: 9000 } },
-  weightKg: { label: 'Weight', unit: 'kg', digits: 1, aggregate: 'mean', plausible: analyzerSpan('weightKg') },
+  weightKg: { label: 'Weight', unit: 'kg', digits: 1, aggregate: 'mean', plausible: { min: 20, max: 400 } },
 }
 
 export interface Reading {

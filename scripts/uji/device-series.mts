@@ -153,6 +153,11 @@ await gagal('jumlah_harian_dua_sumber_tidak_ganda', () => {
   assert.deepEqual(dailyValues([{ t: 0, value: 3 }, { t: 1000, value: 4 }], 'sum', 0), [{ date: '1970-01-01', value: 7 }], 'tanpa sumber = satu sumber, tetap dijumlah')
   assert.deepEqual(dailyValues([{ t: 0, value: 60, source: 'a' }, { t: 1000, value: 80, source: 'b' }], 'mean', 0), [{ date: '1970-01-01', value: 70 }], 'level dirata-rata lintas sumber')
 })
+await gagal('rentang_wajar_sama_dengan_analyzer', () => {
+  for (const [seri, metrik] of [['restingHr', 'restingHr'], ['weightKg', 'weightKg']] as const) {
+    assert.deepEqual(SERIES[seri].plausible, glanceMetric(metrik).plausible, `${seri}: satu aturan rentang untuk pembaca dan layar`)
+  }
+})
 await gagal('menolak_xml_bukan_gpx_atau_apple', () => no(parseDeviceSeries('a.xml', '<root/>', 0), /neither a GPX/))
 
 // ── masukan umum ──
