@@ -339,6 +339,13 @@ jobs:
           path: artifacts/longevity-inputs
           if-no-files-found: ignore
 
+      - name: Health Data analyzer fills right after an import (real browser, 390x844)
+        timeout-minutes: 5
+        env:
+          HEALTH_ANALYZER_QA_ORIGIN: http://127.0.0.1:4173
+          PLAYWRIGHT_MODULE: ${{ runner.temp }}/panacea-playwright/node_modules/playwright/index.mjs
+        run: node scripts/qa/health-analyzer-import-smoke.mjs
+
       - name: Strength draft inputs (synthetic client, 390x844)
         timeout-minutes: 5
         env:
