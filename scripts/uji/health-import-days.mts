@@ -2,7 +2,7 @@
 // aturan konversi untuk keduanya (kJ→kkal, proporsi→%, menit tidur→jam), ekspor per-jam dilipat menjadi satu hari
 // (kumulatif dijumlah, level dirata-rata), dan sampel tanpa tanggal/tak sah dibuang, bukan ditebak.
 import assert from 'node:assert/strict'
-import { parseHealthAutoExport, parseHealthAutoExportDays, parseHealthFile, parseHealthFileDays } from '../../src/lib/healthImport.ts'
+import { parseHealthAutoExport, parseHealthAutoExportDays, parseHealthFile, parseHealthFileDays, parseHealthFileSeries, latestOfDays } from '../../src/lib/healthImport.ts'
 
 const gagal = async (nama: string, f: () => void | Promise<void>) => { try { await f() } catch (e) { throw new Error(`[${nama}] ${(e as Error).message}`) } }
 const hae = (metrics: unknown[]) => JSON.stringify({ data: { metrics } })
@@ -63,5 +63,39 @@ await gagal('bukan-health-auto-export-kosong', async () => {
   assert.deepEqual(parseHealthAutoExportDays(hae([{ name: 'unknown_metric', data: [{ date: d('2026-11-19'), qty: 3 }] }])), [], 'metrik tak dikenal tidak membuat hari kosong')
 })
 await gagal('deterministik', async () => { assert.deepEqual(parseHealthAutoExportDays(HARIAN), parseHealthAutoExportDays(HARIAN)) })
+
+// Hari khas: butuh waktu tiap bacaan, jadi dihitung saat impor dari berkas apa pun yang dibaca pembaca seri.
+await gagal('jam-khas-dari-csv-tanpa-hari', async () => {
+  const csv = 'time,hrv,steps\n2026-11-18T06:10:00,52,100\n2026-11-18T06:40:00,54,300\n2026-11-19T06:20:00,56,200\n2026-11-19T13:00:00,,900'
+  const { days, hours } = await parseHealthFileSeries('watch.csv', csv, 420)
+  assert.deepEqual(days, [], 'CSV tetap tanpa hari, seperti sebelumnya')
+  assert.equal(hours.hrvMs?.length, 24); assert.equal(hours.hrvMs?.[6], 54); assert.equal(hours.hrvMs?.[13], null, 'jam tanpa bacaan = null')
+  assert.equal(hours.steps?.[6], 300, 'hitungan: total jam dibagi jumlah hari berbacaan'); assert.equal(hours.steps?.[13], 450)
+  assert.equal(hours.steps?.[0], null)
+})
+// Cadangan: berkas jam polos yang tak dikenali parser aplikasi tetap punya hari dari pembaca seri.
+await gagal('csv-polos-punya-hari-cadangan-dan-nilai-terbaru', async () => {
+  const csv = 'time,hrv,steps\n2026-11-18T06:10:00,52,100\n2026-11-18T06:40:00,54,300\n2026-11-19T06:20:00,56,200\n2026-11-19T13:00:00,,900'
+  const { read } = await parseHealthFileSeries('watch.csv', csv, 420)
+  assert.deepEqual(read.map((d) => d.date), ['2026-11-18', '2026-11-19'])
+  assert.equal(read[0]?.values.hrvMs, 53); assert.equal(read[1]?.values.steps, 1100, 'langkah dijumlah per hari')
+  assert.deepEqual(latestOfDays(read), { hrvMs: 56, steps: 1100 })
+  assert.deepEqual(parseHealthFile('watch.csv', csv), { source: 'WHOOP' }, 'parser aplikasi memang tidak mengenalinya — itu alasan cadangan')
+})
+await gagal('nilai-terbaru-tanpa-hari-kosong', async () => {
+  assert.deepEqual(latestOfDays([]), {})
+  assert.deepEqual((await parseHealthFileSeries('notes.txt', 'tidak ada angka', 420)).read, [])
+})
+await gagal('jam-khas-apple-satu-baca-hari-dan-jam', async () => {
+  const xml = '<HealthData><Record type="HKQuantityTypeIdentifierRestingHeartRate" unit="count/min" startDate="2026-11-19 06:00:00 +0700" value="52"/></HealthData>'
+  const r = await parseHealthFileSeries('export.xml', xml, 420)
+  assert.deepEqual(r.days, await parseHealthFileDays('export.xml', xml, 420), 'hari sama dengan jalur lama')
+  assert.equal(r.days[0]?.values.restingHr, 52); assert.equal(r.hours.restingHr?.[6], 52)
+})
+await gagal('jam-khas-berkas-tak-terbaca-kosong', async () => {
+  assert.deepEqual(await parseHealthFileSeries('notes.txt', 'tidak ada angka', 420), { days: [], hours: {}, read: [] })
+  assert.deepEqual(await parseHealthFileSeries('export.xml', '<HealthData/>', 420), { days: [], hours: {}, read: [] })
+  assert.deepEqual(await parseHealthFileSeries('watch.csv', 'time,hrv\n2026-11-18T06:10:00,52', 9999), { days: [], hours: {}, read: [] }, 'offset mustahil')
+})
 
 console.log('health-import-days: OK')

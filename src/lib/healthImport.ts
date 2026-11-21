@@ -338,20 +338,51 @@ const SERIES_FIELD: Readonly<Record<SeriesId, keyof ImportResult | null>> = {
  */
 export async function parseAppleHealthDays(xml: string, utcOffsetMin = 0): Promise<ImportedDay[]> {
   if (!xml.includes('<HealthData')) return []
-  const { dailyValues, parseDeviceSeries, SERIES } = await import('../domains/personal-health/engine/glance/deviceSeries.ts')
-  const r = parseDeviceSeries('export.xml', xml, utcOffsetMin)
-  if (!r.ok) return []
+  return (await parseHealthFileSeries('export.xml', xml, utcOffsetMin)).days
+}
+
+/** Each daily-history field's typical day: 24 entries, hour 0 first, null where that hour never had a reading. */
+export type HourProfiles = Readonly<Record<string, readonly (number | null)[]>>
+
+/**
+ * Dated daily rows and each signal's typical day from one read of the file. Days come from formats that carry them
+ * (Health Auto Export JSON, Apple Health XML); every other format gives no days, as before. The typical day needs
+ * the readings' own times, which daily history does not keep, so it is computed here, from any file the
+ * device-series reader accepts (CSV, JSON, GPX, Apple Health). `read` is the device-series reader's own daily fold
+ * of any such file: the page falls back to it when no named-app parser (WHOOP, InBody, Garmin…) recognised the file,
+ * so a plain timestamped watch export still fills history instead of being rejected. Not a readable file → all empty.
+ */
+export async function parseHealthFileSeries(name: string, text: string, utcOffsetMin = 0): Promise<{ days: ImportedDay[]; hours: HourProfiles; read: ImportedDay[] }> {
+  const lower = name.toLowerCase()
+  // An .xml that is not an Apple export gives no days, as before.
+  const apple = text.includes('<HealthData')
+  const json = !lower.endsWith('.xml') && !apple && (lower.endsWith('.json') || /^\s*[[{]/.test(text))
+  const { dailyValues, hourProfile, parseDeviceSeries, SERIES } = await import('../domains/personal-health/engine/glance/deviceSeries.ts')
+  const r = parseDeviceSeries(name, text, utcOffsetMin)
   const acc: DayCells = new Map()
-  for (const [id, readings] of Object.entries(r.series) as [SeriesId, Reading[]][]) {
-    const field = SERIES_FIELD[id]
-    if (!field) continue
-    for (const { date, value } of dailyValues(readings, SERIES[id].aggregate, utcOffsetMin)) {
-      const row = acc.get(date) ?? new Map()
-      row.set(field, { sum: value, n: 1, cumulative: false, integer: INTEGER_FIELDS.has(field) })
-      acc.set(date, row)
+  const hours: Record<string, (number | null)[]> = {}
+  if (r.ok) {
+    for (const [id, readings] of Object.entries(r.series) as [SeriesId, Reading[]][]) {
+      const field = SERIES_FIELD[id]
+      if (!field) continue
+      hours[field] = hourProfile(readings, SERIES[id].aggregate, utcOffsetMin)
+      for (const { date, value } of dailyValues(readings, SERIES[id].aggregate, utcOffsetMin)) {
+        const row = acc.get(date) ?? new Map()
+        row.set(field, { sum: value, n: 1, cumulative: false, integer: INTEGER_FIELDS.has(field) })
+        acc.set(date, row)
+      }
     }
   }
-  return foldDays(acc)
+  const read = foldDays(acc)
+  const days = apple ? read : json ? parseHealthAutoExportDays(text) : []
+  return { days, hours, read }
+}
+
+/** Each field's value on the newest day it appears in, for the form and shared vitals. No days → {}. */
+export function latestOfDays(days: readonly ImportedDay[]): Record<string, number> {
+  const out: Record<string, number> = {}
+  for (const d of days) Object.assign(out, d.values)
+  return out
 }
 
 /**
@@ -359,10 +390,7 @@ export async function parseAppleHealthDays(xml: string, utcOffsetMin = 0): Promi
  * `utcOffsetMin` is the wearer's offset, used where a time must be cut into days (Apple Health XML).
  */
 export async function parseHealthFileDays(name: string, text: string, utcOffsetMin = 0): Promise<ImportedDay[]> {
-  const lower = name.toLowerCase()
-  if (lower.endsWith('.xml') || text.includes('<HealthData')) return parseAppleHealthDays(text, utcOffsetMin)
-  if (!(lower.endsWith('.json') || /^\s*[[{]/.test(text))) return []
-  return parseHealthAutoExportDays(text)
+  return (await parseHealthFileSeries(name, text, utcOffsetMin)).days
 }
 
 // Apple Health export.xml — records are written chronologically, so the LAST

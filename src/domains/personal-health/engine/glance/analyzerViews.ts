@@ -103,3 +103,59 @@ export function coverage(metrics: readonly GlanceMetric[], seriesById: Readonly<
     : `${order[0].label} arrived on ${order[0].n} of ${days} days; ${order[order.length - 1].label} on ${order[order.length - 1].n}.`
   return { matrix, counts, days, sentence }
 }
+
+export interface ClockSpoke {
+  readonly hour: number
+  readonly value: number
+  /** From (x1, y1) on the inner ring outward to (x2, y2); length grows with the value. */
+  readonly x1: number
+  readonly y1: number
+  readonly x2: number
+  readonly y2: number
+}
+
+export interface TypicalDay {
+  readonly size: number
+  readonly inner: number
+  readonly outer: number
+  readonly spokes: readonly ClockSpoke[]
+  /** Hours with no reading: drawn as a faint dot, never as a zero-length spoke. */
+  readonly empty: readonly number[]
+  /** Hour labels at 00, 06, 12, 18. */
+  readonly labels: ReadonlyArray<{ readonly hour: number; readonly x: number; readonly y: number }>
+  readonly sentence: string
+}
+
+const hh = (h: number) => `${String(h).padStart(2, '0')}:00`
+
+/**
+ * A signal's typical day as 24 spokes around a dial, midnight at the top, clockwise. A level's spokes start at its
+ * lowest hour, so variation is not swamped by the baseline; a count's start at zero. The sentence names the highest
+ * and lowest hour with their values and how many hours had readings. A profile that is not 24 entries, or has no
+ * reading, → null: nothing is drawn rather than an empty dial.
+ */
+export function typicalDay(metric: GlanceMetric, hours: readonly (number | null)[], size = 200): TypicalDay | null {
+  if (hours.length !== 24 || !(size > 0)) return null
+  const known = hours.map((v, hour) => ({ hour, v })).filter((x): x is { hour: number; v: number } => x.v !== null && Number.isFinite(x.v))
+  if (!known.length) return null
+  const c = size / 2, inner = size * 0.2, outer = size * 0.42, floor = 6
+  const values = known.map((x) => x.v)
+  const max = Math.max(...values)
+  const min = metric.mark === 'bars' ? 0 : Math.min(...values)
+  const at = (hour: number, r: number) => {
+    const a = (hour / 24) * 2 * Math.PI - Math.PI / 2
+    return { x: +(c + r * Math.cos(a)).toFixed(2), y: +(c + r * Math.sin(a)).toFixed(2) }
+  }
+  const spokes = known.map(({ hour, v }) => {
+    // A flat profile still shows every recorded hour, at equal full length.
+    const f = max > min ? (v - min) / (max - min) : 1
+    const a = at(hour, inner), b = at(hour, inner + floor + f * (outer - inner - floor))
+    return { hour, value: v, x1: a.x, y1: a.y, x2: b.x, y2: b.y }
+  })
+  const empty = hours.flatMap((v, hour) => (v === null || !Number.isFinite(v) ? [hour] : []))
+  const hi = known.reduce((b, x) => (x.v > b.v ? x : b)), lo = known.reduce((b, x) => (x.v < b.v ? x : b))
+  const sentence = known.length < 2
+    ? `Only ${hh(known[0].hour)} has readings so far (${fmt(known[0].v, metric.digits)} ${metric.unit}).`
+    : `Highest around ${hh(hi.hour)} (${fmt(hi.v, metric.digits)} ${metric.unit}), lowest around ${hh(lo.hour)} (${fmt(lo.v, metric.digits)}); ${known.length} of 24 hours have readings.`
+  return { size, inner, outer, spokes, empty, labels: [0, 6, 12, 18].map((hour) => ({ hour, ...at(hour, outer + 12) })), sentence }
+}

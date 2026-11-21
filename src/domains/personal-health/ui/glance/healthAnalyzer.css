@@ -52,6 +52,26 @@
 .ha-week .pc-svg { height: 112px; }
 .ha-cov .pc-svg { height: auto; aspect-ratio: 160 / 126; max-height: 170px; }
 
+/* Typical day: 24 spokes around a dial; a missing hour is a dot, never a zero spoke. Full width so the sentence
+   fits the site's three-line prose limit; stacked under the dial on a phone. */
+.ha-grid > .ha-day { grid-column: 1 / -1; }
+.ha-day-body { display: grid; grid-template-columns: minmax(0, 220px) minmax(0, 1fr); gap: 16px; align-items: center; }
+.ha-day svg { width: 100%; height: auto; max-width: 220px; justify-self: center; }
+.ha-day-ring { fill: none; stroke: var(--ha-line); }
+.ha-day-gap { fill: var(--ha-dim); }
+.ha-day line { stroke-width: 5; stroke-linecap: round; opacity: 0.6; transform-box: fill-box; transform-origin: center; animation: ha-spoke 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+.ha-day line.is-peak { stroke-width: 7; opacity: 1; }
+.ha-day text { font-size: 9px; font-weight: 700; fill: var(--ha-dim); }
+.ha-day-text { display: grid; gap: 10px; min-width: 0; }
+.ha-day-text p { font-size: 15px; font-weight: 600; line-height: 1.4; }
+.ha-day-key { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; color: var(--ha-dim); }
+.ha-day-key i { width: 5px; height: 5px; border-radius: 50%; background: var(--ha-dim); }
+@media (max-width: 479px) {
+  .ha-day-body { grid-template-columns: minmax(0, 1fr); }
+  .ha-day svg { max-width: 200px; }
+}
+@keyframes ha-spoke { from { opacity: 0; transform: scale(0.2); } }
+
 .ha-empty, .ha-boundary { margin: 0; font-size: 12px; color: var(--ha-dim); }
 
 @media (min-width: 640px) {
@@ -59,4 +79,5 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .ha-connect-btn, .ha-chip { transition: none; }
+  .ha-day line { animation: none; }
 }
