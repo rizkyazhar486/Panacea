@@ -6,9 +6,10 @@
 // counted as rejected — never clamped, never guessed. The span says a value is a device error, not that it is
 // unhealthy. A file with no readable reading is an error with a reason, not an empty success.
 
+import { ANALYZER_METRICS } from './glanceMetrics.ts'
 import type { DayValue } from './metricInsight.ts'
 
-export type SeriesId = 'heartRate' | 'hrv' | 'spo2' | 'respRate' | 'steps' | 'activeKcal' | 'bodyTempC' | 'elevationM'
+export type SeriesId = 'heartRate' | 'restingHr' | 'hrv' | 'spo2' | 'respRate' | 'steps' | 'activeKcal' | 'bodyTempC' | 'elevationM' | 'weightKg'
 
 export interface SeriesSpec {
   label: string
@@ -19,8 +20,12 @@ export interface SeriesSpec {
   plausible: { min: number; max: number }
 }
 
+/** The analyzer's own device-error span for a signal, so a reading is judged the same way here and on screen. */
+const analyzerSpan = (id: 'restingHr' | 'weightKg') => ANALYZER_METRICS.find((m) => m.id === id)!.plausible
+
 export const SERIES: Readonly<Record<SeriesId, SeriesSpec>> = {
   heartRate: { label: 'Heart rate', unit: 'bpm', digits: 0, aggregate: 'mean', plausible: { min: 20, max: 250 } },
+  restingHr: { label: 'Resting heart rate', unit: 'bpm', digits: 0, aggregate: 'mean', plausible: analyzerSpan('restingHr') },
   hrv: { label: 'HRV', unit: 'ms', digits: 0, aggregate: 'mean', plausible: { min: 1, max: 400 } },
   spo2: { label: 'SpO₂', unit: '%', digits: 1, aggregate: 'mean', plausible: { min: 50, max: 100 } },
   respRate: { label: 'Breathing rate', unit: '/min', digits: 1, aggregate: 'mean', plausible: { min: 3, max: 80 } },
@@ -28,12 +33,15 @@ export const SERIES: Readonly<Record<SeriesId, SeriesSpec>> = {
   activeKcal: { label: 'Active energy', unit: 'kcal', digits: 0, aggregate: 'sum', plausible: { min: 0, max: 20_000 } },
   bodyTempC: { label: 'Body temperature', unit: '°C', digits: 1, aggregate: 'mean', plausible: { min: 30, max: 45 } },
   elevationM: { label: 'Elevation', unit: 'm', digits: 0, aggregate: 'mean', plausible: { min: -500, max: 9000 } },
+  weightKg: { label: 'Weight', unit: 'kg', digits: 1, aggregate: 'mean', plausible: analyzerSpan('weightKg') },
 }
 
 export interface Reading {
   /** Epoch milliseconds (UTC). */
   t: number
   value: number
+  /** The app or device that wrote it, when the export says (Apple Health's sourceName). */
+  source?: string
 }
 
 export type SeriesFormat = 'csv' | 'gpx' | 'apple-health' | 'json'
@@ -95,10 +103,10 @@ class Collector {
   series: Partial<Record<SeriesId, Reading[]>> = {}
   accepted = 0
   rejected = 0
-  add(id: SeriesId, t: number | null, value: number) {
+  add(id: SeriesId, t: number | null, value: number, source?: string) {
     const { min, max } = SERIES[id].plausible
     if (t === null || !Number.isFinite(value) || value < min || value > max) { this.rejected++; return }
-    ;(this.series[id] ??= []).push({ t, value })
+    ;(this.series[id] ??= []).push(source === undefined ? { t, value } : { t, value, source })
     this.accepted++
   }
   finish(format: SeriesFormat, empty: string): DeviceSeriesResult {
@@ -181,25 +189,41 @@ function parseGpx(text: string, offset: number): DeviceSeriesResult {
   return c.finish('gpx', 'The GPX has no track point with a value.')
 }
 
-const APPLE: Readonly<Record<string, SeriesId>> = {
-  HeartRate: 'heartRate', RestingHeartRate: 'heartRate', HeartRateVariabilitySDNN: 'hrv', OxygenSaturation: 'spo2',
-  RespiratoryRate: 'respRate', StepCount: 'steps', ActiveEnergyBurned: 'activeKcal', BodyTemperature: 'bodyTempC',
+const same = (v: number) => v
+/**
+ * Apple Health quantity types this reader knows, with every unit Apple may write for each and its conversion to the
+ * series unit. A record in a unit not listed is rejected, not assumed to be in the usual one: a weight in pounds read
+ * as kilograms, or an energy in kJ read as kcal, would be a wrong number that looks right.
+ */
+const APPLE: Readonly<Record<string, { id: SeriesId; units: Readonly<Record<string, (v: number) => number>> }>> = {
+  HeartRate: { id: 'heartRate', units: { 'count/min': same } },
+  RestingHeartRate: { id: 'restingHr', units: { 'count/min': same } },
+  HeartRateVariabilitySDNN: { id: 'hrv', units: { ms: same } },
+  // Apple stores saturation as a fraction of 1 under unit "%".
+  OxygenSaturation: { id: 'spo2', units: { '%': (v) => (v <= 1 ? v * 100 : v) } },
+  RespiratoryRate: { id: 'respRate', units: { 'count/min': same } },
+  StepCount: { id: 'steps', units: { count: same } },
+  ActiveEnergyBurned: { id: 'activeKcal', units: { kcal: same, Cal: same, kJ: (v) => v / 4.184 } },
+  BodyTemperature: { id: 'bodyTempC', units: { degC: same, degF: (v) => ((v - 32) * 5) / 9 } },
+  BodyMass: { id: 'weightKg', units: { kg: same, lb: (v) => v * 0.45359237 } },
 }
 
 function parseAppleHealth(text: string, offset: number): DeviceSeriesResult {
   const c = new Collector()
+  // Exports run to hundreds of MB: compile each attribute pattern once, not once per record.
+  const patterns = new Map<string, RegExp>()
   for (const m of text.matchAll(/<Record\b([^>]*?)\/?>/g)) {
-    const attr = (k: string) => new RegExp(`\\b${k}="([^"]*)"`).exec(m[1]!)?.[1] ?? null
-    const id = APPLE[(attr('type') ?? '').replace('HKQuantityTypeIdentifier', '')]
-    if (!id) continue
-    let value = num(attr('value'))
-    const unit = attr('unit')
-    // Apple stores saturation as a fraction and lets the user pick °F or kJ; the series is always %, °C, kcal.
-    if (id === 'spo2' && unit === '%' && value <= 1) value *= 100
-    if (unit === 'degF') value = ((value - 32) * 5) / 9
-    if (unit === 'kJ') value /= 4.184
+    const attr = (k: string) => {
+      let re = patterns.get(k)
+      if (!re) { re = new RegExp(`\\b${k}="([^"]*)"`); patterns.set(k, re) }
+      return re.exec(m[1]!)?.[1] ?? null
+    }
+    const rule = APPLE[(attr('type') ?? '').replace('HKQuantityTypeIdentifier', '')]
+    if (!rule) continue
+    const convert = rule.units[attr('unit') ?? '']
+    const value = convert ? convert(num(attr('value'))) : Number.NaN
     const start = attr('startDate')
-    c.add(id, start === null ? null : parseTimestamp(start, offset), value)
+    c.add(rule.id, start === null ? null : parseTimestamp(start, offset), value, attr('sourceName') ?? undefined)
   }
   return c.finish('apple-health', 'The Health export has no record type this reader knows.')
 }
@@ -221,19 +245,29 @@ const pad = (n: number) => String(n).padStart(2, '0')
 const wall = (t: number, offset: number) => new Date(t + offset * 60_000)
 const dateKey = (d: Date) => `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())}`
 
-/** One value per calendar day at the wearer's offset — the shape `metricInsight` reads. Oldest first. */
+/**
+ * One value per calendar day at the wearer's offset — the shape `metricInsight` reads. Oldest first. A count (steps,
+ * energy) logged by two sources for the same activity — an iPhone and a Watch both counting one walk — is the larger
+ * single source's day total, never the two added together; readings without a source count as one source.
+ */
 export function dailyValues(readings: readonly Reading[], aggregate: SeriesSpec['aggregate'], utcOffsetMin = 0): DayValue[] {
   if (!validOffset(utcOffsetMin)) return []
-  const days = new Map<string, { sum: number; n: number }>()
-  for (const { t, value } of readings) {
+  const days = new Map<string, Map<string, { sum: number; n: number }>>()
+  for (const { t, value, source } of readings) {
     if (!Number.isFinite(t) || !Number.isFinite(value)) continue
     const key = dateKey(wall(t, utcOffsetMin))
-    const d = days.get(key) ?? { sum: 0, n: 0 }
+    const bySource = days.get(key) ?? new Map<string, { sum: number; n: number }>()
+    const from = aggregate === 'sum' ? source ?? '' : ''
+    const d = bySource.get(from) ?? { sum: 0, n: 0 }
     d.sum += value
     d.n++
-    days.set(key, d)
+    bySource.set(from, d)
+    days.set(key, bySource)
   }
-  return [...days].sort(([a], [b]) => (a < b ? -1 : 1)).map(([date, d]) => ({ date, value: aggregate === 'sum' ? d.sum : d.sum / d.n }))
+  return [...days].sort(([a], [b]) => (a < b ? -1 : 1)).map(([date, bySource]) => {
+    const cells = [...bySource.values()]
+    return { date, value: aggregate === 'sum' ? Math.max(...cells.map((c) => c.sum)) : cells[0]!.sum / cells[0]!.n }
+  })
 }
 
 /**

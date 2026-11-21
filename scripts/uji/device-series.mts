@@ -128,6 +128,31 @@ await gagal('apple_health_satuan_dinormalkan', () => {
   assert.deepEqual(r.series.heartRate, [{ t: at, value: 64 }])
   assert.equal(r.accepted, 4, 'unknown record types are skipped, not counted')
 })
+const rec = (type: string, unit: string, value: number | string, start: string, source = 'Apple Watch') =>
+  `<Record type="HKQuantityTypeIdentifier${type}" sourceName="${source}" unit="${unit}" value="${value}" startDate="${start}"/>`
+await gagal('apple_health_denyut_istirahat_deret_sendiri', () => {
+  const r = ok(parseDeviceSeries('export.xml', `<HealthData>${rec('RestingHeartRate', 'count/min', 52, '2026-11-18 06:00:00 +0700')}${rec('HeartRate', 'count/min', 90, '2026-11-18 12:00:00 +0700')}</HealthData>`, 0))
+  assert.deepEqual(r.series.restingHr?.map((x) => x.value), [52]); assert.deepEqual(r.series.heartRate?.map((x) => x.value), [90])
+})
+await gagal('apple_health_berat_lb_dikonversi', () => {
+  const r = ok(parseDeviceSeries('export.xml', `<HealthData>${rec('BodyMass', 'lb', 154.324, '2026-11-18 06:00:00 +0700')}</HealthData>`, 0))
+  assert.ok(Math.abs(r.series.weightKg![0]!.value - 70) < 1e-3)
+})
+await gagal('apple_health_satuan_tak_dikenal_ditolak_bukan_dianggap', () => {
+  // Pasangan: kg diterima, stone ditolak — hanya satuan yang berbeda.
+  assert.equal(ok(parseDeviceSeries('export.xml', `<HealthData>${rec('BodyMass', 'kg', 70, '2026-11-18 06:00:00 +0700')}</HealthData>`, 0)).accepted, 1)
+  no(parseDeviceSeries('export.xml', `<HealthData>${rec('BodyMass', 'st', 11, '2026-11-18 06:00:00 +0700')}</HealthData>`, 0), /all 1 were/)
+  no(parseDeviceSeries('export.xml', `<HealthData>${rec('HeartRate', '', 60, '2026-11-18 06:00:00 +0700')}</HealthData>`, 0), /all 1 were/)
+})
+await gagal('jumlah_harian_dua_sumber_tidak_ganda', () => {
+  const r = ok(parseDeviceSeries('export.xml', `<HealthData>${[
+    rec('StepCount', 'count', 5000, '2026-11-18 07:00:00 +0700', 'iPhone'),
+    rec('StepCount', 'count', 4800, '2026-11-18 07:00:00 +0700'), rec('StepCount', 'count', 300, '2026-11-18 18:00:00 +0700'),
+  ].join('')}</HealthData>`, 0))
+  assert.deepEqual(dailyValues(r.series.steps!, 'sum', WIB), [{ date: '2026-11-18', value: 5100 }], 'sumber terbesar (Watch 5100), bukan 10100')
+  assert.deepEqual(dailyValues([{ t: 0, value: 3 }, { t: 1000, value: 4 }], 'sum', 0), [{ date: '1970-01-01', value: 7 }], 'tanpa sumber = satu sumber, tetap dijumlah')
+  assert.deepEqual(dailyValues([{ t: 0, value: 60, source: 'a' }, { t: 1000, value: 80, source: 'b' }], 'mean', 0), [{ date: '1970-01-01', value: 70 }], 'level dirata-rata lintas sumber')
+})
 await gagal('menolak_xml_bukan_gpx_atau_apple', () => no(parseDeviceSeries('a.xml', '<root/>', 0), /neither a GPX/))
 
 // ── masukan umum ──

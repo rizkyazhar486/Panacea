@@ -6,6 +6,7 @@
 // app does, so for those two the flow is: export from the app, upload the
 // file here. Everything runs client-side — no file ever leaves the device
 // during parsing.
+import { dailyValues, parseDeviceSeries, SERIES, type Reading, type SeriesId } from '../domains/personal-health/engine/glance/deviceSeries.ts'
 
 export interface ImportResult {
   vo2max?: number
@@ -322,87 +323,42 @@ function foldDays(acc: DayCells): ImportedDay[] {
   }))
 }
 
-const same = (v: number) => v
-const fraction = (v: number) => (v <= 1 ? v * 100 : v)
-const LB_KG = 0.45359237
-/**
- * Apple Health quantity types read day by day, with every unit Apple may write for each. A record in a unit not
- * listed here is skipped rather than assumed to be in the usual one (a pound weight read as kilograms is wrong).
- */
-const APPLE_DAILY: Readonly<Record<string, { field: keyof ImportResult; units: Readonly<Record<string, (v: number) => number>> }>> = {
-  HKQuantityTypeIdentifierStepCount: { field: 'steps', units: { count: same } },
-  HKQuantityTypeIdentifierActiveEnergyBurned: { field: 'activeKcal', units: { kcal: same, Cal: same, kJ: (v) => v / 4.184 } },
-  HKQuantityTypeIdentifierAppleExerciseTime: { field: 'exerciseMin', units: { min: same } },
-  HKQuantityTypeIdentifierDistanceWalkingRunning: { field: 'distanceKm', units: { km: same, m: (v) => v / 1000, mi: (v) => v * 1.609344 } },
-  HKQuantityTypeIdentifierHeartRate: { field: 'heartRate', units: { 'count/min': same } },
-  HKQuantityTypeIdentifierRestingHeartRate: { field: 'restingHr', units: { 'count/min': same } },
-  HKQuantityTypeIdentifierHeartRateVariabilitySDNN: { field: 'hrvMs', units: { ms: same } },
-  HKQuantityTypeIdentifierOxygenSaturation: { field: 'spo2Pct', units: { '%': fraction } },
-  HKQuantityTypeIdentifierRespiratoryRate: { field: 'respRate', units: { 'count/min': same } },
-  HKQuantityTypeIdentifierBloodPressureSystolic: { field: 'systolic', units: { mmHg: same } },
-  HKQuantityTypeIdentifierBloodPressureDiastolic: { field: 'diastolic', units: { mmHg: same } },
-  HKQuantityTypeIdentifierBodyMass: { field: 'weightKg', units: { kg: same, lb: (v) => v * LB_KG } },
-  HKQuantityTypeIdentifierLeanBodyMass: { field: 'leanMassKg', units: { kg: same, lb: (v) => v * LB_KG } },
-  HKQuantityTypeIdentifierBodyFatPercentage: { field: 'bodyFatPct', units: { '%': fraction } },
-  HKQuantityTypeIdentifierBodyTemperature: { field: 'bodyTempC', units: { degC: same, degF: (v) => ((v - 32) * 5) / 9 } },
-  HKQuantityTypeIdentifierVO2Max: { field: 'vo2max', units: { 'mL/min·kg': same } },
+/** Which daily-history field each device series fills. */
+const SERIES_FIELD: Readonly<Record<SeriesId, keyof ImportResult | null>> = {
+  heartRate: 'heartRate', restingHr: 'restingHr', hrv: 'hrvMs', spo2: 'spo2Pct', respRate: 'respRate', steps: 'steps',
+  activeKcal: 'activeKcal', bodyTempC: 'bodyTempC', weightKg: 'weightKg', elevationM: null,
 }
 
 /**
- * Every day an Apple Health export.xml covers, oldest first. Date is the startDate as the phone wrote it. iPhone and
- * Watch both log steps and energy for the same walk, so a cumulative signal's day total is the LARGEST single-source
- * total, never the sum across sources (which would double-count); levels are averaged over all readings. Sleep is not
- * read here: its records are intervals that cross midnight. Not an export, or no usable records → [].
+ * Every day an Apple Health export.xml covers, oldest first, read by the one device-series reader
+ * (domains/personal-health/engine/glance/deviceSeries): units converted or the record rejected, implausible values
+ * dropped, two sources never added together, days cut at the wearer's UTC offset. Sleep is not read here: its records
+ * are intervals that cross midnight. Not an export, or nothing usable → [].
  */
-export function parseAppleHealthDays(xml: string): ImportedDay[] {
+export function parseAppleHealthDays(xml: string, utcOffsetMin = 0): ImportedDay[] {
   if (!xml.includes('<HealthData')) return []
-  const levels: DayCells = new Map()
-  const totals = new Map<string, Map<string, Map<string, number>>>() // day → field → source → sum
-  // Exports run to hundreds of MB: compile each attribute pattern once, not once per record.
-  const patterns = new Map<string, RegExp>()
-  const attr = (tag: string, key: string) => {
-    let re = patterns.get(key)
-    if (!re) { re = new RegExp(`\\b${key}="([^"]*)"`); patterns.set(key, re) }
-    return re.exec(tag)?.[1]
-  }
-  const records = /<Record\b([^>]*)>/g
-  let m: RegExpExecArray | null
-  while ((m = records.exec(xml))) {
-    const tag = m[1]
-    const rule = APPLE_DAILY[attr(tag, 'type') ?? '']
-    if (!rule) continue
-    const day = (attr(tag, 'startDate') ?? '').slice(0, 10)
-    const convert = rule.units[attr(tag, 'unit') ?? '']
-    const raw = Number(attr(tag, 'value'))
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(day) || !convert || !Number.isFinite(raw) || raw <= 0) continue
-    const v = convert(raw)
-    if (CUMULATIVE_FIELDS.has(rule.field)) {
-      const bySource = totals.get(day)?.get(rule.field) ?? new Map<string, number>()
-      const source = attr(tag, 'sourceName') ?? ''
-      bySource.set(source, (bySource.get(source) ?? 0) + v)
-      const row = totals.get(day) ?? new Map()
-      row.set(rule.field, bySource); totals.set(day, row)
-    } else {
-      const row = levels.get(day) ?? new Map()
-      const cell = row.get(rule.field) ?? { sum: 0, n: 0, cumulative: false, integer: INTEGER_FIELDS.has(rule.field) }
-      cell.sum += v; cell.n += 1
-      row.set(rule.field, cell); levels.set(day, row)
+  const r = parseDeviceSeries('export.xml', xml, utcOffsetMin)
+  if (!r.ok) return []
+  const acc: DayCells = new Map()
+  for (const [id, readings] of Object.entries(r.series) as [SeriesId, Reading[]][]) {
+    const field = SERIES_FIELD[id]
+    if (!field) continue
+    for (const { date, value } of dailyValues(readings, SERIES[id].aggregate, utcOffsetMin)) {
+      const row = acc.get(date) ?? new Map()
+      row.set(field, { sum: value, n: 1, cumulative: false, integer: INTEGER_FIELDS.has(field) })
+      acc.set(date, row)
     }
   }
-  for (const [day, row] of totals) {
-    const cells = levels.get(day) ?? new Map()
-    for (const [field, bySource] of row) {
-      cells.set(field, { sum: Math.max(...bySource.values()), n: 1, cumulative: true, integer: INTEGER_FIELDS.has(field as keyof ImportResult) })
-    }
-    levels.set(day, cells)
-  }
-  return foldDays(levels)
+  return foldDays(acc)
 }
 
-/** Dated daily rows for formats that carry them (Health Auto Export JSON, Apple Health XML); every other format → []. */
-export function parseHealthFileDays(name: string, text: string): ImportedDay[] {
+/**
+ * Dated daily rows for formats that carry them (Health Auto Export JSON, Apple Health XML); every other format → [].
+ * `utcOffsetMin` is the wearer's offset, used where a time must be cut into days (Apple Health XML).
+ */
+export function parseHealthFileDays(name: string, text: string, utcOffsetMin = 0): ImportedDay[] {
   const lower = name.toLowerCase()
-  if (lower.endsWith('.xml') || text.includes('<HealthData')) return parseAppleHealthDays(text)
+  if (lower.endsWith('.xml') || text.includes('<HealthData')) return parseAppleHealthDays(text, utcOffsetMin)
   if (!(lower.endsWith('.json') || /^\s*[[{]/.test(text))) return []
   return parseHealthAutoExportDays(text)
 }

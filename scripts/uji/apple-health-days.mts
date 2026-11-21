@@ -1,8 +1,11 @@
-// Apple Health export.xml → satu baris riwayat per hari: tanggal dari startDate apa adanya, unit dikonversi menurut
-// atribut unit (unit tak dikenal ditolak, bukan dianggap), sinyal kumulatif tidak dihitung ganda antar sumber
-// (iPhone + Watch), level dirata-rata; rekaman tak sah dibuang, bukan ditebak.
+// Apple Health export.xml → satu baris riwayat per hari, lewat SATU pembaca deret perangkat (deviceSeries): hari dipotong
+// pada offset UTC pemakai, unit dikonversi menurut atribut unit (unit tak dikenal ditolak, bukan dianggap), sinyal
+// kumulatif tidak dihitung ganda antar sumber (iPhone + Watch), level dirata-rata; rekaman tak sah dibuang.
 import assert from 'node:assert/strict'
-import { parseAppleHealthDays, parseHealthFileDays } from '../../src/lib/healthImport.ts'
+import { parseAppleHealthDays as baca, parseHealthFileDays } from '../../src/lib/healthImport.ts'
+
+const WIB = 420
+const parseAppleHealthDays = (x: string) => baca(x, WIB)
 
 const gagal = (nama: string, f: () => void) => { try { f() } catch (e) { throw new Error(`[${nama}] ${(e as Error).message}`) } }
 const rec = (type: string, unit: string, start: string, value: string | number, source = 'Apple Watch') =>
@@ -25,9 +28,13 @@ gagal('satu-baris-per-hari', () => {
 gagal('unit-dikonversi', () => {
   const [d] = parseAppleHealthDays(xml(
     rec('BodyMass', 'lb', t('2026-11-19'), 154.324), rec('ActiveEnergyBurned', 'kJ', t('2026-11-19'), 1046),
-    rec('DistanceWalkingRunning', 'mi', t('2026-11-19'), 2), rec('BodyTemperature', 'degF', t('2026-11-19'), 98.6),
+    rec('BodyTemperature', 'degF', t('2026-11-19'), 98.6),
   ))
-  assert.deepEqual(d.values, { weightKg: 70, activeKcal: 250, distanceKm: 3.22, bodyTempC: 37 })
+  assert.deepEqual(d.values, { weightKg: 70, activeKcal: 250, bodyTempC: 37 })
+})
+gagal('denyut-istirahat-tidak-dicampur-denyut-jantung', () => {
+  const [d] = parseAppleHealthDays(xml(rec('RestingHeartRate', 'count/min', t('2026-11-19', '06'), 52), rec('HeartRate', 'count/min', t('2026-11-19', '12'), 90)))
+  assert.deepEqual(d.values, { heartRate: 90, restingHr: 52 })
 })
 gagal('dua-sumber-tidak-dihitung-ganda', () => {
   // Jalan yang sama tercatat di iPhone (5000) dan Watch (4800 + 300): total hari = sumber terbesar, bukan 10100.
@@ -37,19 +44,21 @@ gagal('dua-sumber-tidak-dihitung-ganda', () => {
   ))
   assert.equal(d.values.steps, 5100)
 })
-gagal('tanggal-dari-teks-tanpa-geser-zona', () => {
-  assert.equal(parseAppleHealthDays(xml(rec('RestingHeartRate', 'count/min', '2026-11-19 00:30:00 +0700', 50)))[0].date, '2026-11-19')
+gagal('hari-dipotong-di-zona-pemakai', () => {
+  const x = xml(rec('RestingHeartRate', 'count/min', '2026-11-19 00:30:00 +0700', 50))
+  assert.equal(parseAppleHealthDays(x)[0].date, '2026-11-19', 'WIB: lewat tengah malam = hari baru')
+  assert.equal(baca(x, 0)[0].date, '2026-11-18', 'di UTC instan yang sama masih 18 November')
 })
 gagal('dispatch-nama-berkas', () => {
   const x = xml(rec('RestingHeartRate', 'count/min', t('2026-11-19'), 50))
-  assert.deepEqual(parseHealthFileDays('export.xml', x), parseAppleHealthDays(x))
-  assert.equal(parseHealthFileDays('apa-saja.txt', x).length, 1, 'dikenali dari isi <HealthData')
+  assert.deepEqual(parseHealthFileDays('export.xml', x, WIB), parseAppleHealthDays(x))
+  assert.equal(parseHealthFileDays('apa-saja.txt', x, WIB).length, 1, 'dikenali dari isi <HealthData')
 })
 
 // ── Batas ────────────────────────────────────────────────────────────────────────────────────────────────────
 gagal('fraksi-dan-persen-sama', () => {
-  const [d] = parseAppleHealthDays(xml(rec('BodyFatPercentage', '%', t('2026-11-19', '07'), 0.2), rec('BodyFatPercentage', '%', t('2026-11-19', '08'), 22)))
-  assert.equal(d.values.bodyFatPct, 21, '0.2 dibaca 20%, 22 tetap 22%')
+  const [d] = parseAppleHealthDays(xml(rec('OxygenSaturation', '%', t('2026-11-19', '07'), 0.96), rec('OxygenSaturation', '%', t('2026-11-19', '08'), 98)))
+  assert.equal(d.values.spo2Pct, 97, '0.96 dibaca 96%, 98 tetap 98%')
 })
 
 // ── Negatif: gagal tertutup ──────────────────────────────────────────────────────────────────────────────────

@@ -323,7 +323,7 @@ export function HealthProfile() {
       // invisible after they were already being parsed correctly.
       // A dated export writes one history row per day it covers, so the analyzer gets real past days instead of
       // every value being filed under today. A file without dates (or an image) records the latest values as today.
-      const days = gambar ? [] : parseHealthFileDays(file.name, text)
+      const days = gambar ? [] : parseHealthFileDays(file.name, text, -new Date().getTimezoneOffset())
       const daysRecorded = catatRiwayatHarian(days)
       mergeVitals({ ...r, source: r.source, measuredAt: r.measuredAt }, { record: days.length === 0 })
 
