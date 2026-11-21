@@ -196,18 +196,22 @@ export function bubbleLayout(
 
 export interface HeatCell { readonly row: number; readonly col: number; readonly x: number; readonly y: number; readonly w: number; readonly h: number; readonly value: number; readonly t: number }
 
-/** Heatmap cells with `t` as each value's 0..1 position between the matrix min and max. */
-export function heatCells(matrix: ReadonlyArray<readonly number[]>, b: Box, pad = 2): HeatCell[] {
+/**
+ * Heatmap cells with `t` as each value's 0..1 position between the matrix min and max, or within `domain` when one
+ * is given (needed when every cell can be equal: an all-gap coverage map must read as 0, not as the middle).
+ */
+export function heatCells(matrix: ReadonlyArray<readonly number[]>, b: Box, pad = 2, domain?: readonly [number, number]): HeatCell[] {
   if (!matrix || matrix.length === 0 || !box(b) || !num(pad) || pad < 0) return []
   const cols = matrix[0]?.length ?? 0
   if (cols === 0 || matrix.some((r) => r.length !== cols || r.some((v) => !num(v)))) return []
+  if (domain && (!num(domain[0]) || !num(domain[1]) || !(domain[1] > domain[0]))) return []
   const flat = matrix.flat()
-  const lo = Math.min(...flat), hi = Math.max(...flat)
+  const lo = domain ? domain[0] : Math.min(...flat), hi = domain ? domain[1] : Math.max(...flat)
   const cw = b.w / cols, ch = b.h / matrix.length
   if (cw <= pad || ch <= pad) return []
   const out: HeatCell[] = []
   matrix.forEach((row, ri) => row.forEach((v, ci) => {
-    out.push({ row: ri, col: ci, x: r2(ci * cw + pad / 2), y: r2(ri * ch + pad / 2), w: r2(cw - pad), h: r2(ch - pad), value: v, t: hi === lo ? 0.5 : (v - lo) / (hi - lo) })
+    out.push({ row: ri, col: ci, x: r2(ci * cw + pad / 2), y: r2(ri * ch + pad / 2), w: r2(cw - pad), h: r2(ch - pad), value: v, t: hi === lo ? 0.5 : Math.min(1, Math.max(0, (v - lo) / (hi - lo))) })
   }))
   return out
 }

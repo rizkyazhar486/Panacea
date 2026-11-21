@@ -127,19 +127,33 @@ export function catatRiwayat(v: Vitals): void {
   const scope = readPersonalHealthStorageScope()
   // The deferred mergeVitals callback carries its original owner, not the new session.
   if (!allowsPersonalHealthStorageScope(scope) || !matchesHistoryOwner(v, scope)) return
-  const key = historyKey(scope)
+  const angka = angkaPositif(v)
+  if (!Object.keys(angka).length) return
+  tulisBaris(scope, [{ tanggal: kunciTanggalLokal(), nilai: angka }])
+}
+
+/** Hanya angka hingga dan positif; selain itu bukan bacaan. */
+function angkaPositif(v: Readonly<Record<string, unknown>>): Record<string, number> {
   const angka: Record<string, number> = {}
   for (const [k, val] of Object.entries(v)) {
     if (typeof val === 'number' && Number.isFinite(val) && val > 0) angka[k] = val
   }
-  if (!Object.keys(angka).length) return
+  return angka
+}
 
-  const hariIni = kunciTanggalLokal()
-  const sebelumnya = ambilRiwayat()
-  const barisHariIni = sebelumnya.find((h) => h.tanggal === hariIni)
-  const riwayat = sebelumnya.filter((h) => h.tanggal !== hariIni)
-  riwayat.push({ tanggal: hariIni, nilai: { ...(barisHariIni?.nilai ?? {}), ...angka } })
-  riwayat.sort((a, b) => (a.tanggal < b.tanggal ? -1 : 1))
+/**
+ * Menggabungkan baris-baris bertanggal ke riwayat pemilik `scope`: untuk setiap tanggal, sinyal yang dibawa baris
+ * menimpa sinyal yang sama pada hari itu, sinyal lain hari itu tetap. Satu jalur tulis untuk bacaan hari ini dan
+ * untuk riwayat yang diimpor.
+ */
+function tulisBaris(scope: PersonalHealthStorageScope, baris: readonly HariVitals[]): void {
+  const key = historyKey(scope)
+  const perTanggal = new Map(ambilRiwayat().map((h) => [h.tanggal, h]))
+  for (const b of baris) {
+    const lama = perTanggal.get(b.tanggal)
+    perTanggal.set(b.tanggal, { tanggal: b.tanggal, nilai: { ...(lama?.nilai ?? {}), ...b.nilai } })
+  }
+  const riwayat = [...perTanggal.values()].sort((a, b) => (a.tanggal < b.tanggal ? -1 : 1))
 
   const penuh = riwayat.slice(-MAKS_HARI)
   try {
@@ -160,6 +174,25 @@ export function catatRiwayat(v: Vitals): void {
       cachedHistory = ringkas
     } catch { /* menyerah, tanpa mengganggu apa pun */ }
   }
+}
+
+/**
+ * Riwayat yang tiba BERTANGGAL — mis. ekspor Health Auto Export 90 hari. Sebelumnya hanya nilai terakhir file yang
+ * dicatat, dan dicatat sebagai hari ini: ekspor tiga bulan memberi penganalisis satu hari. Setiap hari kini masuk ke
+ * tanggalnya sendiri. Tanggal yang bukan YYYY-MM-DD, hari di masa depan, atau baris tanpa angka positif dilewati.
+ * Mengembalikan jumlah hari yang dicatat (0 bila sesi bukan milik siapa pun yang boleh menulis).
+ */
+export function catatRiwayatHarian(hari: ReadonlyArray<{ readonly date: string; readonly values: Readonly<Record<string, number>> }>, today: string = kunciTanggalLokal()): number {
+  const scope = readPersonalHealthStorageScope()
+  if (!allowsPersonalHealthStorageScope(scope) || scope.kind === 'invalid') return 0
+  const baris: HariVitals[] = []
+  for (const h of hari ?? []) {
+    if (typeof h?.date !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(h.date) || h.date > today) continue
+    const angka = angkaPositif(h.values ?? {})
+    if (Object.keys(angka).length) baris.push({ tanggal: h.date, nilai: angka })
+  }
+  if (baris.length) tulisBaris(scope, baris)
+  return baris.length
 }
 
 /** Deret nilai satu metrik, terlama di depan. */

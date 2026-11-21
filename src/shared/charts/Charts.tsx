@@ -7,6 +7,7 @@ import {
   arcPath, boxStats, bubbleLayout, divergingBars, donutSlices, gaugeAngle, groupedBars, heatCells, histogramBins, polar,
   radarPoints, scale, scatterPoints, seriesPath, stackedColumns, treemapLayout, waterfallSteps,
 } from './chartGeometry.ts'
+import './charts.css'
 
 const VB = (w: number, h: number) => ({ viewBox: `0 0 ${w} ${h}`, preserveAspectRatio: 'none' as const })
 const SQ = (w: number, h: number) => ({ viewBox: `0 0 ${w} ${h}` })
@@ -143,9 +144,9 @@ export function BubbleChart({ rows, xDomain, yDomain, w = 160, h = 110, maxR = 1
   )
 }
 
-export interface HeatmapProps { matrix: ReadonlyArray<readonly number[]>; cold: string; hot: string; w?: number; h?: number }
-export function HeatmapChart({ matrix, cold, hot, w = 160, h = 76 }: HeatmapProps) {
-  const cells = heatCells(matrix, { w, h })
+export interface HeatmapProps { matrix: ReadonlyArray<readonly number[]>; cold: string; hot: string; w?: number; h?: number; domain?: readonly [number, number] }
+export function HeatmapChart({ matrix, cold, hot, w = 160, h = 76, domain }: HeatmapProps) {
+  const cells = heatCells(matrix, { w, h }, 2, domain)
   if (cells.length === 0) return null
   return (
     <svg {...VB(w, h)} className="pc-svg" aria-hidden>
