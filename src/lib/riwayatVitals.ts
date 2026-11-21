@@ -1,6 +1,7 @@
 import type { Vitals } from './healthVitals'
 import { allowsPersonalHealthStorageScope, type PersonalHealthStorageScope } from '../shared/kernel/personalHealthStorageScope.ts'
 import { readPersonalHealthStorageScope } from '../domains/personal-health/index.ts'
+import { RANGE_MIN_DAYS, RANGE_SPAN_DAYS, personalRange, rangePosition } from '../domains/personal-health/engine/glance/metricInsight.ts'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Riwayat angka tubuh, dan rentang kebiasaan Anda sendiri.
@@ -170,7 +171,7 @@ export function deretMetrik(kunci: string, maksHari = MAKS_HARI): { tanggal: str
 }
 
 /** Jumlah hari terkecil sebelum sebuah rentang pribadi boleh disebut. */
-export const CUKUP_HARI = 14
+export const CUKUP_HARI = RANGE_MIN_DAYS
 
 export interface RentangPribadi {
   bawah: number
@@ -194,17 +195,14 @@ export interface RentangPribadi {
  * dari lima hari lebih menyesatkan daripada tidak ada rentang sama sekali.
  */
 export function rentangPribadi(kunci: string, nilaiKini?: number): RentangPribadi | null {
-  const deret = deretMetrik(kunci, 90).map((d) => d.nilai)
-  if (deret.length < CUKUP_HARI) return null
-
-  const urut = [...deret].sort((a, b) => a - b)
-  const ambil = (p: number) => urut[Math.min(urut.length - 1, Math.max(0, Math.round((urut.length - 1) * p)))]
-  const bawah = ambil(0.1)
-  const atas = ambil(0.9)
-
+  // Satu aturan rentang untuk seluruh aplikasi (domains/personal-health/engine/glance/metricInsight): kalimat
+  // "kebiasaan Anda" di sini dan lembar wawasan Home tidak boleh menyebut angka berbeda untuk data yang sama.
+  const deret = deretMetrik(kunci, RANGE_SPAN_DAYS).map((d) => d.nilai)
+  const r = personalRange(deret)
+  if (!r) return null
   const kini = typeof nilaiKini === 'number' ? nilaiKini : deret[deret.length - 1]
-  const posisi = kini < bawah ? 'below your usual' : kini > atas ? 'above your usual' : 'within your usual'
-  return { bawah, atas, hari: deret.length, posisi }
+  const posisi = rangePosition(r, kini)
+  return { bawah: r.low, atas: r.high, hari: r.days, posisi: `${posisi} your usual` }
 }
 
 /**
