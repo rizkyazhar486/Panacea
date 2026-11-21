@@ -20,11 +20,11 @@ import { api, backendEnabled, apiBaseUrl, type KatalogMetrik } from '../../lib/a
 import { healthWebhookUrl } from '../../domains/devices/engine/healthWebhookUrl'
 import { useStore } from '../../lib/store'
 import { mergeDemoStored } from '../../lib/profile'
-import { parseHealthFile, type ImportResult } from '../../lib/healthImport'
+import { parseHealthFile, parseHealthFileDays, type ImportResult } from '../../lib/healthImport'
 import { getVitals, mergeVitals, syncedToday } from '../../lib/healthVitals'
 import { readUnifiedLocalVitals, recoverSameUserVitalsIntoScope } from '../../domains/identity/localRecovery'
 import { foldsOpenForSession } from '../../shared/ui/foldsPreference'
-import { deretMetrik } from '../../lib/riwayatVitals'
+import { catatRiwayatHarian, deretMetrik } from '../../lib/riwayatVitals'
 import { parseWorkouts, parseHrNotifications } from '../../lib/workoutImport'
 import { mergeWorkouts, mergeHrNotifications } from '../../lib/workoutStore'
 import { diagnose, type SyncDiagnosis } from '../../lib/syncDiagnostics'
@@ -321,7 +321,11 @@ export function HealthProfile() {
       // dropped each newly-parsed metric until someone remembered to add it
       // here too — which is how gait, running form and sleep stages stayed
       // invisible after they were already being parsed correctly.
-      mergeVitals({ ...r, source: r.source, measuredAt: r.measuredAt })
+      // A dated export writes one history row per day it covers, so the analyzer gets real past days instead of
+      // every value being filed under today. A file without dates (or an image) records the latest values as today.
+      const days = gambar ? [] : parseHealthFileDays(file.name, text)
+      const daysRecorded = catatRiwayatHarian(days)
+      mergeVitals({ ...r, source: r.source, measuredAt: r.measuredAt }, { record: days.length === 0 })
 
       // Workouts and heart-rate notifications live in the same file but are not
       // "latest value of a metric", so they go to their own store instead of
@@ -337,6 +341,7 @@ export function HealthProfile() {
       const extra = [
         wBaru ? `${wBaru} new workouts` : '',
         nBaru ? `${nBaru} heart-rate alerts` : '',
+        daysRecorded ? `${daysRecorded} days of history` : '',
       ].filter(Boolean).join(', ')
 
       setNote(`Filled from ${r.source}: ${keys.length} values — now shared across the app.${extra ? ` Plus ${extra}.` : ''} Review, then press Save.`)

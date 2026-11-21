@@ -145,7 +145,7 @@ export function DeviceQuickSyncCard() {
     if (!file) return
     try {
       const text = await file.text()
-      const parsed = parseHealthFile(text, file.name)
+      const parsed = parseHealthFile(file.name, text)
       const count = Object.keys(parsed).filter((k) => k !== 'source').length
       if (!count) {
         setStatusMsg('No supported metrics found in file')
