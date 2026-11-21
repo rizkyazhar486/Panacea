@@ -2,6 +2,7 @@ import { capturePersonalHealthOperation, readPersonalHealthFile, readPersonalHea
 import { loadBluetoothWearablePanel, recordConnectedDevice, type WearableSavePatch } from '../../domains/devices'
 import { loadBodyExposureLocalHub } from '../../domains/body-exposure'
 import { lazy, Suspense, useEffect, useRef, useState } from 'react'
+import { useNearViewport } from '../../shared/hooks/useNearViewport'
 import { Fold } from '../../shared/ui/Fold'
 import { Prosa } from '../../components/Prosa'
 import { KolomAngka } from '../../components/KolomAngka'
@@ -90,6 +91,7 @@ const saveBluetoothReading = (patch: WearableSavePatch) => {
 
 export function HealthProfile() {
   const { account, activePatient } = useStore()
+  const analyzerSlot = useNearViewport('200px 0px')
   const [p, setP] = useState<HealthProfile>(DEF)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -447,10 +449,13 @@ export function HealthProfile() {
 
       <Card className="!p-5">
         <SectionTitle icon={<IconActivity size={20} />} title="Analyzer" subtitle="Every signal against your own record" />
-        <div className="mt-3">
-          <Suspense fallback={<div className="h-40" aria-hidden />}>
-            <HealthAnalyzer readSeries={readDailySeries} today={localDayOf(new Date())} />
-          </Suspense>
+        {/* The analyzer and its charts load only when the reader scrolls near them, not on first paint. */}
+        <div className="mt-3 min-h-40" ref={analyzerSlot.ref}>
+          {analyzerSlot.ready && (
+            <Suspense fallback={<div className="h-40" aria-hidden />}>
+              <HealthAnalyzer readSeries={readDailySeries} today={localDayOf(new Date())} />
+            </Suspense>
+          )}
         </div>
       </Card>
 
