@@ -52,6 +52,15 @@
 .ha-week .pc-svg { height: 112px; }
 .ha-cov .pc-svg { height: auto; aspect-ratio: 160 / 126; max-height: 170px; }
 
+/* Typical day: 24 spokes around a dial; a missing hour is a dot, never a zero spoke. */
+.ha-day-body { display: grid; grid-template-columns: minmax(0, 160px) minmax(0, 1fr); gap: 12px; align-items: center; }
+.ha-day svg { width: 100%; height: auto; max-width: 160px; }
+.ha-day-ring { fill: none; stroke: var(--ha-line); }
+.ha-day-gap { fill: var(--ha-dim); opacity: 0.6; }
+.ha-day line { stroke-width: 5; stroke-linecap: round; transform-box: fill-box; transform-origin: center; animation: ha-spoke 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+.ha-day text { font-size: 9px; fill: var(--ha-dim); }
+@keyframes ha-spoke { from { opacity: 0; transform: scale(0.2); } }
+
 .ha-empty, .ha-boundary { margin: 0; font-size: 12px; color: var(--ha-dim); }
 
 @media (min-width: 640px) {
@@ -59,4 +68,5 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .ha-connect-btn, .ha-chip { transition: none; }
+  .ha-day line { animation: none; }
 }

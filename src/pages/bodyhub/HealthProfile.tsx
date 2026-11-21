@@ -20,7 +20,7 @@ import { api, backendEnabled, apiBaseUrl, type KatalogMetrik } from '../../lib/a
 import { healthWebhookUrl } from '../../domains/devices/engine/healthWebhookUrl'
 import { useStore } from '../../lib/store'
 import { mergeDemoStored } from '../../lib/profile'
-import { parseHealthFile, parseHealthFileDays, type ImportResult } from '../../lib/healthImport'
+import { parseHealthFile, parseHealthFileSeries, type HourProfiles, type ImportResult } from '../../lib/healthImport'
 import { getVitals, mergeVitals, syncedToday } from '../../lib/healthVitals'
 import { readUnifiedLocalVitals, recoverSameUserVitalsIntoScope } from '../../domains/identity/localRecovery'
 import { foldsOpenForSession } from '../../shared/ui/foldsPreference'
@@ -92,6 +92,7 @@ const saveBluetoothReading = (patch: WearableSavePatch) => {
 export function HealthProfile() {
   const { account, activePatient } = useStore()
   const analyzerSlot = useNearViewport('200px 0px')
+  const [typicalDays, setTypicalDays] = useState<{ source: string; hours: HourProfiles } | null>(null)
   const [p, setP] = useState<HealthProfile>(DEF)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -307,8 +308,10 @@ export function HealthProfile() {
       }
       // A dated export writes one history row per day it covers, so the analyzer gets real past days instead of
       // every value being filed under today. A file without dates (or an image) records the latest values as today.
-      const days = gambar ? [] : await parseHealthFileDays(file.name, text, -new Date().getTimezoneOffset())
+      const { days, hours } = gambar ? { days: [], hours: {} } : await parseHealthFileSeries(file.name, text, -new Date().getTimezoneOffset())
       if (!current()) return
+      // The typical day needs each reading's time, which daily history does not keep: shown for this import only.
+      setTypicalDays(Object.keys(hours).length ? { source: file.name, hours } : null)
       // Read before any state is written, so leaving the page mid-read changes nothing.
       setP((x) => ({
         ...x,
@@ -460,7 +463,7 @@ export function HealthProfile() {
         <div className="mt-3 min-h-40" ref={analyzerSlot.ref}>
           {analyzerSlot.ready && (
             <Suspense fallback={<div className="h-40" aria-hidden />}>
-              <HealthAnalyzer readSeries={readDailySeries} today={localDayOf(new Date())} />
+              <HealthAnalyzer readSeries={readDailySeries} today={localDayOf(new Date())} typicalDays={typicalDays} />
             </Suspense>
           )}
         </div>

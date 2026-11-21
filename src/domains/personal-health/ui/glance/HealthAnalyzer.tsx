@@ -8,7 +8,7 @@
 
 import { useMemo, useState } from 'react'
 import { BoxPlotChart, HeatmapChart, HistogramChart } from '../../../../shared/charts/Charts.tsx'
-import { coverage, spread, weekdayPattern } from '../../engine/glance/analyzerViews.ts'
+import { coverage, spread, typicalDay, weekdayPattern, type TypicalDay } from '../../engine/glance/analyzerViews.ts'
 import { ANALYZER_METRICS, type AnalyzerMetricId } from '../../engine/glance/glanceMetrics.ts'
 import { INSIGHT_BOUNDARY, withUnit } from '../../engine/glance/insightText.ts'
 import { metricInsight, type DayValue } from '../../engine/glance/metricInsight.ts'
@@ -21,6 +21,11 @@ export interface HealthAnalyzerProps {
   readSeries: (id: string) => readonly DayValue[]
   /** The person's calendar day, YYYY-MM-DD. */
   today: string
+  /**
+   * Each signal's typical day from the file just imported (24 entries, hour 0 first, null = no reading). Daily
+   * history keeps one value per day, so the hours exist only for that import; `source` names the file.
+   */
+  typicalDays?: { readonly source: string; readonly hours: Readonly<Record<string, readonly (number | null)[]>> } | null
 }
 
 const ARROW = { below: '↓', within: '•', above: '↑' } as const
@@ -39,7 +44,33 @@ function goTo(id: string) {
   el.scrollIntoView({ behavior: 'smooth', block: 'start' })
 }
 
-export function HealthAnalyzer({ readSeries, today }: HealthAnalyzerProps) {
+/** The typical day as a dial: spokes grow once on arrival, longest = the hour with the most. */
+function DayTile({ day, tone, label, source }: { day: TypicalDay; tone: string; label: string; source: string }) {
+  const c = day.size / 2
+  return (
+    <figure className="ha-tile ha-day">
+      <figcaption>Typical day · {source}</figcaption>
+      <div className="ha-day-body">
+        <svg viewBox={`0 0 ${day.size} ${day.size}`} role="img" aria-label={`${label} by hour of day. ${day.sentence}`}>
+          <circle cx={c} cy={c} r={day.outer} className="ha-day-ring" />
+          <circle cx={c} cy={c} r={day.inner} className="ha-day-ring" />
+          {day.empty.map((h) => {
+            const a = (h / 24) * 2 * Math.PI - Math.PI / 2
+            return <circle key={h} cx={c + day.inner * Math.cos(a)} cy={c + day.inner * Math.sin(a)} r={1.5} className="ha-day-gap" />
+          })}
+          {day.spokes.map((s) => (
+            <line key={s.hour} x1={s.x1} y1={s.y1} x2={s.x2} y2={s.y2} stroke={tone} style={{ animationDelay: `${s.hour * 20}ms` }} />
+          ))}
+          {day.labels.map((l) => <text key={l.hour} x={l.x} y={l.y + 3.5} textAnchor="middle">{String(l.hour).padStart(2, '0')}</text>)}
+        </svg>
+        {/* data-pmd-unclamped: the site-wide clamp would cut "not a zero" off the missing-hour note. */}
+        <p data-pmd-unclamped="true">{day.sentence} A dot on the inner ring is an hour with no reading, not a zero.</p>
+      </div>
+    </figure>
+  )
+}
+
+export function HealthAnalyzer({ readSeries, today, typicalDays }: HealthAnalyzerProps) {
   const dark = useDarkClass()
   const seriesById = useMemo(() => Object.fromEntries(ANALYZER_METRICS.map((m) => [m.id, readSeries(m.id)])), [readSeries])
   const chips = useMemo(() => ANALYZER_METRICS.map((metric) => {
@@ -56,6 +87,10 @@ export function HealthAnalyzer({ readSeries, today }: HealthAnalyzerProps) {
   const cov = useMemo(() => coverage(ANALYZER_METRICS, seriesById, today), [seriesById, today])
   const sp = useMemo(() => (metric ? spread(metric, series, today) : null), [metric, series, today])
   const wk = useMemo(() => (metric ? weekdayPattern(metric, series, today) : null), [metric, series, today])
+  const day = useMemo(() => {
+    const hours = metric && typicalDays?.hours[metric.id]
+    return metric && hours ? typicalDay(metric, hours) : null
+  }, [metric, typicalDays])
   const wkValues = wk?.days.flatMap((d) => d.values) ?? []
   const wkDomain: [number, number] | null = wkValues.length ? [Math.min(...wkValues), Math.max(...wkValues)] : null
 
@@ -128,6 +163,7 @@ export function HealthAnalyzer({ readSeries, today }: HealthAnalyzerProps) {
               )}
               <p>{wk?.sentence}</p>
             </figure>
+            {day && typicalDays && <DayTile day={day} tone={tone} label={metric.label} source={typicalDays.source} />}
           </div>
         </>
       )}
