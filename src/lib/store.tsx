@@ -175,7 +175,7 @@ function mergePosts(server: SocialPost[], local: SocialPost[]): SocialPost[] {
 // yet (e.g. a doctor before adding any patient). These are NOT seeded content.
 const PLACEHOLDER_PATIENT: Patient = {
   id: 'none', name: 'No patient yet', sex: 'L', dob: '1990-01-01', mrn: '—',
-  heightCm: 165, weightKg: 60, allergies: [], chronicConditions: [], riskFlags: [], avatarColor: '#94a3b8',
+  heightCm: 0, weightKg: 0, allergies: [], chronicConditions: [], riskFlags: [], avatarColor: '#94a3b8',
 }
 const PLACEHOLDER_CONTRIBUTOR: Contributor = {
   id: 'me', name: 'Saya', role: 'Dokter', specialty: '', verified: false, canVerify: false,
@@ -221,8 +221,11 @@ function patientFromAccount(account: Account): Patient {
     // Prefer the real date of birth from the datepicker; fall back to age estimate.
     dob: account.dob || `${year}-01-01`,
     mrn: 'PMD-' + account.email.replace(/[^0-9]/g, '').slice(0, 6).padStart(6, '0'),
-    heightCm: 165,
-    weightKg: 60,
+    // Registration does not ask for height or weight, so they are UNKNOWN (0), never a guess. A guessed 60 kg used to
+    // reach the BMI card ("22.0 Normal" for everyone), FHIR exports, sepsis fluid volumes and the vitals history as
+    // if measured; every reader already treats a non-positive value as missing.
+    heightCm: 0,
+    weightKg: 0,
     allergies: [],
     chronicConditions: [],
     riskFlags: [],
