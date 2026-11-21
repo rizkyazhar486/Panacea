@@ -66,7 +66,8 @@ assert.ok(hal.includes('pushBiometrics(biometrikUntukDibagikan(masukan))'), 'the
 assert.ok(hal.includes('kurangKomposisi(masukan)') && hal.includes('kurangSkor.length === 0'), 'the score and body type wait for their inputs')
 assert.match(hal, /\{kurangSkor\.length === 0 \? \(\s*<>\s*<div className="text-4xl font-extrabold text-brand-dark">\{d\.score\}/, 'the headline score is rendered only when nothing is missing')
 assert.match(hal, /\{kurangUbin\('mental'\)\.length === 0 && \(/, 'the mental quick screen is rendered only when stress, anxiety and mood are filled')
-assert.match(hal, /kurangSkor\.length === 0\s*\? <BodyTypeGrid/, 'the body type grid is rendered only when nothing is missing')
+assert.match(hal, /kurangSkor\.length === 0\s*\? <Card[^>]*><BodyTypeGrid/, 'the body type grid is rendered only when nothing is missing')
+assert.ok(!hal.includes('Appears once the score has what it needs'), 'no empty Body Type card while inputs are missing')
 assert.ok(hal.includes("High anxiety/stress score or low mood"), 'the high-risk message is still present for real input')
 assert.ok(!hal.includes("value={b.g} onChange"), 'the sex select no longer shows an unchosen default as chosen')
 
