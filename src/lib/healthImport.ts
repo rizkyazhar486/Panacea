@@ -6,6 +6,7 @@
 // app does, so for those two the flow is: export from the app, upload the
 // file here. Everything runs client-side — no file ever leaves the device
 // during parsing.
+import type { Reading, SeriesId } from '../domains/personal-health/engine/glance/deviceSeries.ts'
 
 export interface ImportResult {
   vo2max?: number
@@ -289,7 +290,7 @@ export interface ImportedDay {
 export function parseHealthAutoExportDays(text: string): ImportedDay[] {
   const metrics = haeMetrics(text)
   if (!metrics) return []
-  const acc = new Map<string, Map<string, { sum: number; n: number; cumulative: boolean; integer: boolean }>>()
+  const acc: DayCells = new Map()
   for (const m of metrics) {
     const name = typeof m?.name === 'string' ? m.name.toLowerCase() : ''
     const samples = Array.isArray(m?.data) ? (m.data as Record<string, unknown>[]) : []
@@ -306,6 +307,13 @@ export function parseHealthAutoExportDays(text: string): ImportedDay[] {
       }
     }
   }
+  return foldDays(acc)
+}
+
+type DayCells = Map<string, Map<string, { sum: number; n: number; cumulative: boolean; integer: boolean }>>
+
+/** One value per signal per day, oldest day first: cumulative signals as their sum, levels as their mean. */
+function foldDays(acc: DayCells): ImportedDay[] {
   return [...acc.entries()].sort(([a], [b]) => (a < b ? -1 : 1)).map(([date, row]) => ({
     date,
     values: Object.fromEntries([...row.entries()].map(([k, c]) => {
@@ -315,9 +323,44 @@ export function parseHealthAutoExportDays(text: string): ImportedDay[] {
   }))
 }
 
-/** Dated daily rows for formats that carry them (Health Auto Export today); every other format → []. */
-export function parseHealthFileDays(name: string, text: string): ImportedDay[] {
+/** Which daily-history field each device series fills. */
+const SERIES_FIELD: Readonly<Record<SeriesId, keyof ImportResult | null>> = {
+  heartRate: 'heartRate', restingHr: 'restingHr', hrv: 'hrvMs', spo2: 'spo2Pct', respRate: 'respRate', steps: 'steps',
+  activeKcal: 'activeKcal', bodyTempC: 'bodyTempC', weightKg: 'weightKg', elevationM: null,
+}
+
+/**
+ * Every day an Apple Health export.xml covers, oldest first, read by the one device-series reader
+ * (domains/personal-health/engine/glance/deviceSeries): units converted or the record rejected, implausible values
+ * dropped, two sources never added together, days cut at the wearer's UTC offset. Sleep is not read here: its records
+ * are intervals that cross midnight. Not an export, or nothing usable → []. The reader is loaded on demand, so Health
+ * Data does not fetch it until someone imports a file.
+ */
+export async function parseAppleHealthDays(xml: string, utcOffsetMin = 0): Promise<ImportedDay[]> {
+  if (!xml.includes('<HealthData')) return []
+  const { dailyValues, parseDeviceSeries, SERIES } = await import('../domains/personal-health/engine/glance/deviceSeries.ts')
+  const r = parseDeviceSeries('export.xml', xml, utcOffsetMin)
+  if (!r.ok) return []
+  const acc: DayCells = new Map()
+  for (const [id, readings] of Object.entries(r.series) as [SeriesId, Reading[]][]) {
+    const field = SERIES_FIELD[id]
+    if (!field) continue
+    for (const { date, value } of dailyValues(readings, SERIES[id].aggregate, utcOffsetMin)) {
+      const row = acc.get(date) ?? new Map()
+      row.set(field, { sum: value, n: 1, cumulative: false, integer: INTEGER_FIELDS.has(field) })
+      acc.set(date, row)
+    }
+  }
+  return foldDays(acc)
+}
+
+/**
+ * Dated daily rows for formats that carry them (Health Auto Export JSON, Apple Health XML); every other format → [].
+ * `utcOffsetMin` is the wearer's offset, used where a time must be cut into days (Apple Health XML).
+ */
+export async function parseHealthFileDays(name: string, text: string, utcOffsetMin = 0): Promise<ImportedDay[]> {
   const lower = name.toLowerCase()
+  if (lower.endsWith('.xml') || text.includes('<HealthData')) return parseAppleHealthDays(text, utcOffsetMin)
   if (!(lower.endsWith('.json') || /^\s*[[{]/.test(text))) return []
   return parseHealthAutoExportDays(text)
 }
