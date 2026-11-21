@@ -285,8 +285,7 @@ export function HealthSyncTutorial() {
       </Card>
 
       {/* Live link preview, if logged in with backend enabled */}
-      {backendEnabled && (
-        <Card className="!p-5">
+      <Card className="!p-5">
           <SectionTitle icon={<IconKey size={20} />} title="Your Private Sync Link" subtitle="For step 2 — copy this into the app" />
           <div className="mt-2 rounded-xl bg-neutral-50 p-3 font-mono text-[11px] text-neutral-600 break-all">
             {url ?? (linkStatus === 'loading' ? 'Loading…' : linkStatus === 'error' ? 'Unable to load Private Sync Link' : 'Backend connection is not configured')}
@@ -304,7 +303,6 @@ export function HealthSyncTutorial() {
             <Button className="mt-3 w-full">Open the Health Data Page <IconChevronRight size={16} /></Button>
           </Link>
         </Card>
-      )}
 
       {/* Privacy note */}
       <Card className="!p-5 !bg-brand-50 !border-brand/20">
