@@ -3,7 +3,7 @@
 // pernah menilai sehat/sakit, dan masukan tak sah gagal tertutup.
 import assert from 'node:assert/strict'
 import { ANALYZER_METRICS, GLANCE_METRICS, glanceMetric } from '../../src/domains/personal-health/engine/glance/glanceMetrics.ts'
-import { WEEKDAY_MIN_READINGS, coverage, spread, weekdayPattern } from '../../src/domains/personal-health/engine/glance/analyzerViews.ts'
+import { WEEKDAY_MIN_READINGS, coverage, rangeBoard, spread, typicalDay, weekdayPattern } from '../../src/domains/personal-health/engine/glance/analyzerViews.ts'
 import { dateOfDay, dayNumber } from '../../src/domains/personal-health/engine/glance/metricInsight.ts'
 
 const gagal = (nama: string, f: () => void) => { try { f() } catch (e) { throw new Error(`[${nama}] ${(e as Error).message}`) } }
@@ -99,4 +99,55 @@ gagal('hari-ini-tak-sah-tanpa-data', () => {
   assert.equal(spread(RHR, deret(30, () => 60), 'bukan-tanggal').latest, null)
 })
 
+// ── Hari khas (jam 24) ───────────────────────────────────────────────────────────────────────────────────────
+const STEPS = glanceMetric('steps')!
+const jam = (f: (h: number) => number | null) => Array.from({ length: 24 }, (_, h) => f(h))
+const jari = (d: NonNullable<ReturnType<typeof typicalDay>>, h: number) => { const s = d.spokes.find((x) => x.hour === h)!; return Math.hypot(s.x2 - 100, s.y2 - 100) }
+gagal('hari-khas-garis-hanya-jam-terekam', () => {
+  const d = typicalDay(RHR, jam((h) => (h % 2 ? null : 50 + h)))!
+  assert.equal(d.spokes.length, 12); assert.equal(d.empty.length, 12, 'jam kosong = titik, bukan jari nol')
+  const nol = d.spokes.find((s) => s.hour === 0)!
+  assert.deepEqual([nol.x1, nol.y1, nol.x2, nol.y2], [100, 60, 100, 54], 'tengah malam di atas; terendah = 6 px minimum')
+  assert.ok(Math.abs(jari(d, 22) - 84) < 0.01, 'tertinggi mencapai cincin luar')
+  assert.equal(d.sentence, 'Highest around 22:00 (72 bpm), lowest around 00:00 (50); 12 of 24 hours have readings.')
+  assert.doesNotMatch(d.sentence, TANPA_PENILAIAN)
+})
+gagal('hari-khas-batang-mulai-dari-nol', () => {
+  const d = typicalDay(STEPS, jam((h) => (h === 12 ? 1000 : h === 0 ? 500 : null)))!
+  assert.ok(Math.abs(jari(d, 12) - 84) < 0.01)
+  assert.ok(Math.abs(jari(d, 0) - (40 + 6 + 0.5 * (84 - 40 - 6))) < 0.01, 'hitungan: 500 dari 1000 = setengah rentang')
+  const rendah = typicalDay(RHR, jam((h) => (h === 12 ? 1000 : h === 0 ? 500 : null)))!
+  assert.ok(Math.abs(jari(rendah, 0) - 46) < 0.01, 'kadar: mulai dari jam terendah')
+})
+gagal('hari-khas-rata-dan-satu-jam', () => {
+  const rata = typicalDay(RHR, jam(() => 60))!
+  assert.equal(rata.spokes.length, 24); assert.ok(rata.spokes.every((s) => Math.abs(Math.hypot(s.x2 - 100, s.y2 - 100) - 84) < 0.01))
+  const satu = typicalDay(RHR, jam((h) => (h === 5 ? 58 : null)))!
+  assert.equal(satu.spokes.length, 1); assert.equal(satu.empty.length, 23)
+  assert.equal(satu.sentence, 'Only 05:00 has readings so far (58 bpm).')
+})
+gagal('hari-khas-menolak-profil-tak-sah', () => {
+  assert.equal(typicalDay(RHR, jam(() => null)), null)
+  assert.equal(typicalDay(RHR, Array(23).fill(60)), null); assert.equal(typicalDay(RHR, Array(25).fill(60)), null)
+  assert.equal(typicalDay(RHR, jam(() => 60), 0), null)
+  assert.equal(typicalDay(RHR, jam((h) => (h ? null : Number.NaN))), null, 'NaN bukan bacaan')
+})
+
+// ── Papan rentang: semua sinyal di skala bersama ─────────────────────────────────────────────────────────────
+gagal('papan-rentang-posisi-pada-skala-sepertiga', () => {
+  const b = rangeBoard(ANALYZER_METRICS, { restingHr: deret(20, (i) => 50 + i), hrvMs: deret(20, () => 40), steps: deret(5, () => 5000) }, HARI)
+  assert.deepEqual(b.rows.map((r) => [r.id, r.position, r.value]), [['restingHr', 'above', '69 bpm'], ['hrvMs', 'within', '40 ms']])
+  assert.ok(Math.abs(b.rows[0]!.at - 32 / 45) < 1e-9, 'rentang 52–67: (69−37)/45')
+  assert.equal(b.rows[1]!.at, 0.5, 'rentang datar, di dalam = tengah')
+  assert.deepEqual(b.building, [{ id: 'steps', label: 'Steps', days: 5 }])
+  assert.equal(b.sentence, '1 of 2 signals sit within your usual range; 1 above.')
+  assert.doesNotMatch(b.sentence, TANPA_PENILAIAN)
+})
+gagal('papan-rentang-dijepit-dan-kosong', () => {
+  const jauh = rangeBoard(ANALYZER_METRICS, { restingHr: [...deret(19, (i) => 50 + (i % 5)), { date: HARI, value: 120 }] }, HARI)
+  assert.equal(jauh.rows[0]!.at, 1, 'jauh di atas dijepit ke 1')
+  assert.deepEqual(rangeBoard(ANALYZER_METRICS, {}, HARI), { rows: [], building: [], sentence: 'No signal has a reading yet.' })
+  assert.equal(rangeBoard(ANALYZER_METRICS, { steps: deret(3, () => 4000) }, HARI).sentence, 'A usual range appears after 14 recorded days of a signal.')
+  assert.deepEqual(rangeBoard(ANALYZER_METRICS, { restingHr: deret(20, (i) => 50 + i) }, 'bukan-tanggal'), { rows: [], building: [], sentence: 'No signal has a reading yet.' })
+})
 console.log('analyzer-views: OK')

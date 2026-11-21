@@ -288,3 +288,39 @@ export function hourProfile(readings: readonly Reading[], aggregate: SeriesSpec[
   }
   return hours.map((h) => (h.n ? (aggregate === 'sum' ? h.sum / days.size : h.sum / h.n) : null))
 }
+
+/** Each recorded day's 24 hours, oldest day first; null where that hour had no reading. */
+export interface DayHourGrid {
+  readonly days: readonly string[]
+  readonly cells: ReadonlyArray<readonly (number | null)[]>
+}
+
+/**
+ * The last `maxDays` recorded days, hour by hour, at the wearer's offset: a level averages the hour's readings, a
+ * count is the hour's total from its largest single source (two sources are never added, as in dailyValues). Days
+ * with no reading at all are not invented. Bad offset or maxDays → empty.
+ */
+export function dayHourGrid(readings: readonly Reading[], aggregate: SeriesSpec['aggregate'], utcOffsetMin = 0, maxDays = 14): DayHourGrid {
+  if (!validOffset(utcOffsetMin) || !Number.isInteger(maxDays) || maxDays < 1 || maxDays > 90) return { days: [], cells: [] }
+  const acc = new Map<string, Map<string, { sum: number; n: number }>[]>()
+  for (const { t, value, source } of readings) {
+    if (!Number.isFinite(t) || !Number.isFinite(value)) continue
+    const d = wall(t, utcOffsetMin)
+    const key = dateKey(d)
+    const row = acc.get(key) ?? Array.from({ length: 24 }, () => new Map<string, { sum: number; n: number }>())
+    const from = aggregate === 'sum' ? source ?? '' : ''
+    const cell = row[d.getUTCHours()]!
+    const c = cell.get(from) ?? { sum: 0, n: 0 }
+    c.sum += value
+    c.n++
+    cell.set(from, c)
+    acc.set(key, row)
+  }
+  const days = [...acc.keys()].sort().slice(-maxDays)
+  const cells = days.map((day) => acc.get(day)!.map((bySource) => {
+    const cs = [...bySource.values()]
+    if (!cs.length) return null
+    return aggregate === 'sum' ? Math.max(...cs.map((c) => c.sum)) : cs[0]!.sum / cs[0]!.n
+  }))
+  return { days, cells }
+}

@@ -21,7 +21,7 @@ import { api, backendEnabled, apiBaseUrl, type KatalogMetrik } from '../../lib/a
 import { healthWebhookUrl } from '../../domains/devices/engine/healthWebhookUrl'
 import { useStore } from '../../lib/store'
 import { mergeDemoStored } from '../../lib/profile'
-import { parseHealthFile, parseHealthFileDays, type ImportResult } from '../../lib/healthImport'
+import { latestOfDays, parseHealthFile, parseHealthFileSeries, type DayHourGrids, type HourProfiles, type ImportResult } from '../../lib/healthImport'
 import { getVitals, mergeVitals, syncedToday } from '../../lib/healthVitals'
 import { readUnifiedLocalVitals, recoverSameUserVitalsIntoScope } from '../../domains/identity/localRecovery'
 import { foldsOpenForSession } from '../../shared/ui/foldsPreference'
@@ -93,6 +93,7 @@ const saveBluetoothReading = (patch: WearableSavePatch) => {
 export function HealthProfile() {
   const { account, activePatient } = useStore()
   const analyzerSlot = useNearViewport('200px 0px')
+  const [typicalDays, setTypicalDays] = useState<{ source: string; hours: HourProfiles; grids: DayHourGrids } | null>(null)
   // The analyzer reads history through this function and recomputes only when its identity changes. Any health write
   // (an import, a Bluetooth save, a device sync) publishes on the data bus; a new function per write makes the card
   // show what just arrived instead of the empty state it had on first paint.
@@ -303,19 +304,27 @@ export function HealthProfile() {
       // angka dari layar yang sudah ada di tangan.
       const prepared = await readPersonalHealthFile(file, current, parseHealthFile, bacaGambarBia)
       if (!prepared || !current()) return
-      const { values: r, text, image: gambar } = prepared
+      const { text, image: gambar } = prepared
+      const series = gambar ? null : await parseHealthFileSeries(file.name, text, -new Date().getTimezoneOffset())
+      if (!current()) return
+      // A named-app parser (Apple, WHOOP, InBody, Garmin…) wins. When none recognised the file but it is a plain
+      // timestamped device export, the device-series reader's own days fill the form and the history instead.
+      const named = Object.keys(prepared.values).some((k) => k !== 'source')
+      const fallback = !named && series && series.read.length > 0
+      const r: ImportResult = fallback ? { source: 'Other', ...latestOfDays(series.read) } : prepared.values
       const keys = Object.keys(r).filter((k) => k !== 'source')
       if (!keys.length) {
         setNote('')
         setErr(gambar
           ? 'No numbers could be read from that image. Make sure the whole list is visible and not cut off, then try again.'
-          : 'No recognizable data found in that file. Try export.xml (Apple Health), physiological_cycles.csv (WHOOP), or a JSON export from WHOOP/Garmin Connect.')
+          : 'No recognizable data found in that file. Try export.xml (Apple Health), physiological_cycles.csv (WHOOP), a JSON export from WHOOP/Garmin Connect, or a CSV with a time column.')
         return
       }
       // A dated export writes one history row per day it covers, so the analyzer gets real past days instead of
       // every value being filed under today. A file without dates (or an image) records the latest values as today.
-      const days = gambar ? [] : await parseHealthFileDays(file.name, text, -new Date().getTimezoneOffset())
-      if (!current()) return
+      const days = fallback ? series.read : series?.days ?? []
+      // The typical day needs each reading's time, which daily history does not keep: shown for this import only.
+      setTypicalDays(series && Object.keys(series.hours).length ? { source: file.name, hours: series.hours, grids: series.grids } : null)
       // Read before any state is written, so leaving the page mid-read changes nothing.
       setP((x) => ({
         ...x,
@@ -467,7 +476,7 @@ export function HealthProfile() {
         <div className="mt-3 min-h-40" ref={analyzerSlot.ref}>
           {analyzerSlot.ready && (
             <Suspense fallback={<div className="h-40" aria-hidden />}>
-              <HealthAnalyzer readSeries={readSeries} today={localDayOf(new Date())} />
+              <HealthAnalyzer readSeries={readSeries} today={localDayOf(new Date())} typicalDays={typicalDays} />
             </Suspense>
           )}
         </div>
