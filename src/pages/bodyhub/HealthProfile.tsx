@@ -1,7 +1,7 @@
 import { capturePersonalHealthOperation, readPersonalHealthFile, readPersonalHealthImage } from '../../domains/personal-health'
 import { loadBluetoothWearablePanel, recordConnectedDevice, type WearableSavePatch } from '../../domains/devices'
 import { loadBodyExposureLocalHub } from '../../domains/body-exposure'
-import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react'
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useNearViewport } from '../../shared/hooks/useNearViewport'
 import { subscribeDataUpdates } from '../../lib/dataSync'
 import { Fold } from '../../shared/ui/Fold'
@@ -844,6 +844,8 @@ function timeAgoShort(d: Date): string {
 
 function AutoSyncCard() {
   const [token, setToken] = useState<string | null>(null)
+  const [tokenLoading, setTokenLoading] = useState(true)
+  const [tokenError, setTokenError] = useState(false)
   const [busy, setBusy] = useState(false)
   const [copied, setCopied] = useState(false)
   // Connection state. Worth surfacing because "is the server even up?" is the
@@ -857,13 +859,28 @@ function AutoSyncCard() {
     try { await api.health(); setConn('up') } catch { setConn('down') }
   }
 
+  const loadPrivateSyncToken = useCallback(async () => {
+    setTokenLoading(true)
+    setTokenError(false)
+    try {
+      const nextToken = await api.getHealthWebhookToken()
+      if (!healthWebhookUrl(apiBaseUrl, nextToken)) throw new Error('Invalid API origin or sync token')
+      setToken(nextToken)
+    } catch {
+      setToken(null)
+      setTokenError(true)
+    } finally {
+      setTokenLoading(false)
+    }
+  }, [])
+
   useEffect(() => {
-    api.getHealthWebhookToken().then(setToken).catch(() => {})
+    void loadPrivateSyncToken()
     checkConnection()
     api.getHealthProfile()
       .then((r) => setLastSync((r as { lastDeviceSyncAt?: string })?.lastDeviceSyncAt ?? null))
       .catch(() => {})
-  }, [])
+  }, [loadPrivateSyncToken])
 
   const url = token ? (healthWebhookUrl(apiBaseUrl, token) ?? '') : ''
   // Rotating silently swaps the token and breaks the phone until the new link is
@@ -927,9 +944,16 @@ function AutoSyncCard() {
       <div className="mt-3">
         <div className="text-xs font-semibold uppercase tracking-wide text-neutral-500">Private Sync Link</div>
         <div className="mt-1.5 flex items-center gap-2">
-          <input readOnly value={url || 'Loading…'} className={inputClass + ' flex-1 !text-[11px]'} onFocus={(e) => e.target.select()} />
+          <input readOnly value={url || (tokenLoading ? 'Loading…' : tokenError ? 'Unable to load Private Sync Link' : 'Link unavailable')} className={inputClass + ' flex-1 !text-[11px]'} onFocus={(e) => e.target.select()} />
           <button onClick={copy} disabled={!url} className="shrink-0 rounded-xl bg-neutral-100 px-3 py-2 text-xs font-bold text-neutral-600 transition hover:bg-neutral-200 disabled:opacity-50">{copied ? 'Copied ✓' : 'Copy'}</button>
         </div>
+        {tokenError && (
+          <div role="alert" className="mt-2 rounded-xl border border-rose-200 bg-rose-50 p-3 text-[11px] leading-relaxed text-rose-700">
+            Panaceamed could not retrieve your account's sync token. Confirm that you are signed in, then try again.
+            <button onClick={() => void loadPrivateSyncToken()} disabled={tokenLoading} className="ml-2 font-bold underline disabled:opacity-50">Try again</button>
+          </div>
+        )}
+        {!backendEnabled && <p className="mt-2 text-[11px] text-amber-700">The backend API is not configured for this site, so a private link cannot be generated.</p>}
         <p className="mt-1 text-[10px] leading-relaxed text-neutral-500">
           Keep this link secret — anyone who has it can push data into your account.
           When pasting it into Health Auto Export, <b>clear the URL field first</b>, then paste
