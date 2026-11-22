@@ -331,6 +331,12 @@ function shadeTissue(material: THREE.Material): THREE.Material {
   const fisik = new THREE.MeshPhysicalMaterial({
     name: material.name,
     color: material.color.clone(),
+    map: material.map,
+    vertexColors: material.vertexColors,
+    normalMap: material.normalMap,
+    normalMapType: material.normalMapType,
+    normalScale: material.normalScale.clone(),
+    alphaMap: material.alphaMap,
     transparent: material.transparent,
     opacity: material.opacity,
     alphaTest: material.alphaTest,
@@ -360,7 +366,7 @@ function cloneLayerMaterials(root: THREE.Group) {
       const existing = lokal.get(material)
       if (existing) return existing
       const copy = shadeTissue(material)
-      copy.userData = { ...material.userData, body3dBaseOpacity: material.opacity }
+      copy.userData.body3dBaseOpacity = material.opacity
       lokal.set(material, copy)
       return copy
     })
