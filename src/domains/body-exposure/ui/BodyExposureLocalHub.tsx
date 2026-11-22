@@ -41,11 +41,11 @@ const FaceCapture = lazy(() => import('./face-capture/FaceCapture.tsx').then((m)
 export type HubTab = 'vitality' | 'wearables' | 'emv_pass' | 'face'
 type FilterCategory = 'all' | WearableCategory
 
-const HUB_TABS: readonly { readonly id: HubTab; readonly label: string }[] = [
-  { id: 'vitality', label: 'Vitality Bio-Scrolling' },
-  { id: 'wearables', label: '25 Wearable Hub' },
-  { id: 'emv_pass', label: 'EMV QR & Barcode' },
-  { id: 'face', label: 'Face from photo' },
+const HUB_TABS: readonly { readonly id: HubTab; readonly label: string; readonly icon: string }[] = [
+  { id: 'vitality', label: 'Vitals', icon: 'M2 12h5l3-8 4 16 3-8h5' },
+  { id: 'wearables', label: 'Wearables', icon: 'M9 6l1-4h4l1 4 M9 18l1 4h4l1-4 M7 6h10v12H7z' },
+  { id: 'emv_pass', label: 'ID pass', icon: 'M3 5h18v14H3z M6 9h3v3H6z M13 9h5 M13 13h4' },
+  { id: 'face', label: '3D face', icon: 'M12 2l9 5v10l-9 5-9-5V7z M3 7l9 5 9-5 M12 12v10' },
 ]
 
 function QrSvg({ payload }: { readonly payload: string }) {
@@ -123,7 +123,10 @@ export function BodyExposureLocalHub({
   const videoRef = useRef<HTMLVideoElement | null>(null)
   const streamRef = useRef<MediaStream | null>(null)
 
+  const cameraRequest = useRef(0)
+
   const stopScanner = () => {
+    cameraRequest.current++
     if (streamRef.current) {
       streamRef.current.getTracks().forEach((t) => t.stop())
       streamRef.current = null
@@ -137,12 +140,17 @@ export function BodyExposureLocalHub({
       setScannerStatus('unsupported')
       return
     }
+    const request = ++cameraRequest.current
     setScannerStatus('requesting')
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         video: { facingMode: { ideal: 'environment' } },
         audio: false,
       })
+      if (request !== cameraRequest.current) {
+        stream.getTracks().forEach((track) => track.stop())
+        return
+      }
       streamRef.current = stream
       setScannerStatus('active')
       setScannerActive(true)
@@ -151,7 +159,7 @@ export function BodyExposureLocalHub({
         videoRef.current.play().catch(() => {})
       }
     } catch {
-      setScannerStatus('denied')
+      if (request === cameraRequest.current) setScannerStatus('denied')
     }
   }
 
@@ -164,6 +172,7 @@ export function BodyExposureLocalHub({
 
   useEffect(() => {
     return () => {
+      cameraRequest.current++
       if (streamRef.current) {
         streamRef.current.getTracks().forEach((t) => t.stop())
       }
@@ -268,7 +277,7 @@ export function BodyExposureLocalHub({
     const nextIdx = Math.max(0, Math.min(vitalityCards.length - 1, activeCardIdx + delta))
     setActiveCardIdx(nextIdx)
     const child = scrollerRef.current?.children.item(nextIdx) as HTMLElement | null
-    child?.scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'nearest' })
+    child?.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', inline: 'start', block: 'nearest' })
   }
 
   const toneBadgeColor = (tone: 'live' | 'warn' | 'muted') =>
@@ -302,13 +311,7 @@ export function BodyExposureLocalHub({
         }}
       >
         <div style={{ minWidth: 0 }}>
-          <div style={{ ...eyebrow, color: TONE.liveText }}>PanaceaMed Body Exposure · Local Hub</div>
-          <h3 style={{ margin: '4px 0 0', fontSize: compact ? 16 : 18, fontWeight: 800, color: TONE.text }}>
-            Vitality Bio-Scrolling, 25 Wearables &amp; Rotating EMV Pass
-          </h3>
-          <p style={{ margin: '4px 0 0', fontSize: 12, color: TONE.dim, lineHeight: 1.5 }}>
-            Synchronized directly with your canonical PanaceaMed account and recorded wearable vitals — unrecorded metrics stay explicitly empty.
-          </p>
+          <h3 style={{ margin: 0, fontSize: compact ? 16 : 18, color: TONE.text }}>Body Exposure</h3>
         </div>
 
         <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 8 }}>
@@ -320,7 +323,10 @@ export function BodyExposureLocalHub({
                   key={item.id}
                   type="button"
                   aria-pressed={active}
-                  onClick={() => setTab(item.id)}
+                  onClick={() => {
+                    if (tab === 'emv_pass' && item.id !== tab) stopScanner()
+                    setTab(item.id)
+                  }}
                   className="as-focus as-hover as-fade"
                   style={{
                     minHeight: TOUCH,
@@ -334,6 +340,9 @@ export function BodyExposureLocalHub({
                     cursor: 'pointer',
                   }}
                 >
+                  <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinejoin="round" strokeLinecap="round" style={{ verticalAlign: 'middle', marginRight: 6 }}>
+                    <path d={item.icon} />
+                  </svg>
                   {item.label}
                 </button>
               )
@@ -408,7 +417,7 @@ export function BodyExposureLocalHub({
         <div style={{ marginTop: 14, display: 'flex', flexDirection: 'column', gap: 12 }}>
           <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
             <span style={{ fontSize: 12, fontWeight: 700, color: TONE.liveText }}>
-              Live Canonical Mirror · Card {activeCardIdx + 1} of {vitalityCards.length}
+              Vitals · Card {activeCardIdx + 1} of {vitalityCards.length}
             </span>
             <div style={{ display: 'flex', gap: 8 }}>
               <button
@@ -735,6 +744,7 @@ export function BodyExposureLocalHub({
                       <button
                         type="button"
                         onClick={startScanner}
+                        disabled={scannerStatus === 'requesting'}
                         style={{ ...primaryButton, minHeight: TOUCH, padding: '0 14px', fontSize: 11, width: 'auto' }}
                       >
                         📷 Buka Kamera Pemindai
