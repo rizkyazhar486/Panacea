@@ -237,6 +237,13 @@ export function Login({ onBack }: { onBack?: () => void }) {
     })
   }
 
+  const verificationOptions = useRef<HTMLDivElement>(null)
+
+  function showVerification() {
+    setError('Verifikasi akun melalui Google atau kode email yang tersedia untuk menyinkronkan perangkat.')
+    verificationOptions.current?.scrollIntoView({ block: 'center' })
+  }
+
   function doLogin() {
     if (!consentOk()) return
     const email = f.email.trim().toLowerCase()
@@ -274,9 +281,13 @@ export function Login({ onBack }: { onBack?: () => void }) {
       strStatus: clinical ? 'pending' : 'none', consentAt: new Date().toISOString(), isOwner,
     }
     if (backendEnabled) {
+      if (import.meta.env.PROD) {
+        showVerification()
+        return
+      }
       api.devLogin(acc.email, acc.name, role)
         .then(a => finish({ ...a, isOwner, isSubscriber: acc.isSubscriber }))
-        .catch(() => finish(acc))
+        .catch(showVerification)
       return
     }
     finish(acc)
@@ -458,19 +469,24 @@ export function Login({ onBack }: { onBack?: () => void }) {
           )}
 
           {/* ── 1-Click Google Sign-In, Authenticator & QR Access ────────────────────────────── */}
-          <div className="space-y-2.5">
+          <div ref={verificationOptions} className="space-y-2.5">
             {rememberedAccounts.length > 0 && (
               <div className="space-y-1.5">
                 {rememberedAccounts.slice(0, 2).map((acc) => (
                   <button
                     key={acc.email}
                     type="button"
-                    onClick={() => completeQuickSignIn(acc)}
+                    onClick={() => {
+                      if (!backendEnabled) return completeQuickSignIn(acc)
+                      setF(prev => ({ ...prev, email: acc.email, name: acc.name ?? '' }))
+                      setRole(acc.role ?? role)
+                      showVerification()
+                    }}
                     data-testid="remembered-account-btn"
                     className="login-submit-btn flex w-full items-center justify-between rounded-2xl px-4 py-2.5 text-xs"
                   >
                     <span className="truncate font-bold">Lanjutkan sebagai {acc.name}</span>
-                    <span className="shrink-0 opacity-85">1-Tap →</span>
+                    <span className="shrink-0 opacity-85">{backendEnabled ? 'Verifikasi →' : '1-Tap →'}</span>
                   </button>
                 ))}
               </div>

@@ -17,8 +17,9 @@ const HealthTrendRechart = lazy(() =>
   import('./HealthTrendRechart').then((m) => ({ default: m.HealthTrendRechart })),
 )
 import { IconHeart, IconActivity, IconCheck, IconChevronRight } from '../../components/icons'
-import { api, backendEnabled, apiBaseUrl, type KatalogMetrik } from '../../lib/api'
+import { api, GalatApi, backendEnabled, apiBaseUrl, type KatalogMetrik } from '../../lib/api'
 import { healthWebhookUrl } from '../../domains/devices/engine/healthWebhookUrl'
+import { SyncSignIn } from './SyncSignIn'
 import { useStore } from '../../lib/store'
 import { mergeDemoStored } from '../../lib/profile'
 import { latestOfDays, parseHealthFile, parseHealthFileSeries, type DayHourGrids, type HourProfiles, type ImportResult } from '../../lib/healthImport'
@@ -217,7 +218,8 @@ export function HealthProfile() {
     const history = withSnapshot(p)
     const payload = { ...p, history, updatedAt: now }
     setP(payload)
-    try { localStorage.setItem(LKEY, JSON.stringify(payload)) } catch { /* ignore */ }
+    let savedLocally = false
+    try { localStorage.setItem(LKEY, JSON.stringify(payload)); savedLocally = true } catch { /* report below */ }
     // Keep the shared local demographics & live vitals in sync across every surface without inventing zeroed defaults.
     mergeDemoStored({
       age: p.age || undefined,
@@ -253,11 +255,18 @@ export function HealthProfile() {
         ownerEmail: account?.email,
       })
     }
+    let savedOnServer = false
     if (backendEnabled) {
-      try { await api.saveHealthProfile(payload as unknown as Record<string, unknown>) }
-      catch { setErr('Saved on this device, but syncing to the server failed (offline). It will be kept locally automatically.') }
+      try { await api.saveHealthProfile(payload as unknown as Record<string, unknown>); savedOnServer = true }
+      catch (error) {
+        const reason = error instanceof GalatApi && error.status === 401
+          ? 'Sign in with Google or a verified email code, then save again.'
+          : 'Server sync failed. Try saving again.'
+        setErr((savedLocally ? 'Saved on this device. ' : 'Unable to save on this device. ') + reason)
+      }
     }
-    setSavedAt(now); setSaving(false)
+    if (!backendEnabled && !savedLocally) setErr('Unable to save on this device.')
+    setSavedAt(savedLocally || savedOnServer ? now : null); setSaving(false)
   }
 
   const MAX_IMPORT_BYTES = 60 * 1024 * 1024 // 60 MB — big Apple Health exports can freeze the tab if loaded whole
@@ -845,14 +854,14 @@ function timeAgoShort(d: Date): string {
 function AutoSyncCard() {
   const [token, setToken] = useState<string | null>(null)
   const [tokenLoading, setTokenLoading] = useState(true)
-  const [tokenError, setTokenError] = useState(false)
+  const [tokenError, setTokenError] = useState<'session' | 'request' | null>(null)
   const [busy, setBusy] = useState(false)
   const [copied, setCopied] = useState(false)
   // Connection state. Worth surfacing because "is the server even up?" is the
   // first thing to rule out when a sync produces nothing, and until now the
   // only way to answer it was to guess a URL by hand.
   const [conn, setConn] = useState<'checking' | 'up' | 'down'>('checking')
-  const [lastSync, setLastSync] = useState<string | null>(null)
+  const [lastSync, setLastSync] = useState<string | null | undefined>(undefined)
 
   const checkConnection = async () => {
     setConn('checking')
@@ -861,7 +870,7 @@ function AutoSyncCard() {
 
   const loadPrivateSyncToken = useCallback(async () => {
     setTokenLoading(true)
-    setTokenError(false)
+    setTokenError(null)
     if (!backendEnabled) {
       setToken(null)
       setTokenLoading(false)
@@ -871,9 +880,9 @@ function AutoSyncCard() {
       const nextToken = await api.getHealthWebhookToken()
       if (!healthWebhookUrl(apiBaseUrl, nextToken)) throw new Error('Invalid API origin or sync token')
       setToken(nextToken)
-    } catch {
+    } catch (error) {
       setToken(null)
-      setTokenError(true)
+      setTokenError(error instanceof GalatApi && error.status === 401 ? 'session' : 'request')
     } finally {
       setTokenLoading(false)
     }
@@ -932,7 +941,7 @@ function AutoSyncCard() {
         <div className="mt-1.5 flex items-center justify-between gap-2">
           <span className="text-[12px] font-bold text-neutral-600 dark:text-neutral-300">Last delivery from the device</span>
           <span className="text-[12px] font-black text-ink dark:text-ink">
-            {lastSync ? timeAgoShort(new Date(lastSync)) : "never"}
+            {lastSync ? timeAgoShort(new Date(lastSync)) : lastSync === null ? 'No recorded delivery' : 'Unknown'}
           </span>
         </div>
         {conn === 'down' && (
@@ -941,8 +950,8 @@ function AutoSyncCard() {
             check the deployment status before hunting through settings in the app.
           </p>
         )}
-        {conn === 'up' && !lastSync && (
-          <Prosa kelas="mt-2 text-[11px] leading-relaxed text-neutral-500">The server is healthy but has never received a delivery from your device. That places the problem on the iPhone side — the URL, Health permissions, or an automation that has not run — not on the server.</Prosa>
+        {conn === 'up' && lastSync === null && (
+          <Prosa kelas="mt-2 text-[11px] leading-relaxed text-neutral-500">No device delivery is recorded for this account. Check the private link and run a manual export.</Prosa>
         )}
       </div>
 
@@ -954,7 +963,7 @@ function AutoSyncCard() {
         </div>
         {tokenError && (
           <div role="alert" className="mt-2 rounded-xl border border-rose-200 bg-rose-50 p-3 text-[11px] leading-relaxed text-rose-700">
-            Panaceamed could not retrieve your account's sync token. Confirm that you are signed in, then try again.
+            {tokenError === 'session' ? <SyncSignIn /> : 'Could not retrieve the private link.'}
             <button onClick={() => void loadPrivateSyncToken()} disabled={tokenLoading} className="ml-2 font-bold underline disabled:opacity-50">Try again</button>
           </div>
         )}
