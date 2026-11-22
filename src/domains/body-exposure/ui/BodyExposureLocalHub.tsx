@@ -48,6 +48,32 @@ const HUB_TABS: readonly { readonly id: HubTab; readonly label: string; readonly
   { id: 'face', label: '3D face', icon: 'M12 2l9 5v10l-9 5-9-5V7z M3 7l9 5 9-5 M12 12v10' },
 ]
 
+type OpticalDetector = new (options: { formats: string[] }) => {
+  detect: (image: HTMLVideoElement | ImageBitmap) => Promise<Array<{ rawValue?: string }>>
+}
+
+async function readOpticalCode(image: HTMLVideoElement | File): Promise<string> {
+  const Detector = (globalThis as { BarcodeDetector?: OpticalDetector }).BarcodeDetector
+  if (!Detector || (image instanceof File && typeof createImageBitmap !== 'function')) {
+    return 'Dekoder QR dan barcode tidak tersedia di browser ini.'
+  }
+  let bitmap: ImageBitmap | undefined
+  try {
+    const input = image instanceof File ? (bitmap = await createImageBitmap(image)) : image
+    const hits = await new Detector({ formats: ['qr_code', 'code_128'] }).detect(input)
+    const raw = hits.find(hit => hit.rawValue?.trim())?.rawValue?.trim()
+    if (!raw) return 'Kode belum terbaca. Posisikan seluruh kode di dalam bingkai.'
+    if (/^\d{16}$/.test(raw) && verifyLuhnCardNumber(raw)) {
+      return 'Barcode terbaca · checksum valid · identitas belum diverifikasi.'
+    }
+    return 'Kode terbaca · identitas belum diverifikasi.'
+  } catch {
+    return 'Gagal membaca kode. Coba lagi dengan pencahayaan yang cukup.'
+  } finally {
+    bitmap?.close()
+  }
+}
+
 function QrSvg({ payload }: { readonly payload: string }) {
   const matrix = useMemo(() => encodeQrMatrix21(payload), [payload])
   return (
@@ -125,7 +151,22 @@ export function BodyExposureLocalHub({
 
   const cameraRequest = useRef(0)
 
+  const scanVersion = useRef(0)
+  const [readingCode, setReadingCode] = useState(false)
+  const scan = async (source: HTMLVideoElement | File) => {
+    const version = ++scanVersion.current
+    setReadingCode(true)
+    const message = await readOpticalCode(source)
+    if (version === scanVersion.current) {
+      setScannedResult(message)
+      setReadingCode(false)
+    }
+  }
+
   const stopScanner = () => {
+    scanVersion.current++
+    setReadingCode(false)
+    setScannedResult(null)
     cameraRequest.current++
     if (streamRef.current) {
       streamRef.current.getTracks().forEach((t) => t.stop())
@@ -173,6 +214,7 @@ export function BodyExposureLocalHub({
   useEffect(() => {
     return () => {
       cameraRequest.current++
+      scanVersion.current++
       if (streamRef.current) {
         streamRef.current.getTracks().forEach((t) => t.stop())
       }
@@ -762,29 +804,13 @@ export function BodyExposureLocalHub({
                       📁 Unggah Gambar QR
                       <input
                         type="file"
+                        disabled={readingCode}
                         accept="image/*"
                         onChange={async (e) => {
                           const file = e.target.files?.[0]
                           if (!file) return
-                          const BD = (globalThis as { BarcodeDetector?: new (opts: { formats: string[] }) => { detect: (img: ImageBitmapSource) => Promise<Array<{ rawValue?: string }>> } }).BarcodeDetector
-                          if (!BD || typeof createImageBitmap !== 'function') {
-                            setScannedResult(`Berkas ${file.name} diterima — dekoder QR optik memerlukan browser dengan BarcodeDetector API; gunakan kamera aktif atau token di layar.`)
-                            return
-                          }
-                          try {
-                            const bmp = await createImageBitmap(file)
-                            const hits = await new BD({ formats: ['qr_code', 'code_128'] }).detect(bmp)
-                            const raw = hits.find((h) => h.rawValue)?.rawValue?.trim() ?? ''
-                            if (!raw) {
-                              setScannedResult(`Tidak ditemukan QR atau Code-128 terbaca pada ${file.name}.`)
-                              return
-                            }
-                            const pan = raw.replace(/\D/g, '').slice(0, 16)
-                            const luhnOk = pan.length === 16 && verifyLuhnCardNumber(pan)
-                            setScannedResult(`Token terbaca (${raw.slice(0, 24)}…) — ${luhnOk ? 'ISO/IEC 7812 Luhn Checksum PASS' : 'Token terdekode (memerlukan verifikasi faskes)'}`)
-                          } catch {
-                            setScannedResult(`Gagal mendekode QR/Barcode dari ${file.name}.`)
-                          }
+                          e.target.value = ''
+                          await scan(file)
                         }}
                         style={{ display: 'none' }}
                       />
@@ -818,6 +844,13 @@ export function BodyExposureLocalHub({
                       Arahkan kamera ke QR / Barcode kartu EMVCo
                     </div>
                   </div>
+                )}
+
+                {scannerActive && (
+                  <button type="button" disabled={readingCode} style={{ ...primaryButton, minHeight: TOUCH }}
+                    onClick={() => { if (videoRef.current) void scan(videoRef.current) }}>
+                    {readingCode ? 'Memindai…' : 'Pindai kode'}
+                  </button>
                 )}
 
                 {scannedResult && (
