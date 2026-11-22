@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 import { runCounterfactualIntervention } from '../../src/engines/reality-view/counterfactualSimulator.ts'
+import { selectQuietModeSummary } from '../../src/engines/reality-view/quietModeSelector.ts'
 
 const patientId = 'synthetic-patient'
 const meshId = 'synthetic-atlas-heart'
@@ -163,4 +164,17 @@ test('lifestyle interventions stay unavailable until adequate models exist', () 
     assert.deepEqual(result.activeChevrons, [])
     assert.equal(result.medicationScreen, 'not_run')
   }
+})
+
+test('Quiet mode escalates a medication hold for this patient only', () => {
+  const result = runCounterfactualIntervention(state, proposed('clopidogrel', context('omeprazole')))
+  assert.equal(result.patientId, state.patientId)
+  const summary = selectQuietModeSummary(state, result)
+  assert.equal(summary.escalated, true)
+  assert.equal(summary.primaryAction.urgent, true)
+  assert.equal(summary.primaryAction.actionType, 'view_medication')
+  assert.match(summary.headline, /medication/i)
+  assert.doesNotMatch(summary.headline, /emergency|acute|recorded/i)
+  const otherPatient = { ...state, patientId: 'different-patient' }
+  assert.deepEqual(selectQuietModeSummary(otherPatient, result), selectQuietModeSummary(otherPatient))
 })

@@ -62,6 +62,7 @@ export interface CounterfactualSafetyChevron {
 }
 
 export interface CounterfactualResult {
+  readonly patientId: string
   readonly status: 'blocked' | 'unavailable'
   readonly reason: 'rule_flagged' | 'invalid_request' | 'incomplete_context' | 'unsupported_medication' | 'projection_unavailable'
   readonly counterfactualId: string | null
@@ -138,6 +139,7 @@ export function runCounterfactualIntervention(state: RealityViewState, req: Coun
     ? req.counterfactualId
     : null
   const unavailable: CounterfactualResult = {
+    patientId: state.patientId,
     status: 'unavailable',
     reason: 'projection_unavailable',
     counterfactualId,
