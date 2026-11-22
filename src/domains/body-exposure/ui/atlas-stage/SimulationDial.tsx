@@ -2,7 +2,7 @@
 // read the cardiac output. Everything shown is computed by lib/bodySim; nothing here is a measurement of the viewer.
 
 import type { BodyMotionResult } from '../../engine/body-motion/bodyMotion.ts'
-import { MOTION_SCENARIOS } from '../../engine/body-motion/bodyMotion.ts'
+import { MOTION_SCENARIOS, planScenarioMotion } from '../../engine/body-motion/bodyMotion.ts'
 import { TONE, TOUCH, glass } from './stageTokens'
 
 export interface SimulationDialProps {
@@ -20,6 +20,13 @@ export interface SimulationDialProps {
 }
 
 const fixed = (v: number, digits: number) => v.toFixed(digits)
+
+const resting = planScenarioMotion('normal')
+const systemMetrics = [
+  { key: 'mapMmHg', label: 'Mean arterial pressure', unit: ' mmHg' },
+  { key: 'sao2Pct', label: 'Arterial O₂ saturation', unit: '%' },
+  { key: 'urineMlPerHour', label: 'Urine output', unit: ' mL/h' },
+] as const
 
 export function SimulationDial({ scenario, onScenario, running, stalled = false, onToggle, result, compact, insideHidden, onSeeInside }: SimulationDialProps) {
   return (
@@ -50,10 +57,26 @@ export function SimulationDial({ scenario, onScenario, running, stalled = false,
           <span style={{ fontSize: 11, color: TONE.dim }}>Cardiac output</span>
           <details open={!compact} key={compact ? 'compact' : 'wide'}>
             <summary style={{ minHeight: TOUCH, alignContent: 'center', cursor: 'pointer', fontSize: 12, color: TONE.dim }}>System outputs</summary>
+            {resting.ok && <small style={{ color: TONE.dim }}>Top · scenario　 Bottom · rest</small>}
             <dl style={{ display: 'grid', gridTemplateColumns: 'auto auto', gap: '4px 10px', margin: 0, fontSize: 12, fontVariantNumeric: 'tabular-nums' }}>
-              <dt>Arterial pressure (mean)</dt><dd style={{ margin: 0 }}>{fixed(result.readout.mapMmHg, 0)} mmHg</dd>
-              <dt>Arterial O₂ saturation</dt><dd style={{ margin: 0 }}>{fixed(result.readout.sao2Pct, 0)}%</dd>
-              <dt>Urine output</dt><dd style={{ margin: 0 }}>{fixed(result.readout.urineMlPerHour, 0)} mL/h</dd>
+              {systemMetrics.map(({ key, label, unit }) => {
+                const value = result.readout[key]
+                const baseline = resting.ok ? resting.readout[key] : null
+                const ceiling = Math.max(1, value, baseline ?? 0)
+                return (
+                  <div key={key} style={{ gridColumn: '1 / -1' }}>
+                    <dt style={{ color: TONE.dim }}>{label}</dt>
+                    <dd style={{ margin: 0 }}>{fixed(value, 0)}{unit}</dd>
+                    {baseline !== null && (
+                      <svg role="img" aria-label={`Scenario ${fixed(value, 0)}${unit}, rest ${fixed(baseline, 0)}${unit}`}
+                        viewBox="0 0 100 10" preserveAspectRatio="none" width="100%" height="10">
+                        <rect width={100 * value / ceiling} height="5" fill={TONE.sim} />
+                        <rect y="7" width={100 * baseline / ceiling} height="2" fill={TONE.dim} />
+                      </svg>
+                    )}
+                  </div>
+                )
+              })}
             </dl>
           </details>
         </div>
