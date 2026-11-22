@@ -22,10 +22,15 @@ export function FaceMesh3D({ mesh, photo }: { readonly mesh: FaceMesh; readonly 
       setNoGl(true)
       return
     }
-    const size = el.clientWidth
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2))
     // false: keep the canvas styled by CSS (100% of the stage) rather than inline pixel sizes.
-    renderer.setSize(size, size, false)
+    const resize = () => {
+      const size = Math.max(1, el.clientWidth)
+      renderer.setSize(size, size, false)
+    }
+    resize()
+    const observer = new ResizeObserver(resize)
+    observer.observe(el)
     renderer.outputColorSpace = THREE.SRGBColorSpace
     el.appendChild(renderer.domElement)
 
@@ -43,6 +48,7 @@ export function FaceMesh3D({ mesh, photo }: { readonly mesh: FaceMesh; readonly 
     geo.setIndex(new THREE.BufferAttribute(mesh.indices, 1))
     geo.computeVertexNormals()
     const tex = new THREE.CanvasTexture(photo)
+    tex.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy())
     tex.colorSpace = THREE.SRGBColorSpace
     const mat = new THREE.MeshStandardMaterial({ map: tex, roughness: 0.75, side: THREE.DoubleSide })
     const face = new THREE.Mesh(geo, mat)
@@ -68,19 +74,23 @@ export function FaceMesh3D({ mesh, photo }: { readonly mesh: FaceMesh; readonly 
     renderer.domElement.addEventListener('pointerdown', stopAuto)
 
     let raf = 0
+    let previousTime = performance.now()
     let dir = 1
-    const tick = () => {
+    const tick = (time: number) => {
+      const elapsed = Math.min(0.1, Math.max(0, (time - previousTime) / 1000))
+      previousTime = time
       // Swing left-right inside the front arc instead of spinning past it.
       const az = controls.getAzimuthalAngle()
       if (controls.autoRotate && Math.abs(az) > 0.7) dir = az > 0 ? 1 : -1
       controls.autoRotateSpeed = 1.6 * dir
-      controls.update()
+      controls.update(elapsed)
       renderer.render(scene, camera)
       raf = requestAnimationFrame(tick)
     }
-    tick()
+    raf = requestAnimationFrame(tick)
 
     return () => {
+      observer.disconnect()
       cancelAnimationFrame(raf)
       renderer.domElement.removeEventListener('pointerdown', stopAuto)
       controls.dispose()
@@ -91,7 +101,7 @@ export function FaceMesh3D({ mesh, photo }: { readonly mesh: FaceMesh; readonly 
     }
   }, [mesh, photo])
 
-  useEffect(() => { if (wireRef.current) wireRef.current.visible = wire }, [wire])
+  useEffect(() => { if (wireRef.current) wireRef.current.visible = wire }, [wire, mesh, photo])
 
   if (noGl) return <p className="fc-err" role="alert">3D is not available in this browser.</p>
 
