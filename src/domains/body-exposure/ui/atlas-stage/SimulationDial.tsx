@@ -35,7 +35,7 @@ export function SimulationDial({ scenario, onScenario, running, stalled = false,
           aria-label="Simulation scenario"
           value={scenario}
           onChange={(e) => onScenario(e.target.value)}
-          style={{ minHeight: compact ? 36 : TOUCH, maxWidth: compact ? 150 : 200, background: TONE.panelSolid, color: TONE.text, border: `1px solid ${TONE.lineStrong}`, borderRadius: 10, padding: '0 8px', fontSize: 13, fontWeight: 700 }}
+          style={{ minHeight: TOUCH, maxWidth: compact ? 150 : 200, background: TONE.panelSolid, color: TONE.text, border: `1px solid ${TONE.lineStrong}`, borderRadius: 10, padding: '0 8px', fontSize: 13, fontWeight: 700 }}
         >
           {MOTION_SCENARIOS.map((s) => <option key={s.key} value={s.key}>{s.label}</option>)}
         </select>
@@ -48,11 +48,14 @@ export function SimulationDial({ scenario, onScenario, running, stalled = false,
             <span style={{ fontSize: compact ? 11 : 13, fontWeight: 700, color: TONE.dim }}> L/min</span>
           </span>
           <span style={{ fontSize: 11, color: TONE.dim }}>Cardiac output</span>
-          {!compact && (
-            <span style={{ fontSize: 11, color: TONE.faint, fontVariantNumeric: 'tabular-nums', marginTop: 4 }}>
-              MAP {fixed(result.readout.mapMmHg, 0)} mmHg · SaO₂ {fixed(result.readout.sao2Pct, 0)}% · Urine {fixed(result.readout.urineMlPerHour, 0)} mL/h
-            </span>
-          )}
+          <details open={!compact} key={compact ? 'compact' : 'wide'}>
+            <summary style={{ minHeight: TOUCH, alignContent: 'center', cursor: 'pointer', fontSize: 12, color: TONE.dim }}>System outputs</summary>
+            <dl style={{ display: 'grid', gridTemplateColumns: 'auto auto', gap: '4px 10px', margin: 0, fontSize: 12, fontVariantNumeric: 'tabular-nums' }}>
+              <dt>Arterial pressure (mean)</dt><dd style={{ margin: 0 }}>{fixed(result.readout.mapMmHg, 0)} mmHg</dd>
+              <dt>Arterial O₂ saturation</dt><dd style={{ margin: 0 }}>{fixed(result.readout.sao2Pct, 0)}%</dd>
+              <dt>Urine output</dt><dd style={{ margin: 0 }}>{fixed(result.readout.urineMlPerHour, 0)} mL/h</dd>
+            </dl>
+          </details>
         </div>
       ) : (
         <span role="status" style={{ fontSize: 12, color: TONE.gate }}>Simulation unavailable for this state.</span>
