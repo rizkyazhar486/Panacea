@@ -78,6 +78,7 @@ export function Login({ onBack }: { onBack?: () => void }) {
     backendEnabled ? 'connecting' : 'idle',
   )
   const [healthRetrySeed, setHealthRetrySeed] = useState(0)
+  const [emailVerificationVersion, setEmailVerificationVersion] = useState(0)
 
   const rememberedAccounts = listRememberedAccounts({
     profiles: state.profiles,
@@ -281,10 +282,6 @@ export function Login({ onBack }: { onBack?: () => void }) {
       strStatus: clinical ? 'pending' : 'none', consentAt: new Date().toISOString(), isOwner,
     }
     if (backendEnabled) {
-      if (import.meta.env.PROD) {
-        showVerification()
-        return
-      }
       api.devLogin(acc.email, acc.name, role)
         .then(a => finish({ ...a, isOwner, isSubscriber: acc.isSubscriber }))
         .catch(showVerification)
@@ -478,6 +475,7 @@ export function Login({ onBack }: { onBack?: () => void }) {
                     type="button"
                     onClick={() => {
                       if (!backendEnabled) return completeQuickSignIn(acc)
+                      if (acc.email !== f.email || (acc.role ?? role) !== role) setEmailVerificationVersion(version => version + 1)
                       setF(prev => ({ ...prev, email: acc.email, name: acc.name ?? '' }))
                       setRole(acc.role ?? role)
                       showVerification()
@@ -547,6 +545,7 @@ export function Login({ onBack }: { onBack?: () => void }) {
 
           {health?.features.otpEmail && (
             <EmailOtpLogin
+              key={emailVerificationVersion}
               role={role}
               consentOk={consentOk}
               name={f.name}

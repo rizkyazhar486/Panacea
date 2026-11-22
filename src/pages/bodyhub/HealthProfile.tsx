@@ -863,10 +863,13 @@ function AutoSyncCard() {
   const [conn, setConn] = useState<'checking' | 'up' | 'down'>('checking')
   const [lastSync, setLastSync] = useState<string | null | undefined>(undefined)
 
-  const checkConnection = async () => {
+  const checkConnection = useCallback(async () => {
     setConn('checking')
-    try { await api.health(); setConn('up') } catch { setConn('down') }
-  }
+    const [health, profile] = await Promise.allSettled([api.health(), api.getHealthProfile()])
+    const deliveredAt = profile.status === 'fulfilled' ? profile.value?.lastDeviceSyncAt : undefined
+    setLastSync(profile.status === 'rejected' ? undefined : typeof deliveredAt === 'string' ? deliveredAt : null)
+    setConn(health.status === 'fulfilled' ? 'up' : 'down')
+  }, [])
 
   const loadPrivateSyncToken = useCallback(async () => {
     setTokenLoading(true)
@@ -890,11 +893,8 @@ function AutoSyncCard() {
 
   useEffect(() => {
     void loadPrivateSyncToken()
-    checkConnection()
-    api.getHealthProfile()
-      .then((r) => setLastSync((r as { lastDeviceSyncAt?: string })?.lastDeviceSyncAt ?? null))
-      .catch(() => {})
-  }, [loadPrivateSyncToken])
+    void checkConnection()
+  }, [checkConnection, loadPrivateSyncToken])
 
   const url = token ? (healthWebhookUrl(apiBaseUrl, token) ?? '') : ''
   // Rotating silently swaps the token and breaks the phone until the new link is
@@ -935,7 +935,7 @@ function AutoSyncCard() {
             <Badge tone={conn === 'up' ? 'normal' : conn === 'down' ? 'critical' : 'low'}>
               {conn === 'up' ? 'Connected' : conn === 'down' ? 'Not responding' : 'Checking…'}
             </Badge>
-            <button onClick={checkConnection} className="text-[11px] font-bold text-brand-dark hover:underline">Check again</button>
+            <button onClick={checkConnection} disabled={conn === 'checking'} className="text-[11px] font-bold text-brand-dark hover:underline disabled:opacity-50">Check again</button>
           </div>
         </div>
         <div className="mt-1.5 flex items-center justify-between gap-2">
