@@ -79,7 +79,7 @@ function QrSvg({ payload }: { readonly payload: string }) {
   return (
     <svg
       role="img"
-      aria-label="EMV dynamic medical token QR matrix"
+      aria-label="Token pattern preview"
       data-testid="emv-qr-svg"
       viewBox="0 0 23 23"
       style={{ width: 148, height: 148, borderRadius: 12, background: '#f8fafc', padding: 6, flex: 'none' }}
@@ -127,7 +127,7 @@ export function BodyExposureLocalHub({
 
   const [tab, setTab] = useState<HubTab>(initialTab)
   const [category, setCategory] = useState<FilterCategory>('all')
-  const [emvMode, setEmvMode] = useState<EmvPassMode>('universal')
+  const [emvMode, setEmvMode] = useState<EmvPassMode>('wristband')
   const [epochMs, setEpochMs] = useState<number>(() => Date.now())
   const [subtleHex, setSubtleHex] = useState<string | null>(null)
   const [vitals, setVitals] = useState<Vitals>(() =>
@@ -723,8 +723,8 @@ export function BodyExposureLocalHub({
 
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }} role="group" aria-label="Token pass variant">
                   {([
-                    { id: 'universal', label: 'Universal QR' },
-                    { id: 'emergency', label: 'Emergency QR' },
+                    { id: 'universal', label: 'Universal preview' },
+                    { id: 'emergency', label: 'Emergency preview' },
                     { id: 'wristband', label: 'Code-128 Band' },
                   ] as const).map((variant) => {
                     const active = emvMode === variant.id
@@ -755,9 +755,14 @@ export function BodyExposureLocalHub({
               </div>
 
               <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 16 }}>
-                <QrSvg payload={emvMode === 'emergency' ? emvPass.payloads.emergency : emvPass.payloads.universal} />
+                {emvMode !== 'wristband' && (
+                  <figure style={{ margin: 0 }}>
+                    <QrSvg payload={emvMode === 'emergency' ? emvPass.payloads.emergency : emvPass.payloads.universal} />
+                    <figcaption style={{ fontSize: 11, color: TONE.dim }}>Visual preview · unscannable</figcaption>
+                  </figure>
+                )}
                 <div style={{ flex: '1 1 240px', minWidth: 0, display: 'flex', flexDirection: 'column', gap: 10 }}>
-                  <Code128Svg value={emvPass.payloads.wristbandCode128} />
+                  {emvMode === 'wristband' && <Code128Svg value={emvPass.payloads.wristbandCode128} />}
                   <div style={{ fontSize: 11, fontVariantNumeric: 'tabular-nums', color: TONE.dim }}>
                     Wristband Code-128: <strong style={{ color: TONE.text }}>{emvPass.payloads.wristbandCode128}</strong>
                   </div>
