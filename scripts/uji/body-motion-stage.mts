@@ -78,8 +78,20 @@ gagal('organ-tampak-tanpa-tombol-lihat-ke-dalam', () => {
   assert.doesNotMatch(dial({ insideHidden: false }), /data-sim-see-inside/)
   assert.match(dial({ insideHidden: true }), /data-sim-see-inside/)
 })
-gagal('ringkas-di-ponsel-tanpa-baris-detail', () => {
-  assert.doesNotMatch(dial({ compact: true }), /MAP /); assert.match(dial({ compact: false }), /MAP \d+ mmHg/)
+gagal('hasil-sistem-terlipat-di-ponsel-terbuka-di-desktop', () => {
+  const compact = dial({ compact: true })
+  const wide = dial({ compact: false })
+  assert.match(compact, /<details>/)
+  assert.match(wide, /<details open=""/)
+  const motion = planScenarioMotion('normal')
+  assert.ok(motion.ok)
+  for (const markup of [compact, wide]) {
+    for (const value of [
+      motion.readout.mapMmHg.toFixed(0) + ' mmHg',
+      motion.readout.sao2Pct.toFixed(0) + '%',
+      motion.readout.urineMlPerHour.toFixed(0) + ' mL/h',
+    ]) assert.ok(markup.includes('>' + value + '</dd>'))
+  }
 })
 gagal('skenario-olahraga-angka-sendiri', () => {
   const ex = SKENARIO.find((s) => s.key === 'exercise')!
