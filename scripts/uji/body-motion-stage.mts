@@ -93,6 +93,17 @@ gagal('hasil-sistem-terlipat-di-ponsel-terbuka-di-desktop', () => {
     ]) assert.ok(markup.includes('>' + value + '</dd>'))
   }
 })
+gagal('grafik-membandingkan-skenario-dengan-istirahat', () => {
+  const exercise = planScenarioMotion('exercise')
+  const baseline = planScenarioMotion('normal')
+  assert.ok(exercise.ok && baseline.ok)
+  const markup = dial({ scenario: 'exercise', result: exercise })
+  for (const [key, unit] of [['mapMmHg', ' mmHg'], ['sao2Pct', '%'], ['urineMlPerHour', ' mL/h']] as const) {
+    const pair = `Scenario ${exercise.readout[key].toFixed(0)}${unit}, rest ${baseline.readout[key].toFixed(0)}${unit}`
+    assert.ok(markup.includes(`aria-label="${pair}"`))
+  }
+  assert.doesNotMatch(dial({ result: planScenarioMotion('unknown') }), /Top · scenario/)
+})
 gagal('skenario-olahraga-angka-sendiri', () => {
   const ex = SKENARIO.find((s) => s.key === 'exercise')!
   assert.match(dial({ scenario: 'exercise', result: planScenarioMotion('exercise') }), new RegExp(`>${simulate(ex.input).cardiacOutput.toFixed(1)}<`))
