@@ -557,19 +557,21 @@ export function deriveCareContinuityState(input: CareContinuityProjectionInput):
   }))
 
   const payer: PayerOrchestrationState = {
-    coverage: input.payerCoverageActive === false ? 'inactive' : 'active',
-    payerAdapterConfigured: true,
-    preauthorization: 'not-required',
+    coverage: input.payerCoverageActive === true ? 'active'
+      : input.payerCoverageActive === false ? 'inactive' : 'unknown',
+    // The local encounter projection has no authoritative payer or coding record.
+    payerAdapterConfigured: false,
+    preauthorization: 'unknown',
     payment: 'not-submitted',
     evidence: {
       patientIdentityResolved: Boolean(input.patientId),
-      coverageIdentityResolved: true,
-      encounterLinked: Boolean(record),
+      coverageIdentityResolved: false,
+      encounterLinked: typeof record?.id === 'string' && Boolean(record.id.trim()),
       clinicalRecordSigned: isRecordSignedByClinician,
-      diagnosisCoded: Boolean(record?.primaryDiagnosis?.code || record?.primaryDiagnosis?.title),
-      serviceItemsCoded: Boolean(record?.plan && record.plan.length > 0),
-      supportingEvidenceLinked: validSupportive.length > 0,
-      provenanceComplete: Boolean(record?.updatedAt),
+      diagnosisCoded: false,
+      serviceItemsCoded: false,
+      supportingEvidenceLinked: false,
+      provenanceComplete: false,
     },
   }
 

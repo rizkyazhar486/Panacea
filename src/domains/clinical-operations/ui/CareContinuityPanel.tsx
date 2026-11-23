@@ -276,21 +276,24 @@ export function CareContinuityPanel({
                 </span>
               </div>
               <div className="flex justify-between text-white/70">
-                <span>Claim packet ready:</span>
+                <span>Claim readiness</span>
                 <span className="font-semibold text-white">
-                  {careAccess.financialWorkflow.claimSubmissionReady ? 'Yes' : 'Pending evidence'}
+                  {careAccess.financialWorkflow.claimSubmissionReady ? 'Ready for review' : 'Pending'}
                 </span>
               </div>
-              <p className="mt-1.5 text-[11px] leading-snug text-white/65">
-                {careAccess.financialWorkflow.nextAdministrativeAction}
-              </p>
-
-              {careAccess.financialWorkflow.missingClaimEvidence.length > 0 && (
-                <div className="mt-2 rounded-lg bg-amber-400/5 p-2 text-[10px] text-amber-200/90">
-                  <span className="font-bold">Missing packet items:</span>{' '}
-                  {careAccess.financialWorkflow.missingClaimEvidence.join(', ')}
-                </div>
-              )}
+              <details className="rounded-lg border border-white/10 px-2">
+                <summary className="min-h-11 cursor-pointer py-3.5 font-semibold text-white/85">
+                  Claim evidence · {careAccess.financialWorkflow.missingClaimEvidence.length} missing
+                </summary>
+                <p className="pb-2 text-sm text-white/75">
+                  {careAccess.financialWorkflow.nextAdministrativeAction}
+                </p>
+                {careAccess.financialWorkflow.missingClaimEvidence.length > 0 && (
+                  <ul className="list-disc space-y-1 pb-3 pl-5 text-sm text-amber-200">
+                    {careAccess.financialWorkflow.missingClaimEvidence.map(item => <li key={item}>{item}</li>)}
+                  </ul>
+                )}
+              </details>
             </div>
           ) : (
             <p className="mt-2 text-xs text-white/40">No care access orchestration attached.</p>

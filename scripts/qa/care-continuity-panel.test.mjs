@@ -123,6 +123,9 @@ test('CareContinuityPanel: enforces PRD §8.5 result closure and clinical safety
   assert.match(panelSrc, /Diagnostic Continuity/)
   assert.match(panelSrc, /Administrative status:/)
 
+  assert.match(panelSrc, /<details[\s\S]*?<summary[\s\S]*?Claim evidence/)
+  assert.match(panelSrc, /missingClaimEvidence\.map/)
+
   // Episode Transport Durability Section
   assert.match(panelSrc, /Offline Transport/)
   assert.match(panelSrc, /Offline ready/)
@@ -195,7 +198,14 @@ test('deriveCareContinuityState: signed encounter without result evidence remain
   assert.equal(projection.closure.items[0].state, 'open-no-deadline')
   assert.deepEqual(projection.closure.items[0].unmetSteps, ['review', 'explanation'])
   assert.equal(projection.careAccess.clinicalCare.financialStateMayDenyCare, false)
-  assert.equal(projection.careAccess.financialWorkflow.claimSubmissionReady, true)
+  const claim = projection.careAccess.financialWorkflow
+  assert.equal(claim.claimSubmissionReady, false)
+  assert.equal(claim.claimEvidenceReady, false)
+  assert.equal(claim.preauthorizationReady, false)
+  assert.deepEqual(claim.missingClaimEvidence, [
+    'coverage identity', 'coded diagnosis', 'coded service items', 'supporting evidence', 'provenance',
+  ])
+  assert.ok(projection.careAccess.warnings.includes('Coverage status is unknown'))
   assert.equal(projection.episodeResilience.safeToContinueOffline, true)
 
   // One OS Care Proof assertions
