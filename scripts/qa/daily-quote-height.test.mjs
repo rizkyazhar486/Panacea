@@ -6,8 +6,8 @@ import { readFileSync } from 'node:fs'
 
 const source = readFileSync(new URL('../../src/components/dashboard/DailyQuoteBanner.tsx', import.meta.url), 'utf8')
 const card = (text) => text.match(/className="(fly-in-drop[^"]+)"/)?.[1] || ''
-const stable = (text) => /(?:^|\s)min-h-\[100px\](?:\s|$)/.test(card(text)) &&
-  !/(?:^|\s)h-\[100px\](?:\s|$)/.test(card(text))
+const stable = (text) => /(?:^|\s)has-\[details\[open\]\]:min-h-\[100px\](?:\s|$)/.test(card(text)) &&
+  !/(?:^|\s|:)h-\[100px\](?:\s|$)/.test(card(text))
 
 test('F2: rotating quote has stable minimum card height without fixed clipping', () => {
   assert.equal(stable(source), true)
