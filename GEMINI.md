@@ -4,6 +4,8 @@
 > [`docs/governance/README.md`](docs/governance/README.md) and machine-checked by `node scripts/qa/acceptance-v2.mjs`.
 > Where process text below conflicts with it, `docs/governance/` wins. Product doctrine and safety rules below are unchanged.
 
+> Before any architectural design, shader work, EMR change, or UI commit, read and enforce [`docs/PANACEAMED_OS_CONSTITUTION.md`](docs/PANACEAMED_OS_CONSTITUTION.md). Never violate the Seven Immutable Constitutional Laws or the 5 Verification Gates.
+
 
 > **Owner directive 2026-10-17 (clinical review phase boundary, see `governance/doctrine/PANACEA_ALPHA_CLINICAL_REVIEW_PHASE_POLICY.md`):** C6 formal clinical review is outside the active Alpha engineering scope. Do not count it as unfinished Alpha work, do not let it block Alpha engineering completion, and do not reintroduce it into the active denominator without an explicit Product Owner decision. Deferral is not validation or authorisation for clinical use; `clinically_reviewed` stays false until genuinely reviewed.
 

@@ -4,6 +4,8 @@
 > [`docs/governance/README.md`](docs/governance/README.md) and machine-checked by `node scripts/qa/acceptance-v2.mjs`.
 > Where process text below conflicts with it, `docs/governance/` wins. Product doctrine and safety rules below are unchanged.
 
+> Before any architectural design, shader work, EMR change, or UI commit, read and enforce [`docs/PANACEAMED_OS_CONSTITUTION.md`](docs/PANACEAMED_OS_CONSTITUTION.md). Never violate the Seven Immutable Constitutional Laws or the 5 Verification Gates.
+
 
 ## Frontier biomedical discovery directive — mandatory (owner, 2026-10-13)
 
