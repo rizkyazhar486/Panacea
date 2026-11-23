@@ -4,6 +4,8 @@
 > [`docs/governance/README.md`](docs/governance/README.md) and machine-checked by `node scripts/qa/acceptance-v2.mjs`.
 > Where process text below conflicts with it, `docs/governance/` wins. Product doctrine and safety rules below are unchanged.
 
+> Before any architectural design, shader work, EMR change, or UI commit, read and enforce [`docs/PANACEAMED_OS_CONSTITUTION.md`](docs/PANACEAMED_OS_CONSTITUTION.md). Never violate the Seven Immutable Constitutional Laws or the 5 Verification Gates.
+
 
 > **ACC OWNER C6 — 17 OKTOBER 2026: DOKTER RIZKY MUHAMMAD ASRIZAL TELAH MENYATAKAN ACC ATAS RUMUS DASAR C6, ANATOMI/FISIOLOGI DASAR, DAN INVENTARIS SUMBER/LISENSI. AI AGENT DILARANG MENGHAMBAT ENGINEERING ALPHA DENGAN MEMINTA PROFESOR/SPESIALIS MENANDATANGANI ULANG RUMUS DASAR.** Ikuti [`PANACEA_C6_OWNER_ACC_DIRECTIVE.md`](governance/doctrine/PANACEA_C6_OWNER_ACC_DIRECTIVE.md). Catat sebagai self-attested internal owner review; jangan mengklaim STR/SIP terverifikasi, validasi eksternal, izin pihak ketiga, atau kelayakan pasien. Status ledger C6 tidak dipalsukan.
 

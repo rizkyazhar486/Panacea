@@ -3,7 +3,7 @@
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import {
-  GOOGLE_CLIENT_ID_CACHE_KEY, isGoogleClientId, readCachedGoogleClientId, rememberGoogleClientId, resolveGoogleClientId,
+  GOOGLE_CLIENT_ID_CACHE_KEY, getGoogleClientIdStorage, isGoogleClientId, readCachedGoogleClientId, rememberGoogleClientId, resolveGoogleClientId,
 } from '../../src/domains/identity/googleClientId.ts'
 
 const gagal = (nama: string, f: () => void) => { try { f() } catch (e) { throw new Error(`[${nama}] ${(e as Error).message}`) } }
@@ -45,12 +45,22 @@ gagal('cache-rusak-atau-diblokir-dibaca-kosong', () => {
   assert.equal(rememberGoogleClientId(blokir, A), false)
   assert.equal(readCachedGoogleClientId(null), null)
 })
+gagal('getter-local-storage-diblokir-tetap-menampilkan-google', () => {
+  const browser = { get localStorage(): Storage { throw new DOMException('Storage blocked', 'SecurityError') } }
+  const storage = getGoogleClientIdStorage(browser)
+  assert.equal(storage, undefined)
+  assert.equal(readCachedGoogleClientId(storage), null)
+  assert.equal(rememberGoogleClientId(storage, A), false)
+  assert.deepEqual(resolveGoogleClientId({ build: A }), { id: A, source: 'build' })
+  assert.deepEqual(resolveGoogleClientId({ server: B, build: A }), { id: B, source: 'server' })
+})
 gagal('login-merender-tombol-tanpa-menunggu-health', () => {
   const src = readFileSync('src/pages/landing/Login.tsx', 'utf8')
   assert.match(src, /resolveGoogleClientId\(\{ server: health\?\.googleClientId, build: import\.meta\.env\.VITE_GOOGLE_CLIENT_ID, cache: cachedGoogleId \}\)/)
   assert.match(src, /\{googleClientId \? \(/, 'slot tombol bergantung pada ID terpilih, bukan health')
   assert.doesNotMatch(src, /\{health\?\.googleClientId \? \(/, 'slot tidak boleh lagi menunggu health')
-  assert.match(src, /rememberGoogleClientId\(window\.localStorage, h\?\.googleClientId\)/)
+  assert.match(src, /readCachedGoogleClientId\(getGoogleClientIdStorage\(\)\)/)
+  assert.match(src, /rememberGoogleClientId\(getGoogleClientIdStorage\(\), h\?\.googleClientId\)/)
 })
 
 console.log('google-signin-always: OK')

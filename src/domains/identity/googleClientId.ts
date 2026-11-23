@@ -24,6 +24,17 @@ export function resolveGoogleClientId(sources: { server?: unknown; build?: unkno
   return null
 }
 
+/** Accessing the browser storage getter itself can throw before any storage method runs. */
+export function getGoogleClientIdStorage(
+  browser: Pick<Window, 'localStorage'> | undefined = typeof window === 'undefined' ? undefined : window,
+): Storage | undefined {
+  try {
+    return browser?.localStorage
+  } catch {
+    return undefined
+  }
+}
+
 /** Last ID the server confirmed in this browser; storage that is missing or blocked reads as none. */
 export function readCachedGoogleClientId(storage: Pick<Storage, 'getItem'> | null | undefined): string | null {
   try {

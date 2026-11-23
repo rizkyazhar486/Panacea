@@ -11,7 +11,7 @@ import type { Account, Role } from '../../lib/types'
 import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 import { listRememberedAccounts } from '../../domains/identity/bootVitals'
 import { DEVICE_GUEST_STORAGE_KEY, deviceGuestProfile } from '../../domains/identity/deviceGuest'
-import { readCachedGoogleClientId, rememberGoogleClientId, resolveGoogleClientId } from '../../domains/identity/googleClientId'
+import { getGoogleClientIdStorage, readCachedGoogleClientId, rememberGoogleClientId, resolveGoogleClientId } from '../../domains/identity/googleClientId'
 import { STR_ROLES, ROLES, LOGIN_PILLS } from './loginData'
 import './login.css'
 import { Prosa } from '../../components/Prosa'
@@ -71,7 +71,7 @@ export function Login({ onBack }: { onBack?: () => void }) {
   const [theme, setTheme] = useState<Theme>(getTheme)
   const [health, setHealth] = useState<Health | null>(null)
   // The button no longer waits for the backend: built-in ID or the last confirmed one render it at once.
-  const [cachedGoogleId] = useState(() => readCachedGoogleClientId(typeof window === 'undefined' ? null : window.localStorage))
+  const [cachedGoogleId] = useState(() => readCachedGoogleClientId(getGoogleClientIdStorage()))
   const googleClient = resolveGoogleClientId({ server: health?.googleClientId, build: import.meta.env.VITE_GOOGLE_CLIENT_ID, cache: cachedGoogleId })
   const googleClientId = googleClient?.id ?? null
   const [googleStatus, setGoogleStatus] = useState<'idle' | 'connecting' | 'ready' | 'unavailable'>(
@@ -166,7 +166,7 @@ export function Login({ onBack }: { onBack?: () => void }) {
           const h = await api.health()
           if (batal) return
           setHealth(h)
-          if (h?.features?.google) rememberGoogleClientId(window.localStorage, h?.googleClientId)
+          if (h?.features?.google) rememberGoogleClientId(getGoogleClientIdStorage(), h?.googleClientId)
           setGoogleStatus(h?.features?.google && h?.googleClientId ? 'ready' : 'unavailable')
           return
         } catch {
