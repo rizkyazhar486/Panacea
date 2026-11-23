@@ -1,0 +1,281 @@
+{
+ "lods": {
+  "LOD0": {
+   "target_ratio": 0.5,
+   "min_tris": 400
+  },
+  "LOD1": {
+   "target_ratio": 0.25,
+   "min_tris": 200
+  },
+  "LOD2": {
+   "target_ratio": 0.1,
+   "min_tris": 120
+  },
+  "LOD3": {
+   "target_ratio": 0.04,
+   "min_tris": 60
+  },
+  "LOD4": {
+   "system_budget_tris": {
+    "skeletal": 20000,
+    "cardiovascular": 38000,
+    "surface": 6000,
+    "digestive": 6000,
+    "respiratory": 3500,
+    "urinary": 2000,
+    "reproductive": 2000,
+    "muscular": 24000,
+    "nervous": 12000,
+    "joint": 8000,
+    "lymphatic": 3000,
+    "fascia": 3000,
+    "sensory": 3000,
+    "endocrine": 1500,
+    "visceral_unclassified": 1000
+   },
+   "body_overrides": {
+    "HUMAN.ADULT.MALE": {
+     "skeletal": 16000,
+     "surface": 5000,
+     "digestive": 5000,
+     "respiratory": 3000,
+     "urinary": 1800,
+     "reproductive": 1800
+    }
+   },
+   "min_tris": 8,
+   "initial_load_systems": [
+    "cardiovascular",
+    "digestive",
+    "reproductive",
+    "respiratory",
+    "skeletal",
+    "surface",
+    "urinary"
+   ],
+   "allocation": "per system: floor + remainder proportional to surface area"
+  }
+ },
+ "files": [
+  {
+   "body": "VHF_DENVER_CT.ADULT.FEMALE",
+   "system": "joint",
+   "lod": "LOD1",
+   "file": "vhf_denver_ct_adult_female.joint.LOD1.glb",
+   "structures": 24,
+   "tris_master": 262053,
+   "tris_lod": 65491,
+   "bytes_raw": 1235828,
+   "error_mm_largest_structures": [
+    [
+     "VHF_DENVER_CT.ADULT.FEMALE.JOINT.ACETABULAR_ARTICULAR_CARTILAGE.L",
+     0.007,
+     0.032
+    ],
+    [
+     "VHF_DENVER_CT.ADULT.FEMALE.JOINT.TALAR_ARTICULAR_CARTILAGE.L",
+     0.0,
+     0.001
+    ],
+    [
+     "VHF_DENVER_CT.ADULT.FEMALE.JOINT.DISTAL_FEMORAL_ARTICULAR_CARTILAGE.L",
+     0.01,
+     0.044
+    ],
+    [
+     "VHF_DENVER_CT.ADULT.FEMALE.JOINT.DISTAL_FEMORAL_ARTICULAR_CARTILAGE.R",
+     0.014,
+     0.063
+    ],
+    [
+     "VHF_DENVER_CT.ADULT.FEMALE.JOINT.FEMORAL_HEAD_ARTICULAR_CARTILAGE.R",
+     0.012,
+     0.045
+    ],
+    [
+     "VHF_DENVER_CT.ADULT.FEMALE.JOINT.FEMORAL_HEAD_ARTICULAR_CARTILAGE.L",
+     0.011,
+     0.042
+    ],
+    [
+     "VHF_DENVER_CT.ADULT.FEMALE.JOINT.ACETABULAR_ARTICULAR_CARTILAGE.R",
+     0.015,
+     0.091
+    ],
+    [
+     "VHF_DENVER_CT.ADULT.FEMALE.JOINT.PATELLAR_ARTICULAR_CARTILAGE.L",
+     0.012,
+     0.058
+    ],
+    [
+     "VHF_DENVER_CT.ADULT.FEMALE.JOINT.MEDIAL_TIBIAL_PLATEAU_ARTICULAR_CARTILAGE.R",
+     0.013,
+     0.066
+    ],
+    [
+     "VHF_DENVER_CT.ADULT.FEMALE.JOINT.MEDIAL_TIBIAL_PLATEAU_ARTICULAR_CARTILAGE.L",
+     0.006,
+     0.026
+    ],
+    [
+     "VHF_DENVER_CT.ADULT.FEMALE.JOINT.PATELLAR_ARTICULAR_CARTILAGE.R",
+     0.015,
+     0.07
+    ],
+    [
+     "VHF_DENVER_CT.ADULT.FEMALE.JOINT.LATERAL_TIBIAL_PLATEAU_ARTICULAR_CARTILAGE.R",
+     0.014,
+     0.083
+    ]
+   ],
+   "bbox_escape_fixed": []
+  },
+  {
+   "body": "VHF_DENVER_CT.ADULT.FEMALE",
+   "system": "muscular",
+   "lod": "LOD1",
+   "file": "vhf_denver_ct_adult_female.muscular.LOD1.glb",
+   "structures": 76,
+   "tris_master": 1304042,
+   "tris_lod": 325956,
+   "bytes_raw": 6041044,
+   "error_mm_largest_structures": [
+    [
+     "VHF_DENVER_CT.ADULT.FEMALE.MUSCULAR.QUADRATUS_FEMORIS.R",
+     0.002,
+     0.011
+    ],
+    [
+     "VHF_DENVER_CT.ADULT.FEMALE.MUSCULAR.GLUTEUS_MAXIMUS.R",
+     0.014,
+     0.062
+    ],
+    [
+     "VHF_DENVER_CT.ADULT.FEMALE.MUSCULAR.GLUTEUS_MAXIMUS.L",
+     0.014,
+     0.062
+    ],
+    [
+     "VHF_DENVER_CT.ADULT.FEMALE.MUSCULAR.PECTINEUS.L",
+     0.005,
+     0.028
+    ],
+    [
+     "VHF_DENVER_CT.ADULT.FEMALE.MUSCULAR.VASTUS_LATERALIS.L",
+     0.028,
+     0.116
+    ],
+    [
+     "VHF_DENVER_CT.ADULT.FEMALE.MUSCULAR.VASTUS_LATERALIS.R",
+     0.015,
+     0.081
+    ],
+    [
+     "VHF_DENVER_CT.ADULT.FEMALE.MUSCULAR.VASTUS_INTERMEDIUS.L",
+     0.03,
+     0.153
+    ],
+    [
+     "VHF_DENVER_CT.ADULT.FEMALE.MUSCULAR.VASTUS_INTERMEDIUS.R",
+     0.024,
+     0.093
+    ],
+    [
+     "VHF_DENVER_CT.ADULT.FEMALE.MUSCULAR.ADDUCTOR_MAGNUS.R",
+     0.031,
+     0.129
+    ],
+    [
+     "VHF_DENVER_CT.ADULT.FEMALE.MUSCULAR.ADDUCTOR_MAGNUS.L",
+     0.031,
+     0.143
+    ],
+    [
+     "VHF_DENVER_CT.ADULT.FEMALE.MUSCULAR.GLUTEUS_MEDIUS.L",
+     0.03,
+     0.129
+    ],
+    [
+     "VHF_DENVER_CT.ADULT.FEMALE.MUSCULAR.SOLEUS.R",
+     0.028,
+     0.106
+    ]
+   ],
+   "bbox_escape_fixed": []
+  },
+  {
+   "body": "VHF_DENVER_CT.ADULT.FEMALE",
+   "system": "skeletal",
+   "lod": "LOD1",
+   "file": "vhf_denver_ct_adult_female.skeletal.LOD1.glb",
+   "structures": 84,
+   "tris_master": 1667890,
+   "tris_lod": 416912,
+   "bytes_raw": 7700160,
+   "error_mm_largest_structures": [
+    [
+     "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.SKULL_CRANIUM_AND_MANDIBLE_ONE_MESH",
+     0.024,
+     0.122
+    ],
+    [
+     "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.HIP_BONE_OS_COXAE.L",
+     0.016,
+     0.08
+    ],
+    [
+     "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.HIP_BONE_OS_COXAE.R",
+     0.015,
+     0.082
+    ],
+    [
+     "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.FEMUR.L",
+     0.013,
+     0.05
+    ],
+    [
+     "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.FEMUR.R",
+     0.017,
+     0.072
+    ],
+    [
+     "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.TIBIA.R",
+     0.02,
+     0.103
+    ],
+    [
+     "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.TIBIA.L",
+     0.017,
+     0.079
+    ],
+    [
+     "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.SACRUM",
+     0.022,
+     0.096
+    ],
+    [
+     "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.SCAPULA.R",
+     0.031,
+     0.126
+    ],
+    [
+     "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.SCAPULA.L",
+     0.029,
+     0.145
+    ],
+    [
+     "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.METATARSALS_AND_PHALANGES_COMBINED.R",
+     0.035,
+     0.135
+    ],
+    [
+     "VHF_DENVER_CT.ADULT.FEMALE.SKELETAL.VERTEBRA_L3",
+     0.044,
+     0.174
+    ]
+   ],
+   "bbox_escape_fixed": []
+  }
+ ]
+}
