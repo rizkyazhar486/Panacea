@@ -94,7 +94,10 @@ export function DailyQuoteBanner() {
             Daily quote
           </summary>
           <div className="pb-3">
-            <p className="text-sm leading-snug text-white">“{quote.quote}”</p>
+            <p className="text-sm leading-snug text-white"
+              style={{ display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+              “{quote.quote}”
+            </p>
             <p className="mt-1 text-sm text-white/70">— {quote.source}</p>
           </div>
         </details>
