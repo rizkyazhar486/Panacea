@@ -1,5 +1,4 @@
 import type { OrganTelemetryNode, RealityViewState } from '../../types/realityView.ts'
-
 import type { CounterfactualResult } from './counterfactualSimulator.ts'
 
 export interface QuietModeSummary {
@@ -27,7 +26,7 @@ export function selectQuietModeSummary(state: RealityViewState, projection?: Cou
       escalated: true,
     }
   }
-  if (projection?.patientId === state.patientId
+  if (projection && projection.patientId === state.patientId
     && projection.status === 'blocked'
     && projection.hardSafetyLock
     && Object.prototype.hasOwnProperty.call(state.nodes, projection.targetMeshId)) {
