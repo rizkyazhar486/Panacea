@@ -81,7 +81,7 @@ const metrics = new Map<string, MetricBinding>([
   ['lab.hba1c', { anchor: anchors.pancreas, unit: '%' }],
 ])
 
-const shippedAnchors = new Set(
+const shippedAnchors = new Set<AtlasAnchor>(
   Object.values(anchors).filter(anchor =>
     INDEKS_TUBUH.some(structure => structure.n === anchor.meshId && structure.l === anchor.layer),
   ),
