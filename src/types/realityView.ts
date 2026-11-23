@@ -180,7 +180,7 @@ export function isOrganTelemetryNode(value: unknown): value is OrganTelemetryNod
     && Array.isArray(provenance)
     && provenance.every(isProvenanceRef)
     && (evidenceClass === 'simulated_projection' || provenance.length > 0)
-    && (evidenceClass !== 'ocr_verified' || provenance.every(ref => ref.verified))
+    && (evidenceClass !== 'ocr_verified' || provenance.some(ref => ref.verified))
     && Array.isArray(activeChevrons)
     && activeChevrons.every(chevron => isTrajectoryChevron(chevron) && chevron.targetMeshId === value.meshId)
     && typeof value.hardSafetyLock === 'boolean'

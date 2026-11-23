@@ -135,3 +135,17 @@ test('a reviewed clinical flag escalates through the summary and never uses the 
   assert.equal(output.quietModePrimaryAction.urgent, true)
   assert.equal(state([{ ...high, provenance: { ...high.provenance, verified: false } }]).quietModePrimaryAction.urgent, false)
 })
+
+test('newer wearable readings do not hide a reviewed finding from another source', () => {
+  const recorded = reading({
+    id: 'reviewed-bp', metric: 'blood-pressure-systolic', unit: 'mmHg', value: 190,
+    hardSafetyReason: 'Clinician flagged a recorded measurement.',
+  })
+  const wearable = reading({
+    id: 'newer-watch', recordedAt: later, sourceKind: 'wearable', evidenceClass: 'wearable_stream',
+    verified: false, accepted: false,
+  })
+  const output = state([recorded, wearable])
+  assert.equal(output.nodes['Left ventricle'].provenance.length, 2)
+  assert.equal(output.quietModePrimaryAction.urgent, true)
+})
