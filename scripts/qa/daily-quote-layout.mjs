@@ -30,7 +30,7 @@ try {
         localStorage.removeItem('pmd-quote-seen-date')
       }, { token: login.token, theme })
       const page = await ctx.newPage()
-      let firstHeight
+      let firstCollapsedHeight
       for (let index = 0; index < KUTIPAN_HIDUP.length; index++) {
         console.log(`daily-quote-layout: ${viewport.width}/${theme}/quote-${index}`)
         await page.clock.setFixedTime(new Date(Date.UTC(2026, 0, index + 1, 12)))
@@ -41,7 +41,7 @@ try {
         const reminder = page.locator('[data-daily-reminder]')
         await reminder.waitFor({ state: 'visible', timeout: 60000 })
         await page.locator('main h1').first().waitFor({ state: 'visible', timeout: 60000 })
-        assert.ok((await reminder.innerText()).includes(KUTIPAN_HIDUP[index].quote), 'the requested date must render its actual quote')
+        await reminder.getByText('Daily quote', { exact: true }).waitFor()
         const measured = await reminder.evaluate((element) => {
           const box = element.getBoundingClientRect()
           const heading = document.querySelector('main h1')?.getBoundingClientRect()
@@ -49,10 +49,14 @@ try {
           return { height: box.height, overflow: document.documentElement.scrollWidth - innerWidth,
             overlapsHeading: Math.min(box.right, heading.right) > Math.max(box.left, heading.left) && Math.min(box.bottom, heading.bottom) > Math.max(box.top, heading.top) }
         })
-        firstHeight ??= measured.height
-        assert.ok(measured.height > 0 && Math.abs(measured.height - firstHeight) <= 1, `${viewport.width}/${theme}/quote-${index}: rotating content must not move the Home layout`)
+        firstCollapsedHeight ??= measured.height
+        assert.ok(measured.height > 0 && Math.abs(measured.height - firstCollapsedHeight) <= 1, `${viewport.width}/${theme}/quote-${index}: rotating content must not move the Home layout`)
         assert.ok(measured.overflow <= 1, 'quote must not create horizontal overflow')
         assert.equal(measured.overlapsHeading, false, 'quote must not cover the Home heading')
+        const quote = reminder.getByText(`“${KUTIPAN_HIDUP[index].quote}”`, { exact: true })
+        await quote.waitFor({ state: 'hidden' })
+        await reminder.getByText('Daily quote', { exact: true }).click()
+        await quote.waitFor({ state: 'visible' })
         await reminder.getByRole('button', { name: 'Dismiss', exact: true }).click()
         await reminder.waitFor({ state: 'hidden' })
         measurements.push({ width: viewport.width, theme, index, ...measured })

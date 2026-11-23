@@ -2,20 +2,7 @@ import { useEffect, useState } from 'react'
 import { kutipanHariIni, durasiBacaMs } from '../../lib/lifeQuotes'
 import { IconX, IconFlame } from '../icons'
 
-// "Sesuatu untuk dibawa hari ini" — muncul sekali per hari, hari kalender
-// lokal pengguna, saat sesi pertama kali masuk aplikasi. Bukan dialog yang
-// memblokir (ini bukan onboarding), dan bukan achievement toast yang hilang
-// dalam hitungan detik (kutipannya perlu dibaca, bukan sekadar dilihat) —
-// jadi ia tetap sampai ditutup sendiri atau setelah waktu baca yang wajar.
-//
-// Desain: pelajaran dari .kaca yang membasahi SELURUH kartu dengan
-// gradasi penuh spektrum — begitu setiap piksel berwarna, tombol dan
-// ikon yang duduk di atasnya kehilangan latar yang stabil untuk dibaca.
-// Di sini warnanya jadi AKSEN yang terkonsentrasi (satu bara api di
-// pojok kiri atas, satu kilau neon di pojok kanan bawah) di atas dasar
-// ruang angkasa nyaris hitam — bukan dicat rata. Tombol tutup dan avatar
-// duduk di atas alasnya sendiri yang gelap solid, terlepas dari animasi
-// warna di baliknya.
+// The daily reminder opens in place and starts its reading timer when expanded.
 const SEEN_KEY = 'pmd-quote-seen-date'
 
 function todayKey(): string {
@@ -29,6 +16,7 @@ function tandaiSudahDilihat() {
 
 export function DailyQuoteBanner() {
   const [visible, setVisible] = useState(false)
+  const [expanded, setExpanded] = useState(false)
   const quote = kutipanHariIni()
 
   useEffect(() => {
@@ -40,17 +28,14 @@ export function DailyQuoteBanner() {
     return () => clearTimeout(t)
   }, [])
 
-  // Menyingkir sendiri setelah waktu baca. Tanpa ini spanduknya menutupi
-  // sepertiga layar pertama SETIAP halaman sampai seseorang menekan ×, dan
-  // halaman yang baru dibuka kehilangan judulnya sendiri di balik kutipan.
   useEffect(() => {
-    if (!visible) return
+    if (!visible || !expanded) return
     const t = setTimeout(() => {
       setVisible(false)
       tandaiSudahDilihat()
     }, durasiBacaMs(`${quote.quote} ${quote.source}`))
     return () => clearTimeout(t)
-  }, [visible, quote.quote, quote.source])
+  }, [visible, expanded, quote.quote, quote.source])
 
   function dismiss() {
     setVisible(false)
@@ -68,7 +53,7 @@ export function DailyQuoteBanner() {
       className="relative mt-4 flex w-full justify-center px-3 sm:px-6"
     >
       <div
-        className="fly-in-drop pointer-events-auto relative min-h-[100px] w-full max-w-sm overflow-hidden rounded-2xl shadow-2xl"
+        className="fly-in-drop motion-reduce:animate-none! pointer-events-auto relative has-[details[open]]:min-h-[100px] w-full max-w-sm overflow-hidden rounded-2xl shadow-2xl"
         style={{
           animation: 'fly-in-drop 0.7s cubic-bezier(0.2, 0.9, 0.25, 1.1) both',
           background:
@@ -82,7 +67,7 @@ export function DailyQuoteBanner() {
         {/* Cincin tepi tipis yang berkilau perlahan — aksen, bukan isi. */}
         <span
           aria-hidden
-          className="pointer-events-none absolute inset-0 rounded-2xl"
+          className="pointer-events-none absolute inset-0 rounded-2xl motion-reduce:animate-none!"
           style={{
             padding: 1,
             background: 'linear-gradient(120deg, #FF6600, #FFD700, #00D2FF, #9D00FF, #FF6600)',
@@ -103,27 +88,16 @@ export function DailyQuoteBanner() {
           <IconX size={13} />
         </button>
 
-        <div className="relative flex min-h-[60px] gap-2.5 p-3 pr-16">
-          <span
-            aria-hidden
-            className="mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-full border border-white/15 bg-black/50"
-            style={{ boxShadow: '0 0 14px rgba(255,140,0,0.5)' }}
-          >
-            <IconFlame size={14} className="text-amber-400" />
-          </span>
-          <div className="min-w-0">
-            {/* Baris label dibuang: "Today's reminder" tidak menambah apa pun
-                di atas kutipan yang jelas-jelas sebuah kutipan, dan barisnya
-                ikut mendorong kartunya melewati sepertiga layar. */}
-            <p
-              className="text-[13px] font-bold leading-snug text-white"
-              style={{ display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}
-            >
-              “{quote.quote}”
-            </p>
-            <p className="mt-1 truncate text-[10px] font-semibold text-white/55">— {quote.source}</p>
+        <details onToggle={(event) => setExpanded(event.currentTarget.open)} className="relative px-3 pr-16">
+          <summary className="flex min-h-14 cursor-pointer items-center gap-2 text-sm font-semibold text-white">
+            <IconFlame size={16} className="text-amber-400" aria-hidden="true" />
+            Daily quote
+          </summary>
+          <div className="pb-3">
+            <p className="text-sm leading-snug text-white">“{quote.quote}”</p>
+            <p className="mt-1 text-sm text-white/70">— {quote.source}</p>
           </div>
-        </div>
+        </details>
       </div>
     </div>
   )
