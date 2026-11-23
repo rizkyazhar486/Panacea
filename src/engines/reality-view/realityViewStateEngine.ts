@@ -3,8 +3,9 @@ import { CANONICAL_MULTISCALE_KNOWLEDGE_GRAPH_EDGES } from '../../domains/one-os
 import { INDEKS_TUBUH, type StrukturTubuh } from '../../lib/bodyIndex.gen.ts'
 import { PARAMETER_BAKU, profilPotensialAksi } from '../../lib/bioelectric.ts'
 import {
-  isConsentActive, validateLongitudinalEvent, type LongitudinalEvent,
+  validateLongitudinalEvent, type LongitudinalEvent,
 } from '../../lib/panaceaLongitudinalState.ts'
+import { isEventPurposeAuthorized, type PurposeConsentLedger } from '../../lib/purposeConsentLedger.ts'
 import {
   isProvenanceRef, isValidRealityTimestamp, type AnatomicalSystemId, type EvidenceClass,
   type OrganTelemetryNode, type ProvenanceRef, type RealityViewMode, type RealityViewState,
@@ -31,6 +32,8 @@ export interface BuildRealityViewStateInput {
   readonly timeAxisCursorIso: string
   readonly dualCodingTm1Enabled?: boolean
   readonly selectedMeshId?: string | null
+  /** Supply the current canonical consent ledger, including revocations. */
+  readonly consentLedger: PurposeConsentLedger
   readonly readings: readonly RealityViewReading[]
 }
 
@@ -131,21 +134,27 @@ function matchesEvidence({ event, evidenceClass, provenance }: RealityViewReadin
     && provenance.fhirResourceType === 'Observation'
 }
 
-function isAdmitted(reading: RealityViewReading, patientId: string, cutoff: number, now: number): boolean {
-  const { event, provenance } = reading
+function isAvailableNow(event: LongitudinalEvent<number>, patientId: string, now: number): boolean {
+  if (event?.subjectId !== patientId) return false
   try {
     validateLongitudinalEvent(event)
-    return event.subjectId === patientId && isProvenanceRef(provenance)
-      && isValidRealityTimestamp(event.recordedAt) && isValidRealityTimestamp(event.provenance.receivedAt)
-      && typeof event.value === 'number' && Number.isFinite(event.value) && event.value >= 0
-      && Date.parse(event.recordedAt) === Date.parse(provenance.recordedAt)
-      && Date.parse(event.recordedAt) <= cutoff && Date.parse(event.provenance.receivedAt) <= cutoff
-      && (event.review.state !== 'accepted' || Date.parse(event.review.reviewedAt ?? '') <= cutoff)
-      && isConsentActive(event.consent, 'personal-visualization', now)
-      && matchesEvidence(reading)
+    return isValidRealityTimestamp(event.recordedAt)
+      && isValidRealityTimestamp(event.provenance.receivedAt)
+      && Date.parse(event.recordedAt) <= now
+      && Date.parse(event.provenance.receivedAt) <= now
   } catch {
     return false
   }
+}
+
+function isAdmitted(reading: RealityViewReading, cutoff: number): boolean {
+  const { event, provenance } = reading
+  return isProvenanceRef(provenance)
+    && typeof event.value === 'number' && Number.isFinite(event.value) && event.value >= 0
+    && Date.parse(event.recordedAt) === Date.parse(provenance.recordedAt)
+    && Date.parse(event.recordedAt) <= cutoff && Date.parse(event.provenance.receivedAt) <= cutoff
+    && (event.review.state !== 'accepted' || Date.parse(event.review.reviewedAt ?? '') <= cutoff)
+    && matchesEvidence(reading)
 }
 
 function latestFirst(left: RealityViewReading, right: RealityViewReading): number {
@@ -215,22 +224,31 @@ export function buildRealityViewState(input: BuildRealityViewStateInput): Realit
   const cursor = Date.parse(input.timeAxisCursorIso)
   const cutoff = Math.min(cursor, now)
   const dualCodingTm1Enabled = input.dualCodingTm1Enabled ?? false
-  const duplicates = new Set<string>()
+  const blockedIds = new Set<string>()
   const eventById = new Map<string, RealityViewReading>()
   for (const reading of input.readings) {
-    const binding = metrics.get(reading.event?.metric)
-    if (!binding || !shippedAnchors.has(binding.anchor) || reading.event.unit !== binding.unit
-      || !isAdmitted(reading, input.patientId, cutoff, now)) continue
+    const { event } = reading
+    if (!isAvailableNow(event, input.patientId, now)) continue
+    // Access follows the current permission and review decision, even during historical replay.
+    // A stale copy of the same record cannot override a current denial.
+    if (!isEventPurposeAuthorized(event, input.consentLedger, 'personal-visualization', now)
+      || (event.review.state === 'rejected' && Date.parse(event.review.reviewedAt ?? '') <= now)) {
+      blockedIds.add(event.id)
+      continue
+    }
+    const binding = metrics.get(event.metric)
+    if (!binding || !shippedAnchors.has(binding.anchor) || event.unit !== binding.unit
+      || !isAdmitted(reading, cutoff)) continue
 
     const previous = eventById.get(reading.event.id)
     if (!previous) eventById.set(reading.event.id, reading)
     else if (evidenceIdentity(previous) !== evidenceIdentity(reading)) {
-      duplicates.add(reading.event.id)
+      blockedIds.add(reading.event.id)
     }
   }
 
   const latestByAnchor = new Map<AtlasAnchor, Map<string, RealityViewReading>>()
-  const admitted = [...eventById.values()].filter(row => !duplicates.has(row.event.id)).sort(latestFirst)
+  const admitted = [...eventById.values()].filter(row => !blockedIds.has(row.event.id)).sort(latestFirst)
   for (const reading of admitted) {
     const { metric } = reading.event
     const { anchor } = metrics.get(metric)!

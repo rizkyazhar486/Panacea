@@ -3,6 +3,7 @@ import { test } from 'node:test'
 import {
   buildRealityViewState, relationsForCanonicalOntologyId,
 } from '../../src/engines/reality-view/realityViewStateEngine.ts'
+import { appendPurposeConsentDecision, createPurposeConsentLedger } from '../../src/lib/purposeConsentLedger.ts'
 import { isRealityViewState } from '../../src/types/realityView.ts'
 
 const patientId = 'synthetic-subject'
@@ -36,7 +37,7 @@ function reading({
 }
 
 function state(readings, timeAxisCursorIso = nowIso, options = {}) {
-  return buildRealityViewState({ patientId, readings, nowIso, timeAxisCursorIso, ...options })
+  return buildRealityViewState({ patientId, readings, nowIso, timeAxisCursorIso, consentLedger: createPurposeConsentLedger(), ...options })
 }
 
 test('past replay uses only observations and reviews known then; future keeps the observed snapshot', () => {
@@ -148,4 +149,47 @@ test('newer wearable readings do not hide a reviewed finding from another source
   const output = state([recorded, wearable])
   assert.equal(output.nodes['Left ventricle'].provenance.length, 2)
   assert.equal(output.quietModePrimaryAction.urgent, true)
+})
+
+test('current consent and review denials block stale copies of the same record in every timeline', () => {
+  const allowed = reading({ id: 'shared-record', value: 70, statusScore: 0.9 })
+  const revoked = reading({ id: 'shared-record', value: 70, revokedAt: later })
+  const rejected = structuredClone(allowed)
+  rejected.event.review = { state: 'rejected', reviewerId: 'synthetic-reviewer', reviewedAt: later }
+
+  for (const denial of [revoked, rejected]) {
+    for (const cursor of [yesterday, nowIso, tomorrow]) {
+      for (const input of [[allowed, denial], [denial, allowed]]) {
+        assert.deepEqual(state(input, cursor).nodes, {})
+      }
+    }
+  }
+  assert.equal(state([allowed]).nodes['Left ventricle'].statusScore, 0.9)
+})
+
+test('unrelated, unreceived and scheduled denials do not remove an admitted record', () => {
+  const allowed = reading({ id: 'shared-record', statusScore: 0.9 })
+  const differentPatient = reading({ id: 'shared-record', subjectId: 'different-subject', revokedAt: later })
+  const futureReceive = reading({ id: 'shared-record', receivedAt: tomorrow, revokedAt: later })
+  const futureDecision = reading({ id: 'shared-record', revokedAt: tomorrow, statusScore: 0.9 })
+  const output = state([allowed, differentPatient, futureReceive, futureDecision])
+  assert.equal(output.nodes['Left ventricle'].statusScore, 0.9)
+  assert.equal(output.nodes['Left ventricle'].readings.length, 1)
+})
+
+test('the canonical purpose ledger governs current access to historical observations', () => {
+  const sample = reading({ id: 'old-reading' })
+  const purpose = 'personal-visualization'
+  const empty = createPurposeConsentLedger()
+  const revoke = { id: 'revoke-now', subjectId: patientId, purpose, action: 'revoke', decidedAt: later }
+  const foreign = appendPurposeConsentDecision(empty, { ...revoke, subjectId: 'different-subject' })
+  assert.equal(state([sample], yesterday, { consentLedger: foreign }).nodes['Left ventricle'].readings.length, 1)
+
+  const denied = appendPurposeConsentDecision(empty, revoke)
+  for (const cursor of [yesterday, nowIso, tomorrow]) {
+    assert.deepEqual(state([sample], cursor, { consentLedger: denied }).nodes, {})
+  }
+  const corrupted = { ...denied, decisionIdsByPurpose: {} }
+  assert.deepEqual(state([sample], yesterday, { consentLedger: corrupted }).nodes, {})
+  assert.deepEqual(state([sample], yesterday, { consentLedger: undefined }).nodes, {})
 })
