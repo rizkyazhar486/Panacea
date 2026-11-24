@@ -5,7 +5,8 @@ import {
   IconHeart, IconActivity, IconDownload, IconKey, IconShield, IconCheck,
   IconTimer, IconGauge, IconChevronRight,
 } from '../../components/icons'
-import { api, apiBaseUrl, backendEnabled, type SyncFinding } from '../../lib/api'
+import { SyncSignIn } from './SyncSignIn'
+import { api, GalatApi, apiBaseUrl, backendEnabled, type SyncFinding } from '../../lib/api'
 import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -125,7 +126,7 @@ import { healthWebhookUrl } from '../../domains/devices/engine/healthWebhookUrl'
 
 export function HealthSyncTutorial() {
   const [url, setUrl] = useState<string | null>(null)
-  const [linkStatus, setLinkStatus] = useState<'loading' | 'ready' | 'error' | 'unavailable'>(backendEnabled ? 'loading' : 'unavailable')
+  const [linkStatus, setLinkStatus] = useState<'loading' | 'ready' | 'error' | 'session' | 'unavailable'>(backendEnabled ? 'loading' : 'unavailable')
 
   const loadPrivateSyncLink = useCallback(async () => {
     if (!backendEnabled) {
@@ -140,9 +141,9 @@ export function HealthSyncTutorial() {
       if (!nextUrl) throw new Error('Invalid API origin or sync token')
       setUrl(nextUrl)
       setLinkStatus('ready')
-    } catch {
+    } catch (error) {
       setUrl(null)
-      setLinkStatus('error')
+      setLinkStatus(error instanceof GalatApi && error.status === 401 ? 'session' : 'error')
     }
   }, [])
 
@@ -288,8 +289,9 @@ export function HealthSyncTutorial() {
       <Card className="!p-5">
           <SectionTitle icon={<IconKey size={20} />} title="Your Private Sync Link" subtitle="For step 2 — copy this into the app" />
           <div className="mt-2 rounded-xl bg-neutral-50 p-3 font-mono text-[11px] text-neutral-600 break-all">
-            {url ?? (linkStatus === 'loading' ? 'Loading…' : linkStatus === 'error' ? 'Unable to load Private Sync Link' : 'Backend connection is not configured')}
+            {url ?? (linkStatus === 'loading' ? 'Loading…' : linkStatus === 'session' ? 'Sign-in required' : linkStatus === 'error' ? 'Unable to load Private Sync Link' : 'Backend connection is not configured')}
           </div>
+          {linkStatus === 'session' && <SyncSignIn />}
           {linkStatus === 'error' && (
             <div role="alert" className="mt-2 rounded-xl border border-rose-200 bg-rose-50 p-3 text-[12px] text-rose-700">
               Panaceamed could not retrieve your account's sync token. Confirm that you are signed in, then try again.

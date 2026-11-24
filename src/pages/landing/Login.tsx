@@ -78,6 +78,7 @@ export function Login({ onBack }: { onBack?: () => void }) {
     backendEnabled ? 'connecting' : 'idle',
   )
   const [healthRetrySeed, setHealthRetrySeed] = useState(0)
+  const [emailVerificationVersion, setEmailVerificationVersion] = useState(0)
 
   const rememberedAccounts = listRememberedAccounts({
     profiles: state.profiles,
@@ -237,6 +238,13 @@ export function Login({ onBack }: { onBack?: () => void }) {
     })
   }
 
+  const verificationOptions = useRef<HTMLDivElement>(null)
+
+  function showVerification() {
+    setError('Verifikasi akun melalui Google atau kode email yang tersedia untuk menyinkronkan perangkat.')
+    verificationOptions.current?.scrollIntoView({ block: 'center' })
+  }
+
   function doLogin() {
     if (!consentOk()) return
     const email = f.email.trim().toLowerCase()
@@ -276,7 +284,7 @@ export function Login({ onBack }: { onBack?: () => void }) {
     if (backendEnabled) {
       api.devLogin(acc.email, acc.name, role)
         .then(a => finish({ ...a, isOwner, isSubscriber: acc.isSubscriber }))
-        .catch(() => finish(acc))
+        .catch(showVerification)
       return
     }
     finish(acc)
@@ -458,19 +466,25 @@ export function Login({ onBack }: { onBack?: () => void }) {
           )}
 
           {/* ── 1-Click Google Sign-In, Authenticator & QR Access ────────────────────────────── */}
-          <div className="space-y-2.5">
+          <div ref={verificationOptions} className="space-y-2.5">
             {rememberedAccounts.length > 0 && (
               <div className="space-y-1.5">
                 {rememberedAccounts.slice(0, 2).map((acc) => (
                   <button
                     key={acc.email}
                     type="button"
-                    onClick={() => completeQuickSignIn(acc)}
+                    onClick={() => {
+                      if (!backendEnabled) return completeQuickSignIn(acc)
+                      if (acc.email !== f.email || (acc.role ?? role) !== role) setEmailVerificationVersion(version => version + 1)
+                      setF(prev => ({ ...prev, email: acc.email, name: acc.name ?? '' }))
+                      setRole(acc.role ?? role)
+                      showVerification()
+                    }}
                     data-testid="remembered-account-btn"
                     className="login-submit-btn flex w-full items-center justify-between rounded-2xl px-4 py-2.5 text-xs"
                   >
                     <span className="truncate font-bold">Lanjutkan sebagai {acc.name}</span>
-                    <span className="shrink-0 opacity-85">1-Tap →</span>
+                    <span className="shrink-0 opacity-85">{backendEnabled ? 'Verifikasi →' : '1-Tap →'}</span>
                   </button>
                 ))}
               </div>
@@ -531,6 +545,7 @@ export function Login({ onBack }: { onBack?: () => void }) {
 
           {health?.features.otpEmail && (
             <EmailOtpLogin
+              key={emailVerificationVersion}
               role={role}
               consentOk={consentOk}
               name={f.name}
