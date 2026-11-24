@@ -17,3 +17,11 @@ execFileSync(process.execPath, [
   '--test',
   ...tests,
 ], { stdio: 'inherit' })
+
+for (const gate of ['./verify-reality-view-ontology.mjs', './verify-reality-view-budgets.mjs']) {
+  execFileSync(process.execPath, [
+    ...typeScriptRunnerArgs(process.versions.node),
+    '--import=' + new URL('./typescript-resolver.mjs', import.meta.url).href,
+    fileURLToPath(new URL(gate, import.meta.url)),
+  ], { stdio: 'inherit' })
+}
