@@ -167,6 +167,7 @@ interface DB {
   facilityPrices?: FacilityPriceSubmission[] // crowd-sourced provider price board — real submissions, no fabricated numbers
   visitMemberships?: Record<string, VisitMembership> // canonical Visit OS patient/clinician authorization registry
   facilityLayouts?: Record<string, import('./domains/facility-architect/facilityStore.js').ServerFacilityLayoutRecord>
+  schedulingState?: import('./domains/scheduling/schedulingStore.js').ServerSchedulingWorkspaceState
 }
 
 // A real patient/doctor-submitted price for a facility, optionally scoped to
@@ -776,6 +777,15 @@ export function saveFacilityLayout(record: import('./domains/facility-architect/
   db.facilityLayouts[record.facilityId] = record
   save()
   return record
+}
+
+export function getSchedulingState() {
+  return db.schedulingState
+}
+export function saveSchedulingState(next: import('./domains/scheduling/schedulingStore.js').ServerSchedulingWorkspaceState) {
+  db.schedulingState = next
+  save()
+  return next
 }
 
 export function listPosts(): Post[] {
