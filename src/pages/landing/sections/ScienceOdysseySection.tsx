@@ -25,7 +25,7 @@ export function VideoSaatTerlihat({ src, judul }: { src: string; judul: string }
           controls
           muted
           playsInline
-          preload="metadata"
+          preload="none"
           poster={HISTORY_POSTER}
           onError={() => setFailed(true)}
           aria-label={`Archival reference clip for ${judul}`}
@@ -56,6 +56,7 @@ export function VideoSaatTerlihat({ src, judul }: { src: string; judul: string }
           alt={`Arsip referensi klinis untuk ${judul}`}
           width={1200}
           height={675}
+          loading="lazy"
           decoding="async"
           className="h-full w-full object-cover object-center"
         />
@@ -143,15 +144,10 @@ export function ScienceOdysseySection() {
           {/* Self-hosted timeline overview — user-controlled playback (no forced auto-loop) */}
           {(scienceTab === 'eras' || scienceTab === 'all') && (
             <Reveal delay={80}>
-              <div className="dark mt-8 overflow-hidden rounded-[2rem] border border-white/10 bg-[#060A09]">
-                <video
+              <div className="mt-8">
+                <VideoSaatTerlihat
                   src={`${import.meta.env.BASE_URL}media/history.mp4`}
-                  controls
-                  muted
-                  playsInline
-                  preload="metadata"
-                  poster={HISTORY_POSTER}
-                  className="aspect-video w-full bg-[#060A09] object-cover"
+                  judul="Sejarah Kedokteran"
                 />
               </div>
             </Reveal>

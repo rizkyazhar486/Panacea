@@ -587,6 +587,7 @@ export default function BodyAllSystems3D({
         </div>
         <button
           type="button"
+          data-pmd-native="true"
           aria-expanded={open}
           onClick={toggleOpen}
           className="min-h-11 shrink-0 rounded-full border border-cyan-300/20 bg-cyan-300/[.08] px-4 text-[10px] font-black text-cyan-100 transition hover:bg-cyan-300/[.13] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/50"
@@ -603,9 +604,10 @@ export default function BodyAllSystems3D({
               key={system.id}
               type="button"
               role="tab"
+              data-pmd-native="true"
               aria-selected={active}
               onClick={() => selectSystem(system.id)}
-              className={`min-h-10 shrink-0 rounded-full border px-3 text-[9px] font-black transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/50 ${active ? 'border-cyan-300/30 bg-[linear-gradient(135deg,rgba(34,211,238,.18),rgba(139,92,246,.12))] text-white' : 'border-white/[.07] bg-white/[.025] text-white/45 hover:bg-white/[.055] hover:text-white/75'}`}
+              className={`min-h-10 shrink-0 rounded-full border px-3 text-[9px] font-black transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/50 ${active ? 'border-cyan-300/30 bg-[linear-gradient(135deg,rgba(34,211,238,.18),rgba(139,92,246,.12))] text-white' : 'border-white/[.07] bg-white/[.025] text-white/75 hover:bg-white/[.055] hover:text-white'}`}
             >
               {system.label}
             </button>

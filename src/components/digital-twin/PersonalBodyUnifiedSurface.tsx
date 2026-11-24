@@ -173,8 +173,9 @@ function PermukaanTubuh({
           {cameraCapture ? (
             <button
               type="button"
+              data-pmd-native="true"
               onClick={() => setScanOpen((value) => !value)}
-              className="min-h-9 shrink-0 rounded-full border border-white/12 px-3 text-[11px] font-black text-white/80 hover:bg-white/[.06]"
+              className="min-h-9 shrink-0 rounded-full border border-white/15 bg-white/[.05] px-3 text-[11px] font-black text-white/85 hover:bg-white/[.10]"
             >
               {scanOpen ? 'Close scan' : 'Scan'}
             </button>
@@ -183,9 +184,10 @@ function PermukaanTubuh({
           {shareable ? (
             <button
               type="button"
+              data-pmd-native="true"
               onClick={() => void share()}
               disabled={shareState === 'busy'}
-              className="min-h-9 shrink-0 rounded-full border border-white/12 px-3 text-[11px] font-black text-white/80 hover:bg-white/[.06] disabled:opacity-50"
+              className="min-h-9 shrink-0 rounded-full border border-white/15 bg-white/[.05] px-3 text-[11px] font-black text-white/85 hover:bg-white/[.10] disabled:opacity-50"
             >
               {shareState === 'busy' ? 'Preparing…' : shareState === 'done' ? 'Shared ✓' : shareState === 'error' ? 'Try again' : 'Share'}
             </button>
@@ -194,6 +196,7 @@ function PermukaanTubuh({
           {onClose ? (
             <button
               type="button"
+              data-pmd-native="true"
               onClick={onClose}
               aria-label={`Close ${title}`}
               className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-white text-[15px] font-black text-black"
@@ -209,9 +212,10 @@ function PermukaanTubuh({
               key={item.id}
               type="button"
               role="tab"
+              data-pmd-native="true"
               aria-selected={focus === item.id}
               onClick={() => setFocus(item.id)}
-              className={`min-h-9 rounded-full px-3 text-[11px] font-black transition ${focus === item.id ? 'bg-white text-black' : 'text-white/70 hover:bg-white/[.06] hover:text-white'}`}
+              className={`min-h-9 rounded-full px-3 text-[11px] font-black transition ${focus === item.id ? 'bg-white text-black' : 'bg-transparent text-white/80 hover:bg-white/[.08] hover:text-white'}`}
             >
               {item.label}
             </button>

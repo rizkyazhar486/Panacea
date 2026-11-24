@@ -165,6 +165,7 @@ export function RealityViewCockpit() {
             <button
               key={m}
               type="button"
+              data-pmd-native="true"
               onClick={() => setMode(m)}
               aria-pressed={mode === m}
               className="min-h-[44px] rounded-xl border px-2.5 text-[10px] font-black uppercase transition"
@@ -254,17 +255,17 @@ export function RealityViewCockpit() {
         {/* Live Synthesized Tensor KPIs */}
         <div className="grid grid-cols-3 gap-1.5 md:col-span-5">
           <div className="rounded-xl border border-white/10 bg-slate-950/80 p-2 text-center">
-            <div className="font-mono text-[9px] uppercase text-slate-400">Cohort</div>
+            <div className="font-mono text-[9px] uppercase text-slate-200">Cohort</div>
             <div className="font-mono text-xs font-black text-cyan-200">{manifold.cohortId}</div>
           </div>
           <div className="rounded-xl border border-white/10 bg-slate-950/80 p-2 text-center">
-            <div className="font-mono text-[9px] uppercase text-slate-400">Kyphosis / BMD</div>
-            <div className="font-mono text-xs font-black text-amber-200">
+            <div className="font-mono text-[9px] uppercase text-slate-200">Kyphosis / BMD</div>
+            <div className="font-mono text-xs font-black text-amber-100">
               {manifold.senescenceVector.thoracicKyphosisDeg}° / {manifold.composition.boneMineralDensityTScore}
             </div>
           </div>
           <div className="rounded-xl border border-white/10 bg-slate-950/80 p-2 text-center">
-            <div className="font-mono text-[9px] uppercase text-slate-400">VAT / SMM</div>
+            <div className="font-mono text-[9px] uppercase text-slate-200">VAT / SMM</div>
             <div className="font-mono text-xs font-black text-emerald-300">
               {manifold.composition.visceralFatIndex} / {manifold.composition.skeletalMusclePct}%
             </div>
@@ -281,6 +282,7 @@ export function RealityViewCockpit() {
                 key={sys}
                 type="button"
                 role="tab"
+                data-pmd-native="true"
                 aria-selected={selectedSystem === sys}
                 onClick={() => {
                   setSelectedSystem(sys)
@@ -304,6 +306,7 @@ export function RealityViewCockpit() {
               <button
                 key={m.meshId}
                 type="button"
+                data-pmd-native="true"
                 onClick={() => setSelectedMeshId(m.meshId)}
                 aria-pressed={selectedMeshId === m.meshId}
                 className="min-h-[44px] rounded-xl border px-2.5 text-left text-[11px] font-bold"
@@ -314,7 +317,7 @@ export function RealityViewCockpit() {
                 }}
               >
                 <div>{m.indonesianLabel}</div>
-                <div className="font-mono text-[9px] text-cyan-300">{m.canonicalOntologyId} · {m.snomedCtId}</div>
+                <div className="font-mono text-[9px] text-cyan-200">{m.canonicalOntologyId} · {m.snomedCtId}</div>
               </button>
             ))}
           </div>
@@ -323,18 +326,19 @@ export function RealityViewCockpit() {
             <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-cyan-400/20 bg-slate-950/90 px-3 py-2 text-[11px]">
               <div>
                 <span className="font-black text-white">{resolvedMesh.binding.englishLabel}</span>
-                <span className="ml-2 font-mono text-[10px] text-cyan-300">{resolvedMesh.binding.canonicalOntologyId}</span>
+                <span className="ml-2 font-mono text-[10px] text-cyan-200">{resolvedMesh.binding.canonicalOntologyId}</span>
                 {tm1Overlay.icd11Tm1Code && (
-                  <span className="ml-2 rounded-full border border-violet-400/40 bg-violet-500/15 px-2 py-0.5 font-mono text-[9px] text-violet-200">
+                  <span className="ml-2 rounded-full border border-violet-400/40 bg-violet-500/15 px-2 py-0.5 font-mono text-[9px] text-violet-100">
                     ICD-11 TM1: {tm1Overlay.icd11Tm1Code}
                   </span>
                 )}
               </div>
               <button
                 type="button"
+                data-pmd-native="true"
                 onClick={() => setDualCodingTm1((v) => !v)}
                 aria-pressed={dualCodingTm1}
-                className="min-h-[44px] rounded-xl border border-violet-400/35 bg-violet-500/10 px-2.5 font-mono text-[10px] font-black text-violet-200"
+                className="min-h-[44px] rounded-xl border border-violet-400/35 bg-violet-500/10 px-2.5 font-mono text-[10px] font-black text-violet-100"
               >
                 TM1 {dualCodingTm1 ? 'ON' : 'OFF'}
               </button>
@@ -345,7 +349,7 @@ export function RealityViewCockpit() {
         {/* Right: CAD Multi-Planar Slicing + SDF Safety Corridor + Counterfactual Toggle */}
         <div className="flex flex-col justify-between gap-2 rounded-2xl border border-white/10 bg-[#060c18] p-2.5 lg:col-span-5">
           <div className="flex items-center justify-between">
-            <span className="font-mono text-[10px] font-black uppercase text-amber-200">CAD Slice &amp; SDF Corridor</span>
+            <span className="font-mono text-[10px] font-black uppercase text-amber-100">CAD Slice &amp; SDF Corridor</span>
             <span className="font-mono text-[10px] text-emerald-300">Clearance ≥ {safetyMarginMm}mm</span>
           </div>
 
@@ -354,6 +358,7 @@ export function RealityViewCockpit() {
               <button
                 key={pl}
                 type="button"
+                data-pmd-native="true"
                 onClick={() => setCadPlane(pl)}
                 aria-pressed={cadPlane === pl}
                 className="min-h-[44px] rounded-xl border px-2.5 font-mono text-[10px] font-black uppercase"
@@ -370,6 +375,7 @@ export function RealityViewCockpit() {
               <button
                 key={mm}
                 type="button"
+                data-pmd-native="true"
                 onClick={() => setSafetyMarginMm(mm)}
                 aria-pressed={safetyMarginMm === mm}
                 className="min-h-[44px] rounded-xl border px-2 font-mono text-[10px] font-black"
@@ -386,6 +392,7 @@ export function RealityViewCockpit() {
           <div className="flex items-center justify-between gap-2 border-t border-white/10 pt-2">
             <button
               type="button"
+              data-pmd-native="true"
               onClick={() => setCounterfactualActive((v) => !v)}
               aria-pressed={counterfactualActive}
               className="min-h-[44px] flex-1 rounded-xl border border-amber-300/40 bg-amber-400/15 px-3 text-[11px] font-black text-amber-100"
@@ -395,6 +402,7 @@ export function RealityViewCockpit() {
             {!nudgeStatus.suppressed && (
               <button
                 type="button"
+                data-pmd-native="true"
                 onClick={() => overrideStore.recordOverride('sleep_hrv_advisory', 'lifestyle', false, 'user_dismiss')}
                 className="min-h-[44px] rounded-xl border border-white/15 bg-white/5 px-2.5 text-[10px] font-bold text-slate-300"
               >
@@ -413,6 +421,7 @@ export function RealityViewCockpit() {
             <button
               key={stop.label}
               type="button"
+              data-pmd-native="true"
               onClick={() => setTimeOffsetDays(stop.offsetDays)}
               aria-pressed={timeOffsetDays === stop.offsetDays}
               className="min-h-[44px] rounded-xl border px-3 font-mono text-[10px] font-black"
@@ -432,6 +441,7 @@ export function RealityViewCockpit() {
       <div className="flex flex-wrap items-center gap-1.5" role="group" aria-label="Multiscale and century extensions">
         <button
           type="button"
+          data-pmd-native="true"
           onClick={() => setExtensionTab((t) => (t === 'multiscale' ? 'none' : 'multiscale'))}
           aria-pressed={extensionTab === 'multiscale'}
           data-rv-multiscale-toggle
@@ -441,6 +451,7 @@ export function RealityViewCockpit() {
         </button>
         <button
           type="button"
+          data-pmd-native="true"
           onClick={() => setExtensionTab((t) => (t === 'century' ? 'none' : 'century'))}
           aria-pressed={extensionTab === 'century'}
           data-rv-century-toggle
@@ -450,6 +461,7 @@ export function RealityViewCockpit() {
         </button>
         <button
           type="button"
+          data-pmd-native="true"
           onClick={() => setExtensionTab((t) => (t === 'fsd15' ? 'none' : 'fsd15'))}
           aria-pressed={extensionTab === 'fsd15'}
           data-rv-fsd15-toggle

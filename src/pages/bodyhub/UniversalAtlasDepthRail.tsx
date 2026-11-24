@@ -58,14 +58,15 @@ export default function UniversalAtlasDepthRail({
             <button
               key={depth.id}
               type="button"
+              data-pmd-native="true"
               onClick={() => onOpenScale(depth.semanticScale)}
               aria-pressed={active}
               title={depth.rule}
               className={
-                'group relative min-h-[54px] min-w-[92px] shrink-0 overflow-hidden rounded-[16px] border px-2.5 text-left transition ' +
+                'group relative flex min-h-[62px] min-w-[92px] shrink-0 flex-col justify-start overflow-hidden rounded-[16px] border px-2.5 pt-2 pb-6 text-left transition ' +
                 (active
                   ? 'border-cyan-300/35 bg-cyan-300/[.10] text-white'
-                  : 'border-white/[.07] bg-white/[.018] text-white/46 hover:bg-white/[.04] hover:text-white/72')
+                  : 'border-white/[.10] bg-white/[.03] text-white/75 hover:bg-white/[.06] hover:text-white')
               }
             >
               <span className="absolute inset-x-2 bottom-2 flex h-3 items-end gap-[2px]" aria-hidden="true">

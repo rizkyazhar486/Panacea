@@ -1,5 +1,6 @@
-import React from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { Reveal } from '../../../components/Reveal'
+import { WhenOpened } from '../../../shared/ui/WhenOpened'
 import { VideoSaatTerlihat } from './ScienceOdysseySection'
 
 const VISUAL_PLATES = [
@@ -24,8 +25,29 @@ const VISUAL_PLATES = [
 ] as const
 
 export function BrandFilmsSection() {
+  const sectionRef = useRef<HTMLElement>(null)
+  const [near, setNear] = useState(() => typeof IntersectionObserver === 'undefined')
+
+  useEffect(() => {
+    if (near || typeof IntersectionObserver === 'undefined') return
+    const el = sectionRef.current
+    if (!el) return
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          setNear(true)
+          observer.disconnect()
+        }
+      },
+      { rootMargin: '400px 0px' },
+    )
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [near])
+
   return (
     <section
+      ref={sectionRef}
       id="studio-showcase"
       aria-labelledby="studio-showcase-title"
       className="bg-white py-16 text-neutral-950 transition-colors dark:bg-[#111815] dark:text-neutral-50 sm:py-20"
@@ -56,15 +78,19 @@ export function BrandFilmsSection() {
             <Reveal key={plate.id} variant="soft">
               <article className="overflow-hidden rounded-3xl border border-neutral-200 bg-[#F8FAF9] shadow-sm transition hover:border-emerald-700/35 dark:border-white/10 dark:bg-[#090F0C] dark:hover:border-emerald-400/35">
                 <div className="dark relative aspect-[16/10] w-full overflow-hidden bg-[#060A09]">
-                  <img
-                    src={plate.img}
-                    alt={plate.alt}
-                    width={1600}
-                    height={1000}
-                    loading="lazy"
-                    decoding="async"
-                    className="h-full w-full object-cover object-center transition duration-500 hover:scale-[1.02]"
-                  />
+                  {near ? (
+                    <img
+                      src={plate.img}
+                      alt={plate.alt}
+                      width={1600}
+                      height={1000}
+                      loading="lazy"
+                      decoding="async"
+                      className="h-full w-full object-cover object-center transition duration-500 hover:scale-[1.02]"
+                    />
+                  ) : (
+                    <div className="h-full w-full bg-[#060A09]" aria-hidden="true" />
+                  )}
                   <span className="dark absolute left-4 top-4 rounded-full border border-emerald-400/35 bg-[#060A09]/85 px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-wider text-emerald-300 backdrop-blur">
                     {plate.badge}
                   </span>
@@ -82,7 +108,9 @@ export function BrandFilmsSection() {
                       <span className="transition group-open:rotate-180">▾</span>
                     </summary>
                     <div className="mt-3 overflow-hidden rounded-2xl border border-white/10">
-                      <VideoSaatTerlihat src={plate.videoSrc} judul={plate.title} />
+                      <WhenOpened>
+                        <VideoSaatTerlihat src={plate.videoSrc} judul={plate.title} />
+                      </WhenOpened>
                     </div>
                   </details>
                 </div>
