@@ -40,7 +40,7 @@ export interface VaultFileRecord {
   readonly fileId: string
   readonly name: string
   readonly mimeType: string
-  readonly sizeBytes: number
+  readonly sizeBytes: number | null
   readonly md5Checksum?: string
   readonly modifiedTime: string
   readonly domain: VaultDomain
@@ -210,13 +210,15 @@ export async function syncDriveVaultRecursive(options: {
     const isProtected = Boolean(node.encryptedOrProtected) || /\b(locked|protected|drm)\b/i.test(node.name)
     const extractionStatus: VaultFileRecord['extractionStatus'] = isProtected ? 'preview_only' : 'indexed'
     if (isProtected) previewOnlyCount += 1
+    const rawSize = node.size === undefined || node.size === null || node.size === '' ? null : Number(node.size)
+    const sizeBytes = rawSize !== null && Number.isFinite(rawSize) ? rawSize : null
     byKey.set(dedupKey, {
       userId: options.userId,
       layer: 'private_vault',
       fileId: node.id,
       name: node.name,
       mimeType: node.mimeType,
-      sizeBytes: Number(node.size ?? 0) || 0,
+      sizeBytes,
       md5Checksum: node.md5Checksum,
       modifiedTime: modTime,
       domain: classifyVaultDomain(`${fullPath} ${node.name}`),
