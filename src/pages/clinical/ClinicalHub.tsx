@@ -11,6 +11,7 @@ import { PersonalBodyUnifiedSurface } from '../../components/PersonalBodyUnified
 import { SurfaceGuide } from '../../components/SurfaceGuide'
 import { MentalHealthClinicalResearchLab } from '../../components/MentalHealthClinicalResearchLab'
 import { Fold } from '../../shared/ui/Fold'
+import { WhenOpened } from '../../shared/ui/WhenOpened'
 import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 import { readUnifiedLocalVitals } from '../../domains/identity/localRecovery'
 
@@ -304,15 +305,17 @@ export function ClinicalHub() {
           </div>
         </section>
 
-        <Suspense fallback={<div className="mt-6 border-t border-white/10 pt-4 text-xs text-white/50">Loading clinical workbench…</div>}>
-          <ClinicalInteropSection
-            vitals={vitals}
-            activePatient={activePatient}
-            account={account}
-            emrCount={emrCount}
-            rev={rev}
-          />
-        </Suspense>
+        <WhenOpened>
+          <Suspense fallback={<div className="mt-6 border-t border-white/10 pt-4 text-xs text-white/50">Loading clinical workbench…</div>}>
+            <ClinicalInteropSection
+              vitals={vitals}
+              activePatient={activePatient}
+              account={account}
+              emrCount={emrCount}
+              rev={rev}
+            />
+          </Suspense>
+        </WhenOpened>
         </Fold>
 
         <Fold label="Research">

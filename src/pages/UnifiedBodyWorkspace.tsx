@@ -29,6 +29,9 @@ const UniversalCompactBodyCockpit = lazy(() =>
 const DigitalTwinScanFlow = lazy(() =>
   import('../components/scan/DigitalTwinScanFlow').then((m) => ({ default: m.DigitalTwinScanFlow })),
 )
+const RealityViewCockpit = lazy(() =>
+  import('../components/reality-view/RealityViewCockpit').then((m) => ({ default: m.RealityViewCockpit })),
+)
 
 type BodyView = 'body' | 'body-exposure' | 'body-tools' | 'character' | 'training' | 'ranked' | 'workout' | 'recovery' | 'numbers' | 'nutrition' | 'health-data' | 'labs' | 'longevity' | 'vitapulse'
 type View = { key: BodyView; label: string; short: string; component: ComponentType; childTab?: string; description: string }
@@ -241,6 +244,22 @@ export function UnifiedBodyWorkspace() {
           <Suspense fallback={<div className="p-4 text-xs text-white/50">Loading cockpit…</div>}>
             <UniversalCompactBodyCockpit />
           </Suspense>
+        )}
+        {(activeKey === 'body' || activeKey === 'body-exposure') && (
+          <details className="dark rounded-2xl border border-cyan-400/25 bg-[#04070e] p-3 text-white">
+            <summary
+              className="flex min-h-[44px] cursor-pointer list-none items-center justify-between font-mono text-[11px] font-bold uppercase tracking-[0.12em]"
+              style={{ color: '#67e8f9' }}
+            >
+              <span>Reality View OS · 10-System 1:1 Ontology · 22 Cohorts · 4D Time Axis</span>
+              <span>OPEN ▾</span>
+            </summary>
+            <div className="mt-3">
+              <Suspense fallback={<div className="p-4 text-xs text-slate-200">Loading Reality View…</div>}>
+                <RealityViewCockpit />
+              </Suspense>
+            </div>
+          </details>
         )}
         {(activeKey === 'body' || activeKey === 'body-exposure') && (
           <details className="dark rounded-2xl border border-cyan-400/20 bg-[#05070b] p-3 text-white">

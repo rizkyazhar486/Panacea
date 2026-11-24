@@ -1,4 +1,6 @@
-import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent, type ReactNode } from 'react'
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent, type ReactNode } from 'react'
+
+const AssistedMapDrawer = lazy(() => import('../ui/AssistedMapDrawer'))
 import { useLocation, useNavigate } from 'react-router-dom'
 import { LogoMark } from '../Logo'
 import { KATALOG_AKSI, SLOT_PER_HALAMAN } from '../../lib/aksiFab'
@@ -104,6 +106,7 @@ export function FabNavigasi({ onCari, onKembali, tersembunyi = false }: {
   const [aturBuka, setAturBuka] = useState(false)
   const [redup, setRedup] = useState(false)
   const [halaman, setHalaman] = useState(0)
+  const [mapMode, setMapMode] = useState(false)
   const menyingkir = tersembunyi && !buka && !menggeser
 
   const orbRef = useRef<HTMLButtonElement>(null)
@@ -371,13 +374,32 @@ export function FabNavigasi({ onCari, onKembali, tersembunyi = false }: {
             aria-label="Panacea Assistive Touch commands"
             data-panacea-assistive-orbit="true"
             className="absolute rounded-[28px] border border-white/10 bg-neutral-950/78 p-2 shadow-xl backdrop-blur-2xl backdrop-saturate-150"
-            style={{ width: 224, [keAtas ? 'bottom' : 'top']: prefs.size + 8, [keKiri ? 'right' : 'left']: 0 } as React.CSSProperties}
+            style={{ width: mapMode ? 'min(360px, calc(100vw - 24px))' : 224, [keAtas ? 'bottom' : 'top']: prefs.size + 8, [keKiri ? 'right' : 'left']: 0 } as React.CSSProperties}
           >
-            <div className="mb-1 flex items-center justify-between gap-2 px-2 py-1">
-              <span className="truncate text-[9px] font-black uppercase tracking-[.14em] text-neutral-400">Actions</span>
-              <button type="button" onClick={() => { setBuka(false); setAturBuka(true) }} className="grid h-9 w-9 place-items-center rounded-full text-[14px] text-neutral-500 hover:bg-black/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40 dark:hover:bg-white/10" aria-label="Customize Assistive Touch">Edit</button>
+            <div className="mb-1 flex items-center justify-between gap-1.5 px-2 py-1">
+              <span className="truncate text-[9px] font-black uppercase tracking-[.14em] text-neutral-400">{mapMode ? 'Assisted Map' : 'Actions'}</span>
+              <div className="flex items-center gap-1">
+                <button
+                  type="button"
+                  onClick={() => setMapMode((v) => !v)}
+                  aria-pressed={mapMode}
+                  data-panacea-assisted-map-toggle="true"
+                  className="min-h-[36px] rounded-full border border-cyan-400/35 bg-cyan-500/15 px-2.5 text-[10px] font-black text-cyan-200"
+                >
+                  {mapMode ? 'Orb' : 'Map 360°'}
+                </button>
+                <button type="button" onClick={() => { setBuka(false); setAturBuka(true) }} className="grid h-9 w-9 place-items-center rounded-full text-[14px] text-neutral-500 hover:bg-black/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40 dark:hover:bg-white/10" aria-label="Customize Assistive Touch">Edit</button>
+              </div>
             </div>
 
+            {mapMode ? (
+              <div className="max-h-[70vh] overflow-y-auto">
+                <Suspense fallback={<div className="p-4 text-center text-[11px] font-bold text-cyan-200">Loading 360° Assisted Map…</div>}>
+                  <AssistedMapDrawer />
+                </Suspense>
+              </div>
+            ) : (
+            <>
             <SlidableRail
               ref={railRef}
               ariaLabel="Assistive Touch command pages"
@@ -418,6 +440,8 @@ export function FabNavigasi({ onCari, onKembali, tersembunyi = false }: {
                   />
                 ))}
               </div>
+            )}
+            </>
             )}
           </div>
         )}

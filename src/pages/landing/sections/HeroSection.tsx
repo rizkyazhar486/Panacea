@@ -1,4 +1,4 @@
-import { lazy, Suspense } from 'react'
+import { lazy, Suspense, useState } from 'react'
 import { Reveal } from '../../../components/Reveal'
 import { BatasKlaimKesehatan } from '../../../components/BatasKlaimKesehatan'
 import { scrollToSection } from './LandingHeader'
@@ -6,23 +6,33 @@ import {
   IconShield,
   IconCheck,
   IconStethoscope,
-  IconChat,
-  IconHeart,
 } from '../../../components/icons'
 import { IconArrowRight } from '../landingSvgs'
-import { STATS } from '../landingData'
 
 // Decorative canvas: loaded after the hero renders so it stays out of the initial JS budget.
 const InteractiveAura = lazy(() => import('../../../components/InteractiveAura').then((m) => ({ default: m.InteractiveAura })))
+
+const HERO_ORGANS = [
+  { id: 'brain', label: 'Neuro', metric: '95%', cx: 50, cy: 14, color: '#a78bfa' },
+  { id: 'heart', label: 'Cardio', metric: '72 bpm', cx: 53, cy: 34, color: '#fb7185' },
+  { id: 'lungs', label: 'Pulmo', metric: '98% SpO2', cx: 43, cy: 33, color: '#38bdf8' },
+  { id: 'liver', label: 'Hepato', metric: '93%', cx: 44, cy: 46, color: '#34d399' },
+  { id: 'metabolic', label: 'Metabolic', metric: 'HRV 68ms', cx: 52, cy: 58, color: '#fbbf24' },
+] as const
+
+type HoloLayer = 'surface' | 'vascular' | 'neural'
 
 interface HeroSectionProps {
   onMasuk: () => void
 }
 
 export function HeroSection({ onMasuk }: HeroSectionProps) {
+  const [layer, setLayer] = useState<HoloLayer>('vascular')
+  const [focusOrganId, setFocusOrganId] = useState<(typeof HERO_ORGANS)[number]['id']>('heart')
+  const focusOrgan = HERO_ORGANS.find((o) => o.id === focusOrganId) ?? HERO_ORGANS[1]
+
   return (
     <section className="astro-horizon-grid relative overflow-hidden px-4 py-16 sm:px-8 sm:py-20 lg:py-24">
-      {/* Realistic astronomical bio-telemetry horizon backdrop (replaces uncanny auto-looping synthetic video) */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <svg
           aria-hidden="true"
@@ -126,127 +136,98 @@ export function HeroSection({ onMasuk }: HeroSectionProps) {
             </Reveal>
           </div>
 
-          {/* Sisi Kanan (Interactive Live Card Showcase) */}
+          {/* Sisi Kanan (Instant Interactive 360° Holographic BodyExposure Stage) */}
           <div className="lg:col-span-6">
             <Reveal delay={200}>
-              <div className="relative mx-auto max-w-xl rounded-3xl border border-black/10 bg-white/80 p-5 shadow-2xl backdrop-blur-2xl dark:border-white/15 dark:bg-black/70 sm:p-6">
-                <div className="flex items-center justify-between gap-3 border-b border-black/5 pb-3.5 dark:border-white/10">
+              <div className="relative mx-auto max-w-xl rounded-3xl border border-cyan-400/20 bg-[#050811]/92 p-3.5 shadow-2xl backdrop-blur-2xl sm:p-4">
+                <div className="mb-2 flex items-center justify-between gap-2 px-1">
                   <div className="flex min-w-0 items-center gap-2">
-                    <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-emerald-500 animate-pulse" />
-                    <span className="whitespace-nowrap font-mono text-[11px] sm:text-xs font-extrabold uppercase tracking-wider text-neutral-800 dark:text-neutral-200">
-                      Clinical OS · Sesi Aktif
+                    <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-emerald-400 animate-pulse" />
+                    <span className="whitespace-nowrap font-mono text-[11px] font-extrabold uppercase tracking-wider text-cyan-100">
+                      BodyExposure 360° · Live Twin
                     </span>
                   </div>
-                  <div className="flex shrink-0 items-center gap-1.5">
-                    <span className="whitespace-nowrap rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-0.5 text-[10px] font-bold text-emerald-700 dark:text-emerald-300">
-                      HL7® FHIR
-                    </span>
-                    <span className="whitespace-nowrap rounded-full border border-blue-500/20 bg-blue-500/10 px-2.5 py-0.5 text-[10px] font-bold text-blue-700 dark:text-blue-300">
-                      SOCRATES
-                    </span>
+                  <div className="flex shrink-0 items-center gap-1">
+                    {(['surface', 'vascular', 'neural'] as const).map((l) => (
+                      <button
+                        key={l}
+                        type="button"
+                        onClick={() => setLayer(l)}
+                        aria-pressed={layer === l}
+                        className={`min-h-[30px] whitespace-nowrap rounded-full border px-2 font-mono text-[9.5px] font-extrabold uppercase transition ${
+                          layer === l
+                            ? 'border-cyan-300/60 bg-cyan-500/25 text-cyan-100'
+                            : 'border-white/10 bg-white/5 text-slate-400 hover:text-white'
+                        }`}
+                      >
+                        {l}
+                      </button>
+                    ))}
                   </div>
                 </div>
 
-                <div className="mt-4 space-y-3.5">
-                  {/* Stacked Card 1: AI Clinical Intake Parser */}
-                  <div className="rounded-2xl border border-black/5 bg-white/90 p-4 shadow-sm dark:border-white/5 dark:bg-neutral-900/90">
-                    <div className="flex items-center justify-between gap-2">
-                      <div className="flex min-w-0 items-center gap-2 text-xs font-bold text-neutral-700 dark:text-neutral-200">
-                        <IconChat size={15} className="shrink-0 text-emerald-600 dark:text-emerald-400" />
-                        <span className="whitespace-nowrap">AI Intake Parser (SOCRATES)</span>
-                      </div>
-                      <span className="shrink-0 whitespace-nowrap text-[10px] font-bold text-emerald-600 dark:text-emerald-400">Perekaman Aktif</span>
+                <div className="relative flex flex-col items-center rounded-2xl border border-cyan-400/15 bg-gradient-to-b from-[#071326] to-[#030710] p-3">
+                  <svg viewBox="0 0 100 92" className="h-64 w-full max-w-[270px]" role="img" aria-label="Interactive holographic body twin">
+                    <defs>
+                      <radialGradient id="heroTwinAura" cx="50%" cy="44%" r="48%">
+                        <stop offset="0%" stopColor={focusOrgan.color} stopOpacity="0.34" />
+                        <stop offset="100%" stopColor="#030710" stopOpacity="0" />
+                      </radialGradient>
+                    </defs>
+                    <circle cx="50" cy="45" r="41" fill="url(#heroTwinAura)" />
+                    <ellipse cx="50" cy="84" rx="28" ry="4" fill="none" stroke="rgba(34,211,238,0.35)" strokeWidth="0.7" strokeDasharray="2 2" />
+                    <path
+                      d="M50 7 C54 7 56 10 56 14 C56 18 53 20 53 22 L63 25 C67 27 69 32 71 44 L73 56 C73 58 70 59 69 57 L65 36 L60 36 L61 54 L63 82 C63 85 59 86 58 83 L52 58 L48 58 L42 83 C41 86 37 85 37 82 L39 54 L40 36 L35 36 L31 57 C30 59 27 58 27 56 L29 44 C31 32 33 27 37 25 L47 22 C47 20 44 18 44 14 C44 10 46 7 50 7 Z"
+                      fill={layer === 'surface' ? 'rgba(34, 211, 238, 0.22)' : 'rgba(34, 211, 238, 0.10)'}
+                      stroke="#67e8f9"
+                      strokeWidth="0.9"
+                    />
+                    {layer === 'vascular' && (
+                      <path d="M50 14 V58 M44 33 Q50 38 56 33 M43 46 Q50 50 57 46 M48 58 L41 81 M52 58 L59 81" fill="none" stroke="rgba(251,113,133,0.65)" strokeWidth="0.85" />
+                    )}
+                    {layer === 'neural' && (
+                      <path d="M50 11 V54 M50 22 L33 34 M50 22 L67 34 M50 38 L42 52 M50 38 L58 52" fill="none" stroke="rgba(167,139,250,0.75)" strokeWidth="0.85" strokeDasharray="1.4 1" />
+                    )}
+                    {HERO_ORGANS.map((org) => {
+                      const active = org.id === focusOrgan.id
+                      return (
+                        <g
+                          key={org.id}
+                          onClick={() => setFocusOrganId(org.id)}
+                          style={{ cursor: 'pointer' }}
+                          role="button"
+                          tabIndex={0}
+                          aria-label={`${org.label} ${org.metric}`}
+                          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setFocusOrganId(org.id) }}
+                        >
+                          {active && <circle cx={org.cx} cy={org.cy} r="6.4" fill="none" stroke={org.color} strokeWidth="0.9" strokeDasharray="1.6 1.6" />}
+                          <circle cx={org.cx} cy={org.cy} r={active ? 3.4 : 2.3} fill={org.color} stroke="#ffffff" strokeWidth="0.7" />
+                        </g>
+                      )
+                    })}
+                  </svg>
+                  <div className="mt-2 flex w-full items-center justify-between gap-2 rounded-xl border border-white/10 bg-slate-950/90 px-3 py-2">
+                    <div className="flex items-center gap-2">
+                      <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: focusOrgan.color }} />
+                      <span className="whitespace-nowrap text-xs font-black text-white">{focusOrgan.label}</span>
+                      <span className="whitespace-nowrap font-mono text-xs font-bold" style={{ color: focusOrgan.color }}>{focusOrgan.metric}</span>
                     </div>
-                    <div className="mt-2.5 space-y-2 text-xs">
-                      <div className="rounded-xl bg-neutral-100/80 p-2.5 dark:bg-neutral-800/80 text-neutral-700 dark:text-neutral-300">
-                        <span className="text-[10px] font-extrabold uppercase tracking-wider text-neutral-400">Keluhan Pasien:</span>
-                        <p className="mt-0.5 font-medium leading-relaxed">"Jantung berdebar dan sesak ringan pasca lari pagi 5km."</p>
-                      </div>
-                      <div className="rounded-xl border border-emerald-500/20 bg-emerald-50/70 p-2.5 text-emerald-900 dark:bg-emerald-950/50 dark:text-emerald-200">
-                        <span className="text-[10px] font-extrabold uppercase tracking-wider text-emerald-700 dark:text-emerald-400">Terjemahan SOAP (Subjektif):</span>
-                        <p className="mt-0.5 text-[11px] font-medium leading-relaxed">Onset akut, palpitasi teratur pasca-latihan, tanpa riwayat syncope sebelumnya.</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Stacked Card 2: Longevity Biomarkers Dial */}
-                  <div className="rounded-2xl border border-black/5 bg-white/90 p-4 shadow-sm dark:border-white/5 dark:bg-neutral-900/90">
-                    <div className="flex items-center justify-between gap-2">
-                      <div className="flex min-w-0 items-center gap-2 text-xs font-bold text-neutral-700 dark:text-neutral-200">
-                        <IconHeart size={15} className="shrink-0 text-emerald-600 dark:text-emerald-400" />
-                        <span className="whitespace-nowrap">Biomarker &amp; Healthspan</span>
-                      </div>
-                      <span className="shrink-0 whitespace-nowrap rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-extrabold text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
-                        Skor: 94/100
-                      </span>
-                    </div>
-                    <div className="mt-3 flex items-center justify-between">
-                      <div>
-                        <div className="text-[10px] font-bold uppercase tracking-wider text-neutral-400">Usia Kronologis</div>
-                        <div className="text-2xl font-black text-ink">42 <span className="text-xs font-normal text-neutral-500">thn</span></div>
-                      </div>
-                      <div className="text-right">
-                        <div className="text-[10px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">Usia Biologis</div>
-                        <div className="text-2xl font-black text-emerald-600 dark:text-emerald-400">36.4 <span className="text-xs font-normal">thn</span></div>
-                      </div>
-                    </div>
-                    <div className="mt-2.5">
-                      <div className="flex justify-between text-[11px] font-bold">
-                        <span className="text-neutral-500">Keunggulan Healthspan</span>
-                        <span className="text-emerald-600 dark:text-emerald-400">+5.6 thn</span>
-                      </div>
-                      <div className="mt-1 h-2 w-full overflow-hidden rounded-full bg-neutral-200 dark:bg-neutral-700">
-                        <div className="h-full w-4/5 rounded-full bg-gradient-to-r from-emerald-500 to-teal-400" />
-                      </div>
-                      <div className="mt-2 flex justify-between text-[10px] text-neutral-500">
-                        <span>HRV: 68 ms</span>
-                        <span>Tidur: 8.4 jam</span>
-                        <span>Aktivitas: 8.200 langkah</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Stacked Card 3: Persetujuan Dokter Berizin */}
-                  <div className="rounded-2xl border border-black/5 bg-white/90 p-4 shadow-sm dark:border-white/5 dark:bg-neutral-900/90">
-                    <div className="flex items-center justify-between gap-2">
-                      <div className="flex min-w-0 items-center gap-2 text-xs font-bold text-neutral-700 dark:text-neutral-200">
-                        <IconStethoscope size={15} className="shrink-0 text-emerald-600 dark:text-emerald-400" />
-                        <span className="whitespace-nowrap">Verifikasi Klinisi &amp; STR</span>
-                      </div>
-                      <span className="flex shrink-0 items-center gap-1 whitespace-nowrap rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-bold text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
-                        <IconCheck size={11} /> STR Valid
-                      </span>
-                    </div>
-                    <div className="mt-2.5 flex items-center justify-between gap-3 text-xs">
-                      <div className="min-w-0">
-                        <div className="whitespace-nowrap font-bold text-neutral-800 dark:text-neutral-200">dr. Sp.PD (Spesialis Penyakit Dalam)</div>
-                        <div className="whitespace-nowrap text-[11px] text-neutral-500">Rekam Medis EMR Ditandatangani &amp; Terarsip</div>
-                      </div>
-                      <div className="shrink-0 whitespace-nowrap rounded-lg border border-dashed border-emerald-500/40 bg-emerald-50/70 px-2.5 py-1 text-center text-[10px] font-black uppercase tracking-wider text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300">
-                        Dokter Berdaulat
-                      </div>
-                    </div>
+                    <svg viewBox="0 0 80 18" width="76" height="18" aria-hidden="true">
+                      <path d="M2 10h14l4-6 5 11 5-13 5 10 4-2h39" fill="none" stroke={focusOrgan.color} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                    <button
+                      type="button"
+                      onClick={onMasuk}
+                      className="min-h-[34px] whitespace-nowrap rounded-lg border border-emerald-400/40 bg-emerald-500/20 px-2.5 text-[10px] font-black text-emerald-100 hover:bg-emerald-500/30"
+                    >
+                      360° 3D ↗
+                    </button>
                   </div>
                 </div>
               </div>
             </Reveal>
           </div>
         </div>
-
-        {/* Stat band — glassmorphism */}
-        <Reveal delay={300}>
-          <div className="mx-auto mt-14 grid max-w-4xl grid-cols-2 gap-3 sm:grid-cols-4">
-            {STATS.map((s, i) => (
-              <div key={i} className="liquid-glass rounded-2xl p-4 text-center shadow-sm">
-                <div className="bg-gradient-to-r from-brand to-brand-dark bg-clip-text text-2xl font-black text-transparent sm:text-3xl">
-                  {s.node}
-                </div>
-                <div className="mt-1 text-[11px] font-semibold leading-tight text-neutral-500">{s.label}</div>
-              </div>
-            ))}
-          </div>
-        </Reveal>
-        <p className="mt-4 text-center text-xs text-neutral-500">AI mendukung proses evaluasi, namun tidak pernah menggantikan pertimbangan dokter berizin.</p>
       </div>
     </section>
   )
