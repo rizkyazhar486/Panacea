@@ -179,6 +179,9 @@ export function getProductSpace(id: ProductSpaceId): ProductSpace {
 export const SECONDARY_DAILY_DESTINATIONS: ReadonlySet<string> = new Set([
   '/tutorial',
   '/workout',
+  '/body-explorer',
+  '/scan',
+  '/sync',
   '/radiology',
   '/electrophysiology',
   '/genome-lab',

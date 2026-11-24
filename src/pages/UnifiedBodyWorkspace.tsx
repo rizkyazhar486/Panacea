@@ -53,7 +53,7 @@ const VIEWS: View[] = [
   { key: 'vitapulse', label: 'VitaPulse', short: 'VitaPulse', component: VitaPulse, description: 'Compact vitality overview.' },
 ]
 const VALID = new Set(VIEWS.map((view) => view.key))
-const PRIMARY_VIEW_KEYS = new Set<BodyView>(['body', 'body-exposure', 'training', 'ranked', 'recovery', 'nutrition', 'health-data'])
+const PRIMARY_VIEW_KEYS = new Set<BodyView>(['body', 'body-exposure', 'training', 'recovery', 'health-data'])
 
 const BODY_DEPTH_BY_VIEW: Record<BodyView, string> = {
   body: 'today',
@@ -164,11 +164,12 @@ export function UnifiedBodyWorkspace() {
                   key={view.key}
                   type="button"
                   role="tab"
+                  data-pmd-native="true"
                   aria-selected={selected}
                   onClick={() => select(view)}
                   className={`min-h-[42px] shrink-0 snap-start rounded-full border px-3.5 text-[11px] font-black transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/50 ${
                     selected
-                      ? 'border-transparent text-black'
+                      ? 'border-emerald-300 bg-emerald-400 text-neutral-950'
                       : exposureTab
                         ? 'border-white/15 bg-white/[.055] text-white/85 hover:bg-white/[.09]'
                         : 'border-white/[.08] bg-white/[.035] text-white/75 hover:border-white/15 hover:bg-white/[.055] hover:text-white'
@@ -208,7 +209,7 @@ export function UnifiedBodyWorkspace() {
             <ol className="mt-2 grid gap-1 leading-relaxed">
               {[
                 'Start with My Body or Body Exposure.',
-                'Use the six primary destinations for daily work.',
+                'Use the five primary destinations for daily work.',
                 'Everything else stays preserved under More features.',
               ].map((langkah, i) => (
                 <li key={langkah} className="flex gap-2"><span className="font-black text-[#a5f3fc]">{i + 1}</span>{langkah}</li>

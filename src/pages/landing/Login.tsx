@@ -365,22 +365,24 @@ export function Login({ onBack }: { onBack?: () => void }) {
           <div className="flex rounded-full border border-neutral-200/80 bg-neutral-100/80 p-1 dark:border-white/10 dark:bg-white/[0.04]">
             <button
               type="button"
+              data-pmd-native="true"
               onClick={() => { setAuthMode('masuk'); setError('') }}
-              className={`flex-1 rounded-full py-2 text-xs font-bold transition duration-150 ${
+              className={`flex-1 min-h-[40px] rounded-full py-2 text-xs font-bold transition duration-150 ${
                 authMode === 'masuk'
-                  ? 'bg-white text-neutral-900 shadow-xs dark:bg-neutral-800 dark:text-white'
-                  : 'text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white'
+                  ? 'bg-emerald-700 text-white shadow-xs dark:bg-emerald-700 dark:text-white'
+                  : 'text-neutral-600 hover:text-neutral-950 dark:text-neutral-300 dark:hover:text-white'
               }`}
             >
               Masuk ke Akun
             </button>
             <button
               type="button"
+              data-pmd-native="true"
               onClick={() => { setAuthMode('daftar'); setError('') }}
-              className={`flex-1 rounded-full py-2 text-xs font-bold transition duration-150 ${
+              className={`flex-1 min-h-[40px] rounded-full py-2 text-xs font-bold transition duration-150 ${
                 authMode === 'daftar'
-                  ? 'bg-white text-neutral-900 shadow-xs dark:bg-neutral-800 dark:text-white'
-                  : 'text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white'
+                  ? 'bg-emerald-700 text-white shadow-xs dark:bg-emerald-700 dark:text-white'
+                  : 'text-neutral-600 hover:text-neutral-950 dark:text-neutral-300 dark:hover:text-white'
               }`}
             >
               Daftar Baru
@@ -388,10 +390,10 @@ export function Login({ onBack }: { onBack?: () => void }) {
           </div>
 
           <div>
-            <h2 className="text-2xl font-black tracking-tight text-ink dark:text-white">
+            <h2 className="text-2xl font-black tracking-tight text-neutral-950 dark:text-white">
               {authMode === 'masuk' ? 'Masuk ke Akun Anda' : 'Buat Akun Panaceamed'}
             </h2>
-            <p className="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
+            <p className="mt-1 text-xs text-neutral-600 dark:text-neutral-300">
               {authMode === 'masuk'
                 ? 'Pintu gerbang rekam medis & kesehatan longevity presisi.'
                 : 'Pilih peran dan daftarkan diri untuk akses rekam medis digital.'}
@@ -404,6 +406,7 @@ export function Login({ onBack }: { onBack?: () => void }) {
               <div className="login-role-switch" role="tablist">
                 <button
                   type="button"
+                  data-pmd-native="true"
                   role="tab"
                   aria-selected={role === 'pasien' && !pilihPeran}
                   data-active={role === 'pasien' && !pilihPeran ? 'true' : 'false'}
@@ -415,6 +418,7 @@ export function Login({ onBack }: { onBack?: () => void }) {
                 </button>
                 <button
                   type="button"
+                  data-pmd-native="true"
                   role="tab"
                   aria-selected={pilihPeran || role !== 'pasien'}
                   data-active={pilihPeran || role !== 'pasien' ? 'true' : 'false'}
@@ -436,7 +440,7 @@ export function Login({ onBack }: { onBack?: () => void }) {
                     <span className="font-bold uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
                       Peran Terpilih:
                     </span>
-                    <span className="font-bold text-emerald-600 dark:text-emerald-400">
+                    <span className="font-bold text-emerald-700 dark:text-emerald-400">
                       {clinical ? 'Kredensial STR Diperlukan' : 'Otorisasi Faskes / Admin'}
                     </span>
                   </div>
@@ -447,6 +451,7 @@ export function Login({ onBack }: { onBack?: () => void }) {
                         <button
                           key={r.id}
                           type="button"
+                          data-pmd-native="true"
                           onClick={() => setRole(r.id)}
                           data-selected={isSelected ? 'true' : 'false'}
                           className="login-subrole-btn"
@@ -457,7 +462,7 @@ export function Login({ onBack }: { onBack?: () => void }) {
                       )
                     })}
                   </div>
-                  <p className="text-[11px] leading-snug text-neutral-500 dark:text-neutral-400">
+                  <p className="text-[11px] leading-snug text-neutral-600 dark:text-neutral-300">
                     {cur.desc}
                   </p>
                 </div>
@@ -473,6 +478,7 @@ export function Login({ onBack }: { onBack?: () => void }) {
                   <button
                     key={acc.email}
                     type="button"
+                    data-pmd-native="true"
                     onClick={() => {
                       if (!backendEnabled) return completeQuickSignIn(acc)
                       if (acc.email !== f.email || (acc.role ?? role) !== role) setEmailVerificationVersion(version => version + 1)
@@ -511,9 +517,10 @@ export function Login({ onBack }: { onBack?: () => void }) {
             ) : backendEnabled && googleStatus === 'unavailable' ? (
               <button
                 type="button"
+                data-pmd-native="true"
                 data-testid="google-signin-retry"
                 onClick={() => setHealthRetrySeed((n) => n + 1)}
-                className="flex min-h-[44px] w-full items-center justify-center rounded-xl border border-neutral-300 bg-white px-3 text-xs font-bold text-neutral-800 hover:bg-neutral-50 dark:border-white/15 dark:bg-neutral-900 dark:text-neutral-100 dark:hover:bg-neutral-800"
+                className="flex min-h-[44px] w-full items-center justify-center rounded-xl border border-neutral-300 bg-neutral-50 px-3 text-xs font-bold text-neutral-800 hover:bg-neutral-100 dark:border-white/15 dark:bg-neutral-900 dark:text-neutral-100 dark:hover:bg-neutral-800"
               >
                 Muat ulang Google Sign-In
               </button>
@@ -522,9 +529,10 @@ export function Login({ onBack }: { onBack?: () => void }) {
             <div className="grid grid-cols-2 gap-2">
               <button
                 type="button"
+                data-pmd-native="true"
                 onClick={() => setAccessModal('authenticator')}
                 data-testid="open-passkey-modal-btn"
-                className="flex min-h-[44px] items-center justify-center gap-1.5 rounded-xl border border-neutral-200 bg-neutral-50 px-3 py-2 text-xs font-bold text-neutral-700 dark:border-white/10 dark:bg-neutral-900 dark:text-neutral-200"
+                className="flex min-h-[44px] items-center justify-center gap-1.5 rounded-xl border border-neutral-200 bg-neutral-50 px-3 py-2 text-xs font-bold text-neutral-800 dark:border-white/15 dark:bg-neutral-900 dark:text-neutral-100"
                 title="Authenticator / Passkey (TouchID / FaceID / 6-Digit)"
               >
                 <span>🔐</span>
@@ -532,9 +540,10 @@ export function Login({ onBack }: { onBack?: () => void }) {
               </button>
               <button
                 type="button"
+                data-pmd-native="true"
                 onClick={() => setAccessModal('qr')}
                 data-testid="open-qr-modal-btn"
-                className="flex min-h-[44px] items-center justify-center gap-1.5 rounded-xl border border-neutral-200 bg-neutral-50 px-3 py-2 text-xs font-bold text-neutral-700 dark:border-white/10 dark:bg-neutral-900 dark:text-neutral-200"
+                className="flex min-h-[44px] items-center justify-center gap-1.5 rounded-xl border border-neutral-200 bg-neutral-50 px-3 py-2 text-xs font-bold text-neutral-800 dark:border-white/15 dark:bg-neutral-900 dark:text-neutral-100"
                 title="Scan EMV QR / Code-128 Barcode Health Pass"
               >
                 <span>📱</span>
@@ -726,6 +735,7 @@ export function Login({ onBack }: { onBack?: () => void }) {
           {/* ── Primary Submit Button ─────────────────────────────── */}
           <button
             type="button"
+            data-pmd-native="true"
             onClick={doLogin}
             disabled={!isFormValid}
             className="login-submit-btn flex w-full items-center justify-center gap-2 rounded-full py-3"
@@ -748,6 +758,7 @@ export function Login({ onBack }: { onBack?: () => void }) {
             <summary className="cursor-pointer text-[11px] text-neutral-500 dark:text-neutral-400">Opsi lain</summary>
             <button
               type="button"
+              data-pmd-native="true"
               onClick={continueOnThisDevice}
               data-testid="device-session-btn"
               className="astro-chip mt-2 flex min-h-[44px] w-full items-center justify-center rounded-full px-4 py-2.5 text-xs font-bold"
