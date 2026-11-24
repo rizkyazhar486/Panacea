@@ -17,6 +17,7 @@ import { readUnifiedLocalVitals } from '../../domains/identity/localRecovery'
 
 const ClinicalInteropSection = lazy(() => import('./ClinicalInteropSection'))
 const ClinicalToClaimShieldWorkbench = lazy(() => import('../../components/clinical/ClinicalToClaimShieldWorkbench'))
+const DoctorModeSwitcherDock = lazy(() => import('../../components/clinical/DoctorModeSwitcherDock'))
 
 export const GROUPS = [
   {
@@ -358,6 +359,14 @@ export function ClinicalHub() {
         </Fold>
 
         <PersonalBodyUnifiedSurface compact defaultFocus="clinical" shareable={false} cameraCapture={false} />
+
+        <Fold label="Doctor Workspace Modes" subtitle="IGD · Ward · OK · ICU · Command OS">
+        <WhenOpened>
+          <Suspense fallback={<div className="py-4 text-xs text-white/50">Loading Doctor Modes…</div>}>
+            <DoctorModeSwitcherDock />
+          </Suspense>
+        </WhenOpened>
+        </Fold>
 
         <Fold label="Frontier & Surgical OS">
           <div className="space-y-3 border-t border-white/10 pt-3">

@@ -1,4 +1,6 @@
-import { useState } from 'react'
+import { lazy, Suspense, useState } from 'react'
+
+const VerifierEvidenceQueueDeck = lazy(() => import('../../components/governance/VerifierEvidenceQueueDeck'))
 import { useStore } from '../../lib/store'
 import { Card, SectionTitle, Badge, Button } from '../../components/ui'
 import { IconShield, IconSparkle, IconCheck } from '../../components/icons'
@@ -197,6 +199,9 @@ export function Verification() {
           </table>
         </div>
       </Card>
+      <Suspense fallback={null}>
+        <VerifierEvidenceQueueDeck />
+      </Suspense>
     </div>
   )
 }
