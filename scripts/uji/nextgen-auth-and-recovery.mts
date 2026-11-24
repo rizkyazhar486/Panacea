@@ -67,7 +67,7 @@ const oldToken = encodeURIComponent(JSON.stringify([`acc-owner-${enc}`, 'p1']))
 
 mem.set('panaceamed.session.v1', JSON.stringify({
   account: { id: targetId, email: myEmail, name: 'QA Recover', role: 'owner', patientId: targetPatientId },
-  loginAt: now,
+  loginAt: Date.now(),
 }))
 bindPersonalHealthAccount({ id: targetId, patientId: targetPatientId })
 
