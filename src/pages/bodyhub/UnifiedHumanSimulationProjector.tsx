@@ -140,10 +140,10 @@ function readableSystem(id: BodySystemId) {
 }
 
 function tabClass(active: boolean) {
-  const base = 'min-h-10 shrink-0 rounded-full border px-3 text-[10px] font-black transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/60 '
+  const base = 'min-h-[44px] shrink-0 rounded-full border px-3.5 text-[11px] font-black transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/60 '
   return base + (active
-    ? 'border-cyan-300/30 bg-cyan-300/[.12] text-white'
-    : 'border-white/[.07] bg-white/[.025] text-white/45 hover:border-white/15 hover:bg-white/[.05] hover:text-white/80')
+    ? 'border-cyan-300 bg-cyan-400 text-neutral-950'
+    : 'border-white/15 bg-white/[.06] text-slate-200 hover:border-white/30 hover:bg-white/[.12] hover:text-white')
 }
 
 function ProjectorLoader({ label }: { label: string }) {
@@ -262,28 +262,29 @@ export default function UnifiedHumanSimulationProjector({
       default:
         return (
           <div className="grid gap-3 @[44rem]:grid-cols-[minmax(0,1fr)_minmax(280px,.72fr)]">
-            <div className="rounded-2xl border border-white/[.08] bg-white/[.025] p-3">
-              <div className="text-[9px] font-black uppercase tracking-[.14em] text-[#a5f3fc]">Selected structure</div>
-              <div className="mt-1 text-base font-black text-white/90">{selectedStructureName ?? 'Tap a rendered structure'}</div>
-              <p className="mt-1 text-[10px] leading-relaxed text-white/45">
-                Selection comes from the rendered source mesh, not inferred screen position. The exact structure can stay in context while the projection changes.
+            <div className="rounded-2xl border border-white/15 bg-white/[.04] p-3">
+              <div className="text-[10px] font-black uppercase tracking-[.14em] text-[#a5f3fc]">Selected structure</div>
+              <div className="mt-1 text-base font-black text-white">{selectedStructureName ?? 'Tap a rendered structure'}</div>
+              <p className="mt-1 text-[11px] leading-relaxed text-slate-300">
+                Selection comes from the rendered source mesh. The selected structure stays active across projections.
               </p>
               {selectedStructureName && (
-                <button type="button" onClick={() => setSelectedStructureName(null)} className="mt-3 min-h-9 rounded-full border border-white/10 px-3 text-[9px] font-black text-white/55 hover:text-white">
+                <button type="button" data-pmd-native="true" onClick={() => setSelectedStructureName(null)} className="mt-3 min-h-[44px] rounded-full border border-white/20 bg-white/[.06] px-3.5 text-[11px] font-black text-white hover:bg-white/[.14]">
                   Clear structure
                 </button>
               )}
             </div>
-            <div className="rounded-2xl border border-white/[.08] bg-white/[.025] p-3">
-              <div className="text-[9px] font-black uppercase tracking-[.14em] text-white/35">Source-backed structure shortcuts</div>
-              <div className="mt-2 flex max-h-36 flex-wrap gap-1.5 overflow-y-auto pr-1">
+            <div className="rounded-2xl border border-white/15 bg-white/[.04] p-3">
+              <div className="text-[10px] font-black uppercase tracking-[.14em] text-slate-300">Source-backed structure shortcuts</div>
+              <div className="mt-2 flex max-h-40 flex-wrap gap-1.5 overflow-y-auto pr-1">
                 {currentSystem.targets.flatMap((target) => target.names.slice(0, 4)).slice(0, 18).map((name) => (
                   <button
                     key={name}
                     type="button"
+                    data-pmd-native="true"
                     aria-pressed={selectedStructureName === name}
                     onClick={() => setSelectedStructureName(name)}
-                    className="min-h-8 max-w-full truncate rounded-full border border-white/[.08] bg-black/20 px-2.5 text-[8px] font-bold text-white/45 aria-pressed:border-cyan-300/35 aria-pressed:bg-cyan-300/[.10] aria-pressed:text-cyan-100"
+                    className="min-h-[44px] max-w-full truncate rounded-full border border-white/15 bg-black/30 px-3 text-[11px] font-bold text-slate-200 aria-pressed:border-cyan-300 aria-pressed:bg-cyan-400/20 aria-pressed:text-cyan-100"
                   >
                     {name}
                   </button>
@@ -302,34 +303,28 @@ export default function UnifiedHumanSimulationProjector({
       data-simulation-domain={domain}
       data-semantic-scale={semanticZoom.scale}
       data-selected-source-structure={selectedStructureName ?? undefined}
-      className="@container dark overflow-hidden rounded-[30px] border border-white/[.09] bg-[#020508] text-white shadow-[0_28px_90px_rgba(0,0,0,.36)]"
+      className="@container dark overflow-hidden rounded-[30px] border border-white/15 bg-[#020508] text-white shadow-[0_28px_90px_rgba(0,0,0,.36)]"
       aria-labelledby="unified-human-simulation-title"
       aria-description="Body → system → organ → tissue → cell → organelle → molecule → genome"
     >
-      <header className="border-b border-white/[.08] p-3 sm:p-4">
-        <div className="flex flex-col gap-3 @[50rem]:flex-row @[50rem]:items-end @[50rem]:justify-between">
-          <div className="min-w-0">
-            <div className="text-[9px] font-black uppercase tracking-[.22em] text-[#a5f3fc]">Body Exposure · unified human simulation projector</div>
-            <h3 id="unified-human-simulation-title" className="mt-1 text-lg font-black tracking-[-.025em] sm:text-xl">
-              One body. Switch the projection.
-            </h3>
-            <p className="mt-1 max-w-4xl text-[10px] leading-relaxed text-white/45 sm:text-[11px]">
-              Anatomy · function · imaging · scope · surgery · micro — one persistent body context.
-            </p>
-          </div>
-          <div className="shrink-0 rounded-2xl border border-cyan-300/15 bg-cyan-300/[.055] px-3 py-2">
-            <div className="text-[8px] font-black uppercase tracking-[.15em] text-cyan-200/55">Selected system</div>
-            <div className="mt-0.5 text-xs font-black text-cyan-50">{systemLabel}</div>
+      <header className="border-b border-white/10 p-2.5 sm:px-3.5 sm:py-2.5">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <h3 id="unified-human-simulation-title" className="text-base font-black tracking-[-.02em] text-white sm:text-lg">
+            One body. Every projection.
+          </h3>
+          <div className="shrink-0 rounded-full border border-cyan-300/25 bg-cyan-400/10 px-3 py-1.5 text-[11px] font-black text-cyan-100">
+            {systemLabel}
           </div>
         </div>
 
         {!compact && (
-          <div className="no-scrollbar mt-3 flex gap-1.5 overflow-x-auto pb-1" role="tablist" aria-label="Unified simulation domains">
+          <div className="no-scrollbar mt-1.5 flex gap-1.5 overflow-x-auto pb-1" role="tablist" aria-label="Unified simulation domains">
             {DOMAINS.map((item) => (
               <button
                 key={item.id}
                 type="button"
                 role="tab"
+                data-pmd-native="true"
                 aria-selected={domain === item.id}
                 onClick={() => selectDomain(item.id)}
                 className={tabClass(domain === item.id)}
@@ -342,16 +337,8 @@ export default function UnifiedHumanSimulationProjector({
       </header>
 
       {!hideReferenceAtlasCanvas && (
-        <UniversalAtlasDepthRail
-          semanticScale={semanticZoom.scale}
-          selectedSystemId={selectedSystemId}
-          onOpenScale={openScale}
-        />
-      )}
-
-      {!hideReferenceAtlasCanvas && (
-      <div className="grid gap-0 @[50rem]:grid-cols-[minmax(0,1fr)_250px]">
-        <div className="min-w-0 border-b border-white/[.08] p-2 sm:p-3 @[50rem]:border-b-0 @[50rem]:border-r">
+      <div className="grid gap-0 @[50rem]:grid-cols-[minmax(0,1fr)_270px]">
+        <div className="min-w-0 border-b border-white/10 p-2 sm:p-3 @[50rem]:border-b-0 @[50rem]:border-r">
           <Suspense fallback={<ProjectorLoader label="3D anatomy" />}>
             <BodyAllSystems3D
               selectedSystemId={selectedSystemId}
@@ -365,60 +352,69 @@ export default function UnifiedHumanSimulationProjector({
         </div>
 
         <aside className="p-3 sm:p-4">
-          <div className="text-[8px] font-black uppercase tracking-[.16em] text-white/30">Active projection</div>
-          <div className="mt-1 text-sm font-black text-white/90">{current.label}</div>
-          <div className="mt-0.5 text-[9px] font-bold text-cyan-200/55">{current.scale}</div>
-          <p className="mt-2 text-[10px] leading-relaxed text-white/45">{current.description}</p>
+          <div className="text-[10px] font-black uppercase tracking-[.14em] text-slate-300">Active projection</div>
+          <div className="mt-1 text-sm font-black text-white">{current.label}</div>
+          <div className="mt-0.5 text-[11px] font-bold text-cyan-200">{current.scale}</div>
+          <p className="mt-2 text-[11px] leading-relaxed text-slate-300">{current.description}</p>
 
           <div className="mt-4 flex items-end justify-between gap-2">
             <div>
-              <div className="text-[8px] font-black uppercase tracking-[.16em] text-white/30" title="Relative zoom controls representation/LOD; it is not optical magnification">Semantic zoom</div>
-              <div className="mt-1 text-xs font-black text-white/85">{semanticStop.label}</div>
+              <div className="text-[10px] font-black uppercase tracking-[.14em] text-slate-300" title="Relative zoom controls representation/LOD; it is not optical magnification">Semantic zoom</div>
+              <div className="mt-1 text-xs font-black text-white">{semanticStop.label}</div>
             </div>
-            <div className="text-right text-[8px] font-bold text-cyan-200/55">{semanticZoom.relativeZoom.toFixed(1)}× from fitted view</div>
+            <div className="text-right text-[11px] font-bold text-cyan-200">{semanticZoom.relativeZoom.toFixed(1)}×</div>
           </div>
 
-          <div className="mt-4 rounded-2xl border border-white/[.08] bg-white/[.025] p-2.5">
-            <div className="text-[8px] font-black uppercase tracking-[.16em] text-white/30">Structure context</div>
-            <div className="mt-1 truncate text-[10px] font-black text-cyan-100/80">{selectedStructureName ?? 'No exact mesh selected'}</div>
-            <div className="mt-1 text-[8px] leading-relaxed text-white/30">Tap the 3D atlas or choose a source node in Anatomy. Context persists across projections.</div>
+          <div className="mt-4 rounded-2xl border border-white/15 bg-white/[.04] p-2.5">
+            <div className="text-[10px] font-black uppercase tracking-[.14em] text-slate-300">Structure context</div>
+            <div className="mt-1 truncate text-[11px] font-black text-cyan-100">{selectedStructureName ?? 'No exact mesh selected'}</div>
+            <div className="mt-1 text-[11px] leading-relaxed text-slate-300">Tap the 3D atlas or choose a structure to keep it coupled across projections.</div>
             {selectedStructureEducation && (
-              <details className="mt-2 border-t border-white/[.07] pt-2">
-                <summary className="cursor-pointer text-[8px] font-black uppercase tracking-[.12em] text-cyan-100/55">Explain structure</summary>
-                <p className="mt-1 line-clamp-6 whitespace-pre-line text-[9px] leading-relaxed text-white/42">{selectedStructureEducation}</p>
+              <details className="mt-2 border-t border-white/10 pt-2">
+                <summary className="flex min-h-[44px] cursor-pointer items-center text-[10px] font-black uppercase tracking-[.12em] text-cyan-200">Explain structure</summary>
+                <p className="mt-1 line-clamp-6 whitespace-pre-line text-[11px] leading-relaxed text-slate-300">{selectedStructureEducation}</p>
               </details>
             )}
           </div>
 
           {/* Golden Journey 3D <-> Case Bridge */}
-          <div style={{ marginTop: '0.75rem', borderRadius: '1rem', border: '1px solid rgba(165,243,252,0.2)', backgroundColor: 'rgba(8,47,73,0.3)', padding: '0.625rem' }}>
+          <div style={{ marginTop: '0.75rem', borderRadius: '1rem', border: '1px solid rgba(165,243,252,0.25)', backgroundColor: 'rgba(8,47,73,0.4)', padding: '0.75rem' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.25rem' }}>
-              <span style={{ fontSize: '8px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.15em', color: '#a5f3fc' }}>
+              <span style={{ fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.14em', color: '#a5f3fc' }}>
                 Golden Journey (EDU-6)
               </span>
               {isGoldenRestored && (
-                <span style={{ borderRadius: '9999px', backgroundColor: 'rgba(6,78,59,0.7)', border: '1px solid #059669', padding: '0.125rem 0.5rem', fontSize: '8px', fontWeight: 800, color: '#6ee7b7' }}>
+                <span style={{ borderRadius: '9999px', backgroundColor: 'rgba(6,78,59,0.85)', border: '1px solid #059669', padding: '0.125rem 0.5rem', fontSize: '10px', fontWeight: 800, color: '#6ee7b7' }}>
                   ✓ Step 15 Restored
                 </span>
               )}
             </div>
-            <p style={{ marginTop: '0.25rem', fontSize: '9px', lineHeight: '1.4', color: 'rgba(255,255,255,0.6)' }}>
-              15-step multimodal loop: Left Ventricle (FMA:7101) → Wiggers hemodynamics → acute clinical vignette → exact 3D return.
+            <p style={{ marginTop: '0.35rem', fontSize: '11px', lineHeight: '1.45', color: '#cbd5e1' }}>
+              Left Ventricle (FMA:7101) → Wiggers hemodynamics → acute clinical vignette → 3D return.
             </p>
             <button
               type="button"
+              data-pmd-native="true"
               onClick={() => navigate('/med-study?bagian=golden-journey')}
-              style={{ marginTop: '0.5rem', width: '100%', minHeight: '36px', borderRadius: '0.5rem', border: '1px solid rgba(165,243,252,0.4)', backgroundColor: 'rgba(6,182,212,0.15)', padding: '0.375rem 0.5rem', fontSize: '9px', fontWeight: 900, color: '#cffafe', cursor: 'pointer' }}
+              style={{ marginTop: '0.5rem', width: '100%', minHeight: '44px', borderRadius: '0.75rem', border: '1px solid rgba(165,243,252,0.45)', backgroundColor: 'rgba(6,182,212,0.2)', padding: '0.5rem 0.75rem', fontSize: '11px', fontWeight: 900, color: '#cffafe', cursor: 'pointer' }}
             >
-              🌟 Launch Golden Educational Journey →
+              Launch Golden Educational Journey →
             </button>
           </div>
 
-          <div className="mt-3 rounded-2xl border border-amber-300/12 bg-amber-300/[.045] p-2.5 text-[9px] leading-relaxed text-amber-100/65">
+          <div className="mt-3 rounded-2xl border border-amber-300/25 bg-amber-300/[.07] p-2.5 text-[11px] leading-relaxed text-amber-100">
             Educational/reference simulation. Generic atlas geometry and synthetic models are not patient-specific anatomy, diagnosis, operative navigation or treatment advice.
           </div>
         </aside>
       </div>
+      )}
+
+      {!hideReferenceAtlasCanvas && (
+        <UniversalAtlasDepthRail
+          semanticScale={semanticZoom.scale}
+          selectedSystemId={selectedSystemId}
+          onOpenScale={openScale}
+        />
       )}
 
       {!compact && !hideReferenceAtlasCanvas && (

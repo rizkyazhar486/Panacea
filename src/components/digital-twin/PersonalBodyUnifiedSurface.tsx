@@ -88,14 +88,27 @@ export function PersonalBodyUnifiedSurface(props: PersonalBodyUnifiedSurfaceProp
       <div
         data-personal-body-launcher="v1"
         onClick={() => setLayarPenuh(true)}
-        className="dark grid w-full cursor-pointer grid-cols-[56px_minmax(0,1fr)_auto] items-center gap-3 rounded-[20px] border border-white/10 bg-[#050708] p-3 text-left text-white"
+        className="dark grid w-full cursor-pointer grid-cols-[56px_minmax(0,1fr)_auto] items-center gap-3 rounded-[20px] border border-white/15 bg-[#050708] p-3 text-left text-white"
       >
-        <SiluetTubuh />
+        <img
+          src="/home/atlas-body-holo.webp"
+          alt=""
+          width={56}
+          height={72}
+          className="h-[72px] w-[56px] rounded-xl bg-[#040a14] object-contain p-1"
+        />
         <span className="min-w-0">
-          <span className="block text-[15px] font-black tracking-[-.01em]">{title}</span>
-          <span className="block text-[12px] font-semibold text-white/60">Your 3D body and anatomy.</span>
+          <span className="block text-[15px] font-black tracking-[-.01em] text-white">{title}</span>
+          <span className="block text-[12px] font-semibold text-slate-300">Unified 4D whole-body projection &amp; twin.</span>
         </span>
-        <button type="button" aria-haspopup="dialog" className="min-h-10 rounded-full px-4 text-[12px] font-black">Open 3D</button>
+        <button
+          type="button"
+          data-pmd-native="true"
+          aria-haspopup="dialog"
+          className="min-h-[44px] shrink-0 rounded-full bg-emerald-400 px-4 text-[12px] font-black text-neutral-950"
+        >
+          Open 4D
+        </button>
       </div>
     )
   }
@@ -111,21 +124,6 @@ export function PersonalBodyUnifiedSurface(props: PersonalBodyUnifiedSurfaceProp
         }}
       />
     </div>
-  )
-}
-
-function SiluetTubuh() {
-  return (
-    <svg viewBox="0 0 56 84" className="h-[72px] w-[56px]" aria-hidden>
-      <circle cx="28" cy="10" r="7" fill="none" stroke="#00BF63" strokeWidth="2" />
-      <path
-        d="M17 22h22l6 24-5 1-5-17v20l3 30h-6l-4-26-4 26h-6l3-30V30l-5 17-5-1z"
-        fill="rgba(0,191,99,.12)"
-        stroke="#00BF63"
-        strokeWidth="2"
-        strokeLinejoin="round"
-      />
-    </svg>
   )
 }
 
@@ -175,7 +173,7 @@ function PermukaanTubuh({
               type="button"
               data-pmd-native="true"
               onClick={() => setScanOpen((value) => !value)}
-              className="min-h-9 shrink-0 rounded-full border border-white/15 bg-white/[.05] px-3 text-[11px] font-black text-white/85 hover:bg-white/[.10]"
+              className="min-h-[44px] shrink-0 rounded-full border border-white/15 bg-white/[.08] px-3.5 text-[11px] font-black text-white hover:bg-white/[.14]"
             >
               {scanOpen ? 'Close scan' : 'Scan'}
             </button>
@@ -187,7 +185,7 @@ function PermukaanTubuh({
               data-pmd-native="true"
               onClick={() => void share()}
               disabled={shareState === 'busy'}
-              className="min-h-9 shrink-0 rounded-full border border-white/15 bg-white/[.05] px-3 text-[11px] font-black text-white/85 hover:bg-white/[.10] disabled:opacity-50"
+              className="min-h-[44px] shrink-0 rounded-full border border-white/15 bg-white/[.08] px-3.5 text-[11px] font-black text-white hover:bg-white/[.14] disabled:opacity-50"
             >
               {shareState === 'busy' ? 'Preparing…' : shareState === 'done' ? 'Shared ✓' : shareState === 'error' ? 'Try again' : 'Share'}
             </button>
@@ -199,7 +197,7 @@ function PermukaanTubuh({
               data-pmd-native="true"
               onClick={onClose}
               aria-label={`Close ${title}`}
-              className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-white text-[15px] font-black text-black"
+              className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-white text-[15px] font-black text-black"
             >
               ✕
             </button>
@@ -215,7 +213,7 @@ function PermukaanTubuh({
               data-pmd-native="true"
               aria-selected={focus === item.id}
               onClick={() => setFocus(item.id)}
-              className={`min-h-9 rounded-full px-3 text-[11px] font-black transition ${focus === item.id ? 'bg-white text-black' : 'bg-transparent text-white/80 hover:bg-white/[.08] hover:text-white'}`}
+              className={`min-h-[44px] rounded-full px-3 text-[11px] font-black transition ${focus === item.id ? 'bg-white text-black' : 'bg-transparent text-slate-200 hover:bg-white/[.08] hover:text-white'}`}
             >
               {item.label}
             </button>

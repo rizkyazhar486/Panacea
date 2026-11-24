@@ -653,18 +653,27 @@ export function BodyExplorer() {
         title="Body Explorer"
         info="A real 3D anatomy model. Tap any bone, muscle, vessel, nerve, or organ to inspect it, rotate with one finger, and pinch to zoom."
       />
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+      <div className="flex flex-wrap items-center gap-2">
+        <Link
+          to="/fitness-hub?view=body-exposure"
+          data-pmd-native="true"
+          className="inline-flex min-h-[44px] items-center justify-center rounded-full border border-emerald-400/70 bg-emerald-400 px-4 text-xs font-black text-neutral-950 transition hover:bg-emerald-300"
+        >
+          Unified 4D Body (Your Body) →
+        </Link>
         <Link
           to="/body-exposure"
-          style={{ display: 'inline-flex', minHeight: '44px', alignItems: 'center', justifyContent: 'center', borderRadius: '0.75rem', border: '1px solid #00BF63', background: '#00BF63', padding: '0.5rem 1rem', fontSize: '0.875rem', fontWeight: 700, color: '#ffffff', textDecoration: 'none' }}
+          data-pmd-native="true"
+          className="inline-flex min-h-[44px] items-center justify-center rounded-full border border-emerald-500/40 bg-emerald-500/15 px-3.5 text-xs font-bold text-emerald-700 dark:text-emerald-200"
         >
-          Open 3D Human Atlas Home (BioDigital Progressive Disclosure) →
+          Atlas Home →
         </Link>
         <Link
           to="/body-exposure/canonical"
-          style={{ display: 'inline-flex', minHeight: '44px', alignItems: 'center', justifyContent: 'center', borderRadius: '0.75rem', border: '1px solid rgba(0, 191, 99, 0.5)', background: 'rgba(0, 191, 99, 0.1)', padding: '0.5rem 1rem', fontSize: '0.875rem', fontWeight: 600, color: '#00BF63', textDecoration: 'none' }}
+          data-pmd-native="true"
+          className="inline-flex min-h-[44px] items-center justify-center rounded-full border border-neutral-300 bg-neutral-100 px-3.5 text-xs font-semibold text-neutral-800 dark:border-white/15 dark:bg-white/[.06] dark:text-slate-200"
         >
-          Canonical Variant Matrices (LOD1–LOD4) →
+          LOD1–LOD4 →
         </Link>
       </div>
       <BatasKlaimKesehatan permukaan="body.explorer" className="mt-2 text-[11px] leading-snug text-white/55" />
@@ -715,27 +724,29 @@ export function BodyExplorer() {
         </div>
         <div role="region" aria-label="Reference anatomy viewer" className={kelasPanggung}>
           {/* Backdrop Studio Switcher */}
-          <div className="absolute right-3 top-3 z-10 flex items-center gap-1 rounded-full border border-white/15 bg-black/60 p-1 text-[11px] font-medium text-white shadow-lg backdrop-blur-md">
+          <div className="absolute right-3 top-3 z-10 flex items-center gap-1 rounded-full border border-white/15 bg-black/65 p-1 text-[11px] font-medium text-white shadow-lg backdrop-blur-md">
             <button
               type="button"
+              data-pmd-native="true"
               onClick={() => toggleBackdrop('studio-dark')}
               aria-pressed={studioBackdrop === 'studio-dark'}
-              className={`rounded-full px-2.5 py-1 text-xs font-semibold transition ${
+              className={`min-h-[44px] rounded-full px-3 text-xs font-semibold transition ${
                 studioBackdrop === 'studio-dark'
                   ? 'bg-white/25 text-white shadow-sm'
-                  : 'text-white/60 hover:text-white'
+                  : 'text-slate-200 hover:text-white'
               }`}
             >
               Studio Dark
             </button>
             <button
               type="button"
+              data-pmd-native="true"
               onClick={() => toggleBackdrop('clinical-slate')}
               aria-pressed={studioBackdrop === 'clinical-slate'}
-              className={`rounded-full px-2.5 py-1 text-xs font-semibold transition ${
+              className={`min-h-[44px] rounded-full px-3 text-xs font-semibold transition ${
                 studioBackdrop === 'clinical-slate'
-                  ? 'bg-slate-700/80 text-white shadow-sm'
-                  : 'text-white/60 hover:text-white'
+                  ? 'bg-slate-600/90 text-white shadow-sm'
+                  : 'text-slate-200 hover:text-white'
               }`}
             >
               Clinical Slate
@@ -746,52 +757,57 @@ export function BodyExplorer() {
           <div
             role="toolbar"
             aria-label="3D Viewport Controls"
-            className="absolute bottom-3 right-3 z-10 flex items-center gap-1 rounded-full border border-white/15 bg-black/65 p-1 text-white shadow-xl backdrop-blur-md"
+            className="absolute bottom-3 right-3 z-10 flex items-center gap-1 rounded-full border border-white/15 bg-black/70 p-1 text-white shadow-xl backdrop-blur-md"
           >
             <button
               type="button"
+              data-pmd-native="true"
               title="Zoom In"
               aria-label="Zoom In"
               onClick={() => triggerCamera('zoomIn')}
-              className="flex h-8 w-8 items-center justify-center rounded-full text-base font-bold text-white/90 transition hover:bg-white/20 active:scale-95"
+              className="flex h-11 w-11 items-center justify-center rounded-full text-base font-bold text-white transition hover:bg-white/20 active:scale-95"
             >
               +
             </button>
             <button
               type="button"
+              data-pmd-native="true"
               title="Zoom Out"
               aria-label="Zoom Out"
               onClick={() => triggerCamera('zoomOut')}
-              className="flex h-8 w-8 items-center justify-center rounded-full text-base font-bold text-white/90 transition hover:bg-white/20 active:scale-95"
+              className="flex h-11 w-11 items-center justify-center rounded-full text-base font-bold text-white transition hover:bg-white/20 active:scale-95"
             >
               −
             </button>
             <div className="h-4 w-px bg-white/20" />
             <button
               type="button"
+              data-pmd-native="true"
               title="Pandangan Depan (Anterior)"
               aria-label="Pandangan Depan (Anterior)"
               onClick={() => triggerCamera('front')}
-              className="rounded-full px-2.5 py-1 text-xs font-semibold text-white/80 transition hover:bg-white/20 hover:text-white active:scale-95"
+              className="min-h-[44px] rounded-full px-3 text-xs font-semibold text-white transition hover:bg-white/20 active:scale-95"
             >
               Depan
             </button>
             <button
               type="button"
+              data-pmd-native="true"
               title="Pandangan Belakang (Posterior)"
               aria-label="Pandangan Belakang (Posterior)"
               onClick={() => triggerCamera('back')}
-              className="rounded-full px-2.5 py-1 text-xs font-semibold text-white/80 transition hover:bg-white/20 hover:text-white active:scale-95"
+              className="min-h-[44px] rounded-full px-3 text-xs font-semibold text-white transition hover:bg-white/20 active:scale-95"
             >
               Belakang
             </button>
             <div className="h-4 w-px bg-white/20" />
             <button
               type="button"
+              data-pmd-native="true"
               title="Reset View"
               aria-label="Reset View"
               onClick={() => triggerCamera('reset')}
-              className="flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold text-white/90 transition hover:bg-white/20 active:scale-95"
+              className="flex h-11 w-11 items-center justify-center rounded-full text-xs font-bold text-white transition hover:bg-white/20 active:scale-95"
             >
               ↺
             </button>
@@ -801,8 +817,9 @@ export function BodyExplorer() {
             <>
               <button
                 type="button"
+                data-pmd-native="true"
                 onClick={() => setPaksaDekat('tubuh')}
-                className="absolute left-2 top-2 z-10 min-h-11 rounded-full border border-white/20 bg-black/60 px-3 text-xs font-bold text-white"
+                className="absolute left-2 top-2 z-10 min-h-[44px] rounded-full border border-white/20 bg-black/70 px-3 text-xs font-bold text-white"
               >
                 Whole body
               </button>
@@ -835,7 +852,7 @@ export function BodyExplorer() {
         <p className="mx-auto mt-1 max-w-md text-center text-[12px] leading-relaxed text-neutral-500">
           {selectedLabel
             ? (kalimatPertama(explanation) || 'No written fact is available for this name.')
-            : 'Search or tap a structure. This is reference geometry, and the upstream cut is not pinned to a source commit.'}
+            : 'Tap any anatomical structure to inspect its function, vessels, nerves, and clinical links.'}
         </p>
         <details id="laboratorium-atlas" open={laboratoriumTerbuka || undefined} className="mt-3 rounded-xl border border-neutral-200 dark:border-white/10">
           <summary className="min-h-11 cursor-pointer list-none px-3 py-2 text-xs font-bold text-neutral-500">Laboratory</summary>
@@ -1065,6 +1082,7 @@ export function BodyExplorer() {
               <button
                 key={k}
                 type="button"
+                data-pmd-native="true"
                 onClick={() => lompatKeKelompok(k)}
                 // Nama aksesibel yang BERBEDA dari label tab. Keping "Physiology"
                 // dan tab "Physiology" sebelumnya bertabrakan, sehingga pencarian
@@ -1073,10 +1091,10 @@ export function BodyExplorer() {
                 // ini melompat, bukan memilih.
                 aria-label={`Jump to ${k}`}
                 aria-pressed={kelompokAktif === k}
-                className={`min-h-[30px] shrink-0 rounded-full px-3 text-[11px] font-black uppercase tracking-[0.08em] transition ${
+                className={`min-h-[44px] shrink-0 rounded-full px-3.5 text-[11px] font-black uppercase tracking-[0.08em] transition ${
                   kelompokAktif === k
-                    ? 'bg-[#00BF63] text-white'
-                    : 'bg-neutral-100 text-neutral-500 dark:bg-white/5'
+                    ? 'bg-[#00BF63] text-neutral-950'
+                    : 'bg-neutral-100 text-neutral-700 dark:bg-white/10 dark:text-slate-200'
                 }`}
               >
                 {k}
@@ -1152,7 +1170,7 @@ export function BodyExplorer() {
                     <input
                       type="range" min={0} max={0.35} step={0.005} value={unfold}
                       onChange={(e) => setUnfold(Number(e.target.value))}
-                      className="mt-1 w-full accent-brand" aria-label="Unfold"
+                      className="mt-1 h-11 min-h-[44px] w-full accent-brand" aria-label="Unfold"
                     />
                     <span className="block text-[10px] font-normal normal-case tracking-normal text-neutral-400">
                       Slides every structure outward from the body axis. Height never changes, so what sits above
@@ -1164,7 +1182,7 @@ export function BodyExplorer() {
                     <input
                       type="range" min={0} max={6} step={1} value={dissect}
                       onChange={(e) => setDissect(Number(e.target.value))}
-                      className="mt-1 w-full accent-brand" aria-label="Dissection depth"
+                      className="mt-1 h-11 min-h-[44px] w-full accent-brand" aria-label="Dissection depth"
                     />
                     <span className="block text-[10px] font-normal normal-case tracking-normal text-neutral-400">
                       Fades the layers above that depth in the order a scalpel meets them. They never vanish
@@ -1614,7 +1632,7 @@ export function BodyExplorer() {
             </p>
             <p className="text-[11px] leading-relaxed text-neutral-400">
               3D anatomy model: <a href={`${import.meta.env.BASE_URL}anatomy/CREDITS.txt`} target="_blank" rel="noreferrer" className="underline">Z-Anatomy</a>,
-              based on BodyParts3D — licensed under CC BY-SA 4.0. The ambient-occlusion shading is computed from the same model and carries the same licence.
+              based on BodyParts3D — licensed under CC BY-SA 4.0. Reference geometry; the upstream cut is not pinned to a source commit. The ambient-occlusion shading is computed from the same model and carries the same licence.
             </p>
             <p className="text-[11px] leading-relaxed text-neutral-400">
               The X-ray, CT and MRI options recolour that same 3D model to match how each modality sees tissue. They

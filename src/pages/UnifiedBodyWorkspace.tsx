@@ -37,23 +37,23 @@ type BodyView = 'body' | 'body-exposure' | 'body-tools' | 'character' | 'trainin
 type View = { key: BodyView; label: string; short: string; component: ComponentType; childTab?: string; description: string }
 
 const VIEWS: View[] = [
-  { key: 'body', label: 'Your Body', short: 'Body', component: BodyComposition, description: 'Body composition and core metrics.' },
-  { key: 'body-exposure', label: 'Body Exposure', short: 'Body Exposure', component: BodyExposureOS, description: '3D anatomy, CAD/CAE, and organ atlas.' },
-  { key: 'body-tools', label: 'Body & Skin Tools', short: 'Body Tools', component: BodyToolkit, description: 'Skin checks and body region logs.' },
-  { key: 'character', label: '3D Character', short: '3D Character', component: ShapeForming, description: 'Parametric 3D twin proportions.' },
+  { key: 'body-exposure', label: '4D Body & Anatomy', short: '4D Body', component: BodyExposureOS, description: 'Unified 4D whole-body atlas, physiology, imaging, micro, and simulation projector.' },
+  { key: 'body', label: 'Body Composition', short: 'Composition', component: BodyComposition, description: 'Body composition and core anthropometry.' },
   { key: 'training', label: 'Training', short: 'Training', component: PusatLatihan, childTab: 'rencana', description: 'Plans and training progression.' },
-  { key: 'ranked', label: 'Ranked Season', short: 'League', component: HealthPerformanceLeague, description: '90-day health and sport rank.' },
-  { key: 'workout', label: 'Workout', short: 'Workout', component: PusatLatihan, childTab: 'sesi', description: 'Daily strength and cardio sessions.' },
   { key: 'recovery', label: 'Recovery', short: 'Recovery', component: PusatTubuh, childTab: 'pulih', description: 'Sleep and recovery readiness.' },
-  { key: 'numbers', label: 'Numbers', short: 'Numbers', component: PusatTubuh, childTab: 'energi', description: 'Recorded body signals.' },
   { key: 'nutrition', label: 'Nutrition', short: 'Nutrition', component: PusatGizi, childTab: 'makan', description: 'Fuel and hydration logs.' },
   { key: 'health-data', label: 'Health Data', short: 'Data', component: HealthProfile, description: 'Wearable sync and exports.' },
+  { key: 'body-tools', label: 'Body & Skin Tools', short: 'Body Tools', component: BodyToolkit, description: 'Skin checks and body region logs.' },
+  { key: 'character', label: '3D Character', short: '3D Character', component: ShapeForming, description: 'Parametric 3D twin proportions.' },
+  { key: 'ranked', label: 'Ranked Season', short: 'League', component: HealthPerformanceLeague, description: '90-day health and sport rank.' },
+  { key: 'workout', label: 'Workout', short: 'Workout', component: PusatLatihan, childTab: 'sesi', description: 'Daily strength and cardio sessions.' },
+  { key: 'numbers', label: 'Numbers', short: 'Numbers', component: PusatTubuh, childTab: 'energi', description: 'Recorded body signals.' },
   { key: 'labs', label: 'Data Lab', short: 'Lab', component: DataLab, description: 'Structured biomarker trends.' },
   { key: 'longevity', label: 'Longevity', short: 'Longevity', component: Longevity, description: 'Long-term healthspan metrics.' },
   { key: 'vitapulse', label: 'VitaPulse', short: 'VitaPulse', component: VitaPulse, description: 'Compact vitality overview.' },
 ]
 const VALID = new Set(VIEWS.map((view) => view.key))
-const PRIMARY_VIEW_KEYS = new Set<BodyView>(['body', 'body-exposure', 'training', 'recovery', 'health-data'])
+const PRIMARY_VIEW_KEYS = new Set<BodyView>(['body-exposure', 'body', 'training', 'recovery', 'nutrition', 'health-data'])
 
 const BODY_DEPTH_BY_VIEW: Record<BodyView, string> = {
   body: 'today',
@@ -92,7 +92,7 @@ function Loader({ exposure = false }: { exposure?: boolean }) {
 export function UnifiedBodyWorkspace() {
   const [params, setParams] = useSearchParams()
   const requested = params.get('view') as BodyView | null
-  const activeKey: BodyView = requested && VALID.has(requested) ? requested : 'body'
+  const activeKey: BodyView = requested && VALID.has(requested) ? requested : 'body-exposure'
   const active = VIEWS.find((view) => view.key === activeKey) ?? VIEWS[0]
   const Active = active.component
   const isExposure = activeKey === 'body-exposure'
@@ -134,14 +134,14 @@ export function UnifiedBodyWorkspace() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-[1580px] space-y-4 pb-10">
+    <div className="mx-auto w-full max-w-[1580px] space-y-2.5 pb-8">
       <PanaceaZoneNav />
 
       {/* `dark` menandai bahwa permukaan ini memang gelap apa pun tema
           aplikasinya. Seluruh gaya `dark:` dan lapisan pemetaan `.dark`
           bergantung pada kelas itu; tanpa penandanya komponen di dalam sini
           merender versi terangnya di atas latar hitam. */}
-      <section className={`dark relative overflow-hidden grid gap-4 rounded-[24px] border border-white/[.075] bg-[#020306] p-3.5 shadow-[0_18px_60px_rgba(0,0,0,.24)] sm:p-4 ${isExposure ? 'lg:grid-cols-1' : 'lg:grid-cols-[minmax(0,1fr)_340px]'}`}>
+      <section className={`dark relative overflow-hidden grid gap-2 rounded-[24px] border border-white/[.075] bg-[#020306] p-2.5 shadow-[0_18px_60px_rgba(0,0,0,.24)] sm:p-3 ${isExposure ? 'lg:grid-cols-1' : 'lg:grid-cols-[minmax(0,1fr)_340px]'}`}>
         <div className="relative min-w-0">
           {/* Keep one semantic page title without duplicating the visible
               Body Exposure identity owned by BodyExposureOS. */}
@@ -151,7 +151,7 @@ export function UnifiedBodyWorkspace() {
               role="tablist" (ARIA: tablist hanya memiliki tab; axe aria-required-children). */}
           <div
             ref={workspaceRailRef}
-            className={`no-scrollbar flex snap-x gap-1.5 overflow-x-auto pb-1 ${isExposure ? 'mt-3' : ''}`}
+            className="no-scrollbar mt-0 flex snap-x gap-1.5 overflow-x-auto pb-1"
             data-body-workspace-rail="v1"
           >
             <div role="tablist" aria-label="Your Body workspace" data-one-shape="aria" className="flex shrink-0 gap-1.5">
@@ -167,12 +167,12 @@ export function UnifiedBodyWorkspace() {
                   data-pmd-native="true"
                   aria-selected={selected}
                   onClick={() => select(view)}
-                  className={`min-h-[42px] shrink-0 snap-start rounded-full border px-3.5 text-[11px] font-black transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/50 ${
+                  className={`min-h-[44px] shrink-0 snap-start rounded-full border px-3.5 text-[11px] font-black transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/50 ${
                     selected
                       ? 'border-emerald-300 bg-emerald-400 text-neutral-950'
                       : exposureTab
-                        ? 'border-white/15 bg-white/[.055] text-white/85 hover:bg-white/[.09]'
-                        : 'border-white/[.08] bg-white/[.035] text-white/75 hover:border-white/15 hover:bg-white/[.055] hover:text-white'
+                        ? 'border-white/20 bg-white/[.08] text-white hover:bg-white/[.14]'
+                        : 'border-white/15 bg-white/[.06] text-slate-200 hover:border-white/25 hover:bg-white/[.12] hover:text-white'
                   }`}
                 >
                   {view.short}
@@ -189,7 +189,7 @@ export function UnifiedBodyWorkspace() {
                   const target = VIEWS.find((view) => view.key === event.target.value)
                   if (target) select(target)
                 }}
-                className="min-h-[42px] rounded-full border border-white/10 bg-white/[.04] px-3 text-[11px] font-black text-white outline-none"
+                className="dark min-h-[44px] rounded-full border border-white/15 bg-[#0b111b] px-3 text-[11px] font-black text-white outline-none"
               >
                 <option value="">More features</option>
                 {secondaryViews.map((view) => <option key={view.key} value={view.key}>{view.short}</option>)}
@@ -198,32 +198,35 @@ export function UnifiedBodyWorkspace() {
           </div>
 
           {/* Satu ⓘ untuk semua penjelasan: deskripsi tampilan, cara pakai, dan
-              tangga kedalaman. Sebelumnya ketiganya tampil terbuka di layar
-              pertama dan menambah 8 tombol sebelum isi apa pun. */}
-          <details className="mt-2 rounded-[14px] border border-white/[.065] bg-white/[.02] px-3 py-2 text-[11px] text-white/60">
-            <summary className="flex min-h-8 cursor-pointer list-none items-center gap-2 font-black text-white/72">
-              <span aria-hidden className="grid h-5 w-5 place-items-center rounded-full border border-white/20 text-[10px]">i</span>
-              About {active.label}
-            </summary>
-            <p className="mt-2 leading-relaxed">{active.description}</p>
-            <ol className="mt-2 grid gap-1 leading-relaxed">
-              {[
-                'Start with My Body or Body Exposure.',
-                'Use the five primary destinations for daily work.',
-                'Everything else stays preserved under More features.',
-              ].map((langkah, i) => (
-                <li key={langkah} className="flex gap-2"><span className="font-black text-[#a5f3fc]">{i + 1}</span>{langkah}</li>
-              ))}
-            </ol>
-            <div className="mt-2">
-              <SurfaceDepthNavigator
-                surface="your-body"
-                activeStopId={BODY_DEPTH_BY_VIEW[activeKey]}
-                onSelect={selectDepth}
-              />
-            </div>
-          </details>
-          <BatasKlaimKesehatan permukaan="body.workspace" className="mt-2" />
+              tangga kedalaman. */}
+          <div className="mt-1.5 flex flex-wrap items-center justify-between gap-2">
+            <details className="min-w-0 flex-1 rounded-2xl border border-white/10 bg-white/[.03] px-3 py-0 text-[11px] text-slate-200">
+              <summary className="flex min-h-[44px] cursor-pointer list-none items-center gap-2 font-black text-white">
+                <span aria-hidden className="grid h-5 w-5 shrink-0 place-items-center rounded-full border border-white/25 text-[10px]">i</span>
+                About {active.label}
+              </summary>
+              <div className="pb-2.5">
+                <p className="mt-1 leading-relaxed">{active.description}</p>
+                <ol className="mt-2 grid gap-1 leading-relaxed">
+                  {[
+                    'Start with My Body or Body Exposure.',
+                    'Use the five primary destinations for daily work.',
+                    'Everything else stays preserved under More features.',
+                  ].map((langkah, i) => (
+                    <li key={langkah} className="flex gap-2"><span className="font-black text-[#a5f3fc]">{i + 1}</span>{langkah}</li>
+                  ))}
+                </ol>
+                <div className="mt-2">
+                  <SurfaceDepthNavigator
+                    surface="your-body"
+                    activeStopId={BODY_DEPTH_BY_VIEW[activeKey]}
+                    onSelect={selectDepth}
+                  />
+                </div>
+              </div>
+            </details>
+            <BatasKlaimKesehatan permukaan="body.workspace" className="shrink-0" />
+          </div>
         </div>
 
         {!isExposure && (
@@ -249,11 +252,11 @@ export function UnifiedBodyWorkspace() {
         {(activeKey === 'body' || activeKey === 'body-exposure') && (
           <details className="dark rounded-2xl border border-cyan-400/25 bg-[#04070e] p-3 text-white">
             <summary
-              className="flex min-h-[44px] cursor-pointer list-none items-center justify-between font-mono text-[11px] font-bold uppercase tracking-[0.12em]"
+              className="flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-2 font-mono text-[11px] font-bold uppercase tracking-[0.08em]"
               style={{ color: '#67e8f9' }}
             >
-              <span>Reality View OS · 10-System 1:1 Ontology · 22 Cohorts · 4D Time Axis</span>
-              <span>OPEN ▾</span>
+              <span className="min-w-0">4D Reality Timeline · 10 Systems &amp; Lifespan Projection</span>
+              <span className="shrink-0 whitespace-nowrap">OPEN ▾</span>
             </summary>
             <div className="mt-3">
               <Suspense fallback={<div className="p-4 text-xs text-slate-200">Loading Reality View…</div>}>
@@ -265,11 +268,11 @@ export function UnifiedBodyWorkspace() {
         {(activeKey === 'body' || activeKey === 'body-exposure') && (
           <details className="dark rounded-2xl border border-cyan-400/20 bg-[#05070b] p-3 text-white">
             <summary
-              className="flex min-h-[44px] cursor-pointer list-none items-center justify-between font-mono text-[11px] font-bold uppercase tracking-[0.12em]"
+              className="flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-2 font-mono text-[11px] font-bold uppercase tracking-[0.08em]"
               style={{ color: '#a5f3fc' }}
             >
-              <span>Digital Twin · CAD/CAE · Skin · Brain/OSA · ANOVA</span>
-              <span>OPEN ▾</span>
+              <span className="min-w-0">Digital Twin Visual Studio · CAD/CAE · Skin · Brain/OSA · ANOVA</span>
+              <span className="shrink-0 whitespace-nowrap">OPEN ▾</span>
             </summary>
             <div className="mt-3">
               <Suspense fallback={<div className="p-4 text-xs text-slate-200">Loading studio…</div>}>
@@ -316,9 +319,9 @@ function YourBodyDailyStrip({ activeKey }: { readonly activeKey: BodyView }) {
   const copy =
     activeKey === 'training' ? { title: 'Daily Training Target', detail: `RHR ${rhr ?? '—'} bpm · HRV ${hrv ?? '—'} ms · Steps ${steps?.toLocaleString('en-US') ?? '—'}`, to: '/fitness-hub?view=health-data', cta: 'Sync Wearable' }
     : activeKey === 'ranked' ? { title: '90-Day League Evidence', detail: `Tracked signals: RHR ${rhr ?? '—'} · HRV ${hrv ?? '—'} · Sleep ${sleep ?? '—'} h`, to: '/fitness-hub?view=training', cta: 'Log Training' }
-    : activeKey === 'recovery' ? { title: 'Autonomic Recovery Focus', detail: `HRV ${hrv ?? '—'} ms · Sleep ${sleep ?? '—'} h · Slow 0.1 Hz vagal pacing & wearable fusion ready`, to: '/body-exposure', cta: 'Open EMV & Local Hub' }
-    : activeKey === 'nutrition' ? { title: 'Daily Fluid & Energy Context', detail: weight != null ? `Recorded Weight ${weight.toFixed(1)} kg · Baseline fluid ~${Math.round(weight * 30)} mL/day` : 'Enter weight on Body tab for fluid target', to: '/fitness-hub?view=body', cta: 'Update Body' }
-    : { title: 'Devices', detail: `${[rhr, hrv, sleep, steps, weight].filter((x) => x != null).length}/5 signals`, to: '/body-exposure', cta: 'Open hub' }
+    : activeKey === 'recovery' ? { title: 'Autonomic Recovery Focus', detail: `HRV ${hrv ?? '—'} ms · Sleep ${sleep ?? '—'} h · Slow 0.1 Hz vagal pacing & wearable fusion ready`, to: '/fitness-hub?view=body-exposure', cta: 'Open 4D Body' }
+    : activeKey === 'nutrition' ? { title: 'Daily Fluid & Energy Context', detail: weight != null ? `Recorded Weight ${weight.toFixed(1)} kg · Baseline fluid ~${Math.round(weight * 30)} mL/day` : 'Enter weight on Composition tab for fluid target', to: '/fitness-hub?view=body', cta: 'Update Composition' }
+    : { title: 'Devices', detail: `${[rhr, hrv, sleep, steps, weight].filter((x) => x != null).length}/5 signals`, to: '/fitness-hub?view=body-exposure', cta: 'Open 4D Body' }
 
   return (
     <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 10, padding: '10px 14px', borderRadius: 16, border: '1px solid rgba(0, 191, 99, 0.28)', background: 'rgba(6, 12, 16, 0.85)', color: '#eef4ff' }}>
