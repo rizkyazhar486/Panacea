@@ -19,6 +19,11 @@ import {
   type AnthropometryManifold,
   type DemographicCohortId,
 } from './demographicManifold.ts'
+import {
+  computeReceptorOccupancy,
+  simulateFirstOrderPharmacokinetics,
+  type CausalRelationType,
+} from './multiscaleRealityGraph.ts'
 
 export type MultiorganScenarioCategory =
   | 'normal'
@@ -104,6 +109,7 @@ export interface EtCausalisEdge {
   readonly fromLabel: string
   readonly toLabel: string
   readonly relationKind: 'causal' | 'mechanistic' | 'physiological' | 'pharmacological'
+  readonly canonicalRelation: CausalRelationType
   readonly feedbackPolarity: 'negative_compensatory' | 'positive_maladaptive' | 'direct_feedforward'
   readonly direction: 'increase' | 'decrease' | 'stable'
   readonly magnitudePct: number
@@ -552,6 +558,7 @@ function buildCausalEdges(restingRef: MultiorganTimepoint, finalState: Multiorga
       fromLabel: labelOf('Left ventricle'),
       toLabel: labelOf('Kidney.l'),
       relationKind: 'causal',
+      canonicalRelation: 'CAUSES',
       feedbackPolarity: finalState.coLMin < restingRef.coLMin ? 'positive_maladaptive' : 'direct_feedforward',
       direction: edgeDirection(rbfPct),
       magnitudePct: Math.abs(rbfPct),
@@ -567,6 +574,7 @@ function buildCausalEdges(restingRef: MultiorganTimepoint, finalState: Multiorga
       fromLabel: labelOf('Kidney.l'),
       toLabel: labelOf('Ascending aorta'),
       relationKind: 'mechanistic',
+      canonicalRelation: 'COMPENSATES_FOR',
       feedbackPolarity: 'negative_compensatory',
       direction: edgeDirection(svrPct),
       magnitudePct: Math.abs(svrPct),
@@ -582,6 +590,7 @@ function buildCausalEdges(restingRef: MultiorganTimepoint, finalState: Multiorga
       fromLabel: labelOf('Ascending aorta'),
       toLabel: labelOf('Vagus nerve (X).l'),
       relationKind: 'physiological',
+      canonicalRelation: 'REGULATES',
       feedbackPolarity: 'negative_compensatory',
       direction: edgeDirection(sympPct),
       magnitudePct: Math.abs(sympPct),
@@ -597,6 +606,7 @@ function buildCausalEdges(restingRef: MultiorganTimepoint, finalState: Multiorga
       fromLabel: labelOf('Vagus nerve (X).l'),
       toLabel: labelOf('Left ventricle'),
       relationKind: 'physiological',
+      canonicalRelation: 'REGULATES',
       feedbackPolarity: 'negative_compensatory',
       direction: edgeDirection(coPct),
       magnitudePct: Math.abs(coPct),
@@ -612,6 +622,7 @@ function buildCausalEdges(restingRef: MultiorganTimepoint, finalState: Multiorga
       fromLabel: labelOf('Inferior lobe of left lung'),
       toLabel: labelOf('Left ventricle'),
       relationKind: 'mechanistic',
+      canonicalRelation: finalState.spo2Pct < 92 ? 'EXACERBATES' : 'TRANSPORTS_TO',
       feedbackPolarity: finalState.spo2Pct < 92 ? 'positive_maladaptive' : 'direct_feedforward',
       direction: edgeDirection(spo2Delta),
       magnitudePct: Math.max(Math.abs(spo2Delta), phShift),
@@ -627,6 +638,7 @@ function buildCausalEdges(restingRef: MultiorganTimepoint, finalState: Multiorga
       fromLabel: labelOf('Ascending aorta'),
       toLabel: labelOf('Liver'),
       relationKind: 'causal',
+      canonicalRelation: finalState.lactateMmolL > 2.0 ? 'EARLY_WARNING_FOR' : 'REGULATES',
       feedbackPolarity: finalState.lactateMmolL > 2.0 ? 'positive_maladaptive' : 'direct_feedforward',
       direction: edgeDirection(lactPct),
       magnitudePct: Math.abs(lactPct),
@@ -691,29 +703,32 @@ export function evaluateEducationalPkPdSnapshot(params: {
   readonly kdMgL: number
   readonly hillN?: number
 }): EducationalPkPdResult {
-  const math = computeCompletePhysiologicalMathematicsSuite({
-    extracellularPotassiumMmolL: 4.1,
-    intracellularPotassiumMmolL: 145,
-    arterialBicarbonateMmolL: 24,
-    arterialPaco2MmHg: 40,
-    substrateConcentrationUmolL: 40,
-    vmaxUmolMin: 100,
-    kmUmolL: 25,
-    drugDoseMg: Math.max(0.1, params.doseMg),
-    volumeOfDistributionL: Math.max(1, params.volumeOfDistributionL),
-    clearanceLPerHour: Math.max(0.1, params.clearanceLPerHour),
-    elapsedHours: Math.max(0, params.elapsedHours),
-    predictedProbabilities: [0.2],
-    observedOutcomes0or1: [0],
+  const dose = Math.max(0.1, params.doseMg)
+  const vd = Math.max(1, params.volumeOfDistributionL)
+  const clearance = Math.max(0.1, params.clearanceLPerHour)
+  const elapsed = Math.max(0, params.elapsedHours)
+  const ke = Math.max(0.01, clearance) / vd
+
+  const step = elapsed >= 0.25 && elapsed <= 12 ? elapsed : Math.min(12, Math.max(0.25, elapsed))
+  const pk = simulateFirstOrderPharmacokinetics({
+    doseMg: dose,
+    volumeDistributionL: vd,
+    bioavailabilityF: 1,
+    eliminationRateKPerHr: ke,
+    durationHr: Math.max(elapsed, 0.25),
+    stepHr: step,
   })
-  const conc = math.plasmaDrugConcentrationMgL
-  const ke = Math.max(0.01, params.clearanceLPerHour) / Math.max(1, params.volumeOfDistributionL)
-  const halfLifeHours = r2(Math.LN2 / ke)
-  const occupancy = computeHillOccupancy(Math.max(1e-6, conc), Math.max(1e-4, params.kdMgL), clamp(params.hillN ?? 1, 0.4, 4))
+  const exactStep = elapsed === 0 ? pk.initialConcentrationMgL : pk.curve.find((pt) => Math.abs(pt.hour - elapsed) < 0.01)?.concentrationMgL
+  const conc = r3(exactStep ?? pk.initialConcentrationMgL * Math.exp(-ke * elapsed))
+  const occ = computeReceptorOccupancy({
+    ligandNm: Math.max(1e-6, conc),
+    kdNm: Math.max(1e-4, params.kdMgL),
+    hillCoeff: clamp(params.hillN ?? 1, 0.5, 4),
+  })
   return Object.freeze({
     plasmaConcentrationMgL: conc,
-    halfLifeHours,
-    receptorOccupancyPct: r1(occupancy * 100),
+    halfLifeHours: r2(pk.halfLifeHr),
+    receptorOccupancyPct: r1(occ.occupancyPct),
     truthClass: 'SIMULATED_EDUCATIONAL' as const,
     clinicallyReviewed: false as const,
   })

@@ -15,6 +15,11 @@ import {
   MULTIORGAN_SCENARIO_SPECS,
   simulateMultiorganCausalTrajectory,
 } from '../../src/engines/reality-view/etCausalisMultiorganEngine.ts'
+import {
+  ALL_20_CAUSAL_RELATIONS,
+  computeReceptorOccupancy,
+  simulateFirstOrderPharmacokinetics,
+} from '../../src/engines/reality-view/multiscaleRealityGraph.ts'
 import { FEATURE_MAP } from '../../src/lib/navigation/featureMap.ts'
 import { SUPER_PAGES } from '../../src/lib/superPages.ts'
 import { QUIET_MODE_MAX_BYTES } from '../../src/components/reality-view/performanceTierManager.ts'
@@ -70,6 +75,9 @@ test('HFrEF reduces EF < 40% & CO and emits active cardiorenal causal edges', ()
   const renalToAorta = hfref.causalEdges.find((e) => e.fromMeshId === 'Kidney.l' && e.toMeshId === 'Ascending aorta')
   assert.ok(coToRenal && coToRenal.direction === 'decrease' && coToRenal.magnitudePct > 5)
   assert.ok(renalToAorta && renalToAorta.feedbackPolarity === 'negative_compensatory')
+  for (const edge of hfref.causalEdges) {
+    assert.equal(ALL_20_CAUSAL_RELATIONS.includes(edge.canonicalRelation), true, `invalid canonicalRelation ${edge.canonicalRelation}`)
+  }
 })
 
 test('sepsis vasodilation lowers SVR & elevates lactate, and vasopressor partially restores SVR & MAP', () => {
@@ -118,6 +126,18 @@ test('lifespan cohorts (MAT_PREG, NEO_TRM_M, GER_M) scale baseline hemodynamics 
   assert.ok(Number.isFinite(pkpd.plasmaConcentrationMgL) && pkpd.plasmaConcentrationMgL > 0)
   assert.ok(pkpd.halfLifeHours > 0)
   assert.ok(pkpd.receptorOccupancyPct >= 0 && pkpd.receptorOccupancyPct <= 100)
+
+  const refPk = simulateFirstOrderPharmacokinetics({
+    doseMg: 40,
+    volumeDistributionL: 32,
+    bioavailabilityF: 1,
+    eliminationRateKPerHr: 4.5 / 32,
+    durationHr: 4,
+    stepHr: 4,
+  })
+  const refOcc = computeReceptorOccupancy({ ligandNm: pkpd.plasmaConcentrationMgL, kdNm: 0.45, hillCoeff: 1 })
+  assert.ok(Math.abs(pkpd.halfLifeHours - refPk.halfLifeHr) <= 0.02)
+  assert.ok(Math.abs(pkpd.receptorOccupancyPct - refOcc.occupancyPct) <= 0.2)
 })
 
 test('all 22 demographic cohorts resolve to real existing disk GLBs <= 1.8 MiB Quiet shell cap', () => {
@@ -165,6 +185,15 @@ test('all 33 canonical Z-Anatomy meshes resolve full 8-scale vertical chain & ve
       assert.equal(validPaths.has(lnk.to.split('?')[0]), true, `Unverified SuperPage route ${lnk.to} on ${meshId}`)
     }
   }
+
+  const heartChain = resolveMultiscaleVerticalChain('Left ventricle')
+  const lungChain = resolveMultiscaleVerticalChain('Inferior lobe of left lung')
+  const kidneyChain = resolveMultiscaleVerticalChain('Kidney.l')
+  assert.equal(heartChain?.realityGraphAnchorId, 'organ_heart')
+  assert.equal(lungChain?.realityGraphAnchorId, 'organ_lung')
+  assert.equal(kidneyChain?.realityGraphAnchorId, 'organ_kidney')
+  assert.equal(heartChain?.realityGraphScaleBridge, 'CONCEPTUAL_SCALE_BRIDGE')
+  assert.ok((heartChain?.realityGraphNodes.length ?? 0) >= 6 && (heartChain?.realityGraphEdges.length ?? 0) >= 5)
 
   assert.equal(resolveMultiscaleVerticalChain('NonExistentMesh'), null)
   assert.equal(resolveOrganConvergenceBundle('NonExistentMesh'), null)

@@ -27,6 +27,18 @@ import {
   type EducationalPkPdResult,
   type MultiorganScenarioSpec,
 } from './etCausalisMultiorganEngine.ts'
+import {
+  MULTISCALE_CAUSAL_EDGES,
+  MULTISCALE_ENTITY_REGISTRY,
+  getEntityNeighborhood,
+  getMultiscaleEntityById,
+  traceSemanticZoomPath,
+  type MultiscaleCausalEdge,
+  type MultiscaleEntityNode,
+  type SpatialRegistrationClass,
+} from './multiscaleRealityGraph.ts'
+
+export type { SpatialRegistrationClass }
 
 export type SpatialRegistrationStatus =
   | 'spatial_registered_glb'
@@ -61,6 +73,10 @@ export interface LinkedDrugPkPdProfile {
 export interface MultiscaleVerticalChain {
   readonly scale1_organ: MeshOntologyBinding
   readonly scale1_spatialRegistration: 'spatial_registered_glb'
+  readonly realityGraphAnchorId: string | null
+  readonly realityGraphNodes: readonly MultiscaleEntityNode[]
+  readonly realityGraphEdges: readonly MultiscaleCausalEdge[]
+  readonly realityGraphScaleBridge: SpatialRegistrationClass
   readonly scale2_tissue_ftu: MultiscaleFtuProfile
   readonly scale3_cell: readonly string[]
   readonly scale4_organelles: readonly Organel[]
@@ -279,10 +295,69 @@ export function resolveSystemSuperPageLinks(systemId: AnatomicalSystemId): reado
   return Object.freeze(links)
 }
 
+const SYSTEM_REALITY_ANCHOR_ID: Readonly<Record<AnatomicalSystemId, string | null>> = {
+  cardiovascular: 'organ_heart',
+  respiratory: 'organ_lung',
+  renal: 'organ_kidney',
+  nervous: null,
+  musculoskeletal: null,
+  gastrointestinal: null,
+  endocrine: null,
+  immune_lymphatic: 'cell_dendritic',
+  integumentary: null,
+  reproductive: null,
+}
+
+function resolveRealityGraphSlice(systemId: AnatomicalSystemId): {
+  readonly anchorId: string | null
+  readonly nodes: readonly MultiscaleEntityNode[]
+  readonly edges: readonly MultiscaleCausalEdge[]
+} {
+  const anchorId = SYSTEM_REALITY_ANCHOR_ID[systemId] ?? null
+  if (!anchorId) return { anchorId: null, nodes: Object.freeze([]), edges: Object.freeze([]) }
+
+  const graphSystemKey = systemId === 'immune_lymphatic' ? 'immune' : systemId
+  const nodeMap = new Map<string, MultiscaleEntityNode>()
+  const edgeMap = new Map<string, MultiscaleCausalEdge>()
+
+  const anchorNode = getMultiscaleEntityById(anchorId)
+  if (anchorNode) nodeMap.set(anchorNode.id, anchorNode)
+  for (const step of traceSemanticZoomPath('human_twin', anchorId)) {
+    nodeMap.set(step.node.id, step.node)
+    if (step.viaEdge) edgeMap.set(step.viaEdge.id, step.viaEdge)
+  }
+  const nb = getEntityNeighborhood(anchorId)
+  for (const edge of [...nb.outgoing, ...nb.incoming]) {
+    edgeMap.set(edge.id, edge)
+    const fromN = getMultiscaleEntityById(edge.fromNodeId)
+    const toN = getMultiscaleEntityById(edge.toNodeId)
+    if (fromN) nodeMap.set(fromN.id, fromN)
+    if (toN) nodeMap.set(toN.id, toN)
+  }
+  for (const node of MULTISCALE_ENTITY_REGISTRY) {
+    if (node.organSystemId === graphSystemKey) {
+      nodeMap.set(node.id, node)
+      for (const step of traceSemanticZoomPath(anchorId, node.id)) {
+        nodeMap.set(step.node.id, step.node)
+        if (step.viaEdge) edgeMap.set(step.viaEdge.id, step.viaEdge)
+      }
+    }
+  }
+  for (const edge of MULTISCALE_CAUSAL_EDGES) {
+    if (nodeMap.has(edge.fromNodeId) && nodeMap.has(edge.toNodeId)) edgeMap.set(edge.id, edge)
+  }
+  return {
+    anchorId,
+    nodes: Object.freeze(Array.from(nodeMap.values())),
+    edges: Object.freeze(Array.from(edgeMap.values())),
+  }
+}
+
 export function resolveMultiscaleVerticalChain(meshId: string): MultiscaleVerticalChain | null {
   const binding = MESH_TO_ONTOLOGY_MAP.get(meshId)
   if (!binding) return null
 
+  const realitySlice = resolveRealityGraphSlice(binding.systemId)
   const ftu = FTU_BY_SYSTEM[binding.systemId]
   const organelleKeys = new Set(SYSTEM_ORGANELLE_KEYS[binding.systemId])
   const organelles = ORGANEL.filter((o) => organelleKeys.has(o.kunci))
@@ -319,6 +394,10 @@ export function resolveMultiscaleVerticalChain(meshId: string): MultiscaleVertic
   return Object.freeze({
     scale1_organ: binding,
     scale1_spatialRegistration: 'spatial_registered_glb',
+    realityGraphAnchorId: realitySlice.anchorId,
+    realityGraphNodes: realitySlice.nodes,
+    realityGraphEdges: realitySlice.edges,
+    realityGraphScaleBridge: 'CONCEPTUAL_SCALE_BRIDGE' as const,
     scale2_tissue_ftu: ftu,
     scale3_cell: ftu.primaryCellTypes,
     scale4_organelles: Object.freeze(organelles),
