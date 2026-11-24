@@ -1,123 +1,30 @@
-import {
-  CANONICAL_MULTISCALE_KNOWLEDGE_GRAPH_EDGES,
-  type MultiscaleKnowledgeGraphEdge,
-} from '../../domains/one-os/omnicausalisRecursiveDiscoveryAndKnowledgeGraphEngine.ts'
-import {
-  listBindingsBySystem,
-  MESH_TO_ONTOLOGY_MAP,
-  projectTm1DualCodingMetadata,
-  resolveMeshOntology,
-  type MeshOntologyBinding,
-  type MeshResolutionResult,
-} from '../../engines/reality-view/anatomyOntologyRegistry.ts'
-import {
-  runCounterfactualIntervention,
-  type CounterfactualRequest,
-  type CounterfactualResult,
-} from '../../engines/reality-view/counterfactualSimulator.ts'
+import { CANONICAL_MULTISCALE_KNOWLEDGE_GRAPH_EDGES, type MultiscaleKnowledgeGraphEdge } from '../../domains/one-os/omnicausalisRecursiveDiscoveryAndKnowledgeGraphEngine.ts'
+import { listBindingsBySystem, MESH_TO_ONTOLOGY_MAP, projectTm1DualCodingMetadata, resolveMeshOntology, type MeshOntologyBinding, type MeshResolutionResult } from '../../engines/reality-view/anatomyOntologyRegistry.ts'
+import { runCounterfactualIntervention, type CounterfactualRequest, type CounterfactualResult } from '../../engines/reality-view/counterfactualSimulator.ts'
 import { OverrideMemoryStore, type AlertSeverity } from '../../engines/reality-view/overrideMemoryStore.ts'
 import { selectQuietModeSummary, type QuietModeSummary } from '../../engines/reality-view/quietModeSelector.ts'
-import {
-  buildRealityViewState,
-  type RealityViewReading,
-} from '../../engines/reality-view/realityViewStateEngine.ts'
-import {
-  assertOutboundClinicalSyncAuthorized,
-  bootRealityViewOfflineFirst,
-  createIndexedDbVaultAdapter,
-  deriveVaultAesKey,
-  sanitizeClinicalText,
-  saveEncryptedRealityViewSnapshot,
-  type VaultAuthSession,
-} from '../../engines/reality-view/realityViewVaultSync.ts'
+import { buildRealityViewState, type RealityViewReading } from '../../engines/reality-view/realityViewStateEngine.ts'
+import { assertOutboundClinicalSyncAuthorized, bootRealityViewOfflineFirst, createIndexedDbVaultAdapter, deriveVaultAesKey, sanitizeClinicalText, saveEncryptedRealityViewSnapshot, type VaultAuthSession } from '../../engines/reality-view/realityViewVaultSync.ts'
 import type { AnatomyLayer } from '../bodyhub/Body3D'
 import type { Vitals } from '../../lib/healthVitals.ts'
 import type { ButirLab } from '../../lib/lab.ts'
 import type { LongitudinalSnapshot } from '../../lib/longitudinalSnapshot.ts'
 import type { LongitudinalEvent } from '../../lib/panaceaLongitudinalState.ts'
-import {
-  appendPurposeConsentDecision,
-  createPurposeConsentLedger,
-  type PurposeConsentLedger,
-} from '../../lib/purposeConsentLedger.ts'
+import { appendPurposeConsentDecision, createPurposeConsentLedger, type PurposeConsentLedger } from '../../lib/purposeConsentLedger.ts'
 import type { Account } from '../../lib/types.ts'
-import {
-  ANATOMICAL_SYSTEM_IDS,
-  type AnatomicalSystemId,
-  type OrganTelemetryNode,
-  type ProvenanceRef,
-  type RealityViewMode,
-  type RealityViewState,
-} from '../../types/realityView.ts'
-import {
-  detectPerformanceTier,
-  FpsTierWatchdog,
-  QUIET_MODE_MAX_BYTES,
-  RealityViewLodResourcePool,
-  resolveActiveLodBundlePlan,
-  TIER_BUDGETS,
-  type HardwareCapabilityProbe,
-  type LodLevelId,
-  type PerformanceTierId,
-  type TierBudgetSpec,
-} from './performanceTierManager.ts'
+import { ANATOMICAL_SYSTEM_IDS, type AnatomicalSystemId, type OrganTelemetryNode, type ProvenanceRef, type RealityViewMode, type RealityViewState } from '../../types/realityView.ts'
+import { detectPerformanceTier, FpsTierWatchdog, QUIET_MODE_MAX_BYTES, RealityViewLodResourcePool, resolveActiveLodBundlePlan, TIER_BUDGETS, type HardwareCapabilityProbe, type LodLevelId, type PerformanceTierId, type TierBudgetSpec } from './performanceTierManager.ts'
 
-export {
-  ANATOMICAL_SYSTEM_IDS,
-  assertOutboundClinicalSyncAuthorized,
-  bootRealityViewOfflineFirst,
-  createIndexedDbVaultAdapter,
-  deriveVaultAesKey,
-  detectPerformanceTier,
-  FpsTierWatchdog,
-  listBindingsBySystem,
-  MESH_TO_ONTOLOGY_MAP,
-  projectTm1DualCodingMetadata,
-  QUIET_MODE_MAX_BYTES,
-  RealityViewLodResourcePool,
-  resolveActiveLodBundlePlan,
-  resolveMeshOntology,
-  runCounterfactualIntervention,
-  sanitizeClinicalText,
-  saveEncryptedRealityViewSnapshot,
-  selectQuietModeSummary,
-  TIER_BUDGETS,
-}
-export type {
-  AnatomicalSystemId,
-  CounterfactualRequest,
-  CounterfactualResult,
-  HardwareCapabilityProbe,
-  LodLevelId,
-  MeshOntologyBinding,
-  MeshResolutionResult,
-  PerformanceTierId,
-  QuietModeSummary,
-  TierBudgetSpec,
-  VaultAuthSession,
-}
+export { ANATOMICAL_SYSTEM_IDS, assertOutboundClinicalSyncAuthorized, bootRealityViewOfflineFirst, createIndexedDbVaultAdapter, deriveVaultAesKey, detectPerformanceTier, FpsTierWatchdog, listBindingsBySystem, MESH_TO_ONTOLOGY_MAP, projectTm1DualCodingMetadata, QUIET_MODE_MAX_BYTES, RealityViewLodResourcePool, resolveActiveLodBundlePlan, resolveMeshOntology, runCounterfactualIntervention, sanitizeClinicalText, saveEncryptedRealityViewSnapshot, selectQuietModeSummary, TIER_BUDGETS }
+export type { AnatomicalSystemId, CounterfactualRequest, CounterfactualResult, HardwareCapabilityProbe, LodLevelId, MeshOntologyBinding, MeshResolutionResult, PerformanceTierId, QuietModeSummary, TierBudgetSpec, VaultAuthSession }
 
 export const GLB_LAYER_ESTIMATED_BYTES: Readonly<Record<AnatomyLayer['key'], number>> = {
-  surface: 998_480,
-  lymphoid: 652_008,
-  skeletal: 2_653_500,
-  visceral: 3_682_364,
-  muscular: 5_636_668,
-  nervous: 7_785_940,
-  cardiovascular: 12_344_948,
+  surface: 998_480, lymphoid: 652_008, skeletal: 2_653_500, visceral: 3_682_364, muscular: 5_636_668, nervous: 7_785_940, cardiovascular: 12_344_948,
 }
 
 export const SYSTEM_TO_GLB_LAYERS: Readonly<Record<AnatomicalSystemId, readonly AnatomyLayer['key'][]>> = {
-  cardiovascular: ['cardiovascular'],
-  respiratory: ['visceral'],
-  nervous: ['nervous'],
-  musculoskeletal: ['skeletal', 'muscular'],
-  gastrointestinal: ['visceral'],
-  renal: ['visceral'],
-  endocrine: ['visceral'],
-  immune_lymphatic: ['lymphoid'],
-  integumentary: ['surface'],
-  reproductive: ['visceral', 'surface'],
+  cardiovascular: ['cardiovascular'], respiratory: ['visceral'], nervous: ['nervous'], musculoskeletal: ['skeletal', 'muscular'], gastrointestinal: ['visceral'],
+  renal: ['visceral'], endocrine: ['visceral'], immune_lymphatic: ['lymphoid'], integumentary: ['surface'], reproductive: ['visceral', 'surface'],
 }
 
 export function probeBrowserHardware(): HardwareCapabilityProbe {
@@ -203,32 +110,15 @@ const LAB_METRIC_MAP: Readonly<Record<string, { readonly metric: string; readonl
 }
 
 const SUPPORTED_METRICS = new Set([
-  'heart-rate',
-  'resting-heart-rate',
-  'hrv',
-  'blood-pressure-systolic',
-  'blood-pressure-diastolic',
-  'spo2',
-  'respiratory-rate',
-  'fev1',
-  'fvc',
-  'lab.sgot',
-  'lab.sgpt',
-  'lab.egfr',
-  'lab.kreatinin',
-  'glucose',
-  'blood-glucose',
-  'lab.gdp',
-  'lab.hba1c',
+  'heart-rate', 'resting-heart-rate', 'hrv', 'blood-pressure-systolic', 'blood-pressure-diastolic',
+  'spo2', 'respiratory-rate', 'fev1', 'fvc', 'lab.sgot', 'lab.sgpt', 'lab.egfr', 'lab.kreatinin',
+  'glucose', 'blood-glucose', 'lab.gdp', 'lab.hba1c',
 ])
 
 const LONGITUDINAL_METRIC_ALIAS: Readonly<Record<string, { readonly metric: string; readonly unit: string }>> = {
-  heartRate: { metric: 'heart-rate', unit: 'bpm' },
-  restingHr: { metric: 'resting-heart-rate', unit: 'bpm' },
-  hrvMs: { metric: 'hrv', unit: 'ms' },
-  systolic: { metric: 'blood-pressure-systolic', unit: 'mmHg' },
-  diastolic: { metric: 'blood-pressure-diastolic', unit: 'mmHg' },
-  spo2Pct: { metric: 'spo2', unit: '%' },
+  heartRate: { metric: 'heart-rate', unit: 'bpm' }, restingHr: { metric: 'resting-heart-rate', unit: 'bpm' },
+  hrvMs: { metric: 'hrv', unit: 'ms' }, systolic: { metric: 'blood-pressure-systolic', unit: 'mmHg' },
+  diastolic: { metric: 'blood-pressure-diastolic', unit: 'mmHg' }, spo2Pct: { metric: 'spo2', unit: '%' },
   respRate: { metric: 'respiratory-rate', unit: 'breaths/min' },
 }
 
@@ -256,11 +146,8 @@ function safeReadingFromEvent(event: LongitudinalEvent): RealityViewReading | nu
     event: { ...event, metric: canonicalMetric, unit: canonicalUnit, value: event.value },
     evidenceClass,
     provenance: {
-      id: event.id,
-      fhirResourceType: isAcceptedLab ? 'DiagnosticReport' : 'Observation',
-      sourceLabel: event.provenance.sourceId,
-      recordedAt: event.recordedAt,
-      verified: event.review.state === 'accepted',
+      id: event.id, fhirResourceType: isAcceptedLab ? 'DiagnosticReport' : 'Observation',
+      sourceLabel: event.provenance.sourceId, recordedAt: event.recordedAt, verified: event.review.state === 'accepted',
     },
   }
 }
@@ -269,12 +156,7 @@ export function buildConsentLedgerForSubject(subjectId: string, grantedAtIso: st
   let ledger = createPurposeConsentLedger()
   if (granted) {
     ledger = appendPurposeConsentDecision(ledger, {
-      id: `consent-grant-${subjectId}`,
-      subjectId,
-      purpose: 'personal-visualization',
-      action: 'grant',
-      decidedAt: grantedAtIso,
-      source: 'user',
+      id: `consent-grant-${subjectId}`, subjectId, purpose: 'personal-visualization', action: 'grant', decidedAt: grantedAtIso, source: 'user',
     })
   }
   return ledger
@@ -301,10 +183,7 @@ export function collectLiveRealityViewReadings(input: {
     }
   }
 
-  const vitalRecordedAt = validIsoOrFallback(
-    typeof vitals.recordedAt === 'string' ? vitals.recordedAt : undefined,
-    nowIso,
-  )
+  const vitalRecordedAt = validIsoOrFallback(typeof vitals.recordedAt === 'string' ? vitals.recordedAt : undefined, nowIso)
   for (const mapping of VITAL_METRIC_MAP) {
     const raw = vitals[mapping.field]
     if (typeof raw !== 'number' || !Number.isFinite(raw) || raw <= 0) continue
@@ -314,27 +193,14 @@ export function collectLiveRealityViewReadings(input: {
     const sourceLabel = typeof vitals.source === 'string' && vitals.source.trim() ? vitals.source : 'local-device-sync'
     collected.push({
       event: {
-        id,
-        subjectId: patientId,
-        domain: mapping.domain,
-        metric: mapping.metric,
-        value: raw,
-        unit: mapping.unit,
-        recordedAt: vitalRecordedAt,
-        confidence: 0.9,
-        semanticState: 'measured',
+        id, subjectId: patientId, domain: mapping.domain, metric: mapping.metric, value: raw, unit: mapping.unit,
+        recordedAt: vitalRecordedAt, confidence: 0.9, semanticState: 'measured',
         provenance: { sourceKind: 'wearable', sourceId: sourceLabel, capturedAt: vitalRecordedAt, receivedAt: vitalRecordedAt },
         consent: { granted: true, purposes: ['personal-visualization'], grantedAt: consentRecordedAt },
         review: { state: 'not-required' },
       },
       evidenceClass: 'wearable_stream',
-      provenance: {
-        id,
-        fhirResourceType: 'Observation',
-        sourceLabel,
-        recordedAt: vitalRecordedAt,
-        verified: false,
-      },
+      provenance: { id, fhirResourceType: 'Observation', sourceLabel, recordedAt: vitalRecordedAt, verified: false },
     })
   }
 
@@ -343,36 +209,21 @@ export function collectLiveRealityViewReadings(input: {
     if (!mapping || !Array.isArray(entries) || entries.length === 0) continue
     const latest = [...entries].sort((a, b) => b.tanggal.localeCompare(a.tanggal))[0]
     if (!latest || typeof latest.nilai !== 'number' || !Number.isFinite(latest.nilai) || latest.nilai < 0) continue
-    const labRecordedAt = /^\d{4}-\d{2}-\d{2}$/.test(latest.tanggal)
-      ? `${latest.tanggal}T08:00:00Z`
-      : validIsoOrFallback(latest.tanggal, nowIso)
+    const labRecordedAt = /^\d{4}-\d{2}-\d{2}$/.test(latest.tanggal) ? `${latest.tanggal}T08:00:00Z` : validIsoOrFallback(latest.tanggal, nowIso)
     if (Date.parse(labRecordedAt) > Date.parse(nowIso)) continue
     const id = `live-lab-${labKey}-${latest.id}`
     if (seenIds.has(id)) continue
     seenIds.add(id)
     collected.push({
       event: {
-        id,
-        subjectId: patientId,
-        domain: 'lab',
-        metric: mapping.metric,
-        value: latest.nilai,
-        unit: mapping.unit,
-        recordedAt: labRecordedAt,
-        confidence: 1,
-        semanticState: 'imported',
+        id, subjectId: patientId, domain: 'lab', metric: mapping.metric, value: latest.nilai, unit: mapping.unit,
+        recordedAt: labRecordedAt, confidence: 1, semanticState: 'imported',
         provenance: { sourceKind: 'import', sourceId: 'patient-lab-import', capturedAt: labRecordedAt, receivedAt: labRecordedAt },
         consent: { granted: true, purposes: ['personal-visualization'], grantedAt: consentRecordedAt },
         review: { state: 'accepted', reviewerId: 'imported-lab-record', reviewedAt: labRecordedAt },
       },
       evidenceClass: 'ocr_verified',
-      provenance: {
-        id,
-        fhirResourceType: 'DiagnosticReport',
-        sourceLabel: 'Imported Lab Sheet',
-        recordedAt: labRecordedAt,
-        verified: true,
-      },
+      provenance: { id, fhirResourceType: 'DiagnosticReport', sourceLabel: 'Imported Lab Sheet', recordedAt: labRecordedAt, verified: true },
     })
   }
 
@@ -392,22 +243,10 @@ export function buildLiveRealityViewState(input: {
   readonly labs: Record<string, ButirLab[]>
 }): RealityViewState {
   const consentLedger = buildConsentLedgerForSubject(input.patientId, new Date(0).toISOString(), input.consentGranted)
-  const readings = collectLiveRealityViewReadings({
-    patientId: input.patientId,
-    snapshot: input.snapshot,
-    vitals: input.vitals,
-    labs: input.labs,
-    nowIso: input.nowIso,
-  })
+  const readings = collectLiveRealityViewReadings({ patientId: input.patientId, snapshot: input.snapshot, vitals: input.vitals, labs: input.labs, nowIso: input.nowIso })
   return buildRealityViewState({
-    patientId: input.patientId,
-    mode: input.mode,
-    nowIso: input.nowIso,
-    timeAxisCursorIso: input.timeAxisCursorIso,
-    dualCodingTm1Enabled: input.dualCodingTm1Enabled,
-    selectedMeshId: input.selectedMeshId,
-    consentLedger,
-    readings,
+    patientId: input.patientId, mode: input.mode, nowIso: input.nowIso, timeAxisCursorIso: input.timeAxisCursorIso,
+    dualCodingTm1Enabled: input.dualCodingTm1Enabled, selectedMeshId: input.selectedMeshId, consentLedger, readings,
   })
 }
 
@@ -418,12 +257,7 @@ export function evaluateLiveVaultAuthSession(
   storageOverride?: { readonly token: string | null; readonly sessionRaw: string | null },
 ): VaultAuthSession {
   if (!account || !account.id) {
-    return {
-      googleAuthVerified: false,
-      vaultUnlocked: false,
-      sessionExpiresAtMs: 0,
-      providerUserId: '',
-    }
+    return { googleAuthVerified: false, vaultUnlocked: false, sessionExpiresAtMs: 0, providerUserId: '' }
   }
 
   let token = storageOverride ? storageOverride.token : null
@@ -443,28 +277,15 @@ export function evaluateLiveVaultAuthSession(
   if (sessionRaw) {
     try {
       const parsed = JSON.parse(sessionRaw) as { readonly loginAt?: number; readonly authProvider?: string }
-      if (typeof parsed.loginAt === 'number' && Number.isFinite(parsed.loginAt)) {
-        sessionExpiresAtMs = parsed.loginAt + 7 * 86_400_000
-      }
+      if (typeof parsed.loginAt === 'number' && Number.isFinite(parsed.loginAt)) sessionExpiresAtMs = parsed.loginAt + 7 * 86_400_000
       if (typeof parsed.authProvider === 'string') providerKind = parsed.authProvider
     } catch {
-      return {
-        googleAuthVerified: false,
-        vaultUnlocked: false,
-        sessionExpiresAtMs: 0,
-        providerUserId: '',
-      }
+      return { googleAuthVerified: false, vaultUnlocked: false, sessionExpiresAtMs: 0, providerUserId: '' }
     }
   }
 
-  const hasToken = Boolean(token && token.trim().length > 0)
-  const googleAuthVerified = hasToken && providerKind === 'google'
-  return {
-    googleAuthVerified,
-    vaultUnlocked,
-    sessionExpiresAtMs,
-    providerUserId: account.id,
-  }
+  const googleAuthVerified = Boolean(token && token.trim().length > 0) && providerKind === 'google'
+  return { googleAuthVerified, vaultUnlocked, sessionExpiresAtMs, providerUserId: account.id }
 }
 
 export interface InspectedOrganView {
@@ -482,36 +303,16 @@ export function inspectSelectedMesh(
   if (meshId === null) return null
   const resolution = resolveMeshOntology(meshId)
   const tm1Metadata = projectTm1DualCodingMetadata(meshId, dualCodingTm1Enabled)
-  if (!resolution.selectable) {
-    return {
-      resolution,
-      tm1Metadata,
-      telemetryNode: null,
-      knowledgeGraphEdges: [],
-    }
-  }
+  if (!resolution.selectable) return { resolution, tm1Metadata, telemetryNode: null, knowledgeGraphEdges: [] }
 
   const allowedEdgeIds = new Set(resolution.binding.knowledgeGraphEdgeIds)
-  const knowledgeGraphEdges = CANONICAL_MULTISCALE_KNOWLEDGE_GRAPH_EDGES.filter((edge) =>
-    allowedEdgeIds.has(edge.edgeId),
-  )
+  const knowledgeGraphEdges = CANONICAL_MULTISCALE_KNOWLEDGE_GRAPH_EDGES.filter((edge) => allowedEdgeIds.has(edge.edgeId))
   const rawNode = Object.prototype.hasOwnProperty.call(state.nodes, meshId) ? state.nodes[meshId] : null
   const telemetryNode = rawNode && dualCodingTm1Enabled && tm1Metadata.icd11Tm1Code
-    ? {
-      ...rawNode,
-      provenance: rawNode.provenance.map((ref) => ({
-        ...ref,
-        icd11Tm1Code: ref.icd11Tm1Code ?? tm1Metadata.icd11Tm1Code,
-      })),
-    }
+    ? { ...rawNode, provenance: rawNode.provenance.map((ref) => ({ ...ref, icd11Tm1Code: ref.icd11Tm1Code ?? tm1Metadata.icd11Tm1Code })) }
     : rawNode
 
-  return {
-    resolution,
-    tm1Metadata,
-    telemetryNode,
-    knowledgeGraphEdges,
-  }
+  return { resolution, tm1Metadata, telemetryNode, knowledgeGraphEdges }
 }
 
 export function runInteractiveCounterfactualMedicationCheck(
@@ -525,37 +326,21 @@ export function runInteractiveCounterfactualMedicationCheck(
 ): CounterfactualResult {
   const fallbackIso = state.timeAxisCursorIso
   const verifiedRef: ProvenanceRef & { readonly fhirResourceType: 'MedicationRequest'; readonly verified: true } = {
-    id: `medreq-${params.activeDrugGeneric}-1`,
-    fhirResourceType: 'MedicationRequest',
-    sourceLabel: 'Clinical Medication Check (Unreviewed Draft Simulation)',
-    recordedAt: fallbackIso,
-    verified: true,
+    id: `medreq-${params.activeDrugGeneric}-1`, fhirResourceType: 'MedicationRequest',
+    sourceLabel: 'Clinical Medication Check (Unreviewed Draft Simulation)', recordedAt: fallbackIso, verified: true,
   }
   const req: CounterfactualRequest = {
-    type: 'medication_change',
-    counterfactualId: params.counterfactualId,
-    targetMeshId: params.targetMeshId,
-    candidateDrugGeneric: params.candidateDrugGeneric,
-    operation: 'add',
-    standardDailyDoseMg: 75,
+    type: 'medication_change', counterfactualId: params.counterfactualId, targetMeshId: params.targetMeshId,
+    candidateDrugGeneric: params.candidateDrugGeneric, operation: 'add', standardDailyDoseMg: 75,
     context: {
-      patientId: state.patientId,
-      reviewedAt: fallbackIso,
-      complete: true,
+      patientId: state.patientId, reviewedAt: fallbackIso, complete: true,
       activeMedicationRequests: params.activeDrugGeneric
-        ? [{
-          genericIngredient: params.activeDrugGeneric,
-          dailyDoseMg: 20,
-          provenance: verifiedRef,
-        }]
+        ? [{ genericIngredient: params.activeDrugGeneric, dailyDoseMg: 20, provenance: verifiedRef }]
         : [],
-      eGfrMlMin173m2: 85,
-      childPughClass: 'A',
+      eGfrMlMin173m2: 85, childPughClass: 'A',
       pharmacogenomicMarkers: params.candidateDrugGeneric === 'clopidogrel'
         ? ['CYP2C19_POOR_METABOLIZER_2_2']
-        : params.candidateDrugGeneric === 'carbamazepine'
-          ? ['HLA-B*15:02_POSITIVE']
-          : ['NORMAL_WILDTYPE'],
+        : params.candidateDrugGeneric === 'carbamazepine' ? ['HLA-B*15:02_POSITIVE'] : ['NORMAL_WILDTYPE'],
       documentedAllergies: [],
     },
   }
