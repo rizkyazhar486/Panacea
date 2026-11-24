@@ -9,7 +9,7 @@ const forYou = readFileSync(new URL('../../src/pages/social/ForYouHub.tsx', impo
 const zoneNav = readFileSync(new URL('../../src/components/ui/PanaceaZoneNav.tsx', import.meta.url), 'utf8')
 
 assert.ok(home.indexOf('<HomeHealthBrief />') < home.indexOf('<HomeVisualLanding />'))
-assert.ok(home.indexOf('<HomeVisualLanding />') < home.indexOf('<SuperPageLauncher />'))
+assert.ok(home.indexOf('<HomeVisualLanding />') < home.indexOf('<HomeCompactWorkspaceHub />'))
 assert.doesNotMatch(home, /<ForYouSocialPulse/)
 
 // PR #2530 moved this header into the desktop bento. Assert its compact type

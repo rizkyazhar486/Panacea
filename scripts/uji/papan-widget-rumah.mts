@@ -25,11 +25,16 @@ import { readFileSync } from 'node:fs'
 
 const tumpukan = readFileSync(new URL('../../src/components/ui/Tumpukan.tsx', import.meta.url), 'utf8')
 const home = readFileSync(new URL('../../src/pages/HomeSocialWorkspace.tsx', import.meta.url), 'utf8')
+const compactHub = readFileSync(new URL('../../src/components/dashboard/HomeCompactWorkspaceHub.tsx', import.meta.url), 'utf8')
 const rel = readFileSync(new URL('../../src/components/dashboard/RelWidgetRumah.tsx', import.meta.url), 'utf8')
 
-assert.ok(/import \{ RelWidgetRumah \} from '\.\.\/components\/RelWidgetRumah'/.test(home),
-  'Home no longer imports the widget rail')
-assert.ok(/<RelWidgetRumah \/>/.test(home),
+assert.ok(/import \{ HomeCompactWorkspaceHub \} from '\.\.\/components\/dashboard\/HomeCompactWorkspaceHub'/.test(home),
+  'Home no longer imports the compact workspace hub')
+assert.ok(/<HomeCompactWorkspaceHub \/>/.test(home),
+  'Home no longer renders the compact workspace hub')
+assert.ok(/import \{ RelWidgetRumah \} from '\.\/RelWidgetRumah'/.test(compactHub),
+  'HomeCompactWorkspaceHub no longer imports the widget rail')
+assert.ok(/<RelWidgetRumah \/>/.test(compactHub),
   'the widget rail is imported but never rendered — that is exactly how it disappeared the first time')
 assert.ok(/PapanWidget/.test(rel), 'the rail no longer mounts the existing widget board')
 

@@ -5,6 +5,7 @@ import { SUPER_PAGES } from '../../src/lib/superPages.ts'
 const landing = readFileSync('src/components/dashboard/HomeVisualLanding.tsx', 'utf8')
 const deck = readFileSync('src/components/dashboard/HomeCommandDeck.tsx', 'utf8')
 const workspace = readFileSync('src/pages/HomeSocialWorkspace.tsx', 'utf8')
+const assistedDrawer = readFileSync('src/components/ui/AssistedMapDrawer.tsx', 'utf8')
 
 // Simplicity is information compression, not feature deletion. The hero owns
 // universal actions while the launcher owns the bounded category model.
@@ -42,8 +43,12 @@ assert.equal(
   true,
   'category pages must not become independent state silos',
 )
-assert.match(workspace, /<SuperPageLauncher \/>/,
-  'Home lost the one-tap category-page launcher')
+assert.match(assistedDrawer, /<SuperPageLauncher/,
+  'AssistedMapDrawer lost the one-tap category-page launcher')
+assert.doesNotMatch(workspace, /<SuperPageLauncher/,
+  'Feature Map must be hosted inside AssistiveTouch rather than inline on Home')
+assert.match(workspace, /<HomeCompactWorkspaceHub \/>/,
+  'Home lost the consolidated compact workspace hub')
 assert.doesNotMatch(workspace, /data-panacea-primary-nav/,
   'a persistent bottom navigation dock returned and competes with the command bar')
 

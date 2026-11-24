@@ -165,7 +165,7 @@ export function FeatureMapOrbit({ icons, hub = FEATURE_MAP_HOME_HUB }: FeatureMa
       data-feature-map-page={pageIndex}
       onKeyDown={(event) => { if (event.key === 'Escape' && activeWorld) { event.stopPropagation(); close() } }}
     >
-      <div className="pmd-feature-map__stage">
+      <div className="pmd-feature-map__stage" data-pmd-liquid="off">
         <svg className="pmd-feature-map__rings" viewBox="0 0 100 100" aria-hidden="true" focusable="false">
           <circle cx="50" cy="50" r="46" />
           <circle cx="50" cy="50" r="37" />
@@ -190,11 +190,12 @@ export function FeatureMapOrbit({ icons, hub = FEATURE_MAP_HOME_HUB }: FeatureMa
           {activeWorld ? (
             <>
               <span className="pmd-feature-map__core-kicker">{activeWorld.shortLabel} {totalPages > 1 ? `${(pageIndex % totalPages) + 1}/${totalPages}` : ''}</span>
-              <button ref={backRef} type="button" className="pmd-feature-map__back" onClick={close} aria-label="Back to all worlds">←</button>
+              <button ref={backRef} type="button" data-pmd-native="true" className="pmd-feature-map__back" onClick={close} aria-label="Back to all worlds">←</button>
             </>
           ) : (
             <button
               type="button"
+              data-pmd-native="true"
               className="pmd-feature-map__hub-btn"
               data-superpage={hubPage.id}
               data-human-state-source={hubPage.stateSource}
@@ -241,6 +242,7 @@ export function FeatureMapOrbit({ icons, hub = FEATURE_MAP_HOME_HUB }: FeatureMa
                 <button
                   key={page.id}
                   type="button"
+                  data-pmd-native="true"
                   className="pmd-feature-map__node"
                   style={{ left: `${points[index].x}%`, top: `${points[index].y}%`, ['--pmd-node-i' as string]: index }}
                   data-superpage={page.id}
@@ -264,7 +266,7 @@ export function FeatureMapOrbit({ icons, hub = FEATURE_MAP_HOME_HUB }: FeatureMa
       </div>
 
       <div className="pmd-feature-map__hud" role="toolbar" aria-label="Interactive feature navigator">
-        <button type="button" onClick={() => stepOrbit(-1)} aria-label="Previous orbit page" className="pmd-feature-map__dock-btn">◀</button>
+        <button type="button" data-pmd-native="true" onClick={() => stepOrbit(-1)} aria-label="Previous orbit page" className="pmd-feature-map__dock-btn">◀</button>
         {SUPER_PAGES.map((page) => {
           const Icon = icons[page.id]
           const isCurrent = activeWorld?.id === page.id
@@ -272,6 +274,7 @@ export function FeatureMapOrbit({ icons, hub = FEATURE_MAP_HOME_HUB }: FeatureMa
             <button
               key={page.id}
               type="button"
+              data-pmd-native="true"
               onClick={() => { openWorld(page.id); setDeckOpen(true) }}
               aria-pressed={isCurrent}
               aria-label={`Switch to ${page.label}`}
@@ -282,9 +285,10 @@ export function FeatureMapOrbit({ icons, hub = FEATURE_MAP_HOME_HUB }: FeatureMa
             </button>
           )
         })}
-        <button type="button" onClick={() => stepOrbit(1)} aria-label="Next orbit page" className="pmd-feature-map__dock-btn">▶</button>
+        <button type="button" data-pmd-native="true" onClick={() => stepOrbit(1)} aria-label="Next orbit page" className="pmd-feature-map__dock-btn">▶</button>
         <button
           type="button"
+          data-pmd-native="true"
           onClick={() => setChartsOpen((open) => !open)}
           aria-expanded={chartsOpen}
           aria-label="Toggle 12-chart telemetry studio"
@@ -297,6 +301,7 @@ export function FeatureMapOrbit({ icons, hub = FEATURE_MAP_HOME_HUB }: FeatureMa
         </button>
         <button
           type="button"
+          data-pmd-native="true"
           onClick={() => setDeckOpen((open) => !open)}
           aria-expanded={deckOpen}
           aria-label="Toggle all feature widgets"

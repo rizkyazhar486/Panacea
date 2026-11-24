@@ -2,6 +2,8 @@ import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 
 const workspace = readFileSync('src/pages/HomeSocialWorkspace.tsx', 'utf8')
+const assistedDrawer = readFileSync('src/components/ui/AssistedMapDrawer.tsx', 'utf8')
+const fab = readFileSync('src/components/layout/FabNavigasi.tsx', 'utf8')
 const deck = readFileSync('src/components/dashboard/HomeCommandDeck.tsx', 'utf8')
 const hero = readFileSync('src/components/dashboard/HomeVisualLanding.tsx', 'utf8')
 const heroCss = readFileSync('src/styles/home-intent-motion.css', 'utf8')
@@ -11,14 +13,20 @@ const launcher = readFileSync('src/components/ui/SuperPageLauncher.tsx', 'utf8')
 const convergence = readFileSync('src/styles/superpage-convergence.css', 'utf8')
 
 // Zero-step: Home itself shows health context. One-step: primary destinations
-// and universal actions are directly exposed without an intermediate menu.
+// and universal actions are directly exposed; Feature Map lives in global AssistiveTouch.
 assert.match(workspace, /<HomeHealthBrief \/>/, 'Home stopped exposing health context at zero steps')
 const healthIndex = workspace.indexOf('<HomeHealthBrief />')
 const heroIndex = workspace.indexOf('<HomeVisualLanding />')
 assert.ok(healthIndex >= 0 && heroIndex >= 0 && healthIndex < heroIndex,
   'Home puts the promotional hero before the user\'s health state; useful content must win the first viewport')
-assert.match(workspace, /<SuperPageLauncher \/>/,
-  'Home lost its three one-tap super-page launcher')
+assert.doesNotMatch(workspace, /<SuperPageLauncher/,
+  'Feature Map must live in AssistiveTouch rather than inline on Home')
+assert.match(workspace, /<HomeCompactWorkspaceHub \/>/,
+  'Home lost its consolidated compact secondary hub')
+assert.match(assistedDrawer, /<SuperPageLauncher/,
+  'AssistedMapDrawer lost its Feature Map launcher')
+assert.match(fab, /<AssistedMapDrawer \/>/,
+  'global AssistiveTouch lost AssistedMapDrawer')
 assert.doesNotMatch(workspace, /data-panacea-primary-nav/,
   'Home reintroduced a persistent bottom navigation dock')
 assert.match(launcher, /SUPER_PAGES\.map\(/,

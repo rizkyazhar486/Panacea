@@ -106,7 +106,7 @@ export function FabNavigasi({ onCari, onKembali, tersembunyi = false }: {
   const [aturBuka, setAturBuka] = useState(false)
   const [redup, setRedup] = useState(false)
   const [halaman, setHalaman] = useState(0)
-  const [mapMode, setMapMode] = useState(false)
+  const [mapMode, setMapMode] = useState(true)
   const menyingkir = tersembunyi && !buka && !menggeser
 
   const orbRef = useRef<HTMLButtonElement>(null)
@@ -355,8 +355,17 @@ export function FabNavigasi({ onCari, onKembali, tersembunyi = false }: {
     try { orbRef.current?.releasePointerCapture(event.pointerId) } catch { /* sudah lepas */ }
   }, [])
 
-  const keAtas = pos.y > window.innerHeight / 2
-  const keKiri = pos.x > window.innerWidth / 2
+  const vpWidth = typeof window !== 'undefined' ? window.innerWidth : 390
+  const vpHeight = typeof window !== 'undefined' ? window.innerHeight : 844
+  const keAtas = pos.y > vpHeight / 2
+  const keKiri = pos.x > vpWidth / 2
+  const panelWidth = mapMode ? Math.min(420, Math.max(296, vpWidth - 24)) : 236
+  const rawPanelLeft = keKiri ? prefs.size - panelWidth : 0
+  const panelLeft = Math.max(12 - pos.x, Math.min(vpWidth - 12 - panelWidth - pos.x, rawPanelLeft))
+  const panelMaxHeight = Math.max(
+    260,
+    Math.min(620, keAtas ? pos.y - 68 : vpHeight - pos.y - prefs.size - 24),
+  )
 
   if (sembunyikanDiBodyExplorer) return null
   if (sembunyikanDiBodyExposure) return null
@@ -365,7 +374,7 @@ export function FabNavigasi({ onCari, onKembali, tersembunyi = false }: {
     <>
       {aturBuka && <PemilihAksiFab tutup={() => setAturBuka(false)} />}
 
-      {buka && <div className="fixed inset-0 z-40 bg-black/20" onPointerDown={() => setBuka(false)} aria-hidden="true" />}
+      {buka && <div className="fixed inset-0 z-40 bg-black/25" onPointerDown={() => setBuka(false)} aria-hidden="true" />}
 
       <div className="fixed z-50" style={{ left: pos.x, top: pos.y }}>
         {buka && (
@@ -373,27 +382,51 @@ export function FabNavigasi({ onCari, onKembali, tersembunyi = false }: {
             role="menu"
             aria-label="Panacea Assistive Touch commands"
             data-panacea-assistive-orbit="true"
-            className="absolute rounded-[28px] border border-white/10 bg-neutral-950/78 p-2 shadow-xl backdrop-blur-2xl backdrop-saturate-150"
-            style={{ width: mapMode ? 'min(360px, calc(100vw - 24px))' : 224, [keAtas ? 'bottom' : 'top']: prefs.size + 8, [keKiri ? 'right' : 'left']: 0 } as React.CSSProperties}
+            className="dark absolute rounded-[28px] border border-white/15 bg-neutral-950/92 p-2.5 text-white shadow-2xl backdrop-blur-2xl backdrop-saturate-150"
+            style={{
+              width: panelWidth,
+              left: panelLeft,
+              [keAtas ? 'bottom' : 'top']: prefs.size + 8,
+            } as React.CSSProperties}
           >
-            <div className="mb-1 flex items-center justify-between gap-1.5 px-2 py-1">
-              <span className="truncate text-[9px] font-black uppercase tracking-[.14em] text-neutral-400">{mapMode ? 'Assisted Map' : 'Actions'}</span>
-              <div className="flex items-center gap-1">
+            <div className="mb-1.5 flex items-center justify-between gap-1.5 px-1.5 py-1">
+              <span className="truncate text-[10px] font-black uppercase tracking-[.14em] text-neutral-300">
+                {mapMode ? 'Feature Map' : 'Quick Actions'}
+              </span>
+              <div className="flex shrink-0 items-center gap-1">
                 <button
                   type="button"
+                  data-pmd-native="true"
                   onClick={() => setMapMode((v) => !v)}
                   aria-pressed={mapMode}
                   data-panacea-assisted-map-toggle="true"
-                  className="min-h-[36px] rounded-full border border-cyan-400/35 bg-cyan-500/15 px-2.5 text-[10px] font-black text-cyan-200"
+                  className="min-h-[36px] rounded-full border border-cyan-400/35 bg-cyan-500/15 px-3 text-[11px] font-bold text-cyan-100 transition hover:bg-cyan-500/25"
                 >
-                  {mapMode ? 'Orb' : 'Map 360°'}
+                  {mapMode ? 'Actions' : 'Feature Map'}
                 </button>
-                <button type="button" onClick={() => { setBuka(false); setAturBuka(true) }} className="grid h-9 w-9 place-items-center rounded-full text-[14px] text-neutral-500 hover:bg-black/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40 dark:hover:bg-white/10" aria-label="Customize Assistive Touch">Edit</button>
+                <button
+                  type="button"
+                  data-pmd-native="true"
+                  onClick={() => { setBuka(false); setAturBuka(true) }}
+                  className="min-h-[36px] rounded-full border border-white/15 bg-white/[.06] px-2.5 text-[11px] font-bold text-neutral-200 transition hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/50"
+                  aria-label="Customize Assistive Touch"
+                >
+                  Edit
+                </button>
+                <button
+                  type="button"
+                  data-pmd-native="true"
+                  onClick={() => setBuka(false)}
+                  aria-label="Close Assistive Touch"
+                  className="grid h-9 w-9 place-items-center rounded-full border border-white/15 bg-white/[.08] text-xs font-black text-neutral-100 transition hover:bg-white/[.18] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/50"
+                >
+                  ✕
+                </button>
               </div>
             </div>
 
             {mapMode ? (
-              <div className="max-h-[70vh] overflow-y-auto">
+              <div className="overflow-y-auto pr-0.5" style={{ maxHeight: panelMaxHeight }}>
                 <Suspense fallback={<div className="p-4 text-center text-[11px] font-bold text-cyan-200">Loading 360° Assisted Map…</div>}>
                   <AssistedMapDrawer />
                 </Suspense>
@@ -409,15 +442,16 @@ export function FabNavigasi({ onCari, onKembali, tersembunyi = false }: {
               onActiveIndexChange={setHalaman}
             >
               {pages.map((page, pageIndex) => (
-                <div key={pageIndex} className="grid h-[192px] w-[208px] grid-cols-3 grid-rows-3 place-items-center">
+                <div key={pageIndex} className="grid h-[196px] w-[208px] grid-cols-3 grid-rows-3 place-items-center">
                   {page.map((action, index) => (
                     <button
                       key={`${pageIndex}-${action.id}`}
                       type="button"
+                      data-pmd-native="true"
                       role="menuitem"
                       data-panacea-assistive-action={action.id}
                       onClick={() => action.id === 'customize' ? (setBuka(false), setAturBuka(true)) : jalankan(action.id)}
-                      className={`flex h-[58px] w-[58px] flex-col items-center justify-center gap-1 rounded-2xl px-1 transition active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40 ${TATA[index]} ${action.primary ? 'bg-brand text-white' : 'text-ink hover:bg-black/5 dark:text-white dark:hover:bg-white/10'}`}
+                      className={`flex h-[58px] w-[58px] flex-col items-center justify-center gap-1 rounded-2xl border px-1 transition active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/50 ${TATA[index]} ${action.primary ? 'border-emerald-400/60 bg-emerald-500 text-neutral-950 font-black' : 'border-white/10 bg-white/[.05] text-white hover:bg-white/15'}`}
                     >
                       <span aria-hidden className="text-[16px] leading-none">{action.icon}</span>
                       <span className="w-full truncate text-center text-[9.5px] font-bold leading-none">{action.label}</span>
@@ -433,6 +467,7 @@ export function FabNavigasi({ onCari, onKembali, tersembunyi = false }: {
                   <button
                     key={index}
                     type="button"
+                    data-pmd-native="true"
                     aria-label={`Command page ${index + 1} of ${pages.length}`}
                     aria-current={index === halaman ? 'page' : undefined}
                     onClick={() => railRef.current?.scrollToIndex(index)}

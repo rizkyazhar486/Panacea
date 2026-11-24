@@ -63,50 +63,69 @@ function CategoryGrid() {
   )
 }
 
-export function SuperPageLauncher() {
+export function SuperPageLauncher({ compact = false }: { compact?: boolean } = {}) {
   const [view, setView] = useState<'map' | 'grid'>('map')
 
   return (
-    <section className="pmd-superpage-launcher pmd-scroll-section" aria-label="Panacea category pages">
-      <div className="pmd-section-heading">
-        <span className="pmd-section-kicker">Feature map</span>
-        <strong className="pmd-one-line">One human state, seven connected lenses</strong>
-      </div>
+    <section
+      className={compact ? 'space-y-2.5' : 'pmd-superpage-launcher pmd-scroll-section'}
+      aria-label="Panacea category pages"
+    >
+      <div className={compact ? 'flex flex-wrap items-center justify-between gap-2' : 'pmd-section-heading'}>
+        <div className="min-w-0">
+          {!compact && <span className="pmd-section-kicker">Feature map</span>}
+          <strong className={compact ? 'block truncate text-xs font-extrabold text-white' : 'pmd-one-line'}>
+            One human state, seven connected lenses
+          </strong>
+        </div>
 
-      <div className="mb-2 flex items-center justify-end gap-2" role="group" aria-label="Feature map view">
-        <button
-          type="button"
-          onClick={() => setView('map')}
-          aria-pressed={view === 'map'}
-          className={
-            view === 'map'
-              ? 'min-h-[44px] min-w-[60px] rounded-full bg-neutral-950 px-3.5 text-[12px] font-bold text-white dark:bg-cyan-300 dark:text-neutral-950'
-              : 'min-h-[44px] min-w-[60px] rounded-full border border-black/15 bg-white px-3.5 text-[12px] font-bold text-neutral-900 dark:border-white/20 dark:bg-neutral-900 dark:text-neutral-100'
-          }
-        >
-          Map
-        </button>
-        <button
-          type="button"
-          onClick={() => setView('grid')}
-          aria-pressed={view === 'grid'}
-          className={
-            view === 'grid'
-              ? 'min-h-[44px] min-w-[60px] rounded-full bg-neutral-950 px-3.5 text-[12px] font-bold text-white dark:bg-cyan-300 dark:text-neutral-950'
-              : 'min-h-[44px] min-w-[60px] rounded-full border border-black/15 bg-white px-3.5 text-[12px] font-bold text-neutral-900 dark:border-white/20 dark:bg-neutral-900 dark:text-neutral-100'
-          }
-        >
-          Grid
-        </button>
+        <div className="flex shrink-0 items-center gap-1.5" role="group" aria-label="Feature map view">
+          <button
+            type="button"
+            data-pmd-native="true"
+            onClick={() => setView('map')}
+            aria-pressed={view === 'map'}
+            className={
+              view === 'map'
+                ? 'min-h-[44px] min-w-[56px] rounded-full bg-emerald-500 px-3 text-[11px] font-extrabold text-neutral-950 transition'
+                : compact
+                  ? 'min-h-[44px] min-w-[56px] rounded-full border border-white/20 bg-white/[.08] px-3 text-[11px] font-bold text-white transition hover:bg-white/[.15]'
+                  : 'min-h-[44px] min-w-[56px] rounded-full border border-neutral-300 bg-neutral-100 px-3 text-[11px] font-bold text-neutral-900 transition hover:bg-neutral-200 dark:border-white/20 dark:bg-white/[.08] dark:text-white dark:hover:bg-white/[.15]'
+            }
+          >
+            Map
+          </button>
+          <button
+            type="button"
+            data-pmd-native="true"
+            onClick={() => setView('grid')}
+            aria-pressed={view === 'grid'}
+            className={
+              view === 'grid'
+                ? 'min-h-[44px] min-w-[56px] rounded-full bg-emerald-500 px-3 text-[11px] font-extrabold text-neutral-950 transition'
+                : compact
+                  ? 'min-h-[44px] min-w-[56px] rounded-full border border-white/20 bg-white/[.08] px-3 text-[11px] font-bold text-white transition hover:bg-white/[.15]'
+                  : 'min-h-[44px] min-w-[56px] rounded-full border border-neutral-300 bg-neutral-100 px-3 text-[11px] font-bold text-neutral-900 transition hover:bg-neutral-200 dark:border-white/20 dark:bg-white/[.08] dark:text-white dark:hover:bg-white/[.15]'
+            }
+          >
+            Grid
+          </button>
+        </div>
       </div>
 
       {view === 'map' ? (
-        // The orbit is the heaviest part of Home and sits below the fold: load it when it scrolls near.
-        <WhenNear minHeight={420}>
+        compact ? (
           <Suspense fallback={<CategoryGrid />}>
             <FeatureMapOrbit icons={ICONS} />
           </Suspense>
-        </WhenNear>
+        ) : (
+          // The orbit is the heaviest part of Home and sits below the fold: load it when it scrolls near.
+          <WhenNear minHeight={420}>
+            <Suspense fallback={<CategoryGrid />}>
+              <FeatureMapOrbit icons={ICONS} />
+            </Suspense>
+          </WhenNear>
+        )
       ) : (
         <CategoryGrid />
       )}

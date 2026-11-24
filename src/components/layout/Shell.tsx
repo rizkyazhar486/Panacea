@@ -1057,29 +1057,27 @@ export function Shell({ children }: { children: ReactNode }) {
 
           Tujuh tujuan yang sama tetap ada, kini di dalam menu yang muncul saat
           tombolnya diketuk; tidak ada satu pun yang dihapus. */}
-      {/* Navigasi mobile: satu tombol melayang Assistive Touch hanya untuk mobile (< 1024px).
-          Di desktop (>= 1024px), navigasi menggunakan Header dan sidebar sesuai standar Dual-Projection. */}
+      {/* Navigasi AssistiveTouch universal (bekerja di phone, iPad/tablet, dan website laptop/desktop):
+          satu tombol melayang iPhone-style yang dapat dipindah untuk membuka Feature Map 7-lensa & aksi cepat. */}
       {['pasien', 'dokter', 'owner'].includes(account.role) && (
-        <div className="lg:hidden">
-          <FabNavigasi
-            tersembunyi={keadaanBilah === 'hidden'}
-            onKembali={kembali}
-            tujuan={[
-              { to: '/', label: 'Home', ikon: <IconHome size={19} />, end: true },
-              { to: '/community', label: 'Community', ikon: <IconUsers size={19} /> },
-              { to: '/vitapulse', label: 'VitaPulse', ikon: <IconActivity size={19} /> },
-              { to: '/health-data', label: 'Device', ikon: <IconHeart size={19} /> },
-              { to: '/latihan', label: 'Training', ikon: <IconRun size={19} /> },
-              { to: '/sports-scores', label: 'Skor Langsung', ikon: <IconFlame size={19} /> },
-              { to: '/profile', label: 'Profile', ikon: <IconUser size={19} /> },
-            ]}
-            onCari={() => setCariBuka(true)}
-            onTambah={() => {
-              navigate('/feed')
-              setTimeout(() => window.dispatchEvent(new Event('panacea:compose')), 60)
-            }}
-          />
-        </div>
+        <FabNavigasi
+          tersembunyi={keadaanBilah === 'hidden'}
+          onKembali={kembali}
+          tujuan={[
+            { to: '/', label: 'Home', ikon: <IconHome size={19} />, end: true },
+            { to: '/community', label: 'Community', ikon: <IconUsers size={19} /> },
+            { to: '/vitapulse', label: 'VitaPulse', ikon: <IconActivity size={19} /> },
+            { to: '/health-data', label: 'Device', ikon: <IconHeart size={19} /> },
+            { to: '/latihan', label: 'Training', ikon: <IconRun size={19} /> },
+            { to: '/sports-scores', label: 'Skor Langsung', ikon: <IconFlame size={19} /> },
+            { to: '/profile', label: 'Profile', ikon: <IconUser size={19} /> },
+          ]}
+          onCari={() => setCariBuka(true)}
+          onTambah={() => {
+            navigate('/feed')
+            setTimeout(() => window.dispatchEvent(new Event('panacea:compose')), 60)
+          }}
+        />
       )}
 
       {onHome && ['pasien', 'dokter', 'owner'].includes(account.role) && <><OnboardingTour /><AssessmentPrompt /></>}

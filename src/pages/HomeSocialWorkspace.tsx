@@ -1,19 +1,13 @@
 import { lazy, Suspense, type ComponentType } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { HomeCommandDeck } from '../components/HomeCommandDeck'
 import { HomeHealthBrief } from '../components/HomeHealthBrief'
-import { HomeLiveWidgetRail } from '../components/HomeLiveWidgetRail'
 import { HomeRecoveryVisuals } from '../components/HomeRecoveryVisuals'
 import { HomeEssentialTools } from '../components/HomeEssentialTools'
 import { HomeVisualLanding } from '../components/HomeVisualLanding'
-import { RelWidgetRumah } from '../components/RelWidgetRumah'
-import { SuperPageLauncher } from '../components/SuperPageLauncher'
-import { PanaceaImageSlider } from '../components/PanaceaImageSlider'
+import { HomeCompactWorkspaceHub } from '../components/dashboard/HomeCompactWorkspaceHub'
 import { ThinkingOrb } from '../components/ThinkingOrb'
 import { SimpleModeInvite } from '../domains/simple-mode'
 import { PanaceaZoneNav } from '../components/PanaceaZoneNav'
-import { Fold, FoldGroup } from '../shared/ui/Fold'
-import { WhenOpened } from '../shared/ui/WhenOpened'
 import { LivingBodyHero } from '../domains/body-exposure/ui/home-hero/LivingBodyHero'
 
 const Feed = lazy(() => import('./social/Feed'))
@@ -59,7 +53,7 @@ export function HomeSocialWorkspace() {
   const LegacyActive = legacy?.component
 
   return (
-    <div className="panacea-liquid-home mx-auto w-full max-w-7xl pb-32">
+    <div className="panacea-liquid-home mx-auto w-full max-w-7xl pb-24">
       <div className="lg:hidden">
         <PanaceaZoneNav />
       </div>
@@ -82,29 +76,8 @@ export function HomeSocialWorkspace() {
             </div>
           </div>
 
-          {/* 7 Connected Categories */}
-          <SuperPageLauncher />
-
-          {/* Secondary Ecosystem Modules: 1-Column Full-Width Stacked Folds (Zero-Void, Exclusive Accordion) */}
-          <FoldGroup name="home-secondary">
-            <div className="mt-6 flex flex-col gap-3.5 w-full">
-              <Fold label="Widgets" subtitle="Tools">
-                <RelWidgetRumah />
-              </Fold>
-              <Fold label="Live" subtitle="Vitals">
-                <HomeLiveWidgetRail />
-              </Fold>
-              <Fold label="Stories" subtitle="Insights">
-                {/* Six organ photos: fetched when the fold is opened, not on every Home visit. */}
-                <WhenOpened>
-                  <PanaceaImageSlider />
-                </WhenOpened>
-              </Fold>
-              <Fold label="Deck" subtitle="Commands">
-                <HomeCommandDeck />
-              </Fold>
-            </div>
-          </FoldGroup>
+          {/* Unified Compact Secondary Workspace Hub (Live Vitals · Widgets · Search & Tools) */}
+          <HomeCompactWorkspaceHub />
         </div>
       ) : activeKey === 'for-you' ? (
         <Suspense fallback={<Loader />}><ForYouHub /></Suspense>
