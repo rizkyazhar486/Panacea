@@ -2835,7 +2835,6 @@ html.pmd-liquid-actions-v45 :is(a, button).cta-atlas-btn,
 html.dark.pmd-liquid-actions-v45 :is(a, button).cta-atlas-btn {
   background: #ffffff !important;
   background-image: none !important;
-  background-color: #ffffff !important;
   color: #042412 !important;
   border: 1px solid rgba(255, 255, 255, 0.92) !important;
   box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.8) !important;
@@ -2859,16 +2858,7 @@ html.pmd-liquid-actions-v45 button.cta-banner-btn .cta-arrow-circle,
 html.dark.pmd-liquid-actions-v45 button.cta-banner-btn .cta-arrow-circle {
   background: #047857 !important;
   background-image: none !important;
-  background-color: #047857 !important;
   color: #ffffff !important;
-}
-
-.cta-banner-btn .cta-arrow-circle svg,
-.dark .cta-banner-btn .cta-arrow-circle svg,
-.cta-atlas-btn svg,
-.dark .cta-atlas-btn svg {
-  color: #042412 !important;
-  stroke: #042412 !important;
 }
 
 .cta-banner-btn .cta-arrow-circle svg,
