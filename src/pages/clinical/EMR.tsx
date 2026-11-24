@@ -10,6 +10,7 @@ import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 // Papan alur otonom dimuat saat halaman dibuka saja — ia membawa tabel rentang
 // rujukan dan aturan pemesanan yang tidak diperlukan sebelum rekamnya dibuka.
 const AutonomousFlow = lazy(() => import('../emr/AutonomousFlow'))
+const EmrInvictusWorkspaceDeck = lazy(() => import('../../components/clinical/EmrInvictusWorkspaceDeck'))
 import { IconEMR, IconCheck, IconSparkle, IconShield, IconBook } from '../../components/icons'
 import { BodyDiagram, type SystemFinding } from '../../components/BodyDiagram'
 import { ClinicalBodyTwin } from '../../components/ClinicalBodyTwin'
@@ -194,7 +195,21 @@ export function EMR() {
   // STR gate — AI-EMR is restricted to clinicians with a verified STR/SIP.
   // Hooks stay above this return so changing auth state never changes hook order.
   if (strBlocked) return <StrGate str={acc?.str} />
-  if (!draft) return <EmptyEMR />
+  if (!draft) {
+    return (
+      <div className="space-y-6">
+        <EmptyEMR />
+        <Suspense fallback={null}>
+          <EmrInvictusWorkspaceDeck
+            patient={activePatient}
+            record={null}
+            vitals={state.vitals[activePatient.id] ?? []}
+            supportive={state.supportive[activePatient.id] ?? []}
+          />
+        </Suspense>
+      </div>
+    )
+  }
 
   const historicalReadOnly = Boolean(record && draft.id !== record.id)
   const systemFindings = buildFindings(draft.physicalExam)
@@ -635,6 +650,14 @@ export function EMR() {
         <KunjunganEmr record={draft} dirty={dirty} klinisi={canEditExam} />
         {(acc?.role === 'dokter' || acc?.isOwner) && <TerbitkanKodeTaut patientId={activePatient.id} />}
       </Card>
+      <Suspense fallback={null}>
+        <EmrInvictusWorkspaceDeck
+          patient={activePatient}
+          record={draft}
+          vitals={state.vitals[activePatient.id] ?? []}
+          supportive={state.supportive[activePatient.id] ?? []}
+        />
+      </Suspense>
     </div>
   )
 }
