@@ -9,9 +9,8 @@ import {
 } from '../../../components/icons'
 import { IconArrowRight } from '../landingSvgs'
 
-// Deferred chunks: stay out of initial landing-anonim JS & request budget until interaction.
+// Decorative canvas: loaded after the hero renders so it stays out of the initial JS budget.
 const InteractiveAura = lazy(() => import('../../../components/InteractiveAura').then((m) => ({ default: m.InteractiveAura })))
-const LivingBodyHero = lazy(() => import('../../../domains/body-exposure/ui/home-hero/LivingBodyHero').then((m) => ({ default: m.LivingBodyHero })))
 
 const HERO_ORGANS = [
   { id: 'brain', label: 'Neuro', metric: '95%', cx: 50, cy: 14, color: '#a78bfa' },
@@ -21,12 +20,14 @@ const HERO_ORGANS = [
   { id: 'metabolic', label: 'Metabolic', metric: 'HRV 68ms', cx: 52, cy: 58, color: '#fbbf24' },
 ] as const
 
+type HoloLayer = 'surface' | 'vascular' | 'neural'
+
 interface HeroSectionProps {
   onMasuk: () => void
 }
 
 export function HeroSection({ onMasuk }: HeroSectionProps) {
-  const [live3D, setLive3D] = useState(false)
+  const [layer, setLayer] = useState<HoloLayer>('vascular')
   const [focusOrganId, setFocusOrganId] = useState<(typeof HERO_ORGANS)[number]['id']>('heart')
   const focusOrgan = HERO_ORGANS.find((o) => o.id === focusOrganId) ?? HERO_ORGANS[1]
 
@@ -135,7 +136,7 @@ export function HeroSection({ onMasuk }: HeroSectionProps) {
             </Reveal>
           </div>
 
-          {/* Sisi Kanan (Instant Holographic BodyExposure Stage + On-Demand 360° Living Twin) */}
+          {/* Sisi Kanan (Instant Interactive 360° Holographic BodyExposure Stage) */}
           <div className="lg:col-span-6">
             <Reveal delay={200}>
               <div className="relative mx-auto max-w-xl rounded-3xl border border-cyan-400/20 bg-[#050811]/92 p-3.5 shadow-2xl backdrop-blur-2xl sm:p-4">
@@ -146,79 +147,83 @@ export function HeroSection({ onMasuk }: HeroSectionProps) {
                       BodyExposure 360° · Live Twin
                     </span>
                   </div>
-                  <div className="flex shrink-0 items-center gap-1.5">
-                    <span className="whitespace-nowrap rounded-full border border-emerald-400/30 bg-emerald-500/15 px-2.5 py-0.5 font-mono text-[10px] font-bold text-emerald-200">
-                      10 Systems
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => setLive3D((v) => !v)}
-                      className="min-h-[32px] whitespace-nowrap rounded-full border border-cyan-400/45 bg-cyan-500/20 px-2.5 font-mono text-[10px] font-extrabold text-cyan-100 transition hover:bg-cyan-500/30"
-                    >
-                      {live3D ? '2.5D Holo' : '3D Twin ↗'}
-                    </button>
+                  <div className="flex shrink-0 items-center gap-1">
+                    {(['surface', 'vascular', 'neural'] as const).map((l) => (
+                      <button
+                        key={l}
+                        type="button"
+                        onClick={() => setLayer(l)}
+                        aria-pressed={layer === l}
+                        className={`min-h-[30px] whitespace-nowrap rounded-full border px-2 font-mono text-[9.5px] font-extrabold uppercase transition ${
+                          layer === l
+                            ? 'border-cyan-300/60 bg-cyan-500/25 text-cyan-100'
+                            : 'border-white/10 bg-white/5 text-slate-400 hover:text-white'
+                        }`}
+                      >
+                        {l}
+                      </button>
+                    ))}
                   </div>
                 </div>
 
-                {live3D ? (
-                  <Suspense fallback={<div className="grid h-[360px] place-items-center rounded-2xl bg-black/50 font-mono text-xs text-cyan-200">Loading 360° Digital Twin…</div>}>
-                    <LivingBodyHero />
-                  </Suspense>
-                ) : (
-                  <div className="relative flex flex-col items-center rounded-2xl border border-cyan-400/15 bg-gradient-to-b from-[#071326] to-[#030710] p-3">
-                    <svg viewBox="0 0 100 92" className="h-60 w-full max-w-[260px]" role="img" aria-label="Interactive holographic body twin">
-                      <defs>
-                        <radialGradient id="heroTwinAura" cx="50%" cy="44%" r="48%">
-                          <stop offset="0%" stopColor={focusOrgan.color} stopOpacity="0.34" />
-                          <stop offset="100%" stopColor="#030710" stopOpacity="0" />
-                        </radialGradient>
-                      </defs>
-                      <circle cx="50" cy="45" r="41" fill="url(#heroTwinAura)" />
-                      <ellipse cx="50" cy="84" rx="28" ry="4" fill="none" stroke="rgba(34,211,238,0.35)" strokeWidth="0.7" strokeDasharray="2 2" />
-                      <path
-                        d="M50 7 C54 7 56 10 56 14 C56 18 53 20 53 22 L63 25 C67 27 69 32 71 44 L73 56 C73 58 70 59 69 57 L65 36 L60 36 L61 54 L63 82 C63 85 59 86 58 83 L52 58 L48 58 L42 83 C41 86 37 85 37 82 L39 54 L40 36 L35 36 L31 57 C30 59 27 58 27 56 L29 44 C31 32 33 27 37 25 L47 22 C47 20 44 18 44 14 C44 10 46 7 50 7 Z"
-                        fill="rgba(34, 211, 238, 0.14)"
-                        stroke="#67e8f9"
-                        strokeWidth="0.9"
-                      />
-                      <path d="M50 14 V58 M44 33 Q50 38 56 33 M43 46 Q50 50 57 46" fill="none" stroke="rgba(251,113,133,0.45)" strokeWidth="0.7" />
-                      {HERO_ORGANS.map((org) => {
-                        const active = org.id === focusOrgan.id
-                        return (
-                          <g
-                            key={org.id}
-                            onClick={() => setFocusOrganId(org.id)}
-                            style={{ cursor: 'pointer' }}
-                            role="button"
-                            tabIndex={0}
-                            aria-label={`${org.label} ${org.metric}`}
-                            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setFocusOrganId(org.id) }}
-                          >
-                            {active && <circle cx={org.cx} cy={org.cy} r="6.4" fill="none" stroke={org.color} strokeWidth="0.9" strokeDasharray="1.6 1.6" />}
-                            <circle cx={org.cx} cy={org.cy} r={active ? 3.4 : 2.3} fill={org.color} stroke="#ffffff" strokeWidth="0.7" />
-                          </g>
-                        )
-                      })}
-                    </svg>
-                    <div className="mt-2 flex w-full items-center justify-between gap-2 rounded-xl border border-white/10 bg-slate-950/90 px-3 py-2">
-                      <div className="flex items-center gap-2">
-                        <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: focusOrgan.color }} />
-                        <span className="whitespace-nowrap text-xs font-black text-white">{focusOrgan.label}</span>
-                        <span className="whitespace-nowrap font-mono text-xs font-bold" style={{ color: focusOrgan.color }}>{focusOrgan.metric}</span>
-                      </div>
-                      <svg viewBox="0 0 80 18" width="76" height="18" aria-hidden="true">
-                        <path d="M2 10h14l4-6 5 11 5-13 5 10 4-2h39" fill="none" stroke={focusOrgan.color} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-                      </svg>
-                      <button
-                        type="button"
-                        onClick={() => setLive3D(true)}
-                        className="min-h-[34px] whitespace-nowrap rounded-lg border border-emerald-400/40 bg-emerald-500/20 px-2.5 text-[10px] font-black text-emerald-100 hover:bg-emerald-500/30"
-                      >
-                        360° 3D ↗
-                      </button>
+                <div className="relative flex flex-col items-center rounded-2xl border border-cyan-400/15 bg-gradient-to-b from-[#071326] to-[#030710] p-3">
+                  <svg viewBox="0 0 100 92" className="h-64 w-full max-w-[270px]" role="img" aria-label="Interactive holographic body twin">
+                    <defs>
+                      <radialGradient id="heroTwinAura" cx="50%" cy="44%" r="48%">
+                        <stop offset="0%" stopColor={focusOrgan.color} stopOpacity="0.34" />
+                        <stop offset="100%" stopColor="#030710" stopOpacity="0" />
+                      </radialGradient>
+                    </defs>
+                    <circle cx="50" cy="45" r="41" fill="url(#heroTwinAura)" />
+                    <ellipse cx="50" cy="84" rx="28" ry="4" fill="none" stroke="rgba(34,211,238,0.35)" strokeWidth="0.7" strokeDasharray="2 2" />
+                    <path
+                      d="M50 7 C54 7 56 10 56 14 C56 18 53 20 53 22 L63 25 C67 27 69 32 71 44 L73 56 C73 58 70 59 69 57 L65 36 L60 36 L61 54 L63 82 C63 85 59 86 58 83 L52 58 L48 58 L42 83 C41 86 37 85 37 82 L39 54 L40 36 L35 36 L31 57 C30 59 27 58 27 56 L29 44 C31 32 33 27 37 25 L47 22 C47 20 44 18 44 14 C44 10 46 7 50 7 Z"
+                      fill={layer === 'surface' ? 'rgba(34, 211, 238, 0.22)' : 'rgba(34, 211, 238, 0.10)'}
+                      stroke="#67e8f9"
+                      strokeWidth="0.9"
+                    />
+                    {layer === 'vascular' && (
+                      <path d="M50 14 V58 M44 33 Q50 38 56 33 M43 46 Q50 50 57 46 M48 58 L41 81 M52 58 L59 81" fill="none" stroke="rgba(251,113,133,0.65)" strokeWidth="0.85" />
+                    )}
+                    {layer === 'neural' && (
+                      <path d="M50 11 V54 M50 22 L33 34 M50 22 L67 34 M50 38 L42 52 M50 38 L58 52" fill="none" stroke="rgba(167,139,250,0.75)" strokeWidth="0.85" strokeDasharray="1.4 1" />
+                    )}
+                    {HERO_ORGANS.map((org) => {
+                      const active = org.id === focusOrgan.id
+                      return (
+                        <g
+                          key={org.id}
+                          onClick={() => setFocusOrganId(org.id)}
+                          style={{ cursor: 'pointer' }}
+                          role="button"
+                          tabIndex={0}
+                          aria-label={`${org.label} ${org.metric}`}
+                          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setFocusOrganId(org.id) }}
+                        >
+                          {active && <circle cx={org.cx} cy={org.cy} r="6.4" fill="none" stroke={org.color} strokeWidth="0.9" strokeDasharray="1.6 1.6" />}
+                          <circle cx={org.cx} cy={org.cy} r={active ? 3.4 : 2.3} fill={org.color} stroke="#ffffff" strokeWidth="0.7" />
+                        </g>
+                      )
+                    })}
+                  </svg>
+                  <div className="mt-2 flex w-full items-center justify-between gap-2 rounded-xl border border-white/10 bg-slate-950/90 px-3 py-2">
+                    <div className="flex items-center gap-2">
+                      <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: focusOrgan.color }} />
+                      <span className="whitespace-nowrap text-xs font-black text-white">{focusOrgan.label}</span>
+                      <span className="whitespace-nowrap font-mono text-xs font-bold" style={{ color: focusOrgan.color }}>{focusOrgan.metric}</span>
                     </div>
+                    <svg viewBox="0 0 80 18" width="76" height="18" aria-hidden="true">
+                      <path d="M2 10h14l4-6 5 11 5-13 5 10 4-2h39" fill="none" stroke={focusOrgan.color} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                    <button
+                      type="button"
+                      onClick={onMasuk}
+                      className="min-h-[34px] whitespace-nowrap rounded-lg border border-emerald-400/40 bg-emerald-500/20 px-2.5 text-[10px] font-black text-emerald-100 hover:bg-emerald-500/30"
+                    >
+                      360° 3D ↗
+                    </button>
                   </div>
-                )}
+                </div>
               </div>
             </Reveal>
           </div>
