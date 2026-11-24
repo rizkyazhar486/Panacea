@@ -112,18 +112,11 @@ export function AstralChartMatrix() {
     [envTempC, envRhPct, envPm25, envAltM, liveHr],
   )
 
-  const handleQuickBle = async () => {
-    setBleStatus('Pairing…')
-    try {
-      const mod = await import('../../domains/devices')
-      await mod.triggerQuickWearableConnect((st) => {
-        if (st.status === 'connected') setBleStatus(st.bpm ? `BLE ${st.bpm}` : 'BLE ON')
-        else if (st.status === 'unavailable') setBleStatus('BLE N/A')
-        else if (st.status === 'cancelled') setBleStatus('BLE')
-        else setBleStatus(st.status === 'connecting' ? 'Scanning…' : 'BLE Retry')
-      })
-    } catch {
-      setBleStatus('BLE N/A')
+  const handleQuickBle = () => {
+    const hasBt = typeof navigator !== 'undefined' && 'bluetooth' in navigator
+    setBleStatus(hasBt ? 'BLE Ready' : 'BLE Hub')
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('panacea:quick-ble-connect'))
     }
   }
 

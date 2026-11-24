@@ -86,7 +86,7 @@ assert.equal(sanitized.sanitizedInput.pm25UgM3, 0)
 const astralSrc = readFileSync(new URL('../../src/components/ui/AstralChartMatrix.tsx', import.meta.url), 'utf8')
 assert.ok(astralSrc.includes('useVitals()'), 'AstralChartMatrix must bind live useVitals() telemetry')
 assert.ok(astralSrc.includes('coupleEnvironmentToPhysiology('), 'AstralChartMatrix must bind Environment-Physiology-ECMO coupler')
-assert.ok(astralSrc.includes('triggerQuickWearableConnect'), 'AstralChartMatrix must provide 1-tap BLE wearable acquisition')
+assert.ok(astralSrc.includes('panacea:quick-ble-connect'), 'AstralChartMatrix must provide 1-tap BLE wearable acquisition')
 assert.ok(astralSrc.includes('data-astral-provenance'), 'AstralChartMatrix must show explicit observed-vs-simulation provenance')
 assert.ok(astralSrc.includes('data-env-ecmo-observatory'), 'AstralChartMatrix must embed Environment x ECMO observatory')
 
