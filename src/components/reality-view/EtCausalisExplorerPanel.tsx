@@ -334,6 +334,7 @@ export function EtCausalisExplorerPanel({
               const my = (from.y + to.y) / 2 - 5
               return (
                 <g key={edge.edgeId}>
+                  <title>{`${edge.canonicalRelation}: ${sanitizeClinicalText(edge.mechanism)}`}</title>
                   <line
                     x1={from.x}
                     y1={from.y}
@@ -530,6 +531,24 @@ export function EtCausalisExplorerPanel({
             )}
           </div>
 
+          {/* Canonical #3143 Ontology Bridge Chips (explicit Conceptual Scale Bridge marker) */}
+          {convergenceBundle.verticalChain.realityGraphNodes.length > 0 && (
+            <div className="flex flex-wrap items-center gap-1.5" aria-label="Canonical multiscale ontology identifiers">
+              <span className="rounded-md border border-amber-400/30 bg-amber-500/10 px-2 py-0.5 text-[10px] font-bold text-amber-200">
+                {convergenceBundle.verticalChain.realityGraphScaleBridge}
+              </span>
+              {convergenceBundle.verticalChain.realityGraphNodes.slice(0, 6).map((node) => (
+                <span
+                  key={node.id}
+                  title={sanitizeClinicalText(node.labelEn)}
+                  className="rounded-md border border-cyan-400/25 bg-cyan-500/10 px-2 py-0.5 text-[10px] font-bold text-cyan-200"
+                >
+                  {node.canonicalIdentifier}
+                </span>
+              ))}
+            </div>
+          )}
+
           {/* Verified Cross-SuperPage Links */}
           <div className="flex flex-wrap gap-1.5">
             {systemLinks.map((lnk) => (
@@ -554,6 +573,7 @@ export function EtCausalisExplorerPanel({
         <div className="space-y-1.5 pb-2 pt-1">
           {simResult.causalEdges.map((edge) => (
             <div key={edge.edgeId} className="rounded-lg bg-black/35 px-2.5 py-1.5">
+              <span className="mr-1.5 rounded bg-cyan-500/20 px-1.5 py-0.5 text-[10px] font-extrabold text-cyan-300">{edge.canonicalRelation}</span>
               <span className="font-bold text-cyan-200">{edge.fromMeshId} → {edge.toMeshId}</span>: {sanitizeClinicalText(edge.mechanism)} ({edge.evidenceCitation})
             </div>
           ))}
