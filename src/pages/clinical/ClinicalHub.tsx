@@ -16,6 +16,7 @@ import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 import { readUnifiedLocalVitals } from '../../domains/identity/localRecovery'
 
 const ClinicalInteropSection = lazy(() => import('./ClinicalInteropSection'))
+const ClinicalToClaimShieldWorkbench = lazy(() => import('../../components/clinical/ClinicalToClaimShieldWorkbench'))
 
 export const GROUPS = [
   {
@@ -314,6 +315,14 @@ export function ClinicalHub() {
               emrCount={emrCount}
               rev={rev}
             />
+          </Suspense>
+        </WhenOpened>
+        </Fold>
+
+        <Fold label="Claim Shield" subtitle="BPJS · iDRG">
+        <WhenOpened>
+          <Suspense fallback={<div className="py-4 text-xs text-white/50">Loading Clinical-to-Claim Shield…</div>}>
+            <ClinicalToClaimShieldWorkbench />
           </Suspense>
         </WhenOpened>
         </Fold>
