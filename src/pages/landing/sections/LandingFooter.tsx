@@ -19,17 +19,17 @@ export function LandingFooter() {
           </div>
 
           <div>
-            <h4 className="text-xs font-bold uppercase tracking-wider text-ink dark:text-neutral-200">Platform &amp; Solusi</h4>
+            <h4 className="text-xs font-bold uppercase tracking-wider text-neutral-950 dark:text-neutral-200">Platform &amp; Solusi</h4>
             <ul className="mt-3 space-y-2 text-xs text-neutral-600 dark:text-neutral-400">
-              <li><button type="button" onClick={() => scrollToSection('features')} className="hover:text-brand-dark dark:hover:text-emerald-400">AI Intake (SOCRATES)</button></li>
-              <li><button type="button" onClick={() => scrollToSection('features')} className="hover:text-brand-dark dark:hover:text-emerald-400">AI Longevity Calculator</button></li>
-              <li><button type="button" onClick={() => scrollToSection('features')} className="hover:text-brand-dark dark:hover:text-emerald-400">AI-EMR for Clinicians</button></li>
-              <li><button type="button" onClick={() => scrollToSection('pricing')} className="hover:text-brand-dark dark:hover:text-emerald-400">34 Skoring Medis Standar</button></li>
+              <li><button type="button" data-pmd-native="true" onClick={() => scrollToSection('features')} className="hover:text-emerald-700 dark:hover:text-emerald-400">AI Intake (SOCRATES)</button></li>
+              <li><button type="button" data-pmd-native="true" onClick={() => scrollToSection('features')} className="hover:text-emerald-700 dark:hover:text-emerald-400">AI Longevity Calculator</button></li>
+              <li><button type="button" data-pmd-native="true" onClick={() => scrollToSection('features')} className="hover:text-emerald-700 dark:hover:text-emerald-400">AI-EMR for Clinicians</button></li>
+              <li><button type="button" data-pmd-native="true" onClick={() => scrollToSection('pricing')} className="hover:text-emerald-700 dark:hover:text-emerald-400">34 Skoring Medis Standar</button></li>
             </ul>
           </div>
 
           <div>
-            <h4 className="text-xs font-bold uppercase tracking-wider text-ink dark:text-neutral-200">Standar &amp; Keamanan</h4>
+            <h4 className="text-xs font-bold uppercase tracking-wider text-neutral-950 dark:text-neutral-200">Standar &amp; Keamanan</h4>
             <ul className="mt-3 space-y-2 text-xs text-neutral-600 dark:text-neutral-400">
               <li><span>Pertukaran Data HL7® FHIR</span></li>
               <li><span>Kepatuhan UU PDP No. 27/2022</span></li>
@@ -39,7 +39,7 @@ export function LandingFooter() {
           </div>
 
           <div>
-            <h4 className="text-xs font-bold uppercase tracking-wider text-ink dark:text-neutral-200">Pemberitahuan Klinis &amp; Legal</h4>
+            <h4 className="text-xs font-bold uppercase tracking-wider text-neutral-950 dark:text-neutral-200">Pemberitahuan Klinis &amp; Legal</h4>
             <Prosa kelas="mt-3 text-[11px] leading-relaxed text-neutral-500 dark:text-neutral-400" baris={4}>
               Keluaran teknis (Technical output). Belum ditinjau klinisi atau divalidasi klinis kecuali telah disahkan oleh dokter berizin. AI mendukung, namun tidak pernah menggantikan dokter berizin.
             </Prosa>

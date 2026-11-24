@@ -89,7 +89,7 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
   }, [])
 
   return (
-    <div className="min-h-screen bg-white text-ink dark:bg-black dark:text-neutral-100">
+    <div className="min-h-screen bg-[#F8FAF9] text-neutral-950 transition-colors dark:bg-[#060A09] dark:text-neutral-50">
       {/* ── [1] CLINICAL TRUST DOCK & GLASS NAVBAR ────────────────── */}
       <LandingHeader
         theme={theme}

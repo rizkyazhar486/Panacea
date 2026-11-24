@@ -160,7 +160,7 @@ export function HeroSection({ onMasuk }: HeroSectionProps) {
                 type="button"
                 data-pmd-native="true"
                 onClick={() => scrollToSection('anatomy-stage')}
-                className="inline-flex min-h-[48px] items-center gap-2 rounded-full border border-neutral-300 bg-white px-6 py-3 text-sm font-bold text-neutral-950 transition hover:border-emerald-700/50 hover:bg-neutral-50 dark:border-white/20 dark:bg-[#111815] dark:text-white dark:hover:border-emerald-400/50"
+                className="inline-flex min-h-[48px] items-center gap-2 rounded-full border border-neutral-300 bg-neutral-50 px-6 py-3 text-sm font-bold text-neutral-950 transition hover:border-emerald-700/50 hover:bg-neutral-100 dark:border-white/20 dark:bg-[#111815] dark:text-white dark:hover:border-emerald-400/50"
               >
                 <span className="whitespace-nowrap">Jelajahi Anatomi 3D</span>
               </button>

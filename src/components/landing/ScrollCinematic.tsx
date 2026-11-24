@@ -112,7 +112,7 @@ export function ScrollCinematic() {
                     className={`stage-btn flex min-h-[52px] flex-col items-start justify-center rounded-2xl border px-3.5 py-2.5 text-left ${
                       selected
                         ? 'border-emerald-700 bg-emerald-700 text-white shadow-sm'
-                        : 'border-neutral-200 bg-white text-neutral-900 hover:border-emerald-600/40 dark:border-white/12 dark:bg-[#111815] dark:text-neutral-100 dark:hover:border-emerald-400/40'
+                        : 'border-neutral-200 bg-neutral-50 text-neutral-900 hover:border-emerald-600/40 dark:border-white/12 dark:bg-[#111815] dark:text-neutral-100 dark:hover:border-emerald-400/40'
                     }`}
                   >
                     <span
