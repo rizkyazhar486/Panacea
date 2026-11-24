@@ -459,7 +459,7 @@ export default function Fsd15BioTelemetryStudio() {
                     </button>
                   ))}
                   <span className="text-slate-400">
-                    {frame.genomicStream.gene.chromosome} · GC {frame.genomicStream.translation.gcContentPct}% · {frame.genomicStream.translation.hydrogenBondsCount} H-bonds
+                    {frame.genomicStream.gene.chromosome} · GC {frame.genomicStream.translation.gcContentPct}% · {frame.genomicStream.translation.hydrogenBondCount} H-bonds
                   </span>
                 </div>
                 <div className="space-y-1 rounded-xl border border-white/10 bg-black/50 p-2 text-[10px] overflow-x-auto">
