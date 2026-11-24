@@ -54,19 +54,20 @@ function fromBase64(b64: string): Uint8Array {
 }
 
 function serializeState(state: RealityViewState, store: OverrideMemoryStore): SerializedRealityViewSnapshot {
-  const nodes = Object.fromEntries(
-    Object.entries(state.nodes).map(([meshId, node]) => [
-      meshId,
-      {
-        ...node,
-        shaderUniforms: {
-          ...node.shaderUniforms,
-          ...(node.shaderUniforms.conductionState
-            ? { conductionState: Array.from(node.shaderUniforms.conductionState) }
-            : {}),
+  const nodes: SerializedRealityViewSnapshot['state']['nodes'] = Object.fromEntries(
+    Object.entries(state.nodes).map(([meshId, node]) => {
+      const { conductionState, ...restUniforms } = node.shaderUniforms
+      return [
+        meshId,
+        {
+          ...node,
+          shaderUniforms: {
+            ...restUniforms,
+            ...(conductionState ? { conductionState: Array.from(conductionState) } : {}),
+          },
         },
-      },
-    ]),
+      ]
+    }),
   )
   return {
     state: { ...state, nodes },
@@ -78,19 +79,20 @@ function hydrateState(snapshot: SerializedRealityViewSnapshot): {
   readonly state: RealityViewState
   readonly overrideStore: OverrideMemoryStore
 } {
-  const nodes = Object.fromEntries(
-    Object.entries(snapshot.state.nodes).map(([meshId, node]) => [
-      meshId,
-      {
-        ...node,
-        shaderUniforms: {
-          ...node.shaderUniforms,
-          ...(Array.isArray(node.shaderUniforms.conductionState)
-            ? { conductionState: Float32Array.from(node.shaderUniforms.conductionState) }
-            : {}),
+  const nodes: RealityViewState['nodes'] = Object.fromEntries(
+    Object.entries(snapshot.state.nodes).map(([meshId, node]) => {
+      const { conductionState, ...restUniforms } = node.shaderUniforms
+      return [
+        meshId,
+        {
+          ...node,
+          shaderUniforms: {
+            ...restUniforms,
+            ...(Array.isArray(conductionState) ? { conductionState: Float32Array.from(conductionState) } : {}),
+          },
         },
-      },
-    ]),
+      ]
+    }),
   )
   const state: RealityViewState = { ...snapshot.state, nodes }
   if (!isRealityViewState(state)) {
