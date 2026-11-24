@@ -10,9 +10,10 @@ import { EXAM_INFO, EXAM_ORDER, questionsForExam, type ExamTrack } from '../../l
 import '../../styles/panacea2026.css'
 import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 
-type Section = 'golden-journey' | 'prometheus' | 'evidence' | 'practice' | 'osce' | 'case-bank' | 'station-sim' | 'skills' | 'procedures' | 'therapy' | 'diseases' | 'mnemonik' | 'techniques' | 'timeline' | 'usmle'
+type Section = 'invictus-hub' | 'golden-journey' | 'prometheus' | 'evidence' | 'practice' | 'osce' | 'case-bank' | 'station-sim' | 'skills' | 'procedures' | 'therapy' | 'diseases' | 'mnemonik' | 'techniques' | 'timeline' | 'usmle'
 
 const SECTIONS: { id: Section; label: string; emoji: string }[] = [
+  { id: 'invictus-hub', label: 'Search · Kardeks · Vault', emoji: '💊' },
   { id: 'golden-journey', label: 'Golden Journey', emoji: '🌟' },
   { id: 'prometheus', label: 'Prometheus Arena', emoji: '⚔️' },
   { id: 'evidence', label: 'Live Evidence', emoji: '🔎' },
@@ -31,6 +32,7 @@ const SECTIONS: { id: Section; label: string; emoji: string }[] = [
 ]
 
 const GoldenJourneyWorkbench = lazy(() => import('../../domains/medstudyhub/ui/GoldenJourneyWorkbench.tsx').then((m) => ({ default: m.GoldenJourneyWorkbench })))
+const MedSciHubVaultWorkspace = lazy(() => import('../../components/medscihub/MedSciHubVaultWorkspace'))
 const PrometheusArenaView = lazy(() => import('../../domains/prometheus-learning/ui/PrometheusArenaView.tsx').then((m) => ({ default: m.PrometheusArenaView })))
 const SkdiSkillsSection = lazy(() => import('./SkdiSkillsSection'))
 const SkdiTherapySection = lazy(() => import('./SkdiTherapySection'))
@@ -96,6 +98,7 @@ export function MedStudyHub() {
       {section === 'timeline' && <TimelineSection />}
 
       <Suspense fallback={<SectionFallback />}>
+        {section === 'invictus-hub' && <MedSciHubVaultWorkspace />}
         {section === 'golden-journey' && <GoldenJourneyWorkbench />}
         {section === 'prometheus' && <PrometheusArenaView />}
         {section === 'case-bank' && <OsceCaseBankSection />}
