@@ -6,14 +6,12 @@ import {
   IconShield,
   IconCheck,
   IconStethoscope,
-  IconChat,
-  IconHeart,
 } from '../../../components/icons'
 import { IconArrowRight } from '../landingSvgs'
-import { STATS } from '../landingData'
 
 // Decorative canvas: loaded after the hero renders so it stays out of the initial JS budget.
 const InteractiveAura = lazy(() => import('../../../components/InteractiveAura').then((m) => ({ default: m.InteractiveAura })))
+const LivingBodyHero = lazy(() => import('../../../domains/body-exposure/ui/home-hero/LivingBodyHero').then((m) => ({ default: m.LivingBodyHero })))
 
 interface HeroSectionProps {
   onMasuk: () => void
@@ -126,127 +124,33 @@ export function HeroSection({ onMasuk }: HeroSectionProps) {
             </Reveal>
           </div>
 
-          {/* Sisi Kanan (Interactive Live Card Showcase) */}
+          {/* Sisi Kanan (Interactive 360° Living Body Exposure Showcase) */}
           <div className="lg:col-span-6">
             <Reveal delay={200}>
-              <div className="relative mx-auto max-w-xl rounded-3xl border border-black/10 bg-white/80 p-5 shadow-2xl backdrop-blur-2xl dark:border-white/15 dark:bg-black/70 sm:p-6">
-                <div className="flex items-center justify-between gap-3 border-b border-black/5 pb-3.5 dark:border-white/10">
+              <div className="relative mx-auto max-w-xl rounded-3xl border border-cyan-400/20 bg-[#050811]/92 p-3.5 shadow-2xl backdrop-blur-2xl sm:p-4">
+                <div className="mb-2 flex items-center justify-between gap-2 px-1">
                   <div className="flex min-w-0 items-center gap-2">
-                    <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-emerald-500 animate-pulse" />
-                    <span className="whitespace-nowrap font-mono text-[11px] sm:text-xs font-extrabold uppercase tracking-wider text-neutral-800 dark:text-neutral-200">
-                      Clinical OS · Sesi Aktif
+                    <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-emerald-400 animate-pulse" />
+                    <span className="whitespace-nowrap font-mono text-[11px] font-extrabold uppercase tracking-wider text-cyan-100">
+                      BodyExposure 360° · Live Twin
                     </span>
                   </div>
                   <div className="flex shrink-0 items-center gap-1.5">
-                    <span className="whitespace-nowrap rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-0.5 text-[10px] font-bold text-emerald-700 dark:text-emerald-300">
-                      HL7® FHIR
+                    <span className="whitespace-nowrap rounded-full border border-emerald-400/30 bg-emerald-500/15 px-2.5 py-0.5 font-mono text-[10px] font-bold text-emerald-200">
+                      10 Systems
                     </span>
-                    <span className="whitespace-nowrap rounded-full border border-blue-500/20 bg-blue-500/10 px-2.5 py-0.5 text-[10px] font-bold text-blue-700 dark:text-blue-300">
-                      SOCRATES
+                    <span className="whitespace-nowrap rounded-full border border-cyan-400/30 bg-cyan-500/15 px-2.5 py-0.5 font-mono text-[10px] font-bold text-cyan-200">
+                      FHIR R4
                     </span>
                   </div>
                 </div>
-
-                <div className="mt-4 space-y-3.5">
-                  {/* Stacked Card 1: AI Clinical Intake Parser */}
-                  <div className="rounded-2xl border border-black/5 bg-white/90 p-4 shadow-sm dark:border-white/5 dark:bg-neutral-900/90">
-                    <div className="flex items-center justify-between gap-2">
-                      <div className="flex min-w-0 items-center gap-2 text-xs font-bold text-neutral-700 dark:text-neutral-200">
-                        <IconChat size={15} className="shrink-0 text-emerald-600 dark:text-emerald-400" />
-                        <span className="whitespace-nowrap">AI Intake Parser (SOCRATES)</span>
-                      </div>
-                      <span className="shrink-0 whitespace-nowrap text-[10px] font-bold text-emerald-600 dark:text-emerald-400">Perekaman Aktif</span>
-                    </div>
-                    <div className="mt-2.5 space-y-2 text-xs">
-                      <div className="rounded-xl bg-neutral-100/80 p-2.5 dark:bg-neutral-800/80 text-neutral-700 dark:text-neutral-300">
-                        <span className="text-[10px] font-extrabold uppercase tracking-wider text-neutral-400">Keluhan Pasien:</span>
-                        <p className="mt-0.5 font-medium leading-relaxed">"Jantung berdebar dan sesak ringan pasca lari pagi 5km."</p>
-                      </div>
-                      <div className="rounded-xl border border-emerald-500/20 bg-emerald-50/70 p-2.5 text-emerald-900 dark:bg-emerald-950/50 dark:text-emerald-200">
-                        <span className="text-[10px] font-extrabold uppercase tracking-wider text-emerald-700 dark:text-emerald-400">Terjemahan SOAP (Subjektif):</span>
-                        <p className="mt-0.5 text-[11px] font-medium leading-relaxed">Onset akut, palpitasi teratur pasca-latihan, tanpa riwayat syncope sebelumnya.</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Stacked Card 2: Longevity Biomarkers Dial */}
-                  <div className="rounded-2xl border border-black/5 bg-white/90 p-4 shadow-sm dark:border-white/5 dark:bg-neutral-900/90">
-                    <div className="flex items-center justify-between gap-2">
-                      <div className="flex min-w-0 items-center gap-2 text-xs font-bold text-neutral-700 dark:text-neutral-200">
-                        <IconHeart size={15} className="shrink-0 text-emerald-600 dark:text-emerald-400" />
-                        <span className="whitespace-nowrap">Biomarker &amp; Healthspan</span>
-                      </div>
-                      <span className="shrink-0 whitespace-nowrap rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-extrabold text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
-                        Skor: 94/100
-                      </span>
-                    </div>
-                    <div className="mt-3 flex items-center justify-between">
-                      <div>
-                        <div className="text-[10px] font-bold uppercase tracking-wider text-neutral-400">Usia Kronologis</div>
-                        <div className="text-2xl font-black text-ink">42 <span className="text-xs font-normal text-neutral-500">thn</span></div>
-                      </div>
-                      <div className="text-right">
-                        <div className="text-[10px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">Usia Biologis</div>
-                        <div className="text-2xl font-black text-emerald-600 dark:text-emerald-400">36.4 <span className="text-xs font-normal">thn</span></div>
-                      </div>
-                    </div>
-                    <div className="mt-2.5">
-                      <div className="flex justify-between text-[11px] font-bold">
-                        <span className="text-neutral-500">Keunggulan Healthspan</span>
-                        <span className="text-emerald-600 dark:text-emerald-400">+5.6 thn</span>
-                      </div>
-                      <div className="mt-1 h-2 w-full overflow-hidden rounded-full bg-neutral-200 dark:bg-neutral-700">
-                        <div className="h-full w-4/5 rounded-full bg-gradient-to-r from-emerald-500 to-teal-400" />
-                      </div>
-                      <div className="mt-2 flex justify-between text-[10px] text-neutral-500">
-                        <span>HRV: 68 ms</span>
-                        <span>Tidur: 8.4 jam</span>
-                        <span>Aktivitas: 8.200 langkah</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Stacked Card 3: Persetujuan Dokter Berizin */}
-                  <div className="rounded-2xl border border-black/5 bg-white/90 p-4 shadow-sm dark:border-white/5 dark:bg-neutral-900/90">
-                    <div className="flex items-center justify-between gap-2">
-                      <div className="flex min-w-0 items-center gap-2 text-xs font-bold text-neutral-700 dark:text-neutral-200">
-                        <IconStethoscope size={15} className="shrink-0 text-emerald-600 dark:text-emerald-400" />
-                        <span className="whitespace-nowrap">Verifikasi Klinisi &amp; STR</span>
-                      </div>
-                      <span className="flex shrink-0 items-center gap-1 whitespace-nowrap rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-bold text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
-                        <IconCheck size={11} /> STR Valid
-                      </span>
-                    </div>
-                    <div className="mt-2.5 flex items-center justify-between gap-3 text-xs">
-                      <div className="min-w-0">
-                        <div className="whitespace-nowrap font-bold text-neutral-800 dark:text-neutral-200">dr. Sp.PD (Spesialis Penyakit Dalam)</div>
-                        <div className="whitespace-nowrap text-[11px] text-neutral-500">Rekam Medis EMR Ditandatangani &amp; Terarsip</div>
-                      </div>
-                      <div className="shrink-0 whitespace-nowrap rounded-lg border border-dashed border-emerald-500/40 bg-emerald-50/70 px-2.5 py-1 text-center text-[10px] font-black uppercase tracking-wider text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300">
-                        Dokter Berdaulat
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                <Suspense fallback={<div className="grid h-[380px] place-items-center rounded-2xl bg-black/50 font-mono text-xs text-cyan-200">Loading 360° Digital Twin…</div>}>
+                  <LivingBodyHero />
+                </Suspense>
               </div>
             </Reveal>
           </div>
         </div>
-
-        {/* Stat band — glassmorphism */}
-        <Reveal delay={300}>
-          <div className="mx-auto mt-14 grid max-w-4xl grid-cols-2 gap-3 sm:grid-cols-4">
-            {STATS.map((s, i) => (
-              <div key={i} className="liquid-glass rounded-2xl p-4 text-center shadow-sm">
-                <div className="bg-gradient-to-r from-brand to-brand-dark bg-clip-text text-2xl font-black text-transparent sm:text-3xl">
-                  {s.node}
-                </div>
-                <div className="mt-1 text-[11px] font-semibold leading-tight text-neutral-500">{s.label}</div>
-              </div>
-            ))}
-          </div>
-        </Reveal>
-        <p className="mt-4 text-center text-xs text-neutral-500">AI mendukung proses evaluasi, namun tidak pernah menggantikan pertimbangan dokter berizin.</p>
       </div>
     </section>
   )
