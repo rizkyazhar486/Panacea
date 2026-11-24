@@ -1,6 +1,7 @@
 import { lazy, Suspense, useEffect, useMemo, useState } from 'react'
 const MultiscaleSocialTwinPanel = lazy(() => import('./MultiscaleSocialTwinPanel'))
 const AureumLifetimeMemoryPanel = lazy(() => import('./AureumLifetimeMemoryPanel'))
+const Fsd15BioTelemetryStudio = lazy(() => import('./Fsd15BioTelemetryStudio'))
 import { Link } from 'react-router-dom'
 import { ANATOMICAL_SYSTEM_IDS, type AnatomicalSystemId, type RealityViewMode } from '../../types/realityView'
 import { buildRealityViewState } from '../../engines/reality-view/realityViewStateEngine'
@@ -57,7 +58,7 @@ export function RealityViewCockpit() {
   const [cadPlane, setCadPlane] = useState<typeof CAD_PLANES[number]>('axial')
   const [safetyMarginMm, setSafetyMarginMm] = useState<2 | 5 | 10>(5)
   const [counterfactualActive, setCounterfactualActive] = useState<boolean>(false)
-  const [extensionTab, setExtensionTab] = useState<'none' | 'multiscale' | 'century'>('none')
+  const [extensionTab, setExtensionTab] = useState<'none' | 'multiscale' | 'century' | 'fsd15'>('none')
   const [overrideStore] = useState(() => new OverrideMemoryStore())
   const [lodPool] = useState(() => new RealityViewLodResourcePool())
 
@@ -442,6 +443,15 @@ export function RealityViewCockpit() {
         >
           {extensionTab === 'century' ? 'Hide' : 'Open'} Century Timeline · Health Memory
         </button>
+        <button
+          type="button"
+          onClick={() => setExtensionTab((t) => (t === 'fsd15' ? 'none' : 'fsd15'))}
+          aria-pressed={extensionTab === 'fsd15'}
+          data-rv-fsd15-toggle
+          className="min-h-[40px] rounded-xl border border-emerald-400/40 bg-emerald-500/15 px-3 font-mono text-[10px] font-black uppercase text-emerald-100 hover:bg-emerald-500/25"
+        >
+          {extensionTab === 'fsd15' ? 'Hide' : 'Open'} FSD-15 Quantum→Twin
+        </button>
       </div>
 
       {extensionTab === 'multiscale' && (
@@ -452,6 +462,11 @@ export function RealityViewCockpit() {
       {extensionTab === 'century' && (
         <Suspense fallback={<div className="rounded-2xl border border-white/10 bg-slate-950/80 p-3 font-mono text-xs text-amber-200">Loading Aureum Century Timeline &amp; Memory…</div>}>
           <AureumLifetimeMemoryPanel />
+        </Suspense>
+      )}
+      {extensionTab === 'fsd15' && (
+        <Suspense fallback={<div className="rounded-2xl border border-white/10 bg-slate-950/80 p-3 font-mono text-xs text-emerald-200">Loading FSD-15 Quantum→Human Bio-Telemetry…</div>}>
+          <Fsd15BioTelemetryStudio />
         </Suspense>
       )}
     </section>
