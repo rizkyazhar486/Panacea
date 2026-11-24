@@ -324,7 +324,7 @@ export function evaluateClinicalToClaimShield(input: ClinicalToClaimInput): Clin
     severity = 'II'
   }
 
-  const procedures: ClinicalCodingBlock['procedures_icd9cm'] = []
+  const procedures: Array<ClinicalCodingBlock['procedures_icd9cm'][number]> = []
   if (ventilatorBilledOrActive) {
     const hrs = input.ventilator_hours ?? 0
     const isGe96 = hrs >= 96 || /\b96\.72\b/.test(`${text} ${billing.join(' ')}`)
