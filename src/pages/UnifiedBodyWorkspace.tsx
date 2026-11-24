@@ -29,12 +29,16 @@ const UniversalCompactBodyCockpit = lazy(() =>
 const DigitalTwinScanFlow = lazy(() =>
   import('../components/scan/DigitalTwinScanFlow').then((m) => ({ default: m.DigitalTwinScanFlow })),
 )
+const RealityViewSurface = lazy(() =>
+  import('../components/reality-view/RealityViewSurface').then((m) => ({ default: m.RealityViewSurface })),
+)
 
-type BodyView = 'body' | 'body-exposure' | 'body-tools' | 'character' | 'training' | 'ranked' | 'workout' | 'recovery' | 'numbers' | 'nutrition' | 'health-data' | 'labs' | 'longevity' | 'vitapulse'
+type BodyView = 'body' | 'reality-view' | 'body-exposure' | 'body-tools' | 'character' | 'training' | 'ranked' | 'workout' | 'recovery' | 'numbers' | 'nutrition' | 'health-data' | 'labs' | 'longevity' | 'vitapulse'
 type View = { key: BodyView; label: string; short: string; component: ComponentType; childTab?: string; description: string }
 
 const VIEWS: View[] = [
   { key: 'body', label: 'Your Body', short: 'Body', component: BodyComposition, description: 'Body composition and core metrics.' },
+  { key: 'reality-view', label: 'Reality View', short: 'Reality View', component: RealityViewSurface, description: 'Longitudinal anatomical telemetry, O(1) ontology, and encrypted offline vault.' },
   { key: 'body-exposure', label: 'Body Exposure', short: 'Body Exposure', component: BodyExposureOS, description: '3D anatomy, CAD/CAE, and organ atlas.' },
   { key: 'body-tools', label: 'Body & Skin Tools', short: 'Body Tools', component: BodyToolkit, description: 'Skin checks and body region logs.' },
   { key: 'character', label: '3D Character', short: '3D Character', component: ShapeForming, description: 'Parametric 3D twin proportions.' },
@@ -54,6 +58,7 @@ const PRIMARY_VIEW_KEYS = new Set<BodyView>(['body', 'body-exposure', 'training'
 
 const BODY_DEPTH_BY_VIEW: Record<BodyView, string> = {
   body: 'today',
+  'reality-view': 'domain',
   'body-exposure': 'domain',
   'body-tools': 'domain',
   character: 'domain',
@@ -222,7 +227,7 @@ export function UnifiedBodyWorkspace() {
           <BatasKlaimKesehatan permukaan="body.workspace" className="mt-2" />
         </div>
 
-        {!isExposure && (
+        {!isExposure && activeKey !== 'reality-view' && (
           <div className="relative lg:sticky lg:top-24 lg:self-start">
             <PersonalBodyUnifiedSurface compact defaultFocus="identity" shareable cameraCapture />
           </div>

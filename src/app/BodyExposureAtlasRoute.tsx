@@ -14,6 +14,9 @@ import type { AtlasCameraCommand, AtlasViewerProps } from '../domains/body-expos
 const BodyExposureLocalHub = lazy(() =>
   import('../domains/body-exposure/ui/BodyExposureLocalHub.tsx').then((m) => ({ default: m.BodyExposureLocalHub })),
 )
+const RealityViewSurface = lazy(() =>
+  import('../components/reality-view/RealityViewSurface').then((m) => ({ default: m.RealityViewSurface })),
+)
 
 /** The stage fills the box the home gives it; these utilities already exist in the compiled CSS. */
 const STAGE_CLASS = 'relative h-full w-full overflow-hidden'
@@ -34,7 +37,10 @@ export function AtlasViewer({ layers, dissect, highlighted, focusKeywords, homeF
       motion={MOTION_OFF}
       unfold={0}
       dissect={dissect}
-      onPick={(rawName, _label, layer) => onPick(rawName, layer ?? null)}
+      onPick={(rawName, _label, layer) => {
+        onPick(rawName, layer ?? null)
+        window.dispatchEvent(new CustomEvent('panacea:reality-view-pick', { detail: rawName }))
+      }}
       stageClassName={STAGE_CLASS}
       homeFrame={homeFrame}
       bodyMotion={motion ?? null}
@@ -52,6 +58,9 @@ export default function BodyExposureAtlasRoute() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       <BodyExposureAtlasHome Viewer={AtlasViewer} sendCamera={sendCamera} />
+      <Suspense fallback={null}>
+        <RealityViewSurface embedExternalViewport initialMode="quiet" />
+      </Suspense>
       <Suspense fallback={null}>
         <BodyExposureLocalHub />
       </Suspense>
