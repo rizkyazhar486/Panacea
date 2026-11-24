@@ -40,6 +40,9 @@ type VaultStatus = {
 const LazyBody3D = lazy(() =>
   import('../bodyhub/Body3D').then((m) => ({ default: m.Body3D })),
 )
+const LazyEtCausalisExplorerPanel = lazy(() =>
+  import('./EtCausalisExplorerPanel').then((m) => ({ default: m.EtCausalisExplorerPanel })),
+)
 
 const DEFAULT_CT_WINDOW: CtWindow = { key: 'soft', label: 'Soft tissue', width: 400, level: 40 }
 const STATIC_MOTION_OFF: MotionState = { heartRate: 0, respRate: 0, contractionRate: 0, peristalsisRate: 0 }
@@ -718,6 +721,22 @@ export function RealityViewSurface({
           </details>
         </div>
       </div>
+
+      {mode !== 'quiet' && (
+        <Suspense
+          fallback={
+            <div className="mt-4 rounded-2xl border border-cyan-400/20 bg-[#050b18] p-4 text-xs font-bold text-cyan-200">
+              Loading Et Causalis 25-Scenario &amp; Multiscale Observatory…
+            </div>
+          }
+        >
+          <LazyEtCausalisExplorerPanel
+            selectedMeshId={selectedMeshId}
+            selectedSystem={selectedSystem}
+            onSelectMesh={handlePickMesh}
+          />
+        </Suspense>
+      )}
     </section>
   )
 }
