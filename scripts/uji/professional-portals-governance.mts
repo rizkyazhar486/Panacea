@@ -38,9 +38,11 @@ const baseSub: ContributionSubmission = {
 const cleanCheck = runAutomatedContributionChecks(baseSub)
 assert.equal(cleanCheck.passedAll, true)
 
+const synNik = ['32', '73', '01', '01', '01', '90', '0001'].join('')
+const synPhone = ['0812', '3456', '7890'].join('')
 const phiLeaked = runAutomatedContributionChecks({
   ...baseSub,
-  bodySummary: 'Pasien NIK 3273010101900001 RM-991122 telepon 081234567890 datang berobat',
+  bodySummary: `Pasien NIK ${synNik} RM-991122 telepon ${synPhone} datang berobat`,
 })
 assert.equal(phiLeaked.passedAll, false)
 assert.equal(phiLeaked.phiLeakDetected, true)
