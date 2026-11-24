@@ -1,4 +1,3 @@
-import { Z_ANATOMY_CLEAR_INDONESIAN_ATLAS } from '../../domains/body-exposure/data/zAnatomyClearIndonesianAtlas.ts'
 import { CANONICAL_MULTISCALE_KNOWLEDGE_GRAPH_EDGES } from '../../domains/one-os/omnicausalisRecursiveDiscoveryAndKnowledgeGraphEngine.ts'
 import { INDEKS_TUBUH, type StrukturTubuh } from '../../lib/bodyIndex.gen.ts'
 import { PARAMETER_BAKU, profilPotensialAksi } from '../../lib/bioelectric.ts'
@@ -10,6 +9,7 @@ import {
   isProvenanceRef, isValidRealityTimestamp, type AnatomicalSystemId, type EvidenceClass,
   type OrganTelemetryNode, type ProvenanceRef, type RealityViewMode, type RealityViewState,
 } from '../../types/realityView.ts'
+import { MESH_TO_ONTOLOGY_MAP } from './anatomyOntologyRegistry.ts'
 import { selectQuietModeSummary } from './quietModeSelector.ts'
 
 type ObservationClass = Exclude<EvidenceClass, 'simulated_projection'>
@@ -46,17 +46,29 @@ interface AtlasAnchor {
   readonly englishLabel: string
 }
 
-const liverCard = Z_ANATOMY_CLEAR_INDONESIAN_ATLAS.find(card => card.id === 'liver-hepatobiliary-pancreas')!
-const pancreasCard = Z_ANATOMY_CLEAR_INDONESIAN_ATLAS.find(card => card.id === 'pancreas-endocrine-exocrine')!
+function anchorFromRegistry(meshId: string): AtlasAnchor {
+  const binding = MESH_TO_ONTOLOGY_MAP.get(meshId)
+  if (!binding) {
+    throw new Error(`Missing canonical ontology anchor in MESH_TO_ONTOLOGY_MAP: ${meshId}`)
+  }
+  return {
+    meshId: binding.meshId,
+    layer: binding.layer,
+    canonicalOntologyId: binding.canonicalOntologyId,
+    systemId: binding.systemId,
+    indonesianLabel: binding.indonesianLabel,
+    englishLabel: binding.englishLabel,
+  }
+}
 
-// Exact source names from the generated Z-Anatomy GLB index. These are
-// anatomical anchors for system telemetry, not organ-local measurements.
+// Exact source names from the canonical ontology registry & Z-Anatomy GLB index.
+// These are anatomical anchors for system telemetry, not organ-local measurements.
 const anchors = {
-  heart: { meshId: 'Left ventricle', layer: 'cardiovascular', canonicalOntologyId: 'FMA:7101', systemId: 'cardiovascular', indonesianLabel: 'Ventrikel kiri', englishLabel: 'Left ventricle' },
-  airway: { meshId: 'Trachea', layer: 'visceral', canonicalOntologyId: 'UBERON:0003126', systemId: 'respiratory', indonesianLabel: 'Trakea', englishLabel: 'Trachea' },
-  liver: { meshId: 'Liver', layer: 'visceral', canonicalOntologyId: liverCard.fmaId, systemId: 'gastrointestinal', indonesianLabel: 'Hati', englishLabel: 'Liver' },
-  kidney: { meshId: 'Kidney.l', layer: 'visceral', canonicalOntologyId: 'FMA:7205', systemId: 'renal', indonesianLabel: 'Ginjal kiri', englishLabel: 'Left kidney' },
-  pancreas: { meshId: 'Pancreas', layer: 'visceral', canonicalOntologyId: pancreasCard.fmaId, systemId: 'endocrine', indonesianLabel: 'Pankreas', englishLabel: 'Pancreas' },
+  heart: anchorFromRegistry('Left ventricle'),
+  airway: anchorFromRegistry('Trachea'),
+  liver: anchorFromRegistry('Liver'),
+  kidney: anchorFromRegistry('Kidney.l'),
+  pancreas: anchorFromRegistry('Pancreas'),
 } as const satisfies Readonly<Record<string, AtlasAnchor>>
 
 interface MetricBinding {

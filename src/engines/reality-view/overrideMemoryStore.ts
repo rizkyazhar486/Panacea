@@ -40,4 +40,44 @@ export class OverrideMemoryStore {
   toJSON(): { readonly audit: readonly OverrideAuditEntry[] } {
     return { audit: [...this.#audit] }
   }
+
+  static fromJSON(snapshot: unknown): OverrideMemoryStore {
+    if (
+      typeof snapshot !== 'object' ||
+      snapshot === null ||
+      Array.isArray(snapshot) ||
+      !Array.isArray((snapshot as { audit?: unknown }).audit)
+    ) {
+      throw new TypeError('Invalid OverrideMemoryStore snapshot.')
+    }
+    const store = new OverrideMemoryStore()
+    for (const raw of (snapshot as { audit: unknown[] }).audit) {
+      if (typeof raw !== 'object' || raw === null || Array.isArray(raw)) {
+        throw new TypeError('Invalid OverrideAuditEntry in snapshot.')
+      }
+      const entry = raw as Record<string, unknown>
+      if (
+        typeof entry.ruleKey !== 'string' ||
+        !entry.ruleKey.trim() ||
+        (entry.severity !== 'lifestyle' && entry.severity !== 'advisory' && entry.severity !== 'clinical_red_flag') ||
+        typeof entry.hardSafetyLock !== 'boolean' ||
+        typeof entry.recordedAt !== 'string' ||
+        !Number.isFinite(Date.parse(entry.recordedAt)) ||
+        (entry.reason !== undefined && typeof entry.reason !== 'string')
+      ) {
+        throw new TypeError('Malformed OverrideAuditEntry fields in snapshot.')
+      }
+      store.#audit.push(
+        Object.freeze({
+          ruleKey: entry.ruleKey,
+          severity: entry.severity,
+          hardSafetyLock: entry.hardSafetyLock,
+          ...(entry.reason !== undefined ? { reason: entry.reason } : {}),
+          recordedAt: entry.recordedAt,
+          mutable: false,
+        }),
+      )
+    }
+    return store
+  }
 }
