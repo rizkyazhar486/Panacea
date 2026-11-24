@@ -83,7 +83,7 @@ export interface KeadaanVV {
   co2: KeadaanCO2
 }
 
-export function simulasiVV(m: MasukanVV, pb = TETAPAN_GAS.PATM_LAUT): KeadaanVV {
+export function simulasiVV(m: MasukanVV, pb: number = TETAPAN_GAS.PATM_LAUT): KeadaanVV {
   const kosong = (status: Status): KeadaanVV => ({ status, resirkulasi: NaN, resirkulasiDariSaturasi: NaN, qEfektif: NaN, rasioEfektifTerhadapCO: NaN, sao2: NaN, pao2: NaN, cao2: NaN, svo2: NaN, cvo2: NaN, sPre: NaN, pPre: NaN, sPost: NaN, pPost: NaN, do2: NaN, vo2: NaN, oer: NaN, do2PerVo2: NaN, vo2Ecmo: NaN, co2: keadaanCO2({ ...m, va: Math.max(m.va, 0.1) }, 0) })
   if (!sah(m.co, m.qEcmo, m.hb, m.vo2, m.shunt, m.fio2, m.va, m.fdo2, m.sweep, m.fungsiMembran, m.jarakKanulaCm) || m.co <= 0 || m.hb <= 0 || m.vo2 <= 0 || m.qEcmo < 0 || m.shunt < 0 || m.shunt > 1 || m.fungsiMembran < 0 || m.fungsiMembran > 1) return kosong('masukan-tidak-sah')
 
@@ -152,7 +152,7 @@ export const BELUM_VA = [
   'Limb ischemia from arterial cannula size',
 ]
 
-export function simulasiVA(m: MasukanVA, pb = TETAPAN_GAS.PATM_LAUT): KeadaanVA {
+export function simulasiVA(m: MasukanVA, pb: number = TETAPAN_GAS.PATM_LAUT): KeadaanVA {
   const qTot = m.qLv + m.qEcmo
   const co2 = keadaanCO2(m, m.qEcmo)
   const gagal = (status: Status): KeadaanVA => ({ status, cabang: [], titikCampur: null, fraksiAsliTotal: NaN, cLv: NaN, sLv: NaN, cPost: NaN, sPost: NaN, cvo2: NaN, svo2: NaN, do2: NaN, vo2: m.vo2, oer: NaN, co2, belumDisimulasikan: BELUM_VA })
