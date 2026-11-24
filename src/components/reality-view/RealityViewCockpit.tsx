@@ -1,4 +1,6 @@
-import { useEffect, useMemo, useState } from 'react'
+import { lazy, Suspense, useEffect, useMemo, useState } from 'react'
+const MultiscaleSocialTwinPanel = lazy(() => import('./MultiscaleSocialTwinPanel'))
+const AureumLifetimeMemoryPanel = lazy(() => import('./AureumLifetimeMemoryPanel'))
 import { Link } from 'react-router-dom'
 import { ANATOMICAL_SYSTEM_IDS, type AnatomicalSystemId, type RealityViewMode } from '../../types/realityView'
 import { buildRealityViewState } from '../../engines/reality-view/realityViewStateEngine'
@@ -55,6 +57,7 @@ export function RealityViewCockpit() {
   const [cadPlane, setCadPlane] = useState<typeof CAD_PLANES[number]>('axial')
   const [safetyMarginMm, setSafetyMarginMm] = useState<2 | 5 | 10>(5)
   const [counterfactualActive, setCounterfactualActive] = useState<boolean>(false)
+  const [extensionTab, setExtensionTab] = useState<'none' | 'multiscale' | 'century'>('none')
   const [overrideStore] = useState(() => new OverrideMemoryStore())
   const [lodPool] = useState(() => new RealityViewLodResourcePool())
 
@@ -418,6 +421,39 @@ export function RealityViewCockpit() {
           ))}
         </div>
       </div>
+
+      {/* On-Demand Multiscale Zoom / Cloud Social Twin & Aureum Century Memory Drawers */}
+      <div className="flex flex-wrap items-center gap-1.5" role="group" aria-label="Multiscale and century extensions">
+        <button
+          type="button"
+          onClick={() => setExtensionTab((t) => (t === 'multiscale' ? 'none' : 'multiscale'))}
+          aria-pressed={extensionTab === 'multiscale'}
+          data-rv-multiscale-toggle
+          className="min-h-[40px] rounded-xl border border-cyan-400/35 bg-cyan-500/10 px-3 font-mono text-[10px] font-black uppercase text-cyan-100 hover:bg-cyan-500/20"
+        >
+          {extensionTab === 'multiscale' ? 'Hide' : 'Open'} 11-Scale Zoom · Twin Barcode
+        </button>
+        <button
+          type="button"
+          onClick={() => setExtensionTab((t) => (t === 'century' ? 'none' : 'century'))}
+          aria-pressed={extensionTab === 'century'}
+          data-rv-century-toggle
+          className="min-h-[40px] rounded-xl border border-amber-400/35 bg-amber-500/10 px-3 font-mono text-[10px] font-black uppercase text-amber-100 hover:bg-amber-500/20"
+        >
+          {extensionTab === 'century' ? 'Hide' : 'Open'} Century Timeline · Health Memory
+        </button>
+      </div>
+
+      {extensionTab === 'multiscale' && (
+        <Suspense fallback={<div className="rounded-2xl border border-white/10 bg-slate-950/80 p-3 font-mono text-xs text-cyan-200">Loading 11-Scale Reality Graph &amp; Social Twin…</div>}>
+          <MultiscaleSocialTwinPanel />
+        </Suspense>
+      )}
+      {extensionTab === 'century' && (
+        <Suspense fallback={<div className="rounded-2xl border border-white/10 bg-slate-950/80 p-3 font-mono text-xs text-amber-200">Loading Aureum Century Timeline &amp; Memory…</div>}>
+          <AureumLifetimeMemoryPanel />
+        </Suspense>
+      )}
     </section>
   )
 }
