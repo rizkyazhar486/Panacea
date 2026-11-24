@@ -1696,7 +1696,7 @@ app.get('/api/ai/codemax/environment', requireAuth, (req, res) => {
   if (!klinisiAtauPemilik(u, isOwner(u))) return res.status(403).json({ error: 'not-clinician' })
   const envStatus = resolveCodeMaxEnvironmentStatus({
     satusehatReady: satusehatConfigured(),
-    icd11Ready: icd11Configured(),
+    icd11Ready: Boolean(icd11Configured),
   })
   return res.json({ ok: true, environment: envStatus, aiStatus: aiStatus() })
 })
@@ -1710,7 +1710,7 @@ app.post('/api/ai/codemax/doctor-emr', requireAuth, async (req, res) => {
   }
   const envStatus = resolveCodeMaxEnvironmentStatus({
     satusehatReady: satusehatConfigured(),
-    icd11Ready: icd11Configured(),
+    icd11Ready: Boolean(icd11Configured),
   })
   const result = await evaluateServerCodeMaxEncounter({
     request: parsed.value,
