@@ -1,5 +1,9 @@
-import { useState } from 'react'
+import { lazy, Suspense, useState } from 'react'
 import { Prosa } from '../../components/Prosa'
+
+const ClinicalCalendarAndTasksWorkspace = lazy(
+  () => import('../../components/scheduling/ClinicalCalendarAndTasksWorkspace'),
+)
 import { Link } from 'react-router-dom'
 import { useStore, uid } from '../../lib/store'
 import { Card, SectionTitle, Badge, Button, Field, inputClass } from '../../components/ui'
@@ -50,6 +54,9 @@ export function Planning() {
             <Button>Open AI Chatbot</Button>
           </Link>
         </Card>
+        <Suspense fallback={null}>
+          <ClinicalCalendarAndTasksWorkspace />
+        </Suspense>
       </div>
     )
   }
@@ -266,6 +273,9 @@ export function Planning() {
         </div>
         <Prosa kelas="mt-3 text-xs text-neutral-500">⚕️ For high-alert medications (anticoagulants, insulin, opioids, vasopressors), AI only provides a range & reference — the final dose is calculated and verified by the physician.</Prosa>
       </Card>
+      <Suspense fallback={null}>
+        <ClinicalCalendarAndTasksWorkspace />
+      </Suspense>
     </div>
   )
 }
