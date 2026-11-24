@@ -1,9 +1,6 @@
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent, type ReactNode } from 'react'
-import { IconActivity, IconBook, IconEMR, IconHeart, IconSparkle, IconStethoscope, IconUser } from '../icons'
-import type { SuperPageId } from '../../lib/superPages'
 
-const AssistedFeatureMapOrbit = lazy(() => import('../ui/FeatureMapOrbit'))
-const ASSISTED_MAP_ICONS = { human: IconActivity, health: IconHeart, clinical: IconStethoscope, explore: IconBook, simulate: IconSparkle, records: IconEMR, 'for-you': IconUser } satisfies Record<SuperPageId, typeof IconHeart>
+const AssistedMapDrawer = lazy(() => import('../ui/AssistedMapDrawer'))
 import { useLocation, useNavigate } from 'react-router-dom'
 import { LogoMark } from '../Logo'
 import { KATALOG_AKSI, SLOT_PER_HALAMAN } from '../../lib/aksiFab'
@@ -398,7 +395,7 @@ export function FabNavigasi({ onCari, onKembali, tersembunyi = false }: {
             {mapMode ? (
               <div className="max-h-[70vh] overflow-y-auto">
                 <Suspense fallback={<div className="p-4 text-center text-[11px] font-bold text-cyan-200">Loading 360° Assisted Map…</div>}>
-                  <AssistedFeatureMapOrbit icons={ASSISTED_MAP_ICONS} />
+                  <AssistedMapDrawer />
                 </Suspense>
               </div>
             ) : (
