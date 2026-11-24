@@ -5,6 +5,8 @@ import { SUPER_PAGES } from '../../src/lib/superPages.ts'
 const landing = readFileSync('src/components/dashboard/HomeVisualLanding.tsx', 'utf8')
 const deck = readFileSync('src/components/dashboard/HomeCommandDeck.tsx', 'utf8')
 const workspace = readFileSync('src/pages/HomeSocialWorkspace.tsx', 'utf8')
+const compactHub = readFileSync('src/components/dashboard/HomeCompactWorkspaceHub.tsx', 'utf8')
+const assistedDrawer = readFileSync('src/components/ui/AssistedMapDrawer.tsx', 'utf8')
 const healthBrief = readFileSync('src/components/dashboard/HomeHealthBrief.tsx', 'utf8')
 const essentialTools = readFileSync('src/components/dashboard/HomeEssentialTools.tsx', 'utf8')
 const liveRail = readFileSync('src/components/dashboard/HomeLiveWidgetRail.tsx', 'utf8')
@@ -46,8 +48,12 @@ assert.equal(
   true,
   'category pages must remain projections of one canonical human state',
 )
-assert.match(workspace, /<SuperPageLauncher \/>/,
-  'Home lost the one-tap category-page launcher')
+assert.match(assistedDrawer, /<SuperPageLauncher/,
+  'AssistedMapDrawer lost the Feature Map category launcher')
+assert.doesNotMatch(workspace, /<SuperPageLauncher/,
+  'Feature Map must stay in AssistiveTouch rather than lengthening Home inline')
+assert.match(workspace, /<HomeCompactWorkspaceHub \/>/,
+  'Home lost the consolidated compact workspace hub')
 assert.doesNotMatch(workspace, /data-panacea-primary-nav/,
   'a persistent bottom navigation dock returned and competes with the command bar')
 
@@ -55,20 +61,20 @@ const homeOrder = [
   workspace.indexOf('<HomeHealthBrief />'),
   workspace.indexOf('<HomeVisualLanding />'),
   workspace.indexOf('<HomeEssentialTools />'),
-  workspace.indexOf('<SuperPageLauncher />'),
-  workspace.indexOf('<HomeLiveWidgetRail />'),
-  workspace.indexOf('<HomeCommandDeck />'),
+  workspace.indexOf('<HomeCompactWorkspaceHub />'),
 ]
-assert.ok(homeOrder.every((index) => index >= 0), 'Home lost a required first-viewport or discovery surface')
+assert.ok(homeOrder.every((index) => index >= 0), 'Home lost a required first-viewport or compact hub surface')
 assert.deepEqual(homeOrder, [...homeOrder].sort((a, b) => a - b),
-  'Home hierarchy drifted: health status → universal actions → daily tools must precede discovery')
+  'Home hierarchy drifted: health status → universal actions → daily tools must precede compact hub')
 assert.equal((essentialTools.match(/\{ to: '/g) ?? []).length, 3,
   'Daily tools must stay bounded to exactly three one-tap utilities')
 assert.match(healthBrief, /aria-label="Today health instruments"/,
   'Home lost the concise health-status anchor')
 
-assert.match(workspace, /<HomeLiveWidgetRail \/>/,
-  'Home lost the compact live-health rail required for dense progressive instrumentation')
+assert.match(compactHub, /<HomeLiveWidgetRail \/>/,
+  'HomeCompactWorkspaceHub lost the compact live-health rail required for dense progressive instrumentation')
+assert.match(compactHub, /<HomeCommandDeck \/>/,
+  'HomeCompactWorkspaceHub lost the full searchable HomeCommandDeck')
 assert.equal((liveRail.match(/\{ key: '/g) ?? []).length, 33,
   'The compact live-health rail must keep the complete 33-signal registry')
 assert.match(liveRail, /const vitals = useVitals\(\)/,

@@ -61,11 +61,12 @@ assert.match(css, /prefers-reduced-motion: reduce/, 'chevron motion respects red
 const page = readFileSync('src/pages/bodyhub/BodyExplorer.tsx', 'utf8')
 for (const w of ['Modality', 'Ask', 'Explore']) assert.match(page, new RegExp(`<Fold label="${w}">`), `Body Explorer folds ${w}`)
 assert.equal((page.match(/<Body3D\b/g) ?? []).length, 1, 'Body Explorer renders exactly one main 3D projection')
-// Home: ringkasan harian, alat esensial dan tujuh kategori tetap terlihat (kontrak hierarki Home);
-// bagian sekunder dilipat satu kata.
+// Home: ringkasan harian, alat esensial dan panel pemulihan tetap terlihat (kontrak hierarki Home);
+// empat bagian sekunder sebelumnya (Widgets/Live/Stories/Deck) kini disatukan dalam satu hub ringkas.
 const home = readFileSync('src/pages/HomeSocialWorkspace.tsx', 'utf8')
-for (const w of ['Widgets', 'Live', 'Stories', 'Deck']) assert.match(home, new RegExp(`<Fold label="${w}"(?: subtitle="[^"]+")?>`), `Home folds ${w}`)
-assert.doesNotMatch(home, /<Fold label="[A-Za-z]+"><(HomeHealthBrief|HomeVisualLanding|HomeEssentialTools|SuperPageLauncher) \/>/, 'the first-viewport hierarchy (status, actions, tools, categories) is never folded')
+assert.match(home, /<HomeCompactWorkspaceHub \/>/, 'Home renders the unified compact secondary hub')
+assert.doesNotMatch(home, /<Fold label="(Widgets|Live|Stories|Deck)"/, 'Home must not stack four separate secondary Folds')
+assert.doesNotMatch(home, /<Fold label="[A-Za-z]+"><(HomeHealthBrief|HomeVisualLanding|HomeEssentialTools|HomeCompactWorkspaceHub) \/>/, 'the first-viewport hierarchy (status, actions, tools, hub) is never folded')
 // Recovery moved into the visible bento in PR #2530; it remains mounted and
 // must not become hidden behind a collapsed Fold.
 assert.match(home, /<HomeRecoveryVisuals \/>/)

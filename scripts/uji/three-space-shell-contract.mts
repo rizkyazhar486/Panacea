@@ -6,6 +6,7 @@ const main = await readFile(new URL('../../src/main.tsx', import.meta.url), 'utf
 const home = await readFile(new URL('../../src/pages/HomeSocialWorkspace.tsx', import.meta.url), 'utf8')
 const shell = await readFile(new URL('../../src/components/layout/Shell.tsx', import.meta.url), 'utf8')
 const fab = await readFile(new URL('../../src/components/layout/FabNavigasi.tsx', import.meta.url), 'utf8')
+const assistedDrawer = await readFile(new URL('../../src/components/ui/AssistedMapDrawer.tsx', import.meta.url), 'utf8')
 const css = await readFile(new URL('../../src/styles/superpage-convergence.css', import.meta.url), 'utf8')
 
 let failed = false
@@ -42,8 +43,9 @@ chk(
   String(FITUR_DARI_HUB.length),
 )
 
-chk('Home mounts the category-page launcher', home.includes('<SuperPageLauncher'))
-chk('Home mounts the existing-asset image slider', home.includes('<PanaceaImageSlider'))
+chk('Global AssistiveTouch hosts the category-page Feature Map', assistedDrawer.includes('<SuperPageLauncher') && fab.includes('<AssistedMapDrawer />'))
+chk('Shell renders AssistiveTouch globally across phone, tablet, and desktop', shell.includes('<FabNavigasi') && !/<div className="lg:hidden">\s*<FabNavigasi/.test(shell))
+chk('Home mounts consolidated compact workspace hub instead of redundant Stories slider', home.includes('<HomeCompactWorkspaceHub />') && !home.includes('<PanaceaImageSlider'))
 chk('Home has no persistent primary navigation dock', !home.includes('data-panacea-primary-nav'))
 
 chk('Shell has no drawer/sidebar implementation', !shell.includes('DrawerNav') && !shell.includes('menuOpen') && !shell.includes('setMenuOpen'))

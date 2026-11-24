@@ -1,21 +1,43 @@
-import React from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 /**
  * UHD Z-Anatomy Multiscale Longitudinal Specimen Frame.
  * Replaces hand-drawn SVG organ doodles with baked WebGL studio anatomy (Z-Anatomy, CC BY-SA 4.0).
  */
 export function HumanAnatomy() {
+  const figureRef = useRef<HTMLElement | null>(null)
+  const [near, setNear] = useState(() => typeof IntersectionObserver === 'undefined')
+
+  useEffect(() => {
+    if (near || typeof IntersectionObserver === 'undefined') return
+    const el = figureRef.current
+    if (!el) return
+    const obs = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          setNear(true)
+          obs.disconnect()
+        }
+      },
+      { rootMargin: '250px 0px' },
+    )
+    obs.observe(el)
+    return () => obs.disconnect()
+  }, [near])
+
   return (
-    <figure className="dark relative h-full w-full overflow-hidden rounded-2xl border border-emerald-500/20 bg-[#060A09] text-white">
-      <img
-        src="/landing/multiscale-systems-uhd.webp"
-        alt="Visualisasi anatomi 3D multisistem Z-Anatomy — kardiovaskular, viseral, limfatik, dan saraf"
-        width={1600}
-        height={1000}
-        loading="lazy"
-        decoding="async"
-        className="h-full w-full object-cover object-top"
-      />
+    <figure ref={figureRef} className="dark relative h-full w-full overflow-hidden rounded-2xl border border-emerald-500/20 bg-[#060A09] text-white">
+      {near && (
+        <img
+          src="/landing/multiscale-systems-uhd.webp"
+          alt="Visualisasi anatomi 3D multisistem Z-Anatomy — kardiovaskular, viseral, limfatik, dan saraf"
+          width={1600}
+          height={1000}
+          loading="lazy"
+          decoding="async"
+          className="h-full w-full object-cover object-top"
+        />
+      )}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#060A09] via-transparent to-transparent opacity-80"

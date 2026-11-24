@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Prosa } from '../../../components/Prosa'
 import { Reveal } from '../../../components/Reveal'
 import { HISTORY_POSTER, renderEraGlyph } from '../landingSvgs'
@@ -16,6 +16,25 @@ import {
 export function VideoSaatTerlihat({ src, judul }: { src: string; judul: string }) {
   const [showClip, setShowClip] = useState(false)
   const [failed, setFailed] = useState(false)
+  const cardRef = useRef<HTMLDivElement | null>(null)
+  const [near, setNear] = useState(() => typeof IntersectionObserver === 'undefined')
+
+  useEffect(() => {
+    if (near || typeof IntersectionObserver === 'undefined') return
+    const el = cardRef.current
+    if (!el) return
+    const obs = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          setNear(true)
+          obs.disconnect()
+        }
+      },
+      { rootMargin: '250px 0px' },
+    )
+    obs.observe(el)
+    return () => obs.disconnect()
+  }, [near])
 
   if (showClip && !failed && src) {
     return (
@@ -43,7 +62,7 @@ export function VideoSaatTerlihat({ src, judul }: { src: string; judul: string }
   }
 
   return (
-    <div className="dark mt-3 flex flex-col justify-between overflow-hidden rounded-2xl border border-white/10 bg-[#060A09] p-4 text-white">
+    <div ref={cardRef} className="dark mt-3 flex flex-col justify-between overflow-hidden rounded-2xl border border-white/10 bg-[#060A09] p-4 text-white">
       <div className="flex items-center justify-between gap-2 pb-3">
         <span className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-emerald-300">
           ARCHIVAL MEDICAL EPOCH
@@ -51,15 +70,17 @@ export function VideoSaatTerlihat({ src, judul }: { src: string; judul: string }
         <span className="font-mono text-[10px] font-bold text-neutral-300">{judul.toUpperCase()}</span>
       </div>
       <div className="relative aspect-[16/9] w-full overflow-hidden rounded-xl border border-white/10 bg-[#040706]">
-        <img
-          src="/images/manufacturing.webp"
-          alt={`Arsip referensi klinis untuk ${judul}`}
-          width={1200}
-          height={675}
-          loading="lazy"
-          decoding="async"
-          className="h-full w-full object-cover object-center"
-        />
+        {near && (
+          <img
+            src="/images/manufacturing.webp"
+            alt={`Arsip referensi klinis untuk ${judul}`}
+            width={1200}
+            height={675}
+            loading="lazy"
+            decoding="async"
+            className="h-full w-full object-cover object-center"
+          />
+        )}
         <div
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#060A09] via-transparent to-transparent opacity-80"
