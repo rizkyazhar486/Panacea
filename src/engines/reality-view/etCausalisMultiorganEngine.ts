@@ -11,6 +11,7 @@ import {
 } from '../../domains/body-exposure/omnicausalis-multiscale-bridge.ts'
 import { deriveAcidBaseCoupling } from '../../lib/physiology/acidBaseCoupling.ts'
 import { deriveBaroreflexDirection } from '../../lib/physiology/baroreflexCoupling.ts'
+import { DEFAULT_OXYGEN_CONTENT_CONVENTION, oxygenContentMlDl } from '../../lib/physiology/oxygenContentConventions.ts'
 import { deriveMeanArterialPressure } from '../../lib/physiology/pressureFlowCoupling.ts'
 import { MESH_TO_ONTOLOGY_MAP } from './anatomyOntologyRegistry.ts'
 import {
@@ -466,7 +467,13 @@ function stepClosedLoopState(
     const spo2Frac = clamp(computeHillOccupancy(paO2MmHg, p50MmHg, 2.7), 0.35, 1.0)
     const spo2Pct = r1(spo2Frac * 100)
 
-    const do2MlMin = clamp(1.34 * base.hbGDl * spo2Frac * rawHemo.cardiacOutputLMin * 10, 120, 2600)
+    const caO2MlDl = oxygenContentMlDl(
+      DEFAULT_OXYGEN_CONTENT_CONVENTION,
+      { value: base.hbGDl, unit: 'g/dL' },
+      spo2Frac,
+      paO2MmHg,
+    )
+    const do2MlMin = clamp(caO2MlDl * rawHemo.cardiacOutputLMin * 10, 120, 2600)
     const vo2MlMin = clamp(base.vo2BaselineMlMin * spec.metabolicDemandFactor, 90, 1800)
     const o2ExtractionRatio = clamp(vo2MlMin / Math.max(120, do2MlMin), 0.1, 0.85)
 
