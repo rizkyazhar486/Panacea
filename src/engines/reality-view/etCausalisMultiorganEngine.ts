@@ -635,7 +635,7 @@ function buildCausalEdges(restingRef: MultiorganTimepoint, finalState: Multiorga
       magnitudePct: Math.max(Math.abs(spo2Delta), phShift),
       timeDelayMin: 5,
       mechanism: `Alveolar gas exchange (SpO2 ${finalState.spo2Pct}%, PaCO2 ${finalState.paCO2MmHg} mmHg) and pH ${finalState.arterialPh} shift Hb P50 (${finalState.p50MmHg} mmHg) & DO2 (${finalState.do2MlMin} mL/min).`,
-      evidenceCitation: 'NCBI Bookshelf NBK606091 / NBK536919 (Bohr & Fick)',
+      evidenceCitation: 'Basnet A, Rout P · Calculating FICK Cardiac Output (NBK606091); Castro D, Zubair M · Arterial Blood Gas Analysis (NBK536919)',
       uncertainty0to1: 0.09,
     },
     {
