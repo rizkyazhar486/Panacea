@@ -58,7 +58,12 @@ export function RealityViewCockpit() {
   const [cadPlane, setCadPlane] = useState<typeof CAD_PLANES[number]>('axial')
   const [safetyMarginMm, setSafetyMarginMm] = useState<2 | 5 | 10>(5)
   const [counterfactualActive, setCounterfactualActive] = useState<boolean>(false)
-  const [extensionTab, setExtensionTab] = useState<'none' | 'multiscale' | 'century' | 'fsd15'>('none')
+  const [extensionTab, setExtensionTab] = useState<'none' | 'multiscale' | 'century' | 'fsd15'>(() => {
+    if (typeof window === 'undefined') return 'none'
+    const raw = window.location.hash.includes('?') ? window.location.hash.split('?')[1] : window.location.search.slice(1)
+    const panel = new URLSearchParams(raw).get('panel')
+    return panel === 'fsd15' || panel === 'multiscale' || panel === 'century' ? panel : 'none'
+  })
   const [overrideStore] = useState(() => new OverrideMemoryStore())
   const [lodPool] = useState(() => new RealityViewLodResourcePool())
 

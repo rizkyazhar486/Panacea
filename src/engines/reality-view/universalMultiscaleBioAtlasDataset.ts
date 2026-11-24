@@ -23,6 +23,7 @@ import {
   type DemographicCohortId,
 } from './demographicManifold'
 import { hantaranO2, kandunganO2, po2DariSaturasi } from '../../lib/ecmo/oksigen'
+import type { AnatomicalSystemId } from '../../types/realityView'
 
 export type VisualDemographicId =
   | 'wanita'
@@ -689,4 +690,210 @@ export function simulateFsd15DigitalTwinFrame(input: Fsd15TwinSimulationInput): 
     },
     vectorLanes,
   }
+}
+
+
+// ── 12-ORGAN & 10-SYSTEM CANONICAL ANATOMICAL ATLAS + LIVE FSD-15 PERFUSION & CROSS-SCALE TRACE ──
+
+export interface OrganAtlasSpec {
+  readonly id: string
+  readonly nameId: string
+  readonly nameEn: string
+  readonly fmaId: string
+  readonly systemId: AnatomicalSystemId
+  readonly coPerfusionFraction: number
+  readonly isPulmonaryCircuit?: boolean
+  readonly massGramsAdult: number
+  readonly tissueId: string
+  readonly cellId: string
+  readonly organelleId: string
+  readonly compoundId: string
+  readonly elementSymbol: string
+  readonly geneSymbol: string
+  readonly quantumId: string
+  readonly hotspotXY: readonly [number, number]
+  readonly mechanismNote: string
+}
+
+export const ORGANS_ATLAS_DATASET: readonly OrganAtlasSpec[] = [
+  { id: 'brain', nameId: 'Otak', nameEn: 'Brain', fmaId: 'FMA:50801', systemId: 'nervous', coPerfusionFraction: 0.15, massGramsAdult: 1380, tissueId: 'cortical_microcircuit', cellId: 'neuron', organelleId: 'mitochondrion', compoundId: 'dopamine', elementSymbol: 'Na', geneSymbol: 'SHANK3', quantumId: 'radical_pair_spin', hotspotXY: [80, 20], mechanismNote: 'Autoregulated cerebral flow, synaptic sensory gating & Na⁺/K⁺ action potentials.' },
+  { id: 'heart', nameId: 'Jantung', nameEn: 'Heart', fmaId: 'FMA:7088', systemId: 'cardiovascular', coPerfusionFraction: 0.05, massGramsAdult: 310, tissueId: 'myocardium', cellId: 'cardiomyocyte', organelleId: 'mitochondrion', compoundId: 'atp', elementSymbol: 'Ca', geneSymbol: 'MYH7', quantumId: 'electron_tunneling_etc', hotspotXY: [84, 48], mechanismNote: 'Rhythmic Ca²⁺-triggered contraction & high-flux mitochondrial OXPHOS ATP pump.' },
+  { id: 'lungs', nameId: 'Paru-paru', nameEn: 'Lungs', fmaId: 'FMA:7195', systemId: 'respiratory', coPerfusionFraction: 1.0, isPulmonaryCircuit: true, massGramsAdult: 1050, tissueId: 'alveolar_barrier', cellId: 'pneumocyte_2', organelleId: 'er_golgi', compoundId: 'o2', elementSymbol: 'O', geneSymbol: 'CFTR', quantumId: 'electron_tunneling_etc', hotspotXY: [71, 46], mechanismNote: '0.5 µm alveolar-capillary gas diffusion loading O₂ onto hemoglobin Fe²⁺.' },
+  { id: 'liver', nameId: 'Hati', nameEn: 'Liver', fmaId: 'FMA:7197', systemId: 'gastrointestinal', coPerfusionFraction: 0.25, massGramsAdult: 1500, tissueId: 'hepatic_lobule', cellId: 'hepatocyte', organelleId: 'er_golgi', compoundId: 'glucose', elementSymbol: 'C', geneSymbol: 'INS', quantumId: 'proton_tunneling_enzyme', hotspotXY: [73, 59], mechanismNote: 'Glycogen buffering, CYP450 enzymatic clearance & metabolic lipid homeostasis.' },
+  { id: 'kidneys', nameId: 'Ginjal', nameEn: 'Kidneys', fmaId: 'FMA:7203', systemId: 'renal', coPerfusionFraction: 0.21, massGramsAdult: 300, tissueId: 'glomerulus', cellId: 'podocyte', organelleId: 'mitochondrion', compoundId: 'h2o', elementSymbol: 'K', geneSymbol: 'HBB', quantumId: 'proton_tunneling_enzyme', hotspotXY: [88, 63], mechanismNote: 'Glomerular filtration, H⁺/HCO₃⁻ acid-base tuning & K⁺/Na⁺ fluid equilibrium.' },
+  { id: 'pancreas', nameId: 'Pankreas', nameEn: 'Pancreas', fmaId: 'FMA:7198', systemId: 'endocrine', coPerfusionFraction: 0.03, massGramsAdult: 95, tissueId: 'hepatic_lobule', cellId: 'beta_cell', organelleId: 'er_golgi', compoundId: 'glucose', elementSymbol: 'Zn', geneSymbol: 'INS', quantumId: 'proton_tunneling_enzyme', hotspotXY: [82, 60], mechanismNote: 'ATP-sensitive K⁺ beta-cell sensing triggering Zn-stabilized insulin release.' },
+  { id: 'skeletal_muscle', nameId: 'Otot Rangka', nameEn: 'Skeletal Muscle', fmaId: 'FMA:30316', systemId: 'musculoskeletal', coPerfusionFraction: 0.20, massGramsAdult: 26000, tissueId: 'myocardium', cellId: 'cardiomyocyte', organelleId: 'sarcoplasmic_reticulum', compoundId: 'lactate', elementSymbol: 'Mg', geneSymbol: 'MYH7', quantumId: 'electron_tunneling_etc', hotspotXY: [65, 73], mechanismNote: 'Dynamic exertion vasodilator absorbing glucose & generating lactate shuttle.' },
+  { id: 'bone_marrow', nameId: 'Tulang & Sumsum', nameEn: 'Bone & Marrow', fmaId: 'FMA:9608', systemId: 'musculoskeletal', coPerfusionFraction: 0.05, massGramsAdult: 4200, tissueId: 'trabecular_bone', cellId: 'erythrocyte', organelleId: 'nucleus', compoundId: 'heme_b', elementSymbol: 'Fe', geneSymbol: 'HBB', quantumId: 'proton_tunneling_enzyme', hotspotXY: [94, 73], mechanismNote: 'Trabecular Ca/P mineral scaffold & Fe²⁺ erythropoiesis (~2M RBC/sec).' },
+  { id: 'spleen_immune', nameId: 'Limpa & Imun', nameEn: 'Spleen & Lymphoid', fmaId: 'FMA:7196', systemId: 'immune_lymphatic', coPerfusionFraction: 0.04, massGramsAdult: 160, tissueId: 'hepatic_lobule', cellId: 'dendritic', organelleId: 'lysosome', compoundId: 'serotonin', elementSymbol: 'Zn', geneSymbol: 'SHANK3', quantumId: 'proton_tunneling_enzyme', hotspotXY: [89, 55], mechanismNote: 'Antigen surveillance, lysosomal phagocytic clearance & RBC quality filtering.' },
+  { id: 'skin', nameId: 'Kulit', nameEn: 'Skin', fmaId: 'FMA:7163', systemId: 'integumentary', coPerfusionFraction: 0.06, massGramsAdult: 3800, tissueId: 'trabecular_bone', cellId: 'dendritic', organelleId: 'lysosome', compoundId: 'h2o', elementSymbol: 'Zn', geneSymbol: 'CFTR', quantumId: 'radical_pair_spin', hotspotXY: [96, 46], mechanismNote: 'Thermoregulatory cutaneous vasodilation, barrier immunity & tactile sensing.' },
+  { id: 'thyroid', nameId: 'Tiroid', nameEn: 'Thyroid', fmaId: 'FMA:9603', systemId: 'endocrine', coPerfusionFraction: 0.02, massGramsAdult: 22, tissueId: 'hepatic_lobule', cellId: 'beta_cell', organelleId: 'er_golgi', compoundId: 'atp', elementSymbol: 'I', geneSymbol: 'INS', quantumId: 'proton_tunneling_enzyme', hotspotXY: [80, 34], mechanismNote: 'Iodine-coupled T3/T4 synthesis pacing basal mitochondrial metabolic rate.' },
+  { id: 'uterus_placenta', nameId: 'Uterus / Reproduksi', nameEn: 'Uterus / Reproductive', fmaId: 'FMA:17558', systemId: 'reproductive', coPerfusionFraction: 0.02, massGramsAdult: 80, tissueId: 'myocardium', cellId: 'erythrocyte', organelleId: 'mitochondrion', compoundId: 'o2', elementSymbol: 'Fe', geneSymbol: 'HBB', quantumId: 'electron_tunneling_etc', hotspotXY: [80, 70], mechanismNote: 'Cyclic endometrial vascularity; expands to uteroplacental O₂ bridge in pregnancy.' },
+] as const
+
+export interface OrganSystemAtlasSpec {
+  readonly id: AnatomicalSystemId
+  readonly labelId: string
+  readonly labelEn: string
+  readonly primaryOrganId: string
+  readonly keyBiomarker: string
+  readonly educationalSummary: string
+}
+
+export const ORGAN_SYSTEMS_ATLAS_DATASET: readonly OrganSystemAtlasSpec[] = [
+  { id: 'cardiovascular', labelId: 'Kardiovaskular', labelEn: 'Cardiovascular', primaryOrganId: 'heart', keyBiomarker: 'HR · CO · DO₂', educationalSummary: 'Distributes O₂, glucose & hormones via pulsatile arterial pressure.' },
+  { id: 'respiratory', labelId: 'Respirasi', labelEn: 'Respiratory', primaryOrganId: 'lungs', keyBiomarker: 'SpO₂ · VA', educationalSummary: 'Alveolar ventilation balancing arterial O₂ loading and CO₂ clearance.' },
+  { id: 'nervous', labelId: 'Saraf & Sensorik', labelEn: 'Nervous & Sensory', primaryOrganId: 'brain', keyBiomarker: 'Synaptic Hz · Vagal', educationalSummary: 'Autonomic regulation, sensory gating & millisecond bioelectric signaling.' },
+  { id: 'musculoskeletal', labelId: 'Muskuloskeletal', labelEn: 'Musculoskeletal', primaryOrganId: 'skeletal_muscle', keyBiomarker: 'MET · Ca/P · Lactate', educationalSummary: 'Locomotion, posture, bone mineral reservoir & exercise glucose sink.' },
+  { id: 'gastrointestinal', labelId: 'Pencernaan & Hepar', labelEn: 'Gastrointestinal', primaryOrganId: 'liver', keyBiomarker: 'Glucose · Glycogen', educationalSummary: 'Nutrient absorption, portal hepatic buffering & xenobiotic clearance.' },
+  { id: 'renal', labelId: 'Renal & Cairan', labelEn: 'Renal & Fluid', primaryOrganId: 'kidneys', keyBiomarker: 'eGFR · K⁺/Na⁺ · pH', educationalSummary: 'Continuous plasma ultrafiltration, electrolyte & acid-base stability.' },
+  { id: 'endocrine', labelId: 'Endokrin', labelEn: 'Endocrine', primaryOrganId: 'pancreas', keyBiomarker: 'Insulin · T3/T4', educationalSummary: 'Feedback hormone loops coordinating glucose uptake & basal metabolism.' },
+  { id: 'immune_lymphatic', labelId: 'Imun & Limfatik', labelEn: 'Immune & Lymphatic', primaryOrganId: 'spleen_immune', keyBiomarker: 'Lymph · Cytokine', educationalSummary: 'Innate/adaptive defense, antigen recognition & tissue repair.' },
+  { id: 'integumentary', labelId: 'Integumen (Kulit)', labelEn: 'Integumentary', primaryOrganId: 'skin', keyBiomarker: 'Core Temp · Sweat', educationalSummary: 'Thermal dissipation, hydration barrier & sensory interface.' },
+  { id: 'reproductive', labelId: 'Reproduksi & Maternal', labelEn: 'Reproductive', primaryOrganId: 'uterus_placenta', keyBiomarker: 'Hormonal · Placental', educationalSummary: 'Reproductive physiology & gestational maternal-fetal O₂ exchange.' },
+] as const
+
+export interface Fsd15EducationalScenario {
+  readonly id: 'rest' | 'cardio' | 'post_meal' | 'high_altitude'
+  readonly labelId: string
+  readonly labelEn: string
+  readonly exertionMet: number
+  readonly spo2Pct: number
+  readonly glucoseMgDl: number
+  readonly tunnelingGapAngstrom: number
+  readonly focusOrganId: string
+}
+
+export const FSD15_EDUCATIONAL_SCENARIOS: readonly Fsd15EducationalScenario[] = [
+  { id: 'rest', labelId: 'Istirahat', labelEn: 'Rest & Recovery', exertionMet: 1.2, spo2Pct: 98, glucoseMgDl: 88, tunnelingGapAngstrom: 10.5, focusOrganId: 'brain' },
+  { id: 'cardio', labelId: 'Kardio 6 MET', labelEn: 'Cardio Exertion', exertionMet: 6.0, spo2Pct: 97, glucoseMgDl: 104, tunnelingGapAngstrom: 9.5, focusOrganId: 'heart' },
+  { id: 'post_meal', labelId: 'Pasca-Makan', labelEn: 'Post-Meal Wave', exertionMet: 1.5, spo2Pct: 98, glucoseMgDl: 158, tunnelingGapAngstrom: 11.0, focusOrganId: 'pancreas' },
+  { id: 'high_altitude', labelId: 'Dataran Tinggi', labelEn: 'High Altitude', exertionMet: 2.5, spo2Pct: 89, glucoseMgDl: 94, tunnelingGapAngstrom: 13.0, focusOrganId: 'lungs' },
+] as const
+
+export interface LiveOrganTelemetry {
+  readonly organ: OrganAtlasSpec
+  readonly perfusionMlMin: number
+  readonly activityPct: number
+  readonly statusTag: string
+}
+
+export function computeLiveOrganTelemetry(frame: Fsd15DigitalTwinFrame): readonly LiveOrganTelemetry[] {
+  const coMlMin = frame.organLevel.cardiacOutputLMin * 1000
+  const weightScale = Math.max(0.08, Math.min(1.4, frame.manifold.weightKg / 68))
+  const hrRatio = frame.organLevel.heartRateBpm / Math.max(50, frame.preset.restingHrBpm)
+  const isExerting = hrRatio >= 1.22
+  const isPregnant = frame.preset.id === 'ibu_hamil'
+  const isAutism = frame.preset.id === 'autism'
+  const isSenior = frame.preset.silhouetteProfile === 'senior_kyphotic'
+
+  return ORGANS_ATLAS_DATASET.map((organ) => {
+    let perfusionMlMin: number
+    if (organ.isPulmonaryCircuit) {
+      perfusionMlMin = Math.round(coMlMin)
+    } else if (organ.id === 'brain') {
+      // Cerebral autoregulation keeps CBF tightly stable despite exertion
+      perfusionMlMin = Math.round(740 * Math.pow(weightScale, 0.72) * (frame.organLevel.spo2Pct < 92 ? 1.12 : 1.0))
+    } else if (organ.id === 'skeletal_muscle') {
+      const muscleShare = isExerting ? Math.min(0.62, organ.coPerfusionFraction * (1 + (hrRatio - 1) * 2.4)) : organ.coPerfusionFraction
+      perfusionMlMin = Math.round(coMlMin * muscleShare)
+    } else if (organ.id === 'heart') {
+      const coronaryShare = organ.coPerfusionFraction * Math.min(1.8, hrRatio)
+      perfusionMlMin = Math.round(coMlMin * coronaryShare)
+    } else if (organ.id === 'uterus_placenta') {
+      const share = isPregnant ? 0.12 : organ.coPerfusionFraction
+      perfusionMlMin = Math.round(coMlMin * share)
+    } else if (organ.id === 'kidneys') {
+      const seniorFactor = isSenior ? 0.78 : 1.0
+      const exertFactor = isExerting ? 0.72 : 1.0
+      perfusionMlMin = Math.round(coMlMin * organ.coPerfusionFraction * seniorFactor * exertFactor)
+    } else {
+      const splanchnicFactor = isExerting && (organ.id === 'liver' || organ.id === 'pancreas') ? 0.76 : 1.0
+      perfusionMlMin = Math.round(coMlMin * organ.coPerfusionFraction * splanchnicFactor)
+    }
+
+    let activityPct = Math.min(100, Math.max(22, Math.round(48 * hrRatio)))
+    let statusTag = 'HOMEOSTASIS'
+    if (organ.id === 'brain' && isAutism) {
+      activityPct = 64
+      statusTag = 'CALM SENSORY GATING'
+    } else if (organ.id === 'uterus_placenta' && isPregnant) {
+      activityPct = 86
+      statusTag = `GESTATIONAL W${frame.preset.gestationalWeek ?? 28}`
+    } else if (organ.id === 'lungs' && frame.organLevel.spo2Pct < 93) {
+      activityPct = 90
+      statusTag = 'HYPOXIC DRIVE ↑'
+    } else if (organ.id === 'pancreas' && frame.cellularLevel.glucoseUtilizationState === 'HYPERGLYCEMIC_LOAD') {
+      activityPct = 92
+      statusTag = 'INSULIN SURGE'
+    } else if (organ.id === 'skeletal_muscle' && isExerting) {
+      activityPct = Math.min(98, Math.round(60 + (hrRatio - 1) * 55))
+      statusTag = 'ACTIVE WORKLOAD'
+    } else if (organ.id === 'heart' && isExerting) {
+      activityPct = Math.min(96, Math.round(55 + (hrRatio - 1) * 50))
+      statusTag = 'INOTROPIC BOOST'
+    } else if (organ.id === 'bone_marrow' && isSenior) {
+      activityPct = 52
+      statusTag = 'BMD REMODELING'
+    }
+
+    return { organ, perfusionMlMin, activityPct, statusTag }
+  })
+}
+
+export interface LiveOrganSystemTelemetry {
+  readonly system: OrganSystemAtlasSpec
+  readonly loadPct: number
+  readonly activeOrganCount: number
+  readonly liveReadout: string
+}
+
+export function computeLiveOrganSystemTelemetry(frame: Fsd15DigitalTwinFrame): readonly LiveOrganSystemTelemetry[] {
+  const organs = computeLiveOrganTelemetry(frame)
+  return ORGAN_SYSTEMS_ATLAS_DATASET.map((system) => {
+    const linked = organs.filter((o) => o.organ.systemId === system.id)
+    const primary = linked[0]
+    const loadPct = linked.length > 0
+      ? Math.round(linked.reduce((acc, item) => acc + item.activityPct, 0) / linked.length)
+      : 50
+    let liveReadout = primary ? `${primary.perfusionMlMin} mL/m · ${primary.statusTag}` : system.keyBiomarker
+    if (system.id === 'cardiovascular') liveReadout = `${frame.organLevel.heartRateBpm} bpm · ${frame.organLevel.cardiacOutputLMin} L/m`
+    if (system.id === 'respiratory') liveReadout = `SpO₂ ${frame.organLevel.spo2Pct}% · VA ${frame.organLevel.alveolarVentilationLMin} L/m`
+    if (system.id === 'endocrine') liveReadout = frame.cellularLevel.glucoseUtilizationState
+    if (system.id === 'nervous') liveReadout = frame.preset.isSensoryFriendlyNeuro ? 'Calm Vagal Balance' : `${frame.cellularLevel.ca2TransientHz} Hz Signaling`
+    return {
+      system,
+      loadPct,
+      activeOrganCount: linked.length,
+      liveReadout,
+    }
+  })
+}
+
+export interface CrossScaleCausalHop {
+  readonly tier: MultiscaleTierId
+  readonly label: string
+  readonly value: string
+}
+
+export function traceCrossScaleCausalChain(organId: string, frame: Fsd15DigitalTwinFrame): readonly CrossScaleCausalHop[] {
+  const organ = ORGANS_ATLAS_DATASET.find((o) => o.id === organId) ?? ORGANS_ATLAS_DATASET[1]
+  const liveOrgan = computeLiveOrganTelemetry(frame).find((item) => item.organ.id === organ.id)
+  const system = ORGAN_SYSTEMS_ATLAS_DATASET.find((s) => s.id === organ.systemId) ?? ORGAN_SYSTEMS_ATLAS_DATASET[0]
+  const tissue = TISSUES_DATASET.find((t) => t.id === organ.tissueId) ?? TISSUES_DATASET[0]
+  const cell = SPECIALIZED_CELLS_DATASET.find((c) => c.id === organ.cellId) ?? SPECIALIZED_CELLS_DATASET[0]
+  const organelle = ORGANELLES_DATASET.find((o) => o.id === organ.organelleId) ?? ORGANELLES_DATASET[1]
+  const compound = BIOCHEMICAL_COMPOUNDS_DATASET.find((c) => c.id === organ.compoundId) ?? BIOCHEMICAL_COMPOUNDS_DATASET[4]
+  const element = CHEMICAL_ELEMENTS_DATASET.find((e) => e.symbol === organ.elementSymbol) ?? CHEMICAL_ELEMENTS_DATASET[0]
+  const gene = CURATED_GENE_LOCI.find((g) => g.symbol === organ.geneSymbol) ?? CURATED_GENE_LOCI[0]
+  const quantum = QUANTUM_BIO_PROCESSES.find((q) => q.id === organ.quantumId) ?? QUANTUM_BIO_PROCESSES[0]
+
+  return [
+    { tier: 'quantum', label: 'Quantum', value: `${quantum.name.split(' ')[0]} · Δ=${frame.organelleQuantumLevel.electronTunnelingGapAngstrom}Å` },
+    { tier: 'element', label: 'Element', value: `${element.symbol} (Z=${element.atomicNumber})` },
+    { tier: 'compound', label: 'Compound', value: `${compound.formula} ${compound.name.split(' ')[0]}` },
+    { tier: 'dna_strand', label: 'Gene/RNA', value: `${gene.symbol} (${gene.chromosome})` },
+    { tier: 'organelle', label: 'Organelle', value: `${organelle.name} · ${frame.organelleQuantumLevel.atpSynthaseRotorRpmEdu} RPM` },
+    { tier: 'cell', label: 'Cell / Tissue', value: `${cell.name} → ${tissue.name.split(' ')[0]}` },
+    { tier: 'organ', label: `${organ.nameId} (${system.labelId})`, value: `${liveOrgan?.perfusionMlMin ?? 0} mL/m · ${liveOrgan?.statusTag ?? 'OK'}` },
+  ]
 }
