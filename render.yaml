@@ -7,7 +7,7 @@ services:
   - type: web
     name: panaceamed-backend
     runtime: node
-    plan: free
+    plan: starter
     rootDir: server
     buildCommand: npm install && node ../scripts/medstudy/fetch-opus55-clinical-dataset.mjs --optional
     startCommand: npm start
@@ -15,7 +15,19 @@ services:
     autoDeploy: true
     envVars:
       - key: NODE_VERSION
-        value: '20'
+        value: '24'
+      - key: PANACEA_ROLLOUT_STAGE
+        value: 'stage-50'
+      - key: PANACEA_MAX_ACCOUNTS
+        value: '50'
+      - key: PANACEA_SIGNUP_KILL_SWITCH
+        value: 'false'
+      - key: PANACEA_READONLY_MODE
+        value: 'false'
+      - key: PANACEA_SUPPORT_EMAIL
+        value: support@panaceamed.id
+      - key: DATABASE_URL
+        sync: false
       # Synthetic Opus 5.5 data is retrieval/teaching context only. The build
       # fetch is integrity-pinned and optional so a third-party outage cannot
       # block the core deployment.

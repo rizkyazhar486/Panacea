@@ -2,10 +2,12 @@
 // Nomor telepon di Connect hanya untuk deteksi akun ganda; OTP login hanya lewat email.
 import { randomInt } from 'node:crypto'
 import type { Request, Response } from 'express'
-import { upsertUser, getUserByEmail, type Role } from '../../store.js'
+import { upsertUser, getUserByEmail, countUsers, type Role } from '../../store.js'
 import { setSession } from '../../auth.js'
 import { sendWelcome, sendOtpCode } from './email.js'
-import { roleForLogin } from './accessControl.js'
+import { isConfiguredOwner, roleForLogin } from './accessControl.js'
+import { config } from '../../config.js'
+import { checkNewAccountAllowed } from '../../modules/rollout/rolloutGuard.js'
 
 export const emailOtpLive = Boolean(process.env.RESEND_API_KEY)
 
@@ -79,6 +81,12 @@ export async function emailOtpVerify(req: Request, res: Response) {
 
   emailCodes.delete(email)
   const existing = getUserByEmail(email)
+  const gate = checkNewAccountAllowed({
+    isExistingUser: Boolean(existing),
+    isOwnerEmail: isConfiguredOwner({ email }, config.ownerEmail),
+    currentUserCount: countUsers(),
+  })
+  if (!gate.allowed) return res.status(gate.status).json({ error: gate.error })
   const isNew = !existing
   const user = upsertUser(
     email,

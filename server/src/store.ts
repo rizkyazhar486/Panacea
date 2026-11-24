@@ -2,7 +2,7 @@
 // real database (Postgres/SQLite). Suitable for the demo backend.
 import { isSignedCarePlan } from './domains/clinical-records/carePlan.js'
 import { readFileSync, existsSync, appendFileSync, mkdirSync } from 'node:fs'
-import { isiConnect, muatConnect, pasangPenyimpan } from './connect.js'
+import { isiConnect, muatConnect, pasangPenyimpan, hapusAkunConnect } from './connect.js'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 import { createHash, randomBytes } from 'node:crypto'
@@ -125,6 +125,15 @@ function seedPatients(): any[] {
   return []
 }
 
+export interface PrivacyConsentRecord {
+  id: string
+  purpose: string
+  policyVersion: string
+  granted: boolean
+  recordedAt: string
+}
+
+// Minimal file-backed persistence continues...
 interface DB {
   users: User[]
   wallets: Record<string, number> // userId -> PNC balance
@@ -166,6 +175,7 @@ interface DB {
   webhookDeliveries?: Record<string, WebhookDelivery[]> // email -> what recent syncs actually contained
   facilityPrices?: FacilityPriceSubmission[] // crowd-sourced provider price board — real submissions, no fabricated numbers
   visitMemberships?: Record<string, VisitMembership> // canonical Visit OS patient/clinician authorization registry
+  privacyConsents?: Record<string, PrivacyConsentRecord[]> // userId -> explicit UU PDP consent ledger
 }
 
 // A real patient/doctor-submitted price for a facility, optionally scoped to
@@ -607,6 +617,9 @@ export function userExistsByEmail(email: string): boolean {
 export function getUserByEmail(email: string): User | undefined {
   return db.users.find((u) => u.email.toLowerCase() === email.toLowerCase())
 }
+export function countUsers(): number {
+  return db.users.length
+}
 
 // Resolve a registered patient-user from a self-patient id.
 // Primary form is "self-u-<stable server user id>". The historical
@@ -1034,6 +1047,98 @@ export function addAudit(user: User, action: string, target?: string) {
     if (arsipkan('audit', evicted)) audit.splice(5000)
   }
   save()
+}
+export function addSystemAudit(opaqueActorId: string, action: string, target?: string) {
+  addAudit({ id: opaqueActorId, email: '[redacted]', name: 'system', role: 'pasien', createdAt: new Date().toISOString() }, action, target)
+}
+export function listPrivacyConsents(userId: string): PrivacyConsentRecord[] {
+  return structuredClone(db.privacyConsents?.[userId] ?? [])
+}
+export function recordPrivacyConsent(
+  userId: string,
+  entry: { purpose: string; policyVersion: string; granted: boolean; recordedAt?: string },
+): PrivacyConsentRecord {
+  const store = (db.privacyConsents ??= {})
+  const list = (store[userId] ??= [])
+  const rec: PrivacyConsentRecord = {
+    id: uid(),
+    purpose: entry.purpose.trim(),
+    policyVersion: entry.policyVersion.trim(),
+    granted: entry.granted,
+    recordedAt: entry.recordedAt || new Date().toISOString(),
+  }
+  list.unshift(rec)
+  if (list.length > 500) list.splice(500)
+  save()
+  return rec
+}
+export function exportUserPersonalData(userId: string) {
+  const user = getUser(userId)
+  if (!user) return null
+  const email = user.email
+  return structuredClone({
+    schema: 'panacea-uu-pdp-export-v1',
+    exportedAt: new Date().toISOString(),
+    account: { id: user.id, email: user.email, name: user.name, role: user.role, createdAt: user.createdAt },
+    settings: getSettings(userId),
+    privacyConsents: db.privacyConsents?.[userId] ?? [],
+    healthProfile: db.healthProfiles?.[email] ?? {},
+    ringkasan: db.ringkasan?.[userId] ?? {},
+    timeSeries: {
+      hrSamplesCount: (db.hrSeries?.[email] ?? []).length,
+      sleepNightsCount: (db.sleepSeries?.[email] ?? []).length,
+      deviceWorkoutsCount: (db.deviceWorkouts?.[email] ?? []).length,
+    },
+    labLogs: db.labLogs?.[email] ?? null,
+    reminders: db.reminders?.[userId] ?? [],
+    sportsFavorites: db.sportsFavorites?.[userId] ?? [],
+    notifications: db.notifications?.[userId] ?? [],
+    posts: db.posts.filter((p) => p.authorEmail.toLowerCase() === email.toLowerCase()),
+    wallet: {
+      balancePnc: db.wallets?.[userId] ?? 0,
+      txs: db.txs.filter((t) => t.userId === userId),
+      orders: db.orders.filter((o) => o.userId === userId),
+    },
+  })
+}
+export function deleteUserAccountData(userId: string): { deleted: boolean; removed: Record<string, number> } {
+  const user = getUser(userId)
+  if (!user) return { deleted: false, removed: {} }
+  const emailLower = user.email.toLowerCase()
+  const removed: Record<string, number> = { users: 1 }
+  db.users = db.users.filter((u) => u.id !== userId)
+  for (const bucket of [db.wallets, db.settings, db.pushSubs, db.notifications, db.reminders, db.ringkasan, db.sportsFavorites, db.privacyConsents]) {
+    if (bucket && userId in bucket) delete (bucket as Record<string, unknown>)[userId]
+  }
+  for (const emailMap of [db.healthProfiles, db.labLogs, db.hrSeries, db.sleepSeries, db.deviceWorkouts, db.hrNotifications, db.webhookDeliveries]) {
+    if (!emailMap) continue
+    for (const k of Object.keys(emailMap)) {
+      if (k.toLowerCase() === emailLower) delete (emailMap as Record<string, unknown>)[k]
+    }
+  }
+  if (db.healthWebhookTokens) {
+    for (const [tok, em] of Object.entries(db.healthWebhookTokens)) {
+      if (String(em).toLowerCase() === emailLower) delete db.healthWebhookTokens[tok]
+    }
+  }
+  const nowIso = new Date().toISOString()
+  for (const s of db.labShares ?? []) {
+    if (s.pasienEmail.toLowerCase() === emailLower && !s.dicabut) s.dicabut = nowIso
+  }
+  const prevPosts = db.posts.length
+  db.posts = db.posts.filter((p) => p.authorEmail.toLowerCase() !== emailLower)
+  removed.posts = prevPosts - db.posts.length
+  if (db.feedback) db.feedback = db.feedback.filter((f) => f.userId !== userId)
+  if (db.applications) db.applications = db.applications.filter((a) => a.userId !== userId)
+  db.creatorSubs = db.creatorSubs.filter((c) => c.subscriberId !== userId && c.authorEmail.toLowerCase() !== emailLower)
+  if (db.visitMemberships) {
+    for (const [vid, m] of Object.entries(db.visitMemberships)) {
+      if (m.patientUserId === userId) delete db.visitMemberships[vid]
+    }
+  }
+  try { hapusAkunConnect(user.email) } catch { /* ignore if Connect not initialized */ }
+  save()
+  return { deleted: true, removed }
 }
 export function getAudit(limit = 200): AuditEntry[] {
   return ((db as any).audit ?? []).slice(0, limit)

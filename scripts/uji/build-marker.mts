@@ -5,6 +5,8 @@ const { commitDariEnv, buildMarker } = await import('../../scripts/vite/buildMar
 const sha = 'a'.repeat(39) + 'B'
 assert.equal(commitDariEnv({ VERCEL_GIT_COMMIT_SHA: sha }), 'a'.repeat(39) + 'b')
 assert.equal(commitDariEnv({ GITHUB_SHA: ` ${'1'.repeat(40)} ` }), '1'.repeat(40))
+assert.equal(commitDariEnv({ WORKERS_CI_COMMIT_SHA: '4'.repeat(40) }), '4'.repeat(40))
+assert.equal(commitDariEnv({ CF_PAGES_COMMIT_SHA: '5'.repeat(40) }), '5'.repeat(40))
 assert.equal(commitDariEnv({ VERCEL_GIT_COMMIT_SHA: 'abc', GITHUB_SHA: '2'.repeat(40) }), '2'.repeat(40), 'nilai tidak valid dilewati')
 for (const key of ['WORKERS_CI_COMMIT_SHA', 'CF_PAGES_COMMIT_SHA']) {
   assert.equal(commitDariEnv({ [key]: sha }), sha.toLowerCase())

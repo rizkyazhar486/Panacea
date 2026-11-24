@@ -4,9 +4,10 @@ import jwt from 'jsonwebtoken'
 import { createHash, randomUUID } from 'node:crypto'
 import { OAuth2Client } from 'google-auth-library'
 import { config, features } from './config.js'
-import { cabutToken, tokenDicabut, upsertUser, getUser, getUserByEmail, getSettings, type Role, type User } from './store.js'
+import { cabutToken, tokenDicabut, upsertUser, getUser, getUserByEmail, getSettings, countUsers, type Role, type User } from './store.js'
 import { sendWelcome } from './domains/identity/email.js'
-import { effectiveRoleForRequest, roleForLogin } from './domains/identity/accessControl.js'
+import { effectiveRoleForRequest, isConfiguredOwner, roleForLogin } from './domains/identity/accessControl.js'
+import { checkNewAccountAllowed } from './modules/rollout/rolloutGuard.js'
 
 const googleClient = new OAuth2Client(config.googleClientId)
 const COOKIE = 'pmd_session'
@@ -116,6 +117,12 @@ export async function googleLogin(req: Request, res: Response) {
 
     const email = payload.email.trim().toLowerCase()
     const existing = getUserByEmail(email)
+    const gate = checkNewAccountAllowed({
+      isExistingUser: Boolean(existing),
+      isOwnerEmail: isConfiguredOwner({ email }, config.ownerEmail),
+      currentUserCount: countUsers(),
+    })
+    if (!gate.allowed) return res.status(gate.status).json({ error: gate.error })
     const isNew = !existing
     const user = upsertUser(
       email,
@@ -139,6 +146,12 @@ export function devLogin(req: Request, res: Response) {
   if (!normalizedEmail) return res.status(400).json({ error: 'missing_email' })
 
   const existing = getUserByEmail(normalizedEmail)
+  const gate = checkNewAccountAllowed({
+    isExistingUser: Boolean(existing),
+    isOwnerEmail: isConfiguredOwner({ email: normalizedEmail }, config.ownerEmail),
+    currentUserCount: countUsers(),
+  })
+  if (!gate.allowed) return res.status(gate.status).json({ error: gate.error })
   const isNew = !existing
   const user = upsertUser(
     normalizedEmail,
