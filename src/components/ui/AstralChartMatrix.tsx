@@ -1,6 +1,8 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { FEATURE_GLYPH_SVG_PATHS, type FeatureGlyphId } from '../../lib/navigation/featureMap'
+import { useVitals } from '../../lib/useVitals'
+import { coupleEnvironmentToPhysiology } from '../../domains/body-exposure/engine/environmentPhysiologyCoupler'
 
 export type AstralChartId =
   | 'all'
@@ -71,11 +73,67 @@ function Glyph({ id, size = 15 }: { id: FeatureGlyphId; size?: number }) {
 }
 
 export function AstralChartMatrix() {
+  const vitals = useVitals()
   const [selectedOrganId, setSelectedOrganId] = useState<string>('heart')
   const [chartFilter, setChartFilter] = useState<AstralChartId>('all')
   const [gainPct, setGainPct] = useState<number>(100)
+  const [bleStatus, setBleStatus] = useState<string>('BLE')
+  const [showEnvPanel, setShowEnvPanel] = useState<boolean>(false)
+  const [showInfo, setShowInfo] = useState<boolean>(false)
+  const [envTempC, setEnvTempC] = useState<number>(30)
+  const [envRhPct, setEnvRhPct] = useState<number>(65)
+  const [envPm25, setEnvPm25] = useState<number>(22)
+  const [envAltM, setEnvAltM] = useState<number>(150)
 
-  const activeOrgan = ORGAN_HOTSPOTS.find((o) => o.id === selectedOrganId) ?? ORGAN_HOTSPOTS[1]
+  const hasObservedVitals = Boolean(
+    vitals.heartRate || vitals.restingHr || vitals.spo2Pct || vitals.systolic || vitals.hrvMs || vitals.sleepH,
+  )
+  const liveHr = typeof vitals.heartRate === 'number' && vitals.heartRate > 25 ? Math.round(vitals.heartRate) : (typeof vitals.restingHr === 'number' && vitals.restingHr > 25 ? Math.round(vitals.restingHr) : 72)
+  const liveSpo2 = typeof vitals.spo2Pct === 'number' && vitals.spo2Pct > 50 ? Math.round(vitals.spo2Pct) : 98
+  const liveResp = typeof vitals.respRate === 'number' && vitals.respRate > 4 ? Math.round(vitals.respRate) : 15
+  const liveSbp = typeof vitals.systolic === 'number' && vitals.systolic > 60 ? Math.round(vitals.systolic) : 118
+  const liveDbp = typeof vitals.diastolic === 'number' && vitals.diastolic > 30 ? Math.round(vitals.diastolic) : 76
+  const liveHrv = typeof vitals.hrvMs === 'number' && vitals.hrvMs > 5 ? Math.round(vitals.hrvMs) : 64
+  const liveRecovery = typeof vitals.recoveryPct === 'number' ? Math.round(vitals.recoveryPct) : 88
+  const provenanceLabel = hasObservedVitals && gainPct === 100
+    ? `OBSERVED · ${typeof vitals.source === 'string' && vitals.source ? vitals.source : 'Wearable'}`
+    : 'SIMULATION MODEL'
+
+  const envReport = useMemo(
+    () =>
+      coupleEnvironmentToPhysiology({
+        ambientTempC: envTempC,
+        relativeHumidityPct: envRhPct,
+        pm25UgM3: envPm25,
+        uvIndex: envTempC >= 32 ? 9 : 5,
+        altitudeM: envAltM,
+        restingHrBpm: liveHr,
+      }),
+    [envTempC, envRhPct, envPm25, envAltM, liveHr],
+  )
+
+  const handleQuickBle = () => {
+    const hasBt = typeof navigator !== 'undefined' && 'bluetooth' in navigator
+    setBleStatus(hasBt ? 'BLE Ready' : 'BLE Hub')
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('panacea:quick-ble-connect'))
+    }
+  }
+
+  const liveHotspots: readonly OrganHotspot[] = useMemo(() => {
+    const cardioScore = Math.max(40, Math.min(99, Math.round(100 - Math.abs(liveHr - 64) * 0.45)))
+    const pulmoScore = Math.max(40, Math.min(99, Math.round(liveSpo2 * (1 - Math.max(0, envPm25 - 25) / 600))))
+    const brainScore = Math.max(45, Math.min(99, Math.round(Math.min(99, 55 + liveHrv * 0.55))))
+    return ORGAN_HOTSPOTS.map((o) => {
+      if (o.id === 'heart') return { ...o, metric: String(liveHr), pct: cardioScore }
+      if (o.id === 'lungs') return { ...o, metric: String(liveSpo2), pct: pulmoScore }
+      if (o.id === 'brain') return { ...o, metric: String(brainScore), pct: brainScore }
+      if (o.id === 'pelvis') return { ...o, metric: String(liveRecovery), pct: liveRecovery }
+      return o
+    })
+  }, [liveHr, liveSpo2, liveHrv, liveRecovery, envPm25])
+
+  const activeOrgan = liveHotspots.find((o) => o.id === selectedOrganId) ?? liveHotspots[1]
   const scale = gainPct / 100
   const clamp = (v: number, lo = 8, hi = 99) => Math.max(lo, Math.min(hi, Math.round(v * scale)))
   const show = (id: AstralChartId) => chartFilter === 'all' || chartFilter === id
@@ -137,6 +195,112 @@ export function AstralChartMatrix() {
         </label>
       </div>
 
+      {/* Universal Device Ingestion Strip + Provenance + Environment/ECMO Observatory Toggle */}
+      <div className="mb-2.5 flex flex-wrap items-center justify-between gap-1.5 rounded-2xl border border-white/10 bg-slate-950/80 px-2.5 py-1.5">
+        <div className="flex flex-wrap items-center gap-1.5">
+          <span
+            data-astral-provenance
+            className={`rounded-full border px-2.5 py-0.5 font-mono text-[10px] font-black ${
+              hasObservedVitals && gainPct === 100
+                ? 'border-emerald-400/45 bg-emerald-500/15 text-emerald-200'
+                : 'border-amber-400/45 bg-amber-500/15 text-amber-200'
+            }`}
+          >
+            {provenanceLabel}
+          </span>
+          <button
+            type="button"
+            onClick={handleQuickBle}
+            className="min-h-[34px] rounded-xl border border-cyan-400/35 bg-cyan-500/15 px-2.5 font-mono text-[10px] font-black text-cyan-100 hover:bg-cyan-500/25"
+          >
+            ᛒ {bleStatus}
+          </button>
+          <Link to="/device-sync" className="inline-flex min-h-[34px] items-center rounded-xl border border-white/15 bg-white/5 px-2.5 font-mono text-[10px] font-bold text-slate-200 hover:border-cyan-400/40">
+            Wi-Fi · Watch
+          </Link>
+          <Link to="/scan-lab" className="inline-flex min-h-[34px] items-center rounded-xl border border-white/15 bg-white/5 px-2.5 font-mono text-[10px] font-bold text-slate-200 hover:border-cyan-400/40">
+            Scan Lab
+          </Link>
+          <Link to="/health-data" className="inline-flex min-h-[34px] items-center rounded-xl border border-white/15 bg-white/5 px-2.5 font-mono text-[10px] font-bold text-slate-200 hover:border-cyan-400/40">
+            All Data ↗
+          </Link>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <button
+            type="button"
+            onClick={() => setShowEnvPanel((v) => !v)}
+            aria-expanded={showEnvPanel}
+            data-env-ecmo-toggle
+            className="min-h-[34px] rounded-xl border border-emerald-400/35 bg-emerald-500/15 px-2.5 font-mono text-[10px] font-black text-emerald-100 hover:bg-emerald-500/25"
+          >
+            Env × ECMO · {envReport.compositeEnvironmentalLoadPct}%
+          </button>
+          <button
+            type="button"
+            onClick={() => setShowInfo((v) => !v)}
+            aria-label="Analyzer epistemic disclosure"
+            className="grid h-[34px] w-[34px] place-items-center rounded-full border border-white/15 bg-white/5 font-mono text-[11px] font-black text-slate-200"
+          >
+            i
+          </button>
+        </div>
+      </div>
+
+      {showInfo && (
+        <div className="mb-2.5 rounded-2xl border border-cyan-400/20 bg-slate-950/95 px-3 py-2 text-[11px] text-slate-300">
+          <strong className="text-cyan-200">Epistemic Boundary:</strong> Observed device telemetry stays tagged <code>OBSERVED</code>; moving the Gain slider or Environment × VV-ECMO sliders enters deterministic <code>MECHANISTIC_EDUCATIONAL_SIMULATION</code> (non-diagnostic; not clinical titration).
+        </div>
+      )}
+
+      {showEnvPanel && (
+        <div data-env-ecmo-observatory className="mb-3 rounded-2xl border border-emerald-400/25 bg-[#05101d] p-2.5">
+          <div className="mb-2 grid grid-cols-2 gap-1.5 sm:grid-cols-4">
+            <label className="flex flex-col gap-0.5 rounded-xl border border-white/10 bg-slate-950/80 px-2 py-1.5 font-mono text-[10px] text-amber-200">
+              <span>Temp {envTempC}°C</span>
+              <input type="range" min={5} max={45} value={envTempC} onChange={(e) => setEnvTempC(Number(e.target.value))} className="accent-amber-400" />
+            </label>
+            <label className="flex flex-col gap-0.5 rounded-xl border border-white/10 bg-slate-950/80 px-2 py-1.5 font-mono text-[10px] text-cyan-200">
+              <span>RH {envRhPct}%</span>
+              <input type="range" min={15} max={98} value={envRhPct} onChange={(e) => setEnvRhPct(Number(e.target.value))} className="accent-cyan-400" />
+            </label>
+            <label className="flex flex-col gap-0.5 rounded-xl border border-white/10 bg-slate-950/80 px-2 py-1.5 font-mono text-[10px] text-rose-200">
+              <span>PM2.5 {envPm25}</span>
+              <input type="range" min={2} max={250} value={envPm25} onChange={(e) => setEnvPm25(Number(e.target.value))} className="accent-rose-400" />
+            </label>
+            <label className="flex flex-col gap-0.5 rounded-xl border border-white/10 bg-slate-950/80 px-2 py-1.5 font-mono text-[10px] text-violet-200">
+              <span>Alt {envAltM}m</span>
+              <input type="range" min={0} max={5000} step={100} value={envAltM} onChange={(e) => setEnvAltM(Number(e.target.value))} className="accent-violet-400" />
+            </label>
+          </div>
+          <div className="grid grid-cols-3 gap-1.5 sm:grid-cols-6 font-mono text-[10px]">
+            <div className="rounded-xl border border-white/10 bg-slate-900/90 px-2 py-1.5">
+              <div className="text-slate-400">Pb / PAO2</div>
+              <div className="font-black text-cyan-200">{envReport.atmosphere.barometricMmHg}/{envReport.atmosphere.pao2AlveolarMmHg}</div>
+            </div>
+            <div className="rounded-xl border border-white/10 bg-slate-900/90 px-2 py-1.5">
+              <div className="text-slate-400">DO2</div>
+              <div className="font-black text-emerald-200">{envReport.atmosphere.do2MlMin} mL/m</div>
+            </div>
+            <div className="rounded-xl border border-white/10 bg-slate-900/90 px-2 py-1.5">
+              <div className="text-slate-400">Wet-Bulb</div>
+              <div className="font-black text-amber-200">{envReport.thermoregulation.wetBulbTempC}°C</div>
+            </div>
+            <div className="rounded-xl border border-white/10 bg-slate-900/90 px-2 py-1.5">
+              <div className="text-slate-400">Sweat / H2O</div>
+              <div className="font-black text-sky-200">{envReport.thermoregulation.sweatRateLPerHr} L/h</div>
+            </div>
+            <div className="rounded-xl border border-white/10 bg-slate-900/90 px-2 py-1.5">
+              <div className="text-slate-400">US-AQI</div>
+              <div className="font-black text-rose-200">{envReport.airway.estimatedUsAqi} · {envReport.airway.airQualityTier.slice(0, 6)}</div>
+            </div>
+            <div className="rounded-xl border border-emerald-400/30 bg-emerald-950/50 px-2 py-1.5">
+              <div className="text-emerald-300">VV-ECMO</div>
+              <div className="font-black text-white">{envReport.ecmoBridge.sao2Pct}% · pH {envReport.ecmoBridge.ph}</div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Anatomical Body Analysis Hotspot Stage + 4 Live Waveforms + Organ Table (Screenshots 9 & 10) */}
       <div className="mb-3 grid grid-cols-1 gap-2.5 lg:grid-cols-12">
         {/* Interactive Anatomical Body Hotspot SVG */}
@@ -159,7 +323,7 @@ export function AstralChartMatrix() {
               strokeWidth="0.9"
             />
             <path d="M50 14 V56 M44 33 Q50 38 56 33 M43 45 Q50 49 57 45" fill="none" stroke="rgba(251,113,133,0.45)" strokeWidth="0.7" />
-            {ORGAN_HOTSPOTS.map((org) => {
+            {liveHotspots.map((org) => {
               const sel = org.id === activeOrgan.id
               return (
                 <g
@@ -209,10 +373,10 @@ export function AstralChartMatrix() {
         <div className="flex flex-col justify-between gap-2 lg:col-span-7">
           <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-4">
             {[
-              { k: 'ECG', v: clamp(91), c: '#34d399', d: 'M2 12h8l2-5 3 10 3-13 3 11 2-3h12' },
-              { k: 'Resp', v: clamp(98), c: '#fbbf24', d: 'M2 13 Q9 4 16 13 T30 13 T42 13' },
-              { k: 'SpO2', v: clamp(97), c: '#38bdf8', d: 'M2 14 C10 4, 18 4, 24 14 C30 18, 36 6, 42 12' },
-              { k: 'IBP', v: `${clamp(118, 90, 140)}/78`, c: '#fb7185', d: 'M2 14 L8 5 L13 15 L18 11 L26 14 L32 5 L38 15' },
+              { k: 'ECG', v: `${Math.round(liveHr * scale)} bpm`, c: '#34d399', d: 'M2 12h8l2-5 3 10 3-13 3 11 2-3h12' },
+              { k: 'Resp', v: `${Math.max(8, Math.round(liveResp * scale))}/m`, c: '#fbbf24', d: 'M2 13 Q9 4 16 13 T30 13 T42 13' },
+              { k: 'SpO2', v: `${Math.min(100, Math.max(70, Math.round(liveSpo2 * (0.94 + 0.06 * scale))))}%`, c: '#38bdf8', d: 'M2 14 C10 4, 18 4, 24 14 C30 18, 36 6, 42 12' },
+              { k: 'IBP', v: `${Math.round(liveSbp * scale)}/${Math.round(liveDbp * scale)}`, c: '#fb7185', d: 'M2 14 L8 5 L13 15 L18 11 L26 14 L32 5 L38 15' },
             ].map((w) => (
               <div key={w.k} className="rounded-xl border border-white/10 bg-slate-900/90 p-2">
                 <div className="flex items-center justify-between text-[10px] font-black">
@@ -228,7 +392,7 @@ export function AstralChartMatrix() {
 
           {/* Compact Visual Organ Vitality Table (Screenshot 9 Archealth Table) */}
           <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-3" role="table" aria-label="Organ vitality table">
-            {ORGAN_HOTSPOTS.map((org) => {
+            {liveHotspots.map((org) => {
               const sel = org.id === activeOrgan.id
               const val = clamp(org.pct)
               return (
