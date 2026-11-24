@@ -98,6 +98,7 @@ const SESSION: readonly string[] = [
   'GET /api/push/status',
   'GET /api/reminders',
   'GET /api/satusehat/status',
+  'GET /api/scheduling/state',
   'GET /api/second-opinion',
   'GET /api/settings',
   'GET /api/sports/favorites',
@@ -153,6 +154,7 @@ const SESSION: readonly string[] = [
   'PUT /api/health-series/vo2max',
   'PUT /api/lab-log',
   'PUT /api/ringkasan',
+  'PUT /api/scheduling/state',
   'PUT /api/settings',
   'PUT /api/sports/favorites',
 ]
@@ -163,17 +165,21 @@ const CLINICIAN: readonly string[] = [
   'GET /api/clinician/lab-shares/:id/care',
   'GET /api/clinician/lab-shares/:id/care/fhir',
   'GET /api/clinician/lab-shares/:id/fhir',
+  'GET /api/facility/layouts',
+  'GET /api/facility/layouts/:facilityId',
   'GET /api/validation/:id/cases',
   'GET /api/validation/:id/disagreements',
   'GET /api/validation/studies',
   'POST /api/clinician/lab-shares/:id/care-plan',
   'POST /api/clinician/lab-shares/:id/review',
+  'POST /api/facility/layouts/:facilityId/beds/transition',
   'POST /api/satusehat/encounter',
   'POST /api/second-opinion/:id/complete',
   'POST /api/validation/:id/assessments',
   'POST /api/validation/:id/usability',
   'POST /api/validation/adjudications',
   'POST /api/validation/safety-events',
+  'PUT /api/facility/layouts/:facilityId',
 ]
 
 const OWNER: readonly string[] = [
