@@ -22,6 +22,7 @@ import {
   type AnthropometryManifold,
   type DemographicCohortId,
 } from './demographicManifold'
+import { hantaranO2, kandunganO2, po2DariSaturasi } from '../../lib/ecmo/oksigen'
 
 export type VisualDemographicId =
   | 'wanita'
@@ -614,8 +615,10 @@ export function simulateFsd15DigitalTwinFrame(input: Fsd15TwinSimulationInput): 
   const strokeVolumeMl = Math.round(preset.strokeVolumeMl * svBoost * 10) / 10
   const cardiacOutputLMin = Math.round(((hr * strokeVolumeMl) / 1000) * 100) / 100
   const hbRef = preset.biologicalSex === 'male' ? 14.8 : 13.2
-  const cao2 = 1.34 * hbRef * (spo2 / 100) + 0.3
-  const oxygenDeliveryMlMin = Math.round(cardiacOutputLMin * cao2 * 10)
+  const sao2Frac = spo2 / 100
+  const pao2Est = po2DariSaturasi(sao2Frac)
+  const cao2 = kandunganO2(hbRef, sao2Frac, pao2Est)
+  const oxygenDeliveryMlMin = Math.round(hantaranO2(cardiacOutputLMin, cao2))
   const alveolarVentilationLMin = Math.round(preset.restingRrPerMin * (preset.weightKg * 0.0055) * (0.7 + exertion * 0.3) * 10) / 10
 
   // Cellular & Organelle coupling
