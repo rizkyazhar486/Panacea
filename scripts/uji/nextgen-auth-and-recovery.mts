@@ -93,7 +93,7 @@ mem.set(`pmd_workouts_v1:scope_v1:${oldToken}`, JSON.stringify({
   version: 1,
   ownerAccountId: `acc-owner-${enc}`,
   subjectId: 'p1',
-  items: [{ id: 'w-1', jenis: 'Run', mulai: '2026-11-10T06:00:00Z', akhir: '2026-11-10T06:40:00Z', durasiDetik: 2400, sourceName: 'Garmin Forerunner' }],
+  items: [{ id: 'w-1', jenis: 'Run', mulai: new Date(now - 3 * 86_400_000).toISOString(), akhir: new Date(now - 3 * 86_400_000 + 2400_000).toISOString(), durasiDetik: 2400, sourceName: 'Garmin Forerunner' }],
 }))
 
 // Foreign user B records (MUST NEVER BE ADOPTED!)
