@@ -27,6 +27,9 @@ import {
   addPost,
   listFacilityPrices,
   addFacilityPrice,
+  listFacilityLayouts,
+  getFacilityLayout,
+  saveFacilityLayout,
   likePost,
   reactPost,
   deletePost,
@@ -171,6 +174,12 @@ import { susunRencana, susunLaporan, laporanKeBundelFhir, signCarePlan, isSigned
 import { putusanPengingatCek, PESAN_PENGINGAT_CEK } from './domains/push/pengingatCek.js'
 import { penyimpananSehat, status as statusSimpan } from './simpanAman.js'
 import { pasangRuteHasilLab } from './modules/labResults/http/routes.js'
+import {
+  applyServerBedTransition,
+  canReadFacilityLayouts,
+  canWriteFacilityLayout,
+  type ServerBedTransitionAction,
+} from './domains/facility-architect/facilityStore.js'
 import { pasangRuteReviewManusia } from './modules/humanReview/http/routes.js'
 import { parseMeetCoordinates } from './modules/meets/domain/coordinates.js'
 import { repoHasilLab, repoRujukan, pasienDitugaskan, tugaskanStaf, cabutStaf, setStaffRole, STAFF_ROLES, daftarStaf, getUser } from './store.js'
@@ -690,6 +699,62 @@ app.post('/api/facility-prices', requireAuth, (req, res) => {
   addFacilityPrice(p)
   const { submittedByEmail: _surel, ...umum } = p
   res.json({ price: umum })
+})
+
+app.get('/api/facility/layouts', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  if (!canReadFacilityLayouts({ id: u.id, role: u.role, isOwner: isOwner(u) })) {
+    return res.status(403).json({ error: 'facility_access_denied' })
+  }
+  res.json({ layouts: listFacilityLayouts() })
+})
+
+app.get('/api/facility/layouts/:facilityId', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  const facilityId = String(req.params.facilityId || '')
+  if (!canReadFacilityLayouts({ id: u.id, role: u.role, isOwner: isOwner(u) })) {
+    return res.status(403).json({ error: 'facility_access_denied' })
+  }
+  const layout = getFacilityLayout(facilityId)
+  if (!layout) return res.status(404).json({ error: 'facility_layout_not_found' })
+  res.json({ layout })
+})
+
+app.put('/api/facility/layouts/:facilityId', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  const facilityId = String(req.params.facilityId || '').slice(0, 120)
+  if (!facilityId || facilityId in Object.prototype) return res.status(400).json({ error: 'invalid_facilityId' })
+  if (!canWriteFacilityLayout({ id: u.id, role: u.role, isOwner: isOwner(u) }, facilityId)) {
+    return res.status(403).json({ error: 'facility_write_denied' })
+  }
+  const body = req.body as { facilityName?: string; facilityType?: string; floors?: unknown[] }
+  if (!Array.isArray(body?.floors)) return res.status(400).json({ error: 'missing_floors' })
+  const saved = saveFacilityLayout({
+    facilityId,
+    facilityName: String(body.facilityName || facilityId).slice(0, 160),
+    facilityType: String(body.facilityType || 'IGD').slice(0, 80),
+    floors: body.floors as import('./domains/facility-architect/facilityStore.js').ServerFloorLayer[],
+    updatedAtIso: new Date().toISOString(),
+    updatedBy: u.name,
+  })
+  addAudit(u, 'facility.layout_saved', facilityId)
+  res.json({ layout: saved })
+})
+
+app.post('/api/facility/layouts/:facilityId/beds/transition', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  const facilityId = String(req.params.facilityId || '')
+  if (!canWriteFacilityLayout({ id: u.id, role: u.role, isOwner: isOwner(u) }, facilityId)) {
+    return res.status(403).json({ error: 'facility_write_denied' })
+  }
+  const current = getFacilityLayout(facilityId)
+  if (!current) return res.status(404).json({ error: 'facility_layout_not_found' })
+  const action = req.body as ServerBedTransitionAction
+  const outcome = applyServerBedTransition(current, action, u.name, new Date().toISOString())
+  if (!outcome.ok) return res.status(outcome.statusCode).json({ error: outcome.error })
+  const saved = saveFacilityLayout(outcome.record)
+  addAudit(u, `facility.bed_${action.type}`, facilityId)
+  res.json({ layout: saved })
 })
 
 app.get('/api/posts', (req, res) => {
