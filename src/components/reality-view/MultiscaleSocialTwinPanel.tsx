@@ -113,7 +113,7 @@ export default function MultiscaleSocialTwinPanel() {
   }
 
   return (
-    <div data-multiscale-social-twin className="space-y-3 rounded-2xl border border-cyan-400/25 bg-[#040a16] p-3 text-white">
+    <div data-multiscale-social-twin className="dark space-y-3 rounded-2xl border border-cyan-400/25 bg-[#040a16] p-3 text-white">
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/10 pb-2">
         <div className="flex items-center gap-1.5">
           <button

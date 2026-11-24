@@ -171,7 +171,7 @@ export default function AureumLifetimeMemoryPanel() {
   }
 
   return (
-    <div data-aureum-lifetime-panel className="space-y-2.5 rounded-2xl border border-amber-400/25 bg-[#050b16] p-3 text-white">
+    <div data-aureum-lifetime-panel className="dark space-y-2.5 rounded-2xl border border-amber-400/25 bg-[#050b16] p-3 text-white">
       {/* 6-Mode Multi-Resolution Century Timeline Selector */}
       <div className="flex flex-wrap items-center justify-between gap-1.5 border-b border-white/10 pb-2">
         <div className="flex flex-wrap gap-1">

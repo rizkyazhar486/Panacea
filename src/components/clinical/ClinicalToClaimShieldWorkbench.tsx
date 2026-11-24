@@ -87,7 +87,7 @@ export default function ClinicalToClaimShieldWorkbench() {
     <section
       data-claim-shield-workbench
       aria-label="Clinical-to-Claim Shield Workbench"
-      className="space-y-3 rounded-2xl border border-white/15 bg-neutral-950 p-3.5 text-white"
+      className="dark space-y-3 rounded-2xl border border-white/15 bg-neutral-950 p-3.5 text-white"
     >
       {/* Top Bar: Presets + Role Governance + Disclosure */}
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/10 pb-2.5">
