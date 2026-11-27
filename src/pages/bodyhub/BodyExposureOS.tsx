@@ -1,6 +1,7 @@
 import { lazy, Suspense, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import type { BodySystemId } from '../../lib/bodySystemSourceWave'
 import type { SimulationDomain } from './UnifiedHumanSimulationProjector'
+import type { BodySemanticScale } from '../../lib/bodySemanticZoom'
 import { BodyExposurePatientOverlay } from '../../components/BodyExposurePatientOverlay'
 import { SinyalPribadiDiTubuh } from '../../components/SinyalPribadiDiTubuh'
 import { BodyExplorer } from './BodyExplorer'
@@ -52,6 +53,7 @@ export function BodyExposureOS() {
   const [immersive, setImmersive] = useState(false)
   const [selectedBodySystemId, setSelectedBodySystemId] = useState<BodySystemId>('cardiovascular')
   const [strukturDiminta, setStrukturDiminta] = useState<{ name: string; nonce: number } | null>(null)
+  const [skalaDiminta, setSkalaDiminta] = useState<{ scale: BodySemanticScale; nonce: number } | null>(null)
 
   useEffect(() => {
     const syncFullscreen = () => setImmersive(document.fullscreenElement === rootRef.current)
@@ -120,7 +122,8 @@ export function BodyExposureOS() {
 
   function openSystemAtlas() {
     syncModeFromProjector('anatomy')
-    setActiveRungId('system')
+    setActiveRungId('body')
+    setSkalaDiminta((k) => ({ scale: 'system', nonce: (k?.nonce ?? 0) + 1 }))
     systemsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
 
@@ -185,6 +188,7 @@ export function BodyExposureOS() {
           onSelect={(rung) => {
             syncModeFromProjector(rung.domain)
             setActiveRungId(rung.id)
+            if (rung.scale) { const scale = rung.scale; setSkalaDiminta((k) => ({ scale, nonce: (k?.nonce ?? 0) + 1 })) }
             systemsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
           }}
         />
@@ -206,6 +210,7 @@ export function BodyExposureOS() {
             hideDomainTabs
             onDomainChange={syncModeFromProjector}
             requestedStructure={strukturDiminta}
+            requestedScale={skalaDiminta}
           />
         </Suspense>
       </div>

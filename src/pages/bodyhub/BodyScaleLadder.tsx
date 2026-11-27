@@ -1,4 +1,5 @@
 import type { SimulationDomain } from './UnifiedHumanSimulationProjector'
+import type { BodySemanticScale } from '../../lib/bodySemanticZoom'
 
 // One strip for every scale and lens the Body page covers. A rung opens the
 // projector domain that already renders it; a rung with no renderer yet stays
@@ -9,6 +10,8 @@ export interface BodyScaleRung {
   label: string
   /** Projector domain that renders this rung, or null when nothing ships yet. */
   domain: SimulationDomain | null
+  /** Semantic zoom stop the projector jumps to, so scale rungs on one domain differ. */
+  scale?: BodySemanticScale
 }
 
 export interface BodyScaleGroup {
@@ -20,14 +23,12 @@ export interface BodyScaleGroup {
 export const BODY_SCALE_GROUPS: readonly BodyScaleGroup[] = [
   { id: 'structure', label: 'Structure', rungs: [
     { id: 'you', label: 'My Body', domain: 'personal-avatar' },
-    { id: 'body', label: 'Body', domain: 'anatomy' },
-    { id: 'system', label: 'System', domain: 'anatomy' },
-    { id: 'organ', label: 'Organ', domain: 'anatomy' },
-    { id: 'tissue', label: 'Tissue · Histology', domain: 'cell' },
-    { id: 'cell', label: 'Cell', domain: 'cell' },
-    { id: 'organelle', label: 'Organelle', domain: 'cell' },
-    { id: 'dna-rna', label: 'DNA · RNA', domain: 'genome' },
-    { id: 'compound', label: 'Compound', domain: 'pharmacology' },
+    { id: 'body', label: 'Body · System', domain: 'anatomy', scale: 'whole-body' },
+    { id: 'organ', label: 'Organ', domain: 'anatomy', scale: 'organ' },
+    { id: 'tissue', label: 'Tissue · Histology', domain: 'anatomy', scale: 'tissue' },
+    { id: 'cell', label: 'Cell · Organelle', domain: 'cell', scale: 'cell' },
+    { id: 'dna-rna', label: 'DNA · RNA', domain: 'genome', scale: 'genome' },
+    { id: 'compound', label: 'Compound', domain: 'anatomy', scale: 'molecule' },
     { id: 'element', label: 'Element', domain: null },
     { id: 'quantum', label: 'Quantum', domain: null },
   ] },
