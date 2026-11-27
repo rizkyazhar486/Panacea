@@ -156,3 +156,17 @@ export {
   type WallPattern,
   type WallFold,
 } from "./engine/endoscopy/scopeSim.ts";
+export {
+  buildAirwayTree,
+  branchDirection,
+  chooseChild,
+  airwayPath,
+  airwayCapsules,
+  nearestCapsules,
+  capsuleAxisDistance,
+  type AirwayBranch,
+  type AirwayBranchDef,
+  type AirwayCapsule,
+  type AirwayTreeResult,
+} from "./engine/endoscopy/airwayTree.ts";
+export { BRONCHIAL_TREE, type BronchusDef } from "./data/bronchialTree.ts";
