@@ -1,3 +1,4 @@
+import { tzOffsetMenit } from './shared/userLocalTime.js'
 import { randomUUID } from 'node:crypto'
 import { middlewareObservabilitas, ringkasanObservabilitas, jalurAman, egressPerRute } from './domains/observability/observabilitas.js'
 import { pasangHealthRingan } from './domains/observability/healthRingan.js'
@@ -1519,7 +1520,7 @@ app.get('/api/hr-notifications', requireAuth, (req, res) => {
 // Why is nothing arriving? Answers with named settings, not vague advice.
 app.get('/api/health-sync/diagnosis', requireAuth, (req, res) => {
   const u = (req as express.Request & { user: User }).user
-  res.json({ ...diagnoseSync(u.email), recent: getWebhookDeliveries(u.email).slice(-10).reverse() })
+  res.json({ ...diagnoseSync(u.email, Date.now(), tzOffsetMenit(getSettings(u.id))), recent: getWebhookDeliveries(u.email).slice(-10).reverse() })
 })
 
 // Heart-rate log. `since` is epoch ms; defaults to the last 24 hours so a
