@@ -150,6 +150,7 @@ export function BodyExposureOS() {
             <h2 id="body-exposure-os-title" className="text-base font-black tracking-[-.02em] text-white sm:text-lg">
               Your body. Every scale.
             </h2>
+            <p className="sr-only">You → anatomy → function → imaging → micro</p>
             <BatasKlaimKesehatan permukaan="body.exposure-os" className="shrink-0" />
           </div>
 

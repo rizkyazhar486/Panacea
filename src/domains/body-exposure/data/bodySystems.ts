@@ -49,7 +49,7 @@ export const BODY_SYSTEM_SOURCE_WAVE: readonly BodySystemSourceDefinition[] = [
   { id: 'nervous', label: 'Nervous', targets: [
     { id: 'brain', label: 'Brain', file: 'nervous.glb', hints: ['brain', 'gyrus', 'sulcus', 'cerebell', 'midbrain', 'medulla oblongata', 'hypothalamus', 'thalamus', 'pons', 'falx cerebri'] },
     { id: 'spinal-cord', label: 'Spinal cord', file: 'nervous.glb', hints: ['spinal cord'] },
-    { id: 'cranial-nerves', label: 'Cranial nerves', file: 'nervous.glb', hints: ['cranial nerve', 'optic nerve', 'oculomotor nerve', 'trigeminal nerve', 'abducens nerve', 'facial nerve', 'glossopharyngeal nerve', 'vagus nerve', 'accessory nerve', 'hypoglossal nerve'] },
+    { id: 'cranial-nerves', label: 'Cranial nerves', file: 'nervous.glb', hints: ['cranial nerve', 'oculomotor nerve', 'trigeminal nerve', 'abducens nerve', 'facial nerve', 'glossopharyngeal nerve', 'vagus nerve', 'accessory nerve', 'hypoglossal nerve'] },
     { id: 'peripheral-nerves', label: 'Peripheral nerves', file: 'nervous.glb', hints: ['nerve'] },
   ] },
   { id: 'respiratory', label: 'Respiratory', targets: [

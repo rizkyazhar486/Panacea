@@ -8,7 +8,7 @@ const iAuto = proyeksi.indexOf('projected.matrixAutoUpdate = false'), iPaksa = p
 assert.ok(iAuto > 0 && iPaksa > iAuto && iBatas > iPaksa, 'batas proyeksi dihitung dari matrixWorld basi (kubus ±1): kamera seluruh tubuh salah bingkai')
 const bingkai = f.slice(f.indexOf('function bingkaiMesh'), f.indexOf('function bingkaiMesh') + 600)
 assert.match(bingkai, /mesh\.updateMatrixWorld\(true\)\n\s*const bounds = new THREE\.Box3\(\)\.setFromObject\(mesh, true\)/, 'bingkai struktur memakai matrixWorld basi: kamera nyaris tidak bergerak')
-assert.match(f, /if \(!open\) \{ openAtlas\(\); return \}/, 'permintaan fokus tidak membuka atlas')
+assert.match(f, /if \(!open( \|\| !rendererArmed)?\) \{ openAtlas\(\); return \}/,'permintaan fokus tidak membuka atlas')
 assert.match(f, /focusStatus\?\.attempted && focusStatus\.name === selectedStructureName/, 'status fokus tampil sebelum ada percobaan (klaim palsu)')
 assert.match(f, /framed: Boolean\(focusApplierRef\.current\?\.\(tertunda\)\), attempted: true/)
 assert.match(readFileSync('src/pages/bodyhub/UnifiedHumanSimulationProjector.tsx', 'utf8'), /focusRequest=\{requestedStructure\}/)

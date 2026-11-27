@@ -682,7 +682,11 @@ export default function BodyAllSystems3D({
       ref={stageHostRef}
       className="dark overflow-hidden rounded-[26px] border border-white/[.12] bg-[#02050b] p-3 text-white shadow-[0_18px_70px_rgba(0,0,0,.28)] sm:p-4"
       aria-label="Eleven body systems source-backed 4D atlas"
+      aria-describedby="body-atlas-provenance"
     >
+      <p id="body-atlas-provenance" className="sr-only">
+        Start from a source-backed whole-body surface, then inspect the selected system inside it; unresolved or failed structures remain blocked instead of being replaced with invented anatomy.
+      </p>
       <div className="no-scrollbar flex gap-1.5 overflow-x-auto pb-1" role="tablist" aria-label="Body systems">
         {BODY_SYSTEM_SOURCE_WAVE.map((system) => {
           const active = system.id === systemId
