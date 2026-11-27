@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from 'react'
+import { lazy, Suspense, useEffect, useRef, useState } from 'react'
+const Img2ThreeJsTwinViewport = lazy(() => import('./Img2ThreeJsTwinViewport'))
 import {
   PERSONAL_AVATAR_CAPTURE_VIEWS,
   PERSONAL_AVATAR_TRUTH_BOUNDARY,
@@ -236,6 +237,11 @@ export default function PersonalAvatarCameraCapture({
 
           {error ? <div className="mt-3 rounded-xl border border-red-300/15 bg-red-500/[.08] p-2 text-[9px] font-bold text-red-100/75">{error}</div> : null}
         </div>
+      </div>
+      <div className="border-t border-white/[.08] p-3 sm:p-4">
+        <Suspense fallback={<div className="p-3 text-xs text-slate-400">Loading 1:1 img2threejs CAD/CAE twin…</div>}>
+          <Img2ThreeJsTwinViewport capturedFrameCount={frames.length} />
+        </Suspense>
       </div>
     </section>
   )
