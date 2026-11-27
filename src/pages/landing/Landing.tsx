@@ -20,7 +20,7 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
   }, [])
 
   return (
-    <div className="min-h-screen bg-white text-ink dark:bg-[#05070b] dark:text-neutral-100">
+    <div className="min-h-screen bg-white text-neutral-950 dark:bg-[#05070b] dark:text-neutral-100">
       <LandingHeader theme={theme} onToggleTheme={() => setTheme(toggleTheme())} onMasuk={onMasuk} />
       <main>
         <HeroSection onMasuk={onMasuk} />

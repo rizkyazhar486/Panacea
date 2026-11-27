@@ -16,14 +16,14 @@ export function GovernanceSection() {
     <>
       {/* ── INSTITUTIONAL GOVERNANCE & CORPORATE CONTACT ─────────── */}
       <div className="h-px w-full bg-gradient-to-r from-transparent via-emerald-500/25 to-transparent" />
-      <section id="about-us" className="border-t border-black/5 bg-[#fafcfb] px-6 py-20 dark:border-white/10 dark:bg-[#030d07] sm:px-10">
+      <section id="about-us" className="border-t border-neutral-200/80 bg-[#F8FAF9] px-6 py-20 text-neutral-950 dark:border-white/10 dark:bg-[#060A09] dark:text-neutral-50 sm:px-10">
         <Reveal>
-          <div className="mx-auto grid max-w-5xl gap-6 rounded-[2.5rem] border border-black/5 bg-gradient-to-br from-white via-neutral-50/50 to-white p-8 shadow-sm dark:border-white/10 dark:from-neutral-900 dark:via-neutral-900 dark:to-neutral-950 lg:grid-cols-3">
+          <div className="mx-auto grid max-w-5xl gap-6 rounded-[2.5rem] border border-neutral-200/80 bg-white p-8 shadow-sm dark:border-white/10 dark:bg-[#111815] lg:grid-cols-3">
             <div>
-              <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-dark dark:text-emerald-400">
+              <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-400">
                 Tata Kelola Institusional
               </span>
-              <h2 className="mt-1 text-2xl font-extrabold text-ink dark:text-white">Tentang Panaceamed</h2>
+              <h2 className="mt-1 text-2xl font-extrabold text-neutral-950 dark:text-white">Tentang Panaceamed</h2>
               <Prosa baris={8} kelas="mt-3 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">
                 Panaceamed.id adalah platform integrasi data klinis dan kesehatan preventif jangka panjang: sistem AI-EMR memfasilitasi anamnesis awal terstruktur, dokter berizin melakukan telaah rekam medis. Misi kami menghadirkan layanan kesehatan presisi, pemantauan penyakit kronis, dan sains longevity teruji yang dapat diakses secara merata — berlandaskan kepatuhan penuh terhadap UU Perlindungan Data Pribadi (UU PDP No. 27/2022).
               </Prosa>
@@ -32,8 +32,8 @@ export function GovernanceSection() {
                 <span>Terdaftar &amp; Mematuhi Regulasi Faskes RI</span>
               </div>
             </div>
-            <div className="rounded-3xl border border-brand/20 bg-brand-50/60 p-6 dark:bg-emerald-950/30">
-              <h3 className="font-extrabold text-ink dark:text-white">Kontak Korporat &amp; Faskes</h3>
+            <div className="rounded-3xl border border-emerald-700/20 bg-emerald-50/60 p-6 dark:border-emerald-400/20 dark:bg-emerald-950/30">
+              <h3 className="font-extrabold text-neutral-950 dark:text-white">Kontak Korporat &amp; Faskes</h3>
               <ul className="mt-4 space-y-3.5 text-sm">
                 <li className="flex items-start gap-2.5">
                   <span className="mt-0.5 text-emerald-600 dark:text-emerald-400">
@@ -62,23 +62,23 @@ export function GovernanceSection() {
                     <IconBuilding size={16} />
                   </span>
                   <div>
-                    <span className="block text-[11px] font-bold uppercase tracking-wider text-neutral-500">Badan Hukum &amp; Kantor</span>
-                    <span className="font-semibold text-ink dark:text-neutral-200">PT Panacea Digital Nusantara</span>
+                    <span className="block text-[11px] font-bold uppercase tracking-wider text-neutral-600 dark:text-neutral-400">Badan Hukum &amp; Kantor</span>
+                    <span className="font-semibold text-neutral-950 dark:text-neutral-100">PT Panacea Digital Nusantara</span>
                     <span className="block text-xs text-neutral-600 dark:text-neutral-400">SCBD, Jl. Jend. Sudirman, Jakarta Selatan</span>
                   </div>
                 </li>
               </ul>
             </div>
-            <div className="rounded-3xl border border-black/5 bg-neutral-50/80 p-6 dark:border-white/5 dark:bg-neutral-800/60">
-              <h3 className="font-extrabold text-ink dark:text-white">Direksi Riset &amp; Kanal Resmi</h3>
+            <div className="rounded-3xl border border-neutral-200/80 bg-neutral-50 p-6 dark:border-white/10 dark:bg-[#17211d]">
+              <h3 className="font-extrabold text-neutral-950 dark:text-white">Direksi Riset &amp; Kanal Resmi</h3>
               <ul className="mt-4 space-y-3.5 text-sm">
                 <li className="flex items-start gap-2.5">
                   <span className="mt-0.5 text-emerald-600 dark:text-emerald-400">
                     <IconStethoscope size={16} />
                   </span>
                   <div>
-                    <span className="block text-[11px] font-bold uppercase tracking-wider text-neutral-500">Lead Research</span>
-                    <b className="text-ink dark:text-white">Rizky Muhammad Azrissal</b>
+                    <span className="block text-[11px] font-bold uppercase tracking-wider text-neutral-600 dark:text-neutral-400">Lead Research</span>
+                    <b className="text-neutral-950 dark:text-white">Rizky Muhammad Azrissal</b>
                   </div>
                 </li>
                 <li className="flex items-start gap-2.5">

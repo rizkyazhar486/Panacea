@@ -35,7 +35,7 @@ export function BrandFilmsSection() {
           <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
             <div className="max-w-2xl space-y-2">
               <span className="inline-block font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-emerald-700 dark:text-emerald-400">
-                ARSHIVAL ANATOMI BERKUALITAS STUDIO
+                VISUALISASI ANATOMI 3D STUDIO
               </span>
               <h2
                 id="studio-showcase-title"
