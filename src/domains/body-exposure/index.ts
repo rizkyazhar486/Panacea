@@ -142,3 +142,17 @@ export {
   type LumenSegmentInput,
   anteriorMap,
 } from "./engine/endoscopy/lumenPath.ts";
+export {
+  routeProfile,
+  radiusAt,
+  openFactor,
+  initialScope,
+  stepScope,
+  wallFold,
+  SCOPE,
+  type RouteProfile,
+  type ScopeState,
+  type ScopeInput,
+  type WallPattern,
+  type WallFold,
+} from "./engine/endoscopy/scopeSim.ts";

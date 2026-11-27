@@ -1,10 +1,9 @@
 import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react'
-import { useReducedMotion } from 'framer-motion'
 import type { BodySystemId } from '../../lib/bodySystemSourceWave'
-import type { EndoluminalRoute, EndoluminalSegment } from '../../components/bodyhub/EndoluminalView3D'
+import type { EndoluminalLandmark, EndoluminalSegment } from '../../components/bodyhub/endoscopy/EndoluminalSim'
 
-// Three.js and the 3.7 MB atlas load only when the scope is opened.
-const EndoluminalView3D = lazy(() => import('../../components/bodyhub/EndoluminalView3D'))
+// Three.js, post-processing and the 3.7 MB atlas load only when the scope is opened.
+const EndoluminalSim = lazy(() => import('../../components/bodyhub/endoscopy/EndoluminalSim'))
 
 type ScopeProcedureId = 'colonoscopy' | 'upper-gi' | 'bronchoscopy'
 
@@ -13,11 +12,14 @@ type ScopeProcedure = {
   label: string
   shortLabel: string
   systemId: BodySystemId
-  /** Insertion order. Only segments that exist as meshes in the reference atlas; no rectum/caecum mesh, so none shown. */
+  /** Insertion order. Only segments that exist as meshes in the reference atlas (it has no rectum or caecum mesh). */
   segments: readonly EndoluminalSegment[]
   /** Which end the scope enters from (metres, atlas space). */
   startNear: { x: number; y: number; z: number }
   tint: string
+  vesselTone: string
+  peristalsis: number
+  breathing: number
 }
 
 const PROCEDURES: readonly ScopeProcedure[] = [
@@ -27,13 +29,16 @@ const PROCEDURES: readonly ScopeProcedure[] = [
     shortLabel: 'Colon',
     systemId: 'digestive',
     segments: [
-      { node: 'Sigmoid_colon', label: 'Sigmoid colon', take: 'all' },
-      { node: 'Descending_colon', label: 'Descending colon', take: 'all' },
-      { node: 'Transverse_colon', label: 'Transverse colon', take: 'all' },
-      { node: 'Ascending_colon', label: 'Ascending colon', take: 'all' },
+      { node: 'Sigmoid_colon', label: 'Sigmoid colon', take: 'all', wall: 'colon' },
+      { node: 'Descending_colon', label: 'Descending colon', take: 'all', wall: 'colon' },
+      { node: 'Transverse_colon', label: 'Transverse colon', take: 'all', wall: 'colon' },
+      { node: 'Ascending_colon', label: 'Ascending colon', take: 'all', wall: 'colon' },
     ],
     startNear: { x: 0, y: 0.8, z: -0.05 },
-    tint: '#c9614f',
+    tint: '#e0846c',
+    vesselTone: '#7a1426',
+    peristalsis: 0.07,
+    breathing: 0,
   },
   {
     id: 'upper-gi',
@@ -41,12 +46,15 @@ const PROCEDURES: readonly ScopeProcedure[] = [
     shortLabel: 'Upper GI',
     systemId: 'digestive',
     segments: [
-      { node: 'Oesophagus', label: 'Oesophagus', take: 'all' },
-      { node: 'Mucosa_of_stomach', label: 'Stomach', take: 'all' },
-      { node: 'Duodenum', label: 'Duodenum', take: 'all' },
+      { node: 'Oesophagus', label: 'Oesophagus', take: 'all', wall: 'oesophagus' },
+      { node: 'Mucosa_of_stomach', label: 'Stomach', take: 'all', wall: 'stomach' },
+      { node: 'Duodenum', label: 'Duodenum', take: 'all', wall: 'duodenum' },
     ],
     startNear: { x: 0, y: 1.6, z: 0 },
-    tint: '#c8634a',
+    tint: '#de7a5c',
+    vesselTone: '#6e1020',
+    peristalsis: 0.09,
+    breathing: 0,
   },
   {
     id: 'bronchoscopy',
@@ -54,14 +62,17 @@ const PROCEDURES: readonly ScopeProcedure[] = [
     shortLabel: 'Airway',
     systemId: 'respiratory',
     segments: [
-      { node: 'Trachea', label: 'Trachea', take: 'own' },
-      { node: 'Right_main_bronchus', label: 'Right main bronchus', take: 'own' },
-      { node: 'Intermediate_bronchusr', label: 'Intermediate bronchus', take: 'own' },
-      { node: 'Right_inferior_lobar_bronchus', label: 'Right lower lobe bronchus', take: 'own' },
-      { node: 'Posterior_basal_segmental_bronchus_of_right_lung_(BX)', label: 'Posterior basal segment', take: 'own' },
+      { node: 'Trachea', label: 'Trachea', take: 'own', wall: 'trachea' },
+      { node: 'Right_main_bronchus', label: 'Right main bronchus', take: 'own', wall: 'bronchus' },
+      { node: 'Intermediate_bronchusr', label: 'Intermediate bronchus', take: 'own', wall: 'bronchus' },
+      { node: 'Right_inferior_lobar_bronchus', label: 'Right lower lobe bronchus', take: 'own', wall: 'bronchus' },
+      { node: 'Posterior_basal_segmental_bronchus_of_right_lung_(BX)', label: 'Posterior basal segment', take: 'own', wall: 'bronchus' },
     ],
     startNear: { x: 0, y: 1.6, z: 0 },
-    tint: '#d99a8c',
+    tint: '#e7a598',
+    vesselTone: '#8a1c2c',
+    peristalsis: 0,
+    breathing: 0.05,
   },
 ] as const
 
@@ -72,136 +83,60 @@ interface VirtualEndoscopyWorkbenchProps {
 }
 
 const clamp01 = (value: number) => Math.max(0, Math.min(1, value))
-const PILL = 'min-h-[44px] shrink-0 rounded-full px-4 text-[12px] font-bold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-200/60'
 
 export default function VirtualEndoscopyWorkbench({
   selectedSystemId,
   selectedSourceStructureName,
   onSystemChange,
 }: VirtualEndoscopyWorkbenchProps) {
-  const reducedMotion = useReducedMotion()
   const initialProcedure = selectedSystemId === 'respiratory' ? 'bronchoscopy' : 'colonoscopy'
   const [procedureId, setProcedureId] = useState<ScopeProcedureId>(initialProcedure)
   const [progress, setProgress] = useState(0)
-  const [playing, setPlaying] = useState(false)
-  const [route, setRoute] = useState<EndoluminalRoute | null>(null)
+  const [landmarks, setLandmarks] = useState<EndoluminalLandmark[] | null>(null)
+  const [jump, setJump] = useState<{ t: number; n: number } | null>(null)
   const procedure = useMemo(
     () => PROCEDURES.find((item) => item.id === procedureId) ?? PROCEDURES[0],
     [procedureId],
   )
-  const landmarks = route?.landmarks ?? procedure.segments.map((s, i, all) => ({ label: s.label, t: i / Math.max(1, all.length - 1) }))
+  const stops = landmarks ?? procedure.segments.map((s) => ({ label: s.label, t: Number.NaN }))
   let pointIndex = 0
-  for (let i = 0; i < landmarks.length; i++) if (progress >= landmarks[i].t) pointIndex = i
-  const point = landmarks[pointIndex]
+  for (let i = 0; i < stops.length; i++) if (progress >= stops[i].t) pointIndex = i
 
   useEffect(() => {
     onSystemChange(procedure.systemId)
   }, [onSystemChange, procedure.systemId])
 
-  useEffect(() => {
-    if (!playing || reducedMotion) return
-    let raf = 0
-    let last = performance.now()
-    const tick = (now: number) => {
-      const dt = Math.min(0.05, (now - last) / 1000)
-      last = now
-      let selesai = false
-      setProgress((current) => {
-        const next = clamp01(current + dt * 0.022)
-        if (next >= 1) selesai = true
-        return next
-      })
-      if (selesai) setPlaying(false)
-      else raf = requestAnimationFrame(tick)
-    }
-    raf = requestAnimationFrame(tick)
-    return () => cancelAnimationFrame(raf)
-  }, [playing, reducedMotion])
-
-  const onRoute = useCallback((r: EndoluminalRoute | null) => setRoute(r), [])
+  const onLandmarks = useCallback((lm: EndoluminalLandmark[]) => setLandmarks(lm), [])
+  const onProgress = useCallback((t: number) => setProgress(t), [])
 
   function chooseProcedure(next: ScopeProcedureId) {
     setProcedureId(next)
-    setRoute(null)
+    setLandmarks(null)
     setProgress(0)
-    setPlaying(false)
+    setJump(null)
   }
 
+  // Training shortcut: restart the scope at the start of a segment. Before the route is computed the stops are spaced
+  // evenly so the call is still well defined.
   function jumpTo(index: number) {
-    const denominator = Math.max(1, landmarks.length - 1)
-    setProgress(route ? landmarks[index].t : index / denominator)
-    setPlaying(false)
+    const denominator = Math.max(1, stops.length - 1)
+    const t = landmarks ? landmarks[index].t : index / denominator
+    setJump((j) => ({ t: clamp01(t), n: (j?.n ?? 0) + 1 }))
   }
-
-  // Position on the route map: last centre-line point at or before the scope.
-  const mapPath = route?.map.length ? route.map.map((m, i) => `${i ? 'L' : 'M'}${m.x.toFixed(1)} ${m.y.toFixed(1)}`).join(' ') : ''
-  const here = route?.map.length ? route.map.reduce((best, m) => (m.t <= progress ? m : best), route.map[0]) : null
-  const cm = route ? Math.round(progress * route.lengthCm) : null
 
   return (
     <section
-      data-virtual-endoscopy="v2"
+      data-virtual-endoscopy="v3-simulator"
       data-selected-source-structure={selectedSourceStructureName ?? undefined}
       data-structure-route-inference="not-inferred"
       data-patient-specific-scope-navigation="not-generated"
-      className="dark overflow-hidden rounded-[24px] bg-black text-white"
+      className="dark flex flex-col gap-3 rounded-[24px] bg-black p-2 text-white sm:p-3"
       aria-labelledby="virtual-endoscopy-title"
       data-pmd-unclamped="true"
     >
-      <div className="relative aspect-[4/5] w-full sm:aspect-[16/9]">
-        <Suspense fallback={<div className="absolute inset-0 grid place-items-center text-[11px] font-bold text-white/50">Loading 3D scope…</div>}>
-          <EndoluminalView3D
-            key={procedure.id}
-            segments={procedure.segments}
-            startNear={procedure.startNear}
-            tint={procedure.tint}
-            t={progress}
-            onRoute={onRoute}
-          />
-        </Suspense>
-
-        <div className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between gap-3 bg-gradient-to-b from-black/70 to-transparent p-4">
-          <div className="min-w-0">
-            <h4 id="virtual-endoscopy-title" className="text-[15px] font-black tracking-[-.01em] text-white">{procedure.label}</h4>
-            <p className="mt-0.5 text-[11px] font-semibold text-white/60">{point.label}{cm !== null ? ` · ${cm} cm` : ''}</p>
-          </div>
-          {mapPath && here && (
-            <svg viewBox="0 0 100 100" className="h-[86px] w-[86px] shrink-0 rounded-[14px] bg-black/45 backdrop-blur-md" role="img" aria-label={`${procedure.label} route seen from the front`}>
-              <path d={mapPath} fill="none" stroke="rgba(255,255,255,.22)" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" />
-              <path d={mapPath} fill="none" stroke="#fda4af" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-              <circle cx={here.x} cy={here.y} r="5" fill="#fff" />
-              <text x="5" y="96" fontSize="10" fontWeight="800" fill="rgba(255,255,255,.55)">R</text>
-              <text x="88" y="96" fontSize="10" fontWeight="800" fill="rgba(255,255,255,.55)">L</text>
-            </svg>
-          )}
-        </div>
-
-        <div className="absolute inset-x-0 bottom-0 flex items-center gap-3 bg-gradient-to-t from-black/80 to-transparent px-4 pb-4 pt-10">
-          <button
-            type="button"
-            aria-label={playing ? 'Pause simulated scope' : 'Play simulated scope'}
-            onClick={() => { if (progress >= 1) setProgress(0); setPlaying((value) => !value) }}
-            style={{ background: '#fff', color: '#000', borderRadius: 9999 }}
-            data-pmd-native="true"
-            className="grid h-12 w-12 shrink-0 place-items-center text-base font-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-200/70"
-          >
-            {playing ? 'Ⅱ' : '▶'}
-          </button>
-          <input
-            type="range"
-            min={0}
-            max={1000}
-            step={1}
-            value={Math.round(progress * 1000)}
-            onChange={(event) => { setProgress(clamp01(Number(event.target.value) / 1000)); setPlaying(false) }}
-            aria-label="Simulated route progress"
-            className="h-11 min-w-0 flex-1 cursor-pointer accent-rose-300"
-          />
-        </div>
-      </div>
-
-      <div className="flex flex-col gap-3 p-3">
-        <div className="no-scrollbar flex gap-2 overflow-x-auto" role="tablist" aria-label="Virtual endoscopy procedure">
+      <div className="flex items-center justify-between gap-2 px-1 pt-1">
+        <h4 id="virtual-endoscopy-title" className="text-[15px] font-black tracking-[-.01em]">{procedure.label}</h4>
+        <div className="no-scrollbar flex gap-1.5 overflow-x-auto" role="tablist" aria-label="Virtual endoscopy procedure">
           {PROCEDURES.map((item) => {
             const active = item.id === procedure.id
             return (
@@ -212,39 +147,54 @@ export default function VirtualEndoscopyWorkbench({
                 aria-selected={active}
                 onClick={() => chooseProcedure(item.id)}
                 data-pmd-native="true"
-                style={active ? { background: '#fff', color: '#000' } : { background: 'rgba(255,255,255,.08)', color: 'rgba(255,255,255,.75)' }}
-                className={PILL}
+                style={active ? { background: '#fff', color: '#000', borderRadius: 9999 } : { background: 'rgba(255,255,255,.08)', color: 'rgba(255,255,255,.75)', borderRadius: 9999 }}
+                className="min-h-[44px] shrink-0 px-3.5 text-[12px] font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-200/60"
               >
                 {item.shortLabel}
               </button>
             )
           })}
         </div>
-
-        <nav className="no-scrollbar flex gap-2 overflow-x-auto" aria-label={`${procedure.label} landmarks`}>
-          {landmarks.map((item, index) => {
-            const active = index === pointIndex
-            return (
-              <button
-                key={item.label}
-                type="button"
-                aria-current={active ? 'step' : undefined}
-                onClick={() => jumpTo(index)}
-                data-pmd-native="true"
-                style={{ background: 'transparent', border: `1px solid ${active ? 'rgba(253,164,175,.7)' : 'rgba(255,255,255,.14)'}`, color: active ? '#fff' : 'rgba(255,255,255,.62)', borderRadius: 9999 }}
-                className="min-h-[44px] shrink-0 px-4 text-[12px] font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-200/60"
-              >
-                {item.label}
-              </button>
-            )
-          })}
-        </nav>
-
-        <details className="rounded-[14px] px-1 text-[11px] text-white/55">
-          <summary className="flex min-h-[44px] cursor-pointer items-center font-bold text-white/70">About this view</summary>
-          <p className="pb-2 leading-relaxed">Simulated reference view · not patient anatomy or procedural navigation. The camera travels inside Z-Anatomy / BodyParts3D reference meshes (CC BY-SA 4.0) along a centre line computed from them; drag to look at the wall. Colour and lighting are illustrative. These views do not estimate patient geometry, lesion position, insertion distance, force, device settings, or a safe procedural trajectory.</p>
-        </details>
       </div>
+
+      <Suspense fallback={<div className="grid aspect-square place-items-center rounded-[22px] bg-black text-[12px] font-bold text-white/50 sm:aspect-[16/10]">Preparing the simulator…</div>}>
+        <EndoluminalSim
+          key={procedure.id}
+          segments={procedure.segments}
+          startNear={procedure.startNear}
+          tint={procedure.tint}
+          vesselTone={procedure.vesselTone}
+          peristalsis={procedure.peristalsis}
+          breathing={procedure.breathing}
+          jump={jump}
+          onLandmarks={onLandmarks}
+          onProgress={onProgress}
+        />
+      </Suspense>
+
+      <nav className="no-scrollbar flex gap-2 overflow-x-auto" aria-label={`${procedure.label}: restart at a segment`}>
+        {stops.map((item, index) => {
+          const active = index === pointIndex
+          return (
+            <button
+              key={item.label}
+              type="button"
+              aria-current={active ? 'step' : undefined}
+              onClick={() => jumpTo(index)}
+              data-pmd-native="true"
+              style={{ background: 'transparent', border: `1px solid ${active ? 'rgba(253,164,175,.7)' : 'rgba(255,255,255,.14)'}`, color: active ? '#fff' : 'rgba(255,255,255,.62)', borderRadius: 9999 }}
+              className="min-h-[44px] shrink-0 px-4 text-[12px] font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-200/60"
+            >
+              {item.label}
+            </button>
+          )
+        })}
+      </nav>
+
+      <details className="px-1 text-[11px] text-white/55">
+        <summary className="flex min-h-[44px] cursor-pointer items-center font-bold text-white/70">About this simulator</summary>
+        <p className="pb-2 leading-relaxed">Simulated reference view · not patient anatomy or procedural navigation. Route and calibre come from Z-Anatomy / BodyParts3D reference meshes (CC BY-SA 4.0); wall motion, folds, vessels, colour and optics are simulated for teaching. Keyboard: ↑/↓ push and pull, W A S D angle the tip, Space air, Q suction. These simulations do not estimate patient geometry, lesion position, insertion distance, force, device settings, or a safe procedural trajectory.</p>
+      </details>
     </section>
   )
 }
