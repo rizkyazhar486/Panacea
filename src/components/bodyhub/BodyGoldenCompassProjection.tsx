@@ -343,7 +343,7 @@ export function BodyGoldenCompassProjection({
           <div className="text-[10px] font-black uppercase tracking-[.14em] text-slate-300">Selected 3D Structure</div>
           <div className="truncate text-xs font-black text-cyan-100">{selectedStructureName ?? 'Tap any organ mesh in 3D'}</div>
           <div className="flex items-center justify-between text-[11px] font-bold text-slate-200">
-            <span>Scale: {semanticScaleLabel}</span>
+            <span title="Relative zoom controls representation/LOD; it is not optical magnification">Scale: {semanticScaleLabel}</span>
             <span className="font-mono text-cyan-200">{relativeZoom.toFixed(1)}×</span>
           </div>
           {structureEducation && (
