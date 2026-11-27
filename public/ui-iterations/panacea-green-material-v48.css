@@ -119,8 +119,9 @@ html.dark.pmd-liquid-actions-v45 :where(
   button[class*='kaca'],
   button[class*='border'],
   button[class*='bg-']
-):not(.bg-brand):not([data-tone='brand']):not([data-variant='primary']) {
+):not(.bg-brand):not([data-tone='brand']):not([data-variant='primary']):not([data-pmd-native='true']):not(.cta-banner-btn):not(.cta-atlas-btn):not([class*='from-[#00BF63]']):not([class*='from-emerald-']) {
   border-color: rgba(255,255,255,.095) !important;
+  color: #ffffff !important;
   background:
     radial-gradient(120% 100% at 18% -16%, rgba(255,255,255,.085), transparent 50%),
     linear-gradient(180deg, var(--pmd48-graphite), var(--pmd48-deep)) !important;
@@ -131,10 +132,10 @@ html.dark.pmd-liquid-actions-v45 :where(
 }
 
 html.pmd-liquid-actions-v45 :where(
-  button.bg-brand,
-  button[class~='bg-brand'],
-  button[data-tone='brand'],
-  button[data-variant='primary'],
+  button.bg-brand:not([data-pmd-native='true']):not(.cta-banner-btn):not(.cta-atlas-btn),
+  button[class~='bg-brand']:not([data-pmd-native='true']):not(.cta-banner-btn):not(.cta-atlas-btn),
+  button[data-tone='brand']:not([data-pmd-native='true']):not(.cta-banner-btn):not(.cta-atlas-btn),
+  button[data-variant='primary']:not([data-pmd-native='true']):not(.cta-banner-btn):not(.cta-atlas-btn),
   input[type='submit']
 ) {
   color: #07150d !important;
@@ -149,10 +150,10 @@ html.pmd-liquid-actions-v45 :where(
 }
 
 html.pmd-liquid-actions-v45 :where(
-  button[aria-pressed='true'],
-  button[aria-selected='true'],
-  [role='tab'][aria-selected='true'],
-  button[aria-current='page']
+  button[aria-pressed='true']:not([data-pmd-native='true']),
+  button[aria-selected='true']:not([data-pmd-native='true']),
+  [role='tab'][aria-selected='true']:not([data-pmd-native='true']),
+  button[aria-current='page']:not([data-pmd-native='true'])
 ) {
   border-color: var(--pmd48-green-line) !important;
   background:
