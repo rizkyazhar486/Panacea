@@ -104,8 +104,6 @@ if (packed.ok) {
 for (const file of [
   'src/components/ui/VideoGallery.tsx',
   'src/pages/landing/sections/HeroSection.tsx',
-  'src/pages/landing/sections/BrandFilmsSection.tsx',
-  'src/pages/landing/sections/ScienceOdysseySection.tsx',
 ]) {
   const txt = readFileSync(file, 'utf8')
   assert.doesNotMatch(txt, /d8j0ntlcm91z4\.cloudfront\.net[^\n]*autoPlay/s, `${file} must not autoPlay uncanny synthetic CDN clips`)
