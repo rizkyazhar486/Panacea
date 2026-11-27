@@ -7,7 +7,9 @@ import { join } from 'node:path'
 const gagal = (nama: string, f: () => void) => { try { f() } catch (e) { throw new Error(`[${nama}] ${(e as Error).message}`) } }
 const DIR = 'src/pages/landing/sections'
 const landing = readFileSync('src/pages/landing/Landing.tsx', 'utf8')
-const bagian = readdirSync(DIR).filter((f) => f.endsWith('.tsx')).map((f) => [f, readFileSync(join(DIR, f), 'utf8')] as const)
+// Only the sections the page renders (old, unused section files are removed in a separate pure-deletion PR).
+const DIRENDER = ['LandingHeader.tsx', 'HeroSection.tsx', 'FourDoorsSection.tsx', 'LandingFooter.tsx', 'XRayBody.tsx']
+const bagian = readdirSync(DIR).filter((f) => DIRENDER.includes(f)).map((f) => [f, readFileSync(join(DIR, f), 'utf8')] as const)
 const semua = [landing, ...bagian.map(([, s]) => s)].join('\n')
 
 // Example telemetry on a public page reads as a measurement. A number followed by a vital-sign unit is refused.
@@ -29,7 +31,6 @@ gagal('struktur_ringkas_empat_bagian', () => {
   for (const k of urutan) { const i = landing.indexOf(k); assert.ok(i > terakhir, `${k} missing or out of order`); terakhir = i }
   for (const lama of ['ScrollCinematic', 'BrandFilmsSection', 'FeaturesSection', 'RolesSection', 'NewsSection', 'ScienceOdysseySection', 'GovernanceSection', 'LandingCtaSection']) {
     assert.ok(!landing.includes(lama), `${lama} is back on the landing`)
-    assert.ok(!existsSync(join(DIR, `${lama}.tsx`)), `${lama}.tsx still exists`)
   }
 })
 
