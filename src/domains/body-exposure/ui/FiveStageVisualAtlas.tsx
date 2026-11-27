@@ -335,7 +335,7 @@ export function FiveStageVisualAtlas({
                   const nextDepth = Number(e.target.value)
                   setScenario((current) => ({ ...current, depth01: nextDepth }))
                 }}
-                className="mt-2 block min-h-[44px] w-full cursor-pointer accent-cyan-300"
+                className="mt-2 block h-11 min-h-[44px] w-full cursor-pointer accent-cyan-300"
               />
             </label>
 
@@ -359,7 +359,7 @@ export function FiveStageVisualAtlas({
                     metabolicDriveFold: Number(e.target.value),
                   }))
                 }
-                className="mt-2 block min-h-[44px] w-full cursor-pointer accent-cyan-300"
+                className="mt-2 block h-11 min-h-[44px] w-full cursor-pointer accent-cyan-300"
               />
             </label>
 
@@ -383,7 +383,7 @@ export function FiveStageVisualAtlas({
                     oxygenFraction: Number(e.target.value),
                   }))
                 }
-                className="mt-2 block min-h-[44px] w-full cursor-pointer accent-cyan-300"
+                className="mt-2 block h-11 min-h-[44px] w-full cursor-pointer accent-cyan-300"
               />
             </label>
           </div>

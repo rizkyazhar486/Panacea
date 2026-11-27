@@ -16,7 +16,7 @@ import { createBodyWebglContextLifecycle } from '../../lib/bodyWebglContextLifec
 import { bodySemanticScaleFromRelativeZoom, type BodySemanticScale } from '../../lib/bodySemanticZoom'
 import { muatAtlas, namaAtlas } from '../../lib/anatomy/pemuatAtlas'
 
-type Sim4DMode = 'live' | 'exercise' | 'future-optimal' | 'future-sedentary'
+export type Sim4DMode = 'live' | 'exercise' | 'future-optimal' | 'future-sedentary'
 
 const SIM_4D_PRESETS: ReadonlyArray<{
   id: Sim4DMode
@@ -171,6 +171,7 @@ interface BodyAllSystems3DProps {
   onSemanticZoomChange?: (state: BodySemanticZoomState) => void
   selectedStructureName?: string | null
   onStructureSelect?: (sourceName: string) => void
+  externalSimMode?: Sim4DMode | null
   /** Permintaan fokus dari luar (mis. temuan AI-EMR): buka atlas bila tertutup,
    *  lalu bingkai kamera pada mesh sumber dengan nama PERSIS itu. Tidak ada mesh -> tidak ada fokus. */
   focusRequest?: { name: string; nonce: number } | null
@@ -182,6 +183,7 @@ export default function BodyAllSystems3D({
   onSemanticZoomChange,
   selectedStructureName,
   onStructureSelect,
+  externalSimMode = null,
   focusRequest = null,
 }: BodyAllSystems3DProps) {
   const stageHostRef = useRef<HTMLDivElement>(null)
@@ -227,6 +229,10 @@ export default function BodyAllSystems3D({
   useEffect(() => {
     motionKickRef.current?.()
   }, [simMode, motionOn])
+
+  useEffect(() => {
+    if (externalSimMode) setSimMode(externalSimMode)
+  }, [externalSimMode])
 
   const systemId = selectedSystemId ?? internalSystemId
   const systems = useMemo(() => resolveBodySystemSourceWave(), [])

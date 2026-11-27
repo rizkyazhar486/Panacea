@@ -46,13 +46,23 @@ function PetaPanas({ medan, judul, min, maks, perhalus }: { medan: Medan; judul:
 }
 
 export function PanelKoplingMultiSkala() {
-  const [hasil, setHasil] = useState<{ dua: HasilJalan; atas: HasilJalan } | null>(null)
+  const [pemecah, setPemecah] = useState<Pemecah>('multigrid')
+  const [hasil, setHasil] = useState<{ dua: HasilJalan; atas: HasilJalan }>(() => ({
+    dua: jalankan(true, 'multigrid'),
+    atas: jalankan(false, 'multigrid'),
+  }))
   const [tampil, setTampil] = useState<'dua' | 'atas'>('dua')
   const [ms, setMs] = useState(0)
-  const [pemecah, setPemecah] = useState<Pemecah>('multigrid')
-  const aktif = hasil?.[tampil]
+  const aktif = hasil[tampil]
   const perhalus = useMemo(() => new Set<number>(aktif?.perhalus[aktif.perhalus.length - 1]?.sel ?? []), [aktif])
   const rantai = useMemo(() => aktif ? rantaiProvenans(aktif, aktif.pesanTerakhir['tissue.stiffness'].provenans.id).slice(0, 4) : [], [aktif])
+
+  function switchSolver(nextSolver: Pemecah) {
+    const t0 = performance.now()
+    setPemecah(nextSolver)
+    setHasil({ dua: jalankan(true, nextSolver), atas: jalankan(false, nextSolver) })
+    setMs(Math.round(performance.now() - t0))
+  }
 
   return (
     <section className="dark rounded-[20px] border border-white/10 bg-black/45 p-3 text-white" aria-label="Multi-scale coupling simulation" data-kopling-multiskala>
@@ -64,21 +74,21 @@ export function PanelKoplingMultiSkala() {
         </div>
         <span className="flex gap-1" role="group" aria-label="Tissue solver" data-pemecah-jaringan={pemecah}>
           {([['multigrid', 'Multigrid'], ['lokal', 'Local Hooke']] as const).map(([k, l]) => (
-            <button key={k} type="button" aria-pressed={pemecah === k} onClick={() => { setPemecah(k); setHasil(null) }}
-              className={`min-h-9 rounded-full px-3 text-[10px] font-black ${pemecah === k ? 'bg-cyan-200 text-black' : 'border border-white/15 text-white/70'}`}>{l}</button>
+            <button key={k} type="button" data-pmd-native="true" aria-pressed={pemecah === k} onClick={() => switchSolver(k)}
+              className={`min-h-[44px] rounded-full px-3 text-[10px] font-black ${pemecah === k ? 'bg-cyan-200 text-black' : 'border border-white/15 text-slate-200'}`}>{l}</button>
           ))}
         </span>
-        <button type="button" className="min-h-11 rounded-full border border-cyan-300/30 px-4 text-[11px] font-black text-cyan-100"
-          onClick={() => { const t0 = performance.now(); setHasil({ dua: jalankan(true, pemecah), atas: jalankan(false, pemecah) }); setMs(Math.round(performance.now() - t0)) }}>
-          {hasil ? 'Run again' : `Run ${T_AKHIR} s simulation`}
+        <button type="button" data-pmd-native="true" className="min-h-[44px] rounded-full border border-cyan-300/30 px-4 text-[11px] font-black text-cyan-100"
+          onClick={() => switchSolver(pemecah)}>
+          Recompute {T_AKHIR} s
         </button>
       </div>
       {aktif && (
         <>
           <div className="mt-2 flex gap-1" role="group" aria-label="Coupling direction">
             {([['dua', 'Two-way'], ['atas', 'Upward only']] as const).map(([k, l]) => (
-              <button key={k} type="button" aria-pressed={tampil === k} onClick={() => setTampil(k)}
-                className={`min-h-9 rounded-full px-3 text-[10px] font-black ${tampil === k ? 'bg-white text-black' : 'border border-white/15 text-white/70'}`}>{l}</button>
+              <button key={k} type="button" data-pmd-native="true" aria-pressed={tampil === k} onClick={() => setTampil(k)}
+                className={`min-h-[44px] rounded-full px-3 text-[10px] font-black ${tampil === k ? 'bg-white text-black' : 'border border-white/15 text-slate-200'}`}>{l}</button>
             ))}
           </div>
           <div className="mt-2 grid grid-cols-3 gap-1.5">
