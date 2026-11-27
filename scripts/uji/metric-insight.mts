@@ -173,7 +173,7 @@ gagal('kalimat_membawa_angka_dan_tidak_menilai', () => {
   const lines = insightLines(ok(metricInsight({ metric: STEPS, series, today: TODAY, window: 30 })))
   assert.deepEqual(lines.map((l) => l.text), [
     'Latest: 8,029 steps on Nov 15.',
-    'Within your usual range of 6,000–9,000 steps (middle 80% of 14 recorded days).',
+    'Within your usual range of 6,000–9,000 steps (middle 80% of 14 recorded days out of the last 90).',
     'Last 7 days averaged 8,861 steps — 2,861 steps more than the 7 days before.',
     'Average over 30 days: 7,431 steps, from 14 recorded days.',
   ])

@@ -623,10 +623,11 @@ export function HealthProfile() {
       </Fold>
 
       <div className="sticky bottom-4 z-10">
-        <Card className="!p-3 flex items-center justify-between gap-3 shadow-lg">
-          <div className="min-w-0 text-[11px] text-neutral-500">
+        {/* Opaque: sits over the page while sticky; the glass Card let the chart behind show through the message. */}
+        <Card className="!p-3 flex items-center justify-between gap-3 shadow-lg !bg-white dark:!bg-[#0d1012]">
+          <div data-pmd-unclamped="true" className="min-w-0 text-[11px] text-neutral-500">
             {savedAt ? <span className="flex items-center gap-1 font-semibold text-brand-dark"><IconCheck size={13} /> Saved {new Date(savedAt).toLocaleString('en-US', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</span> : 'Not saved yet'}
-            {err && <span className="mt-0.5 block text-amber-600">{err}</span>}
+            {err && <span role="status" className="mt-0.5 block text-amber-600">{err}</span>}
           </div>
           <Button onClick={save} disabled={saving} className="shrink-0">{saving ? 'Saving…' : 'Save'}</Button>
         </Card>

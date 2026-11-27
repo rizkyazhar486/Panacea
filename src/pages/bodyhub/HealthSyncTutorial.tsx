@@ -308,7 +308,8 @@ export function HealthSyncTutorial() {
 
       {/* Privacy note */}
       <Card className="!p-5 !bg-brand-50 !border-brand/20">
-        <div className="flex items-start gap-3">
+        {/* data-pmd-unclamped sits on the wrapper: the visual-first CSS only lifts the 3-line cap for descendants, and a privacy statement must not be cut mid-sentence. */}
+        <div data-pmd-unclamped="true" className="flex items-start gap-3">
           <div className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-brand text-white">
             <IconShield size={18} />
           </div>
@@ -325,7 +326,8 @@ export function HealthSyncTutorial() {
           {FAQ.map((f, i) => (
             <details key={i} className="group py-3">
               <summary className="cursor-pointer list-none text-sm font-bold text-ink marker:content-none">
-                <span className="flex items-center justify-between gap-2">
+                {/* pr-11 on phones: the floating assistive button rests on the right edge and covered the chevrons. */}
+                <span className="flex items-center justify-between gap-2 pr-11 sm:pr-0">
                   {f.q}
                   <IconChevronRight size={16} className="shrink-0 text-neutral-500 transition group-open:rotate-90" />
                 </span>
