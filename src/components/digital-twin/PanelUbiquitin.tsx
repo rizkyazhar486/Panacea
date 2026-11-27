@@ -52,7 +52,7 @@ export function PanelUbiquitin() {
           <circle key={`c${p.res.seq}`} cx={p.X * skala} cy={p.Y * skala} r={p.res.seq === sorot ? 5 : 1.6} fill={p.res.seq === sorot ? '#22d3ee' : WARNA[p.res.ss]} onClick={() => setSorot(p.res.seq)} data-residu={p.res.seq} />
         ))}
       </svg>
-      <input type="range" min={0} max={359} value={Math.round((sudut + 360) % 360)} onChange={(e) => setSudut(Number(e.target.value))} aria-label="Rotate structure" className="mt-1 w-full" />
+      <input type="range" min={0} max={359} value={Math.round((sudut + 360) % 360)} onChange={(e) => setSudut(Number(e.target.value))} aria-label="Rotate structure" className="mt-1 h-11 min-h-[44px] w-full" />
       <p className="text-[10px] text-white/70" data-residu-terpilih>
         {pilih ? `${pilih.nama} ${pilih.seq} · ${pilih.ss} · ${Math.round(ringkas.sasaRes.get(pilih.seq) ?? 0)} Å² exposed` : 'Tap a residue'}
       </p>

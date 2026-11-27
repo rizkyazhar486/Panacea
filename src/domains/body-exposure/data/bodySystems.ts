@@ -47,9 +47,9 @@ export const BODY_SYSTEM_SOURCE_WAVE: readonly BodySystemSourceDefinition[] = [
     { id: 'pulmonary-vessels', label: 'Pulmonary vessels', file: 'cardiovascular.glb', hints: ['pulmonary artery', 'pulmonary vein'] },
   ] },
   { id: 'nervous', label: 'Nervous', targets: [
-    { id: 'brain', label: 'Brain', file: 'nervous.glb', hints: ['brain'] },
+    { id: 'brain', label: 'Brain', file: 'nervous.glb', hints: ['brain', 'gyrus', 'sulcus', 'cerebell', 'midbrain', 'medulla oblongata', 'hypothalamus', 'thalamus', 'pons', 'falx cerebri'] },
     { id: 'spinal-cord', label: 'Spinal cord', file: 'nervous.glb', hints: ['spinal cord'] },
-    { id: 'cranial-nerves', label: 'Cranial nerves', file: 'nervous.glb', hints: ['cranial nerve'] },
+    { id: 'cranial-nerves', label: 'Cranial nerves', file: 'nervous.glb', hints: ['cranial nerve', 'oculomotor nerve', 'trigeminal nerve', 'abducens nerve', 'facial nerve', 'glossopharyngeal nerve', 'vagus nerve', 'accessory nerve', 'hypoglossal nerve'] },
     { id: 'peripheral-nerves', label: 'Peripheral nerves', file: 'nervous.glb', hints: ['nerve'] },
   ] },
   { id: 'respiratory', label: 'Respiratory', targets: [
@@ -100,7 +100,7 @@ export const BODY_SYSTEM_SOURCE_WAVE: readonly BodySystemSourceDefinition[] = [
   { id: 'lymphatic-immune', label: 'Lymphatic / Immune', targets: [
     { id: 'spleen', label: 'Spleen', file: 'lymphoid.glb', hints: ['spleen'] },
     { id: 'thymus', label: 'Thymus', file: 'lymphoid.glb', hints: ['thymus'] },
-    { id: 'lymph-nodes', label: 'Lymph nodes', file: 'lymphoid.glb', hints: ['lymph node'] },
+    { id: 'lymph-nodes', label: 'Lymph nodes', file: 'lymphoid.glb', hints: ['lymph node', 'axillary nodes', 'inguinal node', 'lacunar node', 'tibial node', 'pyloric node', 'node'] },
     { id: 'tonsils', label: 'Tonsils', file: 'lymphoid.glb', hints: ['tonsil'] },
   ] },
   { id: 'musculoskeletal', label: 'Musculoskeletal / Articular', targets: [

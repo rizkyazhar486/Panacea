@@ -43,7 +43,7 @@ export function BodyExposureOS() {
   const rootRef = useRef<HTMLElement | null>(null)
   const systemsRef = useRef<HTMLDivElement | null>(null)
   const modeRailRef = useRef<HTMLElement | null>(null)
-  const [activeMode, setActiveMode] = useState<ExposureMode>('identity')
+  const [activeMode, setActiveMode] = useState<ExposureMode>('atlas')
   const [immersive, setImmersive] = useState(false)
   const [selectedBodySystemId, setSelectedBodySystemId] = useState<BodySystemId>('cardiovascular')
   const [strukturDiminta, setStrukturDiminta] = useState<{ name: string; nonce: number } | null>(null)
@@ -143,33 +143,32 @@ export function BodyExposureOS() {
     >
       <div className="body-exposure-os__ambient" aria-hidden />
 
-      <header className="body-exposure-os__glass relative z-[2] overflow-hidden rounded-[24px] border border-white/10 p-3 sm:p-4">
+      <header className="body-exposure-os__glass relative z-[2] overflow-hidden rounded-[18px] border border-white/15 px-3 py-2">
         <div className="pointer-events-none absolute inset-x-[18%] -top-24 h-40 rounded-full bg-cyan-400/10 blur-3xl" aria-hidden />
-        <div className="relative flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div className="min-w-0">
-            <div className="text-[9px] font-black uppercase tracking-[.22em] text-cyan-200/75">Body Exposure</div>
-            <h2 id="body-exposure-os-title" className="mt-1 text-xl font-black tracking-[-.035em] text-white sm:text-2xl">
+        <div className="relative flex flex-wrap items-center justify-between gap-2">
+          <div className="flex min-w-0 items-center gap-2">
+            <h2 id="body-exposure-os-title" className="text-base font-black tracking-[-.02em] text-white sm:text-lg">
               Your body. Every scale.
             </h2>
-            <BatasKlaimKesehatan permukaan="body.exposure-os" className="mt-2 text-[11px] leading-snug text-white/55" />
-            <p className="mt-1 truncate text-[10px] font-bold text-white/42 sm:text-[11px]">
-              You → anatomy → function → imaging → micro
-            </p>
+            <p className="sr-only">You → anatomy → function → imaging → micro</p>
+            <BatasKlaimKesehatan permukaan="body.exposure-os" className="shrink-0" />
           </div>
 
-          <div className="flex shrink-0 gap-2">
+          <div className="flex shrink-0 gap-1.5">
             <button
               type="button"
+              data-pmd-native="true"
               onClick={openSystemAtlas}
               aria-label="Explore 11 systems · one simulation projector"
-              className="min-h-[44px] rounded-full border border-cyan-300/22 bg-cyan-300/[.08] px-4 text-[11px] font-black text-cyan-100 transition hover:bg-cyan-300/[.13] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/60"
+              className="min-h-[44px] rounded-full border border-cyan-300/35 bg-cyan-400/15 px-3.5 text-[11px] font-black text-cyan-100 transition hover:bg-cyan-400/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/60"
             >
               Explore 11 systems
             </button>
             <button
               type="button"
+              data-pmd-native="true"
               onClick={toggleImmersive}
-              className="min-h-[44px] rounded-full border border-white/10 bg-white/[.045] px-4 text-[11px] font-black text-white/72 transition hover:bg-white/[.08] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
+              className="min-h-[44px] rounded-full border border-white/20 bg-white/[.08] px-3.5 text-[11px] font-black text-white transition hover:bg-white/[.15] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
             >
               {immersive ? 'Exit' : 'Immersive'}
             </button>
@@ -179,7 +178,7 @@ export function BodyExposureOS() {
 
       <nav
         ref={modeRailRef}
-        className="body-exposure-os__dock relative z-[3] mt-3 overflow-x-auto rounded-[22px] border border-white/[.08] bg-black/55 p-1.5 backdrop-blur-2xl"
+        className="body-exposure-os__dock relative z-[3] mt-1.5 overflow-x-auto rounded-[16px] border border-white/15 bg-black/70 p-1 backdrop-blur-2xl"
         aria-label="Body Exposure modes"
         data-body-exposure-mode-rail="v1"
       >
@@ -190,13 +189,14 @@ export function BodyExposureOS() {
               <button
                 key={mode.key}
                 type="button"
+                data-pmd-native="true"
                 aria-pressed={active}
                 data-body-exposure-mode-active={String(active)}
                 onClick={() => openPanel(mode)}
-                className={`min-h-[42px] rounded-[16px] border px-4 text-xs font-black transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/60 ${
+                className={`min-h-[44px] rounded-[14px] border px-3.5 text-xs font-black transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/60 ${
                   active
                     ? 'border-white bg-white text-black shadow-sm'
-                    : 'border-transparent bg-transparent text-white/45 hover:border-white/[.08] hover:bg-white/[.04] hover:text-white/80'
+                    : 'border-white/10 bg-white/[.05] text-slate-200 hover:border-white/25 hover:bg-white/[.12] hover:text-white'
                 }`}
               >
                 {mode.label}
@@ -206,12 +206,12 @@ export function BodyExposureOS() {
         </div>
       </nav>
 
-      <div className="relative z-[2] mt-2 flex items-center justify-between gap-3 px-1 text-[10px] font-bold text-white/40" aria-live="polite">
-        <span><span className="text-cyan-200/80">{current.label}</span> · {current.description}</span>
+      <div className="sr-only sm:not-sr-only sm:relative sm:z-[2] sm:mt-1.5 sm:flex sm:items-center sm:justify-between sm:gap-3 sm:px-1 sm:text-[11px] sm:font-bold sm:text-slate-300" aria-live="polite">
+        <span><span className="text-cyan-200">{current.label}</span> · {current.description}</span>
         <span className="hidden shrink-0 sm:inline">Educational atlas · not a patient-specific diagnosis</span>
       </div>
 
-      <div ref={systemsRef} className="relative z-[2] mt-3 scroll-mt-4">
+      <div ref={systemsRef} className="relative z-[2] mt-2 scroll-mt-4">
         <BodyExposurePatientOverlay selectedSystemId={selectedBodySystemId} onClinicalView={() => setActiveMode('clinical')} onShowStructure={(s) => { setSelectedBodySystemId(s.systemId); setStrukturDiminta((k) => ({ name: s.name, nonce: (k?.nonce ?? 0) + 1 })) }} />
         <SinyalPribadiDiTubuh selectedSystemId={selectedBodySystemId} onSelectSystem={setSelectedBodySystemId} />
         <Suspense fallback={<div className="grid min-h-56 place-items-center rounded-[28px] border border-white/[.08] bg-black/35 text-xs font-bold text-white/35">Loading unified human simulation projector…</div>}>
@@ -226,12 +226,12 @@ export function BodyExposureOS() {
       </div>
 
       {/* Closed by default: the hub is a tool, not the first thing on this page (legibility ratchet counts open text). */}
-      <details style={{ borderColor: 'rgba(0, 191, 99, 0.28)' }} className="relative z-[2] mt-3 overflow-hidden rounded-[28px] border bg-black/35">
-        <summary className="flex min-h-[54px] cursor-pointer list-none items-center justify-between gap-3 px-4 text-xs font-black text-white/80 transition hover:text-white">
+      <details style={{ borderColor: 'rgba(0, 191, 99, 0.35)' }} className="relative z-[2] mt-3 overflow-hidden rounded-[24px] border bg-black/45">
+        <summary className="flex min-h-[54px] cursor-pointer list-none items-center justify-between gap-3 px-4 text-xs font-black text-white transition hover:text-emerald-200">
           <span>Devices · Vitality · QR &amp; Barcode</span>
         </summary>
-        <div className="border-t border-white/[.08] p-2 sm:p-3">
-          <Suspense fallback={<div className="grid min-h-32 place-items-center text-xs font-bold text-white/40">Loading wearable hub…</div>}>
+        <div className="border-t border-white/10 p-2 sm:p-3">
+          <Suspense fallback={<div className="grid min-h-32 place-items-center text-xs font-bold text-slate-300">Loading wearable hub…</div>}>
             <BodyExposureLocalHub />
           </Suspense>
         </div>
@@ -248,10 +248,10 @@ export function BodyExposureOS() {
         </div>
       </Fold>
 
-      <details className="body-exposure-os__labs relative z-[1] mt-3 overflow-hidden rounded-[28px] border border-white/[.08] bg-black/35">
-        <summary className="flex min-h-[54px] cursor-pointer list-none items-center justify-between gap-3 px-4 text-xs font-black text-white/65 transition hover:text-white">
+      <details className="body-exposure-os__labs relative z-[1] mt-3 overflow-hidden rounded-[24px] border border-white/15 bg-black/45">
+        <summary className="flex min-h-[54px] cursor-pointer list-none items-center justify-between gap-3 px-4 text-xs font-black text-slate-200 transition hover:text-white">
           <span>Deep reference labs</span>
-          <span className="text-[9px] font-bold uppercase tracking-[.14em] text-white/30">all existing tools preserved · open on demand</span>
+          <span className="text-[10px] font-bold uppercase tracking-[.12em] text-slate-300">all tools preserved</span>
         </summary>
         <div
           id="body-exposure-core"

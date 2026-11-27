@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Fold } from '../../shared/ui/Fold'
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js'
 import { normalizeAnatomySourceName } from '../../lib/anatomySourceNodeRegistry'
 import {
   BODY_SYSTEM_SOURCE_WAVE,
@@ -15,15 +16,38 @@ import { createBodyWebglContextLifecycle } from '../../lib/bodyWebglContextLifec
 import { bodySemanticScaleFromRelativeZoom, type BodySemanticScale } from '../../lib/bodySemanticZoom'
 import { muatAtlas, namaAtlas } from '../../lib/anatomy/pemuatAtlas'
 
+type Sim4DMode = 'live' | 'exercise' | 'future-optimal' | 'future-sedentary'
+
+const SIM_4D_PRESETS: ReadonlyArray<{
+  id: Sim4DMode
+  label: string
+  breathHz: number
+  pulseHz: number
+  emissiveHex: number
+}> = [
+  { id: 'live', label: 'Live 4D', breathHz: 0.25, pulseHz: 1.15, emissiveHex: 0x09313d },
+  { id: 'exercise', label: 'Exercise 2.2×', breathHz: 0.55, pulseHz: 2.4, emissiveHex: 0xb45309 },
+  { id: 'future-optimal', label: '+5Y Optimal', breathHz: 0.2, pulseHz: 0.98, emissiveHex: 0x047857 },
+  { id: 'future-sedentary', label: '+5Y Sedentary', breathHz: 0.32, pulseHz: 1.45, emissiveHex: 0xbe123c },
+]
+
 function materialFor(source: THREE.Material, role: 'selected' | 'context' = 'selected') {
   const cloned = source.clone()
-  cloned.transparent = true
-  cloned.opacity = role === 'context' ? 0.13 : 0.9
-  cloned.depthWrite = false
+  if (role === 'context') {
+    cloned.transparent = true
+    cloned.opacity = 0.14
+    cloned.depthWrite = false
+    cloned.side = THREE.FrontSide
+  } else {
+    cloned.transparent = false
+    cloned.opacity = 1
+    cloned.depthWrite = true
+    cloned.side = THREE.FrontSide
+  }
   if ((cloned as THREE.MeshStandardMaterial).isMeshStandardMaterial) {
     const standard = cloned as THREE.MeshStandardMaterial
-    standard.emissive.set(role === 'context' ? 0x031219 : 0x062f3b)
-    standard.emissiveIntensity = role === 'context' ? 0.08 : 0.32
+    standard.emissive.set(role === 'context' ? 0x031219 : 0x09313d)
+    standard.emissiveIntensity = role === 'context' ? 0.08 : 0.24
     standard.userData.panaceaBaseEmissiveIntensity = standard.emissiveIntensity
   }
   cloned.userData.panaceaBaseOpacity = cloned.opacity
@@ -42,9 +66,10 @@ function applyProjectedSelection(groups: readonly THREE.Group[], selectedName?: 
         if (mesh.userData.panaceaContext === true) {
           const contextOpacity = typeof material.userData.panaceaBaseOpacity === 'number'
             ? material.userData.panaceaBaseOpacity
-            : 0.13
+            : 0.14
           material.transparent = true
           material.opacity = contextOpacity
+          material.depthWrite = false
           if ((material as THREE.MeshStandardMaterial).isMeshStandardMaterial) {
             const standard = material as THREE.MeshStandardMaterial
             standard.emissiveIntensity = typeof standard.userData.panaceaBaseEmissiveIntensity === 'number'
@@ -56,9 +81,16 @@ function applyProjectedSelection(groups: readonly THREE.Group[], selectedName?: 
         }
         const baseOpacity = typeof material.userData.panaceaBaseOpacity === 'number'
           ? material.userData.panaceaBaseOpacity
-          : material.opacity
-        material.transparent = true
-        material.opacity = selected ? (hit ? Math.max(baseOpacity, 0.98) : Math.min(baseOpacity, 0.22)) : baseOpacity
+          : 1
+        if (selected && !hit) {
+          material.transparent = true
+          material.opacity = 0.24
+          material.depthWrite = false
+        } else {
+          material.transparent = false
+          material.opacity = baseOpacity
+          material.depthWrite = true
+        }
         if ((material as THREE.MeshStandardMaterial).isMeshStandardMaterial) {
           const standard = material as THREE.MeshStandardMaterial
           const baseEmissive = typeof standard.userData.panaceaBaseEmissiveIntensity === 'number'
@@ -110,7 +142,7 @@ function projectMatchedSourceMeshes(
     // matriks identitas (kubus ±1 terkuantisasi) — kamera membingkai kotak yang salah.
     projected.updateMatrixWorld(true)
     projected.frustumCulled = source.frustumCulled
-    projected.renderOrder = source.renderOrder
+    projected.renderOrder = role === 'context' ? 2 : 1
     group.add(projected)
     bounds.expandByObject(projected)
     matched += 1
@@ -152,11 +184,18 @@ export default function BodyAllSystems3D({
   onStructureSelect,
   focusRequest = null,
 }: BodyAllSystems3DProps) {
+  const stageHostRef = useRef<HTMLDivElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const openTimerRef = useRef<number | null>(null)
-  const [open, setOpen] = useState(false)
-  const [rendererArmed, setRendererArmed] = useState(false)
+  const motionKickRef = useRef<(() => void) | null>(null)
+  // Auto-renders when mounted without a click wall; offscreen IntersectionObserver pauses idle demand-loaded WebGL frames.
+  const [open, setOpen] = useState(true)
+  const [rendererArmed, setRendererArmed] = useState(true)
   const [internalSystemId, setInternalSystemId] = useState<BodySystemId>('cardiovascular')
+  const [simMode, setSimMode] = useState<Sim4DMode>('live')
+  const [motionOn, setMotionOn] = useState(() => (
+    typeof window !== 'undefined' && !window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+  ))
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [loadedFiles, setLoadedFiles] = useState(0)
@@ -167,6 +206,10 @@ export default function BodyAllSystems3D({
   const selectionApplierRef = useRef<((name?: string | null) => void) | null>(null)
   const focusApplierRef = useRef<((name: string) => boolean) | null>(null)
   const pendingFocusRef = useRef<string | null>(null)
+  const selectedStructureRef = useRef<string | null | undefined>(selectedStructureName)
+  const simConfigRef = useRef({ simMode, motionOn })
+  simConfigRef.current = { simMode, motionOn }
+  selectedStructureRef.current = selectedStructureName
   const [focusStatus, setFocusStatus] = useState<{ name: string; framed: boolean; attempted: boolean } | null>(null)
 
   useEffect(() => {
@@ -180,6 +223,10 @@ export default function BodyAllSystems3D({
   useEffect(() => {
     selectionApplierRef.current?.(selectedStructureName)
   }, [selectedStructureName])
+
+  useEffect(() => {
+    motionKickRef.current?.()
+  }, [simMode, motionOn])
 
   const systemId = selectedSystemId ?? internalSystemId
   const systems = useMemo(() => resolveBodySystemSourceWave(), [])
@@ -195,12 +242,8 @@ export default function BodyAllSystems3D({
   }
 
   function openAtlas() {
-    if (open) return
-    setOpen(true)
-    openTimerRef.current = window.setTimeout(() => {
-      openTimerRef.current = null
-      setRendererArmed(true)
-    }, 120)
+    if (!open) setOpen(true)
+    setRendererArmed(true)
   }
 
   // Fokus dari luar: simpan sebagai tertunda; terapkan segera bila adegan siap,
@@ -209,7 +252,7 @@ export default function BodyAllSystems3D({
     if (!focusRequest?.name) return
     pendingFocusRef.current = focusRequest.name
     setFocusStatus({ name: focusRequest.name, framed: false, attempted: false })
-    if (!open) { openAtlas(); return }
+    if (!open || !rendererArmed) { openAtlas(); return }
     if (focusApplierRef.current?.(focusRequest.name)) {
       pendingFocusRef.current = null
       setFocusStatus({ name: focusRequest.name, framed: true, attempted: true })
@@ -232,10 +275,7 @@ export default function BodyAllSystems3D({
       return
     }
     setOpen(true)
-    openTimerRef.current = window.setTimeout(() => {
-      openTimerRef.current = null
-      setRendererArmed(true)
-    }, 120)
+    setRendererArmed(true)
   }
 
   useEffect(() => {
@@ -262,9 +302,15 @@ export default function BodyAllSystems3D({
 
     renderer.setClearColor(0x000000, 0)
     renderer.outputColorSpace = THREE.SRGBColorSpace
+    renderer.toneMapping = THREE.ACESFilmicToneMapping
+    renderer.toneMappingExposure = 1.15
     renderer.domElement.dataset.bodyAllSystems3d = 'true'
     renderer.domElement.style.touchAction = 'none'
     container.appendChild(renderer.domElement)
+
+    const pmrem = new THREE.PMREMGenerator(renderer)
+    const envRT = pmrem.fromScene(new RoomEnvironment(), 0.04)
+    scene.environment = envRT.texture
 
     scene.add(new THREE.AmbientLight(0xffffff, 0.74))
     const key = new THREE.DirectionalLight(0xdffaff, 1.18)
@@ -278,6 +324,7 @@ export default function BodyAllSystems3D({
     scene.add(violetRim)
 
     const mobile = window.matchMedia('(max-width: 640px)').matches
+    const prefersReducedMotion = () => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false
     const controls = new OrbitControls(camera, renderer.domElement)
     controls.enableDamping = !mobile
     controls.enablePan = false
@@ -286,6 +333,8 @@ export default function BodyAllSystems3D({
 
     const sourceBounds = new THREE.Box3()
     const projectedGroups: THREE.Group[] = []
+    let floorRing: THREE.Mesh | null = null
+    let userInteracting = false
     selectionApplierRef.current = (name) => {
       applyProjectedSelection(projectedGroups, name)
       requestRender()
@@ -313,14 +362,43 @@ export default function BodyAllSystems3D({
       requestFrame: (callback) => requestAnimationFrame(callback),
       cancelFrame: (frameId) => cancelAnimationFrame(frameId),
       renderFrame: () => {
-        // OrbitControls emits another change while damping is still settling,
-        // which requests only the next necessary frame.
+        const cfg = simConfigRef.current
+        const animateLive = cfg.motionOn && !prefersReducedMotion() && projectedGroups.length > 0
+        if (animateLive) {
+          const preset = SIM_4D_PRESETS.find((item) => item.id === cfg.simMode) ?? SIM_4D_PRESETS[0]
+          const t = performance.now() * 0.001
+          const breathScale = 1 + 0.006 * Math.sin(2 * Math.PI * preset.breathHz * t)
+          const pulseIntensity = 0.2 + 0.22 * (0.5 + 0.5 * Math.sin(2 * Math.PI * preset.pulseHz * t))
+          const lockSelection = Boolean(selectedStructureRef.current)
+          for (const g of projectedGroups) {
+            g.scale.set(breathScale, 1 + (breathScale - 1) * 0.25, breathScale)
+            if (!lockSelection) {
+              g.traverse((obj) => {
+                const mesh = obj as THREE.Mesh
+                if (!mesh.isMesh || mesh.userData.panaceaContext === true) return
+                const mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material]
+                for (const mat of mats) {
+                  if ((mat as THREE.MeshStandardMaterial).isMeshStandardMaterial) {
+                    const std = mat as THREE.MeshStandardMaterial
+                    std.emissive.setHex(preset.emissiveHex)
+                    std.emissiveIntensity = pulseIntensity
+                  }
+                }
+              })
+            }
+          }
+          if (!userInteracting) scene.rotation.y = (scene.rotation.y + 0.0018) % (Math.PI * 2)
+        } else {
+          for (const g of projectedGroups) g.scale.set(1, 1, 1)
+        }
         controls.update()
         renderer.render(scene, camera)
+        if (animateLive) requestRender()
       },
     })
     const requestRender = () => renderScheduler.request()
     const stop = () => renderScheduler.stop()
+    motionKickRef.current = requestRender
     const contextLifecycle = createBodyWebglContextLifecycle({
       onLost: () => {
         contextAvailable = false
@@ -391,7 +469,7 @@ export default function BodyAllSystems3D({
       const size = sourceBounds.getSize(new THREE.Vector3())
       const span = Math.max(size.x, size.y, size.z, 0.05)
       controls.target.copy(center)
-      camera.position.set(center.x + span * 0.25, center.y + span * 0.08, center.z + span * 2.25)
+      camera.position.set(center.x + span * 0.16, center.y + span * 0.04, center.z + span * 1.74)
       camera.near = Math.max(span * 0.0005, 0.0001)
       camera.far = Math.max(span * 200, 1000)
       camera.updateProjectionMatrix()
@@ -399,6 +477,15 @@ export default function BodyAllSystems3D({
       fittedCameraDistance = camera.position.distanceTo(center)
       renderer.domElement.dataset.jarakTubuh = fittedCameraDistance.toFixed(4)
       camera.lookAt(center)
+      if (!floorRing) {
+        floorRing = new THREE.Mesh(
+          new THREE.RingGeometry(span * 0.18, span * 0.24, 48),
+          new THREE.MeshBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.22, side: THREE.DoubleSide }),
+        )
+        floorRing.rotation.x = -Math.PI / 2
+        scene.add(floorRing)
+      }
+      floorRing.position.set(center.x, sourceBounds.min.y, center.z)
       semanticZoomCallbackRef.current?.({ scale: 'whole-body', relativeZoom: 1 })
       lastSemanticScale = 'whole-body'
       lastRelativeZoom = 1
@@ -465,10 +552,14 @@ export default function BodyAllSystems3D({
     const ro = new ResizeObserver(resize)
     ro.observe(container)
 
+    const onControlStart = () => {
+      userInteracting = true
+    }
     const onControlChange = () => {
       emitSemanticZoom()
       requestRender()
     }
+    controls.addEventListener('start', onControlStart)
     controls.addEventListener('change', onControlChange)
 
     const raycaster = new THREE.Raycaster()
@@ -476,6 +567,7 @@ export default function BodyAllSystems3D({
     let pointerStartX = 0
     let pointerStartY = 0
     const onPointerDown = (event: PointerEvent) => {
+      userInteracting = true
       pointerStartX = event.clientX
       pointerStartY = event.clientY
     }
@@ -534,7 +626,7 @@ export default function BodyAllSystems3D({
       inViewport = Boolean(entry?.isIntersecting)
       if (inViewport) requestRender()
       else stop()
-    }, { rootMargin: '128px' })
+    }, { rootMargin: '640px' })
     io.observe(container)
 
     const onVisibility = () => {
@@ -547,10 +639,12 @@ export default function BodyAllSystems3D({
 
     return () => {
       disposed = true
+      motionKickRef.current = null
       renderScheduler.dispose()
       io.disconnect()
       ro.disconnect()
       document.removeEventListener('visibilitychange', onVisibility)
+      controls.removeEventListener('start', onControlStart)
       controls.removeEventListener('change', onControlChange)
       renderer.domElement.removeEventListener('pointerdown', onPointerDown)
       renderer.domElement.removeEventListener('pointerup', onPointerUp)
@@ -562,6 +656,12 @@ export default function BodyAllSystems3D({
       focusApplierRef.current = null
       controls.dispose()
       projectedGroups.forEach(disposeProjectedMaterials)
+      if (floorRing) {
+        floorRing.geometry.dispose()
+        ;(floorRing.material as THREE.Material).dispose()
+      }
+      envRT.dispose()
+      pmrem.dispose()
       renderer.dispose()
       renderer.forceContextLoss()
       renderer.domElement.remove()
@@ -570,33 +670,18 @@ export default function BodyAllSystems3D({
 
   const represented = selected.targets.filter((target) => target.available && loadedSourceFiles.includes(target.file) && !failedFiles.includes(target.file))
   const unavailable = selected.targets.filter((target) => !target.available || failedFiles.includes(target.file))
-  const sourceResolved = selected.targets.filter((target) => target.available).length
 
   return (
-    <section className="overflow-hidden rounded-[26px] border border-white/[.09] bg-[linear-gradient(135deg,rgba(34,211,238,.055),rgba(255,255,255,.025)_42%,rgba(139,92,246,.045))] p-3 shadow-[inset_0_1px_0_rgba(255,255,255,.06),0_18px_70px_rgba(0,0,0,.2)] sm:p-4" aria-label="Eleven body systems source-backed 3D atlas">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-        <div className="max-w-4xl">
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="text-[9px] font-black uppercase tracking-[.2em] text-cyan-200/85">Whole-body system atlas</span>
-            <span className="rounded-full border border-white/[.08] bg-black/25 px-2 py-1 text-[8px] font-black uppercase tracking-[.14em] text-white/45">11 systems · canonical GLB only</span>
-          </div>
-          <h3 className="mt-1.5 text-base font-black tracking-[-.02em] text-white sm:text-lg">See the body by system without inventing missing anatomy</h3>
-          <p className="mt-1 max-w-3xl text-[10px] font-medium leading-relaxed text-white/48 sm:text-[11px]">
-            Start from a source-backed whole-body surface, then inspect the selected system inside it; unresolved or failed structures remain blocked instead of being replaced with invented anatomy.
-          </p>
-        </div>
-        <button
-          type="button"
-          data-pmd-native="true"
-          aria-expanded={open}
-          onClick={toggleOpen}
-          className="min-h-11 shrink-0 rounded-full border border-cyan-300/20 bg-cyan-300/[.08] px-4 text-[10px] font-black text-cyan-100 transition hover:bg-cyan-300/[.13] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/50"
-        >
-          {open ? 'Close system atlas' : 'Open system atlas'}
-        </button>
-      </div>
-
-      <div className="no-scrollbar mt-3 flex gap-1.5 overflow-x-auto pb-1" role="tablist" aria-label="Body systems">
+    <section
+      ref={stageHostRef}
+      className="dark overflow-hidden rounded-[26px] border border-white/[.12] bg-[#02050b] p-3 text-white shadow-[0_18px_70px_rgba(0,0,0,.28)] sm:p-4"
+      aria-label="Eleven body systems source-backed 4D atlas"
+      aria-describedby="body-atlas-provenance"
+    >
+      <p id="body-atlas-provenance" className="sr-only">
+        Start from a source-backed whole-body surface, then inspect the selected system inside it; unresolved or failed structures remain blocked instead of being replaced with invented anatomy.
+      </p>
+      <div className="no-scrollbar flex gap-1.5 overflow-x-auto pb-1" role="tablist" aria-label="Body systems">
         {BODY_SYSTEM_SOURCE_WAVE.map((system) => {
           const active = system.id === systemId
           return (
@@ -607,7 +692,11 @@ export default function BodyAllSystems3D({
               data-pmd-native="true"
               aria-selected={active}
               onClick={() => selectSystem(system.id)}
-              className={`min-h-10 shrink-0 rounded-full border px-3 text-[9px] font-black transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/50 ${active ? 'border-cyan-300/30 bg-[linear-gradient(135deg,rgba(34,211,238,.18),rgba(139,92,246,.12))] text-white' : 'border-white/[.07] bg-white/[.025] text-white/75 hover:bg-white/[.055] hover:text-white'}`}
+              className={`min-h-[44px] shrink-0 rounded-full border px-3.5 text-[11px] font-black transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/60 ${
+                active
+                  ? 'border-emerald-300 bg-emerald-400 text-neutral-950'
+                  : 'border-white/15 bg-white/[.06] text-slate-200 hover:bg-white/[.12] hover:text-white'
+              }`}
             >
               {system.label}
             </button>
@@ -615,56 +704,112 @@ export default function BodyAllSystems3D({
         })}
       </div>
 
-      <div className="mt-3 grid gap-3 lg:grid-cols-[minmax(0,1.25fr)_minmax(280px,.75fr)]">
-        <div className="relative min-h-[340px] overflow-hidden rounded-[22px] border border-white/[.08] bg-[radial-gradient(circle_at_50%_42%,rgba(34,211,238,.08),transparent_34%),radial-gradient(circle_at_62%_58%,rgba(139,92,246,.06),transparent_30%),#010207] sm:min-h-[430px]">
-          {open ? (
-            <div ref={containerRef} className="h-[340px] w-full sm:h-[430px]" aria-hidden="true" />
-          ) : (
-            <div className="grid h-[340px] place-items-center px-6 text-center sm:h-[430px]">
-              <div>
-                <div className="mx-auto h-16 w-16 rounded-full border border-cyan-300/15 bg-[radial-gradient(circle,rgba(34,211,238,.16),rgba(139,92,246,.04)_58%,transparent_70%)] shadow-[0_0_50px_rgba(34,211,238,.07)]" aria-hidden />
-                <div className="mt-4 text-xs font-black text-white/70">Renderer is demand-loaded</div>
-                <p className="mx-auto mt-1 max-w-md text-[10px] leading-relaxed text-white/35">Open it to load only the selected system's verified source bundles. This keeps the default Body Exposure view lighter on mobile.</p>
-              </div>
+      <div className="relative mt-2 h-[380px] overflow-hidden rounded-[22px] border border-white/[.10] bg-[radial-gradient(circle_at_50%_42%,rgba(34,211,238,.09),transparent_42%),radial-gradient(circle_at_62%_58%,rgba(139,92,246,.07),transparent_38%),#010308] sm:h-[500px]">
+        {open ? (
+          <div ref={containerRef} className="h-full w-full" aria-hidden="true" />
+        ) : (
+          <div className="grid h-full place-items-center px-6 text-center">
+            <div>
+              <div className="text-xs font-black text-white">3D renderer paused</div>
+              <p className="mx-auto mt-1 max-w-md text-[11px] text-slate-300">Resume to interact with the live 11-system Z-Anatomy 4D stage.</p>
             </div>
-          )}
-          <div className="pointer-events-none absolute inset-x-3 top-3 flex items-center justify-between gap-2">
-            <span className="rounded-full border border-white/[.08] bg-black/60 px-2.5 py-1 text-[8px] font-black uppercase tracking-[.14em] text-white/55 backdrop-blur-xl">{selected.label}</span>
-            <span className="rounded-full border border-white/[.08] bg-black/60 px-2.5 py-1 text-[8px] font-bold text-white/35 backdrop-blur-xl">surface context · tap · zoom</span>
           </div>
-          {selectedStructureName && (
-            <div className="pointer-events-none absolute left-3 top-12 max-w-[72%] truncate rounded-full border border-cyan-300/20 bg-cyan-950/80 px-2.5 py-1 text-[8px] font-black text-cyan-100 backdrop-blur-xl">
-              Selected · {selectedStructureName}
-            </div>
-          )}
-          {focusStatus?.attempted && focusStatus.name === selectedStructureName && (
-            <div data-fokus-kamera={focusStatus.framed ? 'framed' : 'not-rendered'} className="pointer-events-none absolute left-3 top-[4.5rem] max-w-[72%] truncate rounded-full border border-white/10 bg-black/70 px-2.5 py-1 text-[8px] font-black text-white/70">
-              {focusStatus.framed ? 'Camera framed on this structure' : 'Not rendered in this system view — not framed'}
-            </div>
-          )}
-          {loading && <div role="status" className="absolute inset-x-3 bottom-3 rounded-xl border border-cyan-300/10 bg-black/75 px-3 py-2 text-[10px] font-bold text-cyan-100 backdrop-blur-xl">Loading canonical source bundles… {loadedFiles}</div>}
-          {error && <div role="alert" className="absolute inset-x-3 bottom-3 rounded-xl border border-red-300/15 bg-red-950/85 px-3 py-2 text-[10px] font-bold text-red-100 backdrop-blur-xl">{error}</div>}
+        )}
+
+        <div className="pointer-events-none absolute inset-x-3 top-3 flex items-center justify-between gap-2">
+          <span className="min-w-0 truncate rounded-full border border-white/15 bg-black/70 px-3 py-1.5 text-[10px] font-black uppercase tracking-[.14em] text-cyan-100 backdrop-blur-xl">
+            {selected.label} · 1:1 Reference
+          </span>
+          <button
+            type="button"
+            data-pmd-native="true"
+            aria-expanded={open}
+            onClick={toggleOpen}
+            className="pointer-events-auto shrink-0 whitespace-nowrap min-h-[44px] min-w-[44px] rounded-full border border-white/20 bg-black/75 px-3.5 text-[11px] font-black text-white backdrop-blur-xl transition hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/60"
+          >
+            {open ? 'Pause 3D' : 'Resume 3D'}
+          </button>
         </div>
 
-        <aside className="space-y-2.5">
-          <div className="rounded-[20px] border border-white/[.08] bg-white/[.025] p-3.5">
-            <div className="text-[9px] font-black uppercase tracking-[.16em] text-cyan-200/70">{selected.label}</div>
-            <div className="mt-1 text-xl font-black tracking-[-.025em] text-white">{open ? represented.length : sourceResolved}/{selected.targets.length}</div>
-            <div className="text-[10px] font-bold text-white/45">{open ? 'rendered source targets' : 'targets resolved in source index'}</div>
-            <p className="mt-2 text-[9px] leading-relaxed text-white/32">Rendered counts require both exact source-name resolution and successful bundle loading. They do not claim full anatomical completeness or patient-specific validity.</p>
+        {selectedStructureName && (
+          <div className="pointer-events-none absolute left-3 top-14 max-w-[72%] truncate rounded-full border border-cyan-300/30 bg-cyan-950/90 px-3 py-1.5 text-[11px] font-black text-cyan-100 backdrop-blur-xl">
+            Selected · {selectedStructureName}
           </div>
+        )}
 
-          <Fold label="Sources">
-          <div className="grid gap-1.5 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
+        {focusStatus?.attempted && focusStatus.name === selectedStructureName && (
+          <div data-fokus-kamera={focusStatus.framed ? 'framed' : 'not-rendered'} className="pointer-events-none absolute left-3 top-[5.5rem] max-w-[72%] truncate rounded-full border border-white/20 bg-black/80 px-3 py-1.5 text-[11px] font-black text-white">
+            {focusStatus.framed ? 'Camera framed on this structure' : 'Not rendered in this system view — not framed'}
+          </div>
+        )}
+
+        <div className="pointer-events-none absolute bottom-2.5 left-3 max-w-[calc(100%-1.5rem)] truncate rounded-full border border-white/15 bg-black/70 px-3 py-1 text-[10px] font-bold text-slate-200 backdrop-blur-xl">
+          Simulated educational 4D physiology · reference Z-Anatomy
+        </div>
+
+        {loading && (
+          <div role="status" className="absolute right-3 bottom-12 rounded-full border border-cyan-300/25 bg-black/85 px-3.5 py-1.5 text-[11px] font-bold text-cyan-100 backdrop-blur-xl">
+            Loading canonical 3D bundles… {loadedFiles}
+          </div>
+        )}
+        {error && (
+          <div role="alert" className="absolute inset-x-3 bottom-12 rounded-xl border border-red-300/25 bg-red-950/90 px-3 py-2 text-[11px] font-bold text-red-100 backdrop-blur-xl">
+            {error}
+          </div>
+        )}
+      </div>
+
+      <div className="mt-2.5 flex flex-wrap items-center gap-1.5" role="group" aria-label="4D physiological state">
+        {SIM_4D_PRESETS.map((preset) => {
+          const active = simMode === preset.id
+          return (
+            <button
+              key={preset.id}
+              type="button"
+              data-pmd-native="true"
+              aria-pressed={active}
+              onClick={() => setSimMode(preset.id)}
+              className={`min-h-[44px] rounded-full border px-3.5 text-[11px] font-black transition ${
+                active
+                  ? 'border-cyan-300 bg-cyan-400 text-neutral-950'
+                  : 'border-white/15 bg-white/[.06] text-slate-200 hover:bg-white/[.12]'
+              }`}
+            >
+              {preset.label}
+            </button>
+          )
+        })}
+        <button
+          type="button"
+          data-pmd-native="true"
+          aria-pressed={motionOn}
+          onClick={() => setMotionOn((v) => !v)}
+          className={`ml-auto min-h-[44px] min-w-[44px] rounded-full border px-3.5 text-[11px] font-black transition ${
+            motionOn
+              ? 'border-emerald-300/60 bg-emerald-500/20 text-emerald-100'
+              : 'border-white/15 bg-white/[.06] text-slate-200 hover:bg-white/[.12]'
+          }`}
+        >
+          {motionOn ? 'Motion: On' : 'Motion: Paused'}
+        </button>
+      </div>
+
+      <div className="mt-2.5">
+        <Fold label="Sources">
+          <div className="mb-2 flex flex-wrap items-center justify-between gap-2 text-[11px] font-bold text-slate-200">
+            <span>{selected.label}: {represented.length}/{selected.targets.length} rendered source targets</span>
+            <span className="text-slate-300">Zero synthetic substitution</span>
+          </div>
+          <div className="grid gap-1.5 sm:grid-cols-2 lg:grid-cols-3">
             {selected.targets.map((target) => {
               const bundleFailed = failedFiles.includes(target.file)
               const bundleLoaded = loadedSourceFiles.includes(target.file)
               const renderedAvailable = target.available && bundleLoaded && !bundleFailed
               const indexAvailable = target.available
               return (
-                <div key={target.id} className="rounded-[16px] border border-white/[.07] bg-black/20 p-2.5">
-                  <div className="text-[10px] font-black text-white/75">{target.label}</div>
-                  <div className={`mt-1 text-[8px] font-black ${renderedAvailable ? 'text-cyan-200/80' : indexAvailable && !open ? 'text-violet-200/70' : 'text-amber-200/75'}`}>
+                <div key={target.id} className="rounded-[16px] border border-white/10 bg-white/[.04] p-2.5">
+                  <div className="text-[11px] font-black text-white">{target.label}</div>
+                  <div className={`mt-1 text-[10px] font-black ${renderedAvailable ? 'text-cyan-200' : indexAvailable && !open ? 'text-violet-200' : 'text-amber-200'}`}>
                     {renderedAvailable
                       ? `${target.names.length} exact source node${target.names.length === 1 ? '' : 's'}`
                       : bundleFailed
@@ -677,19 +822,17 @@ export default function BodyAllSystems3D({
                               ? 'BLOCKED · bundle not rendered'
                               : `${target.names.length} source node${target.names.length === 1 ? '' : 's'} indexed`}
                   </div>
-                  <div className="mt-1 truncate text-[8px] text-white/25">{target.file}</div>
+                  <div className="mt-1 truncate text-[10px] text-slate-300">{target.file}</div>
                 </div>
               )
             })}
           </div>
-          </Fold>
-
-          {unavailable.length > 0 && (
-            <p className="rounded-[16px] border border-amber-300/12 bg-amber-300/[.045] p-2.5 text-[9px] leading-relaxed text-amber-100/70">
-              Missing or failed targets are deliberately not approximated. Compatible source geometry must resolve and load successfully before it can appear here.
-            </p>
-          )}
-        </aside>
+        </Fold>
+        {unavailable.length > 0 && (
+          <p className="mt-2 rounded-[14px] border border-amber-300/25 bg-amber-300/[.08] p-2.5 text-[11px] leading-relaxed text-amber-100">
+            Missing or failed targets are deliberately not approximated with synthetic substitute geometry.
+          </p>
+        )}
       </div>
     </section>
   )

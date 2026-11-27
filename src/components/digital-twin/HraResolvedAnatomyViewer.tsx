@@ -555,14 +555,14 @@ export function HraResolvedAnatomyViewer({ terms, title, description, maxResults
             <section aria-label="3D anatomy inspection controls" className="mt-4 rounded-2xl border border-neutral-200 bg-neutral-50 p-3 dark:border-white/10 dark:bg-white/[.025]">
               <div className="text-[8px] font-black uppercase tracking-[.16em] text-neutral-400">Visual inspection</div>
               <label className="mt-3 flex items-center justify-between text-[9px] font-black text-neutral-600 dark:text-neutral-300"><span>Opacity</span><span>{Math.round(opacity * 100)}%</span></label>
-              <input aria-label="Anatomy opacity" type="range" min="0.12" max="1" step="0.04" value={opacity} onChange={(event) => changeOpacity(Number(event.target.value))} className="mt-1 w-full" />
+              <input aria-label="Anatomy opacity" type="range" min="0.12" max="1" step="0.04" value={opacity} onChange={(event) => changeOpacity(Number(event.target.value))} className="mt-1 h-11 min-h-[44px] w-full" />
               <label className="mt-3 flex items-center justify-between text-[9px] font-black text-neutral-600 dark:text-neutral-300"><span>Exploded separation</span><span>{Math.round(explode * 100)}%</span></label>
-              <input aria-label="Exploded anatomy separation" type="range" min="0" max="1" step="0.05" value={explode} onChange={(event) => changeExplode(Number(event.target.value))} className="mt-1 w-full" />
+              <input aria-label="Exploded anatomy separation" type="range" min="0" max="1" step="0.05" value={explode} onChange={(event) => changeExplode(Number(event.target.value))} className="mt-1 h-11 min-h-[44px] w-full" />
 
               <div className="mt-3 text-[8px] font-black uppercase tracking-wide text-neutral-400">Cross-section plane</div>
               <div className="mt-1.5 grid grid-cols-4 gap-1.5">
                 {([null, 'x', 'y', 'z'] as const).map((axis) => (
-                  <button key={axis ?? 'off'} type="button" aria-pressed={clipAxis === axis} onClick={() => changeClip(axis)} className={`min-h-10 rounded-xl border px-2 text-[9px] font-black ${clipAxis === axis ? 'border-cyan-500 bg-cyan-50 text-cyan-900 dark:bg-cyan-300/10 dark:text-cyan-100' : 'border-neutral-200 bg-white text-neutral-500 dark:border-white/10 dark:bg-black/20 dark:text-neutral-300'}`}>{axis ? axis.toUpperCase() : 'Off'}</button>
+                  <button key={axis ?? 'off'} type="button" aria-pressed={clipAxis === axis} onClick={() => changeClip(axis)} className={`min-h-[44px] rounded-xl border px-2 text-[9px] font-black ${clipAxis === axis ? 'border-cyan-500 bg-cyan-50 text-cyan-900 dark:bg-cyan-300/10 dark:text-cyan-100' : 'border-neutral-200 bg-white text-neutral-500 dark:border-white/10 dark:bg-black/20 dark:text-neutral-300'}`}>{axis ? axis.toUpperCase() : 'Off'}</button>
                 ))}
               </div>
 

@@ -69,6 +69,7 @@ export function OrganModel3D({ organ, selected, onSelect, tinggiClass = 'h-[300p
   const [loading, setLoading] = useState(true)
   const [pct, setPct] = useState(0)
   const [fatal, setFatal] = useState('')
+  const [showPins, setShowPins] = useState(true)
   // Posisi layar tiap hotspot, dihitung ulang tiap frame. Titiknya digambar
   // sebagai HTML di atas kanvas, bukan sebagai objek 3D: teksnya jadi tetap
   // tajam, bisa dibaca pembaca layar, dan sasaran sentuhnya cukup besar di
@@ -319,29 +320,42 @@ export function OrganModel3D({ organ, selected, onSelect, tinggiClass = 'h-[300p
     >
       <div ref={containerRef} className="h-full w-full touch-none" aria-hidden="true" />
 
-      {organ.hotspots.map((spot) => {
+      {showPins && organ.hotspots.map((spot) => {
         const pos = layar[spot.id]
         if (!pos || loading || fatal) return null
         const aktif = selected === spot.id
         return (
-          // Sasaran sentuh 44 px; penanda yang terlihat tetap kecil di dalamnya.
+          // Sasaran sentuh 44 px; penanda yang terlihat tetap kecil dan bening di dalamnya.
           <button
             key={spot.id}
             type="button"
+            data-pmd-native="true"
             onClick={() => onSelectRef.current?.(aktif ? null : spot.id)}
-            style={{ left: pos.x, top: pos.y, opacity: pos.depan ? 1 : 0.35 }}
-            className="absolute flex h-11 w-11 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+            style={{ left: pos.x, top: pos.y, opacity: pos.depan ? 1 : 0.38 }}
+            className="absolute flex h-11 w-11 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-0 bg-transparent p-0 shadow-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
             aria-label={spot.ta}
             aria-pressed={aktif}
           >
             <span
               aria-hidden="true"
-              className={`block rounded-full border-2 border-white transition ${aktif ? 'h-5 w-5 bg-brand' : 'h-3.5 w-3.5'}`}
+              className={`block rounded-full border-[1.5px] border-white transition ${aktif ? 'h-4 w-4 bg-emerald-400 ring-4 ring-emerald-400/35 shadow-[0_0_12px_rgba(52,211,153,0.85)]' : 'h-2.5 w-2.5 shadow-[0_0_8px_rgba(0,0,0,0.85)]'}`}
               style={!aktif ? { background: spot.color } : undefined}
             />
           </button>
         )
       })}
+
+      {organ.hotspots.length > 0 && !loading && !fatal && (
+        <button
+          type="button"
+          data-pmd-native="true"
+          onClick={() => setShowPins((v) => !v)}
+          aria-pressed={showPins}
+          className="absolute right-3 top-14 z-10 min-h-[44px] min-w-[44px] rounded-full border border-white/20 bg-black/65 px-3 text-[11px] font-bold text-white backdrop-blur-md transition hover:bg-black/80"
+        >
+          {showPins ? 'Pins: On' : 'Pins: Off'}
+        </button>
+      )}
 
       {loading && !fatal && (
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center" role="status" aria-live="polite">
@@ -359,8 +373,8 @@ export function OrganModel3D({ organ, selected, onSelect, tinggiClass = 'h-[300p
         </div>
       )}
       {!loading && !fatal && (
-        <p className="pointer-events-none absolute bottom-1.5 left-0 right-0 text-center text-[10px] text-neutral-500" aria-live="polite">
-          {bagian || '3D ready · drag to rotate · tap a part to name it'}
+        <p className="pointer-events-none absolute top-[62px] left-3 z-10 max-w-[calc(100%-7.5rem)] truncate rounded-full border border-white/15 bg-black/65 px-3 py-1 text-[11px] font-semibold text-slate-100 backdrop-blur-md" aria-live="polite">
+          {bagian || '3D ready · drag to rotate · tap a part'}
         </p>
       )}
     </div>
