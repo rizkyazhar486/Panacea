@@ -1,4 +1,4 @@
-import { withDeadline } from '../../lib/withDeadline'
+import { withDeadline } from '../../shared/kernel/withDeadline'
 import { capturePersonalHealthOperation, readPersonalHealthFile, readPersonalHealthImage } from '../../domains/personal-health'
 import { loadBluetoothWearablePanel, recordConnectedDevice, type WearableSavePatch } from '../../domains/devices'
 import { loadBodyExposureLocalHub } from '../../domains/body-exposure'

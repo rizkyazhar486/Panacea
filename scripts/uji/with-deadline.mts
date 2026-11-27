@@ -1,6 +1,6 @@
 // withDeadline: hasil tepat waktu lolos, janji yang menggantung ditolak dengan DeadlineExceeded, batas tak sah ditolak.
 import assert from 'node:assert/strict'
-import { withDeadline, DeadlineExceeded, type DeadlineTimers } from '../../src/lib/withDeadline.ts'
+import { withDeadline, DeadlineExceeded, type DeadlineTimers } from '../../src/shared/kernel/withDeadline.ts'
 
 function fakeTimers() {
   const pending = new Map<number, () => void>(); let next = 1; const cleared: number[] = []
