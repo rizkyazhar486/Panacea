@@ -169,4 +169,17 @@ export {
   type AirwayCapsule,
   type AirwayTreeResult,
 } from "./engine/endoscopy/airwayTree.ts";
+export {
+  airwayRoute,
+  indexPath,
+  nextAirwayPath,
+  routeBranchAt,
+  type AirwayRoute,
+} from "./engine/endoscopy/airwayNav.ts";
+export {
+  meshIslands,
+  islandTree,
+  withSubsegments,
+  type IslandPiece,
+} from "./engine/endoscopy/airwayIslands.ts";
 export { BRONCHIAL_TREE, type BronchusDef } from "./data/bronchialTree.ts";

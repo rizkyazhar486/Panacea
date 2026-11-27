@@ -97,6 +97,33 @@ gagal('kapsul_menutup_percabangan_dan_terdekat_terurut', () => {
   assert.deepEqual(nearestCapsules(caps, tip, 0), [])
 })
 
+gagal('cabang_tengah_batang_memotong_induk', () => {
+  // A lobar bronchus going down 6 cm with a daughter leaving at 1.5 cm (like RB6 off the lower-lobe bronchus) and
+  // another at its end. The parent is cut at the first takeoff; the rest is its continuation, named as such.
+  const g2: Record<string, Float32Array> = {
+    p: tabung([0, 0.1, 0], [0, 0.04, 0], 0.006),
+    s: tabung([0.004, 0.085, 0], [0.03, 0.075, 0], 0.003),
+    e: tabung([0, 0.038, 0], [0.01, 0.01, 0], 0.003),
+  }
+  const r2 = buildAirwayTree([
+    { id: 'p', parent: null, code: 'P', name: 'Lobar' },
+    { id: 's', parent: 'p', code: 'S6', name: 'Superior' },
+    { id: 'e', parent: 'p', code: 'E', name: 'End' },
+  ], (id) => g2[id], { x: 0, y: 0.12, z: 0 })
+  assert.equal(r2.ok, true)
+  if (!r2.ok) return
+  const [p, s, e, cont] = r2.branches
+  assert.equal(r2.branches.length, 4, 'one continuation piece added')
+  assert.ok(Math.abs(p.slices[p.slices.length - 1].y - 0.085) < 0.006, 'proximal piece ends at the takeoff')
+  assert.deepEqual(p.children, [1, 3], 'takeoff daughter and continuation')
+  assert.equal(s.parent, 0)
+  assert.equal(e.parent, 3, 'end daughter hangs off the continuation')
+  assert.equal(cont.name, 'Lobar (beyond S6)')
+  assert.equal(cont.code, 'P')
+  // Paired: the same daughter at the very end (no takeoff part-way) leaves the parent uncut.
+  assert.equal(res.ok && res.branches.length, 3)
+})
+
 gagal('pohon_bronkus_buku_teks_terstruktur', () => {
   const ids = new Set<string>()
   let roots = 0
