@@ -28,14 +28,14 @@ const PROCEDURES: readonly ScopeProcedure[] = [
     shortLabel: 'Colon',
     systemId: 'digestive',
     routeLabel: 'Lower GI · schematic route',
-    path: 'M50 88 C38 92 28 88 22 77 C17 68 18 54 18 42 C18 25 29 16 44 16 H62 C75 16 82 25 82 39 V66 C82 75 79 80 74 83',
+    path: 'M50 88 C62 92 72 88 78 77 C83 68 82 54 82 42 C82 25 71 16 56 16 H38 C25 16 18 25 18 39 V66 C18 75 21 80 26 83',
     points: [
       { label: 'Rectum', x: 50, y: 88 },
-      { label: 'Sigmoid', x: 24, y: 76 },
-      { label: 'Descending', x: 18, y: 44 },
-      { label: 'Transverse', x: 48, y: 16 },
-      { label: 'Ascending', x: 82, y: 42 },
-      { label: 'Cecum', x: 76, y: 82 },
+      { label: 'Sigmoid', x: 76, y: 76 },
+      { label: 'Descending', x: 82, y: 44 },
+      { label: 'Transverse', x: 52, y: 16 },
+      { label: 'Ascending', x: 18, y: 42 },
+      { label: 'Cecum', x: 24, y: 82 },
     ],
     lumen: 'radial-gradient(circle at 50% 52%, #1b070b 0 6%, #4f161d 7% 14%, #8c3c44 15% 23%, #bd6a68 24% 34%, #d98f82 35% 47%, #a74b4d 48% 58%, #5d1b24 72%, #16060a 100%)',
   },
@@ -45,13 +45,13 @@ const PROCEDURES: readonly ScopeProcedure[] = [
     shortLabel: 'Upper GI',
     systemId: 'digestive',
     routeLabel: 'Upper GI · schematic route',
-    path: 'M48 10 C48 25 49 36 50 46 C51 56 43 61 38 68 C30 79 39 91 56 88 C73 85 76 71 66 64 C59 59 57 55 58 50',
+    path: 'M50 10 C50 25 52 36 55 46 C58 54 64 60 66 70 C68 82 58 90 46 86 C38 83 36 76 38 70',
     points: [
-      { label: 'Esophagus', x: 48, y: 18 },
-      { label: 'GE junction', x: 50, y: 48 },
-      { label: 'Stomach', x: 38, y: 70 },
-      { label: 'Pylorus', x: 58, y: 86 },
-      { label: 'Duodenum', x: 69, y: 67 },
+      { label: 'Esophagus', x: 50, y: 18 },
+      { label: 'GE junction', x: 55, y: 46 },
+      { label: 'Stomach', x: 66, y: 70 },
+      { label: 'Pylorus', x: 46, y: 86 },
+      { label: 'Duodenum', x: 38, y: 70 },
     ],
     lumen: 'radial-gradient(circle at 53% 48%, #1d0806 0 7%, #572019 8% 15%, #a04b36 16% 25%, #d38a64 26% 38%, #edb28a 39% 48%, #b86549 49% 60%, #64251d 73%, #160704 100%)',
   },
@@ -61,12 +61,12 @@ const PROCEDURES: readonly ScopeProcedure[] = [
     shortLabel: 'Airway',
     systemId: 'respiratory',
     routeLabel: 'Airway · schematic route',
-    path: 'M50 10 V48 M50 48 C42 56 34 64 27 79 M50 48 C58 56 66 64 74 79 M37 61 L24 68 M63 61 L77 68',
+    path: 'M50 10 V48 M50 48 C47 56 44 66 41 80 M47 55 L33 57 M50 48 C58 53 66 57 73 63 M73 63 L83 57 M73 63 L77 80',
     points: [
       { label: 'Trachea', x: 50, y: 18 },
       { label: 'Carina', x: 50, y: 48 },
-      { label: 'Right main bronchus', x: 69, y: 66 },
-      { label: 'Left main bronchus', x: 32, y: 66 },
+      { label: 'Right main bronchus', x: 44, y: 66 },
+      { label: 'Left main bronchus', x: 70, y: 61 },
     ],
     lumen: 'radial-gradient(circle at 50% 50%, #071114 0 8%, #18383a 9% 17%, #3f6e6a 18% 27%, #7aa69a 28% 39%, #b9cab9 40% 49%, #69867d 50% 60%, #294844 73%, #071012 100%)',
   },
@@ -274,7 +274,7 @@ export default function VirtualEndoscopyWorkbench({
           <div className="flex items-center justify-between gap-2">
             <div>
               <div className="text-[8px] font-black uppercase tracking-[.16em] text-white/28">Route map</div>
-              <div className="mt-0.5 text-[10px] font-black text-white/66">{procedure.routeLabel}</div>
+              <div className="mt-0.5 text-[10px] font-black text-white/66">{procedure.routeLabel} · anterior view</div>
             </div>
             <span className="text-[10px] font-black tabular-nums text-rose-100/70">{progressPercent}%</span>
           </div>
@@ -283,6 +283,9 @@ export default function VirtualEndoscopyWorkbench({
             <svg viewBox="0 0 100 100" className="aspect-square w-full max-w-[190px]" role="img" aria-label={`${procedure.label} schematic route`}>
               <path d={procedure.path} fill="none" stroke="rgba(255,255,255,.12)" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" />
               <path d={procedure.path} fill="none" stroke="rgba(251,113,133,.55)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+              {/* Anterior view: the patient's right is the viewer's left. */}
+              <text x="3" y="97" fontSize="6" fontWeight="900" fill="rgba(255,255,255,.4)">R</text>
+              <text x="92" y="97" fontSize="6" fontWeight="900" fill="rgba(255,255,255,.4)">L</text>
               {procedure.points.map((item, index) => {
                 const active = index === pointIndex
                 const passed = index <= pointIndex
