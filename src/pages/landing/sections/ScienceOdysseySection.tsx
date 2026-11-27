@@ -43,26 +43,37 @@ export function VideoSaatTerlihat({ src, judul }: { src: string; judul: string }
   }
 
   return (
-    <div className="astro-surface astro-horizon-grid mt-3 flex flex-col justify-between rounded-2xl p-4 text-white">
-      <div className="flex items-center justify-between gap-2">
-        <span className="font-astro text-[10px] font-bold uppercase tracking-[0.18em] text-cyan-300">
+    <div className="dark mt-3 flex flex-col justify-between overflow-hidden rounded-2xl border border-white/10 bg-[#060A09] p-4 text-white">
+      <div className="flex items-center justify-between gap-2 pb-3">
+        <span className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-emerald-300">
           ARCHIVAL MEDICAL EPOCH
         </span>
-        <span className="font-astro-mono text-[10px] font-bold text-emerald-300">{judul.toUpperCase()}</span>
+        <span className="font-mono text-[10px] font-bold text-neutral-300">{judul.toUpperCase()}</span>
       </div>
-      <svg viewBox="0 0 360 88" className="my-2 h-20 w-full" role="img" aria-label={`Historical medical science coordinate plate for ${judul}`}>
-        <circle cx="48" cy="44" r="24" fill="none" stroke="rgba(34,211,238,0.45)" strokeWidth="1.4" strokeDasharray="3 3" />
-        <circle cx="48" cy="44" r="6" fill="#10b981" />
-        <line x1="78" y1="44" x2="342" y2="44" stroke="rgba(148,163,184,0.28)" strokeWidth="1.2" />
-        <path d="M96 44 L134 44 L146 22 L158 64 L170 36 L186 44 L260 44 L272 24 L284 62 L298 44 L342 44" fill="none" stroke="#22d3ee" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-        <text x="96" y="16" fill="#cbd5e1" fontSize="9" fontFamily="monospace">EVIDENCE CONTINUUM · OBSERVATION → PHYSIOLOGY → AI-EMR</text>
-      </svg>
+      <div className="relative aspect-[16/9] w-full overflow-hidden rounded-xl border border-white/10 bg-[#040706]">
+        <img
+          src="/images/manufacturing.webp"
+          alt={`Arsip referensi klinis untuk ${judul}`}
+          width={1200}
+          height={675}
+          decoding="async"
+          className="h-full w-full object-cover object-center"
+        />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#060A09] via-transparent to-transparent opacity-80"
+        />
+        <span className="absolute bottom-2.5 left-3 font-mono text-[10px] font-semibold tracking-wider text-emerald-300">
+          EVIDENCE CONTINUUM · OBSERVATION → PHYSIOLOGY → AI-EMR
+        </span>
+      </div>
       {src && !failed && (
-        <div className="flex justify-end">
+        <div className="mt-3 flex justify-end">
           <button
             type="button"
+            data-pmd-native="true"
             onClick={() => setShowClip(true)}
-            className="astro-chip inline-flex min-h-[44px] items-center rounded-xl px-3 text-[11px] font-bold"
+            className="inline-flex min-h-[44px] items-center rounded-xl border border-emerald-400/35 bg-emerald-500/15 px-3.5 text-[11px] font-bold text-emerald-200 transition hover:bg-emerald-500/25"
           >
             Putar klip arsip opsional
           </button>
@@ -82,29 +93,22 @@ export function ScienceOdysseySection() {
       <div className="h-px w-full bg-gradient-to-r from-transparent via-emerald-500/25 to-transparent" />
       <section
         id="science"
-        className="relative overflow-hidden bg-gradient-to-b from-[#f8faf9] via-[#edf5f0]/60 to-[#f8faf9] px-6 py-24 border-y border-emerald-500/15 dark:border-white/5 dark:from-[#030d07] dark:via-[#06150d] dark:to-[#030d07] sm:px-10"
+        className="relative overflow-hidden border-y border-neutral-200/80 bg-[#F8FAF9] px-6 py-20 text-neutral-950 transition-colors dark:border-white/10 dark:bg-[#060A09] dark:text-neutral-50 sm:px-10"
       >
-        <div className="pointer-events-none absolute inset-0 overflow-hidden">
-          <div className="orb absolute left-1/4 top-10 h-72 w-72 rounded-full bg-brand/10 blur-3xl" />
-          <div
-            className="orb absolute bottom-10 right-1/4 h-72 w-72 rounded-full bg-emerald-300/10 blur-3xl"
-            style={{ animationDelay: '-8s' }}
-          />
-        </div>
         <div className="relative mx-auto max-w-5xl">
           <Reveal className="text-center">
-            <div className="mx-auto mb-3 inline-flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-50/90 px-3.5 py-1 text-[10px] font-black uppercase tracking-[0.2em] text-emerald-800 shadow-sm dark:border-emerald-500/30 dark:bg-emerald-950/70 dark:text-emerald-300">
-              <span className="font-mono text-emerald-600 dark:text-emerald-400 font-extrabold">05</span>
-              <span className="h-2 w-px bg-emerald-300 dark:bg-emerald-700" />
+            <div className="mx-auto mb-3 inline-flex items-center gap-2 rounded-full border border-emerald-700/20 bg-emerald-700/10 px-3.5 py-1 text-[10px] font-black uppercase tracking-[0.2em] text-emerald-800 dark:border-emerald-400/25 dark:bg-emerald-500/15 dark:text-emerald-300">
+              <span className="font-mono font-extrabold text-emerald-700 dark:text-emerald-400">05</span>
+              <span className="h-2 w-px bg-emerald-500/40" />
               <span>Ekspedisi Sains &amp; Longevity</span>
             </div>
             <div>
-              <span className="rounded-full border border-brand/20 bg-brand-50 px-3.5 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-dark dark:bg-emerald-950/60 dark:text-emerald-300">
+              <span className="rounded-full border border-emerald-700/20 bg-white px-3.5 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-800 dark:border-white/10 dark:bg-[#111815] dark:text-emerald-300">
                 Warisan Ribuan Tahun Peradaban
               </span>
             </div>
-            <h2 className="mt-3 text-3xl font-extrabold sm:text-4xl text-ink dark:text-white">
-              Evolusi Sains Medis &amp; <span className="font-serif-display italic text-brand-dark dark:text-emerald-400">Eksplorasi Longevity</span>
+            <h2 className="mt-3 text-3xl font-extrabold text-neutral-950 dark:text-white sm:text-4xl">
+              Evolusi Sains Medis &amp; <span className="font-serif-display italic text-emerald-700 dark:text-emerald-400">Eksplorasi Longevity</span>
             </h2>
             <Prosa kelas="mx-auto mt-3 max-w-2xl text-neutral-600 dark:text-neutral-300">
               Dari papirus era Firaun, tradisi kenabian, kedokteran Yunani-Romawi, hingga perintis sel punca dan presisi robotik — pencarian kesehatan optimal adalah warisan peradaban yang kini diakselerasi Panaceamed.id bersama AI.
@@ -121,11 +125,13 @@ export function ScienceOdysseySection() {
               ].map((tab) => (
                 <button
                   key={tab.id}
+                  type="button"
+                  data-pmd-native="true"
                   onClick={() => setScienceTab(tab.id as typeof scienceTab)}
-                  className={`rounded-full px-4 py-1.5 text-xs font-bold transition-all shadow-sm ${
+                  className={`min-h-[40px] rounded-full px-4 py-1.5 text-xs font-bold shadow-sm transition-all ${
                     scienceTab === tab.id
-                      ? 'bg-brand text-white shadow-brand/20'
-                      : 'border border-black/5 bg-white/70 text-neutral-600 hover:bg-neutral-100 dark:border-white/10 dark:bg-neutral-800 dark:text-neutral-300'
+                      ? 'bg-emerald-700 text-white'
+                      : 'border border-neutral-200 bg-white text-neutral-700 hover:bg-neutral-100 dark:border-white/10 dark:bg-[#111815] dark:text-neutral-300'
                   }`}
                 >
                   {tab.label}
@@ -137,7 +143,7 @@ export function ScienceOdysseySection() {
           {/* Self-hosted timeline overview — user-controlled playback (no forced auto-loop) */}
           {(scienceTab === 'eras' || scienceTab === 'all') && (
             <Reveal delay={80}>
-              <div className="astro-surface mt-8 overflow-hidden rounded-[2rem]">
+              <div className="dark mt-8 overflow-hidden rounded-[2rem] border border-white/10 bg-[#060A09]">
                 <video
                   src={`${import.meta.env.BASE_URL}media/history.mp4`}
                   controls
@@ -145,7 +151,7 @@ export function ScienceOdysseySection() {
                   playsInline
                   preload="metadata"
                   poster={HISTORY_POSTER}
-                  className="aspect-video w-full bg-[#040911] object-cover"
+                  className="aspect-video w-full bg-[#060A09] object-cover"
                 />
               </div>
             </Reveal>
@@ -162,26 +168,28 @@ export function ScienceOdysseySection() {
                 {HISTORY_ERAS.map((e, i) => (
                   <button
                     key={e.era}
+                    type="button"
+                    data-pmd-native="true"
                     onClick={() => setActiveEra(i)}
                     className={`w-full flex items-center justify-between rounded-2xl p-4 text-left transition-all ${
                       activeEra === i
-                        ? 'border-2 border-emerald-500 bg-white shadow-md shadow-emerald-500/10 dark:bg-neutral-900'
-                        : 'border border-black/5 bg-white/70 hover:bg-white hover:border-emerald-300/60 dark:border-white/10 dark:bg-neutral-900/60'
+                        ? 'border-2 border-emerald-600 bg-white shadow-md dark:bg-[#111815]'
+                        : 'border border-neutral-200/80 bg-neutral-50 hover:border-emerald-500/40 hover:bg-white dark:border-white/10 dark:bg-[#111815]/80'
                     }`}
                   >
                     <div className="flex items-center gap-3">
                       <span
                         className={`grid h-10 w-10 shrink-0 place-items-center rounded-xl text-xl ${
                           activeEra === i
-                            ? 'bg-emerald-500 text-white'
-                            : 'bg-brand-50 text-brand-dark dark:bg-emerald-950 dark:text-emerald-300'
+                            ? 'bg-emerald-700 text-white'
+                            : 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300'
                         }`}
                       >
                         {renderEraGlyph(e.era, e.emoji)}
                       </span>
                       <div>
-                        <div className="text-sm font-extrabold text-ink">{e.era}</div>
-                        <div className="text-xs text-neutral-500 dark:text-neutral-400">{e.title}</div>
+                        <div className="text-sm font-extrabold text-neutral-950 dark:text-white">{e.era}</div>
+                        <div className="text-xs text-neutral-600 dark:text-neutral-400">{e.title}</div>
                       </div>
                     </div>
                     <span className="shrink-0 rounded-full bg-emerald-50 px-2.5 py-0.5 text-[10px] font-bold text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300">
@@ -193,21 +201,21 @@ export function ScienceOdysseySection() {
 
               {/* Right: Active Era Viewport Showcase (7 cols) */}
               <div className="lg:col-span-7">
-                <div className="sticky top-24 rounded-3xl border border-black/5 bg-white p-6 shadow-xl shadow-black/5 dark:border-white/10 dark:bg-neutral-900">
+                <div className="sticky top-24 rounded-3xl border border-neutral-200/80 bg-white p-6 shadow-sm dark:border-white/10 dark:bg-[#111815]">
                   <div className="flex items-center justify-between gap-3 border-b border-black/5 pb-4 dark:border-white/10">
                     <div className="flex items-center gap-3">
-                      <span className="grid h-10 w-10 place-items-center rounded-xl bg-brand-50 text-2xl dark:bg-emerald-950">
+                      <span className="grid h-10 w-10 place-items-center rounded-xl bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300">
                         {renderEraGlyph(HISTORY_ERAS[activeEra].era, HISTORY_ERAS[activeEra].emoji)}
                       </span>
                       <div>
-                        <h3 className="text-base font-extrabold text-ink sm:text-lg">{HISTORY_ERAS[activeEra].title}</h3>
-                        <div className="text-xs font-bold text-brand-dark dark:text-emerald-400">
+                        <h3 className="text-base font-extrabold text-neutral-950 dark:text-white sm:text-lg">{HISTORY_ERAS[activeEra].title}</h3>
+                        <div className="text-xs font-bold text-emerald-700 dark:text-emerald-400">
                           {HISTORY_ERAS[activeEra].era} ·{' '}
-                          <span className="text-neutral-500 font-medium">{HISTORY_ERAS[activeEra].when}</span>
+                          <span className="font-medium text-neutral-600 dark:text-neutral-400">{HISTORY_ERAS[activeEra].when}</span>
                         </div>
                       </div>
                     </div>
-                    <span className="rounded-full bg-neutral-100 px-3 py-1 font-mono text-xs font-black text-neutral-600 dark:bg-neutral-800 dark:text-neutral-300">
+                    <span className="rounded-full bg-neutral-100 px-3 py-1 font-mono text-xs font-black text-neutral-700 dark:bg-neutral-800 dark:text-neutral-300">
                       {activeEra + 1} / {HISTORY_ERAS.length}
                     </span>
                   </div>
@@ -229,14 +237,18 @@ export function ScienceOdysseySection() {
                   {/* Stepper Navigation Buttons */}
                   <div className="mt-5 flex items-center justify-between border-t border-black/5 pt-4 dark:border-white/10">
                     <button
+                      type="button"
+                      data-pmd-native="true"
                       onClick={() => setActiveEra((prev) => (prev > 0 ? prev - 1 : HISTORY_ERAS.length - 1))}
-                      className="rounded-full border border-black/10 px-4 py-1.5 text-xs font-bold text-neutral-700 hover:bg-neutral-100 dark:border-white/10 dark:text-neutral-300 dark:hover:bg-neutral-800"
+                      className="min-h-[40px] rounded-full border border-neutral-300 px-4 py-1.5 text-xs font-bold text-neutral-800 hover:bg-neutral-100 dark:border-white/15 dark:text-neutral-200 dark:hover:bg-neutral-800"
                     >
                       ← Era Sebelumnya
                     </button>
                     <button
+                      type="button"
+                      data-pmd-native="true"
                       onClick={() => setActiveEra((prev) => (prev < HISTORY_ERAS.length - 1 ? prev + 1 : 0))}
-                      className="rounded-full bg-brand px-4 py-1.5 text-xs font-bold text-white shadow-sm hover:brightness-110"
+                      className="min-h-[40px] rounded-full bg-emerald-700 px-4 py-1.5 text-xs font-bold text-white shadow-sm hover:bg-emerald-800"
                     >
                       Era Berikutnya →
                     </button>
@@ -250,8 +262,8 @@ export function ScienceOdysseySection() {
           {(scienceTab === 'modern' || scienceTab === 'all') && (
             <>
               <Reveal className="mt-14 text-center">
-                <h3 className="text-2xl font-extrabold text-ink">
-                  Era Modern — <span className="font-serif-display italic text-brand-dark dark:text-emerald-400">Dekade demi Dekade</span>
+                <h3 className="text-2xl font-extrabold text-neutral-950 dark:text-white">
+                  Era Modern — <span className="font-serif-display italic text-emerald-700 dark:text-emerald-400">Dekade demi Dekade</span>
                 </h3>
                 <p className="mx-auto mt-2 max-w-2xl text-sm text-neutral-600 dark:text-neutral-300">
                   Dari penemuan antibiotik &amp; rekam medis, sensor tubuh pintar, standar data FHIR, hingga kecerdasan artifisial.
@@ -260,9 +272,9 @@ export function ScienceOdysseySection() {
               <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {HISTORY_MODERN.map((m, i) => (
                   <Reveal key={m.decade} delay={(i % 3) * 80}>
-                    <div className="liquid-glass h-full rounded-2xl p-5 shadow-sm">
-                      <div className="text-xs font-black text-brand-dark dark:text-emerald-400">{m.decade}</div>
-                      <div className="mt-1 font-bold text-ink">{m.title}</div>
+                    <div className="h-full rounded-2xl border border-neutral-200/80 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-[#111815]">
+                      <div className="text-xs font-black text-emerald-700 dark:text-emerald-400">{m.decade}</div>
+                      <div className="mt-1 font-bold text-neutral-950 dark:text-white">{m.title}</div>
                       <p className="mt-1.5 text-[13px] leading-relaxed text-neutral-600 dark:text-neutral-300">{m.body}</p>
                     </div>
                   </Reveal>
@@ -292,8 +304,8 @@ export function ScienceOdysseySection() {
                 <span className="rounded-full border border-brand/20 bg-brand-50 px-3.5 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-dark dark:bg-emerald-950/60 dark:text-emerald-300">
                   Frontier Kedokteran Regeneratif
                 </span>
-                <h3 className="mt-3 text-2xl font-extrabold text-ink">
-                  Sains Sel Punca (<span className="font-serif-display italic text-brand-dark dark:text-emerald-400">Stem Cells</span>)
+                <h3 className="mt-3 text-2xl font-extrabold text-neutral-950 dark:text-white">
+                  Sains Sel Punca (<span className="font-serif-display italic text-emerald-700 dark:text-emerald-400">Stem Cells</span>)
                 </h3>
                 <Prosa kelas="mx-auto mt-2 max-w-2xl text-sm text-neutral-600 dark:text-neutral-300">
                   Potensi terbesar sains anti-penuaan: regenerasi sel yang rusak dan peremajaan jaringan tubuh. Tiga kategori utama dari yang paling matang secara klinis hingga riset terdepan.
@@ -302,33 +314,33 @@ export function ScienceOdysseySection() {
               <div className="mt-6 grid gap-4 lg:grid-cols-3">
                 {STEM_CELLS.map((s, i) => (
                   <Reveal key={s.type} delay={(i % 3) * 80}>
-                    <div className="liquid-glass flex h-full flex-col justify-between rounded-2xl p-5 shadow-sm">
+                    <div className="flex h-full flex-col justify-between rounded-2xl border border-neutral-200/80 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-[#111815]">
                       <div>
                         <div className="flex items-center gap-2">
-                          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-brand-50 text-brand-dark dark:bg-emerald-950 dark:text-emerald-300">
+                          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300">
                             <s.icon size={20} />
                           </span>
                           <div>
-                            <div className="font-extrabold text-ink">{s.type}</div>
-                            <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-brand-dark dark:text-emerald-400">
+                            <div className="font-extrabold text-neutral-950 dark:text-white">{s.type}</div>
+                            <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-emerald-700 dark:text-emerald-400">
                               {s.short}
                             </div>
                           </div>
                         </div>
                         <p className="mt-2.5 text-[13px] leading-relaxed text-neutral-600 dark:text-neutral-300">{s.body}</p>
                       </div>
-                      <div className="mt-3 rounded-xl bg-neutral-100 px-3 py-1.5 text-[11px] text-neutral-600 dark:bg-neutral-800 dark:text-neutral-300">
-                        <b className="text-neutral-800 dark:text-neutral-100">Penerapan:</b> {s.use}
+                      <div className="mt-3 rounded-xl bg-neutral-100 px-3 py-1.5 text-[11px] text-neutral-700 dark:bg-neutral-800 dark:text-neutral-300">
+                        <b className="text-neutral-900 dark:text-neutral-100">Penerapan:</b> {s.use}
                       </div>
                     </div>
                   </Reveal>
                 ))}
               </div>
               <Reveal delay={80}>
-                <p className="mx-auto mt-4 max-w-2xl text-center text-[11px] leading-relaxed text-neutral-500">
+                <p className="mx-auto mt-4 max-w-2xl text-center text-[11px] leading-relaxed text-neutral-600 dark:text-neutral-400">
                   Potensi vs. kematangan klinis: <b>potensi</b> paling tinggi ada pada sel pluripoten (iPSC &amp; embrionik), sementara <b>kematangan klinis</b> saat ini paling tinggi pada sel somatik dewasa.
                   Riset reprogramming parsial (faktor Yamanaka) kini membuka jalan untuk membalikkan jam biologis seluler — batas terdepan ilmu longevity.
-                  <br /><span className="opacity-70">Hanya untuk tujuan edukasi ilmiah; terapi sel punca wajib dilakukan di fasilitas kesehatan berizin resmi sesuai regulasi Kemenkes.</span>
+                  <br /><span className="opacity-75">Hanya untuk tujuan edukasi ilmiah; terapi sel punca wajib dilakukan di fasilitas kesehatan berizin resmi sesuai regulasi Kemenkes.</span>
                 </p>
               </Reveal>
             </>
@@ -338,11 +350,11 @@ export function ScienceOdysseySection() {
           {(scienceTab === 'robotics' || scienceTab === 'all') && (
             <>
               <Reveal className="mt-14 text-center">
-                <span className="rounded-full border border-brand/20 bg-brand-50 px-3.5 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-dark dark:bg-emerald-950/60 dark:text-emerald-300">
+                <span className="rounded-full border border-emerald-700/20 bg-emerald-50 px-3.5 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300">
                   Presisi Robotik Medis
                 </span>
-                <h3 className="mt-3 text-2xl font-extrabold text-ink">
-                  Robotik dalam <span className="font-serif-display italic text-brand-dark dark:text-emerald-400">Dunia Medis</span>
+                <h3 className="mt-3 text-2xl font-extrabold text-neutral-950 dark:text-white">
+                  Robotik dalam <span className="font-serif-display italic text-emerald-700 dark:text-emerald-400">Dunia Medis</span>
                 </h3>
                 <Prosa kelas="mx-auto mt-2 max-w-2xl text-sm text-neutral-600 dark:text-neutral-300">
                   Dari lengan bedah mikro hingga navigasi intravaskular — mesin memperluas kapabilitas dokter, menjadikan penanganan medis lebih presisi, minim sayatan, dan mempercepat pemulihan pasien.
@@ -351,23 +363,23 @@ export function ScienceOdysseySection() {
               <div className="mt-6 grid gap-4 sm:grid-cols-2">
                 {ROBOTICS.map((r, i) => (
                   <Reveal key={r.type} delay={(i % 2) * 80}>
-                    <div className="liquid-glass flex h-full flex-col justify-between rounded-2xl p-5 shadow-sm">
+                    <div className="flex h-full flex-col justify-between rounded-2xl border border-neutral-200/80 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-[#111815]">
                       <div>
                         <div className="flex items-center gap-2">
-                          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-brand-50 text-brand-dark dark:bg-emerald-950 dark:text-emerald-300">
+                          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300">
                             <r.icon size={18} />
                           </span>
                           <div>
-                            <div className="font-extrabold text-ink">{r.type}</div>
-                            <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-brand-dark dark:text-emerald-400">
+                            <div className="font-extrabold text-neutral-950 dark:text-white">{r.type}</div>
+                            <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-emerald-700 dark:text-emerald-400">
                               {r.short}
                             </div>
                           </div>
                         </div>
                         <p className="mt-2.5 text-[13px] leading-relaxed text-neutral-600 dark:text-neutral-300">{r.body}</p>
                       </div>
-                      <div className="mt-3 rounded-xl bg-neutral-100 px-3 py-1.5 text-[11px] text-neutral-600 dark:bg-neutral-800 dark:text-neutral-300">
-                        <b className="text-neutral-800 dark:text-neutral-100">Penerapan:</b> {r.use}
+                      <div className="mt-3 rounded-xl bg-neutral-100 px-3 py-1.5 text-[11px] text-neutral-700 dark:bg-neutral-800 dark:text-neutral-300">
+                        <b className="text-neutral-900 dark:text-neutral-100">Penerapan:</b> {r.use}
                       </div>
                     </div>
                   </Reveal>
