@@ -1,231 +1,315 @@
-import { lazy, Suspense, useState } from 'react'
-import { Reveal } from '../../../components/Reveal'
+import React, { useEffect, useRef, useState } from 'react'
 import { BatasKlaimKesehatan } from '../../../components/BatasKlaimKesehatan'
-import { scrollToSection } from './LandingHeader'
+import { Reveal } from '../../../components/Reveal'
 import {
-  IconShield,
-  IconCheck,
-  IconStethoscope,
-} from '../../../components/icons'
+  HOME_BODY_ANCHORS,
+  HOME_BODY_HOLO,
+  HOME_BODY_IMAGE,
+  HOME_BODY_TURN,
+} from '../../../domains/body-exposure/data/homeBodyAnchors'
+import type { BodySystemId } from '../../../domains/body-exposure/data/bodySystems'
+import {
+  dragAngle,
+  isFront,
+  settleStep,
+  spinAngle,
+  turnFrame,
+} from '../../../domains/body-exposure/engine/home-hero/homeBodyTurn'
 import { IconArrowRight } from '../landingSvgs'
-
-// Decorative canvas: loaded after the hero renders so it stays out of the initial JS budget.
-const InteractiveAura = lazy(() => import('../../../components/InteractiveAura').then((m) => ({ default: m.InteractiveAura })))
-
-const HERO_ORGANS = [
-  { id: 'brain', label: 'Neuro', metric: '95%', cx: 50, cy: 14, color: '#a78bfa' },
-  { id: 'heart', label: 'Cardio', metric: '72 bpm', cx: 53, cy: 34, color: '#fb7185' },
-  { id: 'lungs', label: 'Pulmo', metric: '98% SpO2', cx: 43, cy: 33, color: '#38bdf8' },
-  { id: 'liver', label: 'Hepato', metric: '93%', cx: 44, cy: 46, color: '#34d399' },
-  { id: 'metabolic', label: 'Metabolic', metric: 'HRV 68ms', cx: 52, cy: 58, color: '#fbbf24' },
-] as const
-
-type HoloLayer = 'surface' | 'vascular' | 'neural'
+import { scrollToSection } from './LandingHeader'
 
 interface HeroSectionProps {
   onMasuk: () => void
 }
 
+const HERO_HOTSPOTS: ReadonlyArray<{
+  readonly id: BodySystemId
+  readonly label: string
+  readonly metric: string
+}> = [
+  { id: 'nervous', label: 'Saraf Pusat', metric: 'Korteks & Traktus Kranial' },
+  { id: 'respiratory', label: 'Respirasi', metric: 'Paru & Pertukaran Gas' },
+  { id: 'cardiovascular', label: 'Kardiovaskular', metric: 'Cor & Sirkulasi Sistemik' },
+  { id: 'digestive', label: 'Digestif', metric: 'Hepar, Gaster & Metabolisme' },
+  { id: 'urinary', label: 'Renal', metric: 'Filtrasi & Keseimbangan Cairan' },
+]
+
 export function HeroSection({ onMasuk }: HeroSectionProps) {
-  const [layer, setLayer] = useState<HoloLayer>('vascular')
-  const [focusOrganId, setFocusOrganId] = useState<(typeof HERO_ORGANS)[number]['id']>('heart')
-  const focusOrgan = HERO_ORGANS.find((o) => o.id === focusOrganId) ?? HERO_ORGANS[1]
+  const [layer, setLayer] = useState<'surface' | 'holo'>('holo')
+  const [angleDeg, setAngleDeg] = useState(0)
+  const [selectedSystem, setSelectedSystem] = useState<BodySystemId>('cardiovascular')
+  const stageRef = useRef<HTMLDivElement>(null)
+  const dragStartRef = useRef<{ x: number; deg: number } | null>(null)
+  const rafRef = useRef<number | null>(null)
+
+  useEffect(() => {
+    return () => {
+      if (rafRef.current !== null) cancelAnimationFrame(rafRef.current)
+    }
+  }, [])
+
+  const startSpin = () => {
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) {
+      setAngleDeg((d) => (d === 0 ? 45 : 0))
+      return
+    }
+    if (rafRef.current !== null) cancelAnimationFrame(rafRef.current)
+    const t0 = performance.now()
+    const duration = 1800
+    const tick = (now: number) => {
+      const elapsed = now - t0
+      if (elapsed >= duration) {
+        setAngleDeg(0)
+        rafRef.current = null
+        return
+      }
+      setAngleDeg(spinAngle(elapsed, duration))
+      rafRef.current = requestAnimationFrame(tick)
+    }
+    rafRef.current = requestAnimationFrame(tick)
+  }
+
+  const settleBack = (fromDeg: number) => {
+    if (rafRef.current !== null) cancelAnimationFrame(rafRef.current)
+    let cur = fromDeg
+    let last = performance.now()
+    const tick = (now: number) => {
+      const dt = now - last
+      last = now
+      cur = settleStep(cur, dt, 160)
+      setAngleDeg(cur)
+      if (cur !== 0) rafRef.current = requestAnimationFrame(tick)
+      else rafRef.current = null
+    }
+    rafRef.current = requestAnimationFrame(tick)
+  }
+
+  const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    if ((e.target as HTMLElement).closest('button')) return
+    if (rafRef.current !== null) cancelAnimationFrame(rafRef.current)
+    dragStartRef.current = { x: e.clientX, deg: angleDeg }
+    e.currentTarget.setPointerCapture(e.pointerId)
+  }
+
+  const onPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    const start = dragStartRef.current
+    const box = stageRef.current
+    if (!start || !box) return
+    const next = dragAngle(start.deg, e.clientX - start.x, box.clientWidth || 320, 360)
+    if (next !== null) setAngleDeg(next)
+  }
+
+  const onPointerUp = () => {
+    if (!dragStartRef.current) return
+    dragStartRef.current = null
+    settleBack(angleDeg)
+  }
+
+  const frame = turnFrame(angleDeg, HOME_BODY_TURN.frames) ?? 0
+  const showFront = isFront(angleDeg, HOME_BODY_TURN.frames)
+  const activeMeta = HERO_HOTSPOTS.find((h) => h.id === selectedSystem) ?? HERO_HOTSPOTS[2]
 
   return (
-    <section className="astro-horizon-grid relative overflow-hidden px-4 py-16 sm:px-8 sm:py-20 lg:py-24">
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <svg
-          aria-hidden="true"
-          viewBox="0 0 1200 640"
-          preserveAspectRatio="xMidYMid slice"
-          className="absolute inset-0 h-full w-full opacity-35 dark:opacity-55"
-        >
-          <defs>
-            <radialGradient id="astroOrb" cx="50%" cy="42%" r="55%">
-              <stop offset="0%" stopColor="#22d3ee" stopOpacity="0.22" />
-              <stop offset="55%" stopColor="#10b981" stopOpacity="0.08" />
-              <stop offset="100%" stopColor="#020617" stopOpacity="0" />
-            </radialGradient>
-          </defs>
-          <rect width="1200" height="640" fill="url(#astroOrb)" />
-          <circle cx="600" cy="310" r="190" fill="none" stroke="rgba(34,211,238,0.22)" strokeWidth="1" strokeDasharray="4 6" />
-          <circle cx="600" cy="310" r="310" fill="none" stroke="rgba(16,185,129,0.18)" strokeWidth="1" />
-          <circle cx="600" cy="310" r="450" fill="none" stroke="rgba(148,163,184,0.12)" strokeWidth="1" strokeDasharray="2 10" />
-          <path d="M0 470 Q320 410 600 450 T1200 430" fill="none" stroke="rgba(34,211,238,0.28)" strokeWidth="1.5" />
-        </svg>
-        <Suspense fallback={null}>
-          <InteractiveAura />
-        </Suspense>
-        <div className="orb absolute -left-20 top-10 h-72 w-72 rounded-full bg-cyan-400/15 blur-3xl" />
-        <div
-          className="orb absolute right-0 top-40 h-80 w-80 rounded-full bg-emerald-400/15 blur-3xl"
-          style={{ animationDelay: '-6s' }}
-        />
-      </div>
-
-      <div className="relative mx-auto max-w-7xl">
-        <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-12">
-          {/* Sisi Kiri (Value Proposition) */}
-          <div className="text-center lg:col-span-6 lg:text-left">
-            <Reveal>
-              <div className="liquid-glass inline-flex items-center gap-2 rounded-full px-4 py-1.5 shadow-sm">
-                <span className="h-2.5 w-2.5 animate-pulse rounded-full bg-emerald-500" />
-                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-neutral-700 dark:text-neutral-200">
-                  SISTEM DUKUNGAN KLINIS &amp; KESEHATAN PREVENTIF
-                </span>
+    <section
+      id="hero"
+      aria-labelledby="hero-headline"
+      className="relative overflow-hidden bg-[#F8FAF9] pb-14 pt-10 text-neutral-950 transition-colors dark:bg-[#060A09] dark:text-neutral-50 sm:pb-20 sm:pt-14 lg:pb-24 lg:pt-16"
+    >
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-12 lg:gap-12">
+          {/* Left Narrative Stack */}
+          <div className="space-y-6 lg:col-span-7">
+            <Reveal variant="rise">
+              <div className="inline-flex items-center gap-2 rounded-full border border-emerald-700/20 bg-emerald-700/10 px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-[0.14em] text-emerald-800 dark:border-emerald-400/25 dark:bg-emerald-500/15 dark:text-emerald-300">
+                <span className="h-2 w-2 rounded-full bg-emerald-700 dark:bg-emerald-400" aria-hidden="true" />
+                <span className="whitespace-nowrap">SatuSehat HL7® FHIR · AI-EMR &amp; 3D Anatomy</span>
               </div>
             </Reveal>
 
-            <Reveal delay={80}>
-              <h1 className="mt-5 text-4xl font-black leading-[1.08] tracking-tight text-ink sm:text-5xl lg:text-6xl">
-                Platform AI-EMR &amp; Rekam Medis Modern untuk{' '}
-                <span className="font-serif-display bg-gradient-to-r from-[#0b7a4b] to-[#00BF63] bg-clip-text italic text-transparent">
-                  Kesehatan &amp; Longevity Anda
-                </span>
+            <Reveal variant="rise">
+              <h1
+                id="hero-headline"
+                className="font-display text-4xl font-bold tracking-tight text-neutral-950 dark:text-white sm:text-5xl lg:text-[3.5rem] lg:leading-[1.08]"
+              >
+                Satu Sistem Kesehatan{' '}
+                <span className="text-emerald-700 dark:text-emerald-400">Longitudinal.</span>
+                <br />
+                Dari Anamnesis ke Atlas 3D.
               </h1>
-              <BatasKlaimKesehatan
-                permukaan="care.landing"
-                className="mt-3.5 max-w-xl text-[12px] leading-snug text-neutral-500"
-              />
             </Reveal>
 
-            <Reveal delay={160}>
-              <p className="mt-5 max-w-xl text-neutral-600 dark:text-neutral-300 sm:text-lg leading-relaxed">
-                AI menyusun anamnesis terstruktur awal; dokter berizin menelaah rekam medis. Tingkatkan rentang hidup sehat (<b>healthspan</b>) Anda melalui evaluasi klinis preventif, deteksi dini risiko, dan panduan gaya hidup berbasis bukti.
+            <Reveal variant="soft">
+              <p className="max-w-2xl text-base leading-relaxed text-neutral-700 dark:text-neutral-300 sm:text-lg">
+                Anamnesis terstruktur SOCRATES, rekam medis AI-EMR, pelacakan biomarker longevity, dan visualisasi
+                anatomi Z-Anatomy 3D dalam satu ruang kerja terpadu—dengan dokter berizin tetap memegang verifikasi akhir.
               </p>
             </Reveal>
 
-            <Reveal delay={240}>
-              <div className="mt-8 flex flex-wrap items-center justify-center gap-3.5 lg:justify-start">
-                <button
-                  onClick={onMasuk}
-                  className="group relative flex items-center gap-3 overflow-hidden rounded-full bg-gradient-to-b from-[#00BF63] to-[#0b7a4b] py-3 pl-7 pr-3 font-extrabold text-white shadow-[0_10px_30px_-8px_rgba(0,191,99,0.5)] transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:-translate-y-0.5 active:scale-[0.98]"
-                >
-                  <span className="relative z-10 text-sm sm:text-base">Mulai Konsultasi Gratis</span>
-                  <span className="relative z-10 grid h-8 w-8 place-items-center rounded-full bg-white/20 transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:translate-x-0.5 group-hover:scale-105">
-                    <IconArrowRight size={15} />
-                  </span>
-                  <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/25 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => scrollToSection('roles')}
-                  className="flex items-center rounded-full border border-black/10 bg-white/70 px-6 py-3 font-bold text-neutral-700 shadow-sm backdrop-blur-md transition-all duration-500 hover:-translate-y-0.5 hover:bg-white dark:border-white/10 dark:bg-neutral-800/70 dark:text-neutral-200"
-                >
-                  Solusi Dokter &amp; Faskes
-                </button>
-              </div>
-            </Reveal>
+            <div className="flex flex-wrap items-center gap-3 pt-1">
+              <button
+                type="button"
+                data-pmd-native="true"
+                onClick={onMasuk}
+                className="inline-flex min-h-[48px] items-center gap-2.5 rounded-full bg-emerald-700 px-6 py-3 text-sm font-bold text-white shadow-md transition hover:bg-emerald-800"
+              >
+                <span className="whitespace-nowrap">Mulai Gratis</span>
+                <IconArrowRight size={16} stroke="#ffffff" />
+              </button>
 
-            {/* Micro Trust Badges */}
-            <Reveal delay={280}>
-              <div className="mt-8 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 border-t border-black/5 pt-5 dark:border-white/10 lg:justify-start">
-                <span className="flex items-center gap-1.5 text-xs font-semibold text-neutral-600 dark:text-neutral-300">
-                  <IconShield size={14} className="text-emerald-600 dark:text-emerald-400" />
-                  34 Skoring Klinis Standar
-                </span>
-                <span className="flex items-center gap-1.5 text-xs font-semibold text-neutral-600 dark:text-neutral-300">
-                  <IconCheck size={14} className="text-emerald-600 dark:text-emerald-400" />
-                  Enkripsi Data Medis End-to-End
-                </span>
-                <span className="flex items-center gap-1.5 text-xs font-semibold text-neutral-600 dark:text-neutral-300">
-                  <IconStethoscope size={14} className="text-emerald-600 dark:text-emerald-400" />
-                  Interoperabilitas SatuSehat
-                </span>
+              <button
+                type="button"
+                data-pmd-native="true"
+                onClick={() => scrollToSection('anatomy-stage')}
+                className="inline-flex min-h-[48px] items-center gap-2 rounded-full border border-neutral-300 bg-white px-6 py-3 text-sm font-bold text-neutral-950 transition hover:border-emerald-700/50 hover:bg-neutral-50 dark:border-white/20 dark:bg-[#111815] dark:text-white dark:hover:border-emerald-400/50"
+              >
+                <span className="whitespace-nowrap">Jelajahi Anatomi 3D</span>
+              </button>
+            </div>
+
+            {/* Clean Architectural Metrics Strip */}
+            <dl className="grid grid-cols-3 gap-4 border-t border-neutral-200 pt-5 dark:border-white/10">
+              <div>
+                <dt className="text-[11px] font-semibold uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
+                  Atlas Tubuh
+                </dt>
+                <dd className="mt-1 font-display text-lg font-bold text-neutral-950 dark:text-white sm:text-xl">
+                  11 Sistem 3D
+                </dd>
               </div>
-            </Reveal>
+              <div>
+                <dt className="text-[11px] font-semibold uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
+                  Integrasi
+                </dt>
+                <dd className="mt-1 font-display text-lg font-bold text-neutral-950 dark:text-white sm:text-xl">
+                  HL7® FHIR
+                </dd>
+              </div>
+              <div>
+                <dt className="text-[11px] font-semibold uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
+                  Kendali Klinis
+                </dt>
+                <dd className="mt-1 font-display text-lg font-bold text-neutral-950 dark:text-white sm:text-xl">
+                  Dokter STR
+                </dd>
+              </div>
+            </dl>
+
+            <BatasKlaimKesehatan
+              permukaan="care.landing"
+              className="text-[11px] leading-relaxed text-neutral-600 dark:text-neutral-400"
+            />
           </div>
 
-          {/* Sisi Kanan (Instant Interactive 360° Holographic BodyExposure Stage) */}
-          <div className="lg:col-span-6">
-            <Reveal delay={200}>
-              <div className="relative mx-auto max-w-xl rounded-3xl border border-cyan-400/20 bg-[#050811]/92 p-3.5 shadow-2xl backdrop-blur-2xl sm:p-4">
-                <div className="mb-2 flex items-center justify-between gap-2 px-1">
-                  <div className="flex min-w-0 items-center gap-2">
-                    <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-emerald-400 animate-pulse" />
-                    <span className="whitespace-nowrap font-mono text-[11px] font-extrabold uppercase tracking-wider text-cyan-100">
-                      BodyExposure 360° · Live Twin
-                    </span>
-                  </div>
-                  <div className="flex shrink-0 items-center gap-1">
-                    {(['surface', 'vascular', 'neural'] as const).map((l) => (
-                      <button
-                        key={l}
-                        type="button"
-                        onClick={() => setLayer(l)}
-                        aria-pressed={layer === l}
-                        className={`min-h-[30px] whitespace-nowrap rounded-full border px-2 font-mono text-[9.5px] font-extrabold uppercase transition ${
-                          layer === l
-                            ? 'border-cyan-300/60 bg-cyan-500/25 text-cyan-100'
-                            : 'border-white/10 bg-white/5 text-slate-400 hover:text-white'
-                        }`}
-                      >
-                        {l}
-                      </button>
-                    ))}
-                  </div>
+          {/* Right Interactive 360° Z-Anatomy Specimen Stage */}
+          <div className="lg:col-span-5">
+            <div className="dark relative overflow-hidden rounded-3xl border border-emerald-500/20 bg-[#060A09] p-4 text-white shadow-2xl sm:p-5">
+              {/* Top Specimen Bar */}
+              <div className="flex flex-wrap items-center justify-between gap-2 pb-3">
+                <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.14em] text-emerald-300">
+                  <span className="h-2 w-2 rounded-full bg-emerald-400" aria-hidden="true" />
+                  <span className="whitespace-nowrap">Z-ANATOMY 360° · LIVE SPECIMEN</span>
                 </div>
 
-                <div className="relative flex flex-col items-center rounded-2xl border border-cyan-400/15 bg-gradient-to-b from-[#071326] to-[#030710] p-3">
-                  <svg viewBox="0 0 100 92" className="h-64 w-full max-w-[270px]" role="img" aria-label="Interactive holographic body twin">
-                    <defs>
-                      <radialGradient id="heroTwinAura" cx="50%" cy="44%" r="48%">
-                        <stop offset="0%" stopColor={focusOrgan.color} stopOpacity="0.34" />
-                        <stop offset="100%" stopColor="#030710" stopOpacity="0" />
-                      </radialGradient>
-                    </defs>
-                    <circle cx="50" cy="45" r="41" fill="url(#heroTwinAura)" />
-                    <ellipse cx="50" cy="84" rx="28" ry="4" fill="none" stroke="rgba(34,211,238,0.35)" strokeWidth="0.7" strokeDasharray="2 2" />
-                    <path
-                      d="M50 7 C54 7 56 10 56 14 C56 18 53 20 53 22 L63 25 C67 27 69 32 71 44 L73 56 C73 58 70 59 69 57 L65 36 L60 36 L61 54 L63 82 C63 85 59 86 58 83 L52 58 L48 58 L42 83 C41 86 37 85 37 82 L39 54 L40 36 L35 36 L31 57 C30 59 27 58 27 56 L29 44 C31 32 33 27 37 25 L47 22 C47 20 44 18 44 14 C44 10 46 7 50 7 Z"
-                      fill={layer === 'surface' ? 'rgba(34, 211, 238, 0.22)' : 'rgba(34, 211, 238, 0.10)'}
-                      stroke="#67e8f9"
-                      strokeWidth="0.9"
-                    />
-                    {layer === 'vascular' && (
-                      <path d="M50 14 V58 M44 33 Q50 38 56 33 M43 46 Q50 50 57 46 M48 58 L41 81 M52 58 L59 81" fill="none" stroke="rgba(251,113,133,0.65)" strokeWidth="0.85" />
-                    )}
-                    {layer === 'neural' && (
-                      <path d="M50 11 V54 M50 22 L33 34 M50 22 L67 34 M50 38 L42 52 M50 38 L58 52" fill="none" stroke="rgba(167,139,250,0.75)" strokeWidth="0.85" strokeDasharray="1.4 1" />
-                    )}
-                    {HERO_ORGANS.map((org) => {
-                      const active = org.id === focusOrgan.id
-                      return (
-                        <g
-                          key={org.id}
-                          onClick={() => setFocusOrganId(org.id)}
-                          style={{ cursor: 'pointer' }}
-                          role="button"
-                          tabIndex={0}
-                          aria-label={`${org.label} ${org.metric}`}
-                          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setFocusOrganId(org.id) }}
-                        >
-                          {active && <circle cx={org.cx} cy={org.cy} r="6.4" fill="none" stroke={org.color} strokeWidth="0.9" strokeDasharray="1.6 1.6" />}
-                          <circle cx={org.cx} cy={org.cy} r={active ? 3.4 : 2.3} fill={org.color} stroke="#ffffff" strokeWidth="0.7" />
-                        </g>
-                      )
-                    })}
-                  </svg>
-                  <div className="mt-2 flex w-full items-center justify-between gap-2 rounded-xl border border-white/10 bg-slate-950/90 px-3 py-2">
-                    <div className="flex items-center gap-2">
-                      <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: focusOrgan.color }} />
-                      <span className="whitespace-nowrap text-xs font-black text-white">{focusOrgan.label}</span>
-                      <span className="whitespace-nowrap font-mono text-xs font-bold" style={{ color: focusOrgan.color }}>{focusOrgan.metric}</span>
-                    </div>
-                    <svg viewBox="0 0 80 18" width="76" height="18" aria-hidden="true">
-                      <path d="M2 10h14l4-6 5 11 5-13 5 10 4-2h39" fill="none" stroke={focusOrgan.color} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
+                <div className="flex items-center gap-1.5">
+                  {(['holo', 'surface'] as const).map((mode) => (
                     <button
+                      key={mode}
                       type="button"
-                      onClick={onMasuk}
-                      className="min-h-[34px] whitespace-nowrap rounded-lg border border-emerald-400/40 bg-emerald-500/20 px-2.5 text-[10px] font-black text-emerald-100 hover:bg-emerald-500/30"
+                      data-pmd-native="true"
+                      onClick={() => setLayer(mode)}
+                      className={`min-h-[34px] rounded-full px-3 text-[11px] font-bold transition ${
+                        layer === mode
+                          ? 'bg-emerald-700 text-white'
+                          : 'border border-white/15 bg-white/[0.04] text-neutral-300 hover:border-emerald-400/50 hover:text-white'
+                      }`}
                     >
-                      360° 3D ↗
+                      {mode === 'holo' ? 'Holo 3D' : 'Anatomi'}
                     </button>
-                  </div>
+                  ))}
+                  <button
+                    type="button"
+                    data-pmd-native="true"
+                    onClick={startSpin}
+                    className="min-h-[34px] rounded-full border border-emerald-400/35 bg-emerald-500/15 px-3 text-[11px] font-bold text-emerald-200 transition hover:bg-emerald-500/25"
+                  >
+                    Putar 360°
+                  </button>
                 </div>
               </div>
-            </Reveal>
+
+              {/* Real Baked Z-Anatomy Stage + Drag-to-Turn */}
+              <div
+                ref={stageRef}
+                onPointerDown={onPointerDown}
+                onPointerMove={onPointerMove}
+                onPointerUp={onPointerUp}
+                onPointerCancel={onPointerUp}
+                aria-label="Tahap interaktif anatomi 3D PanaceaMed — geser untuk memutar 360 derajat"
+                className="relative mx-auto flex aspect-[3/4] max-h-[430px] w-full cursor-grab select-none items-center justify-center overflow-hidden rounded-2xl border border-white/10 bg-[#040706] active:cursor-grabbing"
+              >
+                {showFront ? (
+                  <div className="relative h-full w-auto max-w-full aspect-[1/2]">
+                    <img
+                      src={`/${layer === 'holo' ? HOME_BODY_HOLO.src : HOME_BODY_IMAGE.src}`}
+                      alt="Atlas anatomi 3D tubuh manusia Z-Anatomy"
+                      width={720}
+                      height={1440}
+                      className="h-full w-full object-contain"
+                    />
+                    {HERO_HOTSPOTS.map((spot) => {
+                      const anchor = HOME_BODY_ANCHORS.find((a) => a.id === spot.id)
+                      if (!anchor) return null
+                      const isSel = selectedSystem === spot.id
+                      return (
+                        <button
+                          key={spot.id}
+                          type="button"
+                          data-pmd-native="true"
+                          aria-label={spot.label}
+                          onClick={() => setSelectedSystem(spot.id)}
+                          style={{ left: `${anchor.x * 100}%`, top: `${anchor.y * 100}%` }}
+                          className={`absolute -translate-x-1/2 -translate-y-1/2 rounded-full transition ${
+                            isSel
+                              ? 'h-5 w-5 border-2 border-white bg-emerald-500 shadow-[0_0_0_4px_rgba(16,185,129,0.35)]'
+                              : 'h-3.5 w-3.5 border border-white/80 bg-[#111815]/90 hover:scale-125 hover:bg-emerald-400'
+                          }`}
+                        />
+                      )
+                    })}
+                  </div>
+                ) : (
+                  <div
+                    role="img"
+                    aria-label={`Tampilan 360 derajat sudut ${Math.round(angleDeg)} derajat`}
+                    className="h-full aspect-[1/2] bg-no-repeat"
+                    style={{
+                      backgroundImage: `url('/${HOME_BODY_TURN.src}')`,
+                      backgroundSize: `${HOME_BODY_TURN.frames * 100}% 100%`,
+                      backgroundPosition: `${(frame / (HOME_BODY_TURN.frames - 1)) * 100}% 0%`,
+                    }}
+                  />
+                )}
+              </div>
+
+              {/* Clean Specimen System Telemetry Readout */}
+              <div className="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-white/10 bg-white/[0.03] px-3.5 py-2.5">
+                <div className="min-w-0">
+                  <div className="text-[10px] font-bold uppercase tracking-wider text-emerald-400">
+                    {activeMeta.label}
+                  </div>
+                  <div className="truncate text-xs font-semibold text-white">{activeMeta.metric}</div>
+                </div>
+                <button
+                  type="button"
+                  data-pmd-native="true"
+                  onClick={onMasuk}
+                  className="inline-flex min-h-[36px] shrink-0 items-center gap-1.5 rounded-xl border border-emerald-400/35 bg-emerald-500/15 px-3 py-1.5 text-xs font-bold text-emerald-200 transition hover:bg-emerald-500/25"
+                >
+                  <span className="whitespace-nowrap">Buka Studio 3D</span>
+                  <IconArrowRight size={13} stroke="currentColor" />
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>

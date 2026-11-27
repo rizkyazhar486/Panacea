@@ -222,11 +222,11 @@ button:active, a[href]:active, [role='button']:active { transform: scale(0.985);
    terukur 2,15:1. Keping terpilih di Med Study jatuh tepat ke sana. */
 .dark .bg-brand.text-ink,
 .dark .bg-brand .text-ink { color: var(--color-ink) !important; }
-.dark .bg-white.text-black,
-.dark .bg-white .text-black,
-.dark .bg-white.text-ink,
-.dark .bg-white .text-ink,
-.dark .bg-white.\!text-black { color: #0c1410 !important; }
+.dark :is(button, a, [role='button']).bg-white.text-black,
+.dark :is(button, a, [role='button']).bg-white .text-black,
+.dark :is(button, a, [role='button']).bg-white.text-ink,
+.dark :is(button, a, [role='button']).bg-white .text-ink,
+.dark :is(button, a, [role='button']).bg-white.\!text-black { color: #0c1410 !important; }
 .dark .text-neutral-900,
 .dark .text-neutral-800,
 .dark .text-neutral-700 { color: #e6ece8 !important; }
@@ -2826,12 +2826,17 @@ h1 {
 html.dark .cta-banner-btn,
 html.pmd-liquid-actions-v45 button.cta-banner-btn,
 html.dark.pmd-liquid-actions-v45 button.cta-banner-btn,
-button.cta-banner-btn {
+html.dark.pmd-liquid-actions-v45 :is(button, a).cta-banner-btn:not(.bg-brand),
+button.cta-banner-btn,
+.cta-atlas-btn,
+.dark .cta-atlas-btn,
+html.dark .cta-atlas-btn,
+html.pmd-liquid-actions-v45 :is(a, button).cta-atlas-btn,
+html.dark.pmd-liquid-actions-v45 :is(a, button).cta-atlas-btn {
   background: #ffffff !important;
   background-image: none !important;
-  background-color: #ffffff !important;
-  color: #052e16 !important;
-  border: 1px solid rgba(255, 255, 255, 0.9) !important;
+  color: #042412 !important;
+  border: 1px solid rgba(255, 255, 255, 0.92) !important;
   box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.8) !important;
 }
 
@@ -2839,8 +2844,11 @@ button.cta-banner-btn {
 .dark .cta-banner-btn span,
 html.dark .cta-banner-btn span,
 html.pmd-liquid-actions-v45 button.cta-banner-btn span,
-html.dark.pmd-liquid-actions-v45 button.cta-banner-btn span {
-  color: #052e16 !important;
+html.dark.pmd-liquid-actions-v45 button.cta-banner-btn span,
+.cta-atlas-btn span,
+.dark .cta-atlas-btn span,
+html.dark .cta-atlas-btn span {
+  color: #042412 !important;
 }
 
 .cta-banner-btn .cta-arrow-circle,
@@ -2848,9 +2856,8 @@ html.dark.pmd-liquid-actions-v45 button.cta-banner-btn span {
 html.dark .cta-banner-btn .cta-arrow-circle,
 html.pmd-liquid-actions-v45 button.cta-banner-btn .cta-arrow-circle,
 html.dark.pmd-liquid-actions-v45 button.cta-banner-btn .cta-arrow-circle {
-  background: #059669 !important;
+  background: #047857 !important;
   background-image: none !important;
-  background-color: #059669 !important;
   color: #ffffff !important;
 }
 
