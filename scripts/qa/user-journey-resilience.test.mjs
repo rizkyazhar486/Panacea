@@ -8,9 +8,18 @@ const workflow = readFileSync(new URL('../../.github/workflows/user-journey-acce
 
 test('journey covers five roles and the critical pages beyond the three in user-journey-e2e', () => {
   for (const j of ["J: 'pasien'", "J: 'dokter'", "J: 'pemilik'", "J: 'perawat'", "J: 'lab'"]) assert.ok(script.includes(j), `missing role ${j}`)
-  for (const r of ["'#/chatbot'", "'#/settings'", "'#/profile'", "'#/fitness-hub'", "'#/all-features'", "'#/doctor-review/lab-results'", "'#/owner'"]) assert.ok(script.includes(r), `missing page ${r}`)
+  for (const r of ["'#/chatbot'", "'#/settings'", "'#/profile'", "'#/fitness-hub'", "'#/all-features'", "'#/doctor-review/lab-results'", "'#/owner'", "'#/med-study'", "'#/health-simulator'", "'#/notifications'"]) assert.ok(script.includes(r), `missing page ${r}`)
   const base = readFileSync(new URL('./user-journey-e2e.mjs', import.meta.url), 'utf8')
   for (const r of ["'#/harian'", "'#/health-data'", "'#/clinical-hub'"]) assert.ok(base.includes(r), `the original journey still covers ${r}`)
+})
+
+test('negative-control verifier expects exactly the patient routes the journey visits (no silent drift)', async () => {
+  const { routes } = await import('./f1-negative-evidence.mjs')
+  const m = /J: 'pasien'[\s\S]*?rute: (\[[^\]]*\])/.exec(script)
+  assert.ok(m, 'patient route list not found')
+  const pasien = JSON.parse(m[1].replaceAll("'", '"'))
+  assert.deepEqual(routes, pasien)
+  assert.equal(new Set(pasien).size, pasien.length, 'no duplicate patient routes')
 })
 
 test('each page is checked for slow API, API 500 and recovery, with paired positive control and unhandled-error check', () => {

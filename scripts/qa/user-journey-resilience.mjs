@@ -68,7 +68,7 @@ try {
   // Peran -> sesi, rute yang diuji, dan penanda halaman yang HARUS tetap terlihat (bukan sekadar tidak kosong).
   const PERAN = [
     { J: 'pasien', akun: { email: 'pasien-res@example.com', name: 'Pasien Res', role: 'pasien' }, token: pasien.token, shell: { role: 'button', name: 'Notifications' },
-      rute: ['#/', '#/chatbot', '#/settings', '#/profile', '#/fitness-hub', '#/all-features'], minChar: 100 },
+      rute: ['#/', '#/chatbot', '#/settings', '#/profile', '#/fitness-hub', '#/all-features', '#/med-study', '#/health-simulator', '#/notifications'], minChar: 100 },
     { J: 'dokter', akun: { email: 'dokter-res@example.com', name: 'Dokter Res', role: 'dokter' }, token: dokter.token, shell: { role: 'button', name: 'Notifications' },
       rute: ['#/doctor-review', '#/doctor-review/lab-results'], minChar: 120 },
     { J: 'pemilik', akun: { email: OWNER, name: 'Pemilik Res', role: 'owner', isOwner: true }, token: owner.token, shell: { role: 'button', name: 'Notifications' },
