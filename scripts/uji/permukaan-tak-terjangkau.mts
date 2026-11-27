@@ -134,8 +134,8 @@ const DIKETAHUI: readonly string[] = [
   'components/growth/ClinicalDuel.tsx',
   'components/growth/HumanPassportWidget.tsx',
   'pages/MacroLab.tsx',
-  // Ditambahkan 2026-11-27 (#3179): landing lama yang diganti landing ringkas atas arahan pemilik. Ketujuh seksi ini
-  // sengaja tidak dirender lagi; berkasnya dihapus di PR penghapusan murni berikutnya (pr-shape-guard mengecualikan
+  // Ditambahkan 2026-11-27 (#3179): landing lama yang diganti landing ringkas atas arahan pemilik. Seksi lama ini (dan
+  // ScienceOdysseySection, yang hanya diimpor oleh BrandFilmsSection) sengaja tidak dirender lagi; berkasnya dihapus di PR penghapusan murni berikutnya (pr-shape-guard mengecualikan
   // diff yang hanya menghapus), dan entri ini ikut dihapus di PR itu.
   'pages/landing/sections/BrandFilmsSection.tsx',
   'pages/landing/sections/FeaturesSection.tsx',
@@ -143,7 +143,6 @@ const DIKETAHUI: readonly string[] = [
   'pages/landing/sections/LandingCtaSection.tsx',
   'pages/landing/sections/NewsSection.tsx',
   'pages/landing/sections/RolesSection.tsx',
-  'pages/landing/sections/ScienceOdysseySection.tsx',
 ]
 
 // ── 1. Tidak boleh ada permukaan tak terjangkau yang BARU ────────────────
