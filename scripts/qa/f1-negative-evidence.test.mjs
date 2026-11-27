@@ -7,7 +7,7 @@ import { spawnSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
 import { verifyNegativeEvidence } from './f1-negative-evidence.mjs'
 
-const routes = ['#/', '#/chatbot', '#/settings', '#/profile', '#/fitness-hub', '#/all-features', '#/med-study', '#/health-simulator', '#/notifications']
+const routes = ['#/', '#/chatbot', '#/settings', '#/profile', '#/fitness-hub', '#/all-features', '#/med-study', '#/health-simulator', '#/notifikasi']
 function evidence(mode) {
   const common = { viewport: 'mobile-390x844', journey: 'ketahanan-pasien' }
   return { lulus: 1, gagal: 1, hasil: [

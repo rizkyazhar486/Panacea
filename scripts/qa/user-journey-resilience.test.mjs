@@ -8,7 +8,7 @@ const workflow = readFileSync(new URL('../../.github/workflows/user-journey-acce
 
 test('journey covers five roles and the critical pages beyond the three in user-journey-e2e', () => {
   for (const j of ["J: 'pasien'", "J: 'dokter'", "J: 'pemilik'", "J: 'perawat'", "J: 'lab'"]) assert.ok(script.includes(j), `missing role ${j}`)
-  for (const r of ["'#/chatbot'", "'#/settings'", "'#/profile'", "'#/fitness-hub'", "'#/all-features'", "'#/doctor-review/lab-results'", "'#/owner'", "'#/med-study'", "'#/health-simulator'", "'#/notifications'"]) assert.ok(script.includes(r), `missing page ${r}`)
+  for (const r of ["'#/chatbot'", "'#/settings'", "'#/profile'", "'#/fitness-hub'", "'#/all-features'", "'#/doctor-review/lab-results'", "'#/owner'", "'#/med-study'", "'#/health-simulator'", "'#/notifikasi'"]) assert.ok(script.includes(r), `missing page ${r}`)
   const base = readFileSync(new URL('./user-journey-e2e.mjs', import.meta.url), 'utf8')
   for (const r of ["'#/harian'", "'#/health-data'", "'#/clinical-hub'"]) assert.ok(base.includes(r), `the original journey still covers ${r}`)
 })
@@ -30,6 +30,8 @@ test('each page is checked for slow API, API 500 and recovery, with paired posit
   assert.ok(script.includes("'#/settings': /Reset Saved App State/"), 'Settings must load its own content, not merely shared navigation')
   const settings = readFileSync(new URL('../../src/pages/dashboard/Settings.tsx', import.meta.url), 'utf8')
   assert.ok(settings.includes('Reset Saved App State'), 'F1 Settings readiness marker must match the rendered Settings label')
+  assert.ok(script.includes("'#/notifikasi': /Notification Center/"), 'Notifications must load its own page, not a fallback that merely has enough text')
+  assert.ok(readFileSync(new URL('../../src/pages/dashboard/Notifications.tsx', import.meta.url), 'utf8').includes('title="Notification Center"'), 'F1 notifications readiness marker must match the rendered title')
   assert.ok(script.includes("rute === '#/chatbot' ? 0 : peran.minChar"), 'only the compact Chatbot route may skip the text-length minimum')
   assert.ok(script.includes('m <= 0 || t.trim().length > m'), 'route-specific readiness cannot bypass the minimum content threshold')
   for (const w of ['[object Object]', 'undefined', 'NaN', 'TypeError', 'Cannot read']) assert.ok(script.includes(`'${w}'`), `leak marker ${w}`)

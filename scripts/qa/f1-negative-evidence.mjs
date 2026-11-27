@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs'
 import { pathToFileURL } from 'node:url'
 
 // Harus sama persis dengan rute peran pasien di user-journey-resilience.mjs (dijaga oleh user-journey-resilience.test.mjs).
-export const routes = ['#/', '#/chatbot', '#/settings', '#/profile', '#/fitness-hub', '#/all-features', '#/med-study', '#/health-simulator', '#/notifications']
+export const routes = ['#/', '#/chatbot', '#/settings', '#/profile', '#/fitness-hub', '#/all-features', '#/med-study', '#/health-simulator', '#/notifikasi']
 
 export function verifyNegativeEvidence(mode, report) {
   assert.ok(['bocor', 'overflow', 'crash'].includes(mode), 'unknown negative-control mode')
