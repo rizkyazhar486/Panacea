@@ -1,81 +1,119 @@
-import { Wordmark } from '../../../components/Logo'
-import { IconShield, IconSun, IconMoon } from '../../../components/icons'
-import type { Theme } from '../../../lib/theme'
-import { alignWhenScrollStops } from '../components/alignWhenScrollStops'
+import React, { useState } from 'react'
+import { Wordmark } from '../../../components/ui/Logo'
+import { IconArrowRight } from '../landingSvgs'
 
 interface LandingHeaderProps {
-  theme: Theme
+  theme: string
   onToggleTheme: () => void
   onMasuk: () => void
 }
 
+const NAV_ITEMS = [
+  { id: 'anatomy-stage', label: 'Atlas 3D' },
+  { id: 'features', label: 'Kemampuan' },
+  { id: 'roles', label: 'Peran' },
+  { id: 'pricing', label: 'Paket' },
+  { id: 'news', label: 'Riset' },
+] as const
+
 export function scrollToSection(id: string) {
-  const target = document.getElementById(id)
-  if (!target) return
-  target.scrollIntoView({ behavior: 'smooth' })
-  // The blocks this scroll passes render on the way and can change height: re-align once it stops.
-  alignWhenScrollStops(target)
+  const el = document.getElementById(id)
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
 }
 
 export function LandingHeader({ theme, onToggleTheme, onMasuk }: LandingHeaderProps) {
+  const [menuOpen, setMenuOpen] = useState(false)
+  const isDark = theme === 'dark'
+
+  const handleNav = (id: string) => {
+    setMenuOpen(false)
+    scrollToSection(id)
+  }
+
   return (
-    <>
-      {/* ── [1] CLINICAL TRUST DOCK (KEPATUHAN MEDIS & PRIVASI DATA) ── */}
-      <div className="dark relative z-40 w-full border-b border-emerald-500/20 bg-gradient-to-r from-[#02180e] via-[#043320] to-[#02180e] px-4 py-2 shadow-inner">
-        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-2 text-center text-xs font-medium text-emerald-100 sm:gap-3">
-          <span
-            className="inline-flex items-center gap-1.5 rounded-full border border-emerald-400/40 bg-emerald-500/25 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-widest shadow-sm"
-            style={{ color: '#6ee7b7' }}
+    <header className="sticky top-0 z-40 border-b border-neutral-200/80 bg-[#F8FAF9]/90 backdrop-blur-xl transition-colors dark:border-white/10 dark:bg-[#060A09]/90">
+      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-3 px-4 sm:px-6 lg:px-8">
+        <button
+          type="button"
+          data-pmd-native="true"
+          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          className="inline-flex min-h-[44px] shrink-0 items-center bg-transparent p-0 text-left focus:outline-none"
+          aria-label="PanaceaMed Beranda"
+        >
+          <Wordmark size={22} />
+        </button>
+
+        {/* Desktop Primary Navigation (single focused row) */}
+        <nav aria-label="Navigasi Utama Landing" className="hidden items-center gap-1 lg:flex">
+          {NAV_ITEMS.map((item) => (
+            <button
+              key={item.id}
+              type="button"
+              data-pmd-native="true"
+              onClick={() => handleNav(item.id)}
+              className="min-h-[40px] rounded-full px-3.5 py-2 text-xs font-semibold text-neutral-700 transition-colors hover:bg-neutral-200/70 hover:text-neutral-950 dark:text-neutral-300 dark:hover:bg-white/10 dark:hover:text-white"
+            >
+              {item.label}
+            </button>
+          ))}
+        </nav>
+
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            data-pmd-native="true"
+            onClick={onToggleTheme}
+            aria-label={isDark ? 'Aktifkan mode terang' : 'Aktifkan mode gelap'}
+            className="inline-flex min-h-[40px] items-center gap-1.5 rounded-full border border-neutral-300 bg-neutral-50 px-3 py-1.5 text-xs font-semibold text-neutral-900 transition hover:border-emerald-600/50 dark:border-white/15 dark:bg-[#111815] dark:text-neutral-100 dark:hover:border-emerald-400/50"
           >
-            <IconShield size={12} className="shrink-0" />
-            Kepatuhan Medis
-          </span>
-          <span className="tracking-wide">
-            Interoperabilitas <b>SATUSEHAT (HL7® FHIR)</b>
-            <span className="mx-2 opacity-40">·</span>
-            Perlindungan Data Medis <b>UU PDP No. 27/2022</b>
-            <span className="mx-2 hidden opacity-40 sm:inline">·</span>
-            <span className="hidden sm:inline">Verifikasi STR Klinisi Berizin</span>
-          </span>
+            <span aria-hidden="true">{isDark ? '☀' : '☾'}</span>
+            <span className="hidden sm:inline">{isDark ? 'Terang' : 'Gelap'}</span>
+          </button>
+
+          <button
+            type="button"
+            data-pmd-native="true"
+            onClick={onMasuk}
+            className="inline-flex min-h-[40px] items-center gap-2 rounded-full bg-emerald-700 px-4 py-2 text-xs font-bold text-white shadow-sm transition hover:bg-emerald-800 sm:px-5 sm:text-[13px]"
+          >
+            <span className="whitespace-nowrap">Masuk / Daftar</span>
+            <IconArrowRight size={14} stroke="#ffffff" />
+          </button>
+
+          <button
+            type="button"
+            data-pmd-native="true"
+            onClick={() => setMenuOpen((o) => !o)}
+            aria-expanded={menuOpen}
+            aria-label="Menu Navigasi"
+            className="inline-flex min-h-[40px] min-w-[40px] items-center justify-center rounded-full border border-neutral-300 bg-neutral-50 text-sm font-bold text-neutral-900 dark:border-white/15 dark:bg-[#111815] dark:text-white lg:hidden"
+          >
+            {menuOpen ? '✕' : '☰'}
+          </button>
         </div>
       </div>
 
-      {/* ── FLOATING GLASS NAVBAR ─────────────────────────────────── */}
-      <header className="sticky top-0 z-30 flex items-center justify-between gap-4 border-b border-black/5 bg-white/85 px-4 py-3 backdrop-blur-2xl dark:border-white/10 dark:bg-black/85 sm:px-8">
-        <div className="min-w-0 shrink">
-          <Wordmark size={32} />
-        </div>
-        <nav className="hidden items-center gap-6 text-sm font-semibold text-neutral-600 dark:text-neutral-300 lg:flex">
-          <button type="button" onClick={() => scrollToSection('features')} className="transition hover:text-brand-dark dark:hover:text-emerald-400">
-            Kapabilitas Platform
-          </button>
-          <button type="button" onClick={() => scrollToSection('roles')} className="transition hover:text-brand-dark dark:hover:text-emerald-400">
-            Profil Pengguna
-          </button>
-          <button type="button" onClick={() => scrollToSection('pricing')} className="transition hover:text-brand-dark dark:hover:text-emerald-400">
-            Tarif &amp; Layanan
-          </button>
-          <button type="button" onClick={() => scrollToSection('science')} className="transition hover:text-brand-dark dark:hover:text-emerald-400">
-            Eksplorasi Sains
-          </button>
+      {/* Compact Mobile Drawer */}
+      {menuOpen && (
+        <nav
+          aria-label="Navigasi Seluler Landing"
+          className="border-t border-neutral-200 bg-white px-4 py-3 dark:border-white/10 dark:bg-[#111815] lg:hidden"
+        >
+          <div className="flex flex-wrap gap-2">
+            {NAV_ITEMS.map((item) => (
+              <button
+                key={item.id}
+                type="button"
+                data-pmd-native="true"
+                onClick={() => handleNav(item.id)}
+                className="min-h-[44px] rounded-xl border border-neutral-200 bg-neutral-50 px-3.5 py-2 text-xs font-bold text-neutral-900 dark:border-white/10 dark:bg-white/[0.04] dark:text-white"
+              >
+                {item.label}
+              </button>
+            ))}
+          </div>
         </nav>
-        <div className="flex shrink-0 items-center gap-2">
-          <button
-            onClick={onToggleTheme}
-            className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-black/5 text-neutral-600 transition hover:bg-neutral-100 hover:text-brand-dark dark:border-white/10 dark:text-neutral-300 dark:hover:bg-neutral-800"
-            title={theme === 'dark' ? 'Light mode' : 'Dark mode'}
-            aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
-          >
-            {theme === 'dark' ? <IconSun size={18} /> : <IconMoon size={18} />}
-          </button>
-          <button
-            onClick={onMasuk}
-            className="min-h-[42px] whitespace-nowrap rounded-full bg-gradient-to-b from-[#00BF63] to-[#0b7a4b] px-5 py-2 text-sm font-extrabold text-white shadow-md shadow-brand/20 transition hover:brightness-105 active:scale-95 sm:px-6"
-          >
-            Masuk <span className="hidden sm:inline">/ Daftar Gratis</span>
-          </button>
-        </div>
-      </header>
-    </>
+      )}
+    </header>
   )
 }

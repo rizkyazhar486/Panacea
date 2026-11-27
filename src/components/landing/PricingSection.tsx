@@ -205,11 +205,13 @@ export function PricingSection({ onMasuk, promo }: { onMasuk: () => void; promo?
                   {t.features.map((f, fi) => <Check key={fi}>{f}</Check>)}
                 </ul>
                 <button
+                  type="button"
+                  data-pmd-native="true"
                   onClick={onMasuk}
-                  className={`mt-7 w-full rounded-full py-3.5 text-sm font-extrabold transition-all duration-300 shadow-md ${
+                  className={`mt-7 min-h-[48px] w-full rounded-full py-3.5 text-sm font-extrabold transition-all duration-300 shadow-md ${
                     t.highlight
-                      ? 'bg-gradient-to-b from-[#00BF63] to-[#0b7a4b] text-white shadow-emerald-500/25 hover:brightness-105 active:scale-[0.98]'
-                      : 'border border-neutral-300 bg-neutral-100 text-neutral-800 hover:bg-neutral-200 active:scale-[0.98] dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-100'
+                      ? 'bg-emerald-700 text-white shadow-emerald-700/25 hover:bg-emerald-800 active:scale-[0.98]'
+                      : 'border border-neutral-300 bg-neutral-100 text-neutral-900 hover:bg-neutral-200 active:scale-[0.98] dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-100'
                   }`}
                 >
                   {t.name === 'Gratis' ? 'Mulai Gratis Sekarang' : `Pilih Paket ${t.name}`}
