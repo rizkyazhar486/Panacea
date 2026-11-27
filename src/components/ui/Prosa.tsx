@@ -17,7 +17,8 @@ export function Prosa({ children, kelas, baris = 1 }: {
   const teks = typeof children === 'string' ? children : ''
   const panjang = teks ? teks.trim().split(/\s+/).length > BATAS_KATA : false
 
-  if (!panjang) return <p className={kelas}>{children}</p>
+  // Element children may be block content (<h3>, <p>); a <p> wrapper would be invalid nesting.
+  if (!panjang) return teks || children == null ? <p className={kelas}>{children}</p> : <div className={kelas}>{children}</div>
 
   return (
     <p className={`relative min-w-0 pr-8 ${kelas ?? ''}`}>

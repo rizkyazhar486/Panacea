@@ -47,8 +47,12 @@ interface UnifiedHumanSimulationProjectorProps {
   requestedDomain?: SimulationDomain
   onDomainChange?: (domain: SimulationDomain) => void
   compact?: boolean
+  /** The host renders its own domain navigation (Body scale ladder); skip the duplicate tab row. */
+  hideDomainTabs?: boolean
   /** Permintaan fokus struktur sumber dari luar (mis. temuan AI-EMR). `nonce` memicu ulang pilihan yang sama. */
   requestedStructure?: { name: string; nonce: number } | null
+  /** Semantic zoom stop requested by the host (Body scale ladder). `nonce` re-applies the same stop. */
+  requestedScale?: { scale: BodySemanticScale; nonce: number } | null
 }
 
 type DomainDefinition = {
@@ -162,7 +166,9 @@ export default function UnifiedHumanSimulationProjector({
   requestedDomain,
   onDomainChange,
   compact = false,
+  hideDomainTabs = false,
   requestedStructure = null,
+  requestedScale = null,
 }: UnifiedHumanSimulationProjectorProps) {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
@@ -184,6 +190,10 @@ export default function UnifiedHumanSimulationProjector({
   const microscopic = isMicroscopicBodyScale(semanticZoom.scale)
   const isEndoscopy = domain === 'endoscopy'
   const hideReferenceAtlasCanvas = isEndoscopy
+  // The cell and genome domains already render the lab the microscope stage would load; never mount it twice.
+  const microscopeDuplicatesDomain =
+    (domain === 'cell' && (semanticZoom.scale === 'cell' || semanticZoom.scale === 'organelle'))
+    || (domain === 'genome' && semanticZoom.scale === 'genome')
   const selectedStructureEducation = useMemo(() => {
     if (!selectedStructureName) return ''
     return penjelasanTertulis(selectedStructureName, selectedStructureName).replace(/\*\*/g, '')
@@ -198,6 +208,11 @@ export default function UnifiedHumanSimulationProjector({
   useEffect(() => {
     if (requestedStructure?.name) setSelectedStructureName(requestedStructure.name)
   }, [requestedStructure, selectedSystemId])
+
+  useEffect(() => {
+    if (!requestedScale) return
+    setSemanticZoom({ scale: requestedScale.scale, relativeZoom: getBodySemanticZoomStop(requestedScale.scale).minRelativeZoom })
+  }, [requestedScale])
 
   useEffect(() => {
     if (domain === 'localization' && selectedSystemId !== 'nervous') onSystemChange('nervous')
@@ -320,7 +335,7 @@ export default function UnifiedHumanSimulationProjector({
           </div>
         </div>
 
-        {!compact && (
+        {!compact && !hideDomainTabs && (
           <div className="no-scrollbar mt-1.5 flex gap-1.5 overflow-x-auto pb-1" role="tablist" aria-label="Unified simulation domains">
             {DOMAINS.map((item) => (
               <button
@@ -396,7 +411,7 @@ export default function UnifiedHumanSimulationProjector({
         />
       )}
 
-      {!hideReferenceAtlasCanvas && microscopic && (
+      {!hideReferenceAtlasCanvas && microscopic && !microscopeDuplicatesDomain && (
         <div className="border-t border-white/[.08] p-2 sm:p-3" data-semantic-microscope-active={semanticZoom.scale}>
           <Suspense fallback={<ProjectorLoader label={semanticStop.label + ' detail'} />}>
             <SemanticMicroscopeStage scale={semanticZoom.scale} selectedSystemId={selectedSystemId} />
