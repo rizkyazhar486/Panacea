@@ -132,3 +132,13 @@ export {
   resolveUnifiedBodyNavigation,
   type UnifiedBodyNavigationTarget
 } from "./ui/bodyExposureReactBridge.ts";
+// ── ENGINE: VIRTUAL ENDOSCOPY (centre line inside the reference mesh) ──
+export {
+  lumenPath,
+  landmarkAt,
+  segmentCentreline,
+  type LumenSlice,
+  type LumenPathResult,
+  type LumenSegmentInput,
+  anteriorMap,
+} from "./engine/endoscopy/lumenPath.ts";
