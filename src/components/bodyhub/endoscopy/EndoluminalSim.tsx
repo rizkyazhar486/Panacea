@@ -225,7 +225,7 @@ export default function EndoluminalSim({ segments, startNear, tint, vesselTone, 
     const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' })
     renderer.outputColorSpace = THREE.SRGBColorSpace
     renderer.toneMapping = THREE.ACESFilmicToneMapping
-    renderer.toneMappingExposure = 1.0
+    renderer.toneMappingExposure = 1.2
     renderer.setClearColor(0x000000, 1)
     Object.assign(renderer.domElement.style, { display: 'block', width: '100%', height: '100%' })
     host.appendChild(renderer.domElement)
@@ -234,8 +234,8 @@ export default function EndoluminalSim({ segments, startNear, tint, vesselTone, 
     scene.fog = new THREE.FogExp2(0x040000, 16)
     const camera = new THREE.PerspectiveCamera(100, 1, 0.0004, 3)
     // Two light guides beside the lens, as on a real scope tip.
-    const lampA = new THREE.PointLight(0xfff6ee, 0.006, 0.5, 2)
-    const lampB = new THREE.PointLight(0xfff6ee, 0.006, 0.5, 2)
+    const lampA = new THREE.PointLight(0xfff6ee, 0.014, 0.5, 2)
+    const lampB = new THREE.PointLight(0xfff6ee, 0.014, 0.5, 2)
     const fill = new THREE.HemisphereLight(0xffd2c4, 0x180303, 0.012)
     scene.add(lampA, lampB, fill)
 
