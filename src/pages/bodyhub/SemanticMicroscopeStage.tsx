@@ -7,6 +7,7 @@ const CellLab = lazy(() => import('./CellLab').then((module) => ({ default: modu
 const AlphaGenomeAtlas = lazy(() => import('./AlphaGenomeAtlas'))
 const VertikalMolekulerPanel = lazy(() => import('./VertikalMolekulerPanel'))
 const MolecularChemistryStage = lazy(() => import('./MolecularChemistryStage'))
+const VirtualHistologyMicroscope = lazy(() => import('./VirtualHistologyMicroscope'))
 
 interface SemanticMicroscopeStageProps {
   scale: BodySemanticScale
@@ -75,9 +76,14 @@ export default function SemanticMicroscopeStage({ scale, selectedSystemId }: Sem
 
   if (scale === 'tissue') {
     return (
-      <SourceGap title={systemLabel + ' tissue microanatomy'} targets={namedTargets}>
-        Panacea has reached the resolution boundary of the gross atlas. A tissue view should load only when a source-backed histology or microanatomy asset is registered for this system; the engine must not manufacture a microscopic layer by enlarging the organ mesh.
-      </SourceGap>
+      <section className="space-y-3">
+        <SourceGap title={systemLabel + ' tissue microanatomy'} targets={namedTargets}>
+          Panacea has reached the resolution boundary of the gross atlas. A tissue view should load only when a source-backed histology or microanatomy asset is registered for this system; the engine must not manufacture a microscopic layer by enlarging the organ mesh.
+        </SourceGap>
+        <Suspense fallback={<Loader label="Virtual Histology Microscope" />}>
+          <VirtualHistologyMicroscope selectedSystemId={selectedSystemId} />
+        </Suspense>
+      </section>
     )
   }
 
