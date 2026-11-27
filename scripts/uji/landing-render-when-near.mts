@@ -3,7 +3,7 @@
 //   - the wrapper's exact style and rounding; the phone height below Tailwind's `lg` breakpoint, the desktop height at
 //     and above it (and the phone height when the viewport cannot be queried);
 //   - an invalid estimate for the current viewport renders the block unwrapped;
-//   - the first screen (header, hero) is never deferred, and each of the ten blocks below it is.
+//   - the first two screens (header, hero, four doors) are never deferred; the pricing block below them is.
 import assert from 'node:assert/strict'
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { resolve } from 'node:path'
@@ -67,21 +67,18 @@ gagal('perkiraan_tidak_sah_untuk_layar_ini_merender_tanpa_pembungkus', () => {
   assert.equal(html(1, 1117, NARROW), wrapped(1))
 })
 
-gagal('layar_pertama_tidak_ditunda_sepuluh_blok_di_bawahnya_ditunda', () => {
+gagal('layar_pertama_tidak_ditunda_hanya_tarif_ditunda', () => {
   const landing = readFileSync('src/pages/landing/Landing.tsx', 'utf8')
   const firstDeferred = landing.indexOf('<RenderWhenNear')
   assert.ok(firstDeferred > 0)
-  for (const firstScreen of ['<LandingHeader', '<HeroSection']) {
+  // Header, hero and the four doors are the first two screens: never deferred.
+  for (const firstScreen of ['<LandingHeader', '<HeroSection', '<FourDoorsSection']) {
     const at = landing.indexOf(firstScreen)
     assert.ok(at > 0 && at < firstDeferred, `${firstScreen} renders before anything is deferred`)
   }
-  const below = ['ScrollCinematic', 'BrandFilmsSection', 'FeaturesSection', 'RolesSection', 'PricingSection', 'NewsSection',
-    'ScienceOdysseySection', 'GovernanceSection', 'LandingCtaSection', 'LandingFooter']
-  for (const name of below) {
-    assert.match(landing, new RegExp(`<RenderWhenNear phone=\\{[1-9]\\d*\\} desktop=\\{[1-9]\\d*\\}><${name}[ />]`),
-      `${name} is deferred with positive phone and desktop heights`)
-  }
-  assert.equal((landing.match(/<RenderWhenNear /g) ?? []).length, below.length, 'nothing else is wrapped')
+  assert.match(landing, /<RenderWhenNear phone=\{[1-9]\d*\} desktop=\{[1-9]\d*\}><PricingSection[ />]/,
+    'PricingSection is deferred with positive phone and desktop heights')
+  assert.equal((landing.match(/<RenderWhenNear /g) ?? []).length, 1, 'nothing else is wrapped')
 })
 
-console.log('landing render-when-near: the first screen renders at once; the ten blocks below it are deferred with their measured phone/desktop height; an invalid estimate renders the block normally')
+console.log('landing render-when-near: the first two screens render at once; pricing is deferred with its measured phone/desktop height; an invalid estimate renders the block normally')
