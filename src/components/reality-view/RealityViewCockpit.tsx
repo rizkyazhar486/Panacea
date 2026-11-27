@@ -254,17 +254,17 @@ export function RealityViewCockpit() {
         {/* Live Synthesized Tensor KPIs */}
         <div className="grid grid-cols-3 gap-1.5 md:col-span-5">
           <div className="rounded-xl border border-white/10 bg-slate-950/80 p-2 text-center">
-            <div className="font-mono text-[9px] uppercase text-slate-400">Cohort</div>
+            <div className="font-mono text-[9px] uppercase text-slate-300">Cohort</div>
             <div className="font-mono text-xs font-black text-cyan-200">{manifold.cohortId}</div>
           </div>
           <div className="rounded-xl border border-white/10 bg-slate-950/80 p-2 text-center">
-            <div className="font-mono text-[9px] uppercase text-slate-400">Kyphosis / BMD</div>
+            <div className="font-mono text-[9px] uppercase text-slate-300">Kyphosis / BMD</div>
             <div className="font-mono text-xs font-black text-amber-200">
               {manifold.senescenceVector.thoracicKyphosisDeg}° / {manifold.composition.boneMineralDensityTScore}
             </div>
           </div>
           <div className="rounded-xl border border-white/10 bg-slate-950/80 p-2 text-center">
-            <div className="font-mono text-[9px] uppercase text-slate-400">VAT / SMM</div>
+            <div className="font-mono text-[9px] uppercase text-slate-300">VAT / SMM</div>
             <div className="font-mono text-xs font-black text-emerald-300">
               {manifold.composition.visceralFatIndex} / {manifold.composition.skeletalMusclePct}%
             </div>
@@ -314,7 +314,8 @@ export function RealityViewCockpit() {
                 }}
               >
                 <div>{m.indonesianLabel}</div>
-                <div className="font-mono text-[9px] text-cyan-300">{m.canonicalOntologyId} · {m.snomedCtId}</div>
+                {/* Terpilih: .pmd-liquid-selected menimpa latar jadi hijau di tema terang; cyan-300 hanya 3.72:1 di atasnya (<4.5 AA). */}
+                <div className={`font-mono text-[9px] ${selectedMeshId === m.meshId ? 'text-white' : 'text-cyan-300'}`}>{m.canonicalOntologyId} · {m.snomedCtId}</div>
               </button>
             ))}
           </div>
