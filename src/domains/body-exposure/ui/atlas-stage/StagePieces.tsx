@@ -114,7 +114,7 @@ export function RegionChips({ regions, active, onRegion }: { regions: readonly A
             aria-pressed={on}
             onClick={() => onRegion(region.id)}
             className="as-focus as-fade"
-            style={{ minHeight: TOUCH - 8, padding: '0 12px', border: 'none', borderRadius: 18, background: on ? TONE.active : 'transparent', color: on ? TONE.onActive : TONE.dim, fontSize: 12, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap', flex: 'none' }}
+            style={{ minHeight: TOUCH, padding: '0 12px', border: 'none', borderRadius: 18, background: on ? TONE.active : 'transparent', color: on ? TONE.onActive : TONE.dim, fontSize: 12, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap', flex: 'none' }}
           >
             {region.label}
           </button>
