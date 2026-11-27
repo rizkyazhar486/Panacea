@@ -9,6 +9,7 @@ import '../bodyExposureOS.css'
 import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 import { loadBodyExposureLocalHub } from '../../domains/body-exposure'
 import { Fold } from '../../shared/ui/Fold'
+import { BodyScaleLadder, rungForDomain } from './BodyScaleLadder'
 
 const UnifiedHumanSimulationProjector = lazy(() => import('./UnifiedHumanSimulationProjector'))
 const PanelKoplingMultiSkala = lazy(() => import('../../components/digital-twin/PanelKoplingMultiSkala'))
@@ -42,8 +43,12 @@ const BODY_EXPOSURE_ROOT_CLASS = 'pmd-body-exposure-active'
 export function BodyExposureOS() {
   const rootRef = useRef<HTMLElement | null>(null)
   const systemsRef = useRef<HTMLDivElement | null>(null)
-  const modeRailRef = useRef<HTMLElement | null>(null)
+  const modeRailRef = useRef<HTMLDivElement | null>(null)
   const [activeMode, setActiveMode] = useState<ExposureMode>('atlas')
+  // The ladder can request domains the mode list never exposed (biomechanics,
+  // genome, pharmacology), so the projector follows this, not the mode.
+  const [projectorDomain, setProjectorDomain] = useState<SimulationDomain>('anatomy')
+  const [activeRungId, setActiveRungId] = useState('body')
   const [immersive, setImmersive] = useState(false)
   const [selectedBodySystemId, setSelectedBodySystemId] = useState<BodySystemId>('cardiovascular')
   const [strukturDiminta, setStrukturDiminta] = useState<{ name: string; nonce: number } | null>(null)
@@ -82,7 +87,7 @@ export function BodyExposureOS() {
   }, [])
 
   useLayoutEffect(() => {
-    const rail = modeRailRef.current
+    const rail = modeRailRef.current?.querySelector('nav')
     const active = rail?.querySelector<HTMLElement>('[data-body-exposure-mode-active="true"]')
     if (!rail || !active) return
     const railBox = rail.getBoundingClientRect()
@@ -95,14 +100,11 @@ export function BodyExposureOS() {
       currentScrollLeft: rail.scrollLeft,
     })
     if (Math.abs(next - rail.scrollLeft) > 1) rail.scrollLeft = next
-  }, [activeMode])
-
-  function openPanel(mode: Mode) {
-    setActiveMode(mode.key)
-    systemsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-  }
+  }, [activeRungId])
 
   function syncModeFromProjector(domain: SimulationDomain) {
+    setProjectorDomain(domain)
+    setActiveRungId((current) => rungForDomain(domain, current))
     const next: ExposureMode =
       domain === 'personal-avatar' ? 'identity'
       : domain === 'localization' ? 'localization'
@@ -117,7 +119,8 @@ export function BodyExposureOS() {
   }
 
   function openSystemAtlas() {
-    setActiveMode('atlas')
+    syncModeFromProjector('anatomy')
+    setActiveRungId('system')
     systemsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
 
@@ -176,35 +179,16 @@ export function BodyExposureOS() {
         </div>
       </header>
 
-      <nav
-        ref={modeRailRef}
-        className="body-exposure-os__dock relative z-[3] mt-1.5 overflow-x-auto rounded-[16px] border border-white/15 bg-black/70 p-1 backdrop-blur-2xl"
-        aria-label="Body Exposure modes"
-        data-body-exposure-mode-rail="v1"
-      >
-        <div className="flex min-w-max gap-1.5">
-          {MODES.map((mode) => {
-            const active = mode.key === activeMode
-            return (
-              <button
-                key={mode.key}
-                type="button"
-                data-pmd-native="true"
-                aria-pressed={active}
-                data-body-exposure-mode-active={String(active)}
-                onClick={() => openPanel(mode)}
-                className={`min-h-[44px] rounded-[14px] border px-3.5 text-xs font-black transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/60 ${
-                  active
-                    ? 'border-white bg-white text-black shadow-sm'
-                    : 'border-white/10 bg-white/[.05] text-slate-200 hover:border-white/25 hover:bg-white/[.12] hover:text-white'
-                }`}
-              >
-                {mode.label}
-              </button>
-            )
-          })}
-        </div>
-      </nav>
+      <div ref={modeRailRef}>
+        <BodyScaleLadder
+          activeRungId={activeRungId}
+          onSelect={(rung) => {
+            syncModeFromProjector(rung.domain)
+            setActiveRungId(rung.id)
+            systemsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+          }}
+        />
+      </div>
 
       <div className="sr-only sm:not-sr-only sm:relative sm:z-[2] sm:mt-1.5 sm:flex sm:items-center sm:justify-between sm:gap-3 sm:px-1 sm:text-[11px] sm:font-bold sm:text-slate-300" aria-live="polite">
         <span><span className="text-cyan-200">{current.label}</span> · {current.description}</span>
@@ -212,13 +196,14 @@ export function BodyExposureOS() {
       </div>
 
       <div ref={systemsRef} className="relative z-[2] mt-2 scroll-mt-4">
-        <BodyExposurePatientOverlay selectedSystemId={selectedBodySystemId} onClinicalView={() => setActiveMode('clinical')} onShowStructure={(s) => { setSelectedBodySystemId(s.systemId); setStrukturDiminta((k) => ({ name: s.name, nonce: (k?.nonce ?? 0) + 1 })) }} />
+        <BodyExposurePatientOverlay selectedSystemId={selectedBodySystemId} onClinicalView={() => syncModeFromProjector('pathophysiology')} onShowStructure={(s) => { setSelectedBodySystemId(s.systemId); setStrukturDiminta((k) => ({ name: s.name, nonce: (k?.nonce ?? 0) + 1 })) }} />
         <SinyalPribadiDiTubuh selectedSystemId={selectedBodySystemId} onSelectSystem={setSelectedBodySystemId} />
         <Suspense fallback={<div className="grid min-h-56 place-items-center rounded-[28px] border border-white/[.08] bg-black/35 text-xs font-bold text-white/35">Loading unified human simulation projector…</div>}>
           <UnifiedHumanSimulationProjector
             selectedSystemId={selectedBodySystemId}
             onSystemChange={setSelectedBodySystemId}
-            requestedDomain={current.projectorDomain}
+            requestedDomain={projectorDomain}
+            hideDomainTabs
             onDomainChange={syncModeFromProjector}
             requestedStructure={strukturDiminta}
           />

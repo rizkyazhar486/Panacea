@@ -13,7 +13,8 @@ const endoscopy = readFileSync('src/pages/bodyhub/VirtualEndoscopyWorkbench.tsx'
 
 assert.match(os, /projectorDomain: 'localization'/, 'Body Exposure top-level navigation must expose lesion localization in the same projector')
 assert.match(os, /projectorDomain: 'imaging'/, 'Body Exposure top-level navigation must expose imaging in the same projector')
-assert.match(os, /requestedDomain=\{current\.projectorDomain\}/, 'top-level mode must drive the unified projector')
+assert.match(os, /requestedDomain=\{projectorDomain\}/, 'top-level scale ladder must drive the unified projector')
+assert.match(os, /<BodyScaleLadder/, 'one scale ladder replaces the separate mode rail')
 assert.match(os, /Deep reference labs/, 'legacy Body Explorer capability must be preserved on demand instead of deleted')
 
 assert.match(projector, /type SimulationDomain[\s\S]*'localization'/, 'unified projector must own localization as a first-class projection')

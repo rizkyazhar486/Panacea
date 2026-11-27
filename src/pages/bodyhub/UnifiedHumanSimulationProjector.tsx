@@ -47,6 +47,8 @@ interface UnifiedHumanSimulationProjectorProps {
   requestedDomain?: SimulationDomain
   onDomainChange?: (domain: SimulationDomain) => void
   compact?: boolean
+  /** The host renders its own domain navigation (Body scale ladder); skip the duplicate tab row. */
+  hideDomainTabs?: boolean
   /** Permintaan fokus struktur sumber dari luar (mis. temuan AI-EMR). `nonce` memicu ulang pilihan yang sama. */
   requestedStructure?: { name: string; nonce: number } | null
 }
@@ -162,6 +164,7 @@ export default function UnifiedHumanSimulationProjector({
   requestedDomain,
   onDomainChange,
   compact = false,
+  hideDomainTabs = false,
   requestedStructure = null,
 }: UnifiedHumanSimulationProjectorProps) {
   const navigate = useNavigate()
@@ -320,7 +323,7 @@ export default function UnifiedHumanSimulationProjector({
           </div>
         </div>
 
-        {!compact && (
+        {!compact && !hideDomainTabs && (
           <div className="no-scrollbar mt-1.5 flex gap-1.5 overflow-x-auto pb-1" role="tablist" aria-label="Unified simulation domains">
             {DOMAINS.map((item) => (
               <button
