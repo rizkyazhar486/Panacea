@@ -4,6 +4,8 @@ import type { EndoluminalLandmark, EndoluminalSegment } from '../../components/b
 
 // Three.js, post-processing and the 3.7 MB atlas load only when the scope is opened.
 const EndoluminalSim = lazy(() => import('../../components/bodyhub/endoscopy/EndoluminalSim'))
+// The airway branches, so it has its own simulator: the whole tree to segmental level, entered by aiming the tip.
+const BronchoscopySim = lazy(() => import('../../components/bodyhub/endoscopy/BronchoscopySim'))
 
 type ScopeProcedureId = 'colonoscopy' | 'upper-gi' | 'bronchoscopy'
 
@@ -158,21 +160,25 @@ export default function VirtualEndoscopyWorkbench({
       </div>
 
       <Suspense fallback={<div className="grid aspect-square place-items-center rounded-[22px] bg-black text-[12px] font-bold text-white/50 sm:aspect-[16/10]">Preparing the simulator…</div>}>
-        <EndoluminalSim
-          key={procedure.id}
-          segments={procedure.segments}
-          startNear={procedure.startNear}
-          tint={procedure.tint}
-          vesselTone={procedure.vesselTone}
-          peristalsis={procedure.peristalsis}
-          breathing={procedure.breathing}
-          jump={jump}
-          onLandmarks={onLandmarks}
-          onProgress={onProgress}
-        />
+        {procedure.id === 'bronchoscopy' ? (
+          <BronchoscopySim key="airway" />
+        ) : (
+          <EndoluminalSim
+            key={procedure.id}
+            segments={procedure.segments}
+            startNear={procedure.startNear}
+            tint={procedure.tint}
+            vesselTone={procedure.vesselTone}
+            peristalsis={procedure.peristalsis}
+            breathing={procedure.breathing}
+            jump={jump}
+            onLandmarks={onLandmarks}
+            onProgress={onProgress}
+          />
+        )}
       </Suspense>
 
-      <nav className="no-scrollbar flex gap-2 overflow-x-auto" aria-label={`${procedure.label}: restart at a segment`}>
+      <nav hidden={procedure.id === 'bronchoscopy'} className="no-scrollbar flex gap-2 overflow-x-auto" aria-label={`${procedure.label}: restart at a segment`}>
         {stops.map((item, index) => {
           const active = index === pointIndex
           return (
@@ -193,7 +199,7 @@ export default function VirtualEndoscopyWorkbench({
 
       <details className="px-1 text-[11px] text-white/55">
         <summary className="flex min-h-[44px] cursor-pointer items-center font-bold text-white/70">About this simulator</summary>
-        <p className="pb-2 leading-relaxed">Simulated reference view · not patient anatomy or procedural navigation. Route and calibre come from Z-Anatomy / BodyParts3D reference meshes (CC BY-SA 4.0); wall motion, folds, vessels, colour and optics are simulated for teaching. Keyboard: ↑/↓ push and pull, W A S D angle the tip, Space air, Q suction. These simulations do not estimate patient geometry, lesion position, insertion distance, force, device settings, or a safe procedural trajectory.</p>
+        <p className="pb-2 leading-relaxed">Simulated reference view · not patient anatomy or procedural navigation. Route and calibre come from Z-Anatomy / BodyParts3D reference meshes (CC BY-SA 4.0); wall motion, folds, vessels, colour and optics are simulated for teaching. Keyboard: ↑/↓ push and pull, W A S D angle the tip, Space air, Q suction. Bronchoscopy covers the whole tracheobronchial tree to the 19 segmental bronchi: aim the tip at a labelled opening and advance to enter it; withdraw past a branch origin to return. These simulations do not estimate patient geometry, lesion position, insertion distance, force, device settings, or a safe procedural trajectory.</p>
       </details>
     </section>
   )
