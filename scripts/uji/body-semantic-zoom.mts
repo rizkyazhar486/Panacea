@@ -99,11 +99,13 @@ assert.match(microscope, /VertikalMolekulerPanel/)
 // 3D chemical structure without a verified identifier).
 assert.match(microscope, /MolecularChemistryStage/)
 const chemistryStage = readFileSync(new URL('../../src/pages/bodyhub/MolecularChemistryStage.tsx', import.meta.url), 'utf8')
-assert.match(chemistryStage, /pubchemCid/,
+assert.match(chemistryStage, /entry\.cid/,
   'molecular chemistry stage lost its verified PubChem provenance')
 assert.match(chemistryStage, /not a measured patient flux/,
   'molecular chemistry stage lost its reference-vs-measured disclaimer')
-assert.match(chemistryStage, /must bind to verified chemical\/protein identifiers before they are rendered as source-backed 3D/,
+assert.match(chemistryStage, /entry\?\.conformer \?/,
+  'molecular chemistry stage must render 3D only from a manifest conformer')
+assert.match(chemistryStage, /PubChem publishes no computed 3D conformer/,
   'molecular chemistry stage lost its fail-closed boundary for unverified 3D structures')
 
 console.log('body semantic zoom: camera-relative LOD switches macro anatomy toward source-aware microscopic representations without fake optical magnification')
