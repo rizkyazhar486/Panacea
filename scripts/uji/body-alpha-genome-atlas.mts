@@ -23,9 +23,7 @@ if (!registry.includes('required: true')) throw new Error('Mandatory genome requ
 if (!registry.includes('no fabricated coordinates or patient inference')) throw new Error('Fail-closed genome safety contract missing');
 
 for (const term of [
-  "from 'three'", 'OrbitControls', 'WebGLRenderer', 'ACESFilmicToneMapping',
-  'CapsuleGeometry', 'TubeGeometry', 'TorusKnotGeometry', 'CatmullRomCurve3',
-  'ResizeObserver', 'mulaiLoopTerjaga', 'renderer.dispose()',
+  'StructureViewer3D', 'struktur/manifest.json', 'AlphaFold', 'pLDDT',
   'Chromosome → locus → gene → transcript → variant → protein → pathway',
   'missing coordinates or evidence stay missing rather than being synthesized',
   'Search atlas', 'ALPHA_GENOME_SEED_RECORDS', 'selected.symbol', 'filtered.map',
@@ -33,7 +31,13 @@ for (const term of [
   if (!ui.includes(term)) throw new Error(`Missing Alpha Genome Atlas UI guard: ${term}`);
 }
 
-if (!ui.includes('Math.min(window.devicePixelRatio || 1, 2)')) throw new Error('Device pixel ratio is not bounded');
+// Real structures only: no stand-in primitive geometry may represent a chromosome, helix or protein.
+for (const fake of ['CapsuleGeometry', 'TorusKnotGeometry', 'TorusGeometry']) if (ui.includes(fake)) throw new Error(`Genome atlas renders a stand-in shape: ${fake}`);
+const viewer = fs.readFileSync('src/pages/bodyhub/structure/StructureViewer3D.tsx', 'utf8');
+for (const term of ["from 'three'", 'OrbitControls', 'ACESFilmicToneMapping', 'ResizeObserver', 'mulaiLoopTerjaga', 'renderer.dispose()', 'buatRendererAman']) {
+  if (!viewer.includes(term)) throw new Error(`Missing structure viewer guard: ${term}`);
+}
+if (!viewer.includes('Math.min(window.devicePixelRatio || 1, 2)')) throw new Error('Device pixel ratio is not bounded');
 if (!ui.includes('min-h-11')) throw new Error('Mobile touch target floor missing');
 if (!ui.includes('aria-pressed')) throw new Error('Genome record selection accessibility missing');
 
