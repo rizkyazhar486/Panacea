@@ -50,7 +50,7 @@ uniform vec4 uB[${MAXC}];
 uniform vec4 uS[${MAXC}];
 uniform int uCount;
 uniform vec3 uRight; uniform vec3 uUp; uniform vec3 uFwd;
-uniform float uAspect; uniform float uTan; uniform float uTime; uniform float uRed; uniform float uBreath;
+uniform float uAspect; uniform float uTan; uniform float uTime; uniform float uRed; uniform float uBreath; uniform vec3 uPost;
 
 float hash(vec3 p){ p = fract(p * 0.3183099 + 0.1); p *= 17.0; return fract(p.x * p.y * p.z * (p.x + p.y + p.z)); }
 float noise(vec3 x){
@@ -74,9 +74,13 @@ float field(vec3 p, out float ring){
     float s = uS[i].x + h * sqrt(l2);
     float gen = uS[i].y;
     // Cartilage rings every ~4 mm, prominent in trachea and main bronchi, faint by segmental level.
-    float amp = gen < 0.5 ? 0.075 : gen < 1.5 ? 0.05 : gen < 2.5 ? 0.03 : 0.015;
+    float amp = gen < 0.5 ? 0.06 : gen < 1.5 ? 0.04 : gen < 2.5 ? 0.025 : 0.012;
     float rg = pow(0.5 + 0.5 * cos(6.2831853 * s / (gen < 0.5 ? 0.42 : 0.34)), 3.0);
-    float di = length(pa - ba * h) - r + amp * rg;
+    vec3 radial = pa - ba * h;
+    float rl = length(radial);
+    // Trachea and main bronchi: cartilage is C-shaped; the posterior third is a flat membranous wall without rings.
+    if (gen < 1.5) rg *= 1.0 - smoothstep(0.15, 0.6, dot(radial / max(rl, 1e-4), uPost));
+    float di = rl - r + amp * rg;
     if (di < best) { best = di; ring = rg * smoothstep(3.5, 0.0, gen); }
     d = smin(d, di, 0.22);
   }
@@ -201,7 +205,7 @@ export default function BronchoscopySim({ onPath }: { onPath?: (path: string[]) 
     const uniforms = {
       uA: { value: uA }, uB: { value: uB }, uS: { value: uS }, uCount: { value: 0 },
       uRight: { value: new THREE.Vector3(1, 0, 0) }, uUp: { value: new THREE.Vector3(0, 1, 0) }, uFwd: { value: new THREE.Vector3(0, 0, -1) },
-      uAspect: { value: 1 }, uTan: { value: Math.tan(THREE.MathUtils.degToRad(50)) }, uTime: { value: 0 }, uRed: { value: 0 }, uBreath: { value: 0.04 },
+      uAspect: { value: 1 }, uTan: { value: Math.tan(THREE.MathUtils.degToRad(50)) }, uTime: { value: 0 }, uRed: { value: 0 }, uBreath: { value: 0.04 }, uPost: { value: new THREE.Vector3(0, 0, -1) },
     }
     const material = new THREE.ShaderMaterial({ vertexShader: VERT, fragmentShader: FRAG, uniforms, depthTest: false, depthWrite: false })
     const quad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), material)
@@ -307,6 +311,11 @@ export default function BronchoscopySim({ onPath }: { onPath?: (path: string[]) 
               if (Math.hypot((sx - 0.5) * (w / h), sy - 0.5) > Rimg * 0.97) continue
               labels.push({ code: ch.code, name: ch.name, x: sx * 100, y: sy * 100, aimed: ci === aimed })
             }
+          }
+          // Keep labels readable: push a label down when it would sit on top of an earlier one.
+          labels.sort((a, b) => a.y - b.y)
+          for (let i = 1; i < labels.length; i++) for (let j = 0; j < i; j++) {
+            if (Math.abs(labels[i].x - labels[j].x) < 30 && labels[i].y - labels[j].y < 8) labels[i].y = labels[j].y + 8
           }
           const path = airwayPath(built.branches, bi)
           setHud((prev) => {
