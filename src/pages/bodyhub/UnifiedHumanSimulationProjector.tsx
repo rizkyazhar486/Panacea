@@ -6,8 +6,10 @@ import { getBodySemanticZoomStop, isMicroscopicBodyScale, type BodySemanticScale
 import { penjelasanTertulis } from '../../lib/explainFallback'
 import UniversalAtlasDepthRail from './UniversalAtlasDepthRail'
 import { FiveStageVisualAtlas } from '../../domains/body-exposure/ui/FiveStageVisualAtlas'
+import type { Sim4DProjectionMode } from '../../domains/body-exposure/engine/bodyGoldenCompassEngine'
 
 const BodyAllSystems3D = lazy(() => import('../../components/BodyAllSystems3D'))
+const BodyGoldenCompassProjection = lazy(() => import('../../components/bodyhub/BodyGoldenCompassProjection'))
 const AtlasPhysiologyBridgePanel = lazy(() => import('./AtlasPhysiologyBridgePanel'))
 const WholeBodyPhysiologyWorkbench = lazy(() => import('./WholeBodyPhysiologyWorkbench'))
 const PhysiologyDeepDivePanel = lazy(() => import('./PhysiologyDeepDivePanel').then((module) => ({ default: module.PhysiologyDeepDivePanel })))
@@ -169,6 +171,7 @@ export default function UnifiedHumanSimulationProjector({
   const [internalDomain, setInternalDomain] = useState<SimulationDomain>('anatomy')
   const [selectedStructureName, setSelectedStructureName] = useState<string | null>(null)
   const [semanticZoom, setSemanticZoom] = useState<{ scale: BodySemanticScale; relativeZoom: number }>({ scale: 'whole-body', relativeZoom: 1 })
+  const [compassSimMode, setCompassSimMode] = useState<Sim4DProjectionMode | null>(null)
   const domain = requestedDomain ?? internalDomain
   const systems = useMemo(() => resolveBodySystemSourceWave(), [])
   const currentSystem = systems.find((system) => system.id === selectedSystemId) ?? systems[0]!
@@ -337,8 +340,8 @@ export default function UnifiedHumanSimulationProjector({
       </header>
 
       {!hideReferenceAtlasCanvas && (
-      <div className="grid gap-0 @[50rem]:grid-cols-[minmax(0,1fr)_270px]">
-        <div className="min-w-0 border-b border-white/10 p-2 sm:p-3 @[50rem]:border-b-0 @[50rem]:border-r">
+      <div className="grid gap-0 @[56rem]:grid-cols-[minmax(0,1fr)_350px]">
+        <div className="min-w-0 border-b border-white/10 p-2 sm:p-3 @[56rem]:border-b-0 @[56rem]:border-r">
           <Suspense fallback={<ProjectorLoader label="3D anatomy" />}>
             <BodyAllSystems3D
               selectedSystemId={selectedSystemId}
@@ -346,66 +349,30 @@ export default function UnifiedHumanSimulationProjector({
               onSemanticZoomChange={setSemanticZoom}
               selectedStructureName={selectedStructureName}
               onStructureSelect={setSelectedStructureName}
+              externalSimMode={compassSimMode}
               focusRequest={requestedStructure}
             />
           </Suspense>
         </div>
 
-        <aside className="p-3 sm:p-4">
-          <div className="text-[10px] font-black uppercase tracking-[.14em] text-slate-300">Active projection</div>
-          <div className="mt-1 text-sm font-black text-white">{current.label}</div>
-          <div className="mt-0.5 text-[11px] font-bold text-cyan-200">{current.scale}</div>
-          <p className="mt-2 text-[11px] leading-relaxed text-slate-300">{current.description}</p>
-
-          <div className="mt-4 flex items-end justify-between gap-2">
-            <div>
-              <div className="text-[10px] font-black uppercase tracking-[.14em] text-slate-300" title="Relative zoom controls representation/LOD; it is not optical magnification">Semantic zoom</div>
-              <div className="mt-1 text-xs font-black text-white">{semanticStop.label}</div>
-            </div>
-            <div className="text-right text-[11px] font-bold text-cyan-200">{semanticZoom.relativeZoom.toFixed(1)}×</div>
-          </div>
-
-          <div className="mt-4 rounded-2xl border border-white/15 bg-white/[.04] p-2.5">
-            <div className="text-[10px] font-black uppercase tracking-[.14em] text-slate-300">Structure context</div>
-            <div className="mt-1 truncate text-[11px] font-black text-cyan-100">{selectedStructureName ?? 'No exact mesh selected'}</div>
-            <div className="mt-1 text-[11px] leading-relaxed text-slate-300">Tap the 3D atlas or choose a structure to keep it coupled across projections.</div>
-            {selectedStructureEducation && (
-              <details className="mt-2 border-t border-white/10 pt-2">
-                <summary className="flex min-h-[44px] cursor-pointer items-center text-[10px] font-black uppercase tracking-[.12em] text-cyan-200">Explain structure</summary>
-                <p className="mt-1 line-clamp-6 whitespace-pre-line text-[11px] leading-relaxed text-slate-300">{selectedStructureEducation}</p>
-              </details>
-            )}
-          </div>
-
-          {/* Golden Journey 3D <-> Case Bridge */}
-          <div style={{ marginTop: '0.75rem', borderRadius: '1rem', border: '1px solid rgba(165,243,252,0.25)', backgroundColor: 'rgba(8,47,73,0.4)', padding: '0.75rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.25rem' }}>
-              <span style={{ fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.14em', color: '#a5f3fc' }}>
-                Golden Journey (EDU-6)
-              </span>
-              {isGoldenRestored && (
-                <span style={{ borderRadius: '9999px', backgroundColor: 'rgba(6,78,59,0.85)', border: '1px solid #059669', padding: '0.125rem 0.5rem', fontSize: '10px', fontWeight: 800, color: '#6ee7b7' }}>
-                  ✓ Step 15 Restored
-                </span>
-              )}
-            </div>
-            <p style={{ marginTop: '0.35rem', fontSize: '11px', lineHeight: '1.45', color: '#cbd5e1' }}>
-              Left Ventricle (FMA:7101) → Wiggers hemodynamics → acute clinical vignette → 3D return.
-            </p>
-            <button
-              type="button"
-              data-pmd-native="true"
-              onClick={() => navigate('/med-study?bagian=golden-journey')}
-              style={{ marginTop: '0.5rem', width: '100%', minHeight: '44px', borderRadius: '0.75rem', border: '1px solid rgba(165,243,252,0.45)', backgroundColor: 'rgba(6,182,212,0.2)', padding: '0.5rem 0.75rem', fontSize: '11px', fontWeight: 900, color: '#cffafe', cursor: 'pointer' }}
-            >
-              Launch Golden Educational Journey →
-            </button>
-          </div>
-
-          <div className="mt-3 rounded-2xl border border-amber-300/25 bg-amber-300/[.07] p-2.5 text-[11px] leading-relaxed text-amber-100">
+        <div className="min-w-0 border-b border-white/10 @[56rem]:border-b-0">
+          <Suspense fallback={<ProjectorLoader label="Golden Compass" />}>
+            <BodyGoldenCompassProjection
+              selectedSystemId={selectedSystemId}
+              onSelectSystem={onSystemChange}
+              onSimModeChange={setCompassSimMode}
+              selectedStructureName={selectedStructureName}
+              semanticScaleLabel={semanticStop.label}
+              relativeZoom={semanticZoom.relativeZoom}
+              structureEducation={selectedStructureEducation}
+              onNavigateGoldenJourney={() => navigate('/med-study?bagian=golden-journey')}
+              isGoldenRestored={isGoldenRestored}
+            />
+          </Suspense>
+          <p className="sr-only">
             Educational/reference simulation. Generic atlas geometry and synthetic models are not patient-specific anatomy, diagnosis, operative navigation or treatment advice.
-          </div>
-        </aside>
+          </p>
+        </div>
       </div>
       )}
 
@@ -422,6 +389,7 @@ export default function UnifiedHumanSimulationProjector({
           selectedSystemId={selectedSystemId}
           semanticScale={semanticZoom.scale}
           selectedStructureName={selectedStructureName}
+          defaultExpanded
           onOpenScale={openScale}
           onSelectDomain={(nextDomain) => selectDomain(nextDomain)}
           onSelectStructure={setSelectedStructureName}

@@ -49,6 +49,19 @@ function radarPolygon(vals: readonly number[], cx: number, cy: number, maxR: num
     .join(' ')
 }
 
+// Fixture demo (bukan rekaman pasien): dipakai mesin qEEG dan grafik pita yang sama.
+const DEMO_EEG_BANDS = {
+  dreem: { delta: 24, theta: 22, alpha: 30, beta: 18, gamma: 6 },
+  other: { delta: 10, theta: 14, alpha: 34, beta: 32, gamma: 10 },
+} as const
+const EEG_BAND_COLOR = {
+  delta: 'bg-indigo-400',
+  theta: 'bg-violet-400',
+  alpha: 'bg-emerald-400',
+  beta: 'bg-cyan-400',
+  gamma: 'bg-amber-300',
+} as const
+
 export function DigitalTwinScanFlow({ initialTab = 'builder' }: { readonly initialTab?: ScanTab }) {
   const store = useOptionalStore()
   const account = store?.account ?? null
@@ -243,10 +256,7 @@ export function DigitalTwinScanFlow({ initialTab = 'builder' }: { readonly initi
       evaluateQeegBrainScan({
         chronologicalAgeYears: 32,
         device: eegDevice,
-        bands:
-          eegDevice === 'dreem'
-            ? { delta: 24, theta: 22, alpha: 30, beta: 18, gamma: 6 }
-            : { delta: 10, theta: 14, alpha: 34, beta: 32, gamma: 10 },
+        bands: DEMO_EEG_BANDS[eegDevice === 'dreem' ? 'dreem' : 'other'],
         reactionTimeMs: 226,
         signalQuality01: 0.92,
       }),
@@ -604,25 +614,48 @@ export function DigitalTwinScanFlow({ initialTab = 'builder' }: { readonly initi
           </div>
 
           <div className="grid grid-cols-1 items-center gap-4 sm:grid-cols-[200px_1fr]">
-            <div className="grid place-items-center rounded-2xl border border-cyan-400/25 bg-black/70 p-3">
+            <div className="grid place-items-center rounded-2xl border border-cyan-400/25 bg-[radial-gradient(circle_at_50%_40%,rgba(34,211,238,0.12),rgba(0,0,0,0.92))] p-3">
               <svg viewBox="0 0 140 190" className="h-44 w-36" role="img" aria-label={`Biomedical ${cadView.toUpperCase()} model`}>
-                <g
-                  fill={cadView === 'anatomy' ? 'rgba(16,185,129,0.16)' : 'none'}
+                <defs>
+                  <linearGradient id="caeBodyFill" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor={cadView === 'cae' ? '#f59e0b' : cadView === 'cad' ? '#22d3ee' : '#10b981'} stopOpacity="0.24" />
+                    <stop offset="100%" stopColor="#0f172a" stopOpacity="0.45" />
+                  </linearGradient>
+                </defs>
+                {/* Volumetric anatomical silhouette contour + finite-element rib/spine wireframe */}
+                <path
+                  d="M70 11 C78 11 83 18 82 26 C81 33 77 37 75 40 L92 46 C99 49 102 58 103 70 L107 104 L97 105 L93 74 L90 96 L87 136 L88 176 L76 176 L74 134 L70 116 L66 134 L64 176 L52 176 L53 136 L50 96 L47 74 L43 105 L33 104 L37 70 C38 58 41 49 48 46 L65 40 C63 37 59 33 58 26 C57 18 62 11 70 11 Z"
+                  fill="url(#caeBodyFill)"
                   stroke={cadView === 'cae' ? '#f59e0b' : cadView === 'cad' ? '#22d3ee' : '#10b981'}
-                  strokeWidth="1.5"
-                >
-                  <circle cx="70" cy="24" r="13" />
-                  <path d="M52 44 L88 44 L82 96 L58 96 Z" />
-                  <path d="M58 96 L52 174 M82 96 L88 174 M52 44 L36 102 M88 44 L104 102" />
-                </g>
+                  strokeWidth="1.4"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M70 42 L70 112 M54 62 Q70 67 86 62 M55 78 Q70 83 85 78 M56 96 Q70 100 84 96"
+                  fill="none"
+                  stroke={cadView === 'cae' ? 'rgba(245,158,11,0.45)' : 'rgba(103,232,249,0.42)'}
+                  strokeWidth="0.85"
+                  strokeDasharray={cadView === 'cad' ? '2 2' : undefined}
+                />
                 {cadView === 'cae' && (
                   <>
-                    <circle cx="55" cy="136" r="6" fill="rgba(255,45,70,0.45)" stroke="#ff2d46" />
-                    <circle cx="85" cy="136" r="6" fill="rgba(255,45,70,0.45)" stroke="#ff2d46" />
-                    <circle cx="70" cy="86" r="7" fill="rgba(245,158,11,0.45)" stroke="#f59e0b" />
+                    <circle cx="58" cy="144" r="6" fill="rgba(255,45,70,0.45)" stroke="#fb7185" />
+                    <circle cx="82" cy="144" r="6" fill="rgba(255,45,70,0.45)" stroke="#fb7185" />
+                    <circle cx="70" cy="89" r="7" fill="rgba(245,158,11,0.45)" stroke="#f59e0b" />
                   </>
                 )}
               </svg>
+              <div className="mt-1 w-full space-y-1 text-[9px] font-mono text-slate-200">
+                <div className="flex justify-between">
+                  <span>Tripod Heel / 1st / 5th</span>
+                  <span className="text-cyan-200">{cae.plantarTripodStress.heelPct}/{cae.plantarTripodStress.firstMtpPct}/{cae.plantarTripodStress.fifthMtpPct}%</span>
+                </div>
+                <div className="flex h-1.5 overflow-hidden rounded-full bg-white/10">
+                  <div className="bg-amber-400" style={{ width: `${cae.plantarTripodStress.heelPct}%` }} />
+                  <div className="bg-cyan-400" style={{ width: `${cae.plantarTripodStress.firstMtpPct}%` }} />
+                  <div className="bg-emerald-400" style={{ width: `${cae.plantarTripodStress.fifthMtpPct}%` }} />
+                </div>
+              </div>
             </div>
 
             {/* Strictly 3 compact KPI numbers on primary canvas */}
@@ -783,6 +816,29 @@ export function DigitalTwinScanFlow({ initialTab = 'builder' }: { readonly initi
               </div>
             </div>
           </div>
+
+          {/* 5-Band qEEG Spectrum Visualizer */}
+          <div className="rounded-2xl border border-cyan-400/20 bg-[#070d16] p-3">
+            <div className="flex items-center justify-between text-[10px] font-mono font-bold uppercase text-cyan-200">
+              <span>Demo fixture · qEEG 5-band power</span>
+              <span>θ/β {qEeg.ratios.thetaToBeta} · α/θ {qEeg.ratios.alphaToTheta}</span>
+            </div>
+            <div className="mt-2 grid grid-cols-5 gap-2">
+              {(['delta', 'theta', 'alpha', 'beta', 'gamma'] as const).map((band) => ({
+                band: band[0].toUpperCase() + band.slice(1),
+                pct: DEMO_EEG_BANDS[eegDevice === 'dreem' ? 'dreem' : 'other'][band],
+                color: EEG_BAND_COLOR[band],
+              })).map((item) => (
+                <div key={item.band} className="flex flex-col items-center gap-1 rounded-xl border border-white/10 bg-black/40 p-2">
+                  <div className="flex h-12 w-full items-end justify-center">
+                    <div className={`w-4 rounded-t ${item.color}`} style={{ height: `${Math.max(12, item.pct * 2.4)}%` }} />
+                  </div>
+                  <span className="font-mono text-[10px] font-black text-white">{item.pct}%</span>
+                  <span className="font-mono text-[9px] text-slate-300">{item.band}</span>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       )}
 
@@ -841,6 +897,22 @@ export function DigitalTwinScanFlow({ initialTab = 'builder' }: { readonly initi
               </div>
             ))}
           </div>
+
+          {anova.table ? (
+            <div className="rounded-2xl border border-emerald-400/20 bg-emerald-950/20 p-3 font-mono text-[11px] text-slate-200">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <span>Variance Explained (η²)</span>
+                <strong className="text-emerald-300">{Math.round(anova.table.etaSquared * 100)}% · F({anova.table.df1}, {anova.table.df2}) = {anova.table.fStatistic}</strong>
+              </div>
+              <div className="mt-2 h-2 overflow-hidden rounded-full bg-white/10">
+                <div className="h-full rounded-full bg-cyan-400" style={{ width: `${Math.min(100, Math.max(4, Math.round(anova.table.etaSquared * 100)))}%` }} />
+              </div>
+            </div>
+          ) : (
+            <div className="rounded-2xl border border-amber-300/25 bg-amber-300/[.07] p-3 font-mono text-[11px] text-amber-100">
+              ANOVA gate fail-closed (n &lt; 3 observations recorded). Add longitudinal samples before statistical inference.
+            </div>
+          )}
         </div>
       )}
     </section>

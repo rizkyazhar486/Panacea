@@ -5,10 +5,9 @@ import { hitungScrollAgarTerlihat } from '../../lib/railViewport'
 import '../../styles/superpage-cohesion-v1.css'
 
 const ZONES = [
-  { to: '/fitness-hub', label: 'Your Body', queryAware: false },
+  { to: '/fitness-hub', label: 'BODY', queryAware: false },
   { to: '/clinical-hub', label: 'Clinical', queryAware: false },
   { to: '/?t=for-you', label: 'For You', queryAware: true },
-  { to: '/body-exposure', label: 'Open 3D', queryAware: false },
 ] as const
 
 // Latar zona aktif adalah satu bentuk bersama (OneShape) yang meluncur antar zona.
@@ -20,16 +19,30 @@ export function PanaceaZoneNav() {
   const pathname = location.pathname
   const forYouActive =
     (pathname === '/' && new URLSearchParams(location.search).get('t') === 'for-you') ||
-    pathname === '/for-you'
-  const isBodyActive = pathname === '/fitness-hub' || pathname === '/fitness' || pathname === '/tubuh' || pathname === '/body'
-  const isClinicalActive = pathname === '/clinical-hub' || pathname === '/clinical' || pathname === '/emr'
-  const isOpen3DActive = pathname === '/body-exposure' || pathname.startsWith('/body-exposure')
+    pathname === '/for-you' ||
+    pathname === '/feed'
+  const isBodyActive =
+    pathname === '/fitness-hub' ||
+    pathname === '/fitness' ||
+    pathname === '/tubuh' ||
+    pathname === '/body' ||
+    pathname === '/body-exposure' ||
+    pathname.startsWith('/body-exposure') ||
+    pathname === '/body-explorer' ||
+    pathname.startsWith('/body-explorer')
+  const isClinicalActive =
+    pathname === '/clinical-hub' ||
+    pathname === '/clinical' ||
+    pathname === '/emr' ||
+    pathname === '/med-study' ||
+    pathname === '/learn' ||
+    pathname === '/rujukan' ||
+    pathname === '/clinical-calculators'
 
   const isZoneActive = (to: string, isActive: boolean) => {
     if (to === '/?t=for-you') return forYouActive
     if (to === '/fitness-hub') return isBodyActive
     if (to === '/clinical-hub') return isClinicalActive
-    if (to === '/body-exposure') return isOpen3DActive
     return isActive
   }
 

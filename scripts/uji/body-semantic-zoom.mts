@@ -76,7 +76,10 @@ assert.match(atlas, /semanticZoomCallbackRef\.current\?\.\(\{ scale, relativeZoo
 const projector = readFileSync(new URL('../../src/pages/bodyhub/UnifiedHumanSimulationProjector.tsx', import.meta.url), 'utf8')
 assert.match(projector, /data-semantic-scale=\{semanticZoom\.scale\}/)
 assert.match(projector, /SemanticMicroscopeStage/)
-assert.match(projector, /Relative zoom controls representation\/LOD; it is not optical magnification/)
+// Semantic-zoom readout lives in the Golden Compass panel mounted by the projector.
+const compass = readFileSync(new URL('../../src/components/bodyhub/BodyGoldenCompassProjection.tsx', import.meta.url), 'utf8')
+assert.match(projector, /relativeZoom=\{semanticZoom\.relativeZoom\}/)
+assert.match(compass, /Relative zoom controls representation\/LOD; it is not optical magnification/)
 assert.match(projector, /onSemanticZoomChange=\{setSemanticZoom\}/)
 
 const microscope = readFileSync(new URL('../../src/pages/bodyhub/SemanticMicroscopeStage.tsx', import.meta.url), 'utf8')

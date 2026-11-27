@@ -102,12 +102,12 @@ assert.ok(summary.sbarText.includes('[B] BACKGROUND'), 'SBAR must include Backgr
 assert.ok(summary.sbarText.includes('[A] ASSESSMENT'), 'SBAR must include Assessment')
 assert.ok(summary.sbarText.includes('[R] RECOMMENDATION'), 'SBAR must include Recommendation')
 
-// 4. PanaceaZoneNav 4-Zone Verification
+// 4. PanaceaZoneNav 3-Zone Unification Verification (BODY = Your Body + Open 3D + BodyExposure)
 const zoneNavSource = readFileSync('src/components/ui/PanaceaZoneNav.tsx', 'utf8')
-assert.ok(zoneNavSource.includes("'Your Body'"), 'ZoneNav must have Your Body')
+assert.ok(zoneNavSource.includes("'BODY'"), 'ZoneNav must expose unified BODY zone')
 assert.ok(zoneNavSource.includes("'Clinical'"), 'ZoneNav must have Clinical')
 assert.ok(zoneNavSource.includes("'For You'"), 'ZoneNav must have For You')
-assert.ok(zoneNavSource.includes("'Open 3D'"), 'ZoneNav must have Open 3D')
+assert.ok(zoneNavSource.includes('/body-exposure'), 'BODY zone must unify /body-exposure')
 
 // 5. Cloudflare Pages & Static SPA Artifacts
 assert.ok(existsSync('wrangler.toml'), 'wrangler.toml must exist for Cloudflare SPA asset routing')
