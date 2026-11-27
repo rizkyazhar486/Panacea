@@ -306,7 +306,7 @@ const berkasPermukaan: Record<(typeof PERMUKAAN_KLAIM_KESEHATAN)[number], string
   'care.consult-chat': '../../src/components/clinical/ConsultChat.tsx',
   'care.innovation-lab': '../../src/pages/medstudy/RecentInnovationLabBase.tsx',
   'care.knowledge-bridge': '../../src/pages/medstudy/KnowledgeBridgeBase.tsx',
-  'care.landing': '../../src/pages/landing/Landing.tsx',
+  'care.landing': '../../src/pages/landing/sections/HeroSection.tsx',
   'care.learn-base': '../../src/pages/medstudy/LearnBase.tsx',
   'care.login': '../../src/pages/landing/Login.tsx',
   'care.practice-record-link': '../../src/components/clinical/TautanRekamPraktik.tsx',
