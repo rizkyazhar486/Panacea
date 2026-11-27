@@ -48,10 +48,15 @@ export function sendCamera(command: AtlasCameraCommand) {
   window.dispatchEvent(new CustomEvent('panacea:body3d-camera', { detail: command }))
 }
 
+/** The living whole-body stage on its own: BODY (/fitness-hub) opens on it, so the body is visible without a click. */
+export function BodyAtlasStage() {
+  return <BodyExposureAtlasHome Viewer={AtlasViewer} sendCamera={sendCamera} />
+}
+
 export default function BodyExposureAtlasRoute() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-      <BodyExposureAtlasHome Viewer={AtlasViewer} sendCamera={sendCamera} />
+      <BodyAtlasStage />
       <Suspense fallback={null}>
         <BodyExposureLocalHub />
       </Suspense>

@@ -33,12 +33,18 @@ const RealityViewCockpit = lazy(() =>
   import('../components/reality-view/RealityViewCockpit').then((m) => ({ default: m.RealityViewCockpit })),
 )
 
-type BodyView = 'body' | 'body-exposure' | 'body-tools' | 'character' | 'training' | 'ranked' | 'workout' | 'recovery' | 'numbers' | 'nutrition' | 'health-data' | 'labs' | 'longevity' | 'vitapulse'
+type BodyView = 'body' | 'body-exposure' | 'reality-view' | 'twin-studio' | 'body-tools' | 'character' | 'training' | 'ranked' | 'workout' | 'recovery' | 'numbers' | 'nutrition' | 'health-data' | 'labs' | 'longevity' | 'vitapulse'
 type View = { key: BodyView; label: string; short: string; component: ComponentType; childTab?: string; description: string }
+
+// The living whole-body stage. One copy per page, kept mounted across the daily lenses below it so switching
+// Training ↔ Nutrition ↔ Recovery keeps the same body (one render loop, one camera) instead of a new page.
+const BodyAtlasStage = lazy(() => import('../app/BodyExposureAtlasRoute').then((m) => ({ default: m.BodyAtlasStage })))
 
 const VIEWS: View[] = [
   { key: 'body', label: 'Your Body', short: 'Body', component: BodyComposition, description: 'Body composition and core metrics.' },
-  { key: 'body-exposure', label: 'Body Exposure', short: 'Body Exposure', component: BodyExposureOS, description: '3D anatomy, CAD/CAE, and organ atlas.' },
+  { key: 'body-exposure', label: 'Deep anatomy tools', short: 'Deep anatomy', component: BodyExposureOS, description: 'Multiscale, simulation projector, imaging and organ tools around the same body.' },
+  { key: 'reality-view', label: 'Reality View', short: 'Reality View', component: RealityViewCockpit, description: 'System ontology, life-stage cohorts and the time axis.' },
+  { key: 'twin-studio', label: 'Twin studio', short: 'Twin studio', component: DigitalTwinScanFlow, description: 'Digital twin scan, CAD/CAE, skin, brain/OSA and statistics tools.' },
   { key: 'body-tools', label: 'Body & Skin Tools', short: 'Body Tools', component: BodyToolkit, description: 'Skin checks and body region logs.' },
   { key: 'character', label: '3D Character', short: '3D Character', component: ShapeForming, description: 'Parametric 3D twin proportions.' },
   { key: 'training', label: 'Training', short: 'Training', component: PusatLatihan, childTab: 'rencana', description: 'Plans and training progression.' },
@@ -53,11 +59,15 @@ const VIEWS: View[] = [
   { key: 'vitapulse', label: 'VitaPulse', short: 'VitaPulse', component: VitaPulse, description: 'Compact vitality overview.' },
 ]
 const VALID = new Set(VIEWS.map((view) => view.key))
-const PRIMARY_VIEW_KEYS = new Set<BodyView>(['body', 'body-exposure', 'training', 'ranked', 'recovery', 'nutrition', 'health-data'])
+// The daily lenses on the one body. Deep anatomy, Reality View and the twin studio stay one choice away under
+// More features: they are tools around the body, not competing first screens.
+const PRIMARY_VIEW_KEYS = new Set<BodyView>(['body', 'training', 'ranked', 'recovery', 'nutrition', 'health-data'])
 
 const BODY_DEPTH_BY_VIEW: Record<BodyView, string> = {
   body: 'today',
   'body-exposure': 'domain',
+  'reality-view': 'domain',
+  'twin-studio': 'domain',
   'body-tools': 'domain',
   character: 'domain',
   training: 'domain',
@@ -96,6 +106,7 @@ export function UnifiedBodyWorkspace() {
   const active = VIEWS.find((view) => view.key === activeKey) ?? VIEWS[0]
   const Active = active.component
   const isExposure = activeKey === 'body-exposure'
+  const isCharacter = activeKey === 'character'
   const primaryViews = VIEWS.filter((view) => PRIMARY_VIEW_KEYS.has(view.key))
   const secondaryViews = VIEWS.filter((view) => !PRIMARY_VIEW_KEYS.has(view.key))
   const secondaryValue = secondaryViews.some((view) => view.key === activeKey) ? activeKey : ''
@@ -137,11 +148,19 @@ export function UnifiedBodyWorkspace() {
     <div className="mx-auto w-full max-w-[1580px] space-y-4 pb-10">
       <PanaceaZoneNav />
 
+      {/* BODY opens on the body itself: the source-backed whole-body stage renders immediately, no "open atlas"
+          click. Deep anatomy tools carry their own viewer, so the stage steps aside there (one viewer per page). */}
+      {!isExposure && (
+        <section aria-label="Your body" data-body-stage="v1" className="dark overflow-hidden rounded-[24px] border border-white/[.075] bg-[#020306]">
+          <Suspense fallback={<Loader exposure />}><BodyAtlasStage /></Suspense>
+        </section>
+      )}
+
       {/* `dark` menandai bahwa permukaan ini memang gelap apa pun tema
           aplikasinya. Seluruh gaya `dark:` dan lapisan pemetaan `.dark`
           bergantung pada kelas itu; tanpa penandanya komponen di dalam sini
           merender versi terangnya di atas latar hitam. */}
-      <section className={`dark relative overflow-hidden grid gap-4 rounded-[24px] border border-white/[.075] bg-[#020306] p-3.5 shadow-[0_18px_60px_rgba(0,0,0,.24)] sm:p-4 ${isExposure ? 'lg:grid-cols-1' : 'lg:grid-cols-[minmax(0,1fr)_340px]'}`}>
+      <section className={`dark relative overflow-hidden grid gap-4 rounded-[24px] border border-white/[.075] bg-[#020306] p-3.5 shadow-[0_18px_60px_rgba(0,0,0,.24)] sm:p-4 ${isCharacter ? 'lg:grid-cols-[minmax(0,1fr)_340px]' : 'lg:grid-cols-1'}`}>
         <div className="relative min-w-0">
           {/* Keep one semantic page title without duplicating the visible
               Body Exposure identity owned by BodyExposureOS. */}
@@ -207,7 +226,7 @@ export function UnifiedBodyWorkspace() {
             <p className="mt-2 leading-relaxed">{active.description}</p>
             <ol className="mt-2 grid gap-1 leading-relaxed">
               {[
-                'Start with My Body or Body Exposure.',
+                'Your body is always on top; tap any structure.',
                 'Use the six primary destinations for daily work.',
                 'Everything else stays preserved under More features.',
               ].map((langkah, i) => (
@@ -225,7 +244,9 @@ export function UnifiedBodyWorkspace() {
           <BatasKlaimKesehatan permukaan="body.workspace" className="mt-2" />
         </div>
 
-        {!isExposure && (
+        {/* The personal avatar (proportions, share, camera capture) lives in the 3D Character lens; elsewhere the
+            stage above is the body, so a second 3D surface would compete with it. */}
+        {isCharacter && (
           <div className="relative lg:sticky lg:top-24 lg:self-start">
             <PersonalBodyUnifiedSurface compact defaultFocus="identity" shareable cameraCapture />
           </div>
@@ -244,38 +265,6 @@ export function UnifiedBodyWorkspace() {
           <Suspense fallback={<div className="p-4 text-xs text-white/50">Loading cockpit…</div>}>
             <UniversalCompactBodyCockpit />
           </Suspense>
-        )}
-        {(activeKey === 'body' || activeKey === 'body-exposure') && (
-          <details className="dark rounded-2xl border border-cyan-400/25 bg-[#04070e] p-3 text-white">
-            <summary
-              className="flex min-h-[44px] cursor-pointer list-none items-center justify-between font-mono text-[11px] font-bold uppercase tracking-[0.12em]"
-              style={{ color: '#67e8f9' }}
-            >
-              <span>Reality View OS · 10-System 1:1 Ontology · 22 Cohorts · 4D Time Axis</span>
-              <span>OPEN ▾</span>
-            </summary>
-            <div className="mt-3">
-              <Suspense fallback={<div className="p-4 text-xs text-slate-200">Loading Reality View…</div>}>
-                <RealityViewCockpit />
-              </Suspense>
-            </div>
-          </details>
-        )}
-        {(activeKey === 'body' || activeKey === 'body-exposure') && (
-          <details className="dark rounded-2xl border border-cyan-400/20 bg-[#05070b] p-3 text-white">
-            <summary
-              className="flex min-h-[44px] cursor-pointer list-none items-center justify-between font-mono text-[11px] font-bold uppercase tracking-[0.12em]"
-              style={{ color: '#a5f3fc' }}
-            >
-              <span>Digital Twin · CAD/CAE · Skin · Brain/OSA · ANOVA</span>
-              <span>OPEN ▾</span>
-            </summary>
-            <div className="mt-3">
-              <Suspense fallback={<div className="p-4 text-xs text-slate-200">Loading studio…</div>}>
-                <DigitalTwinScanFlow />
-              </Suspense>
-            </div>
-          </details>
         )}
         {['body', 'training', 'ranked', 'recovery', 'nutrition', 'health-data'].includes(activeKey) && (
           <YourBodyDailyStrip activeKey={activeKey} />
