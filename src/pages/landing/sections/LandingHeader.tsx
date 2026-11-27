@@ -64,7 +64,7 @@ export function LandingHeader({ theme, onToggleTheme, onMasuk }: LandingHeaderPr
             data-pmd-native="true"
             onClick={onToggleTheme}
             aria-label={isDark ? 'Aktifkan mode terang' : 'Aktifkan mode gelap'}
-            className="inline-flex min-h-[40px] items-center gap-1.5 rounded-full border border-neutral-300 bg-white px-3 py-1.5 text-xs font-semibold text-neutral-900 transition hover:border-emerald-600/50 dark:border-white/15 dark:bg-[#111815] dark:text-neutral-100 dark:hover:border-emerald-400/50"
+            className="inline-flex min-h-[40px] items-center gap-1.5 rounded-full border border-neutral-300 bg-neutral-50 px-3 py-1.5 text-xs font-semibold text-neutral-900 transition hover:border-emerald-600/50 dark:border-white/15 dark:bg-[#111815] dark:text-neutral-100 dark:hover:border-emerald-400/50"
           >
             <span aria-hidden="true">{isDark ? '☀' : '☾'}</span>
             <span className="hidden sm:inline">{isDark ? 'Terang' : 'Gelap'}</span>
@@ -86,7 +86,7 @@ export function LandingHeader({ theme, onToggleTheme, onMasuk }: LandingHeaderPr
             onClick={() => setMenuOpen((o) => !o)}
             aria-expanded={menuOpen}
             aria-label="Menu Navigasi"
-            className="inline-flex min-h-[40px] min-w-[40px] items-center justify-center rounded-full border border-neutral-300 bg-white text-sm font-bold text-neutral-900 dark:border-white/15 dark:bg-[#111815] dark:text-white lg:hidden"
+            className="inline-flex min-h-[40px] min-w-[40px] items-center justify-center rounded-full border border-neutral-300 bg-neutral-50 text-sm font-bold text-neutral-900 dark:border-white/15 dark:bg-[#111815] dark:text-white lg:hidden"
           >
             {menuOpen ? '✕' : '☰'}
           </button>
