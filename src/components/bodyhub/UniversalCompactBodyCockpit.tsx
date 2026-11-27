@@ -178,9 +178,9 @@ export function UniversalCompactBodyCockpit() {
           </div>
         </div>
         <div className="mt-2.5 flex flex-wrap gap-x-4 gap-y-1">
-          <a href="/medscihub-4d-anatomy-emr.html" className="inline-flex min-h-[44px] items-center text-xs font-bold text-cyan-300 hover:text-white">4D Anatomy &amp; EMR ↗</a>
-          <a href="/deep-human-lab/medscihub-3d-multiscale-simulation.html" className="inline-flex min-h-[44px] items-center text-xs font-bold text-emerald-300 hover:text-white">3D Multiscale Lab ↗</a>
-          <a href="/cellular-spacetime-debugger-os.html" className="inline-flex min-h-[44px] items-center text-xs font-bold text-cyan-200 hover:text-white">Bio-GDB Cellular ↗</a>
+          <Link to="/body-exposure" className="inline-flex min-h-[44px] items-center text-xs font-bold text-cyan-300 hover:text-white">3D Anatomy &amp; Exposure →</Link>
+          <Link to="/body-explorer" className="inline-flex min-h-[44px] items-center text-xs font-bold text-emerald-300 hover:text-white">System Explorer →</Link>
+          <Link to="/genome-lab" className="inline-flex min-h-[44px] items-center text-xs font-bold text-cyan-200 hover:text-white">Genomics &amp; Cellular →</Link>
           <Link to="/tubuh?tab=pulih" className="inline-flex min-h-[44px] items-center text-xs font-bold text-amber-300 hover:text-white">5-Modality Recovery →</Link>
         </div>
       </details>

@@ -63,15 +63,15 @@
   background: rgba(255, 255, 255, 0.04) !important;
 }
 .login-role-tab[data-active="true"] {
-  background: #00bf63 !important;
+  background: #047857 !important;
   color: #ffffff !important;
-  box-shadow: 0 4px 14px rgba(0, 191, 99, 0.35) !important;
+  box-shadow: 0 4px 14px rgba(4, 120, 87, 0.35) !important;
 }
 .dark .login-role-tab[data-active="true"] {
-  background: #00bf63 !important;
-  color: #041a0d !important;
+  background: #047857 !important;
+  color: #ffffff !important;
   font-weight: 800;
-  box-shadow: 0 4px 18px rgba(0, 191, 99, 0.45) !important;
+  box-shadow: 0 4px 18px rgba(4, 120, 87, 0.45) !important;
 }
 
 /* ── Sub-role pills (Dokter, Kontributor, Verifikator, etc.) ───────────── */
@@ -112,17 +112,17 @@ button.login-subrole-btn:not([data-selected="true"]):hover {
   color: #ffffff !important;
 }
 button.login-subrole-btn[data-selected="true"] {
-  background: #00bf63 !important;
+  background: #047857 !important;
   color: #ffffff !important;
-  border: 1px solid #00bf63 !important;
-  box-shadow: 0 4px 14px rgba(0, 191, 99, 0.4) !important;
+  border: 1px solid #047857 !important;
+  box-shadow: 0 4px 14px rgba(4, 120, 87, 0.4) !important;
   font-weight: 800 !important;
 }
 .dark button.login-subrole-btn[data-selected="true"] {
-  background: #00bf63 !important;
-  color: #041a0d !important;
-  border: 1px solid #00bf63 !important;
-  box-shadow: 0 4px 16px rgba(0, 191, 99, 0.5) !important;
+  background: #047857 !important;
+  color: #ffffff !important;
+  border: 1px solid #047857 !important;
+  box-shadow: 0 4px 16px rgba(4, 120, 87, 0.5) !important;
   font-weight: 800 !important;
 }
 
@@ -158,25 +158,25 @@ button.login-submit-btn {
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 button.login-submit-btn:not(:disabled) {
-  background: linear-gradient(180deg, #00bf63 0%, #0b7a4b 100%) !important;
+  background: linear-gradient(180deg, #047857 0%, #065f46 100%) !important;
   color: #ffffff !important;
   border: none !important;
-  box-shadow: 0 8px 24px -4px rgba(0, 191, 99, 0.45) !important;
+  box-shadow: 0 8px 24px -4px rgba(4, 120, 87, 0.45) !important;
   cursor: pointer;
 }
 button.login-submit-btn:not(:disabled):hover {
   filter: brightness(1.06);
   transform: translateY(-1px);
-  box-shadow: 0 10px 28px -4px rgba(0, 191, 99, 0.55) !important;
+  box-shadow: 0 10px 28px -4px rgba(4, 120, 87, 0.55) !important;
 }
 button.login-submit-btn:not(:disabled):active {
   transform: scale(0.985);
 }
 .dark button.login-submit-btn:not(:disabled) {
-  background: linear-gradient(180deg, #00bf63 0%, #08633c 100%) !important;
+  background: linear-gradient(180deg, #047857 0%, #064e3b 100%) !important;
   color: #ffffff !important;
   border: none !important;
-  box-shadow: 0 8px 26px -4px rgba(0, 191, 99, 0.5) !important;
+  box-shadow: 0 8px 26px -4px rgba(4, 120, 87, 0.5) !important;
 }
 
 /* Disabled state — WCAG compliant contrast, soft background, clear text */

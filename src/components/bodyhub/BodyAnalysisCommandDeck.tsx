@@ -25,7 +25,7 @@ const FasciaKineticTwinCard = lazy(() =>
 interface StudioTrack {
   readonly id: 'multiscale' | 'physiology' | 'surgical' | 'frontier'
   readonly label: string
-  readonly items: readonly { readonly href: string; readonly title: string; readonly meta: string }[]
+  readonly items: readonly { readonly to: string; readonly title: string; readonly meta: string }[]
 }
 
 const COMBINED_ROUTES = [
@@ -41,40 +41,40 @@ const STUDIO_TRACKS: readonly StudioTrack[] = [
     id: 'multiscale',
     label: '3D/4D Anatomy & Multiscale',
     items: [
-      { href: '/medscihub-4d-anatomy-emr.html', title: 'MedSciHub 4D Anatomy & AI-EMR', meta: 'Three.js · XYZ Explode · 1-Projectile' },
-      { href: '/deep-human-lab/medscihub-3d-multiscale-simulation.html', title: 'Deep Human Lab 3D Multiscale', meta: 'Whole Body → Organelle' },
-      { href: '/multiscale-quantum-exposome-os.html', title: '6-Tier Cellular-to-Exposome Lab', meta: 'Educational Biophysical Layers' },
-      { href: '/omega-invictus-body-exposure-os.html', title: '8-in-1 Body Exposure Studio', meta: 'Unified Anatomical & Lab Scope' },
+      { to: '/body-exposure', title: '4D Anatomy & AI-EMR Stage', meta: 'Three.js · Layer Explorer · Z-Anatomy' },
+      { to: '/body-exposure/canonical', title: 'Canonical Multiscale Anatomy', meta: 'Whole Body → Organ System' },
+      { to: '/body-explorer', title: 'Cellular-to-Exposome Explorer', meta: 'Interactive Anatomical & Biomarker Scope' },
+      { to: '/scan', title: 'Body Exposure & Camera Scan Studio', meta: 'Morphometry & Clinical Reference' },
     ],
   },
   {
     id: 'physiology',
     label: 'Network Physiology & Bio-GDB',
     items: [
-      { href: '/whole-body-exposure-os.html', title: 'Whole-Body OS Kernel', meta: 'Ivanov 4-Bus · Borbely · PID' },
-      { href: '/cellular-spacetime-debugger-os.html', title: '4D Cellular Spacetime & Bio-GDB', meta: 'Watchpoints · Reaction-Diffusion' },
-      { href: '/numerical-body-exposure-clinical.html', title: 'Numerical Biophysics Lab', meta: 'Quantitative Hemodynamic Models' },
-      { href: '/panaceamed-legit-clinical-science-os.html', title: 'Clinical Science & QSP Core', meta: 'Stewart · Guyton · PK/PD' },
+      { to: '/frontier-health', title: 'Whole-Body OS Kernel', meta: 'Ivanov 4-Bus · Borbely · PID' },
+      { to: '/genome-lab', title: 'Genomics & Cellular Pathways', meta: 'Pharmacogenomics & Biochemical Models' },
+      { to: '/electrophysiology', title: 'Arrhythmia & Hemodynamic Lab', meta: 'Quantitative ECG & Vascular Models' },
+      { to: '/clinical-scores', title: 'Clinical Science & QSP Scores', meta: 'Validated Clinical Scoring Calculators' },
     ],
   },
   {
     id: 'surgical',
     label: 'Surgical Nav, CT & Anesthesia',
     items: [
-      { href: '/panaceamed-robotaxi-surgical-hospital-os.html', title: 'Surgical Nav, 3D CT & Nerve Block', meta: 'Haptic Arm Sim · Regional Block' },
-      { href: '/hippocratic-clinical-os.html', title: 'Hippocratic Clinical Safety OS', meta: 'Primum Non Nocere · Human Review' },
-      { href: '/panaceamed-unified-superos.html', title: 'Unified Hospital Command Center', meta: 'P4 Systems Medicine Workbench' },
-      { href: '/nobel-invictus-axioms-os.html', title: 'Physics & Physiology Axioms', meta: 'First-Principles Education' },
+      { to: '/radiology', title: '3D Radiology, CT & Regional Planning', meta: 'Cross-Sectional Imaging & Navigation' },
+      { to: '/doctor-review', title: 'Clinician Safety & Review Gate', meta: 'Primum Non Nocere · STR Sign-Off' },
+      { to: '/emr', title: 'Unified Clinical EMR Workbench', meta: 'SOAP · SatuSehat FHIR R4' },
+      { to: '/knowledge-bridge', title: 'Evidence & Physiology Knowledge Base', meta: 'First-Principles Clinical References' },
     ],
   },
   {
     id: 'frontier',
     label: 'Frontier Zero-Queue & 2G/Starlink',
     items: [
-      { href: '/panaceamed-frontier-civilization-superos.html', title: 'Frontier Zero-Queue & 2G/Starlink', meta: 'Pre-Arrival Triage · Doctor Co-Pilot' },
-      { href: '/personal-digital-self-1to1.html', title: 'Digital Self & QR/Barcode Pass', meta: 'Identity · Telemetry Scope' },
-      { href: '/panaceamed-omni-athletic-geomed-os.html', title: 'Omni-Athletic & Geo-Dive Lab', meta: 'Wearables · ZHL-16C Model' },
-      { href: '/panaceamed-1tap-hypervisor-os.html', title: '1-Tap Cross-OS Hypervisor', meta: 'Rapid Workspace Switcher' },
+      { to: '/planning', title: 'Zero-Queue Triage & Episode Planning', meta: 'Pre-Arrival Routing · Care Plan' },
+      { to: '/sync', title: 'Digital Self & QR/Wearable Sync', meta: 'Identity · Telemetry Export' },
+      { to: '/dive-log', title: 'Omni-Athletic & Dive Decompression', meta: 'Wearables · Bühlmann ZHL-16C' },
+      { to: '/semua-fitur', title: 'All Panacea OS Modules', meta: 'Unified Workspace Switcher' },
     ],
   },
 ]
@@ -261,14 +261,14 @@ function KernelTelemetryDrawer() {
         </div>
         <div className="mt-2.5 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
           {track.items.map((item) => (
-            <a
-              key={item.href}
-              href={item.href}
+            <Link
+              key={`${item.to}-${item.title}`}
+              to={item.to}
               className="astro-chip flex min-h-[56px] flex-col justify-center rounded-xl px-3 py-2 no-underline"
             >
-              <span className="text-[12px] font-bold text-white">{item.title} ↗</span>
+              <span className="text-[12px] font-bold text-white">{item.title} →</span>
               <span className="font-astro-mono mt-0.5 text-[10px] text-cyan-200/80">{item.meta}</span>
-            </a>
+            </Link>
           ))}
         </div>
       </div>

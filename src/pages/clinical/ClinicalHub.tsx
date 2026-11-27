@@ -372,27 +372,27 @@ export function ClinicalHub() {
                 <span>AI + Human Doctor Step-In</span>
                 <span className="text-[10px] font-normal text-emerald-300">Review &amp; sign draft notes / labs →</span>
               </Link>
-              <a
-                href="/panaceamed-frontier-civilization-superos.html"
+              <Link
+                to="/frontier-health"
                 className="flex min-h-[48px] flex-col justify-center rounded-xl border border-cyan-400/30 bg-white/[0.03] px-3 py-2 text-xs font-bold text-white transition hover:border-cyan-400"
               >
                 <span>Zero-Queue Triage &amp; 2G/Starlink</span>
-                <span className="text-[10px] font-normal text-cyan-300">Pre-arrival routing &amp; binary mesh ↗</span>
-              </a>
-              <a
-                href="/panaceamed-robotaxi-surgical-hospital-os.html"
+                <span className="text-[10px] font-normal text-cyan-300">Pre-arrival routing &amp; binary mesh →</span>
+              </Link>
+              <Link
+                to="/radiology"
                 className="flex min-h-[48px] flex-col justify-center rounded-xl border border-white/15 bg-white/[0.03] px-3 py-2 text-xs font-bold text-white transition hover:border-emerald-400"
               >
                 <span>Surgical Nav, 3D CT &amp; Blocks</span>
-                <span className="text-[10px] font-normal text-white/65">Educational simulation studio ↗</span>
-              </a>
-              <a
-                href="/cellular-spacetime-debugger-os.html"
+                <span className="text-[10px] font-normal text-white/75">Educational simulation studio →</span>
+              </Link>
+              <Link
+                to="/body-exposure"
                 className="flex min-h-[48px] flex-col justify-center rounded-xl border border-white/15 bg-white/[0.03] px-3 py-2 text-xs font-bold text-white transition hover:border-cyan-400"
               >
-                <span>4D Cellular Bio-GDB &amp; Anatomy</span>
-                <span className="text-[10px] font-normal text-white/65">Multiscale physiology inspector ↗</span>
-              </a>
+                <span>4D Body &amp; Multiscale Anatomy</span>
+                <span className="text-[10px] font-normal text-white/75">Multiscale physiology inspector →</span>
+              </Link>
             </div>
           </div>
         </Fold>
