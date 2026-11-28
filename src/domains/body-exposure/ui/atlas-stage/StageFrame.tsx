@@ -101,7 +101,7 @@ export function WideStage({ plate, depth, viewer, search, rail, regionChips, ref
             <div style={{ position: 'absolute', left: 14, top: 72, bottom: WIDE_STRIP + 8, display: 'flex', alignItems: 'center', pointerEvents: 'none' }}>
               <div style={{ pointerEvents: 'auto' }}>{rail}</div>
             </div>
-            {simulation && <div style={{ position: 'absolute', right: 14, top: 72, pointerEvents: 'auto', maxWidth: 'calc(100% - 220px)' }}>{simulation}</div>}
+            {simulation && <div style={{ position: 'absolute', right: 14, top: 72, pointerEvents: 'auto', width: 232, maxWidth: 'calc(100% - 220px)' }}>{simulation}</div>}
             <div style={{ position: 'absolute', left: 14, right: 14, bottom: 14, display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 12, pointerEvents: 'none' }}>
               <div style={{ ...glass, borderRadius: 12, padding: '6px 10px', pointerEvents: 'auto' }}>{referenceChip}</div>
               <div style={{ pointerEvents: 'auto', minWidth: 0 }}>{regionChips}</div>
