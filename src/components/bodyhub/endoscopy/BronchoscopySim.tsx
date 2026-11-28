@@ -4,10 +4,10 @@
 // are the real intersection of the reference tubes. The learner aims at an orifice (or taps its label) and pushes in;
 // pulling back past a branch's origin returns to the parent.
 // Teaching model only: no patient airway, lesion, insertion depth, force, scope size or safe trajectory.
-import { useEffect, useRef, useState, type KeyboardEvent as RKeyboardEvent, type MouseEvent as RMouseEvent, type PointerEvent as RPointerEvent } from 'react'
+import { memo, useEffect, useRef, useState, type KeyboardEvent as RKeyboardEvent, type MouseEvent as RMouseEvent, type PointerEvent as RPointerEvent } from 'react'
 import * as THREE from 'three'
 import {
-  BRONCHIAL_TREE, airwayRoute, buildAirwayTree, chooseChild, indexPath, initialScope, meshIslands, nextAirwayPath, openFactor,
+  BRONCHIAL_TREE, airwayRoute, buildAirwayTree, chooseChild, indexPath, initialScope, meshIslands, nextAirwayPath, openFactor, radiusAt,
   routeBranchAt, stepScope, withSubsegments,
   type AirwayBranch, type AirwayRoute, type LumenSlice, type RouteProfile, type ScopeInput, type ScopeState,
 } from '../../../domains/body-exposure'
@@ -25,6 +25,10 @@ interface Props {
 
 const START_NEAR = { x: 0, y: 1.6, z: 0 }
 const LABELS = 8
+/** Start 2 cm into the trachea: from the tube's very first slice the camera looked at the wall, not down the lumen. */
+const TRACHEA_IN = 0.02
+// Branches drawn around the scope's branch, counted in parent/child steps.
+const NEAR_HOPS = 3
 const MIN_R = 0.0008
 
 /** Arc-length profile with the atlas radii as measured (the GI floor of 4 mm would swell subsegmental airways). */
@@ -54,19 +58,49 @@ function displayTree(branches: readonly AirwayBranch[]): AirwayBranch[] {
   })
 }
 
+type Cut = { a: LumenSlice; b: LumenSlice; open?: boolean }
+
+/**
+ * The first or last `span` metres of a branch as `n` cut segments, sampled on the same smoothed curve and radius the
+ * tube is built from. Straight segments between the raw slices bowed away from the tube at oblique junctions, and the
+ * cut then removed a neighbour's wall where this tube did not replace it: a black hole at the crotch.
+ */
+function curveCuts(curve: THREE.CatmullRomCurve3, prof: RouteProfile, atStart: boolean, span: number, n: number): Cut[] {
+  const L = prof.length, from = atStart ? 0 : Math.max(0, L - span), to = atStart ? Math.min(L, span) : L
+  const P = new THREE.Vector3()
+  const pts = Array.from({ length: n + 1 }, (_, k) => {
+    const s = Math.min(L, from + ((to - from) * k) / n)
+    curve.getPointAt(L > 0 ? s / L : 0, P)
+    return { x: P.x, y: P.y, z: P.z, r: radiusAt(prof, s) }
+  })
+  return pts.slice(1).map((b, k) => ({ a: pts[k], b, open: atStart && k === 0 }))
+}
+
 /** Round cones whose inside is cut from branch i: the parent's distal end, and the start of children and siblings. */
-function cutsFor(tree: readonly AirwayBranch[], i: number) {
+function cutsFor(tree: readonly AirwayBranch[], curves: readonly THREE.CatmullRomCurve3[], i: number) {
   const b = tree[i]
-  const seg = (s: readonly LumenSlice[], from: number, to: number) => {
-    const out: { a: LumenSlice; b: LumenSlice }[] = []
-    for (let k = Math.max(0, from); k < Math.min(s.length - 1, to); k++) out.push({ a: s[k], b: s[k + 1] })
-    return out
+  // The same reach as before (the parent's last four slice gaps, three at a branch start), now along the curve.
+  const reach = (j: number, atStart: boolean, gaps: number) => {
+    const s = tree[j].profile.s, n = s.length - 1
+    return atStart ? s[Math.min(gaps, n)] : s[n] - s[Math.max(0, n - gaps)]
   }
-  const caps = b.parent >= 0 ? seg(tree[b.parent].slices, tree[b.parent].slices.length - 4, tree[b.parent].slices.length) : []
-  for (const c of b.children) caps.push(...seg(tree[c].slices, 0, 3))
-  if (b.parent >= 0) for (const c of tree[b.parent].children) if (c !== i) caps.push(...seg(tree[c].slices, 0, 3))
+  const caps = b.parent >= 0 ? curveCuts(curves[b.parent], tree[b.parent].profile, false, reach(b.parent, false, 4), 4) : []
+  const starts = [...b.children, ...(b.parent >= 0 ? tree[b.parent].children.filter((c) => c !== i) : [])]
+  for (const c of starts) caps.push(...curveCuts(curves[c], tree[c].profile, true, reach(c, true, 3), 3))
   return cutsFrom(caps)
 }
+
+/** The tree outline; re-rendered only when the route changes, not with every HUD tick. */
+const TreePaths = memo(function TreePaths({ paths, route }: { paths: readonly { i: number; d: string }[]; route: string }) {
+  const on = new Set(route.split(',').map(Number))
+  return (
+    <>
+      {paths.map((p) => (
+        <path key={p.i} d={p.d} fill="none" stroke={on.has(p.i) ? '#fda4af' : 'rgba(255,255,255,.22)'} strokeWidth={on.has(p.i) ? 2.2 : 0.8} strokeLinecap="round" strokeLinejoin="round" />
+      ))}
+    </>
+  )
+})
 
 type Status = 'loading' | 'ready' | 'error' | 'no-webgl'
 interface Hud { name: string; crumbs: string[]; cm: number; contact: boolean; end: boolean; kids: { i: number; code: string; name: string }[]; next: number }
@@ -81,7 +115,7 @@ export default function BronchoscopySim({ tint, vesselTone, breathing, jump }: P
   const [status, setStatus] = useState<Status>('loading')
   const [hud, setHud] = useState<Hud>({ name: 'Trachea', crumbs: ['Trachea'], cm: 0, contact: false, end: false, kids: [], next: -1 })
   const [map, setMap] = useState<{ paths: { i: number; d: string }[]; project: (x: number, y: number) => [number, number] } | null>(null)
-  const [onPath, setOnPath] = useState<number[]>([0])
+  const [onPath, setOnPath] = useState('0')
   const [dot, setDot] = useState<[number, number] | null>(null)
   const [touched, setTouched] = useState(false)
   const [pick, setPick] = useState(-1)
@@ -97,6 +131,18 @@ export default function BronchoscopySim({ tint, vesselTone, breathing, jump }: P
     const uniforms = wallUniforms(0, breathing)
     const materials: THREE.Material[] = []
     const geometries: THREE.BufferGeometry[] = []
+    const meshes: THREE.Mesh[] = []
+    // The wall shader discards at junction cuts, which defeats early-z, so every tube in view was shaded in full.
+    // From inside a lumen the opaque walls hide anything more than a few branches away, so draw only those.
+    const showNear = (at: number) => {
+      const near = new Set([at])
+      let ring = [at]
+      for (let hop = 0; hop < NEAR_HOPS; hop++) {
+        ring = ring.flatMap((i) => [tree[i].parent, ...tree[i].children]).filter((i) => i >= 0 && !near.has(i))
+        ring.forEach((i) => near.add(i))
+      }
+      meshes.forEach((m, i) => { m.visible = near.has(i) })
+    }
     let tree: AirwayBranch[] = []
     let route: AirwayRoute | null = null
     let curve: THREE.CatmullRomCurve3 | null = null
@@ -128,11 +174,15 @@ export default function BronchoscopySim({ tint, vesselTone, breathing, jump }: P
       st = { ...initialScope(1), time: st.time }
       if (!setRoute(indexPath(tree, at)) || !route) return
       const r: AirwayRoute = route
-      st = { ...st, s: carina ? Math.max(0, r.ends[0] - 0.018) : r.starts[r.starts.length - 1] + 0.001 }
+      st = { ...st, s: carina ? Math.max(0, r.ends[0] - 0.018) : r.starts[r.starts.length - 1] + (at === 0 ? TRACHEA_IN : 0.001) }
     }
 
     const P = new THREE.Vector3(), q = new THREE.Vector3(), side = new THREE.Vector3(), tmp = new THREE.Vector3()
     let last = 0, hudAt = 0
+    // Label placement needs the view size; reading clientWidth in the frame forced a whole-page layout after each HUD update.
+    const size = { w: host.clientWidth, h: host.clientHeight }
+    const sizeObs = new ResizeObserver(([e]) => { size.w = e.contentRect.width; size.h = e.contentRect.height })
+    sizeObs.observe(host)
     const frame = () => {
       const now = performance.now()
       const dt = last && now - last < 250 ? Math.min(0.1, (now - last) / 1000) : 0.016
@@ -164,7 +214,7 @@ export default function BronchoscopySim({ tint, vesselTone, breathing, jump }: P
       // Branch choice: aim at an orifice, or keep the one tapped by name.
       const at = routeBranchAt(route, st.s)
       const here = route.path[at]
-      if (here !== current) { current = here; lockRef.current = -1; setPick(-1) }
+      if (here !== current) { current = here; lockRef.current = -1; setPick(-1); showNear(here) }
       const aimed = chooseChild(tree, here, { x: P.x, y: P.y, z: P.z }, { x: q.x, y: q.y, z: q.z })
       const want = nextAirwayPath(tree, route, st.s, aimed, lockRef.current)
       if (want) setRoute(want)
@@ -186,9 +236,10 @@ export default function BronchoscopySim({ tint, vesselTone, breathing, jump }: P
         const inFront = tmp.z < 1 && tmp.z > -1 && Math.abs(tmp.x) < 0.9 && Math.abs(tmp.y) < 0.9
         if (!inFront || dist > 0.05) { el.style.opacity = '0'; continue }
         el.style.opacity = '1'
-        el.style.transform = `translate(${((tmp.x + 1) / 2) * host.clientWidth}px, ${((1 - tmp.y) / 2) * host.clientHeight}px) translate(-50%, -50%)`
-        el.textContent = tree[c].code
-        el.dataset.next = c === next ? 'true' : 'false'
+        el.style.transform = `translate(${((tmp.x + 1) / 2) * size.w}px, ${((1 - tmp.y) / 2) * size.h}px) translate(-50%, -50%)`
+        if (el.textContent !== tree[c].code) el.textContent = tree[c].code
+        const isNext = c === next ? 'true' : 'false'
+        if (el.dataset.next !== isNext) el.dataset.next = isNext
       }
 
       if (now - hudAt > 150) {
@@ -196,7 +247,7 @@ export default function BronchoscopySim({ tint, vesselTone, breathing, jump }: P
         const crumbs = route.path.slice(0, at + 1).map((i) => tree[i].code).filter((c, k, a) => c !== a[k - 1])
         const end = !kids.length && st.s > route.profile.length - 0.002
         setHud({ name: tree[here].name, crumbs, cm: st.s * 100, contact: st.contact, end, kids: kids.map((i) => ({ i, code: tree[i].code, name: tree[i].name })), next })
-        setOnPath(route.path.slice(0, at + 1))
+        setOnPath(route.path.slice(0, at + 1).join(','))
         setDot([P.x, P.y])
       }
     }
@@ -221,17 +272,27 @@ export default function BronchoscopySim({ tint, vesselTone, breathing, jump }: P
       })
       tree = displayTree(full)
       const base = new THREE.Color(tint), ridge = new THREE.Color(RIDGE_AIRWAY)
+      const curves = tree.map((b) => curveOf(b.slices))
       tree.forEach((b, i) => {
         const prof = b.profile
-        const tube = buildTube(curveOf(b.slices), prof, () => (i === 0 ? 'trachea' : 'bronchus'), base, ridge, { cap: true, minRings: 16, maxRings: 500, ringStep: 0.0012 })
-        const material = wallMaterial(tex, uniforms, cutsFor(tree, i))
+        const tube = buildTube(curves[i], prof, () => (i === 0 ? 'trachea' : 'bronchus'), base, ridge, { cap: true, minRings: 16, maxRings: 500, ringStep: 0.0012 })
+        const material = wallMaterial(tex, uniforms, cutsFor(tree, curves, i))
         const mesh = new THREE.Mesh(tube.geometry, material)
-        mesh.frustumCulled = false
+        // The shader only narrows the open rest pose (or widens it a few percent with breathing), so padded rest bounds are safe.
+        tube.geometry.computeBoundingSphere()
+        if (tube.geometry.boundingSphere) tube.geometry.boundingSphere.radius *= 1.15
         rig.scene.add(mesh)
+        meshes.push(mesh)
         materials.push(material)
         geometries.push(tube.geometry)
       })
       if (!setRoute([0])) { setStatus('error'); return }
+      // One frame with every tube visible uploads all buffers now; uploads on first sight stuttered the push.
+      meshes.forEach((m) => { m.frustumCulled = false })
+      rig.composer.render(0)
+      meshes.forEach((m) => { m.frustumCulled = true })
+      showNear(0)
+      st = { ...st, s: TRACHEA_IN }
       // Anterior map of the whole tree: viewer faces the body, so the patient's right is on the left.
       let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity
       for (const b of tree) for (const s of b.slices) { x0 = Math.min(x0, s.x); x1 = Math.max(x1, s.x); y0 = Math.min(y0, s.y); y1 = Math.max(y1, s.y) }
@@ -245,6 +306,7 @@ export default function BronchoscopySim({ tint, vesselTone, breathing, jump }: P
       hidup = false
       jumpRef.current = null
       loop?.hentikan()
+      sizeObs.disconnect()
       geometries.forEach((g) => g.dispose())
       materials.forEach((m) => m.dispose())
       tex?.dispose()
@@ -309,7 +371,8 @@ export default function BronchoscopySim({ tint, vesselTone, breathing, jump }: P
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="relative aspect-square w-full overflow-hidden rounded-[22px] bg-black sm:aspect-[16/10]">
+      {/* Strict containment: the HUD updates several times a second and must not relayout the whole page. */}
+      <div className="relative aspect-square w-full overflow-hidden rounded-[22px] bg-black [contain:strict] sm:aspect-[16/10]">
         <div
           ref={hostRef}
           tabIndex={0}
@@ -340,9 +403,7 @@ export default function BronchoscopySim({ tint, vesselTone, breathing, jump }: P
         </div>
         {map && (
           <svg viewBox="0 0 100 100" className="pointer-events-none absolute right-2 top-2 h-[84px] w-[84px] sm:h-[112px] sm:w-[112px]" role="img" aria-label="Airway tree seen from the front; R is the body's right; the pink line is your route">
-            {map.paths.map((p) => (
-              <path key={p.i} d={p.d} fill="none" stroke={onPath.includes(p.i) ? '#fda4af' : 'rgba(255,255,255,.22)'} strokeWidth={onPath.includes(p.i) ? 2.2 : 0.8} strokeLinecap="round" strokeLinejoin="round" />
-            ))}
+            <TreePaths paths={map.paths} route={onPath} />
             {dot && (() => { const [x, y] = map.project(dot[0], dot[1]); return <circle cx={x} cy={y} r="3.5" fill="#fff" /> })()}
             <text x="2" y="98" fontSize="10" fontWeight="800" fill="rgba(255,255,255,.55)">R</text>
             <text x="91" y="98" fontSize="10" fontWeight="800" fill="rgba(255,255,255,.55)">L</text>
