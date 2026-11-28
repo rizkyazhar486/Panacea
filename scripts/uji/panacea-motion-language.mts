@@ -3,7 +3,8 @@ import { readFile } from 'node:fs/promises'
 import { PANACEA_MOTION, panaceaMotionStyle } from '../../src/lib/panaceaMotionLanguage'
 
 const reveal = await readFile(new URL('../../src/components/ui/Reveal.tsx', import.meta.url), 'utf8')
-const landing = await readFile(new URL('../../src/pages/landing/Landing.tsx', import.meta.url), 'utf8')
+// The landing tree (page + its sections): the motion primitive must be rendered there, not merely named.
+const landing = await readFile(new URL('../../src/pages/landing/sections/FourDoorsSection.tsx', import.meta.url), 'utf8')
 
 assert.deepEqual(Object.keys(PANACEA_MOTION).sort(), ['explode', 'glass', 'kinetic', 'rise', 'soft'])
 for (const [name, preset] of Object.entries(PANACEA_MOTION)) {
@@ -27,7 +28,8 @@ assert.match(reveal, /prefers-reduced-motion: reduce/, 'Reveal must honor the OS
 assert.match(reveal, /data-motion=/, 'Reveal must expose motion identity for deterministic browser QA')
 assert.match(reveal, /IntersectionObserver/, 'Reveal must stay viewport-bounded')
 assert.match(reveal, /cancelAnimationFrame/, 'CountUp must clean up animation frames')
-assert.match(landing, /Reveal, CountUp/, 'the production Landing page must consume the shared Reveal primitive')
+assert.match(landing, /import \{ Reveal \} from '\.\.\/\.\.\/\.\.\/components\/Reveal'/, 'the production Landing page must consume the shared Reveal primitive')
+assert.match(landing, /<Reveal as="li"/, 'the landing must render Reveal, not only import it')
 
 const combined = `${reveal}\n${JSON.stringify(PANACEA_MOTION)}`
 assert.doesNotMatch(combined, /Higgsfield|Marketing Studio|source-prompts|d2ol7oe51mr4n9/, 'runtime motion primitives must not copy external prompt/media material')

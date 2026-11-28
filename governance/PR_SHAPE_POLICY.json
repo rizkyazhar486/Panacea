@@ -14,6 +14,14 @@
     {
       "pathPrefix": "bodyexposure/qa_reports/",
       "generatorScript": "bodyexposure/pipeline/rig_chain.sh"
+    },
+    {
+      "pathPrefix": "public/molecules/",
+      "generatorScript": "scripts/bangun/ambil-molekul-pubchem.mjs"
+    },
+    {
+      "pathPrefix": "public/struktur/",
+      "generatorScript": "scripts/bangun/ambil-struktur-3d.mjs"
     }
   ]
 }

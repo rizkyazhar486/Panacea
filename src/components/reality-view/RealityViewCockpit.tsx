@@ -1,6 +1,8 @@
 import { lazy, Suspense, useEffect, useMemo, useState } from 'react'
 const MultiscaleSocialTwinPanel = lazy(() => import('./MultiscaleSocialTwinPanel'))
 const AureumLifetimeMemoryPanel = lazy(() => import('./AureumLifetimeMemoryPanel'))
+const Fsd15BioTelemetryStudio = lazy(() => import('./Fsd15BioTelemetryStudio'))
+const BodyScienceCaeCompassPanel = lazy(() => import('./BodyScienceCaeCompassPanel'))
 import { Link } from 'react-router-dom'
 import { ANATOMICAL_SYSTEM_IDS, type AnatomicalSystemId, type RealityViewMode } from '../../types/realityView'
 import { buildRealityViewState } from '../../engines/reality-view/realityViewStateEngine'
@@ -57,7 +59,12 @@ export function RealityViewCockpit() {
   const [cadPlane, setCadPlane] = useState<typeof CAD_PLANES[number]>('axial')
   const [safetyMarginMm, setSafetyMarginMm] = useState<2 | 5 | 10>(5)
   const [counterfactualActive, setCounterfactualActive] = useState<boolean>(false)
-  const [extensionTab, setExtensionTab] = useState<'none' | 'multiscale' | 'century'>('none')
+  const [extensionTab, setExtensionTab] = useState<'none' | 'multiscale' | 'century' | 'fsd15' | 'compass'>(() => {
+    if (typeof window === 'undefined') return 'none'
+    const raw = window.location.hash.includes('?') ? window.location.hash.split('?')[1] : window.location.search.slice(1)
+    const panel = new URLSearchParams(raw).get('panel')
+    return panel === 'fsd15' || panel === 'multiscale' || panel === 'century' || panel === 'compass' ? panel : 'none'
+  })
   const [overrideStore] = useState(() => new OverrideMemoryStore())
   const [lodPool] = useState(() => new RealityViewLodResourcePool())
 
@@ -248,17 +255,17 @@ export function RealityViewCockpit() {
         {/* Live Synthesized Tensor KPIs */}
         <div className="grid grid-cols-3 gap-1.5 md:col-span-5">
           <div className="rounded-xl border border-white/10 bg-slate-950/80 p-2 text-center">
-            <div className="font-mono text-[9px] uppercase text-slate-400">Cohort</div>
+            <div className="font-mono text-[9px] uppercase text-slate-300">Cohort</div>
             <div className="font-mono text-xs font-black text-cyan-200">{manifold.cohortId}</div>
           </div>
           <div className="rounded-xl border border-white/10 bg-slate-950/80 p-2 text-center">
-            <div className="font-mono text-[9px] uppercase text-slate-400">Kyphosis / BMD</div>
+            <div className="font-mono text-[9px] uppercase text-slate-300">Kyphosis / BMD</div>
             <div className="font-mono text-xs font-black text-amber-200">
               {manifold.senescenceVector.thoracicKyphosisDeg}° / {manifold.composition.boneMineralDensityTScore}
             </div>
           </div>
           <div className="rounded-xl border border-white/10 bg-slate-950/80 p-2 text-center">
-            <div className="font-mono text-[9px] uppercase text-slate-400">VAT / SMM</div>
+            <div className="font-mono text-[9px] uppercase text-slate-300">VAT / SMM</div>
             <div className="font-mono text-xs font-black text-emerald-300">
               {manifold.composition.visceralFatIndex} / {manifold.composition.skeletalMusclePct}%
             </div>
@@ -308,7 +315,8 @@ export function RealityViewCockpit() {
                 }}
               >
                 <div>{m.indonesianLabel}</div>
-                <div className="font-mono text-[9px] text-cyan-300">{m.canonicalOntologyId} · {m.snomedCtId}</div>
+                {/* Terpilih: .pmd-liquid-selected menimpa latar jadi hijau di tema terang; cyan-300 hanya 3.72:1 di atasnya (<4.5 AA). */}
+                <div className={`font-mono text-[9px] ${selectedMeshId === m.meshId ? 'text-white' : 'text-cyan-300'}`}>{m.canonicalOntologyId} · {m.snomedCtId}</div>
               </button>
             ))}
           </div>
@@ -442,6 +450,24 @@ export function RealityViewCockpit() {
         >
           {extensionTab === 'century' ? 'Hide' : 'Open'} Century Timeline · Health Memory
         </button>
+        <button
+          type="button"
+          onClick={() => setExtensionTab((t) => (t === 'fsd15' ? 'none' : 'fsd15'))}
+          aria-pressed={extensionTab === 'fsd15'}
+          data-rv-fsd15-toggle
+          className="min-h-[40px] rounded-xl border border-emerald-400/40 bg-emerald-500/15 px-3 font-mono text-[10px] font-black uppercase text-emerald-100 hover:bg-emerald-500/25"
+        >
+          {extensionTab === 'fsd15' ? 'Hide' : 'Open'} FSD-15 Quantum→Twin
+        </button>
+        <button
+          type="button"
+          onClick={() => setExtensionTab((t) => (t === 'compass' ? 'none' : 'compass'))}
+          aria-pressed={extensionTab === 'compass'}
+          data-rv-compass-cae-toggle
+          className="min-h-[40px] rounded-xl border border-violet-400/40 bg-violet-500/15 px-3 font-mono text-[10px] font-black uppercase text-violet-100 hover:bg-violet-500/25"
+        >
+          {extensionTab === 'compass' ? 'Hide' : 'Open'} Golden Compass · Physics CAE · 100-Lvl
+        </button>
       </div>
 
       {extensionTab === 'multiscale' && (
@@ -452,6 +478,16 @@ export function RealityViewCockpit() {
       {extensionTab === 'century' && (
         <Suspense fallback={<div className="rounded-2xl border border-white/10 bg-slate-950/80 p-3 font-mono text-xs text-amber-200">Loading Aureum Century Timeline &amp; Memory…</div>}>
           <AureumLifetimeMemoryPanel />
+        </Suspense>
+      )}
+      {extensionTab === 'fsd15' && (
+        <Suspense fallback={<div className="rounded-2xl border border-white/10 bg-slate-950/80 p-3 font-mono text-xs text-emerald-200">Loading FSD-15 Quantum→Human Bio-Telemetry…</div>}>
+          <Fsd15BioTelemetryStudio />
+        </Suspense>
+      )}
+      {extensionTab === 'compass' && (
+        <Suspense fallback={<div className="rounded-2xl border border-white/10 bg-slate-950/80 p-3 font-mono text-xs text-violet-200">Loading Golden Compass &amp; Biomedical Physics CAE…</div>}>
+          <BodyScienceCaeCompassPanel />
         </Suspense>
       )}
     </section>

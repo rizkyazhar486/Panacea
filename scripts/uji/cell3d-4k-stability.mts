@@ -32,4 +32,7 @@ assert.match(lab, /Reference-scale dimensions are typical estimates/)
 assert.match(lab, /not a microscopy-derived segmentation or patient scan/)
 assert.match(lab, /primitive shapes are not ultrastructural evidence/)
 
-console.log('Cell3D 4K/runtime/scientific-boundary guards verified.')
+assert.match(source, /ACESFilmicToneMapping/)
+assert.match(source, /slicePlaneRef/)
+assert.match(lab, /cell-slice-depth/)
+console.log('Cell3D 4K/runtime/tomography/scientific-boundary guards verified.')

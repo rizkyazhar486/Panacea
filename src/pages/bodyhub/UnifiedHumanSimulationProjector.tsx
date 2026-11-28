@@ -24,6 +24,9 @@ const LokalisasiLesiPanel = lazy(() => import('./LokalisasiLesiPanel').then((mod
 const PencitraanVolumetrikPanel = lazy(() => import('./PencitraanVolumetrikPanel').then((module) => ({ default: module.PencitraanVolumetrikPanel })))
 const VirtualEndoscopyWorkbench = lazy(() => import('./VirtualEndoscopyWorkbench'))
 const PersonalAvatarCameraCapture = lazy(() => import('./PersonalAvatarCameraCapture'))
+const QuantumElementStage = lazy(() => import('./QuantumElementStage'))
+const SurgicalRoboticsAnesthesiaLab = lazy(() => import('./SurgicalRoboticsAnesthesiaLab'))
+import { BodyScaleLadder, type BodyScaleRung } from './BodyScaleLadder'
 
 export type SimulationDomain =
   | 'anatomy'
@@ -37,6 +40,8 @@ export type SimulationDomain =
   | 'cell'
   | 'genome'
   | 'surgery'
+  | 'robotics-anesthesia'
+  | 'quantum-element'
   | 'pharmacology'
 
 interface UnifiedHumanSimulationProjectorProps {
@@ -122,6 +127,18 @@ const DOMAINS: DomainDefinition[] = [
     label: 'Surgery',
     scale: 'surface → operative depth',
     description: 'Explore educational surgical layers and spatial checkpoints without turning reference anatomy into navigation.',
+  },
+  {
+    id: 'robotics-anesthesia',
+    label: 'Robotics & Anesthesia',
+    scale: '6-DOF RCM · telesurgery · MAC/local',
+    description: 'Isolated educational surgical robotics, distant surgery latency/E-Stop, and general/local anesthesia physiology.',
+  },
+  {
+    id: 'quantum-element',
+    label: 'Element & Quantum',
+    scale: '18 bio-elements · |ψ(r,θ,φ)|²',
+    description: 'Biological periodic table and textbook hydrogenic quantum probability density clouds.',
   },
   {
     id: 'pharmacology',
@@ -256,6 +273,10 @@ export default function UnifiedHumanSimulationProjector({
         return <AlphaGenomeAtlas />
       case 'surgery':
         return <SurgicalLab selectedSourceStructureName={selectedStructureName} />
+      case 'robotics-anesthesia':
+        return <SurgicalRoboticsAnesthesiaLab />
+      case 'quantum-element':
+        return <QuantumElementStage />
       case 'pharmacology':
         return <PharmacologyMechanismPanel selectedAtlasSystemId={selectedSystemId} selectedSourceStructureName={selectedStructureName} />
       case 'anatomy':
@@ -340,6 +361,20 @@ export default function UnifiedHumanSimulationProjector({
           </div>
         )}
       </header>
+
+      {!compact && (
+        <BodyScaleLadder
+          activeDomain={domain}
+          activeScale={semanticZoom.scale}
+          onSelectRung={(rung: BodyScaleRung) => {
+            if (rung.scale) {
+              const stop = getBodySemanticZoomStop(rung.scale)
+              setSemanticZoom({ scale: rung.scale, relativeZoom: stop.minRelativeZoom })
+            }
+            selectDomain(rung.domain)
+          }}
+        />
+      )}
 
       {!hideReferenceAtlasCanvas && (
         <UniversalAtlasDepthRail
