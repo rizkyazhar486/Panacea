@@ -3,7 +3,7 @@
 // locale-fixed (English first; translation happens in the locale layer).
 
 import type { MetricInsight, RangePosition } from './metricInsight.ts'
-import { RANGE_MIN_DAYS } from './metricInsight.ts'
+import { RANGE_MIN_DAYS, RANGE_SPAN_DAYS } from './metricInsight.ts'
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'] as const
 
@@ -52,7 +52,7 @@ export function insightLines(insight: Extract<MetricInsight, { ok: true }>): Ins
   ]
   if (range && position) {
     lines.push({
-      text: `${POSITION_LABEL[position]} range of ${formatValue(range.low, metric.digits)}–${u(range.high)} (middle 80% of ${range.days} recorded days).`,
+      text: `${POSITION_LABEL[position]} range of ${formatValue(range.low, metric.digits)}–${u(range.high)} (middle 80% of ${range.days} recorded days out of the last ${RANGE_SPAN_DAYS}).`,
       truth: 'derived',
     })
   } else {
