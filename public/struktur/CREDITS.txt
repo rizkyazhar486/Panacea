@@ -17,3 +17,9 @@ mean pLDDT confidence score is recorded in public/struktur/manifest.json.
    - TP53 (P04637), BRCA1 (P38398), APOE (P02649), SCN5A (Q14524), CFTR (P13569)
    Citation: Jumper J et al. Nature 2021;596:583-589; Varadi M et al. Nucleic Acids Res 2024;52:D368-D375.
    Predicted structures display per-residue pLDDT confidence scores (blue >90, cyan 70-90, yellow 50-70, orange <50).
+
+Expanded human experimental RCSB PDB entries (wwPDB, CC0 1.0):
+- 4INS: Human insulin hexamer with Zn2+ coordination (1.5 A X-ray)
+- 3RGK: Human myoglobin with haem cofactor (1.65 A X-ray)
+- 1REX: Human lysozyme antimicrobial enzyme (1.5 A X-ray)
+- 1R42: Human ACE2 cardiovascular ectodomain (2.2 A X-ray)

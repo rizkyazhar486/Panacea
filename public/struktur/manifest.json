@@ -1,5 +1,5 @@
 {
-  "generated": "2026-11-27",
+  "generated": "2026-11-28",
   "entries": [
     {
       "id": "tp53",
@@ -111,7 +111,7 @@
       "id": "1bna",
       "kind": "pdb",
       "pdbId": "1BNA",
-      "title": "B-DNA dodecamer (Drew–Dickerson), the canonical double helix",
+      "title": "B-DNA dodecamer (Drew\u2013Dickerson), the canonical double helix",
       "method": "X-RAY DIFFRACTION",
       "resolutionA": 1.9,
       "sourceUrl": "https://files.rcsb.org/download/1BNA.pdb",
@@ -153,6 +153,54 @@
       "sourceUrl": "https://files.rcsb.org/download/4HHB.pdb",
       "sha256Original": "abf382e0fd84b53bd4c08b373d37c0d7fe9fbe1a9a9c3851b2f5f2fbbe627101",
       "file": "4hhb.pdb",
+      "licence": "wwPDB, CC0 1.0"
+    },
+    {
+      "id": "4ins",
+      "kind": "pdb",
+      "pdbId": "4INS",
+      "title": "Human insulin hexamer (A & B peptide chains with Zn2+ coordination)",
+      "method": "X-RAY DIFFRACTION",
+      "resolutionA": 1.5,
+      "sourceUrl": "https://files.rcsb.org/download/4INS.pdb",
+      "sha256Original": "6262681a54c0184b988243fdcacd778e988818bcfe6fdec258ef22272d6d89f9",
+      "file": "4ins.pdb",
+      "licence": "wwPDB, CC0 1.0"
+    },
+    {
+      "id": "3rgk",
+      "kind": "pdb",
+      "pdbId": "3RGK",
+      "title": "Human myoglobin (muscular oxygen-storage globin with haem cofactor)",
+      "method": "X-RAY DIFFRACTION",
+      "resolutionA": 1.65,
+      "sourceUrl": "https://files.rcsb.org/download/3RGK.pdb",
+      "sha256Original": "73175bcf35092f0ac428991a77101d73b73bede538d834bc7ee602c4db36d549",
+      "file": "3rgk.pdb",
+      "licence": "wwPDB, CC0 1.0"
+    },
+    {
+      "id": "1rex",
+      "kind": "pdb",
+      "pdbId": "1REX",
+      "title": "Human lysozyme (innate mucosal antimicrobial glycoside hydrolase)",
+      "method": "X-RAY DIFFRACTION",
+      "resolutionA": 1.5,
+      "sourceUrl": "https://files.rcsb.org/download/1REX.pdb",
+      "sha256Original": "7923ad559f72cc572abc6392daaadb79e00a6f8269cfc8481298e50bd1b3dc3b",
+      "file": "1rex.pdb",
+      "licence": "wwPDB, CC0 1.0"
+    },
+    {
+      "id": "1r42",
+      "kind": "pdb",
+      "pdbId": "1R42",
+      "title": "Human ACE2 receptor (cardiovascular RAAS peptidase ectodomain)",
+      "method": "X-RAY DIFFRACTION",
+      "resolutionA": 2.2,
+      "sourceUrl": "https://files.rcsb.org/download/1R42.pdb",
+      "sha256Original": "f53771ba65482ac76de721ad7d02fe771087545573100aa6e9a744b4cc7bc9a7",
+      "file": "1r42.pdb",
       "licence": "wwPDB, CC0 1.0"
     }
   ]

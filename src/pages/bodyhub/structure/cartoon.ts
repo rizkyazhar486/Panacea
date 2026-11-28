@@ -8,7 +8,32 @@ import { assignSecondaryStructure, type Ss, type Vec } from '../../../lib/moleku
 // through C4' with base rings as filled slabs. Ligands: ball and stick.
 // Every vertex keeps its residue index so the viewer can name what is hovered.
 
-export type ColourScheme = 'plddt' | 'chain' | 'rainbow'
+export type ColourScheme = 'plddt' | 'secondary' | 'hydrophobicity' | 'chain' | 'rainbow'
+
+/** Kyte & Doolittle (1982) hydropathy index: +4.5 hydrophobic (ILE) to -4.5 hydrophilic (ARG). */
+export const KYTE_DOOLITTLE: Readonly<Record<string, number>> = {
+  ILE: 4.5, VAL: 4.2, LEU: 3.8, PHE: 2.8, CYS: 2.5, MET: 1.9, ALA: 1.8,
+  GLY: -0.4, THR: -0.7, SER: -0.8, TRP: -0.9, TYR: -1.3, PRO: -1.6,
+  HIS: -3.2, GLU: -3.5, GLN: -3.5, ASP: -3.5, ASN: -3.5, LYS: -3.9, ARG: -4.5,
+}
+
+export function hydropathyScore(residueName: string): number {
+  return KYTE_DOOLITTLE[residueName.toUpperCase()] ?? 0
+}
+
+export function hydropathyColour(residueName: string): THREE.Color {
+  const score = hydropathyScore(residueName)
+  const t = Math.max(-1, Math.min(1, score / 4.5))
+  const neutral = new THREE.Color('#e2e8f0')
+  if (t >= 0) return neutral.lerp(new THREE.Color('#ea580c'), t)
+  return neutral.lerp(new THREE.Color('#0284c7'), -t)
+}
+
+export function secondaryColour(ss: Ss): THREE.Color {
+  if (ss === 'H') return new THREE.Color('#f43f5e')
+  if (ss === 'E') return new THREE.Color('#f59e0b')
+  return new THREE.Color('#94a3b8')
+}
 
 export interface ResidueInfo { name: string; seq: number; chain: string; bFactor: number; ss: Ss | 'N' }
 export interface CartoonMesh { mesh: THREE.Mesh; residueOfVertex: Int32Array }
@@ -143,8 +168,10 @@ export function buildCartoon(s: Struktur, scheme: ColourScheme): Cartoon {
     aminoIndex.set(g, residues.length)
     residues.push({ name: g.name, seq: g.seq, chain: g.chain, bFactor: g.atoms.get('CA')!.bFactor, ss: ss[i]! })
   })
-  const proteinColour = (g: Group, iInChain: number, chainLength: number) => {
+  const proteinColour = (g: Group, iInChain: number, chainLength: number, residueSs: Ss) => {
     if (scheme === 'plddt') return plddtColour(g.atoms.get('CA')!.bFactor)
+    if (scheme === 'secondary') return secondaryColour(residueSs)
+    if (scheme === 'hydrophobicity') return hydropathyColour(g.name)
     if (scheme === 'rainbow') return new THREE.Color().setHSL(0.66 * (1 - iInChain / Math.max(1, chainLength - 1)), 0.78, 0.55)
     return chainColour(g.chain)
   }
@@ -171,7 +198,7 @@ export function buildCartoon(s: Struktur, scheme: ColourScheme): Cartoon {
         const pa = shape(a), pb = shape(b), m = smooth(f)
         return { w: pa.w + (pb.w - pa.w) * m, t: pa.t + (pb.t - pa.t) * m, p: pa.p + (pb.p - pa.p) * m }
       }
-      const colours = seg.map((g) => proteinColour(g, inChain.indexOf(g), inChain.length))
+      const colours = seg.map((g, i) => proteinColour(g, inChain.indexOf(g), inChain.length, segSs[i]!))
       const cm = sweep(
         pts, smoothGuides, profileAt,
         (u) => { const i = Math.min(seg.length - 1, Math.round(u)); return colours[i]! },

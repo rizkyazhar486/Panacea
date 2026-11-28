@@ -34,3 +34,16 @@ for (const e of manifest.entries) {
   if (e.kind === 'alphafold') assert.ok(typeof e.meanPlddt === 'number')
 }
 console.log('Secondary structure from backbone H-bonds agrees with depositor records; structure provenance verified.')
+
+assert.ok(manifest.entries.length >= 14, `Expected >= 14 real PDB/AlphaFold structures, got ${manifest.entries.length}`)
+for (const pdbSlug of ['4ins', '3rgk', '1rex', '1r42']) {
+  assert.ok(manifest.entries.some((e) => e.file === `${pdbSlug}.pdb`), `Missing expanded human PDB ${pdbSlug}.pdb`)
+}
+const cartoonSrc = readFileSync('src/pages/bodyhub/structure/cartoon.ts', 'utf8')
+assert.match(cartoonSrc, /KYTE_DOOLITTLE/, 'cartoon.ts must define Kyte-Doolittle hydropathy scale')
+assert.match(cartoonSrc, /secondaryColour/, 'cartoon.ts must define DSSP secondary colouring')
+const atlasSrc = readFileSync('src/pages/bodyhub/AlphaGenomeAtlas.tsx', 'utf8')
+assert.match(atlasSrc, /Insulin/, 'AlphaGenomeAtlas must expose 4INS Insulin')
+assert.match(atlasSrc, /Myoglobin/, 'AlphaGenomeAtlas must expose 3RGK Myoglobin')
+assert.match(atlasSrc, /Lysozyme/, 'AlphaGenomeAtlas must expose 1REX Lysozyme')
+assert.match(atlasSrc, /ACE2/, 'AlphaGenomeAtlas must expose 1R42 ACE2')
