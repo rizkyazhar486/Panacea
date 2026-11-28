@@ -1,7 +1,6 @@
-// Fetches PubChem 3D conformers for the metabolites shown on the Body page's
-// Compound rung. CIDs are resolved from PubChem by name at fetch time and
-// written into the manifest with the exact URL used, so the rendered atoms
-// trace back to PubChem rather than to hand-entered coordinates.
+// Fetches real PubChem 3D conformer SDFs for the biochemical compounds shown
+// at the Compound rung, and writes manifest.json so every rendered 3D shape
+// traces back to PubChem rather than to hand-entered coordinates.
 // Run: node scripts/bangun/ambil-molekul-pubchem.mjs
 import { mkdir, writeFile } from 'node:fs/promises'
 
@@ -13,6 +12,8 @@ const PUG = 'https://pubchem.ncbi.nlm.nih.gov/rest/pug'
 const COMPOUNDS = {
   glucose: 5793,
   pyruvate: 'pyruvate',
+  lactate: 107689,
+  citrate: 311,
   'acetyl-coa': 'acetyl-CoA',
   'nad-plus': 5893,
   nadh: 439153,
@@ -22,6 +23,18 @@ const COMPOUNDS = {
   atp: 5957,
   oxygen: 'oxygen',
   co2: 'carbon dioxide',
+  dopamine: 681,
+  serotonin: 5202,
+  acetylcholine: 187,
+  epinephrine: 5816,
+  norepinephrine: 439260,
+  gaba: 119,
+  glutamate: 33032,
+  histamine: 774,
+  cortisol: 5754,
+  estradiol: 5757,
+  melatonin: 896,
+  cholesterol: 5997,
 }
 
 async function get(url) {

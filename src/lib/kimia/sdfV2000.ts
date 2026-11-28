@@ -20,6 +20,27 @@ export interface SdfMolecule {
   bonds: SdfBond[]
 }
 
+export interface SdfChemistrySummary {
+  readonly hillFormula: string
+  readonly atomCount: number
+  readonly heavyAtomCount: number
+  readonly bondCount: number
+  readonly molarMassDa: number
+  readonly polarHeavyCount: number
+  readonly polarHeavyFraction: number
+  readonly maxBondOrder: number
+}
+
+// IUPAC 2021 standard atomic weights (Da / g·mol^-1) for biological elements.
+const ATOMIC_WEIGHT_DA: Readonly<Record<string, number>> = {
+  H: 1.008, C: 12.011, N: 14.007, O: 15.999, F: 18.998,
+  Na: 22.99, Mg: 24.305, P: 30.974, S: 32.06, Cl: 35.45,
+  K: 39.098, Ca: 40.078, Fe: 55.845, Zn: 65.38, I: 126.904,
+}
+
+// Pauling electronegativity >= 2.5 heteroatoms contributing to molecular polarity / H-bonding.
+const POLAR_HETEROATOMS = new Set(['O', 'N', 'P', 'S', 'F', 'Cl'])
+
 export function parseSdfV2000(text: string): SdfMolecule {
   const lines = text.split(/\r?\n/)
   const counts = lines[3] ?? ''
@@ -55,4 +76,34 @@ export function hillFormula(molecule: SdfMolecule): string {
   const keys = [...counts.keys()].sort()
   const order = counts.has('C') ? ['C', ...(counts.has('H') ? ['H'] : []), ...keys.filter((k) => k !== 'C' && k !== 'H')] : keys
   return order.map((k) => k + ((counts.get(k) ?? 0) > 1 ? counts.get(k) : '')).join('')
+}
+
+/** Exact molecular mass in Daltons computed directly from parsed SDF atoms. */
+export function molarMassDa(molecule: SdfMolecule): number {
+  let mass = 0
+  for (const atom of molecule.atoms) mass += ATOMIC_WEIGHT_DA[atom.element] ?? 12.011
+  return Math.round(mass * 100) / 100
+}
+
+/** Deterministic physical-chemistry summary computed strictly from parsed SDF atoms and bonds. */
+export function summarizeSdfChemistry(molecule: SdfMolecule): SdfChemistrySummary {
+  let heavyAtomCount = 0
+  let polarHeavyCount = 0
+  for (const atom of molecule.atoms) {
+    if (atom.element !== 'H') {
+      heavyAtomCount += 1
+      if (POLAR_HETEROATOMS.has(atom.element)) polarHeavyCount += 1
+    }
+  }
+  const maxBondOrder = molecule.bonds.reduce((max, b) => Math.max(max, b.order === 4 ? 2 : b.order), 1)
+  return {
+    hillFormula: hillFormula(molecule),
+    atomCount: molecule.atoms.length,
+    heavyAtomCount,
+    bondCount: molecule.bonds.length,
+    molarMassDa: molarMassDa(molecule),
+    polarHeavyCount,
+    polarHeavyFraction: heavyAtomCount > 0 ? Math.round((polarHeavyCount / heavyAtomCount) * 1000) / 1000 : 0,
+    maxBondOrder,
+  }
 }
