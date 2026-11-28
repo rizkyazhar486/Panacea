@@ -166,6 +166,7 @@ interface DB {
   webhookDeliveries?: Record<string, WebhookDelivery[]> // email -> what recent syncs actually contained
   facilityPrices?: FacilityPriceSubmission[] // crowd-sourced provider price board — real submissions, no fabricated numbers
   visitMemberships?: Record<string, VisitMembership> // canonical Visit OS patient/clinician authorization registry
+  facilityLayouts?: Record<string, import('./domains/facility-architect/facilityStore.js').ServerFacilityLayoutRecord>
 }
 
 // A real patient/doctor-submitted price for a facility, optionally scoped to
@@ -760,6 +761,21 @@ export function addFacilityPrice(p: FacilityPriceSubmission) {
   if (!db.facilityPrices) db.facilityPrices = []
   db.facilityPrices.unshift(p)
   save()
+}
+
+export function listFacilityLayouts() {
+  return Object.values(db.facilityLayouts ?? {})
+}
+export function getFacilityLayout(facilityId: string) {
+  const map = db.facilityLayouts
+  if (!map || !Object.prototype.hasOwnProperty.call(map, facilityId)) return undefined
+  return map[facilityId]
+}
+export function saveFacilityLayout(record: import('./domains/facility-architect/facilityStore.js').ServerFacilityLayoutRecord) {
+  if (!db.facilityLayouts) db.facilityLayouts = {}
+  db.facilityLayouts[record.facilityId] = record
+  save()
+  return record
 }
 
 export function listPosts(): Post[] {
