@@ -49,6 +49,7 @@ export function buildAirwayTree(
   const index = new Map<string, number>()
   const branches: AirwayBranch[] = []
   const depth: number[] = []
+  const attachAt: number[] = []
   for (const d of defs) {
     if (index.has(d.id)) return { ok: false, reason: 'duplicate-id', id: d.id }
     let parent = -1
@@ -60,10 +61,14 @@ export function buildAirwayTree(
       parent = p
     }
     const level = parent === -1 ? 0 : depth[parent] + 1
-    const start = parent === -1 ? rootStartNear : branches[parent].slices[branches[parent].slices.length - 1]
     let pts = positions(d.id)
+    // A daughter leaves its parent where its mesh comes closest to the parent's centre line: often the distal end,
+    // but not always (RB6 leaves the lower-lobe bronchus near its origin, before the basal trunk).
+    const k = parent === -1 ? -1 : nearestSlice(branches[parent].slices, pts)
+    const start = parent === -1 ? rootStartNear : branches[parent].slices[k]
     if (parent >= 0 && leafReach > 0 && !hasChild.has(d.id)) pts = within(pts, start, leafReach)
-    const r = lumenPath([{ label: d.id, positions: pts }], bins(level), start)
+    // At least one slice per ~4 mm of mesh, so a takeoff part-way along a lobar bronchus lands on its own slice.
+    const r = lumenPath([{ label: d.id, positions: pts }], Math.max(bins(level), Math.min(32, Math.round(meshExtent(pts) / 0.004))), start)
     if (!r.ok) return { ok: false, reason: 'geometry', id: d.id }
     // A daughter bronchus is never wider than its parent; vertex-spread radius estimates can say otherwise.
     if (parent >= 0) {
@@ -73,12 +78,73 @@ export function buildAirwayTree(
     const profile = routeProfile(r.slices)
     if (!profile) return { ok: false, reason: 'geometry', id: d.id }
     index.set(d.id, branches.length)
+    attachAt.push(k)
     depth.push(level)
     branches.push({ id: d.id, code: d.code, name: d.name, parent, children: [], slices: r.slices, profile })
     if (parent >= 0) branches[parent].children.push(branches.length - 1)
   }
   if (!branches.length) return { ok: false, reason: 'no-root' }
+  return splitAtTakeoffs(branches, attachAt)
+}
+
+/** Parent slice nearest to any vertex of a daughter mesh (every 3rd vertex is enough at atlas density). */
+function nearestSlice(slices: readonly LumenSlice[], pts: ArrayLike<number>): number {
+  let best = slices.length - 1, bd = Infinity
+  for (let i = 0; i + 2 < pts.length; i += 9) {
+    for (let k = 0; k < slices.length; k++) {
+      const s = slices[k]
+      const d = (pts[i] - s.x) ** 2 + (pts[i + 1] - s.y) ** 2 + (pts[i + 2] - s.z) ** 2
+      if (d < bd) { bd = d; best = k }
+    }
+  }
+  return best
+}
+
+/**
+ * Cuts a parent wherever a daughter leaves it before its distal end, so every bifurcation is a branch end: the
+ * proximal piece keeps the parent's id, the rest becomes "<name> (beyond <codes>)" — e.g. the basal trunk of the
+ * lower-lobe bronchus beyond RB6. Continuation branches are appended after all defined branches.
+ */
+function splitAtTakeoffs(input: AirwayBranch[], attachAt: readonly number[]): AirwayTreeResult {
+  const branches = input
+  const count = branches.length
+  for (let p = 0; p < count; p++) {
+    const last = branches[p].slices.length - 1
+    const kids = branches[p].children.map((c) => ({ c, k: Math.max(1, Math.min(last, attachAt[c])) }))
+    const cuts: number[] = []
+    for (const k of [...new Set(kids.map((x) => x.k))].sort((a, b) => a - b)) if (k < last && k - (cuts[cuts.length - 1] ?? 0) > 1) cuts.push(k)
+    if (!cuts.length) continue
+    const bounds = [0, ...cuts, last]
+    const endOf = (k: number) => bounds.slice(1).reduce((b, x) => (Math.abs(x - k) < Math.abs(b - k) ? x : b))
+    const all = branches[p].slices
+    const { id, code, name } = branches[p]
+    let prev = p
+    for (let j = 0; j + 1 < bounds.length; j++) {
+      const slices = all.slice(bounds[j], bounds[j + 1] + 1)
+      const profile = routeProfile(slices)
+      if (!profile) return { ok: false, reason: 'geometry', id }
+      const here = kids.filter((x) => endOf(x.k) === bounds[j + 1]).map((x) => x.c)
+      let at = p
+      if (j === 0) branches[p] = { ...branches[p], slices, profile, children: [] }
+      else {
+        const before = kids.filter((x) => endOf(x.k) <= bounds[j]).map((x) => branches[x.c].code).join(', ')
+        at = branches.length
+        branches.push({ id: `${id}>${j}`, code, name: `${name} (beyond ${before})`, parent: prev, children: [], slices, profile })
+        branches[prev].children.push(at)
+      }
+      for (const c of here) { branches[c] = { ...branches[c], parent: at }; branches[at].children.push(c) }
+      prev = at
+    }
+  }
   return { ok: true, branches }
+}
+
+function meshExtent(p: ArrayLike<number>): number {
+  let x0 = Infinity, y0 = Infinity, z0 = Infinity, x1 = -Infinity, y1 = -Infinity, z1 = -Infinity
+  for (let i = 0; i + 2 < p.length; i += 3) {
+    x0 = Math.min(x0, p[i]); x1 = Math.max(x1, p[i]); y0 = Math.min(y0, p[i + 1]); y1 = Math.max(y1, p[i + 1]); z0 = Math.min(z0, p[i + 2]); z1 = Math.max(z1, p[i + 2])
+  }
+  return Number.isFinite(x0) ? Math.hypot(x1 - x0, y1 - y0, z1 - z0) : 0
 }
 
 function within(pts: ArrayLike<number>, c: Vec3, reach: number): Float32Array {
