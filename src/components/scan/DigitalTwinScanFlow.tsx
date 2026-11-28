@@ -17,6 +17,7 @@ import {
   type EegDeviceVendor,
 } from '../../domains/neuro/index.ts'
 import { computeOneWayAnova, computeRepeatedMeasuresAnova } from '../../domains/analytics/index.ts'
+import { parseNumberField } from '../../domains/clinical-calculators'
 import { InfoDisclosure } from '../ui/InfoDisclosure'
 import { triggerSafeBrowserDownload } from '../sync/autoExportBrowserAdapter'
 import { sanitizeExportFilename, sha256Hex } from '../../lib/export/autoExportEngine'
@@ -83,8 +84,9 @@ export function DigitalTwinScanFlow({ initialTab = 'builder' }: { readonly initi
 
   // Neuro qEEG + OSA state (raw strings: blank never coerced to 0)
   const [eegDevice, setEegDevice] = useState<EegDeviceVendor>('muse')
-  const [ahiInput, setAhiInput] = useState<string>('3.8')
-  const [spo2NadirInput, setSpo2NadirInput] = useState<string>('94')
+  // Raw text, empty by default: a blank field is "not entered", never 0 and never a stand-in normal value.
+  const [ahiText, setAhiText] = useState('')
+  const [spo2NadirText, setSpo2NadirText] = useState('')
 
   // ANOVA mode
   const [anovaMode, setAnovaMode] = useState<'longitudinal' | 'bilateral'>('longitudinal')
@@ -253,20 +255,21 @@ export function DigitalTwinScanFlow({ initialTab = 'builder' }: { readonly initi
     [eegDevice],
   )
 
-  const osa = useMemo(() => {
-    const ahiTrim = ahiInput.trim()
-    const spo2Trim = spo2NadirInput.trim()
-    if (!ahiTrim || !spo2Trim) return null
-    const parsedAhi = Number(ahiTrim)
-    const parsedSpo2 = Number(spo2Trim)
-    if (!Number.isFinite(parsedAhi) || !Number.isFinite(parsedSpo2)) return null
-    return evaluateOsaSleepMonitor({
-      ahiEventsPerHour: parsedAhi,
-      odiEventsPerHour: Number((parsedAhi * 0.85).toFixed(1)),
-      spo2NadirPct: parsedSpo2,
-      studySource: 'hsat',
-    })
-  }, [ahiInput, spo2NadirInput])
+  const osa = useMemo(
+    () =>
+      evaluateOsaSleepMonitor({
+        ahiEventsPerHour: parseNumberField(ahiText),
+        // ODI is only shown when it was measured; it is never derived from AHI.
+        odiEventsPerHour: null,
+        spo2NadirPct: parseNumberField(spo2NadirText),
+        studySource: 'hsat',
+      }),
+    [ahiText, spo2NadirText],
+  )
+  const osaNotice =
+    osa.ok ? '' : ahiText.trim() === '' && spo2NadirText.trim() === ''
+      ? 'OSA screening needs the AHI and lowest SpO2 from a sleep study. Nothing is assumed until you enter them.'
+      : osa.error
 
   const anova = useMemo(() => {
     if (anovaMode === 'bilateral') {
@@ -720,20 +723,18 @@ export function DigitalTwinScanFlow({ initialTab = 'builder' }: { readonly initi
 
             <InfoDisclosure
               title="qEEG & OSA Clinical Details"
-              badge={osa?.ok && osa.clinicianReferralRequired ? 'Referral' : qEeg.truthClass}
+              badge={osa.ok && osa.clinicianReferralRequired ? 'Referral' : qEeg.truthClass}
             >
               <p>
                 Peer Percentile: <strong>{qEeg.peerPercentile}th</strong> · Cognitive Delta:{' '}
                 <strong>{qEeg.cognitiveDeltaYears > 0 ? `+${qEeg.cognitiveDeltaYears}` : qEeg.cognitiveDeltaYears} yrs</strong>
               </p>
               <p className="font-mono text-[10px] text-cyan-200">
-                θ/β {qEeg.ratios.thetaToBeta} · α/θ {qEeg.ratios.alphaToTheta} · SpO2 Nadir {osa?.ok ? `${osa.spo2NadirPct}%` : '—'} · ODI {osa?.ok ? (osa.odiEventsPerHour ?? '—') : '—'}/hr
+                θ/β {qEeg.ratios.thetaToBeta} · α/θ {qEeg.ratios.alphaToTheta} · SpO2 Nadir {osa.ok ? `${osa.spo2NadirPct}%` : '—'} · ODI {osa.ok ? (osa.odiEventsPerHour ?? '—') : '—'}/hr
               </p>
-              {osa?.ok && (
-                <p className={osa.clinicianReferralRequired ? 'text-rose-300 font-semibold' : 'text-slate-200'}>
-                  {osa.referralGuidance}
-                </p>
-              )}
+              <p role="status" className={osa.ok && osa.clinicianReferralRequired ? 'text-rose-300 font-semibold' : 'text-slate-200'}>
+                {osa.ok ? osa.referralGuidance : osaNotice}
+              </p>
               <p className="text-[10px] text-slate-200">{qEeg.epistemicNotice}</p>
             </InfoDisclosure>
           </div>
@@ -754,8 +755,8 @@ export function DigitalTwinScanFlow({ initialTab = 'builder' }: { readonly initi
             </div>
             <div className="rounded-2xl border border-white/10 bg-[#090d14] p-4">
               <div className="font-mono text-[10px] uppercase text-slate-200">OSA / AHI</div>
-              <div className={`mt-1 font-mono text-2xl font-black ${osa?.ok && osa.clinicianReferralRequired ? 'text-rose-400' : 'text-emerald-300'}`}>
-                {osa?.ok ? `${osa.ahiEventsPerHour} · ${osa.severity}` : '— · Unobserved'}
+              <div className={`mt-1 font-mono text-2xl font-black ${osa.ok ? (osa.clinicianReferralRequired ? 'text-rose-400' : 'text-emerald-300') : 'text-slate-200'}`}>
+                {osa.ok ? `${osa.ahiEventsPerHour} · ${osa.severity}` : 'AHI —'}
               </div>
               <div className="mt-1 flex items-center gap-2">
                 <label className="font-mono text-[10px] text-slate-200">
@@ -763,9 +764,10 @@ export function DigitalTwinScanFlow({ initialTab = 'builder' }: { readonly initi
                   <input
                     type="text"
                     inputMode="decimal"
-                    value={ahiInput}
-                    onChange={(e) => setAhiInput(e.target.value)}
                     placeholder="—"
+                    aria-label="AHI, apnea-hypopnea events per hour"
+                    value={ahiText}
+                    onChange={(e) => setAhiText(e.target.value)}
                     className="dark ml-1 w-14 rounded border border-white/15 bg-black px-1.5 py-0.5 text-white"
                   />
                 </label>
@@ -774,9 +776,10 @@ export function DigitalTwinScanFlow({ initialTab = 'builder' }: { readonly initi
                   <input
                     type="text"
                     inputMode="decimal"
-                    value={spo2NadirInput}
-                    onChange={(e) => setSpo2NadirInput(e.target.value)}
                     placeholder="—"
+                    aria-label="Lowest SpO2 during sleep, percent"
+                    value={spo2NadirText}
+                    onChange={(e) => setSpo2NadirText(e.target.value)}
                     className="dark ml-1 w-14 rounded border border-white/15 bg-black px-1.5 py-0.5 text-white"
                   />
                 </label>
