@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js'
 import { tempatkan, cuplikan, RADIUS_SEL, RADIUS_INTI, type Penempatan } from '../../lib/cellLayout'
 import { body3dPixelRatio } from '../../lib/body3dQuality'
 
@@ -17,6 +18,8 @@ import { body3dPixelRatio } from '../../lib/body3dQuality'
 export interface Cell3DProps {
   /** Organel yang sedang disorot; sisanya diredupkan. */
   disorot?: string | null
+  /** Bidang potong tomografi sepanjang sumbu Z (-RADIUS_SEL..+RADIUS_SEL). */
+  sliceDepth?: number
   tinggi?: number
   onPilih?: (kunci: string | null) => void
 }
@@ -49,18 +52,28 @@ export const GAMBAR = {
   ribosom: { asli: 10000000, maks: 320 },
 }
 
-export function Cell3D({ disorot, tinggi = 340, onPilih }: Cell3DProps) {
+export function Cell3D({ disorot, sliceDepth = 1.5, tinggi = 340, onPilih }: Cell3DProps) {
   const wadahRef = useRef<HTMLDivElement>(null)
   const requestRenderRef = useRef<(() => void) | null>(null)
+  const slicePlaneRef = useRef<THREE.Plane | null>(null)
   const [gagal, setGagal] = useState('')
   const disorotRef = useRef(disorot)
   disorotRef.current = disorot
+  const sliceDepthRef = useRef(sliceDepth)
+  sliceDepthRef.current = sliceDepth
   const onPilihRef = useRef(onPilih)
   onPilihRef.current = onPilih
 
   useEffect(() => {
     requestRenderRef.current?.()
   }, [disorot])
+
+  useEffect(() => {
+    if (slicePlaneRef.current) {
+      slicePlaneRef.current.constant = sliceDepth
+      requestRenderRef.current?.()
+    }
+  }, [sliceDepth])
 
   useEffect(() => {
     const wadah = wadahRef.current
@@ -78,11 +91,18 @@ export function Cell3D({ disorot, tinggi = 340, onPilih }: Cell3DProps) {
 
     renderer.setClearColor(0x000000, 0)
     renderer.outputColorSpace = THREE.SRGBColorSpace
+    renderer.toneMapping = THREE.ACESFilmicToneMapping
+    renderer.toneMappingExposure = 1.06
     renderer.localClippingEnabled = true
     renderer.domElement.dataset.cellViewer3d = 'true'
     wadah.appendChild(renderer.domElement)
 
-    scene.add(new THREE.AmbientLight(0xffffff, 0.85))
+    const pmrem = new THREE.PMREMGenerator(renderer)
+    const envTex = pmrem.fromScene(new RoomEnvironment(), 0.04).texture
+    scene.environment = envTex
+    scene.environmentIntensity = 0.42
+
+    scene.add(new THREE.AmbientLight(0xffffff, 0.68))
     const kunci = new THREE.DirectionalLight(0xffffff, 1.1)
     kunci.position.set(6, 9, 12)
     scene.add(kunci)
@@ -140,7 +160,8 @@ export function Cell3D({ disorot, tinggi = 340, onPilih }: Cell3DProps) {
     ro.observe(wadah)
 
     // Bidang potong: separuh sel dibuang supaya kompartemen internal terlihat.
-    const potong = new THREE.Plane(new THREE.Vector3(0, 0, -1), 1.5)
+    const potong = new THREE.Plane(new THREE.Vector3(0, 0, -1), sliceDepthRef.current)
+    slicePlaneRef.current = potong
     const grup = new THREE.Group()
     scene.add(grup)
     const perOrganel = new Map<string, THREE.Object3D[]>()
@@ -162,7 +183,18 @@ export function Cell3D({ disorot, tinggi = 340, onPilih }: Cell3DProps) {
 
     const membran = new THREE.Mesh(
       new THREE.SphereGeometry(RADIUS_SEL, 64, 48),
-      bahan('membran', { transparent: true, opacity: 0.16, side: THREE.DoubleSide, depthWrite: false }),
+      new THREE.MeshPhysicalMaterial({
+        color: warnaLinear(WARNA.membran),
+        roughness: 0.18,
+        metalness: 0.02,
+        clearcoat: 0.65,
+        clearcoatRoughness: 0.18,
+        transparent: true,
+        opacity: 0.18,
+        side: THREE.DoubleSide,
+        depthWrite: false,
+        clippingPlanes: [potong],
+      }),
     )
     catat('membran', membran)
     grup.add(membran)
@@ -341,6 +373,7 @@ export function Cell3D({ disorot, tinggi = 340, onPilih }: Cell3DProps) {
 
     return () => {
       requestRenderRef.current = null
+      slicePlaneRef.current = null
       stopRendering()
       io.disconnect()
       ro.disconnect()
@@ -363,6 +396,8 @@ export function Cell3D({ disorot, tinggi = 340, onPilih }: Cell3DProps) {
       })
       geometries.forEach((g) => g.dispose())
       materials.forEach((m) => m.dispose())
+      envTex.dispose()
+      pmrem.dispose()
       renderer.renderLists.dispose()
       renderer.dispose()
       renderer.forceContextLoss()

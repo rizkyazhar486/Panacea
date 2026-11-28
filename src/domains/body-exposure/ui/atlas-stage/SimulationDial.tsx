@@ -66,14 +66,17 @@ export function SimulationDial({ scenario, onScenario, running, stalled = false,
                 return (
                   <div key={key} style={{ gridColumn: '1 / -1' }}>
                     <dt style={{ color: TONE.dim }}>{label}</dt>
-                    <dd style={{ margin: 0 }}>{fixed(value, 0)}{unit}</dd>
-                    {baseline !== null && (
-                      <svg role="img" aria-label={`Scenario ${fixed(value, 0)}${unit}, rest ${fixed(baseline, 0)}${unit}`}
-                        viewBox="0 0 100 10" preserveAspectRatio="none" width="100%" height="10">
-                        <rect width={100 * value / ceiling} height="5" fill={TONE.sim} />
-                        <rect y="7" width={100 * baseline / ceiling} height="2" fill={TONE.dim} />
-                      </svg>
-                    )}
+                    {/* The bar lives inside <dd>: a <dl> group may only hold dt/dd (axe definition-list). */}
+                    <dd style={{ margin: 0 }}>
+                      {fixed(value, 0)}{unit}
+                      {baseline !== null && (
+                        <svg role="img" aria-label={`Scenario ${fixed(value, 0)}${unit}, rest ${fixed(baseline, 0)}${unit}`}
+                          viewBox="0 0 100 10" preserveAspectRatio="none" width="100%" height="10" style={{ display: 'block' }}>
+                          <rect width={100 * value / ceiling} height="5" fill={TONE.sim} />
+                          <rect y="7" width={100 * baseline / ceiling} height="2" fill={TONE.dim} />
+                        </svg>
+                      )}
+                    </dd>
                   </div>
                 )
               })}

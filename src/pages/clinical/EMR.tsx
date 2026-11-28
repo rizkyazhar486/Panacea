@@ -10,6 +10,7 @@ import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
 // Papan alur otonom dimuat saat halaman dibuka saja — ia membawa tabel rentang
 // rujukan dan aturan pemesanan yang tidak diperlukan sebelum rekamnya dibuka.
 const AutonomousFlow = lazy(() => import('../emr/AutonomousFlow'))
+const CodeMaxDoctorSdkConsole = lazy(() => import('../../components/clinical/CodeMaxDoctorSdkConsole'))
 import { IconEMR, IconCheck, IconSparkle, IconShield, IconBook } from '../../components/icons'
 import { BodyDiagram, type SystemFinding } from '../../components/BodyDiagram'
 import { ClinicalBodyTwin } from '../../components/ClinicalBodyTwin'
@@ -161,6 +162,7 @@ export function EMR() {
   const [encounters, setEncounters] = useState<EMRRecord[]>(record ? [record] : [])
   const [encounterLoading, setEncounterLoading] = useState(false)
   const [encounterError, setEncounterError] = useState('')
+  const [showCodeMaxSdk, setShowCodeMaxSdk] = useState(false)
 
   useEffect(() => {
     setDraft(state.records[activePatient.id] ?? null)
@@ -328,6 +330,32 @@ export function EMR() {
           onSignResep={sign}
         />
       </Suspense>
+
+      {/* CodeMax Doctor AI-EMR Environment Ecosystem SDK Console (on-demand lazy) */}
+      <div className="print:hidden">
+        <button
+          type="button"
+          onClick={() => setShowCodeMaxSdk((v) => !v)}
+          aria-expanded={showCodeMaxSdk}
+          data-emr-codemax-toggle
+          className="mb-2 inline-flex min-h-[42px] items-center gap-2 rounded-xl border border-cyan-500/35 bg-neutral-950 px-3.5 font-mono text-xs font-black text-cyan-200 transition hover:border-cyan-400"
+        >
+          <IconSparkle size={14} />
+          <span>{showCodeMaxSdk ? 'Hide' : 'Open'} CodeMax Doctor AI-EMR SDK · Environment &amp; Pipeline</span>
+        </button>
+        {showCodeMaxSdk && (
+          <Suspense fallback={<Card><p className="text-sm text-neutral-500">Loading CodeMax Doctor SDK Console…</p></Card>}>
+            <CodeMaxDoctorSdkConsole
+              record={draft}
+              vitals={state.vitals[activePatient.id] ?? []}
+              clinicianId={acc?.email || acc?.name || 'doc_active'}
+              clinicianName={acc?.name || state.settings.doctorName || 'Dokter'}
+              strVerified={Boolean(canEditExam || acc?.isOwner)}
+              backendEnabled={backendEnabled}
+            />
+          </Suspense>
+        )}
+      </div>
 
       {/* S — Subjective */}
       <Card>

@@ -1,0 +1,178 @@
+{
+  "source": "PubChem PUG REST",
+  "fetchedAt": "2026-11-28T02:35:08.433Z",
+  "compounds": {
+    "glucose": {
+      "query": 5793,
+      "cid": 5793,
+      "title": "D-Glucose",
+      "conformer": "glucose.sdf",
+      "sourceUrl": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/5793/SDF?record_type=3d"
+    },
+    "pyruvate": {
+      "query": "pyruvate",
+      "cid": 107735,
+      "title": "Pyruvate",
+      "conformer": "pyruvate.sdf",
+      "sourceUrl": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/107735/SDF?record_type=3d"
+    },
+    "acetyl-coa": {
+      "query": "acetyl-CoA",
+      "cid": 444493,
+      "conformer": null,
+      "reason": "PubChem has no computed 3D conformer (HTTP 404)"
+    },
+    "nad-plus": {
+      "query": 5893,
+      "cid": 5893,
+      "title": "Nadide (JAN/USAN/INN)",
+      "conformer": "nad-plus.sdf",
+      "sourceUrl": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/5893/SDF?record_type=3d"
+    },
+    "nadh": {
+      "query": 439153,
+      "cid": 439153,
+      "title": "Nadh",
+      "conformer": "nadh.sdf",
+      "sourceUrl": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/439153/SDF?record_type=3d"
+    },
+    "fad": {
+      "query": "flavin adenine dinucleotide",
+      "cid": 643975,
+      "conformer": null,
+      "reason": "PubChem has no computed 3D conformer (HTTP 404)"
+    },
+    "fadh2": {
+      "query": "FADH2",
+      "cid": 446013,
+      "conformer": null,
+      "reason": "PubChem has no computed 3D conformer (HTTP 404)"
+    },
+    "adp": {
+      "query": "adenosine diphosphate",
+      "cid": 6022,
+      "title": "5'-Adp",
+      "conformer": "adp.sdf",
+      "sourceUrl": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/6022/SDF?record_type=3d"
+    },
+    "atp": {
+      "query": 5957,
+      "cid": 5957,
+      "title": "5'-Atp",
+      "conformer": "atp.sdf",
+      "sourceUrl": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/5957/SDF?record_type=3d"
+    },
+    "oxygen": {
+      "query": "oxygen",
+      "cid": 977,
+      "title": "Oxygen",
+      "conformer": "oxygen.sdf",
+      "sourceUrl": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/977/SDF?record_type=3d"
+    },
+    "co2": {
+      "query": "carbon dioxide",
+      "cid": 280,
+      "title": "Carbon Dioxide",
+      "conformer": "co2.sdf",
+      "sourceUrl": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/280/SDF?record_type=3d"
+    },
+    "lactate": {
+      "query": 107689,
+      "cid": 107689,
+      "title": "L-Lactic Acid",
+      "conformer": "lactate.sdf",
+      "sourceUrl": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/107689/SDF?record_type=3d"
+    },
+    "citrate": {
+      "query": 311,
+      "cid": 311,
+      "title": "Citric Acid",
+      "conformer": "citrate.sdf",
+      "sourceUrl": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/311/SDF?record_type=3d"
+    },
+    "dopamine": {
+      "query": 681,
+      "cid": 681,
+      "title": "Dopamine",
+      "conformer": "dopamine.sdf",
+      "sourceUrl": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/681/SDF?record_type=3d"
+    },
+    "serotonin": {
+      "query": 5202,
+      "cid": 5202,
+      "title": "Serotonin",
+      "conformer": "serotonin.sdf",
+      "sourceUrl": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/5202/SDF?record_type=3d"
+    },
+    "acetylcholine": {
+      "query": 187,
+      "cid": 187,
+      "title": "Acetylcholine",
+      "conformer": "acetylcholine.sdf",
+      "sourceUrl": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/187/SDF?record_type=3d"
+    },
+    "epinephrine": {
+      "query": 5816,
+      "cid": 5816,
+      "title": "Epinephrine",
+      "conformer": "epinephrine.sdf",
+      "sourceUrl": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/5816/SDF?record_type=3d"
+    },
+    "norepinephrine": {
+      "query": 439260,
+      "cid": 439260,
+      "title": "Norepinephrine",
+      "conformer": "norepinephrine.sdf",
+      "sourceUrl": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/439260/SDF?record_type=3d"
+    },
+    "gaba": {
+      "query": 119,
+      "cid": 119,
+      "title": "Gamma-Aminobutyric Acid",
+      "conformer": "gaba.sdf",
+      "sourceUrl": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/119/SDF?record_type=3d"
+    },
+    "glutamate": {
+      "query": 33032,
+      "cid": 33032,
+      "title": "L-Glutamic Acid",
+      "conformer": "glutamate.sdf",
+      "sourceUrl": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/33032/SDF?record_type=3d"
+    },
+    "histamine": {
+      "query": 774,
+      "cid": 774,
+      "title": "Histamine",
+      "conformer": "histamine.sdf",
+      "sourceUrl": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/774/SDF?record_type=3d"
+    },
+    "cortisol": {
+      "query": 5754,
+      "cid": 5754,
+      "title": "Cortisol",
+      "conformer": "cortisol.sdf",
+      "sourceUrl": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/5754/SDF?record_type=3d"
+    },
+    "estradiol": {
+      "query": 5757,
+      "cid": 5757,
+      "title": "Estradiol",
+      "conformer": "estradiol.sdf",
+      "sourceUrl": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/5757/SDF?record_type=3d"
+    },
+    "melatonin": {
+      "query": 896,
+      "cid": 896,
+      "title": "Melatonin",
+      "conformer": "melatonin.sdf",
+      "sourceUrl": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/896/SDF?record_type=3d"
+    },
+    "cholesterol": {
+      "query": 5997,
+      "cid": 5997,
+      "title": "Cholesterol",
+      "conformer": "cholesterol.sdf",
+      "sourceUrl": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/5997/SDF?record_type=3d"
+    }
+  }
+}
