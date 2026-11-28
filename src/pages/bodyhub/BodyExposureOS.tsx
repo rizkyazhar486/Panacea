@@ -1,4 +1,5 @@
 import { lazy, Suspense, useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import type { BodySystemId } from '../../lib/bodySystemSourceWave'
 import type { SimulationDomain } from './UnifiedHumanSimulationProjector'
 import { BodyExposurePatientOverlay } from '../../components/BodyExposurePatientOverlay'
@@ -39,14 +40,25 @@ const MODES: Mode[] = [
 const LIQUID_ACTIONS_ROOT_CLASS = 'pmd-liquid-actions-v45'
 const BODY_EXPOSURE_ROOT_CLASS = 'pmd-body-exposure-active'
 
+function resolveExposureMode(value: string | null): ExposureMode | null {
+  if (!value) return null
+  return MODES.some((mode) => mode.key === value) ? (value as ExposureMode) : null
+}
+
 export function BodyExposureOS() {
+  const [searchParams] = useSearchParams()
   const rootRef = useRef<HTMLElement | null>(null)
   const systemsRef = useRef<HTMLDivElement | null>(null)
   const modeRailRef = useRef<HTMLElement | null>(null)
-  const [activeMode, setActiveMode] = useState<ExposureMode>('identity')
+  const [activeMode, setActiveMode] = useState<ExposureMode>(() => resolveExposureMode(searchParams.get('mode')) ?? 'identity')
   const [immersive, setImmersive] = useState(false)
   const [selectedBodySystemId, setSelectedBodySystemId] = useState<BodySystemId>('cardiovascular')
   const [strukturDiminta, setStrukturDiminta] = useState<{ name: string; nonce: number } | null>(null)
+
+  useEffect(() => {
+    const requested = resolveExposureMode(searchParams.get('mode'))
+    if (requested) setActiveMode(requested)
+  }, [searchParams])
 
   useEffect(() => {
     const syncFullscreen = () => setImmersive(document.fullscreenElement === rootRef.current)

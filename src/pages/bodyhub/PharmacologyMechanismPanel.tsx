@@ -1,4 +1,8 @@
-import { useMemo, useState } from 'react'
+import { lazy, Suspense, useMemo, useState } from 'react'
+import { Fold } from '../../shared/ui/Fold'
+import { WhenOpened } from '../../shared/ui/WhenOpened'
+
+const DrugPkPd3DStudio = lazy(() => import('./DrugPkPd3DStudio'))
 import type { BodySystemId } from '../../lib/bodySystemSourceWave'
 import {
   BODY_PHARMACOLOGY_MECHANISM_NETWORK,
@@ -150,6 +154,16 @@ export function PharmacologyMechanismPanel({ selectedAtlasSystemId, selectedSour
           </aside>
         </div>
       )}
+
+      <div className="relative mt-3">
+        <Fold label="3D RDKit Drug Conformer (34 Drugs) & Bateman PK-PD Simulator">
+          <WhenOpened>
+            <Suspense fallback={<div className="p-3 text-xs text-fuchsia-200">Loading 3D Drug Conformers &amp; PK-PD Studio…</div>}>
+              <DrugPkPd3DStudio selectedMechanismId={selected.id} />
+            </Suspense>
+          </WhenOpened>
+        </Fold>
+      </div>
 
       <details className="relative mt-3 rounded-[22px] border border-white/[.07] bg-black/30 p-3"><summary className="cursor-pointer text-[10px] font-black uppercase tracking-[.15em] text-white/55">General PK/PD teaching equations</summary><div className="mt-3 grid gap-2 md:grid-cols-2">{PHARMACOLOGY_TEACHING_EQUATIONS.map((equation) => <div key={equation.expression} className="rounded-2xl border border-white/[.06] bg-white/[.022] p-3"><div className="font-mono text-[11px] font-black text-fuchsia-100/75">{equation.expression}</div><div className="mt-1 text-[10px] font-black text-white/62">{equation.label}</div><p className="mt-1 text-[9px] font-medium leading-relaxed text-white/34">{equation.note}</p></div>)}</div></details>
 
