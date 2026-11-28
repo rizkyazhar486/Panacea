@@ -280,8 +280,14 @@ window.bakeLandingPlates = async ({ origin, width, height }) => {
         obj.traverse((o) => { if (o.isMesh) o.material = mat })
       } else if (f === 'cardiovascular') {
         obj.visible = true
-        const mat = ghost('#e11d48', 0.46)
-        obj.traverse((o) => { if (o.isMesh) o.material = mat })
+        // Keep the atlas's own artery/vein colours: one flat rose tint painted the
+        // jugular veins and dural sinuses as arteries.
+        obj.traverse((o) => {
+          if (!o.isMesh) return
+          const mat = ghost('#e11d48', 0.5)
+          mat.color = colorFrom(o, 0xe11d48)
+          o.material = mat
+        })
       }
     },
   })
