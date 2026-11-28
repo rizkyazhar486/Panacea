@@ -286,7 +286,7 @@ Method: for each open PR, every file it changes was compared with main; no PR ha
 
 Canonical reconciliation ledger for active Omniversal Genesis waves and continuous next-generation R&D backlog across all four primary Superpages (`HOME`, `BODY`, `CLINICAL`, `FOR YOU`). Epistemic guard remains enforced across all slices: engineering convergence is tracked separately from independent biomedical validation, and clinical review remains `clinically_reviewed=false`.
 
-### Active Convergence & Stabilization Wave (`#3152–#3199`)
+### Active Convergence & Stabilization Wave (`#3152–#3205`)
 
 | PR / Scope | Title / Capability Slice | Maturity Status | Notes / Verification Boundary |
 |---|---|---|---|
@@ -300,13 +300,21 @@ Canonical reconciliation ledger for active Omniversal Genesis waves and continuo
 | #3191 | Et Causalis 25-scenario systemic multiorgan solver & 8-scale convergence DB | `PRODUCTION_VERIFIED` (`51030c899`) | Pure physiological causal solver with epistemic boundaries |
 | #3193 | Golden Compass 6-axis radar, Poiseuille/Fick/Elastic CAE solvers & 100-level curriculum | `PRODUCTION_VERIFIED` (`92a590b08`) | `RealityViewCockpit` engineering benchmarked equations |
 | #3189 | Apple Silicon Metal GPU crash fix (`mucosaTexture.ts`) & subsegmental airway tree/island/nav engines | `CI_VERIFIED` (`406c3a846`) | Merged into `main` after 16/16 exact-head GitHub Actions green |
-| #3195 | Calm 2-row 14px `BodyScaleLadder` restoring mobile UI legibility headroom | `CI_VERIFIED` (`376f1df35`) | Merged after 16/16 exact-head CI PASS (`src/pages/bodyhub/BodyScaleLadder.tsx`) |
-| #3199 | Progressive `<details>` disclosure for `Img2ThreeJsTwinViewport` & epistemic boundary | `IN_REVIEW` | `391 <= 460` words on `fitness-hub?view=body-exposure`; zero overlap with #3195 |
-| #3192 | Whole-tree subsegmental `BronchoscopySim` & shared `endoluminalCore` | `BROWSER_VERIFIED` | Apple M4 Chrome 60fps verified; awaiting post-`#3195` rebase & 16/16 CI |
-| #3190 | 9-Organ Z-Anatomy Clinical Visual Atlas & non-medical For You Lifestyle Deck | `IN_REVIEW` | Rebased with `ClinicalMedSciStudyStudio`; awaiting post-`#3195` `full-acceptance` |
-| #3194 | Interactive 25-Scenario Multiorgan `EtCausalisExplorerPanel` UI | `IN_REVIEW` | Needs post-`#3195` merge + `scripts/uji/et-causalis-explorer-ui.mts` ID fix |
-| #3196 / #3197 / #3198 | 22 PubChem 3D biomolecules (#3196), 14 PDB/AlphaFold macromolecules (#3197), Volumetric Quantum & Cell 3D tomography (#3198) | `IN_REVIEW` | Re-run against fixed `main` after `#3195`/`#3199` land |
-| #3152–#3160 | Quick Consult EMR & SISRUTE Referral (#3152/#3153), IGD Floorplan & Live Beds (#3154/#3155), Calendar OS & OR Scheduler (#3157/#3158), 161 Kardeks-Transmedic Map (#3159/#3160) | `IN_REVIEW` | Pending UX contrast/nav alignment & post-`#3195` CI green |
+| #3195 | Calm 2-row 14px `BodyScaleLadder` restoring mobile UI legibility headroom | `PRODUCTION_VERIFIED` (`376f1df35`) | Merged after 16/16 exact-head CI PASS (`src/pages/bodyhub/BodyScaleLadder.tsx`) |
+| #3199 | Progressive `<details>` disclosure for `Img2ThreeJsTwinViewport` & epistemic boundary | `PRODUCTION_VERIFIED` (`b76070fb6`) | `391 <= 460` words on `fitness-hub?view=body-exposure`; zero overlap with #3195 |
+| #3192 | Whole-tree subsegmental `BronchoscopySim` & shared `endoluminalCore` | `PRODUCTION_VERIFIED` (`7789620af`) | Apple M4 Chrome 60fps verified & merged into `main` |
+| #3190 | 9-Organ Z-Anatomy Clinical Visual Atlas & non-medical For You Lifestyle Deck | `PRODUCTION_VERIFIED` (`005e68ffc`) | Clinical visual atlas converged beside `ClinicalMedSciStudyStudio` |
+| #3196 | 22 Real NIH PubChem 3D Biomolecules, Split-CPK & Pauling Polarity Shell | `PRODUCTION_VERIFIED` (`5757e9af2`) | Merged after 16/16 exact-head CI PASS |
+| #3197 | 14 RCSB PDB & AlphaFold 3D macromolecules, DSSP & Kyte-Doolittle hydropathy | `PRODUCTION_VERIFIED` (`ff144dc1a`) | Merged after 16/16 exact-head CI PASS |
+| #3198 | Volumetric Additive `|ψ|²` Orbitals & Studio 3D Cell Cross-Section Tomography | `PRODUCTION_VERIFIED` (`9b1f61997`) | Verified live on production (`panaceamed.id/build-info.json`) |
+| #3200 | 24h Circadian & 0–100y Lifespan Engine, Inverse-Dynamics & Unobstructed Desktop 3D Stage | `PRODUCTION_VERIFIED` (`a0a74cb86`) | Merged into `main` (`temporalPhysiology4DEngine.ts`) |
+| #3201 | Home Omniversal search catalog, BodyExposure `?mode=` deep links & R&D ledger | `PRODUCTION_VERIFIED` (`9f35c66f3`) | Enriched `FITUR_DARI_HUB` & `BodyExposureOS` deep-link routing |
+| #3202 | 34 RDKit 3D Drug Conformers & Bateman Multi-Dose PK-PD Studio | `PRODUCTION_VERIFIED` (`d49c5be4e`) | Merged into `main` after 16/16 exact-head CI PASS |
+| #3194 | Interactive 25-Scenario Multiorgan `EtCausalisExplorerPanel` UI | `CI_VERIFIED` (`7454b74d4`) | Merged into `main`; interactive 25-scenario solver with causal graph & boundary notices |
+| #3203 | Mesh-tube subsegmental airway simulator in `BronchoscopySim` | `CI_VERIFIED` (`a0a2c0f26`) | Merged into `main` |
+| #3204 | Lossless 14-domain routing in `BodyExposureOS` (Quantum, Pharma, Robotics, Biomechanics, Genome) | `CI_VERIFIED` (`38fa3381d`) | Merged after 16/16 exact-head CI PASS; eliminates domain snap-back |
+| #3205 | Build-time static `ui-iterations/*.css` whitespace minification (`minifyStaticUiCss`) | `CI_VERIFIED` (`17451b632`) | Merged after 16/16 exact-head CI PASS; restores `cssBlokirGzip` headroom (`115260 -> 101895`) |
+| #3152–#3160 | Quick Consult EMR & SISRUTE Referral (#3152/#3153), IGD Floorplan & Live Beds (#3154/#3155), Calendar OS & OR Scheduler (#3157/#3158), 161 Kardeks-Transmedic Map (#3159/#3160) | `IN_REVIEW` | #3152, #3154, #3159 updated onto `17451b632` for exact-head CI |
 
 ### Continuous Next-Gen 4-Superpage R&D Backlog (`HOME · BODY · CLINICAL · FOR YOU`)
 
@@ -315,7 +323,7 @@ Canonical reconciliation ledger for active Omniversal Genesis waves and continuo
 | T-OMNI-HOME-01 | HOME | Canonical deep-link search enrichment (`katalogFitur.ts` + `?mode=` parsing in `BodyExposureOS.tsx`) & R&D ledger convergence | `feat/home-omniversal-catalog-and-rd-ledger` | `feature-surface-sync.mts`, `jangkauan-dari-beranda.mts`, `jangkauan-dua-ketukan.mts`, `home-simplicity-contract.mts`, `governance-link-integrity.test.mjs`, `clinically_reviewed=false` |
 | T-OMNI-HOME-02 | HOME | Context-aware 1-tap `LivingBodyHero` -> BODY/CLINICAL/FOR YOU state continuity & low-bandwidth progressive hydration | `src/domains/body-exposure/ui/home-hero/`, `HomeCommandDeck.tsx` | `home-first-viewport-contract.mts`, `perf-audit`, `ux-audit`, zero fabricated vitals |
 | T-OMNI-BODY-01 | BODY | 4D time-axis WebGL/WebGPU shader coupling uniting hemodynamic Poiseuille/Fick pulses, Et Causalis trajectories & Z-Anatomy mesh strain | `src/engines/reality-view/`, `UnifiedHumanSimulationProjector.tsx`, #3194 | `body-exposure-one-projector.mts`, Apple M4 Metal 60fps check, `RenderProof` |
-| T-OMNI-BODY-02 | BODY | Real multi-planar reconstruction (MPR) DICOM window/level CT-MRI overlays synchronized with Surgical Robotics & Endoscopy path planners | `PencitraanVolumetrikPanel.tsx`, `SurgicalRoboticsAnesthesiaLab.tsx`, #3192 | `body-virtual-endoscopy.test.mjs`, `data-atlas-dicom-registration="not-performed"`, `clinically_reviewed=false` |
+| T-OMNI-BODY-02 | BODY | Real multi-planar reconstruction (MPR) DICOM window/level CT-MRI overlays + real-time 3D Surgical Robotics, Telesurgery & OR Anesthesia Monitor Studio | `IN_REVIEW`: `feat/body-surgical-robotics-3d-anesthesia-monitor` (`SurgicalRobotics3DViewport.tsx`, `AnesthesiaMonitorCanvas.tsx`, `SurgicalRoboticsAnesthesiaLab.tsx`, #3192) | `body-virtual-endoscopy.test.mjs`, `surgical-robotics-3d-anesthesia-monitor.test.mjs`, `data-atlas-dicom-registration="not-performed"`, `data-live-actuator-connected="false"`, `clinically_reviewed=false` |
 | T-OMNI-BODY-03 | BODY | Complete molecular -> macromolecular visualizer convergence (Volumetric `|ψ|²` + 22 PubChem + 14 PDB/AlphaFold + Cell 3D tomography) | #3196, #3197, #3198, `src/pages/bodyhub/` | `validate`, `full-acceptance`, `ui-legibility-ratchet.mjs` |
 | T-OMNI-CLIN-01 | CLINICAL | Converge 9-Organ Clinical Visual Atlas (#3190) alongside MedSciHub 732 SKDI / 550 INN & StudyClub interactive OSCE bridge | `src/pages/clinical/ClinicalHub.tsx`, #3190, `ClinicalMedSciStudyStudio.tsx` | `clinical-claim-maturity.mts`, `ux-audit`, strict `clinically_reviewed=false` |
 | T-OMNI-CLIN-02 | CLINICAL | Integrate operational acute care workflow: Quick Consult EMR & SISRUTE referral (#3152/#3153), 161 Kardeks-Transmedic map (#3159/#3160), IGD Facility Floorplan (#3154/#3155) | `src/pages/clinical/`, #3152–#3160 | RBAC server tests, zero mock localStorage clinical state, `acceptance-v2.mjs` |
