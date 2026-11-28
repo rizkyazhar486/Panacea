@@ -1,5 +1,6 @@
 import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react'
 import type { BodySystemId } from '../../lib/bodySystemSourceWave'
+import { Prosa } from '../../components/Prosa'
 import type { EndoluminalLandmark, EndoluminalSegment } from '../../components/bodyhub/endoscopy/EndoluminalSim'
 import { AIRWAY_STOPS, type AirwayJump } from '../../components/bodyhub/endoscopy/airwayStops'
 
@@ -223,7 +224,7 @@ export default function VirtualEndoscopyWorkbench({
       <details className="px-1 text-[11px] text-white/55">
         <summary className="flex min-h-[44px] cursor-pointer items-center font-bold text-white/70">About this simulator</summary>
         {procedure.id === 'bronchoscopy' && (
-          <p className="pb-2 leading-relaxed">Whole airway tree to the subsegmental bronchi. Every tube follows its own Z-Anatomy / BodyParts3D reference mesh (CC BY-SA 4.0); subsegmental branches are the separate pieces inside each segmental mesh, numbered in atlas order (for example RB1-2), not the Boyden a/b/c letters. Ring pattern, vessels, colour and breathing motion are simulated; size and branching come from the reference atlas, not a patient. Aim at an orifice or tap its label to choose the next bronchus.</p>
+          <Prosa kelas="pb-2 leading-relaxed">{'Whole airway tree to the subsegmental bronchi. Every tube follows its own Z-Anatomy / BodyParts3D reference mesh (CC BY-SA 4.0); subsegmental branches are the separate pieces inside each segmental mesh, numbered in atlas order (for example RB1-2), not the Boyden a/b/c letters. Ring pattern, vessels, colour and breathing motion are simulated; size and branching come from the reference atlas, not a patient. Aim at an orifice or tap its label to choose the next bronchus.'}</Prosa>
         )}
         <p className="pb-2 leading-relaxed">Simulated reference view · not patient anatomy or procedural navigation. Route and calibre come from Z-Anatomy / BodyParts3D reference meshes (CC BY-SA 4.0); wall motion, folds, vessels, colour and optics are simulated for teaching. Keyboard: ↑/↓ push and pull, W A S D angle the tip, Space air, Q suction. These simulations do not estimate patient geometry, lesion position, insertion distance, force, device settings, or a safe procedural trajectory.</p>
       </details>

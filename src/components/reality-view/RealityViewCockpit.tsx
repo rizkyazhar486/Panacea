@@ -3,6 +3,7 @@ const MultiscaleSocialTwinPanel = lazy(() => import('./MultiscaleSocialTwinPanel
 const AureumLifetimeMemoryPanel = lazy(() => import('./AureumLifetimeMemoryPanel'))
 const Fsd15BioTelemetryStudio = lazy(() => import('./Fsd15BioTelemetryStudio'))
 const BodyScienceCaeCompassPanel = lazy(() => import('./BodyScienceCaeCompassPanel'))
+const EtCausalisExplorerPanel = lazy(() => import('./EtCausalisExplorerPanel'))
 import { Link } from 'react-router-dom'
 import { ANATOMICAL_SYSTEM_IDS, type AnatomicalSystemId, type RealityViewMode } from '../../types/realityView'
 import { buildRealityViewState } from '../../engines/reality-view/realityViewStateEngine'
@@ -59,7 +60,7 @@ export function RealityViewCockpit() {
   const [cadPlane, setCadPlane] = useState<typeof CAD_PLANES[number]>('axial')
   const [safetyMarginMm, setSafetyMarginMm] = useState<2 | 5 | 10>(5)
   const [counterfactualActive, setCounterfactualActive] = useState<boolean>(false)
-  const [extensionTab, setExtensionTab] = useState<'none' | 'multiscale' | 'century' | 'fsd15' | 'compass'>(() => {
+  const [extensionTab, setExtensionTab] = useState<'none' | 'multiscale' | 'century' | 'fsd15' | 'compass' | 'etcausalis'>(() => {
     if (typeof window === 'undefined') return 'none'
     const raw = window.location.hash.includes('?') ? window.location.hash.split('?')[1] : window.location.search.slice(1)
     const panel = new URLSearchParams(raw).get('panel')
@@ -468,6 +469,15 @@ export function RealityViewCockpit() {
         >
           {extensionTab === 'compass' ? 'Hide' : 'Open'} Golden Compass · Physics CAE · 100-Lvl
         </button>
+        <button
+          type="button"
+          onClick={() => setExtensionTab((t) => (t === 'etcausalis' ? 'none' : 'etcausalis'))}
+          aria-pressed={extensionTab === 'etcausalis'}
+          data-rv-etcausalis-toggle
+          className="min-h-[40px] rounded-xl border border-rose-400/40 bg-rose-500/15 px-3 font-mono text-[10px] font-black uppercase text-rose-100 hover:bg-rose-500/25"
+        >
+          {extensionTab === 'etcausalis' ? 'Hide' : 'Open'} Et Causalis · 25 Scenarios
+        </button>
       </div>
 
       {extensionTab === 'multiscale' && (
@@ -488,6 +498,15 @@ export function RealityViewCockpit() {
       {extensionTab === 'compass' && (
         <Suspense fallback={<div className="rounded-2xl border border-white/10 bg-slate-950/80 p-3 font-mono text-xs text-violet-200">Loading Golden Compass &amp; Biomedical Physics CAE…</div>}>
           <BodyScienceCaeCompassPanel />
+        </Suspense>
+      )}
+      {extensionTab === 'etcausalis' && (
+        <Suspense fallback={<div className="rounded-2xl border border-white/10 bg-slate-950/80 p-3 font-mono text-xs text-rose-200">Loading Et Causalis 25-Scenario Systemic Solver…</div>}>
+          <EtCausalisExplorerPanel
+            selectedMeshId={selectedMeshId}
+            selectedSystem={selectedSystem}
+            onSelectMesh={(meshId) => setSelectedMeshId(meshId)}
+          />
         </Suspense>
       )}
     </section>
