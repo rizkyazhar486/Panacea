@@ -1,6 +1,7 @@
 // One control and one number for the whole-body simulation on the atlas stage: pick a state, see the body light up,
 // read the cardiac output. Everything shown is computed by lib/bodySim; nothing here is a measurement of the viewer.
 
+import { useState } from 'react'
 import type { BodyMotionResult } from '../../engine/body-motion/bodyMotion.ts'
 import { MOTION_SCENARIOS, planScenarioMotion } from '../../engine/body-motion/bodyMotion.ts'
 import { TONE, TOUCH, glass } from './stageTokens'
@@ -29,6 +30,22 @@ const systemMetrics = [
 ] as const
 
 export function SimulationDial({ scenario, onScenario, running, stalled = false, onToggle, result, compact, insideHidden, onSeeInside }: SimulationDialProps) {
+  // Hiding folds the card to one chip; the simulation keeps running so the lit body on the stage does not change.
+  const [hidden, setHidden] = useState(false)
+  if (hidden) {
+    return (
+      <button
+        type="button"
+        onClick={() => setHidden(false)}
+        aria-label="Show simulation controls"
+        data-sim-dial-collapsed
+        style={{ ...glass, minHeight: TOUCH, borderRadius: 9999, padding: '0 14px', display: 'inline-flex', alignItems: 'center', gap: 8, cursor: 'pointer', color: TONE.text, fontSize: 12, fontWeight: 800 }}
+      >
+        <span style={{ fontSize: 10, letterSpacing: '0.12em', textTransform: 'uppercase', color: TONE.sim }}>Simulated</span>
+        {result.ok && <span style={{ fontVariantNumeric: 'tabular-nums' }}>{fixed(result.readout.cardiacOutputLMin, 1)} L/min</span>}
+      </button>
+    )
+  }
   return (
     <div
       role="group"
@@ -111,6 +128,16 @@ export function SimulationDial({ scenario, onScenario, running, stalled = false,
         style={{ minWidth: TOUCH, minHeight: TOUCH, borderRadius: 12, border: `1px solid ${TONE.lineStrong}`, background: running ? TONE.active : TONE.panelSolid, color: TONE.text, fontSize: 14, fontWeight: 800, cursor: result.ok ? 'pointer' : 'not-allowed', opacity: result.ok ? 1 : 0.5 }}
       >
         <span aria-hidden>{running ? '❚❚' : '▶'}</span>
+      </button>
+
+      <button
+        type="button"
+        onClick={() => setHidden(true)}
+        aria-label="Hide simulation controls"
+        data-sim-dial-hide
+        style={{ minWidth: TOUCH, minHeight: TOUCH, borderRadius: 12, border: `1px solid ${TONE.lineStrong}`, background: 'transparent', color: TONE.dim, fontSize: 16, fontWeight: 800, cursor: 'pointer' }}
+      >
+        <span aria-hidden>×</span>
       </button>
     </div>
   )
