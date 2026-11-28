@@ -19,15 +19,15 @@ export const BODY_SCALE_GROUPS: readonly BodyScaleGroup[] = [
     id: 'structure',
     label: 'Structure',
     rungs: [
-      { id: 'you', label: 'My Body (1:1)', domain: 'personal-avatar' },
-      { id: 'body', label: 'Body · System', domain: 'anatomy', scale: 'whole-body' },
+      { id: 'you', label: 'You', domain: 'personal-avatar' },
+      { id: 'body', label: 'Body', domain: 'anatomy', scale: 'whole-body' },
       { id: 'organ', label: 'Organ', domain: 'anatomy', scale: 'organ' },
       { id: 'tissue', label: 'Histology', domain: 'anatomy', scale: 'tissue' },
-      { id: 'cell', label: 'Cell · Organelle', domain: 'cell', scale: 'cell' },
-      { id: 'dna-rna', label: 'DNA · RNA · PDB', domain: 'genome', scale: 'genome' },
-      { id: 'compound', label: 'Compound 3D', domain: 'anatomy', scale: 'molecule' },
-      { id: 'element', label: 'Element', domain: 'quantum-element' },
-      { id: 'quantum', label: 'Quantum |ψ|²', domain: 'quantum-element' },
+      { id: 'cell', label: 'Cell', domain: 'cell', scale: 'cell' },
+      { id: 'dna-rna', label: 'DNA/PDB', domain: 'genome', scale: 'genome' },
+      { id: 'compound', label: 'Molecules', domain: 'anatomy', scale: 'molecule' },
+      { id: 'element', label: 'Elements', domain: 'quantum-element' },
+      { id: 'quantum', label: 'Quantum', domain: 'quantum-element' },
     ],
   },
   {
@@ -43,7 +43,7 @@ export const BODY_SCALE_GROUPS: readonly BodyScaleGroup[] = [
     label: 'Disease',
     rungs: [
       { id: 'pathophysiology', label: 'Pathophysiology', domain: 'pathophysiology' },
-      { id: 'localize', label: 'Localize Lesion', domain: 'localization' },
+      { id: 'localize', label: 'Localize', domain: 'localization' },
       { id: 'imaging', label: 'Imaging', domain: 'imaging' },
     ],
   },
@@ -53,11 +53,18 @@ export const BODY_SCALE_GROUPS: readonly BodyScaleGroup[] = [
     rungs: [
       { id: 'surgery', label: 'Surgery', domain: 'surgery' },
       { id: 'endoscopy', label: 'Endoscopy', domain: 'endoscopy' },
-      { id: 'robotics-anesthesia', label: 'Robotics & Anesthesia', domain: 'robotics-anesthesia' },
-      { id: 'pharmacology', label: 'Pharmacology', domain: 'pharmacology' },
+      { id: 'robotics-anesthesia', label: 'Robotics', domain: 'robotics-anesthesia' },
+      { id: 'pharmacology', label: 'Drugs', domain: 'pharmacology' },
     ],
   },
 ] as const
+
+function resolveActiveGroup(activeDomain: SimulationDomain): BodyScaleGroup {
+  return (
+    BODY_SCALE_GROUPS.find((group) => group.rungs.some((rung) => rung.domain === activeDomain)) ??
+    BODY_SCALE_GROUPS[0]!
+  )
+}
 
 export function BodyScaleLadder({
   activeDomain,
@@ -68,39 +75,61 @@ export function BodyScaleLadder({
   activeScale: BodySemanticScale
   onSelectRung: (rung: BodyScaleRung) => void
 }) {
+  const activeGroup = resolveActiveGroup(activeDomain)
+
   return (
     <nav
       data-body-scale-ladder="v2"
       aria-label="Structure, Function, Disease, and Intervention scale ladder"
-      className="flex flex-wrap items-center gap-2 border-b border-white/[.07] bg-black/25 px-3 py-2"
+      className="space-y-2 border-b border-white/[.07] bg-black/25 px-3 py-2.5"
     >
-      {BODY_SCALE_GROUPS.map((group) => (
-        <div key={group.id} className="flex flex-wrap items-center gap-1">
-          <span className="mr-0.5 font-mono text-[8.5px] font-black uppercase tracking-[.14em] text-cyan-200/60">
-            {group.label}
-          </span>
-          {group.rungs.map((rung) => {
-            const active = rung.scale
-              ? activeDomain === rung.domain && activeScale === rung.scale
-              : activeDomain === rung.domain
-            return (
-              <button
-                key={rung.id}
-                type="button"
-                aria-pressed={active}
-                onClick={() => onSelectRung(rung)}
-                className={`min-h-8 rounded-full border px-2.5 font-mono text-[9.5px] font-bold transition ${
-                  active
-                    ? 'border-cyan-300/70 bg-cyan-400/20 text-white'
-                    : 'border-white/[.08] bg-white/[.03] text-white/60 hover:border-white/25 hover:text-white'
-                }`}
-              >
-                {rung.label}
-              </button>
-            )
-          })}
-        </div>
-      ))}
+      <div className="no-scrollbar flex items-center gap-1.5 overflow-x-auto" role="tablist" aria-label="Body exploration mode">
+        {BODY_SCALE_GROUPS.map((group) => {
+          const selected = group.id === activeGroup.id
+          return (
+            <button
+              key={group.id}
+              type="button"
+              role="tab"
+              aria-selected={selected}
+              onClick={() => {
+                const primary = group.id === 'structure' ? group.rungs[1]! : group.rungs[0]!
+                onSelectRung(primary)
+              }}
+              className={`min-h-[36px] shrink-0 rounded-full border px-3 text-sm font-bold transition ${
+                selected
+                  ? 'border-cyan-300/70 bg-cyan-400/20 text-white'
+                  : 'border-white/15 bg-white/[.04] text-white/75 hover:border-white/30 hover:text-white'
+              }`}
+            >
+              {group.label}
+            </button>
+          )
+        })}
+      </div>
+
+      <div className="no-scrollbar flex items-center gap-1.5 overflow-x-auto" aria-label={`${activeGroup.label} scales`}>
+        {activeGroup.rungs.map((rung) => {
+          const active = rung.scale
+            ? activeDomain === rung.domain && activeScale === rung.scale
+            : activeDomain === rung.domain
+          return (
+            <button
+              key={rung.id}
+              type="button"
+              aria-pressed={active}
+              onClick={() => onSelectRung(rung)}
+              className={`min-h-[34px] shrink-0 rounded-full border px-3 text-sm font-semibold transition ${
+                active
+                  ? 'border-cyan-300/65 bg-cyan-400/18 text-white'
+                  : 'border-white/10 bg-white/[.03] text-white/75 hover:border-white/25 hover:text-white'
+              }`}
+            >
+              {rung.label}
+            </button>
+          )
+        })}
+      </div>
     </nav>
   )
 }
