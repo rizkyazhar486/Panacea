@@ -37,3 +37,9 @@ Compounds included: D-Glucose (CID 5793), Pyruvate (CID 107735), NAD+ (CID 5893)
 NADH (CID 439153), ADP (CID 6022), ATP (CID 5957), Oxygen O2 (CID 977), CO2 (CID 280).
 Note: Computed low-energy 3D conformers in vacuum; compounds without a PubChem 3D record
 (Acetyl-CoA, FAD, FADH2) stay honestly unrendered with their reason recorded in manifest.json.
+
+Expanded human signaling, neurotransmitter, hormone & membrane 3D conformers:
+L-Lactic Acid (CID 107689), Citric Acid (CID 311), Dopamine (CID 681), Serotonin (CID 5202),
+Acetylcholine (CID 187), Epinephrine (CID 5816), Norepinephrine (CID 439260), GABA (CID 119),
+L-Glutamic Acid (CID 33032), Histamine (CID 774), Cortisol (CID 5754), Estradiol (CID 5757),
+Melatonin (CID 896), Cholesterol (CID 5997).
