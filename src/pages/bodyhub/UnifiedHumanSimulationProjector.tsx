@@ -1,6 +1,8 @@
 import { lazy, Suspense, useEffect, useMemo, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { Fold } from '../../shared/ui/Fold'
+import { WhenOpened } from '../../shared/ui/WhenOpened'
+import type { AnatomicalSystemId } from '../../types/realityView'
 import { resolveBodySystemSourceWave, type BodySystemId } from '../../lib/bodySystemSourceWave'
 import { getBodySemanticZoomStop, isMicroscopicBodyScale, type BodySemanticScale } from '../../lib/bodySemanticZoom'
 import { penjelasanTertulis } from '../../lib/explainFallback'
@@ -26,7 +28,25 @@ const VirtualEndoscopyWorkbench = lazy(() => import('./VirtualEndoscopyWorkbench
 const PersonalAvatarCameraCapture = lazy(() => import('./PersonalAvatarCameraCapture'))
 const QuantumElementStage = lazy(() => import('./QuantumElementStage'))
 const SurgicalRoboticsAnesthesiaLab = lazy(() => import('./SurgicalRoboticsAnesthesiaLab'))
+const EtCausalisExplorerPanel = lazy(() => import('../../components/reality-view/EtCausalisExplorerPanel'))
 import { BodyScaleLadder, type BodyScaleRung } from './BodyScaleLadder'
+
+function mapBodySystemToAnatomicalSystem(systemId: BodySystemId | null): AnatomicalSystemId | null {
+  switch (systemId) {
+    case 'cardiovascular': return 'cardiovascular'
+    case 'respiratory': return 'respiratory'
+    case 'nervous':
+    case 'sensory-ent': return 'nervous'
+    case 'musculoskeletal': return 'musculoskeletal'
+    case 'digestive': return 'gastrointestinal'
+    case 'urinary': return 'renal'
+    case 'endocrine': return 'endocrine'
+    case 'lymphatic-immune': return 'immune_lymphatic'
+    case 'integumentary-surface': return 'integumentary'
+    case 'reproductive': return 'reproductive'
+    default: return null
+  }
+}
 
 export type SimulationDomain =
   | 'anatomy'
@@ -260,7 +280,22 @@ export default function UnifiedHumanSimulationProjector({
           </div>
         )
       case 'pathophysiology':
-        return <PathophysiologyNetworkPanel selectedAtlasSystemId={selectedSystemId} selectedSourceStructureName={selectedStructureName} />
+        return (
+          <div className="space-y-3">
+            <PathophysiologyNetworkPanel selectedAtlasSystemId={selectedSystemId} selectedSourceStructureName={selectedStructureName} />
+            <Fold label="Et Causalis · 25-Scenario Systemic Multiorgan Engine">
+              <WhenOpened>
+                <Suspense fallback={<div className="rounded-2xl border border-white/10 bg-slate-950/80 p-3 text-xs text-cyan-200">Loading Et Causalis 25-Scenario Systemic Engine…</div>}>
+                  <EtCausalisExplorerPanel
+                    selectedMeshId={selectedStructureName}
+                    selectedSystem={mapBodySystemToAnatomicalSystem(selectedSystemId)}
+                    onSelectMesh={(meshId) => setSelectedStructureName(meshId)}
+                  />
+                </Suspense>
+              </WhenOpened>
+            </Fold>
+          </div>
+        )
       case 'imaging':
         return <PencitraanVolumetrikPanel selectedSourceStructureName={selectedStructureName} />
       case 'endoscopy':

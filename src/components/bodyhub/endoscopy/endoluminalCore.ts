@@ -87,6 +87,10 @@ export function buildTube(curve: THREE.CatmullRomCurve3, profile: RouteProfile, 
   const frames = curve.computeFrenetFrames(rings - 1, false)
   const capRings = opts.cap ? CAP_RINGS : 0
   const total = rings + capRings
+  // Texture period along the tube follows its calibre (the wrap is a fixed five repeats around): at a fixed 3.5 cm a
+  // 2 mm subsegmental bronchus showed the mucosa stretched into streaks. Wide lumens keep 3.5 cm.
+  const rMean = profile.r.reduce((a, v) => a + v, 0) / Math.max(1, profile.r.length)
+  const period = 0.035 * Math.min(1, Math.max(0.12, rMean / 0.009))
   const M = AROUND
   const nv = total * (M + 1)
   const centre = new Float32Array(nv * 3), dir = new Float32Array(nv * 3), rad = new Float32Array(nv)
@@ -120,7 +124,11 @@ export function buildTube(curve: THREE.CatmullRomCurve3, profile: RouteProfile, 
       posShut.set([P.x + d.x * rs, P.y + d.y * rs, P.z + d.z * rs], k * 3)
       c.copy(tint).lerp(ridgeTint, f.ridge * 0.55).multiplyScalar(0.9 + 0.1 * (1 - f.fixed))
       colour.set([c.r, c.g, c.b], k * 3)
-      uv.set([(j / M) * 5, (s + phi * r0) / 0.035], k * 2)
+      // The dome maps by surface distance from its pole: wrapped like the wall it pinched to radial streaks at the pole,
+      // and a flat projection along the axis smeared into long streaks near the rim where the dome runs parallel to it.
+      const fromPole = (Math.PI / 2 - phi) * r0
+      if (cap) uv.set([(Math.cos(a) * fromPole) / period, (s + Math.sin(a) * fromPole) / period], k * 2)
+      else uv.set([(j / M) * 5, s / period], k * 2)
     }
   }
   const index: number[] = []
@@ -176,12 +184,17 @@ export const wallUniforms = (peristalsis: number, breathing: number): WallUnifor
 export const MAX_CUTS = 32
 export interface WallCuts { a: Float32Array; b: Float32Array; n: number }
 
-export function cutsFrom(caps: readonly { a: LumenSlice; b: LumenSlice }[]): WallCuts {
+/**
+ * `open` drops the round end behind `a`. A branch's first cut segment starts where its sibling and parent meet; a
+ * round end there removed the neighbour's wall where no tube of this branch replaces it, leaving a hole at the crotch.
+ */
+export function cutsFrom(caps: readonly { a: LumenSlice; b: LumenSlice; open?: boolean }[]): WallCuts {
   const n = Math.min(MAX_CUTS, caps.length)
   const a = new Float32Array(MAX_CUTS * 4), b = new Float32Array(MAX_CUTS * 4)
   for (let i = 0; i < n; i++) {
     const c = caps[i]
-    a.set([c.a.x, c.a.y, c.a.z, c.a.r], i * 4)
+    // A negative radius marks an open start; the shader reads the size from its magnitude.
+    a.set([c.a.x, c.a.y, c.a.z, c.open ? -c.a.r : c.a.r], i * 4)
     b.set([c.b.x, c.b.y, c.b.z, c.b.r], i * 4)
   }
   return { a, b, n }
@@ -232,12 +245,14 @@ export function wallMaterial(textures: { map: THREE.Texture; normalMap: THREE.Te
           for (int i = 0; i < ${MAX_CUTS}; i++) {
             if (i >= uCutN) break;
             vec3 ca = uCutA[i].xyz, ab = uCutB[i].xyz - ca, ap = vWallPos - ca;
-            float h = clamp(dot(ap, ab) / max(dot(ab, ab), 1e-12), 0.0, 1.0);
-            if (length(ap - ab * h) < mix(uCutA[i].w, uCutB[i].w, h) * cutScale) discard;
+            float raw = dot(ap, ab) / max(dot(ab, ab), 1e-12);
+            if (uCutA[i].w < 0.0 && raw < 0.0) continue;
+            float h = clamp(raw, 0.0, 1.0);
+            if (length(ap - ab * h) < mix(abs(uCutA[i].w), uCutB[i].w, h) * cutScale) discard;
           }`)
     }
   }
-  material.customProgramCacheKey = () => (cuts ? 'endoluminal-cut-v2' : 'endoluminal-v2')
+  material.customProgramCacheKey = () => (cuts ? 'endoluminal-cut-v3' : 'endoluminal-v2')
   return material
 }
 

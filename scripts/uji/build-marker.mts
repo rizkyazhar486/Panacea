@@ -16,5 +16,5 @@ const out: any[] = []
 buildMarker({ GITHUB_SHA: '3'.repeat(40) }).generateBundle.call({ emitFile: (f: any) => out.push(f) })
 assert.equal(out.length, 1); assert.equal(out[0].fileName, 'build.json'); assert.deepEqual(JSON.parse(out[0].source), { commit: '3'.repeat(40) })
 const cfg = readFileSync('vite.config.ts', 'utf8')
-assert.match(cfg, /plugins: \[react\(\), tailwindcss\(\), buildMarker\(\)\]/, 'plugin terpasang di vite.config')
+assert.match(cfg, /plugins:\s*\[[^\]]*\bbuildMarker\(\)/, 'plugin terpasang di vite.config')
 console.log('build-marker: ok')
