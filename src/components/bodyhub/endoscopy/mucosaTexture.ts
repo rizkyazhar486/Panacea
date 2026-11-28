@@ -37,18 +37,29 @@ function fbm(size: number, rnd: () => number, octaves: number, base: number): Fl
   return out
 }
 
-/** Branching vessel strokes, drawn with wrap-around copies so the tile has no seam. */
-function vessels(ctx: CanvasRenderingContext2D, size: number, rnd: () => number, colour: string, roots: number, width: number) {
+/** Branching vessel strokes, drawn with wrap-around copies only near tile edges and zero ctx.filter GPU passes. */
+function vessels(ctx: CanvasRenderingContext2D, size: number, rnd: () => number, colour: string, haloColour: string, roots: number, width: number) {
   const stroke = (x: number, y: number, ang: number, w: number, depth: number) => {
     let px = x, py = y
     const steps = 18 + Math.floor(rnd() * 26)
     ctx.lineCap = 'round'
-    ctx.strokeStyle = colour
     for (let i = 0; i < steps && w > 0.25; i++) {
       ang += (rnd() - 0.5) * 0.7
       const nx = px + Math.cos(ang) * 6, ny = py + Math.sin(ang) * 6
+      const pad = w * 2.4
+      const nearX = px < pad || nx < pad || px > size - pad || nx > size - pad
+      const nearY = py < pad || ny < pad || py > size - pad || ny > size - pad
+      const oxList = nearX ? [-size, 0, size] : [0]
+      const oyList = nearY ? [-size, 0, size] : [0]
+      // Soft halo + crisp core reproduces submucosal blur without ctx.filter (which crashes Chrome's Metal GPU process).
+      ctx.strokeStyle = haloColour
+      ctx.lineWidth = w * 2.1
+      for (const ox of oxList) for (const oy of oyList) {
+        ctx.beginPath(); ctx.moveTo(px + ox, py + oy); ctx.lineTo(nx + ox, ny + oy); ctx.stroke()
+      }
+      ctx.strokeStyle = colour
       ctx.lineWidth = w
-      for (const ox of [-size, 0, size]) for (const oy of [-size, 0, size]) {
+      for (const ox of oxList) for (const oy of oyList) {
         ctx.beginPath(); ctx.moveTo(px + ox, py + oy); ctx.lineTo(nx + ox, ny + oy); ctx.stroke()
       }
       px = nx; py = ny
@@ -64,7 +75,9 @@ export interface MucosaTextures { map: THREE.CanvasTexture; normalMap: THREE.Can
 export function mucosaTextures(seed: number, vesselTone: string, size = 512): MucosaTextures | null {
   const c = document.createElement('canvas')
   c.width = c.height = size
-  const ctx = c.getContext('2d')
+  // CPU-backed canvases without ctx.filter: a GPU blur filter followed by getImageData crashed Chrome's Metal GPU
+  // process on Apple Silicon, causing Chrome to block WebGL across the whole origin.
+  const ctx = c.getContext('2d', { willReadFrequently: true })
   if (!ctx) return null
   const rnd = mulberry32(seed)
   // Albedo: near-white (the vertex colour carries the regional tint), mottled, with vessels at two depths.
@@ -75,11 +88,8 @@ export function mucosaTextures(seed: number, vesselTone: string, size = 512): Mu
     img.data[i * 4] = 255 * m; img.data[i * 4 + 1] = 236 * m; img.data[i * 4 + 2] = 232 * m; img.data[i * 4 + 3] = 255
   }
   ctx.putImageData(img, 0, 0)
-  ctx.filter = 'blur(1.4px)'
-  vessels(ctx, size, rnd, `${vesselTone}55`, 7, 4.2)
-  ctx.filter = 'blur(0.5px)'
-  vessels(ctx, size, rnd, `${vesselTone}77`, 22, 1.6)
-  ctx.filter = 'none'
+  vessels(ctx, size, rnd, `${vesselTone}48`, `${vesselTone}1c`, 7, 4.2)
+  vessels(ctx, size, rnd, `${vesselTone}72`, `${vesselTone}28`, 22, 1.6)
 
   // Relief: fine pits/glands plus vessels slightly raised, converted to a tangent-space normal map.
   const h = fbm(size, rnd, 3, 48)
@@ -88,7 +98,7 @@ export function mucosaTextures(seed: number, vesselTone: string, size = 512): Mu
   for (let i = 0; i < size * size; i++) height[i] = h[i] * 0.8 + (1 - vd[i * 4 + 1] / 255) * 0.6
   const n = document.createElement('canvas')
   n.width = n.height = size
-  const nctx = n.getContext('2d')
+  const nctx = n.getContext('2d', { willReadFrequently: true })
   if (!nctx) return null
   const nimg = nctx.createImageData(size, size)
   const at = (x: number, y: number) => height[((y + size) % size) * size + ((x + size) % size)]
