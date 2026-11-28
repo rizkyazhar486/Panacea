@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { readFileSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 
 const rootCss = readFileSync(new URL('../../src/index.css', import.meta.url), 'utf8')
 const v46Css = readFileSync(new URL('../../public/ui-iterations/panacea-control-grading-v46.css', import.meta.url), 'utf8')
@@ -32,28 +32,22 @@ for (const [label, css] of [
   assert.match(css, /:not\(\.cta-atlas-btn\)/, `${label} must exempt .cta-atlas-btn`)
 }
 
-// 4. Anti-doodle & anti-bare-text-ink guards across Landing redesign.
-const hero = readFileSync(new URL('../../src/pages/landing/sections/HeroSection.tsx', import.meta.url), 'utf8')
-const anatomy = readFileSync(new URL('../../src/components/landing/HumanAnatomySvg.tsx', import.meta.url), 'utf8')
-const svgs = readFileSync(new URL('../../src/pages/landing/landingSvgs.tsx', import.meta.url), 'utf8')
-const odyssey = readFileSync(new URL('../../src/pages/landing/sections/ScienceOdysseySection.tsx', import.meta.url), 'utf8')
-const gov = readFileSync(new URL('../../src/pages/landing/sections/GovernanceSection.tsx', import.meta.url), 'utf8')
-const roles = readFileSync(new URL('../../src/pages/landing/sections/RolesSection.tsx', import.meta.url), 'utf8')
-const news = readFileSync(new URL('../../src/pages/landing/sections/NewsSection.tsx', import.meta.url), 'utf8')
-
-assert.doesNotMatch(hero, /<svg[^>]*viewBox/, 'HeroSection must render real Z-Anatomy WebGL assets, not cartoon SVG figures')
-assert.doesNotMatch(anatomy, /<svg/, 'HumanAnatomySvg must render UHD Z-Anatomy plate instead of cartoon SVGs')
-assert.doesNotMatch(svgs, /data:image\/svg\+xml/, 'landingSvgs posters must reference baked WebP UHD plates')
-assert.doesNotMatch(odyssey, /M96 44 L134 44/, 'ScienceOdysseySection must not contain cartoon ECG squiggle SVG paths')
-
-for (const [name, src] of [
-  ['HeroSection.tsx', hero],
-  ['RolesSection.tsx', roles],
-  ['NewsSection.tsx', news],
-  ['ScienceOdysseySection.tsx', odyssey],
-  ['GovernanceSection.tsx', gov],
-] as const) {
-  assert.doesNotMatch(src, /\btext-ink\b/, `${name} must use explicit dark/light text classes, never bare text-ink`)
+// 4. Anti-doodle & anti-bare-text-ink guards across the live landing sections.
+const sec = (f: string) => readFileSync(new URL(`../../src/pages/landing/sections/${f}`, import.meta.url), 'utf8')
+const hero = sec('HeroSection.tsx')
+assert.doesNotMatch(hero, /<svg[^>]*viewBox/, 'HeroSection must render real Z-Anatomy assets, not cartoon SVG figures')
+for (const name of ['HeroSection.tsx', 'FourDoorsSection.tsx', 'XRayBody.tsx', 'LandingHeader.tsx', 'LandingFooter.tsx']) {
+  assert.doesNotMatch(sec(name), /\btext-ink\b/, `${name} must use explicit dark/light text classes, never bare text-ink`)
 }
 
-console.log('landing-dark-contrast-guard: OK (dark text-ink container trap closed, anti-doodle + Wordmark + v46/v48 verified)')
+// 5. The old doodle landing (cartoon anatomy SVG, ECG squiggle odyssey, scroll cinematic, seven legacy sections) was
+// deleted on owner direction; it must not come back as dead files.
+for (const old of [
+  'src/components/landing/HumanAnatomySvg.tsx',
+  'src/components/landing/ScrollCinematic.tsx',
+  'src/pages/landing/landingSvgs.tsx',
+  'src/pages/landing/sections/ScienceOdysseySection.tsx',
+  'src/pages/landing/sections/BrandFilmsSection.tsx',
+]) assert.equal(existsSync(new URL(`../../${old}`, import.meta.url)), false, `${old} was deleted with the doodle landing and must not return`)
+
+console.log('landing-dark-contrast-guard: OK (dark text-ink trap closed, live landing sections clean, doodle landing stays deleted)')

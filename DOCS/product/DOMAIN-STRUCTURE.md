@@ -25,7 +25,7 @@ Jadi `import { Login } from '../pages/Login'` tetap jalan. Stub adalah **alat tr
 
 | Domain | `src/pages/` | `src/components/` |
 | --- | --- | --- |
-| Landing & auth | `landing/` — Landing, Login, Legal, NotFound | `landing/` — PricingSection, MedicalNews, ScrollCinematic |
+| Landing & auth | `landing/` — Landing, Login, Legal, NotFound | `landing/` — PricingSection, MedicalNews |
 | Dashboard & layout inti | `dashboard/` — Home, Beranda, Dashboard, Profile, Settings, AturFitur, SemuaFitur, Tutorial, Notifications | `layout/` — Shell, MenuPeran, PencarianGlobal, FabNavigasi, ErrorBoundary, AppStatus, OfflineBanner, Rangka; `dashboard/` — widget, NotificationBell, InstallApp, OnboardingTour, DailyQuoteBanner, PeringatanPenyimpanan |
 | Klinis / EMR | `clinical/` — EMR, Chatbot, Consult, VisitOS, Planning, CareEpisode, hub, Hospitals, Pharmacy, Orders, EmergencyCard; `clinical/scores/` — 32 kalkulator dan skor (Braden, MELD, SOFA, Wells, dll.) | `clinical/` — ClinicalPatientContext, ConsultChat, KunjunganEmr, EmrTimelineLens, berbagi/impor lab, VisitCommandCenter, dll. |
 | Tubuh / biomarker | `bodyhub/` — BodyExplorer beserta panelnya, Radiology, Electrophysiology, GeneInfo, PusatGizi, Longevity, BiologicalAge, dll. | `bodyhub/` — Body3D, BodyAllSystems3D, CardioAtlas3D, AtlasViewer3D, Cell3D, CardiacCycle3D, BilahTubuh |
