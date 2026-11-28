@@ -1,10 +1,11 @@
 import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react'
 import type { BodySystemId } from '../../lib/bodySystemSourceWave'
+import { Prosa } from '../../components/Prosa'
 import type { EndoluminalLandmark, EndoluminalSegment } from '../../components/bodyhub/endoscopy/EndoluminalSim'
+import { AIRWAY_STOPS, type AirwayJump } from '../../components/bodyhub/endoscopy/airwayStops'
 
 // Three.js, post-processing and the 3.7 MB atlas load only when the scope is opened.
 const EndoluminalSim = lazy(() => import('../../components/bodyhub/endoscopy/EndoluminalSim'))
-// The airway branches, so it has its own simulator: the whole tree to segmental level, entered by aiming the tip.
 const BronchoscopySim = lazy(() => import('../../components/bodyhub/endoscopy/BronchoscopySim'))
 
 type ScopeProcedureId = 'colonoscopy' | 'upper-gi' | 'bronchoscopy'
@@ -96,6 +97,7 @@ export default function VirtualEndoscopyWorkbench({
   const [progress, setProgress] = useState(0)
   const [landmarks, setLandmarks] = useState<EndoluminalLandmark[] | null>(null)
   const [jump, setJump] = useState<{ t: number; n: number } | null>(null)
+  const [airwayJump, setAirwayJump] = useState<AirwayJump | null>(null)
   const procedure = useMemo(
     () => PROCEDURES.find((item) => item.id === procedureId) ?? PROCEDURES[0],
     [procedureId],
@@ -116,6 +118,7 @@ export default function VirtualEndoscopyWorkbench({
     setLandmarks(null)
     setProgress(0)
     setJump(null)
+    setAirwayJump(null)
   }
 
   // Training shortcut: restart the scope at the start of a segment. Before the route is computed the stops are spaced
@@ -136,8 +139,8 @@ export default function VirtualEndoscopyWorkbench({
       aria-labelledby="virtual-endoscopy-title"
       data-pmd-unclamped="true"
     >
-      <div className="flex items-center justify-between gap-2 px-1 pt-1">
-        <h4 id="virtual-endoscopy-title" className="text-[15px] font-black tracking-[-.01em]">{procedure.label}</h4>
+      <div className="flex flex-wrap items-center justify-between gap-2 px-1 pt-1">
+        <h4 id="virtual-endoscopy-title" className="shrink-0 whitespace-nowrap text-[15px] font-black tracking-[-.01em]">{procedure.label}</h4>
         <div className="no-scrollbar flex gap-1.5 overflow-x-auto" role="tablist" aria-label="Virtual endoscopy procedure">
           {PROCEDURES.map((item) => {
             const active = item.id === procedure.id
@@ -161,7 +164,7 @@ export default function VirtualEndoscopyWorkbench({
 
       <Suspense fallback={<div className="grid aspect-square place-items-center rounded-[22px] bg-black text-[12px] font-bold text-white/50 sm:aspect-[16/10]">Preparing the simulator…</div>}>
         {procedure.id === 'bronchoscopy' ? (
-          <BronchoscopySim key="airway" />
+          <BronchoscopySim key={procedure.id} tint={procedure.tint} vesselTone={procedure.vesselTone} breathing={procedure.breathing} jump={airwayJump} />
         ) : (
           <EndoluminalSim
             key={procedure.id}
@@ -178,28 +181,52 @@ export default function VirtualEndoscopyWorkbench({
         )}
       </Suspense>
 
-      <nav hidden={procedure.id === 'bronchoscopy'} className="no-scrollbar flex gap-2 overflow-x-auto" aria-label={`${procedure.label}: restart at a segment`}>
-        {stops.map((item, index) => {
-          const active = index === pointIndex
-          return (
-            <button
-              key={item.label}
-              type="button"
-              aria-current={active ? 'step' : undefined}
-              onClick={() => jumpTo(index)}
-              data-pmd-native="true"
-              style={{ background: 'transparent', border: `1px solid ${active ? 'rgba(253,164,175,.7)' : 'rgba(255,255,255,.14)'}`, color: active ? '#fff' : 'rgba(255,255,255,.62)', borderRadius: 9999 }}
-              className="min-h-[44px] shrink-0 px-4 text-[12px] font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-200/60"
-            >
-              {item.label}
-            </button>
-          )
-        })}
-      </nav>
+      {procedure.id === 'bronchoscopy' ? (
+        <nav className="no-scrollbar flex gap-2 overflow-x-auto" aria-label="Bronchoscopy: restart at a bronchus">
+          {AIRWAY_STOPS.map((item) => {
+            const active = item.id === airwayJump?.id
+            return (
+              <button
+                key={item.id}
+                type="button"
+                aria-current={active ? 'step' : undefined}
+                onClick={() => setAirwayJump((j) => ({ id: item.id, n: (j?.n ?? 0) + 1 }))}
+                data-pmd-native="true"
+                style={{ background: 'transparent', border: `1px solid ${active ? 'rgba(253,164,175,.7)' : 'rgba(255,255,255,.14)'}`, color: active ? '#fff' : 'rgba(255,255,255,.62)', borderRadius: 9999 }}
+                className="min-h-[44px] shrink-0 px-4 text-[12px] font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-200/60"
+              >
+                {item.label}
+              </button>
+            )
+          })}
+        </nav>
+      ) : (
+        <nav className="no-scrollbar flex gap-2 overflow-x-auto" aria-label={`${procedure.label}: restart at a segment`}>
+          {stops.map((item, index) => {
+            const active = index === pointIndex
+            return (
+              <button
+                key={item.label}
+                type="button"
+                aria-current={active ? 'step' : undefined}
+                onClick={() => jumpTo(index)}
+                data-pmd-native="true"
+                style={{ background: 'transparent', border: `1px solid ${active ? 'rgba(253,164,175,.7)' : 'rgba(255,255,255,.14)'}`, color: active ? '#fff' : 'rgba(255,255,255,.62)', borderRadius: 9999 }}
+                className="min-h-[44px] shrink-0 px-4 text-[12px] font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-200/60"
+              >
+                {item.label}
+              </button>
+            )
+          })}
+        </nav>
+      )}
 
       <details className="px-1 text-[11px] text-white/55">
         <summary className="flex min-h-[44px] cursor-pointer items-center font-bold text-white/70">About this simulator</summary>
-        <p className="pb-2 leading-relaxed">Simulated reference view · not patient anatomy or procedural navigation. Route and calibre come from Z-Anatomy / BodyParts3D reference meshes (CC BY-SA 4.0); wall motion, folds, vessels, colour and optics are simulated for teaching. Keyboard: ↑/↓ push and pull, W A S D angle the tip, Space air, Q suction. Bronchoscopy covers the whole tracheobronchial tree to the 19 segmental bronchi: aim the tip at a labelled opening and advance to enter it; withdraw past a branch origin to return. These simulations do not estimate patient geometry, lesion position, insertion distance, force, device settings, or a safe procedural trajectory.</p>
+        {procedure.id === 'bronchoscopy' && (
+          <Prosa kelas="pb-2 leading-relaxed">{'Whole airway tree to the subsegmental bronchi. Every tube follows its own Z-Anatomy / BodyParts3D reference mesh (CC BY-SA 4.0); subsegmental branches are the separate pieces inside each segmental mesh, numbered in atlas order (for example RB1-2), not the Boyden a/b/c letters. Ring pattern, vessels, colour and breathing motion are simulated; size and branching come from the reference atlas, not a patient. Aim at an orifice or tap its label to choose the next bronchus.'}</Prosa>
+        )}
+        <p className="pb-2 leading-relaxed">Simulated reference view · not patient anatomy or procedural navigation. Route and calibre come from Z-Anatomy / BodyParts3D reference meshes (CC BY-SA 4.0); wall motion, folds, vessels, colour and optics are simulated for teaching. Keyboard: ↑/↓ push and pull, W A S D angle the tip, Space air, Q suction. These simulations do not estimate patient geometry, lesion position, insertion distance, force, device settings, or a safe procedural trajectory.</p>
       </details>
     </section>
   )
