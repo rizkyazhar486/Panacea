@@ -1,4 +1,7 @@
+import { lazy, Suspense } from 'react'
 import { Link } from 'react-router-dom'
+
+const ContributorGovernanceDeck = lazy(() => import('../../components/governance/ContributorGovernanceDeck'))
 import { useStore, PLATFORM_FEE } from '../../lib/store'
 import { Card, SectionTitle, Badge, Button } from '../../components/ui'
 import { IconBook, IconToken, IconUpload, IconShield, IconSparkle } from '../../components/icons'
@@ -131,6 +134,9 @@ export function MyMaterials() {
           ))}
         </div>
       </Card>
+      <Suspense fallback={null}>
+        <ContributorGovernanceDeck />
+      </Suspense>
     </div>
   )
 }
