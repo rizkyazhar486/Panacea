@@ -1,0 +1,159 @@
+{
+  "generated": "2026-11-27",
+  "entries": [
+    {
+      "id": "tp53",
+      "kind": "alphafold",
+      "gene": "TP53",
+      "uniprot": "P04637",
+      "title": "Cellular tumor antigen p53",
+      "length": 393,
+      "residues": [
+        1,
+        393
+      ],
+      "meanPlddt": 75.06,
+      "sourceUrl": "https://alphafold.ebi.ac.uk/files/AF-P04637-F1-model_v6.pdb",
+      "sha256Original": "5a7051e8f97848d43b3747268825b29cafb5fa99d2e3fff6f58efcdb74e74cc3",
+      "file": "tp53.pdb",
+      "licence": "AlphaFold DB, CC BY 4.0",
+      "citation": "Jumper J et al. Nature 2021;596:583-589; Varadi M et al. Nucleic Acids Res 2024;52:D368-D375."
+    },
+    {
+      "id": "brca1",
+      "kind": "alphafold",
+      "gene": "BRCA1",
+      "uniprot": "P38398",
+      "title": "Breast cancer type 1 susceptibility protein",
+      "length": 1863,
+      "residues": [
+        1,
+        1863
+      ],
+      "meanPlddt": 41.59,
+      "sourceUrl": "https://alphafold.ebi.ac.uk/files/AF-P38398-F1-model_v6.pdb",
+      "sha256Original": "b2af213e2ef20f95c349a2159d628321205ad55b64511dd9e891b8a652d8a1a4",
+      "file": "brca1.pdb",
+      "licence": "AlphaFold DB, CC BY 4.0",
+      "citation": "Jumper J et al. Nature 2021;596:583-589; Varadi M et al. Nucleic Acids Res 2024;52:D368-D375."
+    },
+    {
+      "id": "apoe",
+      "kind": "alphafold",
+      "gene": "APOE",
+      "uniprot": "P02649",
+      "title": "Apolipoprotein E",
+      "length": 317,
+      "residues": [
+        1,
+        317
+      ],
+      "meanPlddt": 75.5,
+      "sourceUrl": "https://alphafold.ebi.ac.uk/files/AF-P02649-F1-model_v6.pdb",
+      "sha256Original": "71e53a341103c27e4425965517fde47df4120e1a61c69c2e538b3ee64e5408ec",
+      "file": "apoe.pdb",
+      "licence": "AlphaFold DB, CC BY 4.0",
+      "citation": "Jumper J et al. Nature 2021;596:583-589; Varadi M et al. Nucleic Acids Res 2024;52:D368-D375."
+    },
+    {
+      "id": "scn5a",
+      "kind": "alphafold",
+      "gene": "SCN5A",
+      "uniprot": "Q14524",
+      "title": "Sodium channel protein type 5 subunit alpha",
+      "length": 2016,
+      "residues": [
+        1,
+        2016
+      ],
+      "meanPlddt": 67.25,
+      "sourceUrl": "https://alphafold.ebi.ac.uk/files/AF-Q14524-F1-model_v6.pdb",
+      "sha256Original": "a0a3b4090d83680e7d55fda3c4538d4df66de03c58c714975f2e42bb016e6970",
+      "file": "scn5a.pdb",
+      "licence": "AlphaFold DB, CC BY 4.0",
+      "citation": "Jumper J et al. Nature 2021;596:583-589; Varadi M et al. Nucleic Acids Res 2024;52:D368-D375."
+    },
+    {
+      "id": "cftr",
+      "kind": "alphafold",
+      "gene": "CFTR",
+      "uniprot": "P13569",
+      "title": "Cystic fibrosis transmembrane conductance regulator",
+      "length": 1480,
+      "residues": [
+        1,
+        1480
+      ],
+      "meanPlddt": 75.62,
+      "sourceUrl": "https://alphafold.ebi.ac.uk/files/AF-P13569-F1-model_v6.pdb",
+      "sha256Original": "afd373f7f29fe06e0b0a5eb630ec3e5ab86371f3796b02cc668a3808c95e8611",
+      "file": "cftr.pdb",
+      "licence": "AlphaFold DB, CC BY 4.0",
+      "citation": "Jumper J et al. Nature 2021;596:583-589; Varadi M et al. Nucleic Acids Res 2024;52:D368-D375."
+    },
+    {
+      "id": "htt",
+      "kind": "pdb",
+      "gene": "HTT",
+      "uniprot": "P42858",
+      "pdbId": "6EZ8",
+      "title": "Huntingtin in complex with HAP40 (cryo-EM)",
+      "length": 3142,
+      "method": "ELECTRON MICROSCOPY",
+      "resolutionA": 4,
+      "reason": "AlphaFold DB publishes no model for this accession",
+      "sourceUrl": "https://files.rcsb.org/download/6EZ8.pdb",
+      "sha256Original": "8a450a02a00c3be0bc50e5dace060d1a3065665fdf9ea479ed8665aff6c9b6aa",
+      "file": "htt.pdb",
+      "licence": "wwPDB, CC0 1.0"
+    },
+    {
+      "id": "1bna",
+      "kind": "pdb",
+      "pdbId": "1BNA",
+      "title": "B-DNA dodecamer (Drew–Dickerson), the canonical double helix",
+      "method": "X-RAY DIFFRACTION",
+      "resolutionA": 1.9,
+      "sourceUrl": "https://files.rcsb.org/download/1BNA.pdb",
+      "sha256Original": "df42f1506792f191b957227b061360652adcf6f813eb69d9ec553067ea584670",
+      "file": "1bna.pdb",
+      "licence": "wwPDB, CC0 1.0"
+    },
+    {
+      "id": "1ehz",
+      "kind": "pdb",
+      "pdbId": "1EHZ",
+      "title": "Yeast phenylalanine tRNA, an RNA fold",
+      "method": "X-RAY DIFFRACTION",
+      "resolutionA": 1.93,
+      "sourceUrl": "https://files.rcsb.org/download/1EHZ.pdb",
+      "sha256Original": "3a43aefed0b6d5d8b4be47c44470e61258d0e90b5ff608f132a2c9731c9df41f",
+      "file": "1ehz.pdb",
+      "licence": "wwPDB, CC0 1.0"
+    },
+    {
+      "id": "1kx5",
+      "kind": "pdb",
+      "pdbId": "1KX5",
+      "title": "Nucleosome core particle: 147 bp DNA wrapped on a histone octamer",
+      "method": "X-RAY DIFFRACTION",
+      "resolutionA": 1.94,
+      "sourceUrl": "https://files.rcsb.org/download/1KX5.pdb",
+      "sha256Original": "6f99aa27cffb3174d0406ebd644eba6475bed61047305aac94fb844d3718112a",
+      "file": "1kx5.pdb",
+      "licence": "wwPDB, CC0 1.0"
+    },
+    {
+      "id": "4hhb",
+      "kind": "pdb",
+      "pdbId": "4HHB",
+      "title": "Human deoxyhaemoglobin, two alpha and two beta chains with haem",
+      "method": "X-RAY DIFFRACTION",
+      "resolutionA": 1.74,
+      "sourceUrl": "https://files.rcsb.org/download/4HHB.pdb",
+      "sha256Original": "abf382e0fd84b53bd4c08b373d37c0d7fe9fbe1a9a9c3851b2f5f2fbbe627101",
+      "file": "4hhb.pdb",
+      "licence": "wwPDB, CC0 1.0"
+    }
+  ]
+}
