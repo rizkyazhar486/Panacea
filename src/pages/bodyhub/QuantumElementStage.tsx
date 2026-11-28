@@ -150,25 +150,21 @@ export default function QuantumElementStage() {
     const ro = new ResizeObserver(resize)
     ro.observe(host)
 
-    let loop: LoopTerjaga | null = mulaiLoopTerjaga({
-      elemen: host,
-      gambar: () => {
-        controls.update()
-        renderer.render(scene, camera)
-      },
-      onStall: () => setWebglFailed(true),
+    const loop: LoopTerjaga = mulaiLoopTerjaga(host, () => {
+      controls.update()
+      renderer.render(scene, camera)
     })
 
     const onContextLost = (e: Event) => {
       e.preventDefault()
-      loop?.hentikan()
+      loop.kontekHilang()
       setWebglFailed(true)
     }
     renderer.domElement.addEventListener('webglcontextlost', onContextLost, false)
 
     return () => {
-      loop?.hentikan()
-      loop = null
+      loop.hentikan()
+      axes.dispose()
       renderer.domElement.removeEventListener('webglcontextlost', onContextLost)
       ro.disconnect()
       controls.dispose()
