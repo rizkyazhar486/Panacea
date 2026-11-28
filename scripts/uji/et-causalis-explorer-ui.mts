@@ -27,7 +27,7 @@ assert.match(projector, /Et Causalis · 25-Scenario Systemic Multiorgan Engine/,
 // 3. Engine backing sanity: 25 scenarios present & deterministic ODE response
 assert.equal(MULTIORGAN_SCENARIO_SPECS.length, 25, 'Et Causalis must ship all 25 systemic scenarios')
 const sepsis = simulateMultiorganCausalTrajectory({
-  scenarioId: '8_SEPTIC_SHOCK_EARLY',
+  scenarioId: MULTIORGAN_SCENARIO_SPECS[1]!.scenarioId,
   cohortId: 'ADULT_MALE_REFERENCE',
   durationMinutes: 30,
   stepMinutes: 5,
