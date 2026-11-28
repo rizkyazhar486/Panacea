@@ -159,6 +159,8 @@ const SESSION: readonly string[] = [
 
 const CLINICIAN: readonly string[] = [
   'GET /api/clinical/patient/:patientId/link-status',
+  'GET /api/ai/codemax/environment',
+  'POST /api/ai/codemax/doctor-emr',
   'GET /api/clinician/lab-shares',
   'GET /api/clinician/lab-shares/:id/care',
   'GET /api/clinician/lab-shares/:id/care/fhir',

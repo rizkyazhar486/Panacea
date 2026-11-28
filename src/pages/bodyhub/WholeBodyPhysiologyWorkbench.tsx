@@ -1,4 +1,8 @@
-import { useMemo, useState } from 'react'
+import { lazy, Suspense, useMemo, useState } from 'react'
+import { Fold } from '../../shared/ui/Fold'
+import { WhenOpened } from '../../shared/ui/WhenOpened'
+
+const Temporal4DAndInverseDynamicsPanel = lazy(() => import('./Temporal4DAndInverseDynamicsPanel'))
 import {
   WHOLE_BODY_COUPLING_LOOPS,
   WHOLE_BODY_PHYSIOLOGY_BOUNDARY,
@@ -264,6 +268,16 @@ export default function WholeBodyPhysiologyWorkbench() {
               <NeuroFascicularReflexDeck />
             </div>
           )}
+
+          <div className="mt-3">
+            <Fold label="4D Temporal Axis · 24h Circadian & 0–100y Lifespan">
+              <WhenOpened>
+                <Suspense fallback={<div className="p-3 text-xs text-cyan-200">Loading 4D Temporal Physiology…</div>}>
+                  <Temporal4DAndInverseDynamicsPanel initialMode="temporal" />
+                </Suspense>
+              </WhenOpened>
+            </Fold>
+          </div>
 
           <div className="mt-3 rounded-2xl border border-white/8 bg-black/25 p-3 text-[9px] leading-relaxed text-white/40">
             <span className="font-black text-white/60">Boundary:</span> {WHOLE_BODY_PHYSIOLOGY_BOUNDARY}

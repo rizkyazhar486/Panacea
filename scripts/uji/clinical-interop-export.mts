@@ -4,7 +4,7 @@
  *  1. HL7 FHIR R4 Bundle generation from clinical vitals & patient context.
  *  2. Bidirectional roundtrip: parseFhirBundle reads back what buildClinicalFhirBundle exports.
  *  3. SOAP / SBAR clinical summary formatting & clinical boundary enforcement.
- *  4. 4-Zone SuperPage Navigation (Your Body, Clinical, For You, Open 3D).
+ *  4. 4-Zone SuperPage Navigation (Home, Body, Clinical, For You).
  *  5. Cloudflare Pages & GitHub Pages static routing artifacts (_redirects & 404.html).
  */
 
@@ -104,10 +104,12 @@ assert.ok(summary.sbarText.includes('[R] RECOMMENDATION'), 'SBAR must include Re
 
 // 4. PanaceaZoneNav 4-Zone Verification
 const zoneNavSource = readFileSync('src/components/ui/PanaceaZoneNav.tsx', 'utf8')
-assert.ok(zoneNavSource.includes("'Your Body'"), 'ZoneNav must have Your Body')
+// Owner directive 2026-11-27: "Your Body" and "Open 3D" merge into one Body destination (Home · Body · Clinical · For You).
+assert.ok(zoneNavSource.includes("label: 'Home'"), 'ZoneNav must have Home')
+assert.ok(zoneNavSource.includes("label: 'Body'"), 'ZoneNav must have one Body destination')
 assert.ok(zoneNavSource.includes("'Clinical'"), 'ZoneNav must have Clinical')
 assert.ok(zoneNavSource.includes("'For You'"), 'ZoneNav must have For You')
-assert.ok(zoneNavSource.includes("'Open 3D'"), 'ZoneNav must have Open 3D')
+assert.ok(!zoneNavSource.includes("label: 'Open 3D'") && !zoneNavSource.includes("label: 'Your Body'"), 'ZoneNav must not split the body into two destinations')
 
 // 5. Cloudflare Pages & Static SPA Artifacts
 assert.ok(existsSync('wrangler.toml'), 'wrangler.toml must exist for Cloudflare SPA asset routing')

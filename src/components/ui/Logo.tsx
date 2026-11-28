@@ -36,12 +36,12 @@ export function Wordmark({
     <div className="flex items-center gap-2.5">
       <LogoMark size={size} dark={onDark} />
       <span
-        className={`tracking-tight ${onDark ? 'text-white' : 'text-ink'}`}
+        className={`tracking-tight font-bold ${onDark ? 'text-white' : 'text-neutral-950 dark:text-white'}`}
         style={{ fontSize: size * 0.6, fontFamily: 'var(--font-wordmark)' }}
       >
         Panacea
-        <span className={onDark ? 'text-white' : 'text-brand'}>med</span>
-        <span style={{ color: onDark ? '#ffd7d7' : '#FF3131' }}>.id</span>
+        <span className={onDark ? 'text-emerald-300' : 'text-[#047857] dark:text-[#34d399]'}>med</span>
+        <span className={onDark ? 'text-rose-300' : 'text-[#dc2626] dark:text-[#f87171]'}>.id</span>
       </span>
     </div>
   )

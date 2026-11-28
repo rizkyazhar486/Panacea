@@ -90,7 +90,8 @@ gagal('hasil-sistem-terlipat-di-ponsel-terbuka-di-desktop', () => {
       motion.readout.mapMmHg.toFixed(0) + ' mmHg',
       motion.readout.sao2Pct.toFixed(0) + '%',
       motion.readout.urineMlPerHour.toFixed(0) + ' mL/h',
-    ]) assert.ok(markup.includes('>' + value + '</dd>'))
+    // The value opens its <dd>; the scenario-vs-rest bar may follow inside the same <dd> (a <dl> group holds only dt/dd).
+    ]) assert.ok(new RegExp('<dd[^>]*>' + value.replace(/[.*+?^${}()|[\]\\%]/g, '\\$&') + '(</dd>|<svg)').test(markup), value)
   }
 })
 gagal('grafik-membandingkan-skenario-dengan-istirahat', () => {
