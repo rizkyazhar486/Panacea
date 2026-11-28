@@ -15,56 +15,61 @@ export function RolesSection({ onMasuk }: RolesSectionProps) {
       <div className="h-px w-full bg-gradient-to-r from-transparent via-emerald-500/25 to-transparent" />
       <section
         id="roles"
-        className="relative overflow-hidden bg-gradient-to-b from-[#f4f8f5] via-[#edf5f0] to-[#f4f8f5] px-6 py-24 border-y border-emerald-500/15 dark:border-white/5 dark:from-[#030d07] dark:via-[#06150d] dark:to-[#030d07] sm:px-10"
+        className="relative overflow-hidden border-y border-neutral-200/80 bg-[#F8FAF9] px-6 py-20 text-neutral-950 transition-colors dark:border-white/10 dark:bg-[#060A09] dark:text-neutral-50 sm:px-10"
       >
-        <div className="orb pointer-events-none absolute right-10 top-10 h-60 w-60 rounded-full bg-brand/15 blur-3xl" />
         <div className="relative mx-auto max-w-5xl">
           <Reveal className="text-center">
-            <div className="mx-auto mb-3 inline-flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-50/90 px-3.5 py-1 text-[10px] font-black uppercase tracking-[0.2em] text-emerald-800 shadow-sm dark:border-emerald-500/30 dark:bg-emerald-950/70 dark:text-emerald-300">
-              <span className="font-mono text-emerald-600 dark:text-emerald-400 font-extrabold">02</span>
-              <span className="h-2 w-px bg-emerald-300 dark:bg-emerald-700" />
+            <div className="mx-auto mb-3 inline-flex items-center gap-2 rounded-full border border-emerald-700/20 bg-emerald-700/10 px-3.5 py-1 text-[10px] font-black uppercase tracking-[0.2em] text-emerald-800 dark:border-emerald-400/25 dark:bg-emerald-500/15 dark:text-emerald-300">
+              <span className="font-mono font-extrabold text-emerald-700 dark:text-emerald-400">02</span>
+              <span className="h-2 w-px bg-emerald-500/40" />
               <span>Profil Pengguna &amp; Tata Kelola</span>
             </div>
             <div>
-              <span className="rounded-full border border-brand/20 bg-white/80 px-3.5 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-dark backdrop-blur dark:bg-neutral-800 dark:text-emerald-300">
+              <span className="rounded-full border border-emerald-700/20 bg-white px-3.5 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-800 dark:border-white/10 dark:bg-[#111815] dark:text-emerald-300">
                 Pengalaman Pengguna &amp; Peran
               </span>
             </div>
-            <h2 className="mt-3 text-3xl font-extrabold sm:text-4xl text-ink dark:text-white">
-              Satu Platform, <span className="font-serif-display italic text-brand-dark dark:text-emerald-400">Berbagai Peran Klinis</span>
+            <h2 className="mt-3 text-3xl font-extrabold text-neutral-950 dark:text-white sm:text-4xl">
+              Satu Platform, <span className="font-serif-display italic text-emerald-700 dark:text-emerald-400">Berbagai Peran Klinis</span>
             </h2>
             <p className="mx-auto mt-3 max-w-2xl text-neutral-600 dark:text-neutral-300">
               Pengalaman antarmuka terpersonalisasi untuk pasien dan dokter, disokong oleh ekosistem kontributor terpercaya dan <b>PanaceaToken</b>.
             </p>
 
             {/* Segmented Persona Tabs */}
-            <div className="mx-auto mt-8 inline-flex rounded-full border border-black/10 bg-white/80 p-1.5 shadow-sm backdrop-blur-md dark:border-white/10 dark:bg-neutral-800">
+            <div className="mx-auto mt-8 inline-flex flex-wrap justify-center gap-1 rounded-full border border-neutral-200 bg-white p-1.5 shadow-sm dark:border-white/10 dark:bg-[#111815]">
               <button
+                type="button"
+                data-pmd-native="true"
                 onClick={() => setRoleTab('patients')}
-                className={`rounded-full px-5 py-2 text-xs font-bold transition-all sm:text-sm ${
+                className={`min-h-[40px] rounded-full px-5 py-2 text-xs font-bold transition-all sm:text-sm ${
                   roleTab === 'patients'
-                    ? 'bg-brand text-white shadow-md'
-                    : 'text-neutral-600 hover:text-brand-dark dark:text-neutral-300'
+                    ? 'bg-emerald-700 text-white shadow-sm'
+                    : 'text-neutral-700 hover:text-emerald-700 dark:text-neutral-300 dark:hover:text-emerald-300'
                 }`}
               >
                 Untuk Pasien &amp; Keluarga
               </button>
               <button
+                type="button"
+                data-pmd-native="true"
                 onClick={() => setRoleTab('doctors')}
-                className={`rounded-full px-5 py-2 text-xs font-bold transition-all sm:text-sm ${
+                className={`min-h-[40px] rounded-full px-5 py-2 text-xs font-bold transition-all sm:text-sm ${
                   roleTab === 'doctors'
-                    ? 'bg-brand text-white shadow-md'
-                    : 'text-neutral-600 hover:text-brand-dark dark:text-neutral-300'
+                    ? 'bg-emerald-700 text-white shadow-sm'
+                    : 'text-neutral-700 hover:text-emerald-700 dark:text-neutral-300 dark:hover:text-emerald-300'
                 }`}
               >
                 Untuk Dokter &amp; Faskes
               </button>
               <button
+                type="button"
+                data-pmd-native="true"
                 onClick={() => setRoleTab('ecosystem')}
-                className={`rounded-full px-5 py-2 text-xs font-bold transition-all sm:text-sm ${
+                className={`min-h-[40px] rounded-full px-5 py-2 text-xs font-bold transition-all sm:text-sm ${
                   roleTab === 'ecosystem'
-                    ? 'bg-brand text-white shadow-md'
-                    : 'text-neutral-600 hover:text-brand-dark dark:text-neutral-300'
+                    ? 'bg-emerald-700 text-white shadow-sm'
+                    : 'text-neutral-700 hover:text-emerald-700 dark:text-neutral-300 dark:hover:text-emerald-300'
                 }`}
               >
                 Ekosistem &amp; Verifikasi
@@ -76,19 +81,19 @@ export function RolesSection({ onMasuk }: RolesSectionProps) {
           <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {ROLES.filter((r) => r.category === roleTab).map((r, i) => (
               <Reveal key={r.title} delay={i * 90}>
-                <div className="group flex h-full flex-col justify-between rounded-3xl border border-neutral-200/80 bg-white p-7 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-brand/50 hover:shadow-xl dark:border-white/10 dark:bg-neutral-900">
+                <div className="group flex h-full flex-col justify-between rounded-3xl border border-neutral-200/80 bg-white p-7 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-emerald-700/40 hover:shadow-xl dark:border-white/10 dark:bg-[#111815]">
                   <div>
                     <div className="flex items-center justify-between">
-                      <span className="grid h-12 w-12 place-items-center rounded-2xl bg-brand-50 text-brand-dark shadow-inner dark:bg-emerald-950 dark:text-emerald-300">
+                      <span className="grid h-12 w-12 place-items-center rounded-2xl bg-emerald-50 text-emerald-700 shadow-inner dark:bg-emerald-950/60 dark:text-emerald-300">
                         <r.icon size={22} />
                       </span>
-                      <span className="rounded-full bg-emerald-100 px-2.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
+                      <span className="rounded-full bg-emerald-100 px-2.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-emerald-800 dark:bg-emerald-950/70 dark:text-emerald-300">
                         {r.badge}
                       </span>
                     </div>
 
-                    <h3 className="mt-4 text-xl font-extrabold text-ink">{r.title}</h3>
-                    <div className="mt-1 text-xs font-bold text-emerald-600 dark:text-emerald-400">
+                    <h3 className="mt-4 text-xl font-extrabold text-neutral-950 dark:text-white">{r.title}</h3>
+                    <div className="mt-1 text-xs font-bold text-emerald-700 dark:text-emerald-400">
                       {r.tagline}
                     </div>
 
@@ -106,11 +111,13 @@ export function RolesSection({ onMasuk }: RolesSectionProps) {
                     </ul>
                   </div>
 
-                  <div className="mt-6 flex items-center justify-between border-t border-black/5 pt-4 text-[11px] font-semibold text-neutral-500 dark:border-white/10">
+                  <div className="mt-6 flex items-center justify-between border-t border-black/5 pt-4 text-[11px] font-semibold text-neutral-500 dark:border-white/10 dark:text-neutral-400">
                     <span>FHIR &amp; Panacea Engine</span>
                     <button
+                      type="button"
+                      data-pmd-native="true"
                       onClick={onMasuk}
-                      className="rounded-full bg-neutral-100 px-3.5 py-1 text-xs font-bold text-neutral-800 transition hover:bg-brand hover:text-white dark:bg-neutral-800 dark:text-neutral-200"
+                      className="min-h-[36px] rounded-full bg-neutral-100 px-3.5 py-1 text-xs font-bold text-neutral-900 transition hover:bg-emerald-700 hover:text-white dark:bg-neutral-800 dark:text-neutral-100"
                     >
                       Coba Akses →
                     </button>

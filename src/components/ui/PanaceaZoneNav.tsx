@@ -4,11 +4,13 @@ import { OneShape } from '../OneShape'
 import { hitungScrollAgarTerlihat } from '../../lib/railViewport'
 import '../../styles/superpage-cohesion-v1.css'
 
+// Four destinations: Home, Body, Clinical, For You. "Your Body" and "Open 3D" were two doors to the same
+// person; they are one Body now (owner directive: 1 user = 1 body = 1 page). Legacy body routes light Body.
 const ZONES = [
-  { to: '/fitness-hub', label: 'Your Body', queryAware: false },
+  { to: '/', label: 'Home', queryAware: true },
+  { to: '/fitness-hub', label: 'Body', queryAware: false },
   { to: '/clinical-hub', label: 'Clinical', queryAware: false },
   { to: '/?t=for-you', label: 'For You', queryAware: true },
-  { to: '/body-exposure', label: 'Open 3D', queryAware: false },
 ] as const
 
 // Latar zona aktif adalah satu bentuk bersama (OneShape) yang meluncur antar zona.
@@ -21,15 +23,16 @@ export function PanaceaZoneNav() {
   const forYouActive =
     (pathname === '/' && new URLSearchParams(location.search).get('t') === 'for-you') ||
     pathname === '/for-you'
+  const isHomeActive = pathname === '/' && !forYouActive
   const isBodyActive = pathname === '/fitness-hub' || pathname === '/fitness' || pathname === '/tubuh' || pathname === '/body'
+    || pathname.startsWith('/body-exposure') || pathname.startsWith('/body-explorer')
   const isClinicalActive = pathname === '/clinical-hub' || pathname === '/clinical' || pathname === '/emr'
-  const isOpen3DActive = pathname === '/body-exposure' || pathname.startsWith('/body-exposure')
 
   const isZoneActive = (to: string, isActive: boolean) => {
     if (to === '/?t=for-you') return forYouActive
+    if (to === '/') return isHomeActive
     if (to === '/fitness-hub') return isBodyActive
     if (to === '/clinical-hub') return isClinicalActive
-    if (to === '/body-exposure') return isOpen3DActive
     return isActive
   }
 
@@ -67,6 +70,7 @@ export function PanaceaZoneNav() {
           <NavLink
             key={zone.to}
             to={zone.to}
+            end={zone.to === '/'}
             data-one-shape-active={String(isZoneActive(zone.to, location.pathname === zone.to))}
             data-panacea-zone-active={String(isZoneActive(zone.to, location.pathname === zone.to))}
             className={({ isActive }) => {

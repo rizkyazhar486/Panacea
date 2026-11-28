@@ -132,3 +132,54 @@ export {
   resolveUnifiedBodyNavigation,
   type UnifiedBodyNavigationTarget
 } from "./ui/bodyExposureReactBridge.ts";
+// ── ENGINE: VIRTUAL ENDOSCOPY (centre line inside the reference mesh) ──
+export {
+  lumenPath,
+  landmarkAt,
+  segmentCentreline,
+  type LumenSlice,
+  type LumenPathResult,
+  type LumenSegmentInput,
+  anteriorMap,
+} from "./engine/endoscopy/lumenPath.ts";
+export {
+  routeProfile,
+  radiusAt,
+  openFactor,
+  initialScope,
+  stepScope,
+  wallFold,
+  SCOPE,
+  type RouteProfile,
+  type ScopeState,
+  type ScopeInput,
+  type WallPattern,
+  type WallFold,
+} from "./engine/endoscopy/scopeSim.ts";
+export {
+  buildAirwayTree,
+  branchDirection,
+  chooseChild,
+  airwayPath,
+  airwayCapsules,
+  nearestCapsules,
+  capsuleAxisDistance,
+  type AirwayBranch,
+  type AirwayBranchDef,
+  type AirwayCapsule,
+  type AirwayTreeResult,
+} from "./engine/endoscopy/airwayTree.ts";
+export {
+  airwayRoute,
+  indexPath,
+  nextAirwayPath,
+  routeBranchAt,
+  type AirwayRoute,
+} from "./engine/endoscopy/airwayNav.ts";
+export {
+  meshIslands,
+  islandTree,
+  withSubsegments,
+  type IslandPiece,
+} from "./engine/endoscopy/airwayIslands.ts";
+export { BRONCHIAL_TREE, type BronchusDef } from "./data/bronchialTree.ts";

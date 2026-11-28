@@ -159,7 +159,12 @@ import { panggilModel } from './ai.js'
 import { lookupDrugLabel } from './domains/medical-reference/drugInfo.js'
 import { sendEmail } from './domains/identity/email.js'
 import { sendPush, notify, keadaanPush } from './domains/push/push.js'
-import { submitEmr } from './domains/clinical-records/satusehat.js'
+import { submitEmr, isConfigured as satusehatConfigured } from './domains/clinical-records/satusehat.js'
+import {
+  resolveCodeMaxEnvironmentStatus,
+  validateCodeMaxDoctorRequest,
+  evaluateServerCodeMaxEncounter,
+} from './domains/clinical-records/codemaxDoctorSdkRuntime.js'
 import { createPayment, confirmPayment, paymentWebhook, orderStatus, normalizeTopUpPnc } from './domains/payments/payments.js'
 import { disburse, irisLive } from './iris.js'
 import { KATALOG, KATEGORI } from './domains/push/healthMetrics.js'
@@ -1683,6 +1688,39 @@ app.post('/api/ai/operator', requireAuth, (req, res) => {
   const u = (req as express.Request & { user: User }).user
   if (!isOwner(u)) return res.status(403).json({ error: 'forbidden' })
   return aiOperator(req, res)
+})
+
+// CodeMax Doctor AI-EMR Environment Ecosystem SDK endpoints (clinician/owner gated, zero PHI leaked in audit)
+app.get('/api/ai/codemax/environment', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  if (!klinisiAtauPemilik(u, isOwner(u))) return res.status(403).json({ error: 'not-clinician' })
+  const envStatus = resolveCodeMaxEnvironmentStatus({
+    satusehatReady: satusehatConfigured(),
+    icd11Ready: Boolean(icd11Configured),
+  })
+  return res.json({ ok: true, environment: envStatus, aiStatus: aiStatus() })
+})
+
+app.post('/api/ai/codemax/doctor-emr', requireAuth, async (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  if (!klinisiAtauPemilik(u, isOwner(u))) return res.status(403).json({ error: 'not-clinician' })
+  const parsed = validateCodeMaxDoctorRequest(req.body)
+  if (!parsed.ok || !parsed.value) {
+    return res.status(400).json({ error: parsed.error ?? 'invalid_codemax_request' })
+  }
+  const envStatus = resolveCodeMaxEnvironmentStatus({
+    satusehatReady: satusehatConfigured(),
+    icd11Ready: Boolean(icd11Configured),
+  })
+  const result = await evaluateServerCodeMaxEncounter({
+    request: parsed.value,
+    clinicianId: u.id,
+    clinicianStrVerified: u.role === 'dokter' || isOwner(u),
+    envStatus,
+    invokeModel: aiConfigured() ? panggilModel : undefined,
+  })
+  addAudit(u, 'codemax.doctor_emr.evaluate', `${result.encounterId} · ${result.modelRouteUsed}`)
+  return res.json({ ok: true, result })
 })
 
 // Daily AI briefing → emailed to the owner. Triggered by a scheduled GET with a

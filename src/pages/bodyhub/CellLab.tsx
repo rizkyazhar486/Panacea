@@ -38,6 +38,7 @@ const TABS: Array<{ id: Tab; label: string }> = [
 
 export function CellLab() {
   const [tab, setTab] = useState<Tab>('sel')
+  const [sliceDepth, setSliceDepth] = useState<number>(1.5)
   const [organel, setOrganel] = useState<string | null>(null)
   const [tahapAktif, setTahapAktif] = useState(0)
   const [antarjemput, setAntarjemput] = useState<Antarjemput>('malat-aspartat')
@@ -118,7 +119,29 @@ export function CellLab() {
 
       {tab === 'sel' && (
         <>
-          <Cell3D disorot={organel} onPilih={setOrganel} tinggi={320} />
+          <Cell3D disorot={organel} onPilih={setOrganel} sliceDepth={sliceDepth} tinggi={340} />
+          <div className="flex flex-wrap items-center gap-2 rounded-xl border border-neutral-200/70 bg-neutral-100/70 px-3 py-2 text-[11px] dark:border-white/10 dark:bg-white/[.04]">
+            <label htmlFor="cell-slice-depth" className="shrink-0 font-bold text-neutral-700 dark:text-slate-200">
+              Cross-section slice ({sliceDepth > 8.5 ? 'Whole cell' : `${sliceDepth.toFixed(1)} µm`})
+            </label>
+            <input
+              id="cell-slice-depth"
+              type="range"
+              min={-9}
+              max={10.5}
+              step={0.5}
+              value={sliceDepth}
+              onChange={(e) => setSliceDepth(Number(e.target.value))}
+              className="min-w-[140px] flex-1 accent-cyan-500"
+            />
+            <button
+              type="button"
+              onClick={() => setSliceDepth(1.5)}
+              className="rounded-full border border-neutral-300 px-2.5 py-0.5 text-[10px] font-bold text-neutral-700 hover:bg-neutral-200 dark:border-white/15 dark:text-slate-200 dark:hover:bg-white/10"
+            >
+              Equator
+            </button>
+          </div>
           <p className="text-[11px] leading-snug text-neutral-500">
             The cell is cut open — a whole sphere would show only the membrane. Tap an organelle to isolate it.
             Reference-scale dimensions are typical estimates in micrometres, normalized against a 20 µm teaching cell;

@@ -1,3 +1,4 @@
+import { withDeadline } from '../../shared/kernel/withDeadline'
 import { capturePersonalHealthOperation, readPersonalHealthFile, readPersonalHealthImage } from '../../domains/personal-health'
 import { loadBluetoothWearablePanel, recordConnectedDevice, type WearableSavePatch } from '../../domains/devices'
 import { loadBodyExposureLocalHub } from '../../domains/body-exposure'
@@ -851,6 +852,8 @@ function timeAgoShort(d: Date): string {
   return `${Math.floor(s / 86400)}d ago`
 }
 
+const SYNC_LINK_DEADLINE_MS = 15_000
+
 function AutoSyncCard() {
   const [token, setToken] = useState<string | null>(null)
   const [tokenLoading, setTokenLoading] = useState(true)
@@ -880,7 +883,8 @@ function AutoSyncCard() {
       return
     }
     try {
-      const nextToken = await api.getHealthWebhookToken()
+      // A sleeping backend must end in the retry state, never in an endless "Loading…".
+      const nextToken = await withDeadline(api.getHealthWebhookToken(), SYNC_LINK_DEADLINE_MS)
       if (!healthWebhookUrl(apiBaseUrl, nextToken)) throw new Error('Invalid API origin or sync token')
       setToken(nextToken)
     } catch (error) {
@@ -963,7 +967,7 @@ function AutoSyncCard() {
         </div>
         {tokenError && (
           <div role="alert" className="mt-2 rounded-xl border border-rose-200 bg-rose-50 p-3 text-[11px] leading-relaxed text-rose-700">
-            {tokenError === 'session' ? <SyncSignIn /> : 'Could not retrieve the private link.'}
+            {tokenError === 'session' ? <SyncSignIn /> : 'Could not retrieve the private link. The server may be waking up — try again in a few seconds.'}
             <button onClick={() => void loadPrivateSyncToken()} disabled={tokenLoading} className="ml-2 font-bold underline disabled:opacity-50">Try again</button>
           </div>
         )}

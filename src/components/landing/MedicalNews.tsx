@@ -67,7 +67,7 @@ function cleanTitle(title: string, source: string) {
   return source && title.endsWith(` - ${source}`) ? title.slice(0, -(source.length + 3)) : title
 }
 
-const cardClass = 'group block rounded-2xl border border-neutral-200/80 bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-emerald-500/40 hover:shadow-md dark:border-white/10 dark:bg-[#07130c]/85 dark:hover:border-emerald-400/40 dark:hover:bg-[#0b1c11]'
+const cardClass = 'group block rounded-2xl border border-neutral-200/80 bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-emerald-500/40 hover:shadow-md dark:border-white/10 dark:bg-[#0D1311] dark:hover:border-emerald-400/40 dark:hover:bg-[#111c17]'
 
 function LiveCard({ item }: { item: LiveNewsItem }) {
   return (
