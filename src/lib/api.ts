@@ -173,9 +173,11 @@ let authToken: string | null = (() => {
   }
 })()
 let authGeneration = 0
+const inFlightGets = new Map<string, { identity: string; promise: Promise<unknown> }>()
 export function setAuthToken(token: string | null) {
   authGeneration += 1
   authToken = token
+  inFlightGets.clear()
   try {
     if (token) localStorage.setItem(TOKEN_KEY, token)
     else localStorage.removeItem(TOKEN_KEY)
@@ -197,6 +199,9 @@ function requestIdentity(): string {
 }
 
 async function req<T>(path: string, init?: RequestInit): Promise<T> {
+  if (init?.method && init.method.toUpperCase() !== 'GET') {
+    inFlightGets.clear()
+  }
   const identity = requestIdentity()
   const ensureCurrent = () => {
     if (requestIdentity() !== identity) throw new Error('Session changed; reload before retrying.')
@@ -220,6 +225,21 @@ async function req<T>(path: string, init?: RequestInit): Promise<T> {
   return body
 }
 
+
+function reqCoalesced<T>(path: string): Promise<T> {
+  let identity: string
+  try { identity = requestIdentity() } catch { return req<T>(path) }
+  const existing = inFlightGets.get(path)
+  if (existing && existing.identity === identity) {
+    return existing.promise as Promise<T>
+  }
+  const promise = req<T>(path).finally(() => {
+    const cur = inFlightGets.get(path)
+    if (cur?.promise === promise) inFlightGets.delete(path)
+  })
+  inFlightGets.set(path, { identity, promise })
+  return promise
+}
 
 function toAccount(u: BackendUser): Account {
   return {
@@ -529,7 +549,7 @@ export const api = {
   deletePost: (id: string) => req<{ ok: boolean }>(`/api/posts/${id}`, { method: 'DELETE' }),
   // Per-user health profile (manual / WHOOP / Apple Watch / other)
   getLabLog: () => req<{ log: Record<string, { id: string; tanggal: string; nilai: number; rujukanBawah?: number; rujukanAtas?: number }[]>; diperbaruiPada: string | null }>('/api/lab-log'),
-  getKeadaanLongitudinal: () => req<{
+  getKeadaanLongitudinal: () => reqCoalesced<{
     subjectId: string
     revision: string
     generatedAt: string
@@ -685,8 +705,8 @@ export const api = {
   listSecondOpinions: () => req<{ requests: BackendSecondOpinion[] }>('/api/second-opinion').then((r) => r.requests),
   completeSecondOpinion: (id: string, finalOpinion: string) =>
     req<{ request: BackendSecondOpinion }>(`/api/second-opinion/${id}/complete`, { method: 'POST', body: JSON.stringify({ finalOpinion }) }).then((r) => r.request),
-  // clinical persistence
-  clinical: () => req<ClinicalData>('/api/clinical'),
+  // clinical persistence (coalesce concurrent same-session in-flight GET reads only)
+  clinical: () => reqCoalesced<ClinicalData>('/api/clinical'),
   issueLinkCode: (patientId: string) =>
     req<{ code: string; expiresAt: string }>(`/api/clinical/patient/${encodeURIComponent(patientId)}/link-code`, { method: 'POST' }),
   linkStatus: (patientId: string) =>

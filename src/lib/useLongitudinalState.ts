@@ -55,7 +55,10 @@ export function LongitudinalStateProvider({ children }: { children: ReactNode })
     unggahDiary.current = ''
   }, [akunId])
 
+  const prevAccountRef = useRef(account)
   useEffect(() => {
+    if (prevAccountRef.current === account) return
+    prevAccountRef.current = account
     setLocal({
       owner: account,
       labs: ambilLab(account),
