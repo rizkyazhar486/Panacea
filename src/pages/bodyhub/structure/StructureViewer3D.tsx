@@ -5,7 +5,7 @@ import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment
 import { mulaiLoopTerjaga } from '../../../lib/loopRenderTerjaga'
 import { buatRendererAman } from '../../../lib/rendererAman'
 import { parsePdb } from '../../../lib/molekul/struktur'
-import { buildCartoon, type Cartoon, type ColourScheme, type ResidueInfo } from './cartoon'
+import { buildCartoon, hydropathyScore, type Cartoon, type ColourScheme, type ResidueInfo } from './cartoon'
 
 const SS_LABEL: Record<ResidueInfo['ss'], string> = { H: 'α-helix', E: 'β-strand', C: 'coil', N: 'nucleotide' }
 
@@ -18,7 +18,8 @@ function plddtBand(p: number) {
 
 export interface StructureStats { protein: number; nucleotide: number; ligand: number; chains: number }
 
-export function StructureViewer3D({ url, label, scheme, onStats }: { url: string; label: string; scheme: ColourScheme; onStats?: (stats: StructureStats) => void }) {
+export function StructureViewer3D({ url, label, scheme, autoRotate = true, onStats }: { url: string; label: string; scheme: ColourScheme; autoRotate?: boolean; onStats?: (stats: StructureStats) => void }) {
+  const controlsRef = useRef<OrbitControls | null>(null)
   const hostRef = useRef<HTMLDivElement | null>(null)
   const [state, setState] = useState<'loading' | 'ready' | 'failed'>('loading')
   const [hover, setHover] = useState<{ x: number; y: number; residue: ResidueInfo } | null>(null)
@@ -57,9 +58,10 @@ export function StructureViewer3D({ url, label, scheme, onStats }: { url: string
     scene.add(camera)
 
     const controls = new OrbitControls(camera, renderer.domElement)
+    controlsRef.current = controls
     controls.enablePan = false
     controls.enableDamping = true
-    controls.autoRotate = !window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    controls.autoRotate = autoRotate && !window.matchMedia('(prefers-reduced-motion: reduce)').matches
     controls.autoRotateSpeed = 0.6
 
     const material = new THREE.MeshPhysicalMaterial({ vertexColors: true, roughness: 0.42, metalness: 0, clearcoat: 0.3, clearcoatRoughness: 0.35, side: THREE.DoubleSide })
@@ -133,6 +135,7 @@ export function StructureViewer3D({ url, label, scheme, onStats }: { url: string
       disposed = true
       if (loop) loop.hentikan()
       ro.disconnect()
+      controlsRef.current = null
       controls.dispose()
       renderer.domElement.removeEventListener('pointermove', onMove)
       renderer.domElement.removeEventListener('pointerleave', onLeave)
@@ -145,6 +148,12 @@ export function StructureViewer3D({ url, label, scheme, onStats }: { url: string
     }
   }, [url, scheme, label])
 
+  useEffect(() => {
+    if (controlsRef.current) {
+      controlsRef.current.autoRotate = autoRotate && !window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    }
+  }, [autoRotate])
+
   return (
     <div className="absolute inset-0" data-structure-3d-state={state}>
       <div ref={hostRef} className="absolute inset-0 cursor-grab active:cursor-grabbing" role="img" aria-label={`${label}: 3D cartoon of the deposited structure. Drag to rotate, scroll to zoom, hover to name a residue.`} />
@@ -152,7 +161,7 @@ export function StructureViewer3D({ url, label, scheme, onStats }: { url: string
         <div className="pointer-events-none absolute z-10 rounded-xl border border-white/15 bg-black/75 px-2.5 py-1.5 text-[11px] font-bold text-white shadow-xl backdrop-blur-md" style={{ left: Math.min(hover.x + 14, (hostRef.current?.clientWidth ?? 300) - 170), top: Math.max(8, hover.y - 46) }}>
           <div>{hover.residue.name} {hover.residue.seq} <span className="text-white/45">· chain {hover.residue.chain}</span></div>
           <div className="text-[10px] font-semibold text-white/60">
-            {SS_LABEL[hover.residue.ss]}{scheme === 'plddt' && hover.residue.ss !== 'N' ? ` · pLDDT ${hover.residue.bFactor.toFixed(1)} (${plddtBand(hover.residue.bFactor)})` : ''}
+            {SS_LABEL[hover.residue.ss]}{scheme === 'plddt' && hover.residue.ss !== 'N' ? ` · pLDDT ${hover.residue.bFactor.toFixed(1)} (${plddtBand(hover.residue.bFactor)})` : scheme === 'hydrophobicity' && hover.residue.ss !== 'N' ? ` · KD ${hydropathyScore(hover.residue.name) > 0 ? '+' : ''}${hydropathyScore(hover.residue.name).toFixed(1)}` : ''}
           </div>
         </div>
       )}

@@ -19,6 +19,10 @@ const PDB = {
   '1EHZ': 'Yeast phenylalanine tRNA, an RNA fold',
   '1KX5': 'Nucleosome core particle: 147 bp DNA wrapped on a histone octamer',
   '4HHB': 'Human deoxyhaemoglobin, two alpha and two beta chains with haem',
+  '4INS': 'Human insulin hexamer (A & B peptide chains with Zn2+ coordination)',
+  '3RGK': 'Human myoglobin (muscular oxygen-storage globin with haem cofactor)',
+  '1REX': 'Human lysozyme (innate mucosal antimicrobial glycoside hydrolase)',
+  '1R42': 'Human ACE2 receptor (cardiovascular RAAS peptidase ectodomain)',
 }
 
 const PROTEIN_ATOMS = new Set(['N', 'CA', 'C', 'O', 'CB'])
