@@ -49,7 +49,7 @@ export default function DrugPkPd3DStudio({ selectedMechanismId }: { selectedMech
       data-drug-pkpd-studio="v1"
       data-clinical-prescribing-authorized="false"
       aria-label="34 RDKit 3D Drug Conformers and Bateman Multi-Dose PK-PD Studio"
-      className="dark space-y-3 rounded-2xl border border-fuchsia-400/25 bg-[#060914] p-3.5 text-slate-100 sm:p-4"
+      className="dark space-y-3 rounded-2xl border border-fuchsia-400/25 bg-slate-950 p-3.5 text-slate-100 sm:p-4"
     >
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/10 pb-2.5">
         <div>
@@ -60,7 +60,7 @@ export default function DrugPkPd3DStudio({ selectedMechanismId }: { selectedMech
             {drug.name} ({drug.drugClass}) · Target: {drug.target}
           </p>
         </div>
-        <span className="rounded-full border border-amber-400/35 bg-amber-500/15 px-2.5 py-1 font-mono text-[9.5px] font-bold text-amber-200">
+        <span className="rounded-full border border-amber-400/35 bg-amber-500/15 px-2.5 py-1 font-mono text-[10px] font-bold text-amber-200">
           {PKPD_STUDIO_BOUNDARY.truthClass}
         </span>
       </div>
@@ -89,9 +89,9 @@ export default function DrugPkPd3DStudio({ selectedMechanismId }: { selectedMech
       </div>
 
       <div className="grid gap-3 lg:grid-cols-12">
-        <div className="relative h-[250px] overflow-hidden rounded-2xl border border-white/10 bg-[radial-gradient(circle_at_50%_45%,rgba(232,121,249,.11),transparent_65%)] lg:col-span-5">
+        <div className="relative h-64 overflow-hidden rounded-2xl border border-white/10 bg-[radial-gradient(circle_at_50%_45%,rgba(232,121,249,.11),transparent_65%)] lg:col-span-5">
           <DrugMolecule3DViewer slug={drug.slug} label={drug.name} mode={mode} onMeta={setMeta} />
-          <div className="pointer-events-none absolute left-2.5 top-2 rounded-full bg-black/60 px-2.5 py-0.5 font-mono text-[9.5px] font-bold text-fuchsia-200 backdrop-blur-md">
+          <div className="pointer-events-none absolute left-2.5 top-2 rounded-full bg-black/60 px-2.5 py-0.5 font-mono text-[10px] font-bold text-fuchsia-200 backdrop-blur-md">
             {drug.name}{meta ? ` · ${meta.formula} (${meta.atomCount}a/${meta.bondCount}b)` : ''}
           </div>
           <div className="absolute bottom-2 right-2 flex gap-1" role="group" aria-label="Drug 3D representation">

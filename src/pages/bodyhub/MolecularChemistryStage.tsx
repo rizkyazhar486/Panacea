@@ -166,7 +166,7 @@ export default function MolecularChemistryStage({ selectedSystemId }: MolecularC
             >
               i
             </summary>
-            <div className="absolute right-0 top-10 z-30 w-[min(420px,84vw)] rounded-2xl border border-white/[.12] bg-[#080c10] p-3 shadow-2xl">
+            <div className="absolute right-0 top-10 z-30 w-full max-w-md rounded-2xl border border-white/[.12] bg-slate-950 p-3 shadow-2xl">
               <p className="m-0 text-[9px] leading-relaxed text-white/58">
                 {GLYCOLYSIS_NET}. This is a reference biochemical reaction, not a measured patient flux. Compounds must bind to verified chemical/protein identifiers before they are rendered as source-backed 3D; each model is PubChem's computed conformer for the cited CID (low-energy shape in vacuum, not bound cellular geometry). Polarity shell highlights Pauling-electronegative O/N/P/S heteroatoms versus hydrophobic C/H regions.
               </p>
@@ -266,12 +266,12 @@ export default function MolecularChemistryStage({ selectedSystemId }: MolecularC
                 setSelectedId(item.id)
               }}
               className={
-                'relative min-h-[76px] min-w-[122px] shrink-0 overflow-hidden rounded-[18px] border p-3 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/60 ' +
+                'relative min-h-20 min-w-32 shrink-0 overflow-hidden rounded-[18px] border p-3 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/60 ' +
                 laneClass(item.lane) + (active ? ' ring-2 ring-cyan-200/70' : ' hover:brightness-125')
               }
             >
               <div className="text-[13px] font-black tracking-[-.02em] text-white/92">{item.label}</div>
-              <div className="mt-1 max-w-[104px] text-[9px] font-bold leading-tight text-white/55">{item.formula}</div>
+              <div className="mt-1 max-w-28 text-[9px] font-bold leading-tight text-white/55">{item.formula}</div>
               <div className="mt-1.5 text-[8px] font-black uppercase tracking-[.12em] text-white/45">{manifest ? (has3d ? '3D SDF' : 'no 3D record') : ''}</div>
             </button>
           )
