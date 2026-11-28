@@ -182,11 +182,11 @@ export default function QuantumElementStage() {
     <section
       data-quantum-element-stage="v2"
       aria-label="Quantum orbitals and biological periodic elements"
-      className="dark space-y-3 rounded-[24px] border border-violet-400/25 bg-[#050816] p-3.5 text-slate-100 sm:p-4"
+      className="dark space-y-3 rounded-[24px] border border-violet-400/25 bg-slate-950 p-3.5 text-slate-100 sm:p-4"
     >
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/10 pb-2.5">
         <div>
-          <p className="font-mono text-[9.5px] font-black uppercase tracking-[.18em] text-violet-300">
+          <p className="font-mono text-[10px] font-black uppercase tracking-[.18em] text-violet-300">
             Quantum Wavefunction |ψₙ,ₗ,ₘ(r,θ,φ)|² &amp; 18 Human Bio-Elements
           </p>
           <p className="text-xs text-slate-300">
@@ -230,10 +230,10 @@ export default function QuantumElementStage() {
             </button>
           </div>
 
-          <div className="relative h-[265px] overflow-hidden rounded-2xl border border-white/10 bg-[radial-gradient(circle_at_50%_45%,#0f1530_0%,#02040a_75%)]">
+          <div className="relative h-64 overflow-hidden rounded-2xl border border-white/10 bg-slate-950">
             <div ref={hostRef} className="absolute inset-0 cursor-grab active:cursor-grabbing" role="img" aria-label={`3D probability cloud for hydrogenic ${orbital.label} orbital`} />
             {webglFailed && <div className="grid h-full place-items-center p-4 text-xs text-slate-400">WebGL unavailable — radial probability P(r) remains plotted below.</div>}
-            <div className="pointer-events-none absolute left-2.5 top-2 rounded-full bg-black/65 px-2.5 py-0.5 font-mono text-[9.5px] text-violet-200 backdrop-blur-md">
+            <div className="pointer-events-none absolute left-2.5 top-2 rounded-full bg-black/65 px-2.5 py-0.5 font-mono text-[10px] text-violet-200 backdrop-blur-md">
               {orbital.label} (n={orbital.n}, l={orbital.l}, {orbital.mLabel}) · nodes {orbital.radialNodes}R/{orbital.angularNodes}A
             </div>
             <div className="pointer-events-none absolute bottom-2 left-2.5 flex gap-2 font-mono text-[9px] text-white/70">
@@ -242,7 +242,7 @@ export default function QuantumElementStage() {
             </div>
           </div>
 
-          <div className="rounded-xl border border-white/10 bg-slate-950/90 p-2 font-mono text-[9.5px]">
+          <div className="rounded-xl border border-white/10 bg-slate-950/90 p-2 font-mono text-[10px]">
             <div className="flex justify-between text-slate-400">
               <span>Radial Probability 4πr²|Rₙ,ₗ(r)|²</span>
               <span>0 → {orbital.maxRadiusBohr} a₀</span>
@@ -278,23 +278,23 @@ export default function QuantumElementStage() {
                     active ? 'border-cyan-300 bg-cyan-500/20 text-white' : 'border-white/10 bg-slate-900/90 text-slate-300 hover:border-cyan-400/40'
                   }`}
                 >
-                  <div className="flex justify-between text-[8.5px] text-cyan-300">
+                  <div className="flex justify-between text-[9px] text-cyan-300">
                     <span>{el.z}</span>
                     <span className="text-slate-400">{el.physiologicalIon.split(' ')[0]}</span>
                   </div>
                   <div className="text-sm font-black text-white">{el.symbol}</div>
-                  <div className="truncate text-[8.5px] text-slate-400">{el.name}</div>
+                  <div className="truncate text-[9px] text-slate-400">{el.name}</div>
                 </button>
               )
             })}
           </div>
 
-          <div className="rounded-2xl border border-cyan-400/25 bg-slate-950/90 p-3 font-mono text-[10.5px]">
+          <div className="rounded-2xl border border-cyan-400/25 bg-slate-950/90 p-3 font-mono text-[11px]">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <strong className="text-sm text-cyan-100">
                 {element.symbol} · {element.name} (Z={element.z}, {element.atomicMassDa} Da)
               </strong>
-              <span className="rounded-full border border-emerald-400/30 bg-emerald-500/15 px-2 py-0.5 text-[9.5px] text-emerald-200">
+              <span className="rounded-full border border-emerald-400/30 bg-emerald-500/15 px-2 py-0.5 text-[10px] text-emerald-200">
                 {element.electronConfig} · valence {valenceOrbitalForElement(element.symbol)}
               </span>
             </div>
