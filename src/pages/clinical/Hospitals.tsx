@@ -1,10 +1,12 @@
-import { useMemo, useState } from 'react'
+import { lazy, Suspense, useMemo, useState } from 'react'
 import { Card, SectionTitle, Button, Badge, SkeletonRows } from '../../components/ui'
 import { IconHospital, IconPhone, IconCheck, IconSearch } from '../../components/icons'
 import { BottomSheet } from '../../components/BottomSheet'
 import { ButtonGroup } from '../../components/Carousel'
 import { HOSPITALS, fetchNearbyFacilities, type FacilityKind, type NearbyFacility } from '../../lib/hospitals'
 import { BatasKlaimKesehatan } from '../../components/BatasKlaimKesehatan'
+
+const FacilityArchitectWorkspace = lazy(() => import('../../components/facility/FacilityArchitectWorkspace'))
 
 const KIND_LABEL: Record<string, string> = { Semua: 'All Facilities', RS: 'Hospital', Klinik: 'Clinic', Apotek: 'Pharmacy' }
 const KIND_EMOJI: Record<string, string> = { Semua: '🏥', RS: '🏥', Klinik: '🩺', Apotek: '💊' }
@@ -18,6 +20,7 @@ const DEMO: NearbyFacility[] = HOSPITALS.map((h) => ({
 }))
 
 export function Hospitals() {
+  const [workspaceTab, setWorkspaceTab] = useState<'architect' | 'directory'>('architect')
   const [coords, setCoords] = useState<Coords | null>(null)
   const [geoState, setGeoState] = useState<'idle' | 'asking' | 'granted' | 'denied'>('idle')
   const [kind, setKind] = useState<FacilityKind | 'Semua'>('Semua')
@@ -63,6 +66,31 @@ export function Hospitals() {
 
   return (
     <div className="space-y-6">
+      <div className="flex flex-wrap gap-2">
+        <button
+          type="button"
+          onClick={() => setWorkspaceTab('architect')}
+          className={`min-h-11 rounded-xl border px-4 text-xs font-bold ${workspaceTab === 'architect' ? 'border-brand bg-brand text-white' : 'border-neutral-200 bg-white text-neutral-700'}`}
+        >
+          Facility Architect &amp; Live Beds
+        </button>
+        <button
+          type="button"
+          onClick={() => setWorkspaceTab('directory')}
+          className={`min-h-11 rounded-xl border px-4 text-xs font-bold ${workspaceTab === 'directory' ? 'border-brand bg-brand text-white' : 'border-neutral-200 bg-white text-neutral-700'}`}
+        >
+          Nearest Health Facilities
+        </button>
+      </div>
+
+      {workspaceTab === 'architect' && (
+        <Suspense fallback={<SkeletonRows rows={4} />}>
+          <FacilityArchitectWorkspace />
+        </Suspense>
+      )}
+
+      {workspaceTab === 'directory' && (
+      <>
       <Card>
         <SectionTitle
           icon={<IconHospital size={20} />}
@@ -123,6 +151,8 @@ export function Hospitals() {
         {!loading && list.map((h) => <FacilityCard key={h.id} h={h} hasCoords={!!coords} />)}
         {!loading && list.length === 0 && <Card className="text-center text-sm text-neutral-500">No matching facilities.</Card>}
       </div>
+      </>
+      )}
     </div>
   )
 }
