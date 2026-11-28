@@ -4,14 +4,14 @@ import { readFileSync } from 'node:fs'
 const osSource = readFileSync(new URL('../../src/pages/bodyhub/BodyExposureOS.tsx', import.meta.url), 'utf8')
 const projSource = readFileSync(new URL('../../src/pages/bodyhub/UnifiedHumanSimulationProjector.tsx', import.meta.url), 'utf8')
 
-// 1. BodyExposureOS must preserve lossless requestedDomain state and never snap sub-domains back via current.projectorDomain.
+// 1. BodyExposureOS must preserve lossless requestedDomain state on current.projectorDomain so sub-domains never snap back.
 assert.ok(
-  osSource.includes('requestedDomain={requestedDomain}'),
-  'BodyExposureOS must pass lossless requestedDomain state to UnifiedHumanSimulationProjector',
+  osSource.includes('projectorDomain: requestedDomain'),
+  'BodyExposureOS must attach lossless requestedDomain to current.projectorDomain',
 )
 assert.ok(
-  !osSource.includes('requestedDomain={current.projectorDomain}'),
-  'BodyExposureOS must never round-trip 14 SimulationDomains lossily through current.projectorDomain',
+  osSource.includes('setRequestedDomain(domain)'),
+  'BodyExposureOS syncModeFromProjector must preserve the exact SimulationDomain selected in the projector',
 )
 
 // 2. All 5 sub-domains that share top-level rail groups must be explicitly mapped in modeForDomain & DOMAIN_ALIASES.

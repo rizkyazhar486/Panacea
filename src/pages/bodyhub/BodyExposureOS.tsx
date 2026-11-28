@@ -187,7 +187,8 @@ export function BodyExposureOS() {
     }
   }
 
-  const current = MODES.find((mode) => mode.key === activeMode) ?? MODES[0]
+  const currentMode = MODES.find((mode) => mode.key === activeMode) ?? MODES[0]
+  const current = { ...currentMode, projectorDomain: requestedDomain }
 
   return (
     <section
@@ -275,7 +276,7 @@ export function BodyExposureOS() {
           <UnifiedHumanSimulationProjector
             selectedSystemId={selectedBodySystemId}
             onSystemChange={setSelectedBodySystemId}
-            requestedDomain={requestedDomain}
+            requestedDomain={current.projectorDomain}
             onDomainChange={syncModeFromProjector}
             requestedStructure={strukturDiminta}
           />

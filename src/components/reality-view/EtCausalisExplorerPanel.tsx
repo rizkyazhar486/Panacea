@@ -164,7 +164,7 @@ export function EtCausalisExplorerPanel({
     <section
       data-et-causalis-panel="v1"
       aria-label="Et Causalis Multiorgan Causal Explorer and Semantic Zoom"
-      className="dark mt-4 space-y-3.5 rounded-2xl border border-cyan-400/25 bg-slate-950 p-3.5 text-slate-100 sm:p-4"
+      className="dark mt-4 space-y-3.5 rounded-2xl border border-cyan-400/25 bg-[#050b18] p-3.5 text-slate-100 sm:p-4"
     >
       {/* Top status strip */}
       <div className="flex flex-wrap items-center justify-between gap-2">
