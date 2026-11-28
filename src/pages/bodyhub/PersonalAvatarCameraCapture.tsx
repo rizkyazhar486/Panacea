@@ -40,6 +40,7 @@ export default function PersonalAvatarCameraCapture({
   const [phase, setPhase] = useState<'idle' | 'permission' | 'capturing' | 'ready' | 'error'>('idle')
   const [message, setMessage] = useState('One RGB camera · guided multi-view scan')
   const [error, setError] = useState('')
+  const [showCadTwin, setShowCadTwin] = useState(false)
 
   function stopCamera() {
     streamRef.current?.getTracks().forEach((track) => track.stop())
@@ -238,11 +239,22 @@ export default function PersonalAvatarCameraCapture({
           {error ? <div className="mt-3 rounded-xl border border-red-300/15 bg-red-500/[.08] p-2 text-[9px] font-bold text-red-100/75">{error}</div> : null}
         </div>
       </div>
-      <div className="border-t border-white/[.08] p-3 sm:p-4">
-        <Suspense fallback={<div className="p-3 text-xs text-slate-400">Loading 1:1 img2threejs CAD/CAE twin…</div>}>
-          <Img2ThreeJsTwinViewport capturedFrameCount={frames.length} />
-        </Suspense>
-      </div>
+      <details
+        className="border-t border-white/[.08] p-3 sm:p-4"
+        onToggle={(e) => setShowCadTwin(e.currentTarget.open)}
+      >
+        <summary className="flex min-h-[44px] cursor-pointer list-none items-center justify-between text-sm font-black text-cyan-100">
+          <span>3D CAD/CAE Twin</span>
+          <span aria-hidden className="text-white/45">{showCadTwin ? '−' : '＋'}</span>
+        </summary>
+        {showCadTwin ? (
+          <div className="pt-2">
+            <Suspense fallback={<div className="p-3 text-sm text-slate-300">Loading 3D CAD/CAE twin…</div>}>
+              <Img2ThreeJsTwinViewport capturedFrameCount={frames.length} />
+            </Suspense>
+          </div>
+        ) : null}
+      </details>
     </section>
   )
 }

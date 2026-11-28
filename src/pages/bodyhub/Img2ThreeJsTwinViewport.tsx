@@ -400,36 +400,36 @@ export default function Img2ThreeJsTwinViewport({ capturedFrameCount = 0 }: Img2
                 {s}
               </button>
             ))}
-            <button type="button" onClick={exportCadJson} className="min-h-9 rounded-xl border border-emerald-400/40 bg-emerald-500/15 px-2.5 font-black text-emerald-100 hover:bg-emerald-500/25">
+            <button type="button" onClick={exportCadJson} className="min-h-[44px] rounded-xl border border-emerald-400/40 bg-emerald-500/15 px-3 font-black text-emerald-100 hover:bg-emerald-500/25">
               Export CAD JSON
             </button>
           </div>
 
-          <div className="grid grid-cols-2 gap-1.5 font-mono text-[10px]">
+          <div className="grid grid-cols-2 gap-1.5 font-mono text-xs">
             <label className="flex flex-col gap-0.5 rounded-xl border border-white/10 bg-slate-950/80 p-2 text-cyan-200">
               <span>Height {heightCm} cm</span>
-              <input type="range" min={110} max={210} value={heightCm} onChange={(e) => setHeightCm(Number(e.target.value))} className="accent-cyan-400" />
+              <input type="range" min={110} max={210} value={heightCm} onChange={(e) => setHeightCm(Number(e.target.value))} className="h-11 min-h-[44px] accent-cyan-400" />
             </label>
             <label className="flex flex-col gap-0.5 rounded-xl border border-white/10 bg-slate-950/80 p-2 text-emerald-200">
               <span>Mass {weightKg} kg</span>
-              <input type="range" min={25} max={145} value={weightKg} onChange={(e) => setWeightKg(Number(e.target.value))} className="accent-emerald-400" />
+              <input type="range" min={25} max={145} value={weightKg} onChange={(e) => setWeightKg(Number(e.target.value))} className="h-11 min-h-[44px] accent-emerald-400" />
             </label>
           </div>
 
-          <div className="flex flex-wrap items-center gap-1 font-mono text-[10px]">
+          <div className="flex flex-wrap items-center gap-1 font-mono text-xs">
             {(['neutral', 'gait', 'squat'] as const).map((pm) => (
-              <button key={pm} type="button" onClick={() => setPostureMode(pm)} aria-pressed={postureMode === pm} className={`min-h-8 rounded-lg border px-2.5 font-bold uppercase ${postureMode === pm ? 'border-amber-300 bg-amber-500/20 text-amber-100' : 'border-white/10 text-slate-400'}`}>
+              <button key={pm} type="button" onClick={() => setPostureMode(pm)} aria-pressed={postureMode === pm} className={`min-h-[44px] rounded-lg border px-2.5 font-bold uppercase ${postureMode === pm ? 'border-amber-300 bg-amber-500/20 text-amber-100' : 'border-white/10 text-slate-400'}`}>
                 CAE: {pm}
               </button>
             ))}
             {(['none', 'axial', 'sagittal'] as const).map((ax) => (
-              <button key={ax} type="button" onClick={() => setClipAxis(ax)} aria-pressed={clipAxis === ax} className={`min-h-8 rounded-lg border px-2.5 font-bold uppercase ${clipAxis === ax ? 'border-violet-300 bg-violet-500/20 text-violet-100' : 'border-white/10 text-slate-400'}`}>
+              <button key={ax} type="button" onClick={() => setClipAxis(ax)} aria-pressed={clipAxis === ax} className={`min-h-[44px] rounded-lg border px-2.5 font-bold uppercase ${clipAxis === ax ? 'border-violet-300 bg-violet-500/20 text-violet-100' : 'border-white/10 text-slate-400'}`}>
                 CAD Slice: {ax}
               </button>
             ))}
           </div>
 
-          <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-3 font-mono text-[10px]">
+          <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-3 font-mono text-xs">
             <div className="rounded-xl border border-white/10 bg-slate-900/90 p-2">
               <div className="text-slate-400">BMI / WHR</div>
               <div className="font-black text-cyan-200">{spec.cadCaeMetrics.bmi} · {spec.cadCaeMetrics.waistToHipRatio}</div>
@@ -444,9 +444,14 @@ export default function Img2ThreeJsTwinViewport({ capturedFrameCount = 0 }: Img2
             </div>
           </div>
 
-          <div className="rounded-xl border border-white/10 bg-slate-950/80 px-2.5 py-1.5 text-[10px] text-slate-400">
-            {IMG2THREEJS_PROVENANCE.epistemicBoundary}
-          </div>
+          <details className="rounded-xl border border-white/10 bg-slate-950/80 px-2.5 py-1.5 text-xs text-slate-300">
+            <summary className="flex min-h-[44px] cursor-pointer items-center font-bold text-slate-200">
+              CAD &amp; medical truth boundary
+            </summary>
+            <p className="pb-1.5 text-xs leading-relaxed text-slate-400">
+              {IMG2THREEJS_PROVENANCE.epistemicBoundary}
+            </p>
+          </details>
         </div>
       </div>
     </section>
