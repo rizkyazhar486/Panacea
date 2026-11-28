@@ -30,6 +30,8 @@ import {
   listFacilityLayouts,
   getFacilityLayout,
   saveFacilityLayout,
+  getSchedulingState,
+  saveSchedulingState,
   likePost,
   reactPost,
   deletePost,
@@ -185,6 +187,10 @@ import {
   canWriteFacilityLayout,
   type ServerBedTransitionAction,
 } from './domains/facility-architect/facilityStore.js'
+import {
+  readSchedulingStateForActor,
+  writeSchedulingStateForActor,
+} from './domains/scheduling/schedulingStore.js'
 import { pasangRuteReviewManusia } from './modules/humanReview/http/routes.js'
 import { parseMeetCoordinates } from './modules/meets/domain/coordinates.js'
 import { repoHasilLab, repoRujukan, pasienDitugaskan, tugaskanStaf, cabutStaf, setStaffRole, STAFF_ROLES, daftarStaf, getUser } from './store.js'
@@ -760,6 +766,21 @@ app.post('/api/facility/layouts/:facilityId/beds/transition', requireAuth, (req,
   const saved = saveFacilityLayout(outcome.record)
   addAudit(u, `facility.bed_${action.type}`, facilityId)
   res.json({ layout: saved })
+})
+
+app.get('/api/scheduling/state', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  res.json(readSchedulingStateForActor(getSchedulingState(), { id: u.id, role: u.role, isOwner: isOwner(u) }))
+})
+
+app.put('/api/scheduling/state', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  const body = (req.body ?? {}) as Parameters<typeof writeSchedulingStateForActor>[2]
+  const outcome = writeSchedulingStateForActor(getSchedulingState(), { id: u.id, name: u.name, role: u.role, isOwner: isOwner(u) }, body, new Date().toISOString())
+  if (!outcome.ok) return res.status(outcome.statusCode).json({ error: outcome.error })
+  saveSchedulingState(outcome.nextState)
+  addAudit(u, 'scheduling.state_saved')
+  res.json(readSchedulingStateForActor(outcome.nextState, { id: u.id, role: u.role, isOwner: isOwner(u) }))
 })
 
 app.get('/api/posts', (req, res) => {
