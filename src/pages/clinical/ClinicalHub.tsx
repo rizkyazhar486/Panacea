@@ -18,6 +18,7 @@ import { readUnifiedLocalVitals } from '../../domains/identity/localRecovery'
 const ClinicalInteropSection = lazy(() => import('./ClinicalInteropSection'))
 const ClinicalToClaimShieldWorkbench = lazy(() => import('../../components/clinical/ClinicalToClaimShieldWorkbench'))
 const ClinicalMedSciStudyStudio = lazy(() => import('../../components/clinical/ClinicalMedSciStudyStudio'))
+const ClinicalVisualAtlasDeck = lazy(() => import('../../components/clinical/ClinicalVisualAtlasDeck'))
 
 export const GROUPS = [
   {
@@ -368,6 +369,14 @@ export function ClinicalHub() {
         </Fold>
 
         <PersonalBodyUnifiedSurface compact defaultFocus="clinical" shareable={false} cameraCapture={false} />
+
+        <Fold label="Visual Atlas">
+          <WhenOpened>
+            <Suspense fallback={<div className="p-3 text-xs text-white/60">Loading Visual Clinical Atlas…</div>}>
+              <ClinicalVisualAtlasDeck />
+            </Suspense>
+          </WhenOpened>
+        </Fold>
 
         <Fold label="Frontier & Surgical OS">
           <div className="space-y-3 border-t border-white/10 pt-3">

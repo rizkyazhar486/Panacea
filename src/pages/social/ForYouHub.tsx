@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useState } from 'react'
+import { lazy, Suspense, useEffect, useMemo, useState } from 'react'
+const ForYouLifestyleDeck = lazy(() => import('../../components/foryou/ForYouLifestyleDeck'))
 import { Link } from 'react-router-dom'
 import { SuperPageCapabilityRail } from '../../components/SuperPageCapabilityRail'
 import { ForYouOmniFeed } from '../../components/ForYouOmniFeed'
@@ -218,6 +219,18 @@ export function ForYouHub() {
       </section>
 
       <ForYouOmniFeed />
+
+      <details className="group border-t border-white/10 pt-3">
+        <summary className="flex min-h-[48px] cursor-pointer list-none items-center justify-between text-xs font-black text-white/80 hover:text-white">
+          <span>Lifestyle, Hobbies, Travel &amp; Privacy Shield</span>
+          <span className="text-white/40" aria-hidden>＋</span>
+        </summary>
+        <div className="pt-3">
+          <Suspense fallback={<div className="p-3 text-xs text-white/50">Loading lifestyle spaces…</div>}>
+            <ForYouLifestyleDeck />
+          </Suspense>
+        </div>
+      </details>
 
       <DestinationRail label="Intelligence" items={INTELLIGENCE} />
 
