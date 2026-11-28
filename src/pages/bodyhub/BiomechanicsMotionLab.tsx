@@ -2,9 +2,12 @@ import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import { AtlasViewer3D } from '../../components/AtlasViewer3D'
 import { WORKOUT_MUSCLE_GROUPS } from '../../lib/workoutMuscles'
 
+import { Fold } from '../../shared/ui/Fold'
+import { WhenOpened } from '../../shared/ui/WhenOpened'
 const FasciaKineticTwinCard = lazy(() =>
   import('../../components/FasciaKineticTwinCard').then((m) => ({ default: m.FasciaKineticTwinCard })),
 )
+const Temporal4DAndInverseDynamicsPanel = lazy(() => import('./Temporal4DAndInverseDynamicsPanel'))
 import {
   calculateSagittalKinematics,
   calculateVerticalGrf,
@@ -607,6 +610,16 @@ export default function BiomechanicsMotionLab() {
             <div>Citations: {GAIT_BIOMECHANICS_SOURCE.citation} (PMID: {GAIT_BIOMECHANICS_SOURCE.pmid}); Hicks JH. J Anat. 1954 (PMID: 13129168).</div>
           </div>
         </div>
+      </div>
+
+      <div className="mt-4">
+        <Fold label="Newtonian Inverse-Dynamics · Elbow, Patellofemoral & L4–L5 Disc">
+          <WhenOpened>
+            <Suspense fallback={<div className="p-3 text-xs text-cyan-200">Loading Inverse-Dynamics Solver…</div>}>
+              <Temporal4DAndInverseDynamicsPanel initialMode="mechanics" />
+            </Suspense>
+          </WhenOpened>
+        </Fold>
       </div>
 
       {/* Feet-to-Face Myofascial Kinetic Chain Twin (lazy-loaded simulated biomechanics) */}

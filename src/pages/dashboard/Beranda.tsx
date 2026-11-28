@@ -130,6 +130,16 @@ export default function Beranda() {
     })
   }
 
+  const bleConnectRef = useRef(handleAutoConnectWearable)
+  bleConnectRef.current = handleAutoConnectWearable
+  useEffect(() => {
+    const onQuickBle = () => {
+      void bleConnectRef.current()
+    }
+    window.addEventListener('panacea:quick-ble-connect', onQuickBle)
+    return () => window.removeEventListener('panacea:quick-ble-connect', onQuickBle)
+  }, [])
+
   const localDailyState = useMemo<HomeDailyState>(() => ({
     foods: state.foods ?? [],
     sleepLogs: state.sleepLogs ?? [],

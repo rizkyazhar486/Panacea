@@ -1,4 +1,5 @@
 import { lazy, Suspense, useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import type { BodySystemId } from '../../lib/bodySystemSourceWave'
 import type { SimulationDomain } from './UnifiedHumanSimulationProjector'
 import { BodyExposurePatientOverlay } from '../../components/BodyExposurePatientOverlay'
@@ -39,14 +40,77 @@ const MODES: Mode[] = [
 const LIQUID_ACTIONS_ROOT_CLASS = 'pmd-liquid-actions-v45'
 const BODY_EXPOSURE_ROOT_CLASS = 'pmd-body-exposure-active'
 
+const DOMAIN_ALIASES: Record<string, SimulationDomain> = {
+  'personal-avatar': 'personal-avatar',
+  anatomy: 'anatomy',
+  localization: 'localization',
+  physiology: 'physiology',
+  pathophysiology: 'pathophysiology',
+  imaging: 'imaging',
+  endoscopy: 'endoscopy',
+  biomechanics: 'biomechanics',
+  cell: 'cell',
+  genome: 'genome',
+  surgery: 'surgery',
+  'robotics-anesthesia': 'robotics-anesthesia',
+  robotics: 'robotics-anesthesia',
+  anesthesia: 'robotics-anesthesia',
+  'quantum-element': 'quantum-element',
+  quantum: 'quantum-element',
+  elements: 'quantum-element',
+  pharmacology: 'pharmacology',
+  drugs: 'pharmacology',
+}
+
+function resolveExposureMode(value: string | null): ExposureMode | null {
+  if (!value) return null
+  return MODES.some((mode) => mode.key === value) ? (value as ExposureMode) : null
+}
+
+function modeForDomain(domain: SimulationDomain): ExposureMode {
+  return domain === 'personal-avatar' ? 'identity'
+    : domain === 'localization' ? 'localization'
+    : domain === 'physiology' || domain === 'biomechanics' ? 'physiology'
+    : domain === 'imaging' ? 'imaging'
+    : domain === 'endoscopy' ? 'endoscopy'
+    : domain === 'surgery' || domain === 'robotics-anesthesia' ? 'surgery'
+    : domain === 'cell' || domain === 'genome' || domain === 'quantum-element' ? 'molecular'
+    : domain === 'pathophysiology' || domain === 'pharmacology' ? 'clinical'
+    : 'atlas'
+}
+
+function resolveRequestedDomain(params: URLSearchParams): SimulationDomain | null {
+  const direct = params.get('domain') ?? params.get('mode')
+  if (direct && DOMAIN_ALIASES[direct]) return DOMAIN_ALIASES[direct]
+  const mode = resolveExposureMode(params.get('mode'))
+  if (!mode) return null
+  return MODES.find((m) => m.key === mode)?.projectorDomain ?? null
+}
+
 export function BodyExposureOS() {
+  const [searchParams] = useSearchParams()
   const rootRef = useRef<HTMLElement | null>(null)
   const systemsRef = useRef<HTMLDivElement | null>(null)
   const modeRailRef = useRef<HTMLElement | null>(null)
-  const [activeMode, setActiveMode] = useState<ExposureMode>('identity')
+  const [requestedDomain, setRequestedDomain] = useState<SimulationDomain>(
+    () => resolveRequestedDomain(searchParams) ?? 'personal-avatar',
+  )
+  const [activeMode, setActiveMode] = useState<ExposureMode>(() => {
+    const requestedDom = resolveRequestedDomain(searchParams)
+    if (requestedDom && !resolveExposureMode(searchParams.get('mode'))) return modeForDomain(requestedDom)
+    return resolveExposureMode(searchParams.get('mode')) ?? 'identity'
+  })
   const [immersive, setImmersive] = useState(false)
   const [selectedBodySystemId, setSelectedBodySystemId] = useState<BodySystemId>('cardiovascular')
   const [strukturDiminta, setStrukturDiminta] = useState<{ name: string; nonce: number } | null>(null)
+
+  useEffect(() => {
+    const requestedDom = resolveRequestedDomain(searchParams)
+    if (requestedDom) {
+      setRequestedDomain(requestedDom)
+      setActiveMode(resolveExposureMode(searchParams.get('mode')) ?? modeForDomain(requestedDom))
+    }
+  }, [searchParams])
 
   useEffect(() => {
     const syncFullscreen = () => setImmersive(document.fullscreenElement === rootRef.current)
@@ -99,25 +163,18 @@ export function BodyExposureOS() {
 
   function openPanel(mode: Mode) {
     setActiveMode(mode.key)
+    setRequestedDomain(mode.projectorDomain)
     systemsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
 
   function syncModeFromProjector(domain: SimulationDomain) {
-    const next: ExposureMode =
-      domain === 'personal-avatar' ? 'identity'
-      : domain === 'localization' ? 'localization'
-      : domain === 'physiology' || domain === 'biomechanics' ? 'physiology'
-      : domain === 'imaging' ? 'imaging'
-      : domain === 'endoscopy' ? 'endoscopy'
-      : domain === 'surgery' ? 'surgery'
-      : domain === 'cell' || domain === 'genome' ? 'molecular'
-      : domain === 'pathophysiology' || domain === 'pharmacology' ? 'clinical'
-      : 'atlas'
-    setActiveMode(next)
+    setRequestedDomain(domain)
+    setActiveMode(modeForDomain(domain))
   }
 
   function openSystemAtlas() {
     setActiveMode('atlas')
+    setRequestedDomain('anatomy')
     systemsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
 
@@ -130,7 +187,8 @@ export function BodyExposureOS() {
     }
   }
 
-  const current = MODES.find((mode) => mode.key === activeMode) ?? MODES[0]
+  const currentMode = MODES.find((mode) => mode.key === activeMode) ?? MODES[0]
+  const current = { ...currentMode, projectorDomain: requestedDomain }
 
   return (
     <section
@@ -212,7 +270,7 @@ export function BodyExposureOS() {
       </div>
 
       <div ref={systemsRef} className="relative z-[2] mt-3 scroll-mt-4">
-        <BodyExposurePatientOverlay selectedSystemId={selectedBodySystemId} onClinicalView={() => setActiveMode('clinical')} onShowStructure={(s) => { setSelectedBodySystemId(s.systemId); setStrukturDiminta((k) => ({ name: s.name, nonce: (k?.nonce ?? 0) + 1 })) }} />
+        <BodyExposurePatientOverlay selectedSystemId={selectedBodySystemId} onClinicalView={() => { setActiveMode('clinical'); setRequestedDomain('pathophysiology') }} onShowStructure={(s) => { setSelectedBodySystemId(s.systemId); setStrukturDiminta((k) => ({ name: s.name, nonce: (k?.nonce ?? 0) + 1 })) }} />
         <SinyalPribadiDiTubuh selectedSystemId={selectedBodySystemId} onSelectSystem={setSelectedBodySystemId} />
         <Suspense fallback={<div className="grid min-h-56 place-items-center rounded-[28px] border border-white/[.08] bg-black/35 text-xs font-bold text-white/35">Loading unified human simulation projector…</div>}>
           <UnifiedHumanSimulationProjector

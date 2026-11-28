@@ -1,6 +1,8 @@
 import { lazy, Suspense, useEffect, useMemo, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { Fold } from '../../shared/ui/Fold'
+import { WhenOpened } from '../../shared/ui/WhenOpened'
+import type { AnatomicalSystemId } from '../../types/realityView'
 import { resolveBodySystemSourceWave, type BodySystemId } from '../../lib/bodySystemSourceWave'
 import { getBodySemanticZoomStop, isMicroscopicBodyScale, type BodySemanticScale } from '../../lib/bodySemanticZoom'
 import { penjelasanTertulis } from '../../lib/explainFallback'
@@ -24,6 +26,27 @@ const LokalisasiLesiPanel = lazy(() => import('./LokalisasiLesiPanel').then((mod
 const PencitraanVolumetrikPanel = lazy(() => import('./PencitraanVolumetrikPanel').then((module) => ({ default: module.PencitraanVolumetrikPanel })))
 const VirtualEndoscopyWorkbench = lazy(() => import('./VirtualEndoscopyWorkbench'))
 const PersonalAvatarCameraCapture = lazy(() => import('./PersonalAvatarCameraCapture'))
+const QuantumElementStage = lazy(() => import('./QuantumElementStage'))
+const SurgicalRoboticsAnesthesiaLab = lazy(() => import('./SurgicalRoboticsAnesthesiaLab'))
+const EtCausalisExplorerPanel = lazy(() => import('../../components/reality-view/EtCausalisExplorerPanel'))
+import { BodyScaleLadder, type BodyScaleRung } from './BodyScaleLadder'
+
+function mapBodySystemToAnatomicalSystem(systemId: BodySystemId | null): AnatomicalSystemId | null {
+  switch (systemId) {
+    case 'cardiovascular': return 'cardiovascular'
+    case 'respiratory': return 'respiratory'
+    case 'nervous':
+    case 'sensory-ent': return 'nervous'
+    case 'musculoskeletal': return 'musculoskeletal'
+    case 'digestive': return 'gastrointestinal'
+    case 'urinary': return 'renal'
+    case 'endocrine': return 'endocrine'
+    case 'lymphatic-immune': return 'immune_lymphatic'
+    case 'integumentary-surface': return 'integumentary'
+    case 'reproductive': return 'reproductive'
+    default: return null
+  }
+}
 
 export type SimulationDomain =
   | 'anatomy'
@@ -37,6 +60,8 @@ export type SimulationDomain =
   | 'cell'
   | 'genome'
   | 'surgery'
+  | 'robotics-anesthesia'
+  | 'quantum-element'
   | 'pharmacology'
 
 interface UnifiedHumanSimulationProjectorProps {
@@ -122,6 +147,18 @@ const DOMAINS: DomainDefinition[] = [
     label: 'Surgery',
     scale: 'surface → operative depth',
     description: 'Explore educational surgical layers and spatial checkpoints without turning reference anatomy into navigation.',
+  },
+  {
+    id: 'robotics-anesthesia',
+    label: 'Robotics & Anesthesia',
+    scale: '6-DOF RCM · telesurgery · MAC/local',
+    description: 'Isolated educational surgical robotics, distant surgery latency/E-Stop, and general/local anesthesia physiology.',
+  },
+  {
+    id: 'quantum-element',
+    label: 'Element & Quantum',
+    scale: '18 bio-elements · |ψ(r,θ,φ)|²',
+    description: 'Biological periodic table and textbook hydrogenic quantum probability density clouds.',
   },
   {
     id: 'pharmacology',
@@ -243,7 +280,22 @@ export default function UnifiedHumanSimulationProjector({
           </div>
         )
       case 'pathophysiology':
-        return <PathophysiologyNetworkPanel selectedAtlasSystemId={selectedSystemId} selectedSourceStructureName={selectedStructureName} />
+        return (
+          <div className="space-y-3">
+            <PathophysiologyNetworkPanel selectedAtlasSystemId={selectedSystemId} selectedSourceStructureName={selectedStructureName} />
+            <Fold label="Et Causalis · 25-Scenario Systemic Multiorgan Engine">
+              <WhenOpened>
+                <Suspense fallback={<div className="rounded-2xl border border-white/10 bg-slate-950/80 p-3 text-xs text-cyan-200">Loading Et Causalis 25-Scenario Systemic Engine…</div>}>
+                  <EtCausalisExplorerPanel
+                    selectedMeshId={selectedStructureName}
+                    selectedSystem={mapBodySystemToAnatomicalSystem(selectedSystemId)}
+                    onSelectMesh={(meshId) => setSelectedStructureName(meshId)}
+                  />
+                </Suspense>
+              </WhenOpened>
+            </Fold>
+          </div>
+        )
       case 'imaging':
         return <PencitraanVolumetrikPanel selectedSourceStructureName={selectedStructureName} />
       case 'endoscopy':
@@ -256,6 +308,10 @@ export default function UnifiedHumanSimulationProjector({
         return <AlphaGenomeAtlas />
       case 'surgery':
         return <SurgicalLab selectedSourceStructureName={selectedStructureName} />
+      case 'robotics-anesthesia':
+        return <SurgicalRoboticsAnesthesiaLab />
+      case 'quantum-element':
+        return <QuantumElementStage />
       case 'pharmacology':
         return <PharmacologyMechanismPanel selectedAtlasSystemId={selectedSystemId} selectedSourceStructureName={selectedStructureName} />
       case 'anatomy':
@@ -340,6 +396,20 @@ export default function UnifiedHumanSimulationProjector({
           </div>
         )}
       </header>
+
+      {!compact && (
+        <BodyScaleLadder
+          activeDomain={domain}
+          activeScale={semanticZoom.scale}
+          onSelectRung={(rung: BodyScaleRung) => {
+            if (rung.scale) {
+              const stop = getBodySemanticZoomStop(rung.scale)
+              setSemanticZoom({ scale: rung.scale, relativeZoom: stop.minRelativeZoom })
+            }
+            selectDomain(rung.domain)
+          }}
+        />
+      )}
 
       {!hideReferenceAtlasCanvas && (
         <UniversalAtlasDepthRail

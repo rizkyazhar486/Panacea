@@ -17,6 +17,8 @@ import { readUnifiedLocalVitals } from '../../domains/identity/localRecovery'
 
 const ClinicalInteropSection = lazy(() => import('./ClinicalInteropSection'))
 const ClinicalToClaimShieldWorkbench = lazy(() => import('../../components/clinical/ClinicalToClaimShieldWorkbench'))
+const ClinicalMedSciStudyStudio = lazy(() => import('../../components/clinical/ClinicalMedSciStudyStudio'))
+const ClinicalVisualAtlasDeck = lazy(() => import('../../components/clinical/ClinicalVisualAtlasDeck'))
 
 export const GROUPS = [
   {
@@ -47,6 +49,7 @@ const PRIMARY_ACTIONS = [
   { to: '/emergency', label: 'Emergency' },
   { to: '/care-episode', label: 'Care' },
   { to: '/body-explorer', label: 'Body Explorer' },
+  { to: '/med-study', label: 'MedSciHub' },
 ] as const
 
 const CLINICAL_DEPTH_ROUTES = {
@@ -180,7 +183,7 @@ export function ClinicalHub() {
             </Link>
           </div>
 
-          <nav className="mt-4 grid grid-cols-2 gap-x-5 sm:grid-cols-5" aria-label="Primary clinical actions">
+          <nav className="mt-4 grid grid-cols-2 gap-x-5 sm:grid-cols-6" aria-label="Primary clinical actions">
             {PRIMARY_ACTIONS.map((item) => (
               <Link
                 key={item.to}
@@ -331,6 +334,14 @@ export function ClinicalHub() {
         <MentalHealthClinicalResearchLab />
         </Fold>
 
+        <Fold label="MedSciHub & StudyClub" subtitle="732 SKDI · INN Drugs · StudyClub Quiz · BODY Bridge">
+        <WhenOpened>
+          <Suspense fallback={<div className="py-4 text-xs text-white/60">Loading MedSciHub &amp; StudyClub…</div>}>
+            <ClinicalMedSciStudyStudio />
+          </Suspense>
+        </WhenOpened>
+        </Fold>
+
         <Fold label="Patient">
         <ClinicalPatientContext />
         </Fold>
@@ -359,6 +370,14 @@ export function ClinicalHub() {
 
         <PersonalBodyUnifiedSurface compact defaultFocus="clinical" shareable={false} cameraCapture={false} />
 
+        <Fold label="Visual Atlas">
+          <WhenOpened>
+            <Suspense fallback={<div className="p-3 text-xs text-white/60">Loading Visual Clinical Atlas…</div>}>
+              <ClinicalVisualAtlasDeck />
+            </Suspense>
+          </WhenOpened>
+        </Fold>
+
         <Fold label="Frontier & Surgical OS">
           <div className="space-y-3 border-t border-white/10 pt-3">
             <p className="text-[11px] leading-snug text-white/65">
@@ -372,27 +391,27 @@ export function ClinicalHub() {
                 <span>AI + Human Doctor Step-In</span>
                 <span className="text-[10px] font-normal text-emerald-300">Review &amp; sign draft notes / labs →</span>
               </Link>
-              <a
-                href="/panaceamed-frontier-civilization-superos.html"
+              <Link
+                to="/emergency"
                 className="flex min-h-[48px] flex-col justify-center rounded-xl border border-cyan-400/30 bg-white/[0.03] px-3 py-2 text-xs font-bold text-white transition hover:border-cyan-400"
               >
-                <span>Zero-Queue Triage &amp; 2G/Starlink</span>
-                <span className="text-[10px] font-normal text-cyan-300">Pre-arrival routing &amp; binary mesh ↗</span>
-              </a>
-              <a
-                href="/panaceamed-robotaxi-surgical-hospital-os.html"
+                <span>Zero-Queue Triage &amp; Emergency OS</span>
+                <span className="text-[10px] font-normal text-cyan-300">Live triage routing &amp; escalation →</span>
+              </Link>
+              <Link
+                to="/body-explorer"
                 className="flex min-h-[48px] flex-col justify-center rounded-xl border border-white/15 bg-white/[0.03] px-3 py-2 text-xs font-bold text-white transition hover:border-emerald-400"
               >
-                <span>Surgical Nav, 3D CT &amp; Blocks</span>
-                <span className="text-[10px] font-normal text-white/65">Educational simulation studio ↗</span>
-              </a>
-              <a
-                href="/cellular-spacetime-debugger-os.html"
+                <span>3D/4D Anatomy &amp; Surgical Orientation</span>
+                <span className="text-[10px] font-normal text-white/65">Interactive anatomical simulation studio →</span>
+              </Link>
+              <Link
+                to="/frontier-health"
                 className="flex min-h-[48px] flex-col justify-center rounded-xl border border-white/15 bg-white/[0.03] px-3 py-2 text-xs font-bold text-white transition hover:border-cyan-400"
               >
-                <span>4D Cellular Bio-GDB &amp; Anatomy</span>
-                <span className="text-[10px] font-normal text-white/65">Multiscale physiology inspector ↗</span>
-              </a>
+                <span>Frontier Multiscale &amp; Bio-Discovery</span>
+                <span className="text-[10px] font-normal text-white/65">Research &amp; multiscale physiology hub →</span>
+              </Link>
             </div>
           </div>
         </Fold>
