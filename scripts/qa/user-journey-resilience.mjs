@@ -68,7 +68,7 @@ try {
   // Peran -> sesi, rute yang diuji, dan penanda halaman yang HARUS tetap terlihat (bukan sekadar tidak kosong).
   const PERAN = [
     { J: 'pasien', akun: { email: 'pasien-res@example.com', name: 'Pasien Res', role: 'pasien' }, token: pasien.token, shell: { role: 'button', name: 'Notifications' },
-      rute: ['#/', '#/chatbot', '#/settings', '#/profile', '#/fitness-hub', '#/all-features'], minChar: 100 },
+      rute: ['#/', '#/chatbot', '#/settings', '#/profile', '#/fitness-hub', '#/all-features', '#/med-study', '#/health-simulator', '#/notifikasi'], minChar: 100 },
     { J: 'dokter', akun: { email: 'dokter-res@example.com', name: 'Dokter Res', role: 'dokter' }, token: dokter.token, shell: { role: 'button', name: 'Notifications' },
       rute: ['#/doctor-review', '#/doctor-review/lab-results'], minChar: 120 },
     { J: 'pemilik', akun: { email: OWNER, name: 'Pemilik Res', role: 'owner', isOwner: true }, token: owner.token, shell: { role: 'button', name: 'Notifications' },
@@ -93,7 +93,7 @@ try {
       const J = `ketahanan-${peran.J}`
       const buka = async (rute) => { await page.goto(APP + rute, { waitUntil: 'domcontentloaded', timeout: 120000 }); await cangkang(page) }
       // Halaman dinilai 'terisi' bila cukup teks ATAU, untuk halaman yang memang ringkas, penanda khasnya terlihat (bukan sekadar bukan-kosong).
-      const PENANDA = { '#/chatbot': /Anamnesis Assistant|educational & supportive/i, '#/settings': /Reset Saved App State/ }
+      const PENANDA = { '#/chatbot': /Anamnesis Assistant|educational & supportive/i, '#/settings': /Reset Saved App State/, '#/notifikasi': /Notification Center/ }
       const sehat = (rute, t) => (!PENANDA[rute] || PENANDA[rute].test(t)) && (rute === '#/chatbot' || t.trim().length > peran.minChar)
       const terisi = (rute, ms) => page.waitForFunction(([m, pen]) => { const t = document.body.innerText; return (!pen || new RegExp(pen.source, pen.flags).test(t)) && (m <= 0 || t.trim().length > m) }, [rute === '#/chatbot' ? 0 : peran.minChar, PENANDA[rute] ? { source: PENANDA[rute].source, flags: PENANDA[rute].flags } : null], { timeout: ms })
       // Kumpulkan SEMUA halaman sebelum menegaskan: satu run memberi data kalibrasi lengkap (ukuran teks per halaman) dan satu pesan gagal merinci semuanya.
