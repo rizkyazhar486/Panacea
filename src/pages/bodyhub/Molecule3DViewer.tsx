@@ -203,9 +203,10 @@ export function Molecule3DViewer({
     controls.autoRotateSpeed = 0.75
 
     const size = () => {
-      const w = Math.max(1, host.clientWidth)
-      const h = Math.max(1, host.clientHeight)
-      renderer.setPixelRatio(body3dPixelRatio())
+      const w = host.clientWidth
+      const h = host.clientHeight
+      if (w < 2 || h < 2) return
+      renderer.setPixelRatio(body3dPixelRatio(w, h, window.devicePixelRatio || 1, window.matchMedia('(max-width: 640px)').matches))
       renderer.setSize(w, h, false)
       camera.aspect = w / h
       camera.updateProjectionMatrix()
@@ -218,7 +219,7 @@ export function Molecule3DViewer({
     let builtGroup: THREE.Group | null = null
     const onContextLost = (e: Event) => {
       e.preventDefault()
-      loop?.hentikan()
+      loop?.kontekHilang()
       if (!disposed) setState('failed')
     }
     renderer.domElement.addEventListener('webglcontextlost', onContextLost, false)
@@ -242,15 +243,9 @@ export function Molecule3DViewer({
         controls.maxDistance = dist * 2.5
         controls.update()
         setState('ready')
-        loop = mulaiLoopTerjaga({
-          elemen: host,
-          gambar: () => {
-            controls.update()
-            renderer.render(scene, camera)
-          },
-          onStall: () => {
-            if (!disposed) setState('failed')
-          },
+        loop = mulaiLoopTerjaga(host, () => {
+          controls.update()
+          renderer.render(scene, camera)
         })
       })
       .catch(() => {
